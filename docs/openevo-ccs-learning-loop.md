@@ -4,7 +4,7 @@
 
 ## The relationship
 
-OpenEvo's [Computational Curriculum Studies (CCS) Lab](http://openevo.eva.mpg.de) runs a mature, actively-used ecosystem of repositories (`conceptbase`, `openevo-core`, `bio-core-k12`, `oe-interdisciplinary-k12`, `lab_manager`, and others) for developing evolution/behavior/sustainability curriculum content — with its own upper ontology, identifier scheme, cross-repo RFC process, and governance conventions refined over real use.
+OpenEvo's [Computational Curriculum Studies (CCS) Lab](http://openevo.eva.mpg.de) runs a mature, actively-used ecosystem of repositories (`conceptbase`, `openevo-core`, `bio-core-k12`, `interdisciplinary-k12`, `lab_manager`, and others) for developing evolution/behavior/sustainability curriculum content — with its own upper ontology, identifier scheme, cross-repo RFC process, and governance conventions refined over real use.
 
 OpenLPM is, in effect, a generalized, freely available version of the same underlying idea: infrastructure for a research group to collaboratively build a rigorous Learning Progression Model. Where the OpenEvo CCS Lab ecosystem is deep and specific to one field, OpenLPM is meant to be shallow and general enough for *any* expert group to pick up. Both are OpenEvo projects; neither one owns the other.
 
