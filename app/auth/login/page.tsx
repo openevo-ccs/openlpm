@@ -1,30 +1,40 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Github, Mail, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  )
+}
 
-  const handleGitHubLogin = async () => {
-    setIsLoading(true)
-    console.log('GitHub login clicked')
-    setIsLoading(false)
-  }
+function LoginForm() {
+  const [isLoading, setIsLoading] = useState<'github' | 'google' | null>(null)
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const next = searchParams.get('next') ?? '/dashboard'
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    console.log('Google login clicked')
-    setIsLoading(false)
-  }
-
-  const handleORCIDLogin = async () => {
-    setIsLoading(true)
-    console.log('ORCID login clicked')
-    setIsLoading(false)
+  const signInWith = async (provider: 'github' | 'google') => {
+    setIsLoading(provider)
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      },
+    })
+    if (error) {
+      setIsLoading(null)
+      console.error(`${provider} sign-in failed:`, error.message)
+    }
   }
 
   return (
@@ -42,33 +52,30 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <div className="rounded-md bg-red-50 p-3 text-sm text-red-700">
+              Sign-in failed. Please try again.
+            </div>
+          )}
+
           <div className="space-y-3">
             <Button
-              onClick={handleGitHubLogin}
-              disabled={isLoading}
+              onClick={() => signInWith('github')}
+              disabled={isLoading !== null}
               className="w-full"
               variant="outline"
             >
               <Github className="mr-2 h-4 w-4" />
-              Continue with GitHub
+              {isLoading === 'github' ? 'Redirecting...' : 'Continue with GitHub'}
             </Button>
             <Button
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
+              onClick={() => signInWith('google')}
+              disabled={isLoading !== null}
               className="w-full"
               variant="outline"
             >
               <Mail className="mr-2 h-4 w-4" />
-              Continue with Google
-            </Button>
-            <Button
-              onClick={handleORCIDLogin}
-              disabled={isLoading}
-              className="w-full"
-              variant="outline"
-            >
-              <GraduationCap className="mr-2 h-4 w-4" />
-              Continue with ORCID
+              {isLoading === 'google' ? 'Redirecting...' : 'Continue with Google'}
             </Button>
           </div>
 

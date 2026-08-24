@@ -91,12 +91,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 ### 3. Run Database Migrations
 
 1. Go to the **SQL Editor** in your Supabase dashboard
-2. Click "New Query"
-3. Copy the contents of `supabase/migrations/001_initial_schema.sql`
-4. Paste it into the SQL Editor
-5. Click "Run" (or press Ctrl+Enter)
-
-This will create all necessary tables, indexes, and RLS policies.
+2. Run each migration file, in order, as its own query:
+   - `supabase/migrations/001_initial_schema.sql` — tables, indexes, base RLS policies
+   - `supabase/migrations/002_require_auth_for_reads.sql` — tightens RLS so reads require a signed-in session, not just writes (this is what makes the app actually private at the data layer, not just in the UI)
+   - `supabase/migrations/003_sync_auth_users.sql` — auto-creates a `public.users` row on first OAuth sign-in
 
 ### 4. Configure OAuth Providers
 
@@ -125,27 +123,24 @@ This will create all necessary tables, indexes, and RLS policies.
 4. Copy the **Client ID** and **Client Secret**
 5. Paste them into the Supabase Google provider settings
 
-#### ORCID OAuth
+> **Note on ORCID:** ORCID is not one of Supabase's built-in OAuth providers (the supported list is GitHub, Google, GitLab, Azure, Discord, Facebook, LinkedIn, Slack, and a handful of others — no ORCID). The login page only wires up GitHub and Google for now. If ORCID sign-in matters for your working group, the realistic paths are (a) a custom OIDC provider on Supabase's paid Team/Enterprise plan, if ORCID's OIDC surface qualifies, or (b) building a small separate OAuth bridge service — both are follow-up work, not something to bolt on silently.
 
-1. Go to **Authentication** > **Providers** > **ORCID**
-2. Click "Enable ORCID"
-3. You'll need an ORCID developer account:
-   - Go to [orcid.org](https://orcid.org)
-   - Register as a developer
-   - Create a new application
-   - Set redirect URI: `https://your-project-id.supabase.co/auth/v1/callback`
-4. Copy the **Client ID** and **Client Secret**
-5. Paste them into the Supabase ORCID provider settings
+#### Redirect URLs (required)
 
-### 5. Create Your First User
+1. Go to **Authentication** > **URL Configuration**
+2. Add these to **Redirect URLs**:
+   - `http://localhost:3000/auth/callback` (development)
+   - `https://your-production-domain/auth/callback` (production — add this once you know your Vercel/Netlify URL)
+3. Set **Site URL** to your production domain
 
-1. Go to **Authentication** > **Users**
-2. Click "Add user" > "Create new user"
-3. Enter email and password
-4. Set role to `admin` (you can change this in the database)
-5. Click "Create user"
+Without this, Supabase will reject the redirect back to the app after a successful provider login.
 
-Alternatively, you can sign up through the app once it's running.
+### 5. Set Your Own Role to Admin
+
+New OAuth sign-ins default to the `contributor` role (via the trigger in migration 003). After you sign in once through the app:
+
+1. Go to **Table Editor** > `users` in the Supabase dashboard
+2. Find your row and change `role` to `admin`
 
 ## Running the Application
 
@@ -164,13 +159,11 @@ npm run build
 npm run start
 ```
 
-### Static Export (for GitHub Pages)
-
-```bash
-npm run export
-```
-
-This creates an `out` directory with static files that can be deployed to GitHub Pages.
+> **Note:** static export (`next export` / `output: 'export'`) is no longer used. OAuth route
+> protection runs in Next.js middleware and server route handlers (`middleware.ts`,
+> `app/auth/callback/route.ts`, `app/auth/signout/route.ts`), which require a Node-capable
+> host — see Deployment below. This also means the site can no longer be pushed to plain
+> GitHub Pages, which only serves static files.
 
 ## Development Workflow
 
@@ -280,19 +273,27 @@ Once you have the platform running:
 
 ## Deployment
 
-### GitHub Pages
+The app needs a Node-capable host to run its middleware and auth route handlers — plain
+static hosting (GitHub Pages, S3, etc.) won't work anymore. Vercel and Netlify both have
+free tiers that support this and both can import a **private** GitHub repository directly,
+so there's no need to make the repo public to deploy it.
 
-1. Build the project: `npm run export`
-2. Push the `out` directory to GitHub
-3. Enable GitHub Pages in repository settings
-4. Configure GitHub Pages to use the `out` directory
-5. Add environment variables to GitHub repository settings
+### Vercel (recommended, free Hobby tier)
 
-### Vercel
+1. Go to [vercel.com](https://vercel.com), sign in with GitHub, and grant it access to the
+   (private) `openlpm` repo specifically — no need to make it public or org-wide
+2. Import the repo as a new project (Vercel auto-detects Next.js)
+3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environment variables
+4. Deploy — Vercel gives you a `*.vercel.app` URL
+5. Add that URL's `/auth/callback` path to Supabase's Redirect URLs (see step 4 above), and
+   set it as the Site URL
+6. Re-deploy (or just push again) once the redirect URL is registered
 
-1. Connect your GitHub repository to Vercel
-2. Add environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+### Netlify (alternative, also free)
+
+Same flow via [netlify.com](https://netlify.com) with its official Next.js runtime — connect
+the private repo, set the same two environment variables, deploy, then register the Netlify
+URL's `/auth/callback` with Supabase the same way.
 
 ## Security Considerations
 

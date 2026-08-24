@@ -36,9 +36,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ## Step 4: Set Up Database
 
 1. Go to SQL Editor in Supabase dashboard
-2. Create a new query
-3. Copy the contents of `supabase/migrations/001_initial_schema.sql`
-4. Paste and run it
+2. Run each file in `supabase/migrations/` in order (001, 002, 003) as its own query
 
 ## Step 5: Run the App
 
@@ -50,8 +48,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## What's Next?
 
-- Configure OAuth providers (GitHub, Google, ORCID) in Supabase
-- Create your first user account
+- Configure OAuth providers (GitHub, Google — see SETUP_GUIDE.md for why ORCID isn't included yet) in Supabase, and add your Redirect URLs
+- Sign in once, then promote your own `users` row to `admin` in the Supabase Table Editor
 - Start adding literature references
 - Create schema elements
 - Invite your team members

@@ -1,13 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  images: {
-    unoptimized: true,
-  },
-  env: {
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  },
+  // NOTE: static export ('output: export') was removed — OAuth route
+  // protection requires middleware and server routes, which need a
+  // Node-capable host (Vercel/Netlify free tier), not static hosting.
 }
 
 module.exports = nextConfig
