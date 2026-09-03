@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "openevo": {
+      "command": "python",
+      "args": ["../curriculum-agents/tools/openevo-mcp/server.py"]
+    }
+  }
+}
