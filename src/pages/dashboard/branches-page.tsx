@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
-import { GitBranch as GitBranchIcon, X } from 'lucide-react'
+import { Link, useOutletContext } from 'react-router-dom'
+import { ArrowRight, GitBranch as GitBranchIcon, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
@@ -8,7 +8,7 @@ import type { Database } from '@/lib/supabase/database.types'
 type Branch = Database['public']['Tables']['branches']['Row']
 
 export default function BranchesPage() {
-  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, slug, supabase } = useOutletContext<ProjectOutletContext>()
   const [branches, setBranches] = useState<Branch[]>([])
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
@@ -129,6 +129,11 @@ export default function BranchesPage() {
             <p className="muted"><b style={{ color: 'var(--text-primary)' }}>Fork rationale: </b>{branch.fork_rationale}</p>
           )}
           {branch.status === 'promoted' && <p style={{ color: 'var(--good)' }}>Promoted to a full independent project.</p>}
+
+          <Link to={`/dashboard/${slug}/branches/${branch.slug}`} className="btn" style={{ marginTop: 4 }}>
+            Enter branch
+            <ArrowRight size={14} />
+          </Link>
 
           {canManage && !branch.is_trunk && branch.status === 'active' && (
             <form onSubmit={(e) => promoteBranch(branch, e)} className="row" style={{ paddingTop: 10, borderTop: '1px dashed var(--border)' }}>

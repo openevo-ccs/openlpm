@@ -12,6 +12,9 @@ import LiteraturePage from '@/pages/dashboard/literature-page'
 import SchemaPage from '@/pages/dashboard/schema-page'
 import StandardsPage from '@/pages/dashboard/standards-page'
 import BranchesPage from '@/pages/dashboard/branches-page'
+import BranchLayout from '@/pages/dashboard/branches/branch-layout'
+import BranchOverviewPage from '@/pages/dashboard/branches/branch-overview-page'
+import BranchSchemaPage from '@/pages/dashboard/branches/branch-schema-page'
 import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
@@ -61,6 +64,10 @@ export default function App() {
             <Route path="schema" element={<SchemaPage />} />
             <Route path="standards" element={<StandardsPage />} />
             <Route path="branches" element={<BranchesPage />} />
+            <Route path="branches/:branchSlug" element={<BranchLayout />}>
+              <Route index element={<BranchOverviewPage />} />
+              <Route path="schema" element={<BranchSchemaPage />} />
+            </Route>
             <Route path="discussions" element={<DiscussionsPage />} />
             <Route path="portfolios" element={<PortfoliosPage />} />
             <Route path="portfolios/:portfolioId" element={<PortfolioDetailPage />} />

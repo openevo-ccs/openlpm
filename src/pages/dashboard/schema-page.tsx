@@ -35,7 +35,16 @@ export default function SchemaPage() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
 
   const reload = async () => {
-    const { data } = await supabase.from('lpm_schema_elements').select('*').eq('project_id', project.id).order('created_at', { ascending: true })
+    // Shared/canonical vocabulary only -- a branch can elaborate its own
+    // schema elements (branch_id set), which show on that branch's own
+    // Schema tab instead, alongside this shared layer. Per RFC 0002: "a
+    // branch shares this project's schema, diverging only in content."
+    const { data } = await supabase
+      .from('lpm_schema_elements')
+      .select('*')
+      .eq('project_id', project.id)
+      .is('branch_id', null)
+      .order('created_at', { ascending: true })
     setElements(data ?? [])
   }
 
@@ -129,7 +138,8 @@ export default function SchemaPage() {
     <div>
       <h1>Schema co-design</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Concepts, competencies, and grade bands — imported from ConceptBase or added directly.
+        Concepts, competencies, and grade bands shared across every branch — imported from
+        ConceptBase or added directly. A branch&apos;s own elaborations live on its own Schema tab.
       </p>
 
       {notice && (
