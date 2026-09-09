@@ -1,0 +1,71 @@
+/* Vendored, pinned copy of the OpenEvo CCS Lab's shared design tokens.
+   Source: openevo-core/design-system/tokens.css, commit e5fb8ef (2026-07-28).
+   Canonical home / usage docs: openevo-core/design-system/README.md
+   (hosted copy: https://openevo-ccs.github.io/openevo-core/design-system/tokens.css)
+
+   Per that README's own versioning note: "while only a couple of apps
+   consume this, tracking main is fine. Once more consumers depend on it,
+   pin to a tagged commit instead." OpenLPM is a second real consumer, so
+   this is a pinned, vendored copy rather than a live <link> to main --
+   re-sync deliberately (bump the commit note above) rather than silently
+   drifting. Do not hand-edit the token values below; edit the upstream
+   file and re-sync instead, so this stays a faithful copy.
+
+   Tokens only -- no component/layout rules. See globals.css for OpenLPM's
+   own hand-rolled component classes built on these values. */
+
+:root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --surface-2: #ffffff;
+  --page-plane: #f9f9f7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+  --border-strong: rgba(11, 11, 11, 0.18);
+  --series-a: #2a78d6;
+  --series-b: #008300;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --radius: 8px;
+  --radius-sm: 5px;
+  --font: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --surface-2: #212120;
+    --page-plane: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --series-a: #3987e5;
+    --series-b: #008300;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --surface-2: #212120;
+  --page-plane: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --series-a: #3987e5;
+  --series-b: #008300;
+}

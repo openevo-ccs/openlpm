@@ -29,8 +29,8 @@ cp env.example .env.local
 Edit `.env.local` and add your Supabase credentials:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ## Step 4: Set Up Database
@@ -44,7 +44,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## What's Next?
 
@@ -67,7 +67,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - Verify your Supabase project is active
 
 **"Build fails"**
-- Run `rm -rf .next node_modules && npm install`
+- Run `rm -rf dist node_modules && npm install`
 - Try `npm run dev` again
 
 **"OAuth doesn't work"**

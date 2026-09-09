@@ -4,7 +4,7 @@
 
 ## What this repo owns
 
-- The OpenLPM application itself (Next.js app, Supabase schema, API integrations).
+- The OpenLPM application itself (Vite/React app, Supabase schema, API integrations).
 - The [AI Ethics Framework](ethics/ai-ethics-framework.md) governing how generative AI may be used inside an OpenLPM-hosted project.
 - The data model for literature references, schema elements, LPM data objects, peer review, and discussion threads.
 

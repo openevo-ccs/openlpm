@@ -9,9 +9,8 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# vite
+/dist/
 
 # production
 /build
@@ -29,11 +28,14 @@ yarn-error.log*
 .env*.local
 .env
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
 # Claude Code project settings — never commit (may hold local tokens)
 .claude/
+
+# Supabase CLI local cache
+supabase/.temp/
+
+# Supabase CLI credentials -- never commit (personal access token, DB password)
+.supabase-secrets/

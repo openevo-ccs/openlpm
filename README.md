@@ -20,7 +20,7 @@ OpenLPM is a single, free tool built for that workflow specifically:
 - **Evidence linking** — connect specific literature to specific LPM elements, so every claim in your progression traces back to its source
 - **Discussion forums** — threaded, citable conversation attached to the object it's actually about
 
-It's free to run (Next.js + Supabase's free tier), open source, and designed so a research group with no dedicated engineering support can stand up their own instance.
+It's free to run (a static Vite/React frontend + Supabase's free tier — deployable straight to GitHub Pages, no server to operate), open source, and designed so a research group with no dedicated engineering support can stand up their own instance.
 
 ## Built-in AI ethics, not an afterthought
 
