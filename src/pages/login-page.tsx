@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Chrome, Github, Mail, GraduationCap } from 'lucide-react'
+import { Github, Mail, GraduationCap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState<'github' | 'google' | null>(null)
+  const [isLoading, setIsLoading] = useState<'github' | null>(null)
   const [email, setEmail] = useState('')
   const [emailBusy, setEmailBusy] = useState(false)
   const [emailMessage, setEmailMessage] = useState<string | null>(null)
@@ -14,7 +14,7 @@ export default function LoginPage() {
   // into a friendlier ?error=auth_callback_failed anymore, so read it as-is.
   const error = searchParams.get('error') || searchParams.get('error_description')
 
-  const signInWith = async (provider: 'github' | 'google') => {
+  const signInWith = async (provider: 'github') => {
     setIsLoading(provider)
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithOAuth({
@@ -29,8 +29,10 @@ export default function LoginPage() {
 
   // Magic-link email sign-in, the same pattern eva-graph/apps/kgdj uses --
   // no password, no OAuth app to misconfigure, just an emailed link. Kept as
-  // a second option alongside GitHub/Google rather than replacing them, so
-  // people can use whichever already works for them.
+  // a second option alongside GitHub rather than replacing it, so people can
+  // use whichever already works for them. Google was dropped 2026-09-09
+  // (never had real credentials configured in Supabase; not worth the setup
+  // for two sign-in paths already covering it).
   const signInWithEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setEmailBusy(true)
@@ -61,10 +63,6 @@ export default function LoginPage() {
           <button className="btn" disabled={isLoading !== null} onClick={() => signInWith('github')}>
             <Github size={16} />
             {isLoading === 'github' ? 'Redirecting…' : 'Continue with GitHub'}
-          </button>
-          <button className="btn" disabled={isLoading !== null} onClick={() => signInWith('google')}>
-            <Chrome size={16} />
-            {isLoading === 'google' ? 'Redirecting…' : 'Continue with Google'}
           </button>
         </div>
 
