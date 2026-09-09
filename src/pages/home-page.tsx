@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, GitBranch, MessageSquare, Search } from 'lucide-react'
 import { useSession } from '@/state/session'
+import { OpenLpmLogo } from '@/components/openlpm-logo'
+import { OpenEvoAttribution } from '@/components/openevo-mark'
 
 export default function HomePage() {
   const { session } = useSession()
@@ -9,7 +11,7 @@ export default function HomePage() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <GitBranch size={22} />
+          <OpenLpmLogo size={22} />
           OpenLPM
         </div>
         <nav className="row" style={{ marginLeft: 'auto' }}>
@@ -62,7 +64,8 @@ export default function HomePage() {
       </main>
 
       <footer className="page page-narrow muted" style={{ textAlign: 'center', paddingTop: 0 }}>
-        © 2026 OpenLPM · Open source, self-hostable, free
+        <p style={{ marginBottom: 10 }}>© 2026 OpenLPM · Open source, self-hostable, free</p>
+        <OpenEvoAttribution />
       </footer>
     </div>
   )

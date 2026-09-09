@@ -128,9 +128,9 @@ export function PortfolioExplorer({
             width: 32, height: 32,
           },
         },
-        { selector: 'node[kind = "canonical"]', style: { 'background-color': token('--series-a', '#2a78d6'), shape: 'ellipse' } },
+        { selector: 'node[kind = "canonical"]', style: { 'background-color': token('--series-a', '#006c66'), shape: 'ellipse' } },
         { selector: 'node[kind = "private"]', style: { 'background-color': token('--text-muted', '#898781'), shape: 'round-rectangle' } },
-        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--series-a', '#2a78d6') } },
+        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--series-a', '#006c66') } },
         {
           selector: 'edge',
           style: {
@@ -139,7 +139,7 @@ export function PortfolioExplorer({
             color: token('--text-secondary', '#52514e'),
           },
         },
-        { selector: 'edge:selected', style: { 'line-color': token('--series-a', '#2a78d6'), width: 2.5 } },
+        { selector: 'edge:selected', style: { 'line-color': token('--series-a', '#006c66'), width: 2.5 } },
       ],
     })
 

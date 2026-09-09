@@ -11,29 +11,51 @@
    No Tailwind, no shadcn: intentional per the same decision. If you're
    tempted to reach for a utility class, add a real rule below instead. */
 
-/* RGB channel triplets for the handful of tokens used as translucent tints
-   (chip backgrounds, notices, the graph legend backdrop) -- rgb(var(--x-rgb)
-   / <alpha>) needs channels, not a hex string. Kept here, not in
-   openevo-design-tokens.css, since that file is a faithful vendored copy;
-   these are OpenLPM's own derived values, re-synced by hand if the source
-   tokens change. Light values from the source hex; dark values only where
-   openevo-design-tokens.css itself redefines that token for dark mode. */
+/* OpenEvo's two real brand colors, sourced from the actual OpenEvo
+   wordmark logo (openevo.eva.mpg.de/wp-content/uploads/OpenEvo-Logo-new-2023.png)
+   -- extracted by pixel-sampling the PNG, since no logo/brand-guide asset
+   exists in any of the ecosystem's git repos (openevo-design-tokens.css
+   above is a *dataviz* palette -- chart/status colors -- a different thing
+   from this brand identity). Overriding --series-a here, in OpenLPM's own
+   stylesheet rather than the vendored token file, makes teal the app's
+   dominant interactive color everywhere that already reads var(--series-a)
+   -- buttons, links, active nav/tab states, the graph explorer's "series A"
+   node color -- in one surgical change, without hand-editing the pinned
+   vendor copy. Navy is used more sparingly, for brand-lockup text (.brand,
+   the login heading) rather than every interactive surface.
+
+   Also carries the RGB channel triplets for the handful of tokens used as
+   translucent tints (chip backgrounds, notices, the graph legend backdrop)
+   -- rgb(var(--x-rgb) / <alpha>) needs channels, not a hex string. Kept
+   here, not in openevo-design-tokens.css, since that file is a faithful
+   vendored copy; these are OpenLPM's own derived values, re-synced by hand
+   if the source tokens (or the brand colors above) change. */
 :root {
+  --brand-navy: #272d63;
+  --brand-teal: #006c66;
+  --series-a: var(--brand-teal);
+
   --background-rgb: 249 249 247; /* page-plane */
-  --primary-rgb: 42 120 214;     /* series-a */
+  --primary-rgb: 0 108 102;      /* brand-teal */
   --good-rgb: 12 163 12;
   --warning-rgb: 250 178 25;
   --critical-rgb: 208 59 59;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
+    --brand-navy: #8b93e6;  /* lighter indigo tint -- #272d63 itself is unreadable on dark surfaces */
+    --brand-teal: #2bb6a8;  /* brighter, for contrast on dark surfaces */
+    --series-a: var(--brand-teal);
     --background-rgb: 13 13 13;
-    --primary-rgb: 57 135 229;
+    --primary-rgb: 43 182 168;
   }
 }
 :root[data-theme="dark"] {
+  --brand-navy: #8b93e6;
+  --brand-teal: #2bb6a8;
+  --series-a: var(--brand-teal);
   --background-rgb: 13 13 13;
-  --primary-rgb: 57 135 229;
+  --primary-rgb: 43 182 168;
 }
 
 * { box-sizing: border-box; }
@@ -67,7 +89,7 @@ code {
   background: var(--surface-2);
   border-bottom: 1px solid var(--border);
 }
-.brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; }
+.brand { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: var(--brand-navy); }
 .brand svg { color: var(--series-a); }
 .nav { display: flex; gap: 4px; flex: 1; }
 .nav a { padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text-secondary); font-size: 13px; }

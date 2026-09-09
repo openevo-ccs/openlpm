@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Github, Mail, GraduationCap } from 'lucide-react'
+import { Github, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { OpenLpmLogo } from '@/components/openlpm-logo'
+import { OpenEvoAttribution } from '@/components/openevo-mark'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<'github' | null>(null)
@@ -50,9 +52,9 @@ export default function LoginPage() {
     <div className="page page-narrow" style={{ maxWidth: 380, marginTop: 80 }}>
       <div className="card">
         <div style={{ textAlign: 'center', marginBottom: 12 }}>
-          <GraduationCap size={40} style={{ color: 'var(--series-a)' }} />
+          <OpenLpmLogo size={40} style={{ color: 'var(--series-a)' }} />
         </div>
-        <h1 style={{ textAlign: 'center' }}>Welcome to OpenLPM</h1>
+        <h1 style={{ textAlign: 'center', color: 'var(--brand-navy)' }}>Welcome to OpenLPM</h1>
         <p className="muted" style={{ textAlign: 'center', marginBottom: 16 }}>
           Sign in to collaborate on learning progressions
         </p>
@@ -91,9 +93,13 @@ export default function LoginPage() {
         {emailMessage && <div className="notice">{emailMessage}</div>}
 
         <p className="muted" style={{ textAlign: 'center', marginTop: 12 }}>Secure authentication powered by Supabase</p>
-        <p style={{ textAlign: 'center', marginTop: 8 }}>
+        <p style={{ textAlign: 'center', marginTop: 8, marginBottom: 0 }}>
           <Link to="/">Back to home</Link>
         </p>
+
+        <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          <OpenEvoAttribution />
+        </div>
       </div>
     </div>
   )

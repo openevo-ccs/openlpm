@@ -1,7 +1,8 @@
 import { Link, Outlet } from 'react-router-dom'
-import { GitBranch, LogOut, User } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
+import { OpenLpmLogo } from '@/components/openlpm-logo'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -20,7 +21,7 @@ export default function DashboardLayout() {
     <div className="app">
       <header className="topbar">
         <Link to="/dashboard" className="brand">
-          <GitBranch size={20} />
+          <OpenLpmLogo size={20} />
           OpenLPM
         </Link>
         <div className="whoami" style={{ marginLeft: 'auto' }}>

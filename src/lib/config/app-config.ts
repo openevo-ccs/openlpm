@@ -13,7 +13,7 @@ export const defaultConfig: AppConfig = {
   appShortName: 'OpenLPM',
   tagline: 'Collaborative Learning Progression Management',
   description: 'A cost-free, scientifically rigorous platform for collaborative development of learning progressions',
-  primaryColor: '#3b82f6'
+  primaryColor: '#006c66' // OpenEvo brand teal (--brand-teal / overridden --series-a in globals.css)
 }
 
 export const config: AppConfig = defaultConfig
