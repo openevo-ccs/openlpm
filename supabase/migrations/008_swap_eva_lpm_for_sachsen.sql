@@ -42,8 +42,8 @@
 DO $$
 DECLARE
   v_eva_lpm_id UUID;
-  v_sachsen_id UUID := uuid_generate_v4();
-  v_sachsen_trunk_id UUID := uuid_generate_v4();
+  v_sachsen_id UUID := gen_random_uuid();
+  v_sachsen_trunk_id UUID := gen_random_uuid();
 BEGIN
 
   SELECT id INTO v_eva_lpm_id FROM projects WHERE slug = 'eva-lpm';
