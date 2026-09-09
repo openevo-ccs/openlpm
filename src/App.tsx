@@ -26,11 +26,13 @@ function RedirectAfterLogin() {
 
   useEffect(() => {
     if (loading || !session || location.pathname !== '/') return
+    // <RequireAuth> only sets this when it bounced someone off a protected
+    // route -- signing in straight from the homepage (the common path)
+    // never sets it, so without a fallback the visitor lands back on the
+    // public homepage with no visible sign they're actually logged in.
     const stored = window.localStorage.getItem(REDIRECT_KEY)
-    if (stored) {
-      window.localStorage.removeItem(REDIRECT_KEY)
-      navigate(stored, { replace: true })
-    }
+    window.localStorage.removeItem(REDIRECT_KEY)
+    navigate(stored || '/dashboard', { replace: true })
   }, [loading, session, location.pathname, navigate])
 
   return null

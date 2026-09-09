@@ -23,7 +23,27 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
     })
     const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
-    return () => data.subscription.unsubscribe()
+
+    // Many mail clients open a magic link in a *new* tab -- the tab someone
+    // is actually watching (where they typed their email) never fires its
+    // own onAuthStateChange, since the session was created in a different
+    // JS runtime. localStorage writes there still fire a `storage` event
+    // here (standard same-origin, cross-tab browser behavior), so re-check
+    // on that and on refocus to pick it up without requiring a manual reload.
+    const recheck = () => supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key.startsWith('sb-')) recheck()
+    }
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('focus', recheck)
+    document.addEventListener('visibilitychange', recheck)
+
+    return () => {
+      data.subscription.unsubscribe()
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('focus', recheck)
+      document.removeEventListener('visibilitychange', recheck)
+    }
   }, [supabase])
 
   return <C.Provider value={{ session, loading }}>{children}</C.Provider>

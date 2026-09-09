@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { BookOpen, GitBranch, MessageSquare, Search } from 'lucide-react'
+import { useSession } from '@/state/session'
 
 export default function HomePage() {
+  const { session } = useSession()
+
   return (
     <div className="app">
       <header className="topbar">
@@ -10,8 +13,14 @@ export default function HomePage() {
           OpenLPM
         </div>
         <nav className="row" style={{ marginLeft: 'auto' }}>
-          <Link className="btn" to="/auth/login">Login</Link>
-          <Link className="btn btn-primary" to="/auth/login">Get started</Link>
+          {session ? (
+            <Link className="btn btn-primary" to="/dashboard">Go to dashboard</Link>
+          ) : (
+            <>
+              <Link className="btn" to="/auth/login">Login</Link>
+              <Link className="btn btn-primary" to="/auth/login">Get started</Link>
+            </>
+          )}
         </nav>
       </header>
 
@@ -22,7 +31,9 @@ export default function HomePage() {
             A cost-free, scientifically rigorous platform for collaborative development of learning progressions.
           </p>
           <div className="row" style={{ justifyContent: 'center' }}>
-            <Link className="btn btn-primary" to="/auth/login">Start collaborating</Link>
+            <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login'}>
+              {session ? 'Go to dashboard' : 'Start collaborating'}
+            </Link>
           </div>
         </section>
 
