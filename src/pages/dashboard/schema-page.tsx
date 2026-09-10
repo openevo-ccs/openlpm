@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { GitBranch, X } from 'lucide-react'
+import { Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
@@ -35,15 +35,13 @@ export default function SchemaPage() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
 
   const reload = async () => {
-    // Shared/canonical vocabulary only -- a branch can elaborate its own
-    // schema elements (branch_id set), which show on that branch's own
-    // Schema tab instead, alongside this shared layer. Per RFC 0002: "a
-    // branch shares this project's schema, diverging only in content."
+    // Every concept/competency/grade-band element that belongs to this
+    // Project -- there's no more separate per-branch schema tab to split
+    // this across (see the project-hierarchy/maturity migrations).
     const { data } = await supabase
       .from('lpm_schema_elements')
       .select('*')
       .eq('project_id', project.id)
-      .is('branch_id', null)
       .order('created_at', { ascending: true })
     setElements(data ?? [])
   }
@@ -138,8 +136,8 @@ export default function SchemaPage() {
     <div>
       <h1>Schema co-design</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Concepts, competencies, and grade bands shared across every branch — imported from
-        ConceptBase or added directly. A branch&apos;s own elaborations live on its own Schema tab.
+        Concepts, competencies, and grade bands used across this project — imported from
+        ConceptBase or added directly.
       </p>
 
       {notice && (
@@ -151,7 +149,7 @@ export default function SchemaPage() {
 
       {elements.length === 0 ? (
         <div className="card empty">
-          <GitBranch size={32} />
+          <Shapes size={32} />
           <p>No schema elements yet.</p>
         </div>
       ) : (

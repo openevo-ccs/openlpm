@@ -18,26 +18,29 @@ export default function ProjectSwitcherPage() {
   }
 
   // Group by parent so a real regional or topic-focused effort (e.g.
-  // "EvoMentor Thuringia") shows nested under its home project instead of
-  // sitting as its own separate tile -- keeps this list from growing one
-  // entry per region/language/theme as those get added.
+  // "EvoMentor Thuringia") shows nested under its home Project Space instead
+  // of sitting as its own separate tile -- keeps this list from growing one
+  // entry per region/language/theme as those get added. Every top-level
+  // entry here is a Project Space; everything nested under one is a Project
+  // (see [[openlpm-project-hierarchy-architecture]] -- this is the entry
+  // point that list is meant to serve).
   const byId = new Map(memberships.map((m) => [m.project.id, m]))
   const topLevel = memberships.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
   const childrenOf = (id: string) => memberships.filter((m) => m.project.parent_project_id === id)
 
   return (
     <div>
-      <h1>Your projects</h1>
+      <h1>Your project spaces</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Pick a project to open it. Everything inside — the curriculum, the literature, the people —
-        belongs to that project alone.
+        Pick a project space to open it. Everything inside — the curriculum, the literature, the
+        people — belongs to that space alone.
       </p>
 
       {memberships.length === 0 ? (
         <div className="card empty">
           <FolderKanban size={32} />
-          <p>You aren&apos;t a member of any project yet.</p>
-          <p className="muted">Ask a project owner to add you, or create a new project.</p>
+          <p>You aren&apos;t a member of any project space yet.</p>
+          <p className="muted">Ask an owner to add you, or create a new one.</p>
         </div>
       ) : (
         <div className="grid grid-3">
@@ -55,7 +58,7 @@ export default function ProjectSwitcherPage() {
                 </Link>
                 {children.length > 0 && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-                    <span className="muted" style={{ fontSize: 12 }}>Also includes:</span>
+                    <span className="muted" style={{ fontSize: 12 }}>Projects inside:</span>
                     {children.map((c) => (
                       <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
                         {c.project.name}

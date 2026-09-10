@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { CheckCircle2, Clock, ExternalLink, XCircle } from 'lucide-react'
-import type { BranchOutletContext } from './branch-layout'
+import type { ProjectOutletContext } from './project-layout'
 import { useSession } from '@/state/session'
 import { listPendingConnections, reviewConnection, type PendingConnection } from '@/lib/supabase/coherence'
 
@@ -15,19 +15,19 @@ import { listPendingConnections, reviewConnection, type PendingConnection } from
 // decision, relayed via lab-manager: "any active user can review" by
 // default) rather than a heavier academic-journal process this app's small
 // curriculum teams don't need.
-export default function BranchReviewPage() {
-  const { project, branch, role, supabase } = useOutletContext<BranchOutletContext>()
+export default function ReviewPage() {
+  const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
   const { session } = useSession()
   const [items, setItems] = useState<PendingConnection[] | null>(null)
   const canReview = role !== 'viewer'
 
-  const reload = () => listPendingConnections(supabase, project.id, branch.id).then(setItems)
+  const reload = () => listPendingConnections(supabase, project.id, defaultBranchId).then(setItems)
 
   useEffect(() => {
     setItems(null)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, project.id, branch.id])
+  }, [supabase, project.id, defaultBranchId])
 
   return (
     <div>
@@ -74,7 +74,7 @@ function ReviewCard({
   canReview: boolean
   isOwnProposal: boolean
   projectId: string
-  supabase: BranchOutletContext['supabase']
+  supabase: ProjectOutletContext['supabase']
   onReviewed: () => void
 }) {
   const [reviewText, setReviewText] = useState('')

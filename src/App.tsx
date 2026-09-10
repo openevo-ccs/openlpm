@@ -14,13 +14,10 @@ import LiteraturePage from '@/pages/dashboard/literature-page'
 import MembersPage from '@/pages/dashboard/members-page'
 import SchemaPage from '@/pages/dashboard/schema-page'
 import StandardsPage from '@/pages/dashboard/standards-page'
-import BranchesPage from '@/pages/dashboard/branches-page'
-import BranchLayout from '@/pages/dashboard/branches/branch-layout'
-import BranchOverviewPage from '@/pages/dashboard/branches/branch-overview-page'
-import BranchExplorePage from '@/pages/dashboard/branches/branch-explore-page'
-import BranchCoherencePage from '@/pages/dashboard/branches/branch-coherence-page'
-import BranchReviewPage from '@/pages/dashboard/branches/branch-review-page'
-import BranchSchemaPage from '@/pages/dashboard/branches/branch-schema-page'
+import ProjectsPage from '@/pages/dashboard/projects-page'
+import ExplorePage from '@/pages/dashboard/explore-page'
+import CoherencePage from '@/pages/dashboard/coherence-page'
+import ReviewPage from '@/pages/dashboard/review-page'
 import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
@@ -88,15 +85,11 @@ export default function App() {
             <Route path="members" element={<MembersPage />} />
             <Route path="schema" element={<SchemaPage />} />
             <Route path="standards" element={<StandardsPage />} />
-            <Route path="branches" element={<BranchesPage />} />
-            <Route path="branches/:branchSlug" element={<BranchLayout />}>
-              <Route index element={<BranchOverviewPage />} />
-              <Route path="explore" element={<BranchExplorePage />} />
-              <Route path="explore/:objectId" element={<BranchExplorePage />} />
-              <Route path="schema" element={<BranchSchemaPage />} />
-              <Route path="coherence" element={<BranchCoherencePage />} />
-              <Route path="review" element={<BranchReviewPage />} />
-            </Route>
+            <Route path="explore" element={<ExplorePage />} />
+            <Route path="explore/:objectId" element={<ExplorePage />} />
+            <Route path="coherence" element={<CoherencePage />} />
+            <Route path="review" element={<ReviewPage />} />
+            <Route path="projects" element={<ProjectsPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />
             <Route path="portfolios" element={<PortfoliosPage />} />
             <Route path="portfolios/:portfolioId" element={<PortfolioDetailPage />} />

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { BookOpen, FileText, MessageSquare, Clock, GitBranch, ArrowRight } from 'lucide-react'
-import { Chip } from '@/components/chip'
+import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, MessageSquare } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/supabase/activity'
+import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
+import { MaturityBadge } from '@/components/maturity-badge'
 
 type CountTable = 'literature_references' | 'lpm_schema_elements' | 'lpm_data_objects' | 'discussion_topics'
-type Branch = Database['public']['Tables']['branches']['Row']
 type Project = Database['public']['Tables']['projects']['Row']
 
 async function countFor(supabase: ProjectOutletContext['supabase'], table: CountTable, projectId: string) {
@@ -16,11 +16,14 @@ async function countFor(supabase: ProjectOutletContext['supabase'], table: Count
 }
 
 export default function OverviewPage() {
-  const { project, slug, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
   const [counts, setCounts] = useState<[number, number, number, number] | null>(null)
-  const [branches, setBranches] = useState<Branch[] | null>(null)
-  const [subProjects, setSubProjects] = useState<Project[] | null>(null)
+  const [childProjects, setChildProjects] = useState<Project[] | null>(null)
   const [activity, setActivity] = useState<ActivityEntry[] | null>(null)
+  const [maturity, setMaturity] = useState(project.maturity)
+  const [busy, setBusy] = useState(false)
+
+  const canManage = role === 'owner' || role === 'maintainer'
 
   useEffect(() => {
     setCounts(null)
@@ -33,30 +36,32 @@ export default function OverviewPage() {
   }, [supabase, project.id])
 
   useEffect(() => {
-    setBranches(null)
-    supabase
-      .from('branches')
-      .select('*')
-      .eq('project_id', project.id)
-      .eq('status', 'active')
-      .eq('is_trunk', false) // the trunk IS this project's own content, already reflected above -- not a separate "experiment" card
-      .order('created_at', { ascending: true })
-      .then(({ data }) => setBranches(data ?? []))
-  }, [supabase, project.id])
-
-  useEffect(() => {
     setActivity(null)
     listRecentActivity(supabase, project.id).then(setActivity)
   }, [supabase, project.id])
 
+  // Everything real that grew out of this Project Space -- whether it's a
+  // fully proven regional curriculum or something still early -- is a
+  // Project nested here (parent_project_id), one list, one word. There is
+  // no separate "drafts" list anymore.
   useEffect(() => {
-    setSubProjects(null)
+    setChildProjects(null)
     supabase
       .from('projects')
       .select('*')
       .eq('parent_project_id', project.id)
-      .then(({ data }) => setSubProjects(data ?? []))
+      .then(({ data }) => setChildProjects(data ?? []))
   }, [supabase, project.id])
+
+  useEffect(() => setMaturity(project.maturity), [project.maturity])
+
+  const toggleMaturity = async () => {
+    const next = maturity === 'draft' ? 'established' : 'draft'
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ maturity: next }).eq('id', project.id)
+    setBusy(false)
+    if (!error) setMaturity(next)
+  }
 
   const stats = [
     { label: 'Papers and sources', count: counts?.[0] ?? 0, icon: BookOpen },
@@ -68,7 +73,17 @@ export default function OverviewPage() {
   return (
     <div>
       <h1>{project.name}</h1>
-      <p className="muted" style={{ marginBottom: 20 }}>{project.description}</p>
+      <p className="muted" style={{ marginBottom: 8 }}>{project.description}</p>
+
+      {canManage && (
+        <div className="row" style={{ marginBottom: 20, alignItems: 'center' }}>
+          <span className="muted" style={{ fontSize: 13 }}>Status:</span>
+          <MaturityBadge status={maturity} />
+          <button className="btn btn-mini" disabled={busy} onClick={toggleMaturity}>
+            {maturity === 'draft' ? 'Mark as established' : 'Mark as draft'}
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-3" style={{ marginBottom: 20 }}>
         {stats.map(({ label, count, icon: Icon }) => (
@@ -82,49 +97,24 @@ export default function OverviewPage() {
         ))}
       </div>
 
-      {subProjects && subProjects.length > 0 && (
+      {childProjects && childProjects.length > 0 && (
         <>
-          <h2 style={{ marginTop: 8 }}>Regional and topic projects</h2>
+          <h2 style={{ marginTop: 8 }}>Projects in this Space</h2>
           <p className="muted" style={{ marginBottom: 12 }}>
-            Real, separate efforts that grew out of {project.name} — each with its own content and its own team.
+            Real efforts inside {project.name} — some fully proven, some still early drafts. See
+            the Projects tab to start a new one.
           </p>
           <div className="grid grid-3" style={{ marginBottom: 20 }}>
-            {subProjects.map((sp) => (
-              <Link key={sp.id} to={`/dashboard/${sp.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="card" style={{ height: '100%' }}>
-                  <h3>{sp.name}</h3>
-                  {sp.description && <p className="muted">{sp.description}</p>}
-                  <span className="row muted" style={{ fontSize: 12 }}>
-                    Open <ArrowRight size={12} />
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-
-      {branches && branches.length > 0 && (
-        <>
-          <h2 style={{ marginTop: 8 }}>Early drafts and experiments</h2>
-          <p className="muted" style={{ marginBottom: 12 }}>
-            Smaller, in-progress ideas being tried out within {project.name} itself.
-          </p>
-          <div className="grid grid-3" style={{ marginBottom: 20 }}>
-            {branches.map((branch) => (
-              <Link
-                key={branch.id}
-                to={`/dashboard/${slug}/branches/${branch.slug}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
+            {childProjects.map((child) => (
+              <Link key={child.id} to={`/dashboard/${child.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div className="card" style={{ height: '100%' }}>
                   <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <h3 className="row"><GitBranch size={14} style={{ color: 'var(--text-muted)' }} />{branch.label}</h3>
-                    <Chip status={branch.status} />
+                    <h3 className="row"><FolderKanban size={14} style={{ color: 'var(--text-muted)' }} />{child.name}</h3>
+                    <MaturityBadge status={child.maturity} />
                   </div>
-                  {branch.description && <p className="muted">{branch.description}</p>}
+                  {child.description && <p className="muted">{child.description}</p>}
                   <span className="row muted" style={{ fontSize: 12 }}>
-                    Enter <ArrowRight size={12} />
+                    Open <ArrowRight size={12} />
                   </span>
                 </div>
               </Link>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { AlertTriangle, CheckCircle2, Clock, Grid3x3, X } from 'lucide-react'
-import type { BranchOutletContext } from './branch-layout'
+import type { ProjectOutletContext } from './project-layout'
 import {
   createConnection,
   getCoOccurringConcepts,
@@ -16,14 +16,14 @@ import {
   type LiteratureReferenceRow,
 } from '@/lib/supabase/coherence'
 
-export default function BranchCoherencePage() {
-  const { project, branch, role, supabase } = useOutletContext<BranchOutletContext>()
+export default function CoherencePage() {
+  const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
   const [matrix, setMatrix] = useState<GradeBandMatrix | null>(null)
   const [selected, setSelected] = useState<GradeBandCell | null>(null)
   const canManage = role !== 'viewer'
 
   const reload = async () => {
-    const m = await getGradeBandMatrix(supabase, project.id, branch.id)
+    const m = await getGradeBandMatrix(supabase, project.id, defaultBranchId)
     setMatrix(m)
     if (selected) {
       const fresh = m.cells.find((c) => c.gradeA === selected.gradeA && c.gradeB === selected.gradeB)
@@ -34,9 +34,9 @@ export default function BranchCoherencePage() {
   useEffect(() => {
     setMatrix(null)
     setSelected(null)
-    getGradeBandMatrix(supabase, project.id, branch.id).then(setMatrix)
+    getGradeBandMatrix(supabase, project.id, defaultBranchId).then(setMatrix)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, project.id, branch.id])
+  }, [supabase, project.id, defaultBranchId])
 
   const stats = useMemo(() => {
     if (!matrix) return null
@@ -65,7 +65,7 @@ export default function BranchCoherencePage() {
       )}
 
       <div className="card" style={{ marginBottom: 16 }}>
-        <Link to={`/dashboard/${project.slug}/branches/${branch.slug}/review`} className="row" style={{ justifyContent: 'space-between', textDecoration: 'none', color: 'inherit' }}>
+        <Link to={`/dashboard/${project.slug}/review`} className="row" style={{ justifyContent: 'space-between', textDecoration: 'none', color: 'inherit' }}>
           <span className="row"><Clock size={14} />Review queue — proposed connections waiting to be checked before teachers see them</span>
           <span className="chip">Open queue →</span>
         </Link>
@@ -144,7 +144,7 @@ export default function BranchCoherencePage() {
             <PairPanel
               cell={selected}
               projectId={project.id}
-              branchId={branch.id}
+              branchId={defaultBranchId}
               canManage={canManage}
               supabase={supabase}
               onClose={() => setSelected(null)}
@@ -170,7 +170,7 @@ function PairPanel({
   projectId: string
   branchId: string
   canManage: boolean
-  supabase: BranchOutletContext['supabase']
+  supabase: ProjectOutletContext['supabase']
   onClose: () => void
   onChanged: () => void
 }) {
@@ -269,7 +269,7 @@ function ConnectForm({
   cell: GradeBandCell
   projectId: string
   branchId: string
-  supabase: BranchOutletContext['supabase']
+  supabase: ProjectOutletContext['supabase']
   onDone: () => void
 }) {
   const [objectsA, setObjectsA] = useState<GradeBandObject[]>([])

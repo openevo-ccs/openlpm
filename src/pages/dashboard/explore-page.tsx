@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Search } from 'lucide-react'
-import type { BranchOutletContext } from './branch-layout'
+import type { ProjectOutletContext } from './project-layout'
 import {
   getAssertedConnections,
   getFullThread,
@@ -41,8 +41,8 @@ function gradeLabel(grade: string | null): string {
   return grade ? `Grade ${grade}` : 'Grade —'
 }
 
-export default function BranchExplorePage() {
-  const { project, branch, supabase } = useOutletContext<BranchOutletContext>()
+export default function ExplorePage() {
+  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
   const navigate = useNavigate()
 
@@ -52,8 +52,8 @@ export default function BranchExplorePage() {
 
   useEffect(() => {
     setTopics(null)
-    listTopics(supabase, project.id, branch.id).then(setTopics)
-  }, [supabase, project.id, branch.id])
+    listTopics(supabase, project.id, defaultBranchId).then(setTopics)
+  }, [supabase, project.id, defaultBranchId])
 
   const grades = useMemo(() => {
     const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
@@ -116,7 +116,7 @@ export default function BranchExplorePage() {
                 <li key={t.id}>
                   <button
                     className={`topic-list-item${t.id === objectId ? ' active' : ''}`}
-                    onClick={() => navigate(`/dashboard/${project.slug}/branches/${branch.slug}/explore/${t.id}`)}
+                    onClick={() => navigate(`/dashboard/${project.slug}/explore/${t.id}`)}
                   >
                     <span className="chip" style={{ flexShrink: 0 }}>{gradeLabel(t.grade_band)}</span>
                     <span>
@@ -133,7 +133,7 @@ export default function BranchExplorePage() {
         <div className="drawer-shell wide">
           <div className="drawer">
             {objectId ? (
-              <TopicDetail objectId={objectId} projectSlug={project.slug} branchSlug={branch.slug} supabase={supabase} />
+              <TopicDetail objectId={objectId} projectSlug={project.slug} supabase={supabase} />
             ) : (
               <div className="empty" style={{ paddingTop: 60 }}>
                 <Compass size={32} />
@@ -151,13 +151,11 @@ export default function BranchExplorePage() {
 function TopicDetail({
   objectId,
   projectSlug,
-  branchSlug,
   supabase,
 }: {
   objectId: string
   projectSlug: string
-  branchSlug: string
-  supabase: BranchOutletContext['supabase']
+  supabase: ProjectOutletContext['supabase']
 }) {
   const [topic, setTopic] = useState<DataObjectRow | null | undefined>(undefined)
   const [connections, setConnections] = useState<ResolvedConnection[] | null>(null)
@@ -195,10 +193,10 @@ function TopicDetail({
           <h3 className="row"><Link2 size={13} />Required order in the curriculum</h3>
           <p className="muted" style={{ marginTop: -4 }}>The curriculum itself sequences these — not a suggestion.</p>
           {requiredBefore.map((c) => (
-            <ConnLine key={c.connection.id} kind="asserted" arrow="in" object={c.other} projectSlug={projectSlug} branchSlug={branchSlug} />
+            <ConnLine key={c.connection.id} kind="asserted" arrow="in" object={c.other} projectSlug={projectSlug} />
           ))}
           {leadsTo.map((c) => (
-            <ConnLine key={c.connection.id} kind="asserted" arrow="out" object={c.other} projectSlug={projectSlug} branchSlug={branchSlug} />
+            <ConnLine key={c.connection.id} kind="asserted" arrow="out" object={c.other} projectSlug={projectSlug} />
           ))}
         </section>
       )}
@@ -206,7 +204,7 @@ function TopicDetail({
       {stations && stations.length > 0 && (
         <section>
           {stations.map((s) => (
-            <ThreadCard key={s.id} station={s} currentObjectId={objectId} projectSlug={projectSlug} branchSlug={branchSlug} supabase={supabase} />
+            <ThreadCard key={s.id} station={s} currentObjectId={objectId} projectSlug={projectSlug} supabase={supabase} />
           ))}
         </section>
       )}
@@ -223,17 +221,15 @@ function ConnLine({
   arrow,
   object,
   projectSlug,
-  branchSlug,
 }: {
   kind: 'asserted' | 'suggested'
   arrow: 'in' | 'out'
   object: DataObjectRow
   projectSlug: string
-  branchSlug: string
 }) {
   return (
     <Link
-      to={`/dashboard/${projectSlug}/branches/${branchSlug}/explore/${object.id}`}
+      to={`/dashboard/${projectSlug}/explore/${object.id}`}
       className={`conn-line conn-${kind}`}
       style={{ textDecoration: 'none', color: 'inherit' }}
     >
@@ -250,14 +246,12 @@ function ThreadCard({
   station,
   currentObjectId,
   projectSlug,
-  branchSlug,
   supabase,
 }: {
   station: ThreadStationWithThread
   currentObjectId: string
   projectSlug: string
-  branchSlug: string
-  supabase: BranchOutletContext['supabase']
+  supabase: ProjectOutletContext['supabase']
 }) {
   const [expanded, setExpanded] = useState(false)
   const [full, setFull] = useState<FullThread | null>(null)
@@ -301,7 +295,7 @@ function ThreadCard({
               {full.stations.map((st) => (
                 <li key={st.id} className={st.data_object_id === currentObjectId ? 'thread-station current' : 'thread-station'}>
                   <div className="row" style={{ justifyContent: 'space-between' }}>
-                    <Link to={`/dashboard/${projectSlug}/branches/${branchSlug}/explore/${st.object.id}`} style={{ textDecoration: 'none' }}>
+                    <Link to={`/dashboard/${projectSlug}/explore/${st.object.id}`} style={{ textDecoration: 'none' }}>
                       <strong>{gradeLabel(st.object.grade_band)} — {st.object.title}</strong>
                     </Link>
                   </div>
