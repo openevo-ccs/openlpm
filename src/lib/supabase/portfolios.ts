@@ -87,3 +87,34 @@ export async function getPortfolioGraph(supabase: Client, portfolioId: string) {
 
   return { nodes, edges, itemCount: items?.length ?? 0, privateNodeCount: privateNodes?.length ?? 0 }
 }
+
+// The "Shared (explicit grants)" visibility option (portfolios-page.tsx) had
+// no way to actually grant anyone access -- portfolio_shares (which RLS
+// already checks, migration 004) had zero UI anywhere. Closes that: the
+// owner names a grantee by email (matching how project invites work),
+// resolved against the users table rather than requiring a raw user id.
+
+export interface ShareGrant {
+  id: string
+  can_review: boolean
+  user: { id: string; name: string; email: string }
+}
+
+export async function listShares(supabase: Client, portfolioId: string): Promise<ShareGrant[]> {
+  const { data } = await supabase
+    .from('portfolio_shares')
+    .select('id, can_review, user:users(id, name, email)')
+    .eq('portfolio_id', portfolioId)
+  return (data ?? []) as unknown as ShareGrant[]
+}
+
+export async function addShare(supabase: Client, portfolioId: string, email: string, canReview: boolean) {
+  const { data: user, error: lookupError } = await supabase.from('users').select('id').ilike('email', email.trim()).maybeSingle()
+  if (lookupError) return { error: lookupError }
+  if (!user) return { error: { message: `No OpenLPM account found for "${email}" yet -- they need to sign in at least once first.` } }
+  return supabase.from('portfolio_shares').insert({ portfolio_id: portfolioId, user_id: user.id, can_review: canReview })
+}
+
+export async function removeShare(supabase: Client, shareId: string) {
+  return supabase.from('portfolio_shares').delete().eq('id', shareId)
+}

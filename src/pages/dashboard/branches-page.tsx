@@ -57,10 +57,17 @@ export default function BranchesPage() {
     setBusy(false)
   }
 
-  // Two-tier branching (RFC 0002 section 3): a content branch is promotable
-  // to a fully independent project. This creates that new project
-  // (auto-enrolling the acting user as its owner, per the handle_new_project
-  // trigger) and marks the source branch as 'promoted', pointing at it.
+  // A draft/experiment can grow into something real and lasting enough to
+  // deserve its own project -- e.g. a real regional or language effort, per
+  // Dustin's own direction that these should be real sub-projects, not
+  // branches (see migration 015). This creates that new project as a
+  // sub-project of this one (auto-enrolling the acting user as owner, and
+  // auto-creating its own trunk, per the handle_new_project trigger), marks
+  // the source branch as 'promoted' pointing at it, and -- critically --
+  // actually moves the branch's real content over. An earlier version of
+  // this only created an empty new project and left the real content
+  // stranded under the now-hidden old branch; found and fixed the same day
+  // it was used for real (Thuringia's own move).
   const promoteBranch = async (branch: Branch, e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
@@ -79,30 +86,61 @@ export default function BranchesPage() {
       .insert({
         slug: newSlug,
         name: newName,
-        description: `Promoted from the "${branch.label}" branch.`,
+        description: `Grew out of "${branch.label}" in ${project.name}.`,
         epistemic_status: 'in-development',
         promoted_from_branch_id: branch.id,
+        parent_project_id: project.id,
         created_by: user.id,
       })
       .select()
       .single()
 
-    if (!error && newProject) {
-      await supabase.from('branches').update({ status: 'promoted', promoted_to_project_id: newProject.id }).eq('id', branch.id)
-      setNotice({ kind: 'ok', text: `Promoted to "${newName}".` })
-      await reload()
-    } else if (error) {
-      setNotice({ kind: 'bad', text: error.message })
+    if (error || !newProject) {
+      setNotice({ kind: 'bad', text: error?.message ?? 'Could not create the new project.' })
+      setBusy(false)
+      return
     }
+
+    const { data: newTrunk } = await supabase.from('branches').select('id').eq('project_id', newProject.id).eq('is_trunk', true).maybeSingle()
+    if (!newTrunk) {
+      setNotice({ kind: 'bad', text: 'New project was created, but it has no home for content yet -- nothing was moved. Contact support.' })
+      setBusy(false)
+      return
+    }
+
+    // Sequential, not parallel -- the object-tags move depends on
+    // data_objects already having their new project_id (it matches by
+    // the objects' own new home, so it has to run after, not racing it).
+    const step1 = await Promise.all([
+      supabase.from('lpm_schema_elements').update({ project_id: newProject.id, branch_id: newTrunk.id }).eq('project_id', project.id).eq('branch_id', branch.id),
+      supabase.from('lpm_data_objects').update({ project_id: newProject.id, branch_id: newTrunk.id }).eq('project_id', project.id).eq('branch_id', branch.id),
+      supabase.from('lpm_connections').update({ project_id: newProject.id, branch_id: newTrunk.id }).eq('project_id', project.id).eq('branch_id', branch.id),
+      supabase.from('lpm_threads').update({ project_id: newProject.id, branch_id: newTrunk.id }).eq('project_id', project.id).eq('branch_id', branch.id),
+      supabase.from('lpm_coherence_reviews').update({ project_id: newProject.id, branch_id: newTrunk.id }).eq('project_id', project.id).eq('branch_id', branch.id),
+    ])
+    const { data: movedObjects } = await supabase.from('lpm_data_objects').select('id').eq('project_id', newProject.id).eq('branch_id', newTrunk.id)
+    const step2 = movedObjects?.length
+      ? [await supabase.from('lpm_object_tags').update({ project_id: newProject.id }).eq('project_id', project.id).in('data_object_id', movedObjects.map((o) => o.id))]
+      : []
+    const moveError = [...step1, ...step2].find((r) => r.error)?.error
+
+    await supabase.from('branches').update({ status: 'promoted', promoted_to_project_id: newProject.id }).eq('id', branch.id)
+
+    if (moveError) {
+      setNotice({ kind: 'bad', text: `Created "${newName}", but moving its content ran into a problem: ${moveError.message}` })
+    } else {
+      setNotice({ kind: 'ok', text: `"${branch.label}" is now its own project: "${newName}".` })
+    }
+    await reload()
     setBusy(false)
   }
 
   return (
     <div>
-      <h1>Branches</h1>
+      <h1>Drafts and experiments</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
-        A branch shares this project&apos;s schema and concept vocabulary, diverging only in
-        content. If one outgrows that, promote it to a fully independent project.
+        A quick way to try something new inside this project without touching the real content.
+        If an idea grows into something real and lasting, turn it into its own project.
       </p>
 
       {notice && (
@@ -126,26 +164,26 @@ export default function BranchesPage() {
           </div>
 
           {branch.fork_rationale && (
-            <p className="muted"><b style={{ color: 'var(--text-primary)' }}>Fork rationale: </b>{branch.fork_rationale}</p>
+            <p className="muted"><b style={{ color: 'var(--text-primary)' }}>Why this exists: </b>{branch.fork_rationale}</p>
           )}
-          {branch.status === 'promoted' && <p style={{ color: 'var(--good)' }}>Promoted to a full independent project.</p>}
+          {branch.status === 'promoted' && <p style={{ color: 'var(--good)' }}>This grew into its own project.</p>}
 
           <Link to={`/dashboard/${slug}/branches/${branch.slug}`} className="btn" style={{ marginTop: 4 }}>
-            Enter branch
+            Open
             <ArrowRight size={14} />
           </Link>
 
           {canManage && !branch.is_trunk && branch.status === 'active' && (
             <form onSubmit={(e) => promoteBranch(branch, e)} className="row" style={{ paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
               <div className="field" style={{ marginBottom: 0 }}>
-                <label>New project slug</label>
+                <label>Short address</label>
                 <input name="new_project_slug" placeholder="e.g. evomentor-fr" style={{ width: 180 }} required />
               </div>
               <div className="field" style={{ marginBottom: 0 }}>
-                <label>New project name</label>
-                <input name="new_project_name" placeholder="e.g. EvoMentor (French)" style={{ width: 220 }} required />
+                <label>Project name</label>
+                <input name="new_project_name" placeholder="e.g. EvoMentor France" style={{ width: 220 }} required />
               </div>
-              <button type="submit" className="btn" disabled={busy}>Promote to full project</button>
+              <button type="submit" className="btn" disabled={busy}>Turn into its own project</button>
             </form>
           )}
         </div>
@@ -153,36 +191,36 @@ export default function BranchesPage() {
 
       {canManage && (
         <div className="card">
-          <h3>Fork a new branch</h3>
-          <p className="muted">Shares this project&apos;s schema; diverges only in content.</p>
+          <h3>Start something new</h3>
+          <p className="muted">Shares this project&apos;s concepts to start; you can change that as it grows.</p>
           <form onSubmit={createBranch} className="grid grid-2">
             <div className="field">
-              <label>Slug</label>
+              <label>Short address</label>
               <input name="slug" placeholder="e.g. spanish" required />
             </div>
             <div className="field">
-              <label>Label</label>
+              <label>Name</label>
               <input name="label" placeholder="e.g. Spanish translation" required />
             </div>
             <div className="field" style={{ gridColumn: '1 / -1' }}>
               <label>Description</label>
-              <input name="description" placeholder="What makes this branch different?" />
+              <input name="description" placeholder="What is this for?" />
             </div>
             <div className="field">
-              <label>Forked from</label>
+              <label>Starting point</label>
               <select name="forked_from_branch_id">
-                <option value="">(none — free-standing)</option>
+                <option value="">(start from scratch)</option>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>{b.label}</option>
                 ))}
               </select>
             </div>
             <div className="field" style={{ gridColumn: '1 / -1' }}>
-              <label>Fork rationale</label>
-              <input name="fork_rationale" placeholder="Why does this need its own branch?" />
+              <label>Why this exists</label>
+              <input name="fork_rationale" placeholder="What are you trying out?" />
             </div>
             <div style={{ gridColumn: '1 / -1' }}>
-              <button type="submit" className="btn btn-primary" disabled={busy}>Create branch</button>
+              <button type="submit" className="btn btn-primary" disabled={busy}>Start it</button>
             </div>
           </form>
         </div>

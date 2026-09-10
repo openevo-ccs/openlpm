@@ -9,27 +9,40 @@ import { createClient } from '@/lib/supabase/client'
 interface Ctx {
   session: Session | null
   loading: boolean
+  // True for exactly one tick after a password-reset email's link is
+  // followed -- Supabase's own onAuthStateChange fires a distinct
+  // 'PASSWORD_RECOVERY' event for this (not 'SIGNED_IN'), so App.tsx's
+  // post-login redirect can send the visitor to "set a new password"
+  // instead of their normal dashboard landing. Consumed once via
+  // consumePasswordRecovery() so it doesn't re-fire on a later refresh.
+  passwordRecovery: boolean
+  consumePasswordRecovery: () => void
 }
-const C = createContext<Ctx>({ session: null, loading: true })
+const C = createContext<Ctx>({ session: null, loading: true, passwordRecovery: false, consumePasswordRecovery: () => {} })
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), [])
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
       setLoading(false)
     })
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
+    const { data } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s)
+      if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+    })
 
-    // Many mail clients open a magic link in a *new* tab -- the tab someone
-    // is actually watching (where they typed their email) never fires its
-    // own onAuthStateChange, since the session was created in a different
-    // JS runtime. localStorage writes there still fire a `storage` event
-    // here (standard same-origin, cross-tab browser behavior), so re-check
-    // on that and on refocus to pick it up without requiring a manual reload.
+    // Password-reset links (like the old magic links) are commonly opened in
+    // a *new* tab from the mail client -- the tab someone's actually
+    // watching never fires its own onAuthStateChange, since the session was
+    // created in a different JS runtime. localStorage writes there still
+    // fire a `storage` event here (standard same-origin, cross-tab browser
+    // behavior), so re-check on that and on refocus rather than requiring a
+    // manual reload.
     const recheck = () => supabase.auth.getSession().then(({ data }) => setSession(data.session))
     const onStorage = (e: StorageEvent) => {
       if (e.key === null || e.key.startsWith('sb-')) recheck()
@@ -46,7 +59,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     }
   }, [supabase])
 
-  return <C.Provider value={{ session, loading }}>{children}</C.Provider>
+  const consumePasswordRecovery = () => setPasswordRecovery(false)
+
+  return <C.Provider value={{ session, loading, passwordRecovery, consumePasswordRecovery }}>{children}</C.Provider>
 }
 
 export function useSession() {

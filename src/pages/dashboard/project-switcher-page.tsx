@@ -17,12 +17,20 @@ export default function ProjectSwitcherPage() {
     return <p className="muted">Loading…</p>
   }
 
+  // Group by parent so a real regional or topic-focused effort (e.g.
+  // "EvoMentor Thuringia") shows nested under its home project instead of
+  // sitting as its own separate tile -- keeps this list from growing one
+  // entry per region/language/theme as those get added.
+  const byId = new Map(memberships.map((m) => [m.project.id, m]))
+  const topLevel = memberships.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+  const childrenOf = (id: string) => memberships.filter((m) => m.project.parent_project_id === id)
+
   return (
     <div>
       <h1>Your projects</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Pick a project to work in. Everything below it — literature, schema, discussions —
-        is scoped to that project alone.
+        Pick a project to open it. Everything inside — the curriculum, the literature, the people —
+        belongs to that project alone.
       </p>
 
       {memberships.length === 0 ? (
@@ -33,18 +41,31 @@ export default function ProjectSwitcherPage() {
         </div>
       ) : (
         <div className="grid grid-3">
-          {memberships.map(({ project, role }) => (
-            <Link key={project.id} to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-              <div className="card" style={{ height: '100%' }}>
-                <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <h3>{project.name}</h3>
-                  <span className="chip capitalize">{role}</span>
-                </div>
-                <p className="muted">{project.description}</p>
-                <EpistemicStatusBadge status={project.epistemic_status} />
+          {topLevel.map(({ project, role }) => {
+            const children = childrenOf(project.id)
+            return (
+              <div key={project.id} className="card" style={{ height: '100%' }}>
+                <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <h3>{project.name}</h3>
+                    <span className="chip capitalize">{role}</span>
+                  </div>
+                  <p className="muted">{project.description}</p>
+                  <EpistemicStatusBadge status={project.epistemic_status} />
+                </Link>
+                {children.length > 0 && (
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
+                    <span className="muted" style={{ fontSize: 12 }}>Also includes:</span>
+                    {children.map((c) => (
+                      <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                        {c.project.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
-            </Link>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

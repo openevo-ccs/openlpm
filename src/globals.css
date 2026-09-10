@@ -136,6 +136,7 @@ code {
 .btn-danger { color: var(--critical); border-color: var(--critical); }
 .btn-mini { padding: 2px 8px; font-size: 11px; border-radius: 10px; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-linklike { background: none; border: none; padding: 0; color: var(--series-a); cursor: pointer; font: inherit; text-decoration: underline; }
 
 .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .field label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
@@ -183,6 +184,11 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 
 .drawer-shell { position: relative; width: 340px; border-left: 1px solid var(--border); background: var(--surface-2); overflow: hidden; display: flex; min-height: 0; }
 .drawer-shell.collapsed { width: 32px; }
+/* Wider variant (the Explore topic-detail panel) -- a distinct class rather
+   than an inline style, specifically so the max-width:900px rule below can
+   still override it. An inline width would always win regardless of any
+   media query, silently defeating mobile responsiveness. */
+.drawer-shell.wide { width: 460px; }
 .drawer { flex: 1; min-width: 0; overflow: auto; padding: 14px 16px; }
 .drawer h2 { margin-bottom: 4px; }
 .drawer-collapse { position: absolute; right: 6px; top: 6px; z-index: 6; }
@@ -243,9 +249,42 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 .help:hover, .help:focus { border-color: var(--series-a); color: var(--series-a); outline: none; }
 
+/* ---- curriculum explorer: topic list + connection/thread styling.
+   Asserted (curriculum-required) vs. suggested (didactic proposal)
+   connections get a deliberately different visual language -- solid vs.
+   dashed border, matching curriculum-mapping literature's own
+   hard-wired/soft-wired convention -- so the distinction survives even if a
+   reader skips every label. ---- */
+.topic-list { list-style: none; margin: 0; padding: 0; }
+.topic-list-item {
+  width: 100%; text-align: left; display: flex; gap: 10px; align-items: flex-start;
+  padding: 8px 10px; border: 1px solid transparent; border-radius: 8px;
+  background: transparent; cursor: pointer; font: inherit; color: var(--text-primary);
+}
+.topic-list-item:hover { background: var(--surface-1); }
+.topic-list-item.active { background: rgb(var(--primary-rgb) / 0.1); border-color: var(--series-a); }
+
+.conn-line {
+  display: block; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px;
+  border: 1px solid var(--border);
+}
+.conn-line.conn-asserted { border-style: solid; border-color: var(--good); background: rgb(var(--good-rgb) / 0.06); }
+.conn-line:hover { filter: brightness(0.98); }
+
+.card.conn-suggested { border-style: dashed; border-color: var(--warning); }
+
+.thread-path { list-style: none; margin: 10px 0 0; padding: 0; border-left: 2px dashed var(--border); }
+.thread-station { padding: 6px 0 6px 14px; margin-left: 2px; position: relative; }
+.thread-station::before {
+  content: ""; position: absolute; left: -5px; top: 12px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--surface-2); border: 2px solid var(--text-muted);
+}
+.thread-station.current::before { border-color: var(--series-a); background: var(--series-a); }
+.thread-station.current { background: rgb(var(--primary-rgb) / 0.06); border-radius: 8px; }
+
 @media (max-width: 900px) {
   .project-shell { flex-direction: column; }
   .project-side { width: auto; }
   .explorer-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-  .drawer-shell { width: auto; border-left: 0; border-top: 1px solid var(--border); max-height: 45%; }
+  .drawer-shell, .drawer-shell.wide { width: auto; border-left: 0; border-top: 1px solid var(--border); max-height: 45%; }
 }

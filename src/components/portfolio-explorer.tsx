@@ -16,10 +16,12 @@ type View = 'graph' | 'cards'
 
 export function PortfolioExplorer({
   portfolioId,
+  projectId,
   initialNodes,
   initialEdges,
 }: {
   portfolioId: string
+  projectId: string
   initialNodes: PortfolioNode[]
   initialEdges: PortfolioEdge[]
 }) {
@@ -37,6 +39,9 @@ export function PortfolioExplorer({
   const [multiSelect, setMultiSelect] = useState<string[]>([])
   const [ctxMenu, setCtxMenu] = useState<CtxMenu>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [addMode, setAddMode] = useState<'note' | 'reference'>('note')
+  const [refQuery, setRefQuery] = useState('')
+  const [refResults, setRefResults] = useState<{ targetType: 'schema_element' | 'data_object'; targetId: string; label: string }[]>([])
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -175,6 +180,39 @@ export function PortfolioExplorer({
     setBusy(false)
   }
 
+  // Referencing a real schema element or data object -- the actual point of
+  // a portfolio (curate real project content, not just private notes) --
+  // had no path in the UI at all before this: portfolio_items was only ever
+  // read and deleted anywhere in the app, never inserted.
+  useEffect(() => {
+    if (addMode !== 'reference' || !refQuery.trim()) { setRefResults([]); return }
+    const q = refQuery.trim()
+    const timer = setTimeout(async () => {
+      const [{ data: schemaEls }, { data: dataObjs }] = await Promise.all([
+        supabase.from('lpm_schema_elements').select('id, label').eq('project_id', projectId).ilike('label', `%${q}%`).limit(8),
+        supabase.from('lpm_data_objects').select('id, title').eq('project_id', projectId).ilike('title', `%${q}%`).limit(8),
+      ])
+      setRefResults([
+        ...(schemaEls ?? []).map((s) => ({ targetType: 'schema_element' as const, targetId: s.id, label: s.label })),
+        ...(dataObjs ?? []).map((o) => ({ targetType: 'data_object' as const, targetId: o.id, label: o.title })),
+      ])
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [addMode, refQuery, supabase, projectId])
+
+  const addReference = async (targetType: 'schema_element' | 'data_object', targetId: string) => {
+    setBusy(true); setNotice(null)
+    const { error } = await supabase.from('portfolio_items').insert({ portfolio_id: portfolioId, target_type: targetType, target_id: targetId })
+    if (error) {
+      setNotice({ kind: 'bad', text: error.code === '23505' ? 'Already in this portfolio.' : error.message })
+    } else {
+      setNotice({ kind: 'ok', text: 'Added.' })
+      setAddOpen(false); setRefQuery(''); setRefResults([])
+      await reload()
+    }
+    setBusy(false)
+  }
+
   const deleteNode = async (id: string) => {
     setBusy(true); setNotice(null)
     const [kind, rawId] = id.split('-', 2)
@@ -222,24 +260,48 @@ export function PortfolioExplorer({
         <span style={{ position: 'relative' }}>
           <button className="btn btn-mini" onClick={(e) => { e.stopPropagation(); setAddOpen(!addOpen) }}>
             <Plus size={12} />
-            Add note
+            Add
           </button>
           {addOpen && (
             <div className="popover" onClick={(e) => e.stopPropagation()}>
-              <form onSubmit={addNote}>
-                <div className="field">
-                  <label>Type</label>
-                  <select name="node_type">
-                    <option value="note">Note</option>
-                    <option value="question">Question</option>
-                    <option value="draft_concept">Draft concept</option>
-                    <option value="draft_lesson">Draft lesson</option>
-                  </select>
+              <div className="tabs">
+                <button className={addMode === 'note' ? 'active' : ''} onClick={() => setAddMode('note')} type="button">Private note</button>
+                <button className={addMode === 'reference' ? 'active' : ''} onClick={() => setAddMode('reference')} type="button">Reference project content</button>
+              </div>
+              {addMode === 'note' ? (
+                <form onSubmit={addNote}>
+                  <div className="field">
+                    <label>Type</label>
+                    <select name="node_type">
+                      <option value="note">Note</option>
+                      <option value="question">Question</option>
+                      <option value="draft_concept">Draft concept</option>
+                      <option value="draft_lesson">Draft lesson</option>
+                    </select>
+                  </div>
+                  <div className="field"><label>Label</label><input name="label" required /></div>
+                  <div className="field"><label>Details</label><textarea name="content" rows={3} /></div>
+                  <button type="submit" className="btn btn-primary" disabled={busy}>Add</button>
+                </form>
+              ) : (
+                <div>
+                  <div className="field">
+                    <label>Search this project&apos;s schema and content</label>
+                    <input type="search" value={refQuery} onChange={(e) => setRefQuery(e.target.value)} placeholder="Start typing…" autoFocus />
+                  </div>
+                  {refResults.length > 0 && (
+                    <div className="menu" style={{ maxHeight: 220, overflowY: 'auto' }}>
+                      {refResults.map((r) => (
+                        <button key={`${r.targetType}-${r.targetId}`} type="button" disabled={busy} onClick={() => addReference(r.targetType, r.targetId)}>
+                          <strong>{r.label}</strong>
+                          <span className="muted" style={{ fontSize: 11 }}>{r.targetType === 'schema_element' ? 'Schema concept' : 'Curriculum content'}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {refQuery.trim() && refResults.length === 0 && <p className="muted">No matches.</p>}
                 </div>
-                <div className="field"><label>Label</label><input name="label" required /></div>
-                <div className="field"><label>Details</label><textarea name="content" rows={3} /></div>
-                <button type="submit" className="btn btn-primary" disabled={busy}>Add</button>
-              </form>
+              )}
             </div>
           )}
         </span>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
-import { ArrowLeft, BookOpen, FileText, GitBranch, Layers, MessageSquare, Network, ShieldAlert } from 'lucide-react'
+import { ArrowLeft, BookOpen, FileText, GitBranch, Layers, MessageSquare, Network, ShieldAlert, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
@@ -17,12 +17,24 @@ export default function ProjectLayout() {
   const { project: slug } = useParams<{ project: string }>()
   const supabase = useMemo(() => createClient(), [])
   const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null } | null>(null)
+  const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
 
   useEffect(() => {
     if (!slug) return
     setState(null)
     getProjectBySlug(supabase, slug).then(setState)
   }, [supabase, slug])
+
+  useEffect(() => {
+    setParent(null)
+    if (!state?.project?.parent_project_id) return
+    supabase
+      .from('projects')
+      .select('slug, name')
+      .eq('id', state.project.parent_project_id)
+      .maybeSingle()
+      .then(({ data }) => setParent(data))
+  }, [supabase, state?.project?.parent_project_id])
 
   if (!slug || state === null) {
     return <p className="muted">Loading…</p>
@@ -70,9 +82,10 @@ export default function ProjectLayout() {
     { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
     { href: `/dashboard/${slug}/schema`, content: <><GitBranch size={14} />Schema</> },
     { href: `/dashboard/${slug}/standards`, content: <><Layers size={14} />Standards</> },
-    { href: `/dashboard/${slug}/branches`, content: <><GitBranch size={14} />Branches</> },
+    { href: `/dashboard/${slug}/branches`, content: <><GitBranch size={14} />Drafts</> },
     { href: `/dashboard/${slug}/portfolios`, content: <><Network size={14} />Portfolios</> },
     { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
+    { href: `/dashboard/${slug}/members`, content: <><Users size={14} />Members</> },
   ]
 
   const context: ProjectOutletContext = { project, role, slug, supabase }
@@ -84,7 +97,12 @@ export default function ProjectLayout() {
           <ArrowLeft size={14} />
           All projects
         </Link>
-        <h2 style={{ marginTop: 8 }}>{project.name}</h2>
+        <h2 style={{ marginTop: 8, marginBottom: 2 }}>{project.name}</h2>
+        {parent && (
+          <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
+            Part of <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link>
+          </p>
+        )}
         <EpistemicStatusBadge status={project.epistemic_status} />
         <ProjectNav items={nav} />
       </aside>

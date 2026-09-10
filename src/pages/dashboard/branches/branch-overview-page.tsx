@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { GitBranch, Settings } from 'lucide-react'
+import { Compass, GitBranch, Settings } from 'lucide-react'
 import type { BranchOutletContext } from './branch-layout'
 
 export default function BranchOverviewPage() {
   const { project, branch, slug, supabase } = useOutletContext<BranchOutletContext>()
   const [schemaCount, setSchemaCount] = useState<number | null>(null)
+  const [topicCount, setTopicCount] = useState<number | null>(null)
 
   useEffect(() => {
     setSchemaCount(null)
@@ -15,10 +16,29 @@ export default function BranchOverviewPage() {
       .eq('project_id', project.id)
       .eq('branch_id', branch.id)
       .then(({ count }) => setSchemaCount(count ?? 0))
+    setTopicCount(null)
+    supabase
+      .from('lpm_data_objects')
+      .select('*', { count: 'exact', head: true })
+      .eq('project_id', project.id)
+      .eq('branch_id', branch.id)
+      .then(({ count }) => setTopicCount(count ?? 0))
   }, [supabase, project.id, branch.id])
 
   return (
     <div>
+      {!!topicCount && (
+        <Link to={`/dashboard/${slug}/branches/${branch.slug}/explore`} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div className="card" style={{ background: 'rgb(var(--primary-rgb) / 0.08)', borderColor: 'var(--series-a)' }}>
+            <h3 className="row"><Compass size={16} style={{ color: 'var(--series-a)' }} />Explore how {topicCount} topics connect</h3>
+            <p className="muted" style={{ marginBottom: 0 }}>
+              Pick a topic, see what leads into it, what it leads to, and — where curriculum
+              designers have identified one — the bigger idea that ties it to other topics.
+            </p>
+          </div>
+        </Link>
+      )}
+
       {branch.fork_rationale && (
         <div className="card">
           <h3>Why this branch exists</h3>

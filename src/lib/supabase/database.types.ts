@@ -190,7 +190,7 @@ export type Database = {
         Row: {
           id: string
           project_id: string
-          target_type: 'schema_element' | 'data_object'
+          target_type: 'schema_element' | 'data_object' | 'connection' | 'thread'
           target_id: string
           reference_id: string | null
           evidence_type: 'supports' | 'challenges' | 'contextualizes'
@@ -202,7 +202,7 @@ export type Database = {
         Insert: {
           id?: string
           project_id: string
-          target_type: 'schema_element' | 'data_object'
+          target_type: 'schema_element' | 'data_object' | 'connection' | 'thread'
           target_id: string
           reference_id?: string | null
           evidence_type?: 'supports' | 'challenges' | 'contextualizes'
@@ -214,7 +214,7 @@ export type Database = {
         Update: {
           id?: string
           project_id?: string
-          target_type?: 'schema_element' | 'data_object'
+          target_type?: 'schema_element' | 'data_object' | 'connection' | 'thread'
           target_id?: string
           reference_id?: string | null
           evidence_type?: 'supports' | 'challenges' | 'contextualizes'
@@ -229,7 +229,7 @@ export type Database = {
         Row: {
           id: string
           project_id: string
-          reviewable_type: 'literature_reference' | 'lpm_data_object'
+          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
           reviewable_id: string
           reviewer_id: string | null
           status: 'pending' | 'in_progress' | 'completed'
@@ -241,7 +241,7 @@ export type Database = {
         Insert: {
           id?: string
           project_id: string
-          reviewable_type: 'literature_reference' | 'lpm_data_object'
+          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
           reviewable_id: string
           reviewer_id?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
@@ -253,7 +253,7 @@ export type Database = {
         Update: {
           id?: string
           project_id?: string
-          reviewable_type?: 'literature_reference' | 'lpm_data_object'
+          reviewable_type?: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
           reviewable_id?: string
           reviewer_id?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
@@ -339,6 +339,7 @@ export type Database = {
       activity_log: {
         Row: {
           id: string
+          project_id: string
           user_id: string | null
           action_type: string
           target_type: string | null
@@ -348,6 +349,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          project_id: string
           user_id?: string | null
           action_type: string
           target_type?: string | null
@@ -357,6 +359,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          project_id?: string
           user_id?: string | null
           action_type?: string
           target_type?: string | null
@@ -364,7 +367,15 @@ export type Database = {
           details?: any
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "activity_log_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"]
+          }
+        ]
       }
       projects: {
         Row: {
@@ -378,6 +389,18 @@ export type Database = {
           projectbase_ref: string | null
           hosting_mode: 'hosted' | 'self-hosted'
           promoted_from_branch_id: string | null
+          parent_project_id: string | null
+          focus_type: 'regional' | 'thematic' | 'general'
+          region_tags: string[]
+          theme_tags: string[]
+          working_languages: string[]
+          // Draft vs. established -- migration 016. Distinct from
+          // epistemic_status (is this content real vs. a thought
+          // experiment): maturity is "how far along is this Project," not
+          // "how real is its content." Folds the old branch-then-promote
+          // mechanism into a plain status flip on a Project already nested
+          // where it belongs (parent_project_id).
+          maturity: 'draft' | 'established'
           created_by: string | null
           created_at: string
           updated_at: string
@@ -393,6 +416,12 @@ export type Database = {
           projectbase_ref?: string | null
           hosting_mode?: 'hosted' | 'self-hosted'
           promoted_from_branch_id?: string | null
+          parent_project_id?: string | null
+          focus_type?: 'regional' | 'thematic' | 'general'
+          region_tags?: string[]
+          theme_tags?: string[]
+          working_languages?: string[]
+          maturity?: 'draft' | 'established'
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -408,11 +437,25 @@ export type Database = {
           projectbase_ref?: string | null
           hosting_mode?: 'hosted' | 'self-hosted'
           promoted_from_branch_id?: string | null
+          parent_project_id?: string | null
+          focus_type?: 'regional' | 'thematic' | 'general'
+          region_tags?: string[]
+          theme_tags?: string[]
+          working_languages?: string[]
+          maturity?: 'draft' | 'established'
           created_by?: string | null
           created_at?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "projects_parent_project_id_fkey",
+            columns: ["parent_project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
       }
       project_members: {
         Row: {
@@ -442,6 +485,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_members_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      project_invites: {
+        Row: {
+          id: string
+          project_id: string
+          email: string
+          role: 'owner' | 'maintainer' | 'editor' | 'reviewer' | 'contributor' | 'viewer'
+          invited_by: string | null
+          redeemed_at: string | null
+          redeemed_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          email: string
+          role?: 'owner' | 'maintainer' | 'editor' | 'reviewer' | 'contributor' | 'viewer'
+          invited_by?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          email?: string
+          role?: 'owner' | 'maintainer' | 'editor' | 'reviewer' | 'contributor' | 'viewer'
+          invited_by?: string | null
+          redeemed_at?: string | null
+          redeemed_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_invites_project_id_fkey",
             columns: ["project_id"],
             isOneToOne: false,
             referencedRelation: "projects",
@@ -582,7 +666,15 @@ export type Database = {
           can_review?: boolean
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_shares_user_id_fkey",
+            columns: ["user_id"],
+            isOneToOne: false,
+            referencedRelation: "users",
+            referencedColumns: ["id"]
+          }
+        ]
       }
       portfolio_items: {
         Row: {
@@ -653,6 +745,258 @@ export type Database = {
           pos_y?: number | null
           created_at?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      lpm_connections: {
+        Row: {
+          id: string
+          project_id: string
+          branch_id: string | null
+          from_object_id: string
+          to_object_id: string
+          relation_type: string
+          kind: 'asserted' | 'suggested'
+          rationale: string | null
+          status: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          branch_id?: string | null
+          from_object_id: string
+          to_object_id: string
+          relation_type?: string
+          kind: 'asserted' | 'suggested'
+          rationale?: string | null
+          status?: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          branch_id?: string | null
+          from_object_id?: string
+          to_object_id?: string
+          relation_type?: string
+          kind?: 'asserted' | 'suggested'
+          rationale?: string | null
+          status?: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lpm_connections_from_object_id_fkey",
+            columns: ["from_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lpm_connections_to_object_id_fkey",
+            columns: ["to_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      lpm_threads: {
+        Row: {
+          id: string
+          project_id: string
+          branch_id: string | null
+          slug: string
+          title: string
+          thread_type: 'vertical' | 'horizontal' | 'vertical_horizontal'
+          explained_by_element_id: string | null
+          connecting_idea: string
+          narrative: string
+          teaching_prompt: string | null
+          evidence_note: string | null
+          gaps: string[]
+          status: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          branch_id?: string | null
+          slug: string
+          title: string
+          thread_type: 'vertical' | 'horizontal' | 'vertical_horizontal'
+          explained_by_element_id?: string | null
+          connecting_idea: string
+          narrative: string
+          teaching_prompt?: string | null
+          evidence_note?: string | null
+          gaps?: string[]
+          status?: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          branch_id?: string | null
+          slug?: string
+          title?: string
+          thread_type?: 'vertical' | 'horizontal' | 'vertical_horizontal'
+          explained_by_element_id?: string | null
+          connecting_idea?: string
+          narrative?: string
+          teaching_prompt?: string | null
+          evidence_note?: string | null
+          gaps?: string[]
+          status?: 'proposed' | 'under_review' | 'accepted' | 'rejected'
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lpm_threads_explained_by_element_id_fkey",
+            columns: ["explained_by_element_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_schema_elements",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      lpm_thread_stations: {
+        Row: {
+          id: string
+          thread_id: string
+          data_object_id: string
+          sequence: number
+          role_note: string
+          via_element_id: string | null
+          relation_to_next: string | null
+        }
+        Insert: {
+          id?: string
+          thread_id: string
+          data_object_id: string
+          sequence: number
+          role_note: string
+          via_element_id?: string | null
+          relation_to_next?: string | null
+        }
+        Update: {
+          id?: string
+          thread_id?: string
+          data_object_id?: string
+          sequence?: number
+          role_note?: string
+          via_element_id?: string | null
+          relation_to_next?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lpm_thread_stations_thread_id_fkey",
+            columns: ["thread_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_threads",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lpm_thread_stations_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lpm_thread_stations_via_element_id_fkey",
+            columns: ["via_element_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_schema_elements",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      lpm_object_tags: {
+        Row: {
+          id: string
+          project_id: string
+          data_object_id: string
+          schema_element_id: string
+          role: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          data_object_id: string
+          schema_element_id: string
+          role?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          data_object_id?: string
+          schema_element_id?: string
+          role?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lpm_object_tags_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lpm_object_tags_schema_element_id_fkey",
+            columns: ["schema_element_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_schema_elements",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      lpm_coherence_reviews: {
+        Row: {
+          id: string
+          project_id: string
+          branch_id: string | null
+          axis: string
+          scope_a: any
+          scope_b: any
+          note: string
+          reviewed_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          branch_id?: string | null
+          axis: string
+          scope_a: any
+          scope_b: any
+          note: string
+          reviewed_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          branch_id?: string | null
+          axis?: string
+          scope_a?: any
+          scope_b?: any
+          note?: string
+          reviewed_by?: string | null
+          created_at?: string
         }
         Relationships: []
       }
