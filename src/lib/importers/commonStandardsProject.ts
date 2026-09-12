@@ -1,14 +1,20 @@
 // Client for api.commonstandardsproject.com -- a live, no-auth, CORS-open
 // (Access-Control-Allow-Origin: *, checked directly against the endpoint)
-// directory of real academic standards for all 50 US states plus other
-// issuing bodies, each republished under its own checked license. Fetched
-// directly from the browser; nothing proxied, since this API allows it.
+// THIRD-PARTY directory of real academic standards for all 50 US states.
+// Fetched directly from the browser; nothing proxied, since this API allows
+// it. Good for DISCOVERY (what does a state call its standards, how are
+// they organized) -- not trusted for licensing.
 //
-// License is checked per STANDARD SET, not per state -- confirmed live that
-// this varies (e.g. Texas's current Biology TEKS republishing carries no
-// license at all, while its own superseded vintage does, from a different
-// republisher). classifyLicense() below fails closed on anything unclear,
-// same discipline as EvoMentor's own case_license_gate.py.
+// Checked directly (2026-09-12): this API claimed Virginia's 2018 Science
+// SOL was "CC BY 4.0 US", but Virginia's OWN first-party CASE hosting
+// (va.satchelcommons.com, see caseDirect.ts) states its real license as
+// plain copyright for the identical document. A re-publisher's own license
+// claim about someone else's copyrighted government work isn't grounds to
+// trust it over the rights holder's own statement, however official the
+// claimed license URL looks -- classifyLicense() below therefore never
+// authorizes full-text reproduction from this source, full stop. Use
+// caseDirect.ts (a state's own hosting) when full text is actually needed;
+// this module is for finding what exists, not importing its wording as-is.
 const API_BASE = 'https://api.commonstandardsproject.com/api/v1'
 
 export interface Jurisdiction {
@@ -69,15 +75,11 @@ export async function getStandardSet(id: string): Promise<StandardSetDetail> {
   return body.data as StandardSetDetail
 }
 
-/** Fail-closed license classification -- same philosophy as
- * ConceptBase's scripts/case_license_gate.py: an absent or unrecognized
- * license blocks full-text reuse rather than assuming it's fine. */
-export function classifyLicense(license: CaseLicense | null | undefined): 'ALLOW_FULL' | 'CITATION_ONLY' | 'BLOCKED' {
+/** Deliberately caps at CITATION_ONLY, never ALLOW_FULL -- see this file's
+ * header comment for why this source's own license claims aren't trusted
+ * for full-text reproduction, proven wrong at least once already. */
+export function classifyLicense(license: CaseLicense | null | undefined): 'CITATION_ONLY' | 'BLOCKED' {
   if (!license || !license.URL) return 'BLOCKED'
-  const url = license.URL.toLowerCase()
-  if (url.includes('creativecommons.org/licenses/by') || url.includes('creativecommons.org/publicdomain')) {
-    return 'ALLOW_FULL'
-  }
   return 'CITATION_ONLY'
 }
 

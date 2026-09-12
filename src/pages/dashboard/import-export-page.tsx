@@ -13,7 +13,6 @@ import {
   type Jurisdiction,
   type StandardSetSummary,
   type StandardSetDetail,
-  type CaseStandard,
 } from '@/lib/importers/commonStandardsProject'
 import {
   FWU_LAENDER,
@@ -22,6 +21,15 @@ import {
   type FwuDocument,
   type FwuCandidate,
 } from '@/lib/importers/fwuLehrplan'
+import {
+  fetchCfPackage,
+  listCfDocuments,
+  cfPackageUrl,
+  classifyCfLicense,
+  leafCfItems,
+  type CfDocumentSummary,
+  type CfPackage,
+} from '@/lib/importers/caseDirect'
 import { todayIso, type CanonicalCurriculumItem } from '@/lib/importers/types'
 
 type Notice = { kind: 'ok' | 'bad'; text: string } | null
@@ -41,15 +49,11 @@ function NoticeBox({ notice, onClear }: { notice: Notice; onClear: () => void })
 // ---------------------------------------------------------------- CASE (US) import
 
 function CaseImportPanel() {
-  const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[] | null>(null)
   const [jurisdictionId, setJurisdictionId] = useState('')
   const [sets, setSets] = useState<StandardSetSummary[]>([])
   const [setId, setSetId] = useState('')
   const [detail, setDetail] = useState<StandardSetDetail | null>(null)
-  const [keyword, setKeyword] = useState('')
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [gradeBand, setGradeBand] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
 
@@ -64,7 +68,7 @@ function CaseImportPanel() {
   }
 
   const loadSets = async (id: string) => {
-    setJurisdictionId(id); setSets([]); setSetId(''); setDetail(null); setSelected(new Set())
+    setJurisdictionId(id); setSets([]); setSetId(''); setDetail(null)
     if (!id) return
     setBusy(true); setNotice(null)
     try {
@@ -77,13 +81,11 @@ function CaseImportPanel() {
   }
 
   const loadDetail = async (id: string) => {
-    setSetId(id); setDetail(null); setSelected(new Set())
+    setSetId(id); setDetail(null)
     if (!id) return
     setBusy(true); setNotice(null)
     try {
-      const d = await getStandardSet(id)
-      setDetail(d)
-      setGradeBand(sets.find((s) => s.id === id)?.educationLevels.join(', ') ?? '')
+      setDetail(await getStandardSet(id))
     } catch (err) {
       setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Could not load this standard set.' })
     }
@@ -92,70 +94,17 @@ function CaseImportPanel() {
 
   const verdict = detail ? classifyLicense(detail.license) : null
   const leaves = detail ? leafStandards(detail) : []
-  const filtered: CaseStandard[] = keyword.trim()
-    ? leaves.filter((s) => s.description.toLowerCase().includes(keyword.trim().toLowerCase()))
-    : leaves
-
-  const toggle = (id: string) => {
-    setSelected((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  const importSelected = async () => {
-    if (!detail || verdict !== 'ALLOW_FULL' || selected.size === 0) return
-    setBusy(true); setNotice(null)
-    try {
-      const rows = Array.from(selected).map((id) => {
-        const s = detail.standards[id]
-        const item: CanonicalCurriculumItem = {
-          sourceFormat: 'case',
-          sourceRef: {
-            documentUri: detail.document.sourceURL ?? null,
-            itemIdentifier: s.statementNotation ?? s.id,
-            licenseVerdict: 'ALLOW_FULL',
-            license: detail.license,
-          },
-          jurisdiction: `US-${detail.jurisdiction.title.slice(0, 2).toUpperCase()}`,
-          language: 'en',
-          subject: detail.subject,
-          gradeBand: gradeBand || undefined,
-          fullStatement: s.description,
-          concepts: [],
-          provenance: { ingestedFrom: 'case', ingestedAt: todayIso(), importedVia: 'openlpm-import-ui', conceptTagged: false },
-        }
-        return {
-          project_id: project.id,
-          branch_id: defaultBranchId,
-          object_type: 'performance_indicator' as const,
-          title: s.description.slice(0, 90),
-          description: s.description,
-          grade_band: gradeBand || null,
-          subject_area: detail.subject,
-          content: item,
-          schema_version: 'case-common-standards-project-v1',
-          status: 'draft' as const,
-        }
-      })
-      const { error } = await supabase.from('lpm_data_objects').insert(rows)
-      if (error) throw error
-      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
-      setSelected(new Set())
-    } catch (err) {
-      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
-    }
-    setBusy(false)
-  }
 
   return (
     <div>
       <p className="muted" style={{ marginBottom: 12 }}>
-        Pulls real, published state standards (CASE format) live from the Common Standards Project
-        directory, covering all 50 US states. Every standard set carries its own checked license —
-        only sets with a clear open license (e.g. CC BY) can be imported with their real wording.
+        Browse what standards a state has, via a third-party directory (Common Standards Project)
+        that covers all 50 states. <strong>Discovery only</strong> — this directory's own license
+        labels turned out not to be reliable (its "CC BY" claim for Virginia's science standards
+        directly contradicted Virginia's own statement of "all rights reserved"), so nothing here
+        can be imported through this tab. Use it to find what a state calls its standards and how
+        many there are, then bring the real wording in through <strong>Direct state API</strong> —
+        the state's own hosting is the only source this app trusts for real text.
       </p>
       <NoticeBox notice={notice} onClear={() => setNotice(null)} />
 
@@ -199,51 +148,200 @@ function CaseImportPanel() {
                 </div>
                 <Chip status={verdict.toLowerCase()} />
               </div>
-
-              {verdict !== 'ALLOW_FULL' ? (
-                <div className="notice notice-bad">
-                  {detail.license?.URL
-                    ? 'This standard set’s license isn’t a clear open license, so its real wording can’t be imported automatically.'
-                    : 'This standard set has no license information at all, so it can’t be imported automatically — reusing its real wording without checking would be a real legal risk.'}
-                  {' '}Check with the source agency directly if you need this specific set.
-                </div>
-              ) : (
-                <>
-                  <p className="muted" style={{ fontSize: 12 }}>
-                    Licensed {detail.license.title} by {detail.license.rightsHolder} — safe to reproduce in full.
-                  </p>
-                  <div className="grid grid-2">
-                    <div className="field">
-                      <label>Filter by keyword (optional)</label>
-                      <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="e.g. evolution" />
-                    </div>
-                    <div className="field">
-                      <label>Grade band label</label>
-                      <input value={gradeBand} onChange={(e) => setGradeBand(e.target.value)} placeholder="e.g. 9-12" />
-                    </div>
-                  </div>
-                  <p className="muted" style={{ fontSize: 12 }}>
-                    {filtered.length} of {leaves.length} standards shown.
-                  </p>
-                  <div style={{ maxHeight: 320, overflowY: 'auto', marginBottom: 10 }}>
-                    {filtered.map((s) => (
-                      <label key={s.id} className="row" style={{ alignItems: 'flex-start', gap: 8, padding: '4px 0' }}>
-                        <input type="checkbox" checked={selected.has(s.id)} onChange={() => toggle(s.id)} style={{ marginTop: 3 }} />
-                        <span style={{ fontSize: 13 }}>
-                          {s.statementNotation && <strong>{s.statementNotation}: </strong>}
-                          {s.description}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                  <button className="btn btn-primary" onClick={importSelected} disabled={busy || selected.size === 0}>
-                    <Upload size={14} /> Import {selected.size || ''} selected item(s) as drafts
-                  </button>
-                </>
+              <p className="muted" style={{ fontSize: 12 }}>
+                {leaves.length} standards in this set. This directory names its license as{' '}
+                {detail.license?.title ?? 'unstated'} — not verified against the state's own terms.
+              </p>
+              {detail.document.sourceURL && (
+                <p style={{ fontSize: 12 }}>
+                  <a href={detail.document.sourceURL} target="_blank" rel="noreferrer">Original document (opens the state's own PDF/page)</a>
+                </p>
               )}
             </div>
           )}
         </>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- Direct state CASE API import
+
+function DirectCaseImportPanel() {
+  const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
+  const [input, setInput] = useState('')
+  const [documents, setDocuments] = useState<CfDocumentSummary[] | null>(null)
+  const [base, setBase] = useState('')
+  const [pkg, setPkg] = useState<CfPackage | null>(null)
+  const [keyword, setKeyword] = useState('')
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [gradeBand, setGradeBand] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<Notice>(null)
+
+  const load = async () => {
+    setBusy(true); setNotice(null); setDocuments(null); setPkg(null); setSelected(new Set())
+    try {
+      if (/\/CFPackages\//.test(input)) {
+        setPkg(await fetchCfPackage(input.trim()))
+      } else {
+        const { base: b, documents: docs } = await listCfDocuments(input)
+        setBase(b)
+        setDocuments(docs)
+      }
+    } catch (err) {
+      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Could not reach that CASE API.' })
+    }
+    setBusy(false)
+  }
+
+  const openDocument = async (doc: CfDocumentSummary) => {
+    setBusy(true); setNotice(null); setPkg(null); setSelected(new Set())
+    try {
+      setPkg(await fetchCfPackage(cfPackageUrl(base, doc.identifier)))
+    } catch (err) {
+      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Could not load that document.' })
+    }
+    setBusy(false)
+  }
+
+  const verdict = pkg ? classifyCfLicense(pkg.CFDocument.licenseURI) : null
+  const leaves = pkg ? leafCfItems(pkg) : []
+  const filtered = keyword.trim() ? leaves.filter((i) => i.fullStatement.toLowerCase().includes(keyword.trim().toLowerCase())) : leaves
+
+  const toggle = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const importSelected = async () => {
+    if (!pkg || verdict !== 'ALLOW_FULL' || selected.size === 0) return
+    setBusy(true); setNotice(null)
+    try {
+      const rows = leaves.filter((i) => selected.has(i.identifier)).map((i) => {
+        const item: CanonicalCurriculumItem = {
+          sourceFormat: 'case',
+          sourceRef: {
+            documentUri: pkg.CFDocument.officialSourceURL ?? null,
+            itemIdentifier: i.identifier,
+            licenseVerdict: 'ALLOW_FULL',
+            license: pkg.CFDocument.licenseURI,
+          },
+          jurisdiction: 'unspecified',
+          language: 'en',
+          subject: pkg.CFDocument.subject?.[0],
+          gradeBand: gradeBand || undefined,
+          fullStatement: i.fullStatement,
+          concepts: [],
+          provenance: { ingestedFrom: 'case', ingestedAt: todayIso(), importedVia: 'openlpm-import-ui', conceptTagged: false },
+        }
+        return {
+          project_id: project.id,
+          branch_id: defaultBranchId,
+          object_type: 'performance_indicator' as const,
+          title: i.fullStatement.slice(0, 90),
+          description: i.fullStatement,
+          grade_band: gradeBand || null,
+          subject_area: pkg.CFDocument.subject?.[0] ?? null,
+          content: item,
+          schema_version: 'case-direct-v1',
+          status: 'draft' as const,
+        }
+      })
+      const { error } = await supabase.from('lpm_data_objects').insert(rows)
+      if (error) throw error
+      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
+      setSelected(new Set())
+    } catch (err) {
+      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Paste a state's own CASE hosting — its real license, straight from the publisher, is the
+        only thing this path trusts for full-text import. Known example: Virginia hosts its own at{' '}
+        <code>va.satchelcommons.com</code> — paste that to see everything it publishes, or paste a
+        full <code>.../CFPackages/&lt;id&gt;</code> URL directly.
+      </p>
+      <NoticeBox notice={notice} onClear={() => setNotice(null)} />
+
+      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+        <input
+          style={{ flex: 1 }}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="e.g. va.satchelcommons.com, or a full CFPackages URL"
+        />
+        <button className="btn btn-primary" onClick={load} disabled={busy || !input.trim()}>Load</button>
+      </div>
+
+      {documents && (
+        <div className="card">
+          <h3>Documents ({documents.length})</h3>
+          {documents.map((d) => {
+            const v = classifyCfLicense(d.licenseURI)
+            return (
+              <div key={d.identifier} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+                <span style={{ fontSize: 13 }}>
+                  {d.title} <Chip status={v.toLowerCase()} />
+                </span>
+                <button className="btn btn-mini" onClick={() => openDocument(d)} disabled={busy}>Open</button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {pkg && verdict && (
+        <div className="card">
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <h3 style={{ margin: 0 }}>{pkg.CFDocument.title}</h3>
+            <Chip status={verdict.toLowerCase()} />
+          </div>
+          <p className="muted" style={{ fontSize: 12 }}>
+            License, straight from the publisher: {pkg.CFDocument.licenseURI?.title ?? 'none stated'}
+          </p>
+
+          {verdict !== 'ALLOW_FULL' ? (
+            <div className="notice notice-bad">
+              {verdict === 'BLOCKED'
+                ? 'The publisher’s own license doesn’t allow reusing this wording, so it can’t be imported.'
+                : 'This license isn’t clearly open, so real wording can’t be imported automatically.'}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-2">
+                <div className="field">
+                  <label>Filter by keyword (optional)</label>
+                  <input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="e.g. evolution" />
+                </div>
+                <div className="field">
+                  <label>Grade band label</label>
+                  <input value={gradeBand} onChange={(e) => setGradeBand(e.target.value)} placeholder="e.g. 9-12" />
+                </div>
+              </div>
+              <p className="muted" style={{ fontSize: 12 }}>{filtered.length} of {leaves.length} items shown.</p>
+              <div style={{ maxHeight: 320, overflowY: 'auto', marginBottom: 10 }}>
+                {filtered.map((i) => (
+                  <label key={i.identifier} className="row" style={{ alignItems: 'flex-start', gap: 8, padding: '4px 0' }}>
+                    <input type="checkbox" checked={selected.has(i.identifier)} onChange={() => toggle(i.identifier)} style={{ marginTop: 3 }} />
+                    <span style={{ fontSize: 13 }}>{i.fullStatement}</span>
+                  </label>
+                ))}
+              </div>
+              <button className="btn btn-primary" onClick={importSelected} disabled={busy || selected.size === 0}>
+                <Upload size={14} /> Import {selected.size || ''} selected item(s) as drafts
+              </button>
+            </>
+          )}
+        </div>
       )}
     </div>
   )
@@ -691,7 +789,8 @@ export default function ImportExportPage() {
       </p>
       <TabPanels
         tabs={[
-          { label: 'US standards (CASE)', content: <CaseImportPanel /> },
+          { label: 'Direct state API', content: <DirectCaseImportPanel /> },
+          { label: 'Browse US states (discovery)', content: <CaseImportPanel /> },
           { label: 'German Lehrplan (MEM-Schule)', content: <FwuImportPanel /> },
           { label: 'Upload a file', content: <UploadImportPanel /> },
           { label: 'Export', content: <ExportPanel /> },
