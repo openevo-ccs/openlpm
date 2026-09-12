@@ -12,10 +12,14 @@ type EpistemicStatus = Database['public']['Tables']['projects']['Row']['epistemi
 // anticipates a future 'field-piloted'-style addition via ordinary RFC, but
 // hasn't added one) -- used for real, non-synthetic project work that isn't
 // yet claiming field-validated status (e.g. a curriculum mid-ingestion).
+// One word each, chosen 2026-09-12 to match the brevity of the Draft/
+// Established maturity badge -- still real vs. not-real at a glance
+// (Sample = synthetic, everything else is real), detail lives in each
+// project's own description and notes, not the chip itself.
 const LABEL: Record<EpistemicStatus, string> = {
-  'designed-thought-experiment': 'Synthetic — thought experiment',
-  'field-validated-curriculum': 'Field-validated',
-  'in-development': 'Real — in development',
+  'designed-thought-experiment': 'Sample',
+  'field-validated-curriculum': 'Adopted',
+  'in-development': 'Growing',
 }
 
 export function EpistemicStatusBadge({ status }: { status: EpistemicStatus }) {

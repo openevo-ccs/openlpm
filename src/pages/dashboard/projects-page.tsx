@@ -4,6 +4,7 @@ import { ArrowRight, FolderKanban, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
+import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Project = Database['public']['Tables']['projects']['Row']
@@ -94,7 +95,10 @@ export default function ProjectsPage() {
                   <MaturityBadge status={child.maturity} />
                 </div>
                 {child.description && <p className="muted">{child.description}</p>}
-                <EpistemicStatusBadge status={child.epistemic_status} />
+                <div className="row" style={{ flexWrap: 'wrap' }}>
+                  <EpistemicStatusBadge status={child.epistemic_status} />
+                  <WorkingLanguagesTag languages={child.working_languages} />
+                </div>
                 <span className="row muted" style={{ fontSize: 12, marginTop: 8 }}>
                   Open <ArrowRight size={12} />
                 </span>

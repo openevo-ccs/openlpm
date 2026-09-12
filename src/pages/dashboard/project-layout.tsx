@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
+import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav } from '@/components/project-nav'
 
 export interface ProjectOutletContext {
@@ -138,6 +139,7 @@ export default function ProjectLayout() {
         <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>
           <EpistemicStatusBadge status={project.epistemic_status} />
           <MaturityBadge status={project.maturity} />
+          <WorkingLanguagesTag languages={project.working_languages} />
         </div>
         <ProjectNav items={nav} />
       </aside>

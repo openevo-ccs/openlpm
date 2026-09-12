@@ -4,6 +4,7 @@ import { FolderKanban } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
+import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
@@ -54,7 +55,10 @@ export default function ProjectSwitcherPage() {
                     <span className="chip capitalize">{role}</span>
                   </div>
                   <p className="muted">{project.description}</p>
-                  <EpistemicStatusBadge status={project.epistemic_status} />
+                  <div className="row" style={{ flexWrap: 'wrap' }}>
+                    <EpistemicStatusBadge status={project.epistemic_status} />
+                    <WorkingLanguagesTag languages={project.working_languages} />
+                  </div>
                 </Link>
                 {children.length > 0 && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
