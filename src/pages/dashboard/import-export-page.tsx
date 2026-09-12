@@ -417,6 +417,214 @@ function FwuImportPanel() {
   )
 }
 
+// ---------------------------------------------------------------- Upload a file
+
+interface UploadedItem {
+  key: string
+  text: string
+  raw: unknown
+}
+
+function detectItems(parsed: unknown, textField: string | null): { items: UploadedItem[]; kind: string; textFieldOptions: string[] } {
+  // OpenLPM's own export shape (export-page's ExportPanel) -- items[].content
+  // is already a CanonicalCurriculumItem, or items[].description has the text.
+  if (parsed && typeof parsed === 'object' && Array.isArray((parsed as any).items) && (parsed as any).exportedFrom === 'OpenLPM') {
+    const arr = (parsed as any).items as any[]
+    return {
+      kind: 'OpenLPM export',
+      textFieldOptions: [],
+      items: arr.map((it, i) => ({
+        key: String(i),
+        text: it.content?.fullStatement ?? it.description ?? it.title ?? JSON.stringify(it),
+        raw: it,
+      })),
+    }
+  }
+  // CASE CFPackage shape.
+  if (parsed && typeof parsed === 'object' && Array.isArray((parsed as any).CFItems)) {
+    const arr = (parsed as any).CFItems as any[]
+    return {
+      kind: 'CASE (CFPackage)',
+      textFieldOptions: [],
+      items: arr.map((it, i) => ({
+        key: it.identifier ?? String(i),
+        text: it.fullStatement ?? it.humanCodingScheme ?? JSON.stringify(it),
+        raw: it,
+      })),
+    }
+  }
+  // Generic array of objects -- ask which field holds the item text.
+  if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object') {
+    const keys = Object.keys(parsed[0] as object)
+    const field = textField && keys.includes(textField) ? textField : null
+    return {
+      kind: 'Generic JSON array',
+      textFieldOptions: keys,
+      items: field ? parsed.map((it, i) => ({ key: String(i), text: String((it as any)[field] ?? ''), raw: it })) : [],
+    }
+  }
+  return { kind: 'Unrecognized', textFieldOptions: [], items: [] }
+}
+
+function UploadImportPanel() {
+  const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
+  const [fileName, setFileName] = useState('')
+  const [parsed, setParsed] = useState<unknown>(null)
+  const [textField, setTextField] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [gradeBand, setGradeBand] = useState('')
+  const [subject, setSubject] = useState('')
+  const [attribution, setAttribution] = useState('')
+  const [confirmed, setConfirmed] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<Notice>(null)
+
+  const onFile = async (file: File) => {
+    setFileName(file.name); setParsed(null); setTextField(null); setSelected(new Set()); setNotice(null)
+    try {
+      const text = await file.text()
+      setParsed(JSON.parse(text))
+    } catch (err) {
+      setNotice({ kind: 'bad', text: `Couldn't read that as JSON: ${err instanceof Error ? err.message : String(err)}` })
+    }
+  }
+
+  const detected = parsed !== null ? detectItems(parsed, textField) : null
+
+  const toggle = (key: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  const selectAll = () => {
+    if (!detected) return
+    setSelected(new Set(detected.items.map((i) => i.key)))
+  }
+
+  const importSelected = async () => {
+    if (!detected || selected.size === 0 || !confirmed) return
+    setBusy(true); setNotice(null)
+    try {
+      const rows = detected.items
+        .filter((i) => selected.has(i.key))
+        .map((i) => {
+          const item: CanonicalCurriculumItem = {
+            sourceFormat: 'custom',
+            sourceRef: { userSchemaId: fileName, sourceItemKey: i.key, mappingReviewed: false, attribution: attribution || null },
+            jurisdiction: 'unspecified',
+            language: 'unspecified',
+            subject: subject || undefined,
+            gradeBand: gradeBand || undefined,
+            fullStatement: i.text,
+            concepts: [],
+            provenance: { ingestedFrom: 'custom', ingestedAt: todayIso(), importedVia: 'openlpm-import-ui', conceptTagged: false },
+          }
+          return {
+            project_id: project.id,
+            branch_id: defaultBranchId,
+            object_type: 'performance_indicator' as const,
+            title: i.text.slice(0, 90),
+            description: i.text,
+            grade_band: gradeBand || null,
+            subject_area: subject || null,
+            content: item,
+            schema_version: 'custom-upload-v1',
+            status: 'draft' as const,
+          }
+        })
+      const { error } = await supabase.from('lpm_data_objects').insert(rows)
+      if (error) throw error
+      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
+      setSelected(new Set())
+    } catch (err) {
+      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Upload your own file — a CASE package, an export from another OpenLPM project, or any JSON
+        array of items. Nothing here has its license checked automatically, since it isn't coming
+        from a known source — you're confirming that yourself before anything is imported.
+      </p>
+      <NoticeBox notice={notice} onClear={() => setNotice(null)} />
+
+      <div className="field">
+        <label>File (JSON)</label>
+        <input type="file" accept=".json,application/json" onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
+      </div>
+
+      {detected && (
+        <div className="card">
+          <p className="muted" style={{ fontSize: 12 }}>Detected: {detected.kind}</p>
+
+          {detected.textFieldOptions.length > 0 && (
+            <div className="field">
+              <label>Which field holds each item's text?</label>
+              <select value={textField ?? ''} onChange={(e) => setTextField(e.target.value || null)}>
+                <option value="">Choose a field…</option>
+                {detected.textFieldOptions.map((k) => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {detected.items.length > 0 && (
+            <>
+              <div className="grid grid-2">
+                <div className="field">
+                  <label>Grade band label (optional)</label>
+                  <input value={gradeBand} onChange={(e) => setGradeBand(e.target.value)} placeholder="e.g. 9-12" />
+                </div>
+                <div className="field">
+                  <label>Subject (optional)</label>
+                  <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Biology" />
+                </div>
+              </div>
+              <div className="field">
+                <label>Where did this come from? (shown alongside anything imported)</label>
+                <input value={attribution} onChange={(e) => setAttribution(e.target.value)} placeholder="e.g. Texas TEKS, downloaded from tea.texas.gov 2026-09" />
+              </div>
+
+              <div className="row" style={{ justifyContent: 'space-between', marginBottom: 6 }}>
+                <p className="muted" style={{ fontSize: 12, margin: 0 }}>{detected.items.length} item(s) found.</p>
+                <button className="btn btn-mini" onClick={selectAll} type="button">Select all</button>
+              </div>
+              <div style={{ maxHeight: 320, overflowY: 'auto', marginBottom: 10 }}>
+                {detected.items.map((it) => (
+                  <label key={it.key} className="row" style={{ alignItems: 'flex-start', gap: 8, padding: '4px 0' }}>
+                    <input type="checkbox" checked={selected.has(it.key)} onChange={() => toggle(it.key)} style={{ marginTop: 3 }} />
+                    <span style={{ fontSize: 13 }}>{it.text.slice(0, 200)}</span>
+                  </label>
+                ))}
+              </div>
+
+              <label className="row" style={{ alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
+                <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} style={{ marginTop: 3 }} />
+                <span style={{ fontSize: 12.5 }}>
+                  I've checked that I have the right to bring this content into this project (my own work, or
+                  something whose license I've verified myself).
+                </span>
+              </label>
+
+              <button className="btn btn-primary" onClick={importSelected} disabled={busy || selected.size === 0 || !confirmed}>
+                <Upload size={14} /> Import {selected.size || ''} selected item(s) as drafts
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ---------------------------------------------------------------- Export
 
 function ExportPanel() {
@@ -485,6 +693,7 @@ export default function ImportExportPage() {
         tabs={[
           { label: 'US standards (CASE)', content: <CaseImportPanel /> },
           { label: 'German Lehrplan (MEM-Schule)', content: <FwuImportPanel /> },
+          { label: 'Upload a file', content: <UploadImportPanel /> },
           { label: 'Export', content: <ExportPanel /> },
         ]}
       />

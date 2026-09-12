@@ -3,7 +3,7 @@
 // lpm_data_objects.content -- mirrors EvoMentor's own
 // schema/canonical-curriculum-item.schema.json so content imported here
 // stays interoperable with the wider ecosystem, not just this one app.
-export type SourceFormat = 'case' | 'fwu-lehrplan-ontologie'
+export type SourceFormat = 'case' | 'fwu-lehrplan-ontologie' | 'custom'
 
 export type LicenseVerdict = 'ALLOW_FULL' | 'CITATION_ONLY' | 'BLOCKED'
 

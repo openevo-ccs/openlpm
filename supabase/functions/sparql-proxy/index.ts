@@ -59,9 +59,17 @@ Deno.serve(async (req: Request) => {
       headers: { Accept: 'application/sparql-results+json' },
     })
     const text = await upstream.text()
+    // The SPARQL results body is valid JSON either way -- but the Supabase
+    // JS client's functions.invoke() only auto-parses a response body when
+    // Content-Type is EXACTLY 'application/json' (strict equality, checked
+    // directly in its source); anything else, including the real SPARQL
+    // media type 'application/sparql-results+json', falls back to returning
+    // the raw text. That silently broke every caller here -- `data` was a
+    // string, `data?.results?.bindings` was always undefined, and every
+    // search quietly came back empty with no error to notice.
     return new Response(text, {
       status: upstream.status,
-      headers: { ...CORS_HEADERS, 'Content-Type': 'application/sparql-results+json' },
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
     })
   } catch (err) {
     return new Response(JSON.stringify({ error: `Upstream SPARQL request failed: ${err}` }), {
