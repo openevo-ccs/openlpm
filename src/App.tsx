@@ -14,6 +14,7 @@ import LiteraturePage from '@/pages/dashboard/literature-page'
 import MembersPage from '@/pages/dashboard/members-page'
 import SchemaPage from '@/pages/dashboard/schema-page'
 import StandardsPage from '@/pages/dashboard/standards-page'
+import ImportExportPage from '@/pages/dashboard/import-export-page'
 import ProjectsPage from '@/pages/dashboard/projects-page'
 import ExplorePage from '@/pages/dashboard/explore-page'
 import CoherencePage from '@/pages/dashboard/coherence-page'
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="members" element={<MembersPage />} />
             <Route path="schema" element={<SchemaPage />} />
             <Route path="standards" element={<StandardsPage />} />
+            <Route path="import" element={<ImportExportPage />} />
             <Route path="explore" element={<ExplorePage />} />
             <Route path="explore/:objectId" element={<ExplorePage />} />
             <Route path="coherence" element={<CoherencePage />} />

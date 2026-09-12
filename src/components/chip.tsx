@@ -38,6 +38,10 @@ const BUCKET: Record<string, string> = {
   restructured: 'draft',
   'grade-band-split': 'draft',
   'new-grade-band-coverage': 'draft',
+  // Import license verdicts (src/lib/importers/commonStandardsProject.ts).
+  allow_full: 'good',
+  citation_only: 'draft',
+  blocked: 'critical',
 }
 
 export function Chip({ status, children }: { status: string; children?: React.ReactNode }) {
