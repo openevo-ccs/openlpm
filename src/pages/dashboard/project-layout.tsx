@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowLeftRight, BookOpen, Clock, Compass, FileText, FolderKanban, Grid3x3, Layers, MessageSquare, Network, ShieldAlert, Shapes, Users } from 'lucide-react'
+import { ArrowLeft, ArrowLeftRight, BookOpen, Clock, Compass, FileText, FolderKanban, Grid3x3, Layers, MessageSquare, Network, ShieldAlert, Shapes, Sparkles, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
@@ -108,6 +108,7 @@ export default function ProjectLayout() {
     { href: `/dashboard/${slug}/coherence`, content: <><Grid3x3 size={14} />Coherence</> },
     { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
     { href: `/dashboard/${slug}/schema`, content: <><Shapes size={14} />Schema</> },
+    { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</> },
     { href: `/dashboard/${slug}/standards`, content: <><Layers size={14} />Standards</> },
     { href: `/dashboard/${slug}/import`, content: <><ArrowLeftRight size={14} />Import / export</> },
     { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
