@@ -37,11 +37,17 @@ export default function SchemaPage() {
   const reload = async () => {
     // Every concept/competency/grade-band element that belongs to this
     // Project -- there's no more separate per-branch schema tab to split
-    // this across (see the project-hierarchy/maturity migrations).
+    // this across (see the project-hierarchy/maturity migrations). Also
+    // pulls in the parent Project Space's own elements when this project
+    // has one (e.g. EvoMentor's shared Basiskonzepte taxonomy, moved up
+    // 2026-09-12 specifically so every regional sub-project sees the same
+    // one, not a separate copy each) -- a shared framework lives on the
+    // Space, sub-projects read it, never fork their own copy.
+    const projectIds = [project.id, project.parent_project_id].filter((id): id is string => !!id)
     const { data } = await supabase
       .from('lpm_schema_elements')
       .select('*')
-      .eq('project_id', project.id)
+      .in('project_id', projectIds)
       .order('created_at', { ascending: true })
     setElements(data ?? [])
   }
