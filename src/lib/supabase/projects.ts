@@ -11,11 +11,31 @@ export interface ProjectWithRole {
   role: ProjectMemberRole
 }
 
-/** Every project the current user is a member of, with their role in each. */
+/**
+ * Every project the current user is a member of, with their role in each.
+ *
+ * Real bug, fixed 2026-09-13: this query had no `user_id` filter, relying
+ * entirely on RLS to scope the rows -- but the `project_members` SELECT
+ * policy correctly lets any member of a project see the *whole* team's
+ * membership rows (that's what the Members page needs), not just the
+ * caller's own. On any project with more than one person, every other
+ * member's row leaked in here too, so a shared project showed once per
+ * person on it, each with that person's own role misattributed to the
+ * viewer -- reported independently by both Dustin and Susan Hanisch on
+ * EvoMentor Thuringia. Filtering by user_id explicitly fixes it at the
+ * source, for every caller of this function (project switcher and profile
+ * page both use it), rather than patching each caller's display logic.
+ */
 export async function getUserProjects(supabase: Client): Promise<ProjectWithRole[]> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+
   const { data, error } = await supabase
     .from('project_members')
     .select('role, projects(*)')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: true })
 
   if (error || !data) return []
