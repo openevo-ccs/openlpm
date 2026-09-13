@@ -9,16 +9,13 @@ import DashboardLayout from '@/pages/dashboard/dashboard-layout'
 import ProjectSwitcherPage from '@/pages/dashboard/project-switcher-page'
 import ProfilePage from '@/pages/dashboard/profile-page'
 import ProjectLayout from '@/pages/dashboard/project-layout'
-import OverviewPage from '@/pages/dashboard/overview-page'
+import DashboardPage from '@/pages/dashboard/dashboard-page'
 import LiteraturePage from '@/pages/dashboard/literature-page'
-import MembersPage from '@/pages/dashboard/members-page'
-import SchemaPage from '@/pages/dashboard/schema-page'
-import StandardsPage from '@/pages/dashboard/standards-page'
-import ImportExportPage from '@/pages/dashboard/import-export-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
-import ProjectsPage from '@/pages/dashboard/projects-page'
-import ExplorePage from '@/pages/dashboard/explore-page'
-import CoherencePage from '@/pages/dashboard/coherence-page'
+import TheoriesPage from '@/pages/dashboard/theories-page'
+import StrandsPage from '@/pages/dashboard/strands-page'
+import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
+import AnalyticsPage from '@/pages/dashboard/analytics-page'
 import ReviewPage from '@/pages/dashboard/review-page'
 import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
@@ -82,21 +79,18 @@ export default function App() {
           <Route index element={<ProjectSwitcherPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path=":project" element={<ProjectLayout />}>
-            <Route index element={<OverviewPage />} />
-            <Route path="literature" element={<LiteraturePage />} />
-            <Route path="members" element={<MembersPage />} />
-            <Route path="schema" element={<SchemaPage />} />
+            <Route index element={<DashboardPage />} />
+            <Route path="learning-goals" element={<LearningGoalsPage />} />
+            <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
             <Route path="concepts" element={<ConceptsPage />} />
-            <Route path="standards" element={<StandardsPage />} />
-            <Route path="import" element={<ImportExportPage />} />
-            <Route path="explore" element={<ExplorePage />} />
-            <Route path="explore/:objectId" element={<ExplorePage />} />
-            <Route path="coherence" element={<CoherencePage />} />
+            <Route path="theories" element={<TheoriesPage />} />
+            <Route path="strands" element={<StrandsPage />} />
+            <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
-            <Route path="projects" element={<ProjectsPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />
-            <Route path="portfolios" element={<PortfoliosPage />} />
-            <Route path="portfolios/:portfolioId" element={<PortfolioDetailPage />} />
+            <Route path="notebooks" element={<PortfoliosPage />} />
+            <Route path="notebooks/:portfolioId" element={<PortfolioDetailPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
           </Route>
         </Route>
 

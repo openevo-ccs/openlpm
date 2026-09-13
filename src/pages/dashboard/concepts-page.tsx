@@ -1,11 +1,79 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { ChevronDown, ChevronRight, Layers, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Layers, Shapes, X } from 'lucide-react'
+import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 type ProjectRow = Database['public']['Tables']['projects']['Row']
+type ProjectBaseLink = Database['public']['Tables']['project_base_links']['Row']
+
+// 2026-09-13 restructure: Schema (taxonomy management + ConceptBase import)
+// and Concepts (cross-project concept map + relevance analytics) folded
+// into one sidebar space, per Dustin's explicit "Schema gets replaced by
+// Concepts" instruction. Both tabs below are the same two components that
+// used to be separate pages, unmodified internally -- still reading/writing
+// `lpm_schema_elements` directly. The plan's longer-term design moves this
+// onto the new `frameworks`/`framework_tags` tables (migration
+// 018_frameworks_and_crosswalks.sql) instead, generalized to also cover
+// subject-area and grade-band taxonomies -- deliberately not done in this
+// pass: that migration hasn't reached the live database yet, and moving
+// real, already-live Basiskonzepte content onto a new table is exactly the
+// kind of change that needs its own careful, separately-verified pass, not
+// bundled into a page-layout reorganization.
+
+const CONCEPTBASE_REPO = 'openevo-ccs/conceptbase'
+
+interface ConceptBaseConcept {
+  id: string
+  type: string
+  status: string
+  version: string
+  definedInVocabulary: string
+  labels: Record<string, string>
+  definitions?: Record<string, Record<string, string>>
+  relations?: Record<string, string[]>
+}
+
+function mapStatus(cbStatus: string): 'proposed' | 'discussed' | 'accepted' | 'deprecated' {
+  if (cbStatus === 'stable') return 'accepted'
+  if (cbStatus === 'deprecated') return 'deprecated'
+  return 'proposed'
+}
+
+type Tab = 'explore' | 'manage'
+
+export default function ConceptsPage() {
+  const [tab, setTab] = useState<Tab>('explore')
+
+  return (
+    <div>
+      <h1 className="row"><Layers size={18} style={{ color: 'var(--text-muted)' }} />Concepts</h1>
+      <p className="muted" style={{ marginBottom: 16 }}>
+        The concepts and concept-domain relations this LPM is organized around — browse how they
+        connect to real content, or manage the taxonomy itself.
+      </p>
+
+      <div className="row" style={{ gap: 8, marginBottom: 20 }}>
+        <button className={`btn btn-mini${tab === 'explore' ? ' btn-primary' : ''}`} onClick={() => setTab('explore')}>
+          Explore
+        </button>
+        <button className={`btn btn-mini${tab === 'manage' ? ' btn-primary' : ''}`} onClick={() => setTab('manage')}>
+          Manage taxonomy
+        </button>
+      </div>
+
+      {tab === 'explore' ? <ConceptMapTab /> : <ManageConceptsTab />}
+    </div>
+  )
+}
+
+// ============================================================================
+// Explore tab -- formerly the standalone Concepts page: a shared concept
+// tree cross-referenced against every real regional sub-project's own
+// tagged learning goals.
+// ============================================================================
 
 interface BkbEntry {
   basiskonzept_id: string
@@ -25,13 +93,7 @@ interface Hit {
   reasoning: string
 }
 
-// Every real Lernziel/standard this page pulls in, across every regional
-// sub-project under this Project Space, tagged against the ONE shared
-// Basiskonzepte taxonomy (schema-page.tsx's own comment explains why it
-// lives on the Space, not any one region) -- built 2026-09-12 once all
-// three German states carried the same full judgment set Thuringia already
-// had, specifically so this became possible.
-export default function ConceptsPage() {
+function ConceptMapTab() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
   const [taxonomy, setTaxonomy] = useState<SchemaElement[] | null>(null)
   const [children, setChildren] = useState<ProjectRow[]>([])
@@ -42,10 +104,10 @@ export default function ConceptsPage() {
   const [hubName, setHubName] = useState<string>(project.name)
 
   // The shared taxonomy and its full sibling list live on the Project Space
-  // (see schema-page.tsx's own comment) -- viewing this tab from inside a
-  // regional sub-project (Thuringia, Bayern, Sachsen...) still needs the
-  // Space-level picture, not just that one sub-project's own (empty) schema
-  // rows, so this always resolves up to the Space first.
+  // -- viewing this tab from inside a regional sub-project (Thuringia,
+  // Bayern, Sachsen...) still needs the Space-level picture, not just that
+  // one sub-project's own (empty) schema rows, so this always resolves up
+  // to the Space first.
   const hubProjectId = project.parent_project_id ?? project.id
 
   useEffect(() => {
@@ -139,7 +201,6 @@ export default function ConceptsPage() {
 
   return (
     <div>
-      <h1 className="row"><Layers size={18} style={{ color: 'var(--text-muted)' }} />Shared concept map</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
         One concept structure, shared across every real regional curriculum in {hubName} — for
         finding what a specific concept looks like across states, and for comparing how much weight
@@ -296,6 +357,165 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
             ))}
           </div>
         ))
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Manage-taxonomy tab -- formerly the standalone Schema page: the flat
+// element list + import-from-ConceptBase tool.
+// ============================================================================
+
+function ManageConceptsTab() {
+  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const [elements, setElements] = useState<SchemaElement[]>([])
+  const [baseLink, setBaseLink] = useState<ProjectBaseLink | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
+
+  const reload = async () => {
+    const projectIds = [project.id, project.parent_project_id].filter((id): id is string => !!id)
+    const { data } = await supabase
+      .from('lpm_schema_elements')
+      .select('*')
+      .in('project_id', projectIds)
+      .order('created_at', { ascending: true })
+    setElements(data ?? [])
+  }
+
+  useEffect(() => {
+    reload()
+    supabase
+      .from('project_base_links')
+      .select('*')
+      .eq('project_id', project.id)
+      .eq('base_repo', 'conceptbase')
+      .maybeSingle()
+      .then(({ data }) => setBaseLink(data))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id])
+
+  const canManage = role === 'owner' || role === 'maintainer'
+
+  const importConcepts = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const vocabulary = String(formData.get('vocabulary') ?? '').trim()
+    if (!vocabulary) return
+    setBusy(true); setNotice(null)
+
+    try {
+      const treeRes = await fetch(`https://api.github.com/repos/${CONCEPTBASE_REPO}/git/trees/main?recursive=1`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      })
+      if (!treeRes.ok) throw new Error(`GitHub API error (${treeRes.status})`)
+      const tree: { tree: { path: string; type: string }[] } = await treeRes.json()
+
+      const conceptPaths = tree.tree
+        .filter((entry) => entry.type === 'blob' && entry.path.startsWith('registry/concept/') && entry.path.endsWith('.json'))
+        .map((entry) => entry.path)
+
+      const concepts = await Promise.all(
+        conceptPaths.map(async (path) => {
+          const res = await fetch(`https://raw.githubusercontent.com/${CONCEPTBASE_REPO}/main/${path}`)
+          if (!res.ok) return null
+          return (await res.json()) as ConceptBaseConcept
+        })
+      )
+
+      const matching = concepts.filter((c): c is ConceptBaseConcept => c !== null && c.definedInVocabulary === vocabulary)
+
+      for (const concept of matching) {
+        const label = concept.labels?.en ?? concept.id
+        const definitionsForLang = concept.definitions?.en ?? {}
+        const definition = Object.values(definitionsForLang)[0] ?? null
+
+        const { data: existing } = await supabase
+          .from('lpm_schema_elements')
+          .select('id')
+          .eq('project_id', project.id)
+          .eq('metadata->>conceptbase_id', concept.id)
+          .maybeSingle()
+
+        const row = {
+          project_id: project.id,
+          element_type: 'concept' as const,
+          label,
+          definition,
+          status: mapStatus(concept.status),
+          metadata: {
+            conceptbase_id: concept.id,
+            vocabulary: concept.definedInVocabulary,
+            version: concept.version,
+            relations: concept.relations ?? {},
+            source: 'conceptbase',
+          },
+        }
+
+        if (existing) await supabase.from('lpm_schema_elements').update(row).eq('id', existing.id)
+        else await supabase.from('lpm_schema_elements').insert(row)
+      }
+
+      setNotice({ kind: 'ok', text: `Imported ${matching.length} concept(s) from "${vocabulary}".` })
+      await reload()
+    } catch (err) {
+      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div>
+      <p className="muted" style={{ marginBottom: 20 }}>
+        Concepts, competencies, and grade bands used across this project — imported from
+        ConceptBase or added directly.
+      </p>
+
+      {notice && (
+        <div className={`notice notice-${notice.kind}`}>
+          {notice.text}
+          <button className="btn btn-mini" onClick={() => setNotice(null)} style={{ marginLeft: 'auto' }}><X size={10} /></button>
+        </div>
+      )}
+
+      {elements.length === 0 ? (
+        <div className="card empty">
+          <Shapes size={32} />
+          <p>No schema elements yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-3" style={{ marginBottom: 20 }}>
+          {elements.map((el) => (
+            <div key={el.id} className="card">
+              <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <h3>{el.label}</h3>
+                <Chip status={el.status} />
+              </div>
+              <span className="muted capitalize">{el.element_type}</span>
+              {el.definition && <p style={{ marginTop: 8 }}>{el.definition}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {canManage && (
+        <div className="card">
+          <h3>Import from ConceptBase</h3>
+          <p className="muted">
+            {baseLink?.can_import
+              ? 'Pulls real oe:Concept records for one vocabulary from the public ConceptBase registry. Read-only — never writes back.'
+              : "This project isn't linked to ConceptBase for import yet (see project_base_links)."}
+          </p>
+          <form onSubmit={importConcepts} className="row">
+            <div className="field" style={{ marginBottom: 0 }}>
+              <input name="vocabulary" placeholder="e.g. BIO-CORE-v1.0.0" style={{ width: 220 }} required />
+            </div>
+            <button type="submit" className="btn btn-primary" disabled={!baseLink?.can_import || busy}>
+              Import concepts
+            </button>
+          </form>
+        </div>
       )}
     </div>
   )

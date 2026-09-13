@@ -56,7 +56,7 @@ export default function PortfoliosPage() {
 
   return (
     <div>
-      <h1>Portfolios</h1>
+      <h1>Notebooks</h1>
       <p className="muted" style={{ marginBottom: 20 }}>
         Unlimited personal spaces per project — curate canonical items alongside your own
         notes, questions, and drafts. Nothing here is shared unless you say so.
@@ -72,12 +72,12 @@ export default function PortfoliosPage() {
       {portfolios.length === 0 ? (
         <div className="card empty">
           <Network size={32} />
-          <p>No portfolios yet.</p>
+          <p>No notebooks yet.</p>
         </div>
       ) : (
         <div className="grid grid-3" style={{ marginBottom: 20 }}>
           {portfolios.map((p) => (
-            <Link key={p.id} to={`/dashboard/${slug}/portfolios/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Link key={p.id} to={`/dashboard/${slug}/notebooks/${p.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               <div className="card" style={{ height: '100%' }}>
                 <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <h3 className="row"><Network size={14} style={{ color: 'var(--text-muted)' }} />{p.name}</h3>
@@ -92,7 +92,7 @@ export default function PortfoliosPage() {
       )}
 
       <div className="card">
-        <h3>New portfolio</h3>
+        <h3>New notebook</h3>
         <p className="muted">Private by default — you can share it later.</p>
         <form onSubmit={createPortfolio} className="grid grid-2">
           <div className="field">

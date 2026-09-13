@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowLeftRight, BookOpen, Clock, Compass, FileText, FolderKanban, Grid3x3, Layers, MessageSquare, Network, ShieldAlert, Shapes, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Lightbulb, MessageSquare, Network, ShieldAlert, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav } from '@/components/project-nav'
+import { LpmSearchBar } from '@/components/lpm-search-bar'
 
 export interface ProjectOutletContext {
   project: ProjectRow
@@ -16,7 +17,7 @@ export interface ProjectOutletContext {
   // Every project has exactly one home for its own content (guaranteed by
   // the on_project_created trigger) -- this used to be a user-visible
   // "branch" someone had to pick; now it's resolved automatically and never
-  // shown, so a Project's Explore/Coherence/Schema/Review tabs work the
+  // shown, so a Project's Learning Goals/Analytics/Review tabs work the
   // moment you open the Project, with nothing extra to understand first.
   defaultBranchId: string
 }
@@ -102,20 +103,23 @@ export default function ProjectLayout() {
     return <p className="muted">Loading…</p>
   }
 
+  // Exactly these 10 items, in this order -- Dustin's explicit, final sidebar
+  // spec for the 2026-09-13 restructure. Projects and Members are folded into
+  // Dashboard; Schema is folded into Concepts; Explore is replaced by the
+  // project-scoped search bar below (not a nav item); Import/export is now a
+  // function inside Learning Goals (and, later, Literature/Concepts/Theories)
+  // rather than its own tab.
   const nav = [
-    { href: `/dashboard/${slug}`, content: <><FileText size={14} />Overview</> },
-    { href: `/dashboard/${slug}/explore`, content: <><Compass size={14} />Explore</> },
-    { href: `/dashboard/${slug}/coherence`, content: <><Grid3x3 size={14} />Coherence</> },
-    { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
-    { href: `/dashboard/${slug}/schema`, content: <><Shapes size={14} />Schema</> },
+    { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
+    { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</> },
     { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</> },
-    { href: `/dashboard/${slug}/standards`, content: <><Layers size={14} />Standards</> },
-    { href: `/dashboard/${slug}/import`, content: <><ArrowLeftRight size={14} />Import / export</> },
+    { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</> },
+    { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</> },
     { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
-    { href: `/dashboard/${slug}/projects`, content: <><FolderKanban size={14} />Projects</> },
-    { href: `/dashboard/${slug}/portfolios`, content: <><Network size={14} />Portfolios</> },
+    { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
     { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
-    { href: `/dashboard/${slug}/members`, content: <><Users size={14} />Members</> },
+    { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</> },
+    { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
   ]
 
   const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId }
@@ -146,6 +150,9 @@ export default function ProjectLayout() {
       </aside>
 
       <div className="project-main">
+        <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
+          <LpmSearchBar project={project} slug={slug} supabase={supabase} />
+        </div>
         <Outlet context={context} />
       </div>
     </div>

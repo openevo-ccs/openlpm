@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { Download, Upload, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
-import { TabPanels } from '@/components/tab-panels'
 import { Chip } from '@/components/chip'
 import {
   listJurisdictions,
@@ -32,6 +31,12 @@ import {
 } from '@/lib/importers/caseDirect'
 import { todayIso, type CanonicalCurriculumItem } from '@/lib/importers/types'
 
+// Formerly the standalone "Import / export" sidebar tab. 2026-09-13
+// restructure: import/export is now a function tailored to each real content
+// space rather than its own tab -- every panel here writes to
+// `lpm_data_objects`, so all of them moved into Learning Goals (which is
+// the page that content actually belongs to) as tabs, unchanged internally.
+
 type Notice = { kind: 'ok' | 'bad'; text: string } | null
 
 function NoticeBox({ notice, onClear }: { notice: Notice; onClear: () => void }) {
@@ -48,7 +53,7 @@ function NoticeBox({ notice, onClear }: { notice: Notice; onClear: () => void })
 
 // ---------------------------------------------------------------- CASE (US) import
 
-function CaseImportPanel() {
+export function CaseImportPanel() {
   const [jurisdictions, setJurisdictions] = useState<Jurisdiction[] | null>(null)
   const [jurisdictionId, setJurisdictionId] = useState('')
   const [sets, setSets] = useState<StandardSetSummary[]>([])
@@ -167,7 +172,7 @@ function CaseImportPanel() {
 
 // ---------------------------------------------------------------- Direct state CASE API import
 
-function DirectCaseImportPanel() {
+export function DirectCaseImportPanel() {
   const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
   const [input, setInput] = useState('')
   const [documents, setDocuments] = useState<CfDocumentSummary[] | null>(null)
@@ -254,7 +259,7 @@ function DirectCaseImportPanel() {
       })
       const { error } = await supabase.from('lpm_data_objects').insert(rows)
       if (error) throw error
-      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
+      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Browse.` })
       setSelected(new Set())
     } catch (err) {
       setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
@@ -349,7 +354,7 @@ function DirectCaseImportPanel() {
 
 // ---------------------------------------------------------------- FWU/MEM-Schule (DE) import
 
-function FwuImportPanel() {
+export function FwuImportPanel() {
   const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
   const [landUri, setLandUri] = useState(FWU_LAENDER[0].uri)
   const [subjectFilter, setSubjectFilter] = useState('biolog')
@@ -435,7 +440,7 @@ function FwuImportPanel() {
         })
       const { error } = await supabase.from('lpm_data_objects').insert(rows)
       if (error) throw error
-      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
+      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Browse.` })
       setSelected(new Set())
     } catch (err) {
       setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
@@ -524,8 +529,8 @@ interface UploadedItem {
 }
 
 function detectItems(parsed: unknown, textField: string | null): { items: UploadedItem[]; kind: string; textFieldOptions: string[] } {
-  // OpenLPM's own export shape (export-page's ExportPanel) -- items[].content
-  // is already a CanonicalCurriculumItem, or items[].description has the text.
+  // OpenLPM's own export shape (ExportPanel below) -- items[].content is
+  // already a CanonicalCurriculumItem, or items[].description has the text.
   if (parsed && typeof parsed === 'object' && Array.isArray((parsed as any).items) && (parsed as any).exportedFrom === 'OpenLPM') {
     const arr = (parsed as any).items as any[]
     return {
@@ -564,7 +569,7 @@ function detectItems(parsed: unknown, textField: string | null): { items: Upload
   return { kind: 'Unrecognized', textFieldOptions: [], items: [] }
 }
 
-function UploadImportPanel() {
+export function UploadImportPanel() {
   const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
   const [fileName, setFileName] = useState('')
   const [parsed, setParsed] = useState<unknown>(null)
@@ -636,7 +641,7 @@ function UploadImportPanel() {
         })
       const { error } = await supabase.from('lpm_data_objects').insert(rows)
       if (error) throw error
-      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Explore.` })
+      setNotice({ kind: 'ok', text: `Imported ${rows.length} item(s) as drafts. Review and accept them from Browse.` })
       setSelected(new Set())
     } catch (err) {
       setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
@@ -725,7 +730,7 @@ function UploadImportPanel() {
 
 // ---------------------------------------------------------------- Export
 
-function ExportPanel() {
+export function ExportPanel() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<Notice>(null)
@@ -772,30 +777,6 @@ function ExportPanel() {
       <button className="btn btn-primary" onClick={exportProject} disabled={busy}>
         <Download size={14} /> Export this project as JSON
       </button>
-    </div>
-  )
-}
-
-// ---------------------------------------------------------------- page
-
-export default function ImportExportPage() {
-  return (
-    <div>
-      <h1>Import &amp; export</h1>
-      <p className="muted" style={{ marginBottom: 20 }}>
-        Bring real curriculum data into this project from a live public standards source, or take
-        this project's content elsewhere. New items land as drafts — nothing goes live until
-        someone reviews and accepts it.
-      </p>
-      <TabPanels
-        tabs={[
-          { label: 'Direct state API', content: <DirectCaseImportPanel /> },
-          { label: 'Browse US states (discovery)', content: <CaseImportPanel /> },
-          { label: 'German Lehrplan (MEM-Schule)', content: <FwuImportPanel /> },
-          { label: 'Upload a file', content: <UploadImportPanel /> },
-          { label: 'Export', content: <ExportPanel /> },
-        ]}
-      />
     </div>
   )
 }

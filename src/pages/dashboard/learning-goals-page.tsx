@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Search } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, Compass, Info, Link2, Search } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
+import { TabPanels } from '@/components/tab-panels'
 import {
   getAssertedConnections,
   getFullThread,
@@ -14,6 +15,17 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
+import { CaseImportPanel, DirectCaseImportPanel, FwuImportPanel, UploadImportPanel, ExportPanel } from './importers-panels'
+
+// 2026-09-13 restructure: renamed from "Standards" (RFC-0003 stub) and
+// merged with the standalone "Explore" tab (which is removed -- Dustin's
+// instruction is for "explore" to become a search bar, not a page) and the
+// standalone "Import / export" tab (every one of whose panels writes to
+// `lpm_data_objects`, i.e. this page's own content, so import/export
+// belongs here as tabs rather than as its own sidebar item). This is the
+// real home for formally stated, officially recognized learning goals --
+// standards, competency frameworks -- mandated or optionally chosen within
+// a jurisdiction.
 
 // Plain-language gloss for the small controlled vocabulary real threads use
 // (conceptbase RFC-0018's frameworkRelation terms) -- a fallback humanizes
@@ -41,7 +53,38 @@ function gradeLabel(grade: string | null): string {
   return grade ? `Grade ${grade}` : 'Grade —'
 }
 
-export default function ExplorePage() {
+export default function LearningGoalsPage() {
+  return (
+    <div>
+      <h1>Learning goals</h1>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Formally stated, officially recognized learning goals — standards and competency
+        frameworks, mandated or optionally chosen within a given jurisdiction.
+      </p>
+
+      <div className="notice">
+        <Info size={14} />
+        Real version lineage (which framework a goal came from, whether it's mandated or optional,
+        and comparing revisions of the same standard over time) needs the new standards_documents
+        schema, written but not yet live — see project notes. Browsing and importing real content
+        below already works.
+      </div>
+
+      <TabPanels
+        tabs={[
+          { label: 'Browse', content: <BrowseTab /> },
+          { label: 'Import: Direct state API', content: <DirectCaseImportPanel /> },
+          { label: 'Import: Browse US states', content: <CaseImportPanel /> },
+          { label: 'Import: German Lehrplan', content: <FwuImportPanel /> },
+          { label: 'Import: Upload a file', content: <UploadImportPanel /> },
+          { label: 'Export', content: <ExportPanel /> },
+        ]}
+      />
+    </div>
+  )
+}
+
+function BrowseTab() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
   const navigate = useNavigate()
@@ -86,7 +129,7 @@ export default function ExplorePage() {
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
           <input
             type="search"
-            placeholder="Search topics by name…"
+            placeholder="Search learning goals by name…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={{ minWidth: 240 }}
@@ -98,17 +141,17 @@ export default function ExplorePage() {
             <option key={g} value={g}>{gradeLabel(g)}</option>
           ))}
         </select>
-        <span className="muted">{topics === null ? 'Loading…' : `${filtered.length} of ${topics.length} topics`}</span>
+        <span className="muted">{topics === null ? 'Loading…' : `${filtered.length} of ${topics.length} learning goals`}</span>
       </div>
 
       <div className="explorer-body">
         <div className="graph-host" style={{ overflow: 'auto', padding: 4 }}>
           {topics === null ? (
-            <p className="muted" style={{ padding: 16 }}>Loading topics…</p>
+            <p className="muted" style={{ padding: 16 }}>Loading…</p>
           ) : filtered.length === 0 ? (
             <div className="card empty">
               <Compass size={28} />
-              <p>No topics match.</p>
+              <p>No learning goals match.</p>
             </div>
           ) : (
             <ul className="topic-list">
@@ -116,7 +159,7 @@ export default function ExplorePage() {
                 <li key={t.id}>
                   <button
                     className={`topic-list-item${t.id === objectId ? ' active' : ''}`}
-                    onClick={() => navigate(`/dashboard/${project.slug}/explore/${t.id}`)}
+                    onClick={() => navigate(`/dashboard/${project.slug}/learning-goals/${t.id}`)}
                   >
                     <span className="chip" style={{ flexShrink: 0 }}>{gradeLabel(t.grade_band)}</span>
                     <span>
@@ -137,7 +180,7 @@ export default function ExplorePage() {
             ) : (
               <div className="empty" style={{ paddingTop: 60 }}>
                 <Compass size={32} />
-                <p>Pick a topic on the left.</p>
+                <p>Pick a learning goal on the left.</p>
                 <p className="muted">You&apos;ll see how it connects to what comes before, what comes after, and — where curriculum designers have identified it — the bigger idea that ties it to other topics.</p>
               </div>
             )}
@@ -171,7 +214,7 @@ function TopicDetail({
   }, [supabase, objectId])
 
   if (topic === undefined) return <p className="muted">Loading…</p>
-  if (topic === null) return <div className="notice notice-bad">Topic not found.</div>
+  if (topic === null) return <div className="notice notice-bad">Learning goal not found.</div>
 
   const requiredBefore = (connections ?? []).filter((c) => c.direction === 'incoming')
   const leadsTo = (connections ?? []).filter((c) => c.direction === 'outgoing')
@@ -210,7 +253,7 @@ function TopicDetail({
       )}
 
       {connections?.length === 0 && stations?.length === 0 && (
-        <p className="muted">No recorded connections for this topic yet.</p>
+        <p className="muted">No recorded connections for this learning goal yet.</p>
       )}
     </div>
   )
@@ -229,11 +272,11 @@ function ConnLine({
 }) {
   return (
     <Link
-      to={`/dashboard/${projectSlug}/explore/${object.id}`}
+      to={`/dashboard/${projectSlug}/learning-goals/${object.id}`}
       className={`conn-line conn-${kind}`}
       style={{ textDecoration: 'none', color: 'inherit' }}
     >
-      <span className="muted" style={{ fontSize: 12 }}>{arrow === 'in' ? 'Comes before this topic' : 'Comes after this topic'}</span>
+      <span className="muted" style={{ fontSize: 12 }}>{arrow === 'in' ? 'Comes before this' : 'Comes after this'}</span>
       <span className="row" style={{ justifyContent: 'space-between' }}>
         <strong>{object.title}</strong>
         <ArrowRight size={13} style={{ color: 'var(--text-muted)' }} />
@@ -295,7 +338,7 @@ function ThreadCard({
               {full.stations.map((st) => (
                 <li key={st.id} className={st.data_object_id === currentObjectId ? 'thread-station current' : 'thread-station'}>
                   <div className="row" style={{ justifyContent: 'space-between' }}>
-                    <Link to={`/dashboard/${projectSlug}/explore/${st.object.id}`} style={{ textDecoration: 'none' }}>
+                    <Link to={`/dashboard/${projectSlug}/learning-goals/${st.object.id}`} style={{ textDecoration: 'none' }}>
                       <strong>{gradeLabel(st.object.grade_band)} — {st.object.title}</strong>
                     </Link>
                   </div>

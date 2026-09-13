@@ -31,12 +31,12 @@ export default function PortfolioDetailPage() {
   if (!portfolio || !portfolioId) {
     return (
       <div>
-        <Link to={`/dashboard/${slug}/portfolios`} className="row muted" style={{ marginBottom: 12 }}>
+        <Link to={`/dashboard/${slug}/notebooks`} className="row muted" style={{ marginBottom: 12 }}>
           <ArrowLeft size={14} />
-          All portfolios
+          All notebooks
         </Link>
         <div className="card empty">
-          <p>Portfolio not found.</p>
+          <p>Notebook not found.</p>
         </div>
       </div>
     )
@@ -45,9 +45,9 @@ export default function PortfolioDetailPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div>
-        <Link to={`/dashboard/${slug}/portfolios`} className="row muted">
+        <Link to={`/dashboard/${slug}/notebooks`} className="row muted">
           <ArrowLeft size={14} />
-          All portfolios
+          All notebooks
         </Link>
         <div className="row" style={{ justifyContent: 'space-between', marginTop: 4 }}>
           <div>
