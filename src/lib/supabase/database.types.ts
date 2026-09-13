@@ -229,7 +229,7 @@ export type Database = {
         Row: {
           id: string
           project_id: string
-          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
+          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id: string
           reviewer_id: string | null
           status: 'pending' | 'in_progress' | 'completed'
@@ -241,7 +241,7 @@ export type Database = {
         Insert: {
           id?: string
           project_id: string
-          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
+          reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id: string
           reviewer_id?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
@@ -253,7 +253,7 @@ export type Database = {
         Update: {
           id?: string
           project_id?: string
-          reviewable_type?: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread'
+          reviewable_type?: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id?: string
           reviewer_id?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
