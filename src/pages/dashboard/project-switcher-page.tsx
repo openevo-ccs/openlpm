@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FolderKanban } from 'lucide-react'
+import { FolderKanban, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge, CURATION, type Curation } from '@/components/epistemic-status-badge'
@@ -52,11 +52,18 @@ export default function ProjectSwitcherPage() {
 
   return (
     <div>
-      <h1>Your project spaces</h1>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        Pick a project space to open it. Everything inside — the curriculum, the literature, the
-        people — belongs to that space alone.
-      </p>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1>Your project spaces</h1>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Pick a project space to open it. Everything inside — the curriculum, the literature, the
+            people — belongs to that space alone.
+          </p>
+        </div>
+        <Link to="/dashboard/new-project" className="btn btn-primary">
+          <Plus size={14} />Start new project
+        </Link>
+      </div>
 
       <div className="row" style={{ gap: 16, marginBottom: 20 }}>
         {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (

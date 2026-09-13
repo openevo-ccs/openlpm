@@ -10,6 +10,7 @@ import ProjectSwitcherPage from '@/pages/dashboard/project-switcher-page'
 import ProfilePage from '@/pages/dashboard/profile-page'
 import ProjectLayout from '@/pages/dashboard/project-layout'
 import DashboardPage from '@/pages/dashboard/dashboard-page'
+import NewProjectWizard from '@/pages/dashboard/new-project-wizard'
 import LiteraturePage from '@/pages/dashboard/literature-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
@@ -77,9 +78,11 @@ export default function App() {
           }
         >
           <Route index element={<ProjectSwitcherPage />} />
+          <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path=":project" element={<ProjectLayout />}>
             <Route index element={<DashboardPage />} />
+            <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
             <Route path="concepts" element={<ConceptsPage />} />

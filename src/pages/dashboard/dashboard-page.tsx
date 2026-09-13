@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, Mail, MessageSquare, Trash2, UserPlus, Users } from 'lucide-react'
+import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, Mail, MessageSquare, Plus, Trash2, UserPlus, Users } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/supabase/activity'
@@ -173,62 +173,27 @@ function ProjectsSection({
   supabase: ProjectOutletContext['supabase']
 }) {
   const [children, setChildren] = useState<Project[]>([])
-  const [busy, setBusy] = useState(false)
-  const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
-
-  const reload = async () => {
-    const { data } = await supabase.from('projects').select('*').eq('parent_project_id', project.id).order('created_at', { ascending: true })
-    setChildren(data ?? [])
-  }
 
   useEffect(() => {
-    reload()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    supabase.from('projects').select('*').eq('parent_project_id', project.id).order('created_at', { ascending: true })
+      .then(({ data }) => setChildren(data ?? []))
   }, [supabase, project.id])
-
-  const createProject = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    setBusy(true); setNotice(null)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-
-    const newSlug = String(formData.get('slug') ?? '').trim()
-    const name = String(formData.get('name') ?? '').trim()
-    const description = String(formData.get('description') ?? '').trim() || null
-    const focusType = String(formData.get('focus_type') ?? 'general') as Project['focus_type']
-
-    if (!newSlug || !name) { setBusy(false); return }
-
-    const { error } = await supabase.from('projects').insert({
-      slug: newSlug,
-      name,
-      description,
-      focus_type: focusType,
-      maturity: 'draft',
-      epistemic_status: project.epistemic_status,
-      parent_project_id: project.id,
-      created_by: user?.id ?? null,
-    })
-
-    if (error) setNotice({ kind: 'bad', text: error.message })
-    else { setNotice({ kind: 'ok', text: `Started "${name}" as a new project in ${project.name}.` }); e.currentTarget.reset(); await reload() }
-    setBusy(false)
-  }
 
   return (
     <>
-      <h2 className="row" style={{ marginTop: 8 }}><FolderKanban size={16} style={{ color: 'var(--text-muted)' }} />Projects in this Space</h2>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        Real efforts inside {project.name} — some fully proven, some still early drafts.
-      </p>
-
-      {notice && (
-        <div className={`notice notice-${notice.kind}`}>
-          {notice.text}
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 8 }}>
+        <div>
+          <h2 className="row"><FolderKanban size={16} style={{ color: 'var(--text-muted)' }} />Projects in this Space</h2>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Real efforts inside {project.name} — some fully proven, some still early drafts.
+          </p>
         </div>
-      )}
+        {canManage && (
+          <Link to="new-project" className="btn btn-primary">
+            <Plus size={14} />Start new project
+          </Link>
+        )}
+      </div>
 
       {children.length === 0 ? (
         <div className="card empty" style={{ marginBottom: 20 }}>
@@ -255,40 +220,6 @@ function ProjectsSection({
               </div>
             </Link>
           ))}
-        </div>
-      )}
-
-      {canManage && (
-        <div className="card" style={{ marginBottom: 20 }}>
-          <h3>Start a new project</h3>
-          <p className="muted">
-            Shares nothing automatically — a new project starts empty and marked as a draft.
-          </p>
-          <form onSubmit={createProject} className="grid grid-2">
-            <div className="field">
-              <label>Short address</label>
-              <input name="slug" placeholder="e.g. evomentor-france" required />
-            </div>
-            <div className="field">
-              <label>Name</label>
-              <input name="name" placeholder="e.g. EvoMentor France" required />
-            </div>
-            <div className="field" style={{ gridColumn: '1 / -1' }}>
-              <label>Description</label>
-              <input name="description" placeholder="What is this for?" />
-            </div>
-            <div className="field">
-              <label>What kind of project is this?</label>
-              <select name="focus_type" defaultValue="general">
-                <option value="general">General</option>
-                <option value="regional">A specific region or jurisdiction</option>
-                <option value="thematic">A specific theme or topic</option>
-              </select>
-            </div>
-            <div style={{ gridColumn: '1 / -1' }}>
-              <button type="submit" className="btn btn-primary" disabled={busy}>Start it</button>
-            </div>
-          </form>
         </div>
       )}
     </>
