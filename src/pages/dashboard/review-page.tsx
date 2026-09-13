@@ -4,6 +4,7 @@ import { CheckCircle2, Clock, ExternalLink, XCircle } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { useSession } from '@/state/session'
 import { listPendingConnections, reviewConnection, type PendingConnection } from '@/lib/supabase/coherence'
+import { completeGenericReview, listGenericReviewQueue, type GenericReviewItem } from '@/lib/supabase/generic-review'
 
 // The journal-submission-style gate for new connections: propose (the
 // coherence tool's "record a connection" form), cite evidence if there is
@@ -19,13 +20,17 @@ export default function ReviewPage() {
   const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
   const { session } = useSession()
   const [items, setItems] = useState<PendingConnection[] | null>(null)
+  const [genericItems, setGenericItems] = useState<GenericReviewItem[] | null>(null)
   const canReview = role !== 'viewer'
 
   const reload = () => listPendingConnections(supabase, project.id, defaultBranchId).then(setItems)
+  const reloadGeneric = () => listGenericReviewQueue(supabase, project.id).then(setGenericItems)
 
   useEffect(() => {
     setItems(null)
+    setGenericItems(null)
     reload()
+    reloadGeneric()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id, defaultBranchId])
 
@@ -57,6 +62,82 @@ export default function ReviewPage() {
             onReviewed={reload}
           />
         ))
+      )}
+
+      <h2 style={{ marginTop: 20 }}>Submitted for review</h2>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Theories, concepts, and notebook drafts someone has proposed for review — open to any
+        member here, since there's no assignment step in this app's lightweight review model.
+      </p>
+      {genericItems === null ? (
+        <p className="muted">Loading…</p>
+      ) : genericItems.length === 0 ? (
+        <div className="card empty">
+          <CheckCircle2 size={32} />
+          <p>Nothing else waiting for review.</p>
+        </div>
+      ) : (
+        genericItems.map((item) => (
+          <GenericReviewCard key={item.assignment.id} item={item} canReview={canReview} supabase={supabase} onReviewed={reloadGeneric} />
+        ))
+      )}
+    </div>
+  )
+}
+
+function GenericReviewCard({
+  item,
+  canReview,
+  supabase,
+  onReviewed,
+}: {
+  item: GenericReviewItem
+  canReview: boolean
+  supabase: ProjectOutletContext['supabase']
+  onReviewed: () => void
+}) {
+  const [reviewText, setReviewText] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const decide = async (decision: 'accept' | 'reject') => {
+    if (!reviewText.trim()) {
+      setError('Say why, even briefly.')
+      return
+    }
+    setBusy(true); setError(null)
+    const { error: err } = await completeGenericReview(supabase, { assignmentId: item.assignment.id, decision, reviewText: reviewText.trim() })
+    setBusy(false)
+    if (err) setError(err.message)
+    else onReviewed()
+  }
+
+  return (
+    <div className="card">
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <h3 style={{ marginBottom: 4 }}>{item.label}</h3>
+        <span className="chip capitalize">{item.assignment.reviewable_type.replace(/_/g, ' ')}</span>
+      </div>
+      {item.detail && <p className="muted">{item.detail}</p>}
+
+      {!canReview ? (
+        <p className="muted">Only editors and above can review here.</p>
+      ) : (
+        <>
+          <div className="field">
+            <label>Your reasoning for accepting or rejecting</label>
+            <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)} />
+          </div>
+          {error && <div className="notice notice-bad">{error}</div>}
+          <div className="row">
+            <button className="btn" style={{ borderColor: 'var(--good)', color: 'var(--good)' }} disabled={busy} onClick={() => decide('accept')}>
+              <CheckCircle2 size={14} />Accept
+            </button>
+            <button className="btn btn-danger" disabled={busy} onClick={() => decide('reject')}>
+              <XCircle size={14} />Reject
+            </button>
+          </div>
+        </>
       )}
     </div>
   )
