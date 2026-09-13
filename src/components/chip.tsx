@@ -17,6 +17,11 @@ const BUCKET: Record<string, string> = {
   active: 'progress',
   'in-development': 'progress',
   'designed-thought-experiment': 'draft',
+  // Collapsed Human-Curated/Synthetic-Theoretical project badge (see
+  // epistemic-status-badge.tsx) -- a derived display key, not a raw enum
+  // value, so both source values that mean "real" share one color.
+  'human-curated': 'good',
+  'synthetic-theoretical': 'draft',
   planning: 'muted',
   accepted: 'good',
   canonical: 'good',

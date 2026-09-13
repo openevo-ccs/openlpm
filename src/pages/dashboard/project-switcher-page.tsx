@@ -3,12 +3,22 @@ import { Link } from 'react-router-dom'
 import { FolderKanban } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
-import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
+import { EpistemicStatusBadge, CURATION, type Curation } from '@/components/epistemic-status-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
+
+const CURATION_LABEL: Record<Curation, string> = {
+  'human-curated': 'Human-Curated',
+  'synthetic-theoretical': 'Synthetic-Theoretical',
+}
 
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
+  // Both on by default -- this only narrows the view, never hides a project
+  // space a user hasn't deliberately chosen to filter out.
+  const [visibleCurations, setVisibleCurations] = useState<Set<Curation>>(
+    new Set(['human-curated', 'synthetic-theoretical'])
+  )
 
   useEffect(() => {
     getUserProjects(supabase).then(setMemberships)
@@ -26,22 +36,46 @@ export default function ProjectSwitcherPage() {
   // (see [[openlpm-project-hierarchy-architecture]] -- this is the entry
   // point that list is meant to serve).
   const byId = new Map(memberships.map((m) => [m.project.id, m]))
-  const topLevel = memberships.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+  const topLevel = memberships
+    .filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+    .filter((m) => visibleCurations.has(CURATION[m.project.epistemic_status]))
   const childrenOf = (id: string) => memberships.filter((m) => m.project.parent_project_id === id)
+
+  const toggleCuration = (c: Curation) => {
+    setVisibleCurations((prev) => {
+      const next = new Set(prev)
+      if (next.has(c)) next.delete(c)
+      else next.add(c)
+      return next
+    })
+  }
 
   return (
     <div>
       <h1>Your project spaces</h1>
-      <p className="muted" style={{ marginBottom: 20 }}>
+      <p className="muted" style={{ marginBottom: 12 }}>
         Pick a project space to open it. Everything inside — the curriculum, the literature, the
         people — belongs to that space alone.
       </p>
+
+      <div className="row" style={{ gap: 16, marginBottom: 20 }}>
+        {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (
+          <label key={c} className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }}>
+            <input type="checkbox" checked={visibleCurations.has(c)} onChange={() => toggleCuration(c)} />
+            {CURATION_LABEL[c]}
+          </label>
+        ))}
+      </div>
 
       {memberships.length === 0 ? (
         <div className="card empty">
           <FolderKanban size={32} />
           <p>You aren&apos;t a member of any project space yet.</p>
           <p className="muted">Ask an owner to add you, or create a new one.</p>
+        </div>
+      ) : topLevel.length === 0 ? (
+        <div className="card empty">
+          <p className="muted">No project spaces match the selected filter.</p>
         </div>
       ) : (
         <div className="grid grid-3">

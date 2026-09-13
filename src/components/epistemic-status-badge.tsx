@@ -3,25 +3,42 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type EpistemicStatus = Database['public']['Tables']['projects']['Row']['epistemic_status']
 
-// Per RFC 0002 section 6: a project's synthetic/real character must stay a
-// clearly visible distinction, not buried metadata. The first two values
-// mirror ConceptBase's own oe:epistemicStatus (RFC-0019) exactly --
-// 'designed-thought-experiment' / 'field-validated-curriculum', its only two
-// real enum values as of this writing. 'in-development' is an OpenLPM-local
-// third value with no ConceptBase counterpart yet (that schema's own comment
-// anticipates a future 'field-piloted'-style addition via ordinary RFC, but
-// hasn't added one) -- used for real, non-synthetic project work that isn't
-// yet claiming field-validated status (e.g. a curriculum mid-ingestion).
-// One word each, chosen 2026-09-12 to match the brevity of the Draft/
-// Established maturity badge -- still real vs. not-real at a glance
-// (Sample = synthetic, everything else is real), detail lives in each
-// project's own description and notes, not the chip itself.
+// 2026-09-13 restructure: collapsed from three displayed labels (Sample/
+// Growing/Adopted) to the two questions a project card actually needs to
+// answer at a glance, per Dustin's direct request and confirmed with Lab
+// Manager -- this stays a pure presentation change, not a schema migration.
+// The enum underneath is untouched (still three values, still mirrors
+// ConceptBase's oe:epistemicStatus RFC-0019 plus OpenLPM's own local
+// 'in-development' extension -- see the Row type/migration 007 for that
+// history); Sample = synthetic, everything else = real, which is exactly
+// what this component's own prior label set already meant, just rendered as
+// three chips instead of two.
+//
+// Known, named tradeoff: 'in-development' (real but not yet field-tested)
+// and 'field-validated-curriculum' (real and field-tested) both collapse
+// into "Human-Curated" here. That distinction is real and shouldn't
+// silently vanish -- it belongs in the project's own description/notes, the
+// same place detail has always lived rather than the chip itself.
 const LABEL: Record<EpistemicStatus, string> = {
-  'designed-thought-experiment': 'Sample',
-  'field-validated-curriculum': 'Adopted',
-  'in-development': 'Growing',
+  'designed-thought-experiment': 'Synthetic-Theoretical',
+  'field-validated-curriculum': 'Human-Curated',
+  'in-development': 'Human-Curated',
+}
+
+// Two source enum values now share the "Human-Curated" label -- they need to
+// share one color too, or the same label would render in two different chip
+// colors depending on which of the two collapsed values it came from. Maps
+// to the two new bucket keys added in chip.tsx rather than the raw enum.
+// Exported so the project-listing pages can filter on the same two
+// categories the badge displays, rather than re-deriving this mapping.
+export type Curation = 'human-curated' | 'synthetic-theoretical'
+
+export const CURATION: Record<EpistemicStatus, Curation> = {
+  'designed-thought-experiment': 'synthetic-theoretical',
+  'field-validated-curriculum': 'human-curated',
+  'in-development': 'human-curated',
 }
 
 export function EpistemicStatusBadge({ status }: { status: EpistemicStatus }) {
-  return <Chip status={status}>{LABEL[status]}</Chip>
+  return <Chip status={CURATION[status]}>{LABEL[status]}</Chip>
 }
