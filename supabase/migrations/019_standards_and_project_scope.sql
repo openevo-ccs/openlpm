@@ -8,6 +8,10 @@
 -- one-to-many table instead. `working_languages` (already live since
 -- migration 015) is left untouched -- it already does the multi-language
 -- job correctly.
+--
+-- uuid-ossp lives in the `extensions` schema on this project -- see
+-- migration 018's comment for why. Same fix here.
+SET search_path = public, extensions;
 
 -- ============================================================================
 -- Standards documents: real version lineage for an ingested curriculum/

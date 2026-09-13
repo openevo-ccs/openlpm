@@ -17,6 +17,13 @@
 -- content the Jena pilot depends on today. That migration is a separate,
 -- carefully-verified step alongside the Concepts page rebuild (next phase of
 -- this restructure), not bundled into this purely-additive schema pass.
+--
+-- uuid-ossp now lives in the `extensions` schema on this project (a
+-- platform-level move since migrations 001-017 were applied -- their own
+-- unqualified uuid_generate_v4() calls only ever worked because they ran
+-- before that move). Setting search_path explicitly rather than qualifying
+-- every call, so this migration reads the same as its predecessors.
+SET search_path = public, extensions;
 
 CREATE TYPE framework_type AS ENUM ('concept-taxonomy', 'subject-area', 'grade-band');
 

@@ -5,6 +5,10 @@
 -- existed unused since migration 001). Also extends peer_review_assignments'
 -- open target-type vocabulary, which migration 012 already designed to be
 -- extended this way, to cover every new content type.
+--
+-- uuid-ossp lives in the `extensions` schema on this project -- see
+-- migration 018's comment for why. Same fix here.
+SET search_path = public, extensions;
 
 -- ============================================================================
 -- Theories: find/curate a theoretical position, link it to the literature
