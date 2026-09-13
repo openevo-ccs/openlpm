@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { createClient } from '@/lib/supabase/client'
 import { Chip } from '@/components/chip'
-import { LayoutGrid, Network, Plus, Search, X } from 'lucide-react'
+import { LayoutGrid, MessageSquare, Network, Plus, Search, Send, X } from 'lucide-react'
 import type { PortfolioEdge, PortfolioNode } from '@/lib/supabase/portfolios'
+import { submitForReview } from '@/lib/supabase/generic-review'
 
 function token(name: string, fallback: string) {
   if (typeof window === 'undefined') return fallback
@@ -381,6 +382,12 @@ export function PortfolioExplorer({
                       This references a canonical item from the project&apos;s Schema page — edit it there, not here.
                     </p>
                   )}
+
+                  <PushToDiscussion nodeId={selected.id} label={selected.label} projectId={projectId} supabase={supabase} />
+                  {selected.kind === 'private' && (
+                    <SubmitForReview nodeId={selected.id} projectId={projectId} supabase={supabase} />
+                  )}
+
                   <button className="btn btn-danger" style={{ marginTop: 12 }} disabled={busy} onClick={() => deleteNode(selected.id)}>
                     Remove from portfolio
                   </button>
@@ -399,5 +406,125 @@ export function PortfolioExplorer({
         </div>
       )}
     </div>
+  )
+}
+
+// ============================================================================
+// The two actions Dustin asked Notebooks to have: push a saved item into a
+// discussion thread, and (for a private draft only -- a canonical reference
+// is already real, reviewed content) submit it for peer review.
+// ============================================================================
+
+function PushToDiscussion({
+  nodeId,
+  label,
+  projectId,
+  supabase,
+}: {
+  nodeId: string
+  label: string
+  projectId: string
+  supabase: ReturnType<typeof createClient>
+}) {
+  const [open, setOpen] = useState(false)
+  const [topics, setTopics] = useState<{ id: string; title: string }[]>([])
+  const [mode, setMode] = useState<'existing' | 'new'>('new')
+  const [topicId, setTopicId] = useState('')
+  const [newTitle, setNewTitle] = useState('')
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    supabase.from('discussion_topics').select('id, title').eq('project_id', projectId).order('created_at', { ascending: false })
+      .then(({ data }) => setTopics(data ?? []))
+  }, [open, projectId, supabase])
+
+  const submit = async () => {
+    setBusy(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    const content = `Shared from notebook: "${label}"${message.trim() ? ` — ${message.trim()}` : ''}`
+
+    let targetTopicId = topicId
+    if (mode === 'new') {
+      if (!newTitle.trim()) { setBusy(false); return }
+      const { data, error } = await supabase.from('discussion_topics').insert({ project_id: projectId, title: newTitle.trim(), created_by: user?.id ?? null }).select('id').single()
+      if (error || !data) { setBusy(false); return }
+      targetTopicId = data.id
+    }
+    if (!targetTopicId) { setBusy(false); return }
+
+    await supabase.from('discussion_posts').insert({ topic_id: targetTopicId, user_id: user?.id ?? null, content })
+    setBusy(false)
+    setDone(true)
+    setTimeout(() => { setOpen(false); setDone(false); setMessage(''); setNewTitle(''); setTopicId('') }, 1200)
+  }
+
+  if (!open) {
+    return (
+      <button className="btn btn-mini" style={{ marginTop: 10 }} onClick={() => setOpen(true)}>
+        <MessageSquare size={12} />Push to discussion
+      </button>
+    )
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 10 }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <strong style={{ fontSize: 13 }}>Push to discussion</strong>
+        <button className="btn-linklike" onClick={() => setOpen(false)}><X size={12} /></button>
+      </div>
+      {done ? (
+        <p className="muted" style={{ fontSize: 13 }}>Posted.</p>
+      ) : (
+        <>
+          <div className="tabs">
+            <button className={mode === 'new' ? 'active' : ''} onClick={() => setMode('new')} type="button">New topic</button>
+            <button className={mode === 'existing' ? 'active' : ''} onClick={() => setMode('existing')} type="button">Existing topic</button>
+          </div>
+          {mode === 'new' ? (
+            <div className="field"><label>Topic title</label><input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} /></div>
+          ) : (
+            <div className="field">
+              <label>Topic</label>
+              <select value={topicId} onChange={(e) => setTopicId(e.target.value)}>
+                <option value="">Choose…</option>
+                {topics.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+              </select>
+            </div>
+          )}
+          <div className="field"><label>Add a note (optional)</label><textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} /></div>
+          <button className="btn btn-primary" disabled={busy} onClick={submit}><Send size={12} />Post</button>
+        </>
+      )}
+    </div>
+  )
+}
+
+function SubmitForReview({
+  nodeId,
+  projectId,
+  supabase,
+}: {
+  nodeId: string
+  projectId: string
+  supabase: ReturnType<typeof createClient>
+}) {
+  const [state, setState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle')
+  const rawId = nodeId.split('-', 2)[1]
+
+  const submit = async () => {
+    setState('busy')
+    const { error } = await submitForReview(supabase, { projectId, reviewableType: 'portfolio_private_node', reviewableId: rawId })
+    setState(error ? 'error' : 'done')
+  }
+
+  if (state === 'done') return <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>Submitted — see the Review page.</p>
+
+  return (
+    <button className="btn btn-mini" style={{ marginTop: 8 }} disabled={state === 'busy'} onClick={submit}>
+      <Send size={12} />{state === 'error' ? 'Failed — try again' : 'Submit for review'}
+    </button>
   )
 }
