@@ -1573,7 +1573,7 @@ export type Database = {
         Row: {
           id: string
           theory_id: string
-          target_type: 'framework_tag' | 'data_object' | 'thread'
+          target_type: 'framework_tag' | 'schema_element' | 'data_object' | 'thread'
           target_id: string
           relation_label: string
           annotation: string | null
@@ -1583,7 +1583,7 @@ export type Database = {
         Insert: {
           id?: string
           theory_id: string
-          target_type: 'framework_tag' | 'data_object' | 'thread'
+          target_type: 'framework_tag' | 'schema_element' | 'data_object' | 'thread'
           target_id: string
           relation_label: string
           annotation?: string | null
@@ -1593,7 +1593,7 @@ export type Database = {
         Update: {
           id?: string
           theory_id?: string
-          target_type?: 'framework_tag' | 'data_object' | 'thread'
+          target_type?: 'framework_tag' | 'schema_element' | 'data_object' | 'thread'
           target_id?: string
           relation_label?: string
           annotation?: string | null
