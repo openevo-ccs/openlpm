@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Github, KeyRound, Link2, Unlink } from 'lucide-react'
 import type { UserIdentity } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { REDIRECT_KEY } from '@/components/require-auth'
+import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 
 // Lets a user end up with either or both sign-in methods, added whenever
 // they want rather than only at sign-up -- a GitHub-first user can set a
@@ -17,9 +19,11 @@ import { REDIRECT_KEY } from '@/components/require-auth'
 // silently.
 export default function ProfilePage() {
   const { session } = useSession()
+  const supabase = useMemo(() => createClient(), [])
   const [identities, setIdentities] = useState<UserIdentity[] | null>(null)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
+  const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
 
   const [newPassword, setNewPassword] = useState('')
 
@@ -31,7 +35,19 @@ export default function ProfilePage() {
 
   useEffect(() => {
     reload()
-  }, [])
+    getUserProjects(supabase).then(setMemberships)
+  }, [supabase])
+
+  // Same grouping convention as project-switcher-page.tsx: a top-level entry
+  // is a Project Space, everything nested under one is a Project -- a user
+  // can hold a different role on each row, since project_members is unique
+  // per (project_id, user_id), not per user, so this must list every
+  // membership row individually rather than collapsing to one "role."
+  const byId = new Map((memberships ?? []).map((m) => [m.project.id, m]))
+  const topLevelMemberships = (memberships ?? []).filter(
+    (m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id)
+  )
+  const childMembershipsOf = (id: string) => (memberships ?? []).filter((m) => m.project.parent_project_id === id)
 
   const hasEmailPassword = (identities ?? []).some((i) => i.provider === 'email')
   const hasGithub = (identities ?? []).some((i) => i.provider === 'github')
@@ -86,11 +102,38 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="page-narrow" style={{ maxWidth: 480 }}>
+    <div className="page-narrow" style={{ maxWidth: 560 }}>
       <h1>Your profile</h1>
       <p className="muted" style={{ marginBottom: 16 }}>{session?.user.email}</p>
 
       {notice && <div className={`notice notice-${notice.kind}`}>{notice.text}</div>}
+
+      <div className="card">
+        <h3>Your projects</h3>
+        {memberships === null ? (
+          <p className="muted">Loading…</p>
+        ) : memberships.length === 0 ? (
+          <p className="muted">You aren&apos;t a member of any project space yet.</p>
+        ) : (
+          topLevelMemberships.map(({ project, role }) => {
+            const children = childMembershipsOf(project.id)
+            return (
+              <div key={project.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                <div className="row" style={{ justifyContent: 'space-between' }}>
+                  <Link to={`/dashboard/${project.slug}`}>{project.name}</Link>
+                  <span className="chip capitalize">{role}</span>
+                </div>
+                {children.map((c) => (
+                  <div key={c.project.id} className="row" style={{ justifyContent: 'space-between', paddingLeft: 16, marginTop: 4, fontSize: 13 }}>
+                    <Link to={`/dashboard/${c.project.slug}`} className="muted">{c.project.name}</Link>
+                    <span className="chip capitalize">{c.role}</span>
+                  </div>
+                ))}
+              </div>
+            )
+          })
+        )}
+      </div>
 
       <div className="card">
         <h3>Sign-in methods</h3>
