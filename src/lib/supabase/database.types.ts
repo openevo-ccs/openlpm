@@ -401,6 +401,10 @@ export type Database = {
           // mechanism into a plain status flip on a Project already nested
           // where it belongs (parent_project_id).
           maturity: 'draft' | 'established'
+          // Which grade-band framework (the seeded ISCED reference, another
+          // project's real scheme, or a custom one) this project's content
+          // is sequenced against -- migration 019.
+          grade_framework_id: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -422,6 +426,7 @@ export type Database = {
           theme_tags?: string[]
           working_languages?: string[]
           maturity?: 'draft' | 'established'
+          grade_framework_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -443,6 +448,7 @@ export type Database = {
           theme_tags?: string[]
           working_languages?: string[]
           maturity?: 'draft' | 'established'
+          grade_framework_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -453,6 +459,13 @@ export type Database = {
             columns: ["parent_project_id"],
             isOneToOne: false,
             referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_grade_framework_id_fkey",
+            columns: ["grade_framework_id"],
+            isOneToOne: false,
+            referencedRelation: "frameworks",
             referencedColumns: ["id"]
           }
         ]
@@ -1035,6 +1048,632 @@ export type Database = {
           created_at?: string
         }
         Relationships: []
+      }
+
+      // ======================================================================
+      // Migrations 018-020 (2026-09-13 restructure): frameworks/crosswalks,
+      // standards versioning, structured project scope, theories, strand
+      // nesting, and discussion tagging. See those migration files' own
+      // comments for the full rationale.
+      // ======================================================================
+
+      frameworks: {
+        Row: {
+          id: string
+          project_id: string | null
+          framework_type: 'concept-taxonomy' | 'subject-area' | 'grade-band'
+          framework_key: string
+          label: string
+          source: string | null
+          version_note: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          framework_type: 'concept-taxonomy' | 'subject-area' | 'grade-band'
+          framework_key: string
+          label: string
+          source?: string | null
+          version_note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          framework_type?: 'concept-taxonomy' | 'subject-area' | 'grade-band'
+          framework_key?: string
+          label?: string
+          source?: string | null
+          version_note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "frameworks_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      framework_tags: {
+        Row: {
+          id: string
+          framework_id: string
+          tag_key: string
+          label: string
+          parent_tag_id: string | null
+          definition: string | null
+          sort_order: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          framework_id: string
+          tag_key: string
+          label: string
+          parent_tag_id?: string | null
+          definition?: string | null
+          sort_order?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          framework_id?: string
+          tag_key?: string
+          label?: string
+          parent_tag_id?: string | null
+          definition?: string | null
+          sort_order?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "framework_tags_framework_id_fkey",
+            columns: ["framework_id"],
+            isOneToOne: false,
+            referencedRelation: "frameworks",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "framework_tags_parent_tag_id_fkey",
+            columns: ["parent_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      framework_crosswalks: {
+        Row: {
+          id: string
+          from_tag_id: string
+          to_tag_id: string
+          relation_type: 'exactMatch' | 'broadMatch' | 'narrowMatch' | 'relatedMatch'
+          confidence: 'exact' | 'approximate' | 'structural' | 'none'
+          note: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          from_tag_id: string
+          to_tag_id: string
+          relation_type?: 'exactMatch' | 'broadMatch' | 'narrowMatch' | 'relatedMatch'
+          confidence: 'exact' | 'approximate' | 'structural' | 'none'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          from_tag_id?: string
+          to_tag_id?: string
+          relation_type?: 'exactMatch' | 'broadMatch' | 'narrowMatch' | 'relatedMatch'
+          confidence?: 'exact' | 'approximate' | 'structural' | 'none'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "framework_crosswalks_from_tag_id_fkey",
+            columns: ["from_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "framework_crosswalks_to_tag_id_fkey",
+            columns: ["to_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      standards_documents: {
+        Row: {
+          id: string
+          project_id: string
+          jurisdiction: string | null
+          subject: string | null
+          school_type: string | null
+          grade_range: string | null
+          version_label: string
+          adoption_status: 'mandated' | 'optional'
+          source_file: string | null
+          format: string | null
+          license_or_rights_note: string | null
+          supersedes_document_id: string | null
+          adopted_at: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          jurisdiction?: string | null
+          subject?: string | null
+          school_type?: string | null
+          grade_range?: string | null
+          version_label: string
+          adoption_status?: 'mandated' | 'optional'
+          source_file?: string | null
+          format?: string | null
+          license_or_rights_note?: string | null
+          supersedes_document_id?: string | null
+          adopted_at?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          jurisdiction?: string | null
+          subject?: string | null
+          school_type?: string | null
+          grade_range?: string | null
+          version_label?: string
+          adoption_status?: 'mandated' | 'optional'
+          source_file?: string | null
+          format?: string | null
+          license_or_rights_note?: string | null
+          supersedes_document_id?: string | null
+          adopted_at?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standards_documents_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standards_documents_supersedes_document_id_fkey",
+            columns: ["supersedes_document_id"],
+            isOneToOne: false,
+            referencedRelation: "standards_documents",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      standards_item_changes: {
+        Row: {
+          id: string
+          from_item_id: string | null
+          to_item_id: string | null
+          change_type: 'content-added' | 'content-removed' | 'wording-refinement' | 'wording-simplification' | 'example-changed' | 'restructured' | 'grade-band-split'
+          note: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          from_item_id?: string | null
+          to_item_id?: string | null
+          change_type: 'content-added' | 'content-removed' | 'wording-refinement' | 'wording-simplification' | 'example-changed' | 'restructured' | 'grade-band-split'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          from_item_id?: string | null
+          to_item_id?: string | null
+          change_type?: 'content-added' | 'content-removed' | 'wording-refinement' | 'wording-simplification' | 'example-changed' | 'restructured' | 'grade-band-split'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standards_item_changes_from_item_id_fkey",
+            columns: ["from_item_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standards_item_changes_to_item_id_fkey",
+            columns: ["to_item_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      standards_item_framework_relevance: {
+        Row: {
+          id: string
+          item_id: string
+          framework_tag_id: string
+          relevance: number
+          justification: string | null
+          related_tag_ids: string[]
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          framework_tag_id: string
+          relevance: number
+          justification?: string | null
+          related_tag_ids?: string[]
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          framework_tag_id?: string
+          relevance?: number
+          justification?: string | null
+          related_tag_ids?: string[]
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standards_item_framework_relevance_item_id_fkey",
+            columns: ["item_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standards_item_framework_relevance_framework_tag_id_fkey",
+            columns: ["framework_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      project_jurisdictions: {
+        Row: {
+          id: string
+          project_id: string
+          country_code: string
+          region_code: string | null
+          label: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          country_code: string
+          region_code?: string | null
+          label: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          country_code?: string
+          region_code?: string | null
+          label?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_jurisdictions_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      project_subject_area_tags: {
+        Row: {
+          id: string
+          project_id: string
+          framework_tag_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          framework_tag_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          framework_tag_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_subject_area_tags_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_subject_area_tags_framework_tag_id_fkey",
+            columns: ["framework_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      project_source_declarations: {
+        Row: {
+          id: string
+          project_id: string
+          source_name: string
+          format: string | null
+          license_or_rights_note: string | null
+          url: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          source_name: string
+          format?: string | null
+          license_or_rights_note?: string | null
+          url?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          source_name?: string
+          format?: string | null
+          license_or_rights_note?: string | null
+          url?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_source_declarations_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      theories: {
+        Row: {
+          id: string
+          project_id: string
+          label: string
+          description: string
+          evidentiary_maturity: 'theoretically-developed' | 'empirically-recovered' | 'tested-against-alternatives' | 'efficacy-demonstrated' | null
+          evidentiary_maturity_note: string | null
+          base_repo: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
+          base_repo_ref: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          label: string
+          description: string
+          evidentiary_maturity?: 'theoretically-developed' | 'empirically-recovered' | 'tested-against-alternatives' | 'efficacy-demonstrated' | null
+          evidentiary_maturity_note?: string | null
+          base_repo?: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
+          base_repo_ref?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          label?: string
+          description?: string
+          evidentiary_maturity?: 'theoretically-developed' | 'empirically-recovered' | 'tested-against-alternatives' | 'efficacy-demonstrated' | null
+          evidentiary_maturity_note?: string | null
+          base_repo?: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
+          base_repo_ref?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theories_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      theory_literature_links: {
+        Row: {
+          id: string
+          theory_id: string
+          reference_id: string
+          relation_type: 'theoretical-clarification' | 'empirical-support' | 'empirical-challenge'
+          note: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          theory_id: string
+          reference_id: string
+          relation_type: 'theoretical-clarification' | 'empirical-support' | 'empirical-challenge'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          theory_id?: string
+          reference_id?: string
+          relation_type?: 'theoretical-clarification' | 'empirical-support' | 'empirical-challenge'
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theory_literature_links_theory_id_fkey",
+            columns: ["theory_id"],
+            isOneToOne: false,
+            referencedRelation: "theories",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "theory_literature_links_reference_id_fkey",
+            columns: ["reference_id"],
+            isOneToOne: false,
+            referencedRelation: "literature_references",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      theory_relations: {
+        Row: {
+          id: string
+          theory_id: string
+          target_type: 'framework_tag' | 'data_object' | 'thread'
+          target_id: string
+          relation_label: string
+          annotation: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          theory_id: string
+          target_type: 'framework_tag' | 'data_object' | 'thread'
+          target_id: string
+          relation_label: string
+          annotation?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          theory_id?: string
+          target_type?: 'framework_tag' | 'data_object' | 'thread'
+          target_id?: string
+          relation_label?: string
+          annotation?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theory_relations_theory_id_fkey",
+            columns: ["theory_id"],
+            isOneToOne: false,
+            referencedRelation: "theories",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      strand_parents: {
+        Row: {
+          id: string
+          strand_id: string
+          parent_strand_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          strand_id: string
+          parent_strand_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          strand_id?: string
+          parent_strand_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strand_parents_strand_id_fkey",
+            columns: ["strand_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_threads",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "strand_parents_parent_strand_id_fkey",
+            columns: ["parent_strand_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_threads",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      discussion_topic_tags: {
+        Row: {
+          id: string
+          topic_id: string
+          tag: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          topic_id: string
+          tag: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          topic_id?: string
+          tag?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_topic_tags_topic_id_fkey",
+            columns: ["topic_id"],
+            isOneToOne: false,
+            referencedRelation: "discussion_topics",
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
   }
