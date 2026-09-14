@@ -1,0 +1,105 @@
+# eva-lpm — MPI-EVA Research & Department Engagement (self-hosted, gated)
+
+**Status:** Prep work only. NOT YET APPLIED, NOT YET LIVE. No self-hosted Supabase project exists yet (that's a separate infrastructure task another session is scoping with the home-server owner), and this worktree has no live Supabase credentials for either the shared production project or a future self-hosted one. Nothing described here has been built, reviewed by any MPI-EVA department, or applied to any database. Prepared on branch `eva-lpm-self-hosted-prep`, in an isolated worktree, specifically so it doesn't collide with anyone using the main OpenLPM checkout.
+
+**Real name, now authorized:** Dustin authorized building this as a real `eva-lpm` project on 2026-09-14, on one condition: it stays private, gated behind its own separate self-hosted deployment, never a row in OpenLPM's shared multi-tenant production database. This document and its companion SQL sketch (`supabase/migrations-draft/DRAFT-eva-lpm-self-hosted-seed.sql`) supersede an earlier version of this same work prepared under the placeholder working title `mpi-eva-research-engagement-draft`, written before that authorization existed. The source-material research below is unchanged from that earlier version — it was already grounded in real data — only the name, the hosting mode, and the operational self-hosting spec are new.
+
+## Why `hosting_mode` has to be `self-hosted`, not `hosted`
+
+Checked directly against the live schema before writing anything here, not assumed: `projects` (migration `004_projects_branches_portfolios.sql`) carries a real RLS policy, `"Authenticated users can view projects"`:
+
+```sql
+CREATE POLICY "Authenticated users can view projects" ON projects
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+```
+
+That's `auth.uid() IS NOT NULL` — any signed-up user of the shared OpenLPM service, not just a project member — can see every project's `name` and `description`. There is no per-project privacy flag on the shared database. Membership (`project_members`) gates who can see a project's actual *content* (literature, schema elements, theories, discussions — all scoped via `is_project_member()`), but the project's existence and description are visible ecosystem-wide the moment a row exists in the shared database. For a project whose whole point is gated research-engagement content about real people at a real institute, that's the opposite of what's wanted — creating a project row named `eva-lpm` in the shared production database would expose it to every signed-up OpenLPM user, not protect it.
+
+The schema already has the real mechanism for this, built for exactly this case (RFC-0002 §1, `proposals/0002-projects-branches-portfolios-and-base-linking.md` line ~16): `projects.hosting_mode`, `CHECK (hosting_mode IN ('hosted', 'self-hosted'))`. A group needing full data sovereignty runs its own separate Supabase project instead of the shared one. That's the path this document specs out. Every seed project OpenLPM has ever had (`EvoMentor`, `Sachsen Biologie`, the two synthetic K-12 LPMs, and the once-seeded-then-deleted original `eva-lpm` — see the naming section below) has shipped with `hosting_mode: 'hosted'`. This is the first project drafted against `'self-hosted'`.
+
+## What "self-hosted" will actually require, operationally
+
+This is the part a future infrastructure session needs as a real spec, not a vague gesture at "self-host it later":
+
+1. **A separate Supabase project**, distinct from OpenLPM's shared production one, holding its own copy of the full OpenLPM schema (all of `supabase/migrations/001` through the current head — a fresh `supabase db push` against a new project, not a partial copy). This is a full second deployment of the database, not a special row or flag inside the existing one.
+2. **The same OpenLPM application codebase**, pointed at that separate project via its own environment configuration (its own `SUPABASE_URL` / keys), most likely running on the lab's own Linux home server rather than wherever the shared hosted deployment runs. No application-code fork is needed — `hosting_mode` already exists as a column precisely so a self-hosted deployment doesn't need special-cased code, only its own database and its own env pointed at it.
+3. **The `eva-lpm` project row itself gets created inside that self-hosted database**, once it exists, the normal way every real OpenLPM project is created — through the authenticated "New Project" wizard (`src/pages/dashboard/new-project-wizard.tsx`) by a real signed-in maintainer on that instance — not by running a raw SQL insert against production. The SQL in this branch's `migrations-draft/` file is a target-shape sketch for review, the same convention the earlier placeholder-named draft used, not a script anyone should execute.
+4. **Access control for who can even sign up** on the self-hosted instance is a separate, real decision (likely: no public sign-up at all, accounts created/invited manually) — this document doesn't resolve it, only flags that a self-hosted deployment being separate from the shared production database doesn't by itself answer "who can log in," and that answer needs to exist before this goes live.
+
+## The tradeoff this buys, plainly
+
+Running as `'self-hosted'` gets real data sovereignty: nobody outside a small, deliberately invited group can see this project exists, let alone read its content, because it never touches the shared database at all. What it gives up is everything RFC-0002 built the shared, multi-tenant deployment to make possible in the first place — live cross-project "commons" features (RFC-0002 §8: shared discovery, live links between projects/branches on the same deployment) are, by construction, only possible between projects that live in the same database. A self-hosted `eva-lpm` can still **import** from OpenEvo's public base repos (ConceptBase today; others once they're public) exactly like a hosted project can, because that import mechanism reads a base repo's own public git files or the shared `openevo-mcp` tools directly — it isn't a live database link to OpenLPM's shared Supabase project, so hosting mode doesn't block it. What's lost is specifically live linking *to other OpenLPM projects* — anything RFC-0002 §8's future Commons mechanism would eventually offer stays **async-only**: manual or scripted export/import between this self-hosted instance and the rest of the ecosystem, never a live shared link. RFC-0002 itself leaves "whether a self-hosted instance can ever join live federation later" as an explicitly open, undecided question (see its "Explicitly not yet decided" section) — this document doesn't resolve that either, only states the tradeoff as it stands today.
+
+## What this project would be
+
+A future OpenLPM project that lets a researcher — and eventually a teacher, in a later phase — look up what each of the Max Planck Institute for Evolutionary Anthropology's seven departments actually studies right now: who leads the work, what theories and methods it uses, what's currently open or contested, and what's been published recently. Someone could browse a department's real content the way OpenLPM already lets a project browse curriculum concepts, and leave a comment or question against any of it, using mechanisms (Discussions, Notebooks, Theories) OpenLPM already has. Because it runs self-hosted, that "someone" is a small, deliberately invited group, not the general OpenLPM user base.
+
+## Source material: mpi-eva-graph, not invented content
+
+Every claim below is read directly from `D:\dev\openevo-ccs-lab\eva-graph\mpi-eva-graph\`, not summarized from memory or made up to fill out an example. The seven departments, each with its own `theories`/`domains`/`methods`/`topics`/`scicomm_sensitivities` node files and an `edges.json`:
+
+| Code | Department | Theories | Domains | Methods | Topics | Scicomm |
+|---|---|---|---|---|---|---|
+| HBEC | Human Behavior, Ecology and Culture | 12 | 11 | 8 | 10 | 2 |
+| HumOr | Human Origins | 6 | 6 | 8 | 6 | 2 |
+| DLCE | Linguistic and Cultural Evolution | 6 | 10 | 8 | 13 | 2 |
+| DAG | Archaeogenetics | 6 | 6 | 6 | 5 | 3 |
+| CCP | Comparative Cultural Psychology | 5 | 6 | 5 | 5 | 3 |
+| EvoGen | Evolutionary Genetics | 7 | 7 | 9 | 8 | 4 |
+| PrimEvo | Primate Behavior and Evolution | 7 | 9 | 8 | 8 | 3 |
+
+Real current directors and research groups are already recorded: Richard McElreath (HBEC), Tracy L. Kivell since February 2023 (HumOr), Johannes Krause (DAG, 2026 Leibniz Prize), Daniel Haun since 2019 (CCP), Svante Pääbo (EvoGen, 2022 Nobel Prize), Jenny Tung since 2022 (PrimEvo — the dataset originally had this wrong and was corrected). Each department's "Current research" section names specific groups and cites real, DOI-linked 2020–2026 papers rather than generic topic labels — for example DAG's plague-genomics and treponemal-disease-origins work (Spyrou et al. 2022, *Nature*; Barquera et al. 2024/2025, *Nature*), EvoGen's Neanderthal-introgression and COVID-19-haplotype findings (Zeberg & Pääbo 2020/2021), CCP's cross-cultural norm-enforcement study across eight societies (Kanngiesser, Schäfer, Haun, Tomasello et al. 2022, *PNAS*), and PrimEvo's Pan African Programme / Chimp&See citizen-science platform. Eleven real, geolocated field sites (Taï National Park, Amboseli, Ranis, Swartkrans, Bili-Uele, and others) sit alongside the department content.
+
+A shared institute-level layer (`eva_institute/`) pulls out ten cross-department nodes (e.g. selection and adaptation, cultural transmission, cooperation and fairness) plus a department-history/lineage record, built by actually tracing which theories and topics recur across department boundaries rather than assuming overlap. The whole graph — 189+ department nodes plus the institute layer — is a single connected component with no isolated nodes as of the last network-analysis pass, and 16 nodes already carry a real, checked crosswalk to OpenEvo ConceptBase concept ids (`OE-CONCEPT-*` / `OE-SANDBOX-CONCEPT-*`).
+
+One fact matters more than any of the content above: **every node in mpi-eva-graph carries `provenance.status: "draft"`.** It's curator-drafted from open-web research and published sources, not yet checked by anyone actually in the department. Each department's own README says this plainly and asks for correction. Any project built on this material has to carry the same caveat as visibly as OpenLPM already shows its epistemic-status and maturity badges — this is unreviewed material about real people and real departments, not settled department output, and should never be presented as if a department signed off on it. Running self-hosted and gated is itself part of how that caveat gets honored in practice: this content shouldn't be broadly visible until it's been checked, and self-hosting is the mechanism that keeps it out of the shared, ecosystem-wide directory until then.
+
+## Where this content would actually come from, technically
+
+`mpi-eva-graph` lives in `eva-graph`, a **private** repository (confirmed live via `gh repo view`). It is not one of the OpenEvo ecosystem's ten Foundational Repos (ConceptBase, TheoryBase, QuestionBase, LiteratureBase, CompetencyBase, MethodsBase, QuoteBase, HumanBase, ProjectBase, TeachingBase), so it has no entry in `project_base_links.base_repo` and shouldn't get one — that mechanism (RFC-0002 §5) is specifically for the ecosystem's shared base repos, and `mpi-eva-graph` is itself a Project-kind graph repo, the same category of thing OpenLPM already pulls curriculum content from directly.
+
+The real fit is the mechanism migration `019_standards_and_project_scope.sql` already built for exactly this case: `project_source_declarations` — "what's being imported, in what format, and confirmation of rights to use it." Seven rows, one per department, each naming `mpi-eva-graph` as the source.
+
+That also means pulling any of this in, even in draft form, isn't a live automated fetch. A private source repo can't be read from a browser the way OpenLPM's ConceptBase importer reads a public one — the same constraint the standing OpenLPM↔OpenEvo compatibility roadmap already found for TheoryBase and LiteratureBase applies here too. It would take a maintainer with real local read access to `eva-graph` doing a manual, curator-checked pass: picking specific theory, topic, and literature nodes and copying them into OpenLPM's own tables, not an automatic sync — and, once self-hosting is real, that maintainer would be doing that pass against the self-hosted instance specifically.
+
+## How this maps onto OpenLPM's real tables
+
+OpenLPM's project model has moved on since RFC-0002 first proposed it — "branch" as a draft/fork mechanism was folded into a nested-Project model in migrations 015–016, and a real "Start new project" wizard (`src/pages/dashboard/new-project-wizard.tsx`) now collects geography, language, subject area, grade bands, and source declarations up front. This draft is scoped against that current shape, not the original RFC text alone. All of it applies equally on a self-hosted deployment — it's the same schema and the same wizard, just running against a different, private database.
+
+- **`projects`** — one row: slug `eva-lpm`; `status: planning`; `epistemic_status: in-development` (real content, not a synthetic comparison object like `bio-core-k12`, but not yet field-validated or department-reviewed either — OpenLPM's own local third value exists for exactly this case); `maturity: draft`; `focus_type: thematic`; **`hosting_mode: 'self-hosted'`**, explicit, not the column default; no `parent_project_id` — nothing among OpenLPM's existing projects (EvoMentor, Sachsen Biologie, the two synthetic K-12 LPMs) is a natural parent for institute-wide research content, so this would start as its own Project Space, not a sub-project.
+- **`project_source_declarations`** — seven rows, one per department, each pointing at `mpi-eva-graph/sub-units/<dept>/` and carrying the same "private repo, curator-drafted, not department-reviewed" rights note.
+- **`project_base_links`** — one row: `conceptbase`, `can_import: true`, `can_propose_pr: false`. ConceptBase is the only Foundational Repo actually public today; this project has no standing yet to contribute anything back anywhere. This link works the same way on a self-hosted instance as a hosted one (see the tradeoff section above) — it isn't a live link to OpenLPM's shared database.
+- **No grade-band framework, no jurisdiction rows.** This isn't jurisdiction-sequenced K-12 standards content, at least not in this first phase, so `grade_framework_id` and `project_jurisdictions` stay empty — a genuinely different shape from every one of OpenLPM's existing seed projects, which are all standards- or LPM-shaped.
+- **Existing tabs, not new ones.** Theories (seeded from each department's `theories.json` plus the shared institute-level theories), Literature (seeded from the real DOI-cited papers already named in each department's "Current research" section — not a full literature review, matching the honesty of the source graph itself), Discussions (open against any of it immediately, using the review/discussion mechanism already generalized to theories and framework tags), Notebooks (a researcher's own working notes), and Concepts only where a real ConceptBase crosswalk already exists — 16 real links, not invented ones. There's no native "department" entity in OpenLPM's schema, and this project doesn't need one invented for it: each source declaration already marks the department boundary.
+
+## Two audiences, two phases
+
+**Phase A (what this document scopes): researcher-facing.** A colleague can look up what a specific department works on right now, who leads it, what it's recently published, and leave a comment or question against any of it.
+
+**Phase B (out of scope here): teacher-facing.** A simplified layer for the pieces that genuinely work in a classroom, most likely reached through the content that already has a real ConceptBase link rather than raw research detail. This stays out of scope until Phase A content has actually had a department member look at it — turning unreviewed research description into classroom material without that step would compound the review gap, not just carry it forward. A teacher-facing phase would also need its own, separate decision about whether it belongs on the gated self-hosted instance or could eventually graduate to the shared hosted service once content is reviewed — not assumed here either way.
+
+## What's explicitly not done here
+
+No Supabase project touched, real or otherwise — not the shared production one, not a self-hosted one (none exists yet). No account created. No project row inserted anywhere live. No content imported from `mpi-eva-graph` — the accompanying SQL file sketches an empty project shell and its source declarations only, not any theory or literature content. No public listing, no announcement to MPI-EVA or anyone else. No self-hosted Supabase infrastructure stood up — that remains a separate task for whoever is scoping the home-server side of this.
+
+## Naming: why this is `eva-lpm` now, and why that's not a collision
+
+The slug `eva-lpm` was used once before, briefly, in OpenLPM's real history — worth stating plainly so nobody reading migration history later gets confused:
+
+- Migration `005_seed_projects.sql` seeded a project with slug `eva-lpm`, `hosting_mode: 'hosted'`, about a *different* thing entirely: a K-12 curriculum framework ("What does it mean to be human?", 13 concept strands) whose source content lives in `eva-graph/curriculum_models/`, not `eva-graph/mpi-eva-graph/`.
+- Migration `008_swap_eva_lpm_for_sachsen.sql` **deleted that row** (`DELETE FROM projects WHERE slug = 'eva-lpm'`) on 2026-09-06, because seeding it as an OpenLPM project would have pre-empted eva-graph's own still-open, "only Dustin can decide" question about that curriculum-models content: migrate it into ConceptBase's real `oe:LPM` schema, or formally retire it. That question is still open and still unmade. The slug was swapped out for `sachsen-biologie` at the time.
+- Because that row was actually deleted, not archived, `eva-lpm` is not currently occupied by any live row in the shared production database — reusing it doesn't collide with anything technically. But the *reason* it was pulled the first time still matters: this project must not be, or look like, a quiet resolution of that other, still-open eva-graph decision.
+
+This project is not that project. It draws on a different part of `eva-graph` (`mpi-eva-graph/`, the seven MPI-EVA department knowledge graphs — directors, theories, methods, topics, recent publications), not `curriculum_models/`. It doesn't touch, import from, or take a position on `curriculum_models/`'s migrate-or-retire question. Dustin's 2026-09-14 authorization to use the name `eva-lpm` here is a distinct, later decision, specifically for this MPI-EVA-department-engagement project, made with this history already on the table — not a reversal or an implicit answer to the older one.
+
+## Real decisions still open
+
+1. **Whether MPI-EVA department content should ever be shown outside a small trusted group at all**, even gated and self-hosted. `mpi-eva-graph` already flags real sensitivities that need deliberate handling before any wider release — animal research, human remains and repatriation, and the communities whose data the research draws on. That's an institute-level judgment call, not a schema question, and this document doesn't try to make it.
+2. **Whether it's worth asking a real contact in each department to sanity-check their section** before this goes any further than a small-group draft — every line of the source content is explicitly self-labeled as unreviewed.
+3. **Who gets an account on the self-hosted instance, and how.** Not resolved here — see the operational-requirements section above.
+4. **When the self-hosted Supabase project actually gets stood up**, and where exactly it runs on the home server — tracked as a separate infrastructure task, not this document's job.
+
+## Files in this branch
+
+- `docs/eva-lpm-self-hosted-prep.md` — this document.
+- `supabase/migrations-draft/DRAFT-eva-lpm-self-hosted-seed.sql` — an unapplied SQL sketch of the rows described above, in the same bootstrap seed style as migrations `005` and `008`, kept out of `supabase/migrations/` on purpose so it can't be picked up by ordinary migration tooling, and out of the shared production database's naming history on purpose too. See its own header for why and for what running it for real would actually require.
