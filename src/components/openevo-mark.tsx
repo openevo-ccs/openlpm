@@ -3,35 +3,20 @@ type MarkProps = {
   className?: string
 }
 
-// The OpenEvo CCS Lab's git repos carry no logo/wordmark asset of their own
-// (checked across openevo-core, conceptbase, lab_manager) -- but a real one
-// exists on the lab's own site (openevo.eva.mpg.de/wp-content/uploads/
-// OpenEvo-Logo-new-2023.png): a node-graph wordmark in navy + teal. This is
-// a small original mark for attribution use here, not a copy of that
-// logo -- a hub connected to three satellites, echoing both the lab's real
-// architecture (one lab coordinating many linked base repos/projects) and
-// the real logo's own two-tone navy/teal network motif.
+// The real OpenEvo CCS Lab logo, hosted on the lab's own site -- a
+// node-graph wordmark in navy + teal. This used to be a small original
+// stand-in mark (a hub-and-three-satellites SVG) because no logo asset
+// lived in any of the lab's git repos; swapped for the real file on
+// Dustin's ask, 2026-09-14.
 export function OpenEvoMark({ size = 16, className }: MarkProps) {
   return (
-    <svg
-      width={size}
+    <img
+      src="https://openevo.eva.mpg.de/wp-content/uploads/OpenEvo-Logo-new-2023.png"
+      alt="OpenEvo Computational Curriculum Studies Lab"
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
+      style={{ height: size, width: 'auto', maxHeight: size }}
       className={className}
-      aria-hidden="true"
-    >
-      <path
-        d="M12 12L12 4M12 12L5 19M12 12L19 19"
-        stroke="var(--brand-navy)"
-        strokeWidth={1.5}
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="12" r="2" fill="var(--brand-navy)" />
-      <circle cx="12" cy="4" r="1.5" fill="var(--brand-teal)" />
-      <circle cx="5" cy="19" r="1.5" fill="var(--brand-teal)" />
-      <circle cx="19" cy="19" r="1.5" fill="var(--brand-teal)" />
-    </svg>
+    />
   )
 }
 
