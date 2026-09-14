@@ -39,3 +39,16 @@ supabase/.temp/
 
 # Supabase CLI credentials -- never commit (personal access token, DB password)
 .supabase-secrets/
+
+# LocalLPM's production-data mirror: staged/archived dumps and the sync
+# pause marker (scripts/localLPM-setup.sh, docs/localLPM-dev-environment.md
+# §5) -- real (if currently pre-launch, per that doc's §5.5) production data,
+# never appropriate to commit. Default location; LOCALLPM_BACKUP_ROOT can
+# point it elsewhere entirely (e.g. a separate data volume on the home
+# server), in which case this line is just a safety net.
+/.locallpm-backups/
+
+# LocalLPM-sandbox's own local Supabase project directory (docs/localLPM-dev-environment.md
+# §8) -- config.toml there is a deliberate local copy with different ports,
+# not meant to travel with the repo the way supabase/config.toml does.
+/supabase-sandbox/
