@@ -4,6 +4,7 @@ import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { MemoChatWidget } from '@/components/memo-chat-widget'
+import { FeedbackWidget } from '@/components/feedback-widget'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -43,6 +44,7 @@ export default function DashboardLayout() {
       </main>
 
       <MemoChatWidget />
+      <FeedbackWidget />
     </div>
   )
 }

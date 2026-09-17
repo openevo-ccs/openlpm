@@ -9,7 +9,8 @@
     "setup": "npm install",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "type-check": "tsc -b --noEmit"
+    "type-check": "tsc -b --noEmit",
+    "read-feedback": "node scripts/read-feedback.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
