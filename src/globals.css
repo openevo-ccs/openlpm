@@ -339,3 +339,41 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   .memo-chat-panel { right: 8px; left: 8px; bottom: 8px; width: auto; }
   .memo-chat-launcher { right: 12px; bottom: 12px; }
 }
+
+/* ---- Feedback widget -- same floating-overlay pattern as "Chat with
+   Me-Mo" above, mirrored to the bottom-LEFT so the two don't overlap. ---- */
+.feedback-launcher {
+  position: fixed; left: 20px; bottom: 20px; z-index: 50;
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--series-b, var(--series-a)); color: #fff; border: none; cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.feedback-launcher:hover { filter: brightness(0.94); }
+
+.feedback-panel {
+  position: fixed; left: 20px; bottom: 20px; z-index: 50;
+  width: 340px; max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px); overflow-y: auto;
+  padding: 0; margin: 0;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+.feedback-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-bottom: 1px solid var(--border);
+}
+.feedback-title { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px; }
+.feedback-body { padding: 10px 12px; }
+
+.feedback-comment {
+  width: 100%; resize: vertical; min-height: 60px;
+  padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-2); color: var(--text-primary); font: inherit;
+}
+.feedback-tag-btn { cursor: pointer; background: none; }
+.feedback-screenshot-canvas { width: 100%; border-radius: 8px; border: 1px solid var(--border); cursor: crosshair; touch-action: none; }
+
+@media (max-width: 480px) {
+  .feedback-panel { left: 8px; right: 8px; bottom: 8px; width: auto; }
+  .feedback-launcher { left: 12px; bottom: 12px; }
+}

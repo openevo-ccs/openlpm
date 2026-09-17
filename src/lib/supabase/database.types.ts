@@ -1675,6 +1675,47 @@ export type Database = {
           }
         ]
       }
+      feedback: {
+        Row: {
+          id: string
+          user_id: string | null
+          project_id: string | null
+          tag: 'Problem' | 'Request' | 'Other'
+          comment: string | null
+          context: any
+          screenshot_path: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          project_id?: string | null
+          tag?: 'Problem' | 'Request' | 'Other'
+          comment?: string | null
+          context?: any
+          screenshot_path?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          project_id?: string | null
+          tag?: 'Problem' | 'Request' | 'Other'
+          comment?: string | null
+          context?: any
+          screenshot_path?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
   }
 }
