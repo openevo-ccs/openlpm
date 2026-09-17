@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Github, KeyRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { REDIRECT_KEY } from '@/components/require-auth'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { OpenEvoAttribution } from '@/components/openevo-mark'
 
@@ -26,6 +27,7 @@ export default function LoginPage() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [searchParams] = useSearchParams()
   const error = searchParams.get('error') || searchParams.get('error_description')
+  const navigate = useNavigate()
 
   const signInWithGithub = async () => {
     setGithubLoading(true)
@@ -55,9 +57,21 @@ export default function LoginPage() {
       setNotice(error ? { kind: 'bad', text: error.message } : { kind: 'ok', text: 'Check your inbox to confirm your email, then sign in.' })
     } else if (mode === 'signin') {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
-      if (error) setNotice({ kind: 'bad', text: error.message })
-      // On success, the session listener in state/session.tsx picks this up
-      // and App.tsx's <RedirectAfterLogin> sends them on -- nothing to do here.
+      if (error) {
+        setNotice({ kind: 'bad', text: error.message })
+      } else {
+        // <RedirectAfterLogin> (App.tsx) only acts at pathname === '/' --
+        // built for the OAuth/password-reset round-trip that lands back at
+        // site root. A direct email+password sign-in never leaves this page
+        // at all, so that effect's guard would never fire here (confirmed
+        // live 2026-09-14 -- a real, successful sign-in left the visitor
+        // stranded on /auth/login). Navigate explicitly instead, honoring
+        // the same REDIRECT_KEY <RequireAuth> already sets when it bounces
+        // someone off a protected route.
+        const stored = window.localStorage.getItem(REDIRECT_KEY)
+        window.localStorage.removeItem(REDIRECT_KEY)
+        navigate(stored || '/dashboard', { replace: true })
+      }
     } else {
       // Deliberately the plain site root, not a '#/auth/update-password'
       // hash target -- Supabase appends '?code=...' after this URL, and
