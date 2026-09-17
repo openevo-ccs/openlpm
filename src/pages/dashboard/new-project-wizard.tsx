@@ -63,6 +63,12 @@ export default function NewProjectWizard() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [curation, setCuration] = useState<EpistemicStatus>('in-development')
+  // Only meaningful for a new top-level project space (a sub-project always
+  // inherits visibility from its parent, same rule as epistemic_status just
+  // above) -- migration 025. Default false: most projects should stay in
+  // the browsable directory; private is an opt-in for something like
+  // eva-lpm that genuinely shouldn't be visible to other OpenLPM users yet.
+  const [isPrivate, setIsPrivate] = useState(false)
 
   // Geography
   const [jurisdictions, setJurisdictions] = useState<JurisdictionDraft[]>([{ countryCode: '', regionCode: '', label: '' }])
@@ -157,6 +163,15 @@ export default function NewProjectWizard() {
           ? (memberships?.find((m) => m.project.id === parentId)?.project.epistemic_status ?? curation)
           : curation
 
+      // A sub-project always inherits its parent Space's privacy too, same
+      // reasoning as epistemic_status above -- a private parent's own
+      // sub-projects can't opt back into being publicly listed.
+      const projectIsPrivate: boolean = fixedParent
+        ? fixedParent.is_private
+        : parentId
+          ? (memberships?.find((m) => m.project.id === parentId)?.project.is_private ?? isPrivate)
+          : isPrivate
+
       const gradeFrameworkId = gradeChoice && gradeChoice !== 'custom-later' ? gradeChoice : null
 
       const { data: project, error: insertError } = await supabase
@@ -171,6 +186,7 @@ export default function NewProjectWizard() {
           parent_project_id: parentId,
           working_languages: Array.from(languages),
           grade_framework_id: gradeFrameworkId,
+          is_private: projectIsPrivate,
           created_by: user?.id ?? null,
         })
         .select()
@@ -273,6 +289,19 @@ export default function NewProjectWizard() {
                   <option value="field-validated-curriculum">Human-curated — already in real classroom use</option>
                   <option value="designed-thought-experiment">Synthetic-theoretical — a designed comparison or research construct</option>
                 </select>
+              </div>
+            )}
+            {!fixedParent && !parentProjectId && (
+              <div className="field">
+                <label className="row" style={{ gap: 6, alignItems: 'center' }}>
+                  <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
+                  Make this project private
+                </label>
+                <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+                  A private project doesn&apos;t appear to anyone outside it — not in the project
+                  directory, not by name. Only people you add as members can see that it exists at
+                  all. Leave unchecked for a normal, browsable project space.
+                </p>
               </div>
             )}
           </div>
@@ -419,6 +448,7 @@ export default function NewProjectWizard() {
             <p><strong>{name || '(no name yet)'}</strong> ({slug || 'no-slug-yet'})</p>
             <p className="muted">{description || 'No description.'}</p>
             <p className="muted">Parent: {fixedParent?.name ?? parentOptions.find((m) => m.project.id === parentProjectId)?.project.name ?? 'None — a new top-level project space'}</p>
+            <p className="muted">Visibility: {(fixedParent?.is_private ?? (parentProjectId ? parentOptions.find((m) => m.project.id === parentProjectId)?.project.is_private : isPrivate)) ? 'Private — members only' : 'Public — anyone signed in can find it'}</p>
             <p className="muted">Languages: {Array.from(languages).join(', ') || 'none selected'}</p>
             <p className="muted">Regions: {jurisdictions.filter((j) => j.label.trim()).map((j) => j.label).join(', ') || 'none specified'}</p>
             <p className="muted">Subject areas: {subjectTags.filter((t) => selectedSubjectTagIds.has(t.id)).map((t) => t.label).join(', ') || 'none selected'}</p>

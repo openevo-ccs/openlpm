@@ -388,6 +388,11 @@ export type Database = {
           epistemic_status_note: string | null
           projectbase_ref: string | null
           hosting_mode: 'hosted' | 'self-hosted'
+          // Whether the project's own existence/name/description is visible
+          // to any signed-in user (false, the default) or only to its
+          // members and creator (true) -- migration 025. Independent of
+          // hosting_mode: this is about who can see it, not where it runs.
+          is_private: boolean
           promoted_from_branch_id: string | null
           parent_project_id: string | null
           focus_type: 'regional' | 'thematic' | 'general'
@@ -419,6 +424,7 @@ export type Database = {
           epistemic_status_note?: string | null
           projectbase_ref?: string | null
           hosting_mode?: 'hosted' | 'self-hosted'
+          is_private?: boolean
           promoted_from_branch_id?: string | null
           parent_project_id?: string | null
           focus_type?: 'regional' | 'thematic' | 'general'
@@ -441,6 +447,7 @@ export type Database = {
           epistemic_status_note?: string | null
           projectbase_ref?: string | null
           hosting_mode?: 'hosted' | 'self-hosted'
+          is_private?: boolean
           promoted_from_branch_id?: string | null
           parent_project_id?: string | null
           focus_type?: 'regional' | 'thematic' | 'general'

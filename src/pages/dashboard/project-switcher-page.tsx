@@ -93,7 +93,10 @@ export default function ProjectSwitcherPage() {
                 <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h3>{project.name}</h3>
-                    <span className="chip capitalize">{role}</span>
+                    <div className="row" style={{ gap: 4 }}>
+                      {project.is_private && <span className="chip" title="Only members can see this project exists">Private</span>}
+                      <span className="chip capitalize">{role}</span>
+                    </div>
                   </div>
                   <p className="muted">{project.description}</p>
                   <div className="row" style={{ flexWrap: 'wrap' }}>
