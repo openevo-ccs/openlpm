@@ -48,9 +48,11 @@ export async function getUserProjects(supabase: Client): Promise<ProjectWithRole
 /**
  * Resolves a project by slug and the current user's role in it (null if the
  * project doesn't exist, or exists but they aren't a member -- RLS lets any
- * authenticated user see the project row itself, per "projects are a
- * browsable directory," but not its content, so those two cases are
- * distinguished by whether `project` comes back at all vs. `role` being null).
+ * authenticated user see a *public* project's row, per "projects are a
+ * browsable directory," but never its content; a *private* project's row
+ * (migration 025) is invisible to non-members entirely, so those two cases
+ * are distinguished by whether `project` comes back at all vs. `role` being
+ * null).
  */
 export async function getProjectBySlug(
   supabase: Client,
