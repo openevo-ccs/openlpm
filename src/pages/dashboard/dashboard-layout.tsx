@@ -3,7 +3,7 @@ import { LogOut, User } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
-import { MemoChatWidget } from '@/components/memo-chat-widget'
+// import { MemoChatWidget } from '@/components/memo-chat-widget' -- see note below, not mounted yet
 import { FeedbackWidget } from '@/components/feedback-widget'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
@@ -43,7 +43,13 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
-      <MemoChatWidget />
+      {/* Not mounted for the live deploy: its backend (curriculum-agents/
+          tools/lpm-chat-bridge) only runs on a developer's own machine, not
+          anywhere real visitors can reach -- built during the now-dropped
+          LocalLPM effort (see lab_manager's superseded design note). Would
+          show a working-looking button that fails for every real user.
+          Re-enable once it's pointed at a real, deployed backend. */}
+      {/* <MemoChatWidget /> */}
       <FeedbackWidget />
     </div>
   )
