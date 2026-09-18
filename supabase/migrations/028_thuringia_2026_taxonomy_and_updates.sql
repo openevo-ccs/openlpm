@@ -125,8 +125,13 @@ BEGIN
 
   -- Level 1: the 6 Basiskonzepte themselves (find-or-create -- may already
   -- exist as real schema_elements from the original EvoMentor import).
+  -- NULL must be cast explicitly here: SELECT DISTINCT forces a concrete
+  -- type onto every output column to make the row comparable for
+  -- deduplication, and an untyped NULL defaults to text in that position --
+  -- which Postgres then refuses to implicitly assign into the uuid
+  -- parent_id column, even though the value itself is NULL either way.
   INSERT INTO lpm_schema_elements (project_id, element_type, label, parent_id, status)
-  SELECT DISTINCT v_project_id, 'concept', t.basiskonzept, NULL, 'accepted'
+  SELECT DISTINCT v_project_id, 'concept', t.basiskonzept, NULL::uuid, 'accepted'
   FROM _taxonomy_import t
   WHERE NOT EXISTS (
     SELECT 1 FROM lpm_schema_elements e
