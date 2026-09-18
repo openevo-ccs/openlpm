@@ -243,8 +243,8 @@ export default function PromptGeneratorPage() {
         <div className="card empty">
           <p>No prompt-generator library is set up for this project yet.</p>
           <p className="muted">
-            A curator needs to add one for this project's working language/subject (see
-            prompt_template_libraries) — this isn't a per-project setting anyone can toggle from here yet.
+            Someone needs to add one for this project's working language and subject before this tool can
+            be used here — that's not something you can set up from this page yet.
           </p>
         </div>
       </div>

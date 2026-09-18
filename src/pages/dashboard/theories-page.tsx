@@ -34,6 +34,17 @@ const MATURITY_LABEL: Record<NonNullable<EvidentiaryMaturity>, string> = {
   'efficacy-demonstrated': 'Efficacy demonstrated',
 }
 
+// Plain-language gloss for each term, shown as a hover tooltip -- same
+// pattern already used for the "Private" chip on the project list, since
+// none of these four terms are self-explanatory to a reader without a
+// research-methods background.
+const MATURITY_GLOSS: Record<NonNullable<EvidentiaryMaturity>, string> = {
+  'theoretically-developed': 'A well-reasoned idea, but not yet checked against real evidence.',
+  'empirically-recovered': 'Someone has found real evidence for this, but it hasn\'t been tested head-to-head against other explanations yet.',
+  'tested-against-alternatives': 'Checked directly against competing explanations, and this one held up better.',
+  'efficacy-demonstrated': 'Shown to actually work in real, practical use, not just in theory.',
+}
+
 export default function TheoriesPage() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
   const [theories, setTheories] = useState<TheoryRow[] | null>(null)
@@ -97,7 +108,7 @@ export default function TheoriesPage() {
               >
                 {t.label}
                 {t.evidentiary_maturity && (
-                  <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>{MATURITY_LABEL[t.evidentiary_maturity]}</span>
+                  <span className="muted" style={{ fontSize: 11, marginLeft: 8 }} title={MATURITY_GLOSS[t.evidentiary_maturity]}>{MATURITY_LABEL[t.evidentiary_maturity]}</span>
                 )}
               </button>
             ))}
@@ -171,7 +182,7 @@ function CreateTheoryForm({
             <label>Evidentiary maturity (optional)</label>
             <select value={maturity ?? ''} onChange={(e) => setMaturity((e.target.value || null) as EvidentiaryMaturity)}>
               <option value="">Not stated</option>
-              {Object.entries(MATURITY_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              {Object.entries(MATURITY_LABEL).map(([k, v]) => <option key={k} value={k} title={MATURITY_GLOSS[k as NonNullable<EvidentiaryMaturity>]}>{v}</option>)}
             </select>
           </div>
           <div className="field">
@@ -214,7 +225,7 @@ function TheoryDetail({ theoryId, projectId, supabase }: { theoryId: string; pro
     <div>
       <h3 style={{ marginTop: 0 }}>{theory.label}</h3>
       {theory.evidentiary_maturity && (
-        <p className="muted" style={{ fontSize: 12 }}>
+        <p className="muted" style={{ fontSize: 12 }} title={MATURITY_GLOSS[theory.evidentiary_maturity]}>
           {MATURITY_LABEL[theory.evidentiary_maturity]}{theory.evidentiary_maturity_note ? ` — ${theory.evidentiary_maturity_note}` : ''}
         </p>
       )}

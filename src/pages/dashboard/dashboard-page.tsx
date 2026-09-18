@@ -295,7 +295,7 @@ function MembersSection({
                   <select value={m.role} onChange={(e) => updateMemberRole(supabase, m.id, e.target.value as ProjectMemberRole).then(reload)}>
                     {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
-                  <button className="btn btn-mini btn-danger" onClick={() => removeMember(supabase, m.id).then(reload)}><Trash2 size={11} /></button>
+                  <button className="btn btn-mini btn-danger" aria-label="Remove member" title="Remove member" onClick={() => removeMember(supabase, m.id).then(reload)}><Trash2 size={11} /></button>
                 </span>
               ) : (
                 <span className="chip">{m.role}</span>

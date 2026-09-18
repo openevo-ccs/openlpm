@@ -100,7 +100,11 @@ function BrowseTab() {
 
   const grades = useMemo(() => {
     const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
-    return Array.from(set).sort((a, b) => Number(a) - Number(b))
+    // grade_band is free text typed during import (e.g. "9", "9-12", "9/10"),
+    // not a plain number -- Number(a) on a range string is NaN, which sorts
+    // inconsistently. Sort by the first number in the label instead.
+    const leadingNumber = (s: string) => parseInt(s, 10) || 0
+    return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
 
   const filtered = useMemo(() => {

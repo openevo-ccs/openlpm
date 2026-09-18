@@ -20,12 +20,16 @@ type Mode = 'signin' | 'signup' | 'forgot'
 // profile page (see profile-page.tsx).
 export default function LoginPage() {
   const [githubLoading, setGithubLoading] = useState(false)
-  const [mode, setMode] = useState<Mode>('signin')
+  const [searchParams] = useSearchParams()
+  // Homepage's "Get started"/"Start collaborating" links pass ?mode=signup
+  // so a brand-new visitor lands on the sign-up form directly instead of
+  // a "Welcome back" sign-in screen they have to notice a secondary link
+  // to get past.
+  const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'signup' ? 'signup' : 'signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
-  const [searchParams] = useSearchParams()
   const error = searchParams.get('error') || searchParams.get('error_description')
   const navigate = useNavigate()
 
@@ -38,6 +42,7 @@ export default function LoginPage() {
     })
     if (error) {
       setGithubLoading(false)
+      setNotice({ kind: 'bad', text: error.message })
       console.error('github sign-in failed:', error.message)
     }
   }
