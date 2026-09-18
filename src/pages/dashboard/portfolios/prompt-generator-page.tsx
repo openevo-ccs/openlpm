@@ -320,9 +320,17 @@ export default function PromptGeneratorPage() {
 
             <h3>Assessment</h3>
             <CheckGroup options={options.assessment} selected={cfg.bewertung} onToggle={(v) => setCfg({ ...cfg, bewertung: toggle(cfg.bewertung, v) })} />
+            <div className="field" style={{ marginTop: 8 }}>
+              <label>Assessment notes</label>
+              <textarea value={cfg.evalNotizen} onChange={(e) => setCfg({ ...cfg, evalNotizen: e.target.value })} />
+            </div>
 
             <h3>Societal context</h3>
             <CheckGroup options={options.societal_context} selected={cfg.kontext} onToggle={(v) => setCfg({ ...cfg, kontext: toggle(cfg.kontext, v) })} />
+            <div className="field" style={{ marginTop: 8 }}>
+              <label>Further notes</label>
+              <textarea value={cfg.kontextNotizen} onChange={(e) => setCfg({ ...cfg, kontextNotizen: e.target.value })} />
+            </div>
 
             <h3>Desired output</h3>
             <div className="row" style={{ gap: 8, marginBottom: 8 }}>
@@ -344,6 +352,10 @@ export default function PromptGeneratorPage() {
               </div>
             </div>
             <CheckGroup options={options.output_types} selected={cfg.ausgabeTyp} onToggle={(v) => setCfg({ ...cfg, ausgabeTyp: toggle(cfg.ausgabeTyp, v) })} />
+            <div className="field" style={{ marginTop: 8 }}>
+              <label>Other notes</label>
+              <textarea value={cfg.sonstigeNotizen} onChange={(e) => setCfg({ ...cfg, sonstigeNotizen: e.target.value })} />
+            </div>
 
             {error && <div className="notice notice-bad" style={{ marginTop: 10 }}>{error}</div>}
             <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={save} disabled={saving}>
