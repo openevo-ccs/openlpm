@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, GitBranch, MessageSquare, Search } from 'lucide-react'
+import { BookOpen, GitBranch, Layers, MessageSquare, Network, Search } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { OpenEvoAttribution } from '@/components/openevo-mark'
@@ -47,8 +47,8 @@ export default function HomePage() {
           </div>
           <div className="card">
             <GitBranch size={20} style={{ color: 'var(--good)' }} />
-            <h3>Schema co-design</h3>
-            <p className="muted">Collaboratively design and refine learning progression schema elements with version tracking.</p>
+            <h3>Concepts &amp; strands</h3>
+            <p className="muted">Collaboratively build out curriculum concepts and learning progression strands, with version tracking.</p>
           </div>
           <div className="card">
             <BookOpen size={20} style={{ color: 'var(--serious)' }} />
@@ -59,6 +59,16 @@ export default function HomePage() {
             <MessageSquare size={20} style={{ color: 'var(--warning)' }} />
             <h3>Discussion forums</h3>
             <p className="muted">Rich discussions with threading, annotations, and linking to specific content elements.</p>
+          </div>
+          <div className="card">
+            <Layers size={20} style={{ color: 'var(--series-a)' }} />
+            <h3>Learning goals</h3>
+            <p className="muted">Track grade-band learning goals and connect them to the concepts and standards behind them.</p>
+          </div>
+          <div className="card">
+            <Network size={20} style={{ color: 'var(--good)' }} />
+            <h3>Notebooks &amp; AI prompts</h3>
+            <p className="muted">Collect curriculum items into a notebook, then generate and test AI teaching prompts from them.</p>
           </div>
         </section>
       </main>

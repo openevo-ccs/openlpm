@@ -144,7 +144,7 @@ function StrandDetail({
           parents.map((p) => (
             <div key={p.id} className="row" style={{ justifyContent: 'space-between', padding: '2px 0' }}>
               <span style={{ fontSize: 13 }}>{p.title}</span>
-              <button className="btn-linklike" onClick={() => removeParent(p.id)}><X size={12} /></button>
+              <button className="btn-linklike" aria-label="Remove nesting" title="Remove nesting" onClick={() => removeParent(p.id)}><X size={12} /></button>
             </div>
           ))
         )}
@@ -155,7 +155,7 @@ function StrandDetail({
               {parentOptions.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
             </select>
             <button className="btn btn-mini" onClick={addParent} disabled={!candidateParentId}>Add</button>
-            <button className="btn btn-mini" onClick={() => setShowAddParent(false)}><X size={12} /></button>
+            <button className="btn btn-mini" aria-label="Cancel" title="Cancel" onClick={() => setShowAddParent(false)}><X size={12} /></button>
           </div>
         ) : (
           <button className="btn btn-mini" style={{ marginTop: 6 }} onClick={() => setShowAddParent(true)}>

@@ -11,6 +11,11 @@ const CURATION_LABEL: Record<Curation, string> = {
   'synthetic-theoretical': 'Synthetic-Theoretical',
 }
 
+const CURATION_GLOSS: Record<Curation, string> = {
+  'human-curated': 'Made or reviewed by real teachers and researchers, whether or not it has been tried in a classroom yet.',
+  'synthetic-theoretical': 'A designed thought experiment -- not yet tried with real students.',
+}
+
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
@@ -67,7 +72,7 @@ export default function ProjectSwitcherPage() {
 
       <div className="row" style={{ gap: 16, marginBottom: 20 }}>
         {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (
-          <label key={c} className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }}>
+          <label key={c} className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title={CURATION_GLOSS[c]}>
             <input type="checkbox" checked={visibleCurations.has(c)} onChange={() => toggleCuration(c)} />
             {CURATION_LABEL[c]}
           </label>
