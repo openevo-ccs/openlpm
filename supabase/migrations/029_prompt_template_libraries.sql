@@ -81,9 +81,10 @@ INSERT INTO prompt_template_libraries (
   section_labels, option_lists
 )
 SELECT
-  'Deutsch -- Biologie (KMK Basiskonzepte)', 'de', 'Biologie', TRUE,
+  'Deutsch -- Biologie (KMK Basiskonzepte)', 'de', 'Biologie',
   'Du bist eine erfahrene Biologie-Lehrkraft und Fachdidaktikerin.',
   'Erstelle auf Basis der folgenden Lernziele eine konkrete Unterrichtsplanung, die die unten genannten Basiskonzepte gezielt einbindet, ohne den Kernlehrplan zu verlassen.',
+  TRUE,
   jsonb_build_object(
     'title', 'UNTERRICHTSVORBEREITUNG MIT BASISKONZEPT-INTEGRATION',
     'grade_label', 'Klassenstufe(n):',
