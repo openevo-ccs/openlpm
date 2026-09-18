@@ -1689,6 +1689,47 @@ export type Database = {
           }
         ]
       }
+      tutorials: {
+        Row: {
+          id: string
+          project_id: string | null
+          title: string
+          description: string | null
+          steps: any
+          sort_order: number
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          title: string
+          description?: string | null
+          steps?: any
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          title?: string
+          description?: string | null
+          steps?: any
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutorials_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       prompt_template_libraries: {
         Row: {
           id: string
