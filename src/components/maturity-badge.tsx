@@ -15,6 +15,12 @@ const LABEL: Record<Maturity, string> = {
   established: 'Established',
 }
 
+// Deliberately NOT 'proposed'/'accepted' (amber/green) -- EpistemicStatusBadge
+// already owns that exact amber/green pair for a different question (is this
+// content real or a thought experiment), and a project card shows both
+// badges side by side. Reusing the same two colors for a different axis
+// meant someone scanning by color alone could easily read the wrong badge.
+// 'planning'/'active' map to a genuinely different pair (muted/teal).
 export function MaturityBadge({ status }: { status: Maturity }) {
-  return <Chip status={status === 'draft' ? 'proposed' : 'accepted'}>{LABEL[status]}</Chip>
+  return <Chip status={status === 'draft' ? 'planning' : 'active'}>{LABEL[status]}</Chip>
 }

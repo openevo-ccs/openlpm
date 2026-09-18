@@ -28,9 +28,12 @@ const BUCKET: Record<string, string> = {
   promoted: 'good',
   completed: 'good',
   'field-validated-curriculum': 'good',
-  rejected: 'muted',
-  deprecated: 'muted',
-  archived: 'muted',
+  // Real, deliberate outcomes -- "didn't make it," not "nothing to report"
+  // the way the rest of the muted bucket is -- so these get a real color
+  // instead of blending into the plain background every other status avoids.
+  rejected: 'critical',
+  deprecated: 'critical',
+  archived: 'critical',
   merged: 'muted',
   discontinued: 'muted',
   paused: 'muted',
