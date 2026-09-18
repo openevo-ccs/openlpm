@@ -44,7 +44,7 @@ CREATE POLICY "General tutorials are visible to all; project ones to members" ON
 -- The real first tutorial: the actual 3-task pilot workflow Dustin
 -- described (2026-09-17/18), covering only features that genuinely exist
 -- in this app today -- the Concepts page's Explore tab, Notebooks, and the
--- AI Prompt Generator (migrations 027/028) -- nothing aspirational.
+-- AI Prompt Generator (migrations 027/029) -- nothing aspirational.
 INSERT INTO tutorials (project_id, title, description, sort_order, steps)
 SELECT
   p.id,

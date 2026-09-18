@@ -411,7 +411,7 @@ export type Database = {
           // is sequenced against -- migration 019.
           grade_framework_id: string | null
           // Which prompt_template_libraries row the KI-Prompt-Generator
-          // defaults to for this project -- migration 028. Nullable: falls
+          // defaults to for this project -- migration 029. Nullable: falls
           // back to whichever library has is_default=true for the
           // project's own working_languages[0], resolved app-side.
           prompt_template_library_id: string | null
