@@ -410,6 +410,11 @@ export type Database = {
           // project's real scheme, or a custom one) this project's content
           // is sequenced against -- migration 019.
           grade_framework_id: string | null
+          // Which prompt_template_libraries row the KI-Prompt-Generator
+          // defaults to for this project -- migration 029. Nullable: falls
+          // back to whichever library has is_default=true for the
+          // project's own working_languages[0], resolved app-side.
+          prompt_template_library_id: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -433,6 +438,7 @@ export type Database = {
           working_languages?: string[]
           maturity?: 'draft' | 'established'
           grade_framework_id?: string | null
+          prompt_template_library_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -456,6 +462,7 @@ export type Database = {
           working_languages?: string[]
           maturity?: 'draft' | 'established'
           grade_framework_id?: string | null
+          prompt_template_library_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -1678,6 +1685,146 @@ export type Database = {
             columns: ["topic_id"],
             isOneToOne: false,
             referencedRelation: "discussion_topics",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      tutorials: {
+        Row: {
+          id: string
+          project_id: string | null
+          title: string
+          description: string | null
+          steps: any
+          sort_order: number
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          title: string
+          description?: string | null
+          steps?: any
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          title?: string
+          description?: string | null
+          steps?: any
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tutorials_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      prompt_template_libraries: {
+        Row: {
+          id: string
+          label: string
+          language: string
+          subject_area: string | null
+          role_preamble: string
+          instruction_preamble: string
+          section_labels: any
+          option_lists: any
+          is_default: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          label: string
+          language: string
+          subject_area?: string | null
+          role_preamble: string
+          instruction_preamble: string
+          section_labels?: any
+          option_lists?: any
+          is_default?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          label?: string
+          language?: string
+          subject_area?: string | null
+          role_preamble?: string
+          instruction_preamble?: string
+          section_labels?: any
+          option_lists?: any
+          is_default?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      prompt_experiments: {
+        Row: {
+          id: string
+          project_id: string
+          portfolio_id: string | null
+          created_by: string | null
+          visibility: 'private' | 'shared' | 'project'
+          config: any
+          prompt_text: string
+          llm_name: string | null
+          llm_output: string | null
+          evaluation_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          portfolio_id?: string | null
+          created_by?: string | null
+          visibility?: 'private' | 'shared' | 'project'
+          config?: any
+          prompt_text: string
+          llm_name?: string | null
+          llm_output?: string | null
+          evaluation_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          portfolio_id?: string | null
+          created_by?: string | null
+          visibility?: 'private' | 'shared' | 'project'
+          config?: any
+          prompt_text?: string
+          llm_name?: string | null
+          llm_output?: string | null
+          evaluation_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_experiments_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_experiments_portfolio_id_fkey",
+            columns: ["portfolio_id"],
+            isOneToOne: false,
+            referencedRelation: "portfolios",
             referencedColumns: ["id"]
           }
         ]

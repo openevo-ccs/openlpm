@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 // import { MemoChatWidget } from '@/components/memo-chat-widget' -- see note below, not mounted yet
 import { FeedbackWidget } from '@/components/feedback-widget'
+import { HelpWidget } from '@/components/help-widget'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -28,6 +29,7 @@ export default function DashboardLayout() {
         </Link>
         <div className="whoami" style={{ marginLeft: 'auto' }}>
           <span className="muted">{session?.user.email}</span>
+          <HelpWidget />
           <Link to="/dashboard/profile" className="btn btn-mini">
             <User size={12} />
             Profile
