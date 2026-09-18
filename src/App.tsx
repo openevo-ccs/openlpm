@@ -21,6 +21,7 @@ import ReviewPage from '@/pages/dashboard/review-page'
 import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
+import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -93,6 +94,7 @@ export default function App() {
             <Route path="discussions" element={<DiscussionsPage />} />
             <Route path="notebooks" element={<PortfoliosPage />} />
             <Route path="notebooks/:portfolioId" element={<PortfolioDetailPage />} />
+            <Route path="notebooks/:portfolioId/prompt" element={<PromptGeneratorPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
           </Route>
         </Route>

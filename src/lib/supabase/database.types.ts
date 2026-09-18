@@ -1682,6 +1682,66 @@ export type Database = {
           }
         ]
       }
+      prompt_experiments: {
+        Row: {
+          id: string
+          project_id: string
+          portfolio_id: string | null
+          created_by: string | null
+          visibility: 'private' | 'shared' | 'project'
+          config: any
+          prompt_text: string
+          llm_name: string | null
+          llm_output: string | null
+          evaluation_notes: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          portfolio_id?: string | null
+          created_by?: string | null
+          visibility?: 'private' | 'shared' | 'project'
+          config?: any
+          prompt_text: string
+          llm_name?: string | null
+          llm_output?: string | null
+          evaluation_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          portfolio_id?: string | null
+          created_by?: string | null
+          visibility?: 'private' | 'shared' | 'project'
+          config?: any
+          prompt_text?: string
+          llm_name?: string | null
+          llm_output?: string | null
+          evaluation_notes?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompt_experiments_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "prompt_experiments_portfolio_id_fkey",
+            columns: ["portfolio_id"],
+            isOneToOne: false,
+            referencedRelation: "portfolios",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       feedback: {
         Row: {
           id: string

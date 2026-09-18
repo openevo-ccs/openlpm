@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowLeft, Trash2, UserPlus } from 'lucide-react'
+import { ArrowLeft, Sparkles, Trash2, UserPlus } from 'lucide-react'
 import { addShare, getPortfolioGraph, listShares, removeShare, type PortfolioEdge, type PortfolioNode, type ShareGrant } from '@/lib/supabase/portfolios'
 import { PortfolioExplorer } from '@/components/portfolio-explorer'
 import type { ProjectOutletContext } from '../project-layout'
@@ -54,7 +54,13 @@ export default function PortfolioDetailPage() {
             <h1>{portfolio.name}</h1>
             <p className="muted">{portfolio.description}</p>
           </div>
-          <span className="chip capitalize">{portfolio.visibility}</span>
+          <div className="row" style={{ gap: 8 }}>
+            <Link to={`/dashboard/${slug}/notebooks/${portfolioId}/prompt`} className="btn btn-mini">
+              <Sparkles size={12} />
+              Generate teaching prompt
+            </Link>
+            <span className="chip capitalize">{portfolio.visibility}</span>
+          </div>
         </div>
         {portfolio.visibility === 'shared' && portfolio.owner_id === userId && (
           <ShareManager portfolioId={portfolioId} supabase={supabase} />
