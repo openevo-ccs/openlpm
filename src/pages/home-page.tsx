@@ -20,7 +20,7 @@ export default function HomePage() {
           ) : (
             <>
               <Link className="btn" to="/auth/login">Login</Link>
-              <Link className="btn btn-primary" to="/auth/login">Get started</Link>
+              <Link className="btn btn-primary" to="/auth/login?mode=signup">Get started</Link>
             </>
           )}
         </nav>
@@ -33,7 +33,7 @@ export default function HomePage() {
             A cost-free, scientifically rigorous platform for collaborative development of learning progressions.
           </p>
           <div className="row" style={{ justifyContent: 'center' }}>
-            <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login'}>
+            <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login?mode=signup'}>
               {session ? 'Go to dashboard' : 'Start collaborating'}
             </Link>
           </div>

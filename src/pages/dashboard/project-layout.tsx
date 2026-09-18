@@ -111,14 +111,14 @@ export default function ProjectLayout() {
   // rather than its own tab.
   const nav = [
     { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
-    { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</> },
+    { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</>, end: false },
     { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</> },
     { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</> },
     { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</> },
     { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
     { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
     { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
-    { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</> },
+    { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</>, end: false },
     { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
   ]
 

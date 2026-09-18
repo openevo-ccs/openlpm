@@ -278,7 +278,7 @@ export function FeedbackWidget() {
 
   if (!open) {
     return (
-      <button type="button" className="feedback-launcher" onClick={() => setOpen(true)} aria-label="Send feedback">
+      <button type="button" className="feedback-launcher" onClick={() => setOpen(true)} aria-label="Send feedback" title="Send feedback">
         <MessageSquareText size={20} />
       </button>
     )

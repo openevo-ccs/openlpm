@@ -205,7 +205,7 @@ export function PortfolioExplorer({
     setBusy(true); setNotice(null)
     const { error } = await supabase.from('portfolio_items').insert({ portfolio_id: portfolioId, target_type: targetType, target_id: targetId })
     if (error) {
-      setNotice({ kind: 'bad', text: error.code === '23505' ? 'Already in this portfolio.' : error.message })
+      setNotice({ kind: 'bad', text: error.code === '23505' ? 'Already in this notebook.' : error.message })
     } else {
       setNotice({ kind: 'ok', text: 'Added.' })
       setAddOpen(false); setRefQuery(''); setRefResults([])
@@ -348,7 +348,7 @@ export function PortfolioExplorer({
             {visible.nodes.length === 0 && (
               <div className="empty" style={{ position: 'absolute', inset: 0 }}>
                 <Network size={32} />
-                <p>Nothing in this portfolio yet — add a note above.</p>
+                <p>Nothing in this notebook yet — add a note above.</p>
               </div>
             )}
             <div className="legend">
@@ -389,12 +389,12 @@ export function PortfolioExplorer({
                   )}
 
                   <button className="btn btn-danger" style={{ marginTop: 12 }} disabled={busy} onClick={() => deleteNode(selected.id)}>
-                    Remove from portfolio
+                    Remove from notebook
                   </button>
                 </>
               ) : (
                 <>
-                  <h2>Portfolio graph</h2>
+                  <h2>Notebook graph</h2>
                   <p className="muted">
                     Click a node for details. Shift+click several to multi-select, then link them. Right-click for
                     quick actions.

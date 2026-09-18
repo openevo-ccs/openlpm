@@ -109,10 +109,10 @@ export default function PortfoliosPage() {
           </div>
           <div className="field" style={{ gridColumn: '1 / -1' }}>
             <label>Description</label>
-            <input name="description" placeholder="What's this portfolio for?" />
+            <input name="description" placeholder="What's this notebook for?" />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
-            <button type="submit" className="btn btn-primary" disabled={busy}>Create portfolio</button>
+            <button type="submit" className="btn btn-primary" disabled={busy}>Create notebook</button>
           </div>
         </form>
       </div>
