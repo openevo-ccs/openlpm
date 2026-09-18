@@ -45,6 +45,15 @@ export interface PromptOptionLists {
   tones: [string, string][]
   lengths: [string, string][]
   prior_knowledge_levels: [string, string][]
+  // Explicit, not "whichever option happens to be listed first" -- that
+  // was a real bug caught in review: the seeded German library lists
+  // 'kurz' (short) before 'ausführlich' (detailed) in `lengths` for
+  // alphabetical/display reasons, but the tool's actual intended default
+  // has always been the detailed option. Picking index 0 as a silent
+  // default would have quietly flipped that the moment anyone reordered
+  // the list for an unrelated reason.
+  default_tone: string
+  default_length: string
 }
 
 // English fallbacks -- used only for a key a library's own JSONB happens to
@@ -80,6 +89,8 @@ const FALLBACK_OPTIONS: PromptOptionLists = {
   tones: [['professional', 'Professional'], ['casual', 'Casual'], ['academic', 'Academic']],
   lengths: [['short', 'Short'], ['detailed', 'Detailed']],
   prior_knowledge_levels: [['none', 'No prior knowledge'], ['basic', 'Basic concepts known'], ['solid', 'Solid foundation']],
+  default_tone: 'professional',
+  default_length: 'detailed',
 }
 
 export function resolveSectionLabels(raw: any): SectionLabels {

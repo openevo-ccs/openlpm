@@ -117,6 +117,11 @@ SELECT
     'default_assessment', jsonb_build_array('Formative Beurteilung (laufend)'),
     'tones', jsonb_build_array(jsonb_build_array('professionell', 'Professionell'), jsonb_build_array('locker', 'Locker'), jsonb_build_array('wissenschaftlich', 'Wissenschaftlich')),
     'lengths', jsonb_build_array(jsonb_build_array('kurz', 'Kurz'), jsonb_build_array('ausführlich', 'Ausführlich')),
+    -- Explicit, not inferred from list order: EvoMentor DE v1.2's own
+    -- default was always 'professionell'/'ausführlich', regardless of
+    -- which order these display in.
+    'default_tone', 'professionell',
+    'default_length', 'ausführlich',
     'prior_knowledge_levels', jsonb_build_array(jsonb_build_array('keins', 'Kein Vorwissen'), jsonb_build_array('grundlagen', 'Grundbegriffe bekannt'), jsonb_build_array('solide', 'Solides Grundwissen'))
   )
 WHERE NOT EXISTS (

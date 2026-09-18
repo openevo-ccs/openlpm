@@ -90,7 +90,7 @@ function defaultConfig(options: PromptOptionLists): Config {
     bewertung: [...options.default_assessment], evalNotizen: '',
     kontext: [], kontextNotizen: '',
     ausgabeTyp: [...options.default_output_types],
-    ton: options.tones[0]?.[0] ?? '', laenge: options.lengths[0]?.[0] ?? '', sonstigeNotizen: '',
+    ton: options.default_tone, laenge: options.default_length, sonstigeNotizen: '',
   }
 }
 
