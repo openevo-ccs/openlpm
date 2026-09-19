@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { GitBranch, Plus, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { Chip } from '@/components/chip'
@@ -18,9 +18,11 @@ import { addParentStrand, listChildStrands, listParentStrands, removeParentStran
 // arbitrary graph (a tree view would need cycle-detection Postgres doesn't
 // enforce on its own) and just as usable for finding your way around.
 export default function StrandsPage() {
-  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const canManage = role !== 'viewer'
+  const { strandId } = useParams<{ strandId?: string }>()
+  const navigate = useNavigate()
   const [strands, setStrands] = useState<ThreadRow[] | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const reload = () => {
     supabase
@@ -34,10 +36,20 @@ export default function StrandsPage() {
 
   useEffect(() => {
     setStrands(null)
-    setSelectedId(null)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id, defaultBranchId])
+
+  useEffect(() => {
+    // A strandId can be stale after a project/branch switch (it belonged to
+    // the previous project) or just wrong in a shared link. Once the real
+    // list is in, if it's not there, drop back to the bare list instead of
+    // leaving a dead strandId sitting in the URL.
+    if (strands && strandId && !strands.some((s) => s.id === strandId)) {
+      navigate(`/dashboard/${project.slug}/strands`, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [strands, strandId])
 
   return (
     <div>
@@ -61,8 +73,8 @@ export default function StrandsPage() {
               <button
                 key={s.id}
                 className="btn-linklike"
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: s.id === selectedId ? 600 : 400 }}
-                onClick={() => setSelectedId(s.id)}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: s.id === strandId ? 600 : 400 }}
+                onClick={() => navigate(`/dashboard/${project.slug}/strands/${s.id}`)}
               >
                 <span className="row" style={{ justifyContent: 'space-between' }}>
                   {s.title}
@@ -73,8 +85,8 @@ export default function StrandsPage() {
           </div>
 
           <div className="card" style={{ minHeight: 200 }}>
-            {selectedId ? (
-              <StrandDetail strandId={selectedId} strands={strands} supabase={supabase} />
+            {strandId ? (
+              <StrandDetail strandId={strandId} strands={strands} canManage={canManage} supabase={supabase} />
             ) : (
               <p className="muted">Pick a strand on the left to see its stations and nesting.</p>
             )}
@@ -88,10 +100,12 @@ export default function StrandsPage() {
 function StrandDetail({
   strandId,
   strands,
+  canManage,
   supabase,
 }: {
   strandId: string
   strands: ThreadRow[]
+  canManage: boolean
   supabase: ProjectOutletContext['supabase']
 }) {
   const [full, setFull] = useState<FullThread | null>(null)
@@ -144,23 +158,27 @@ function StrandDetail({
           parents.map((p) => (
             <div key={p.id} className="row" style={{ justifyContent: 'space-between', padding: '2px 0' }}>
               <span style={{ fontSize: 13 }}>{p.title}</span>
-              <button className="btn-linklike" aria-label="Remove nesting" title="Remove nesting" onClick={() => removeParent(p.id)}><X size={12} /></button>
+              {canManage && (
+                <button className="btn-linklike" aria-label="Remove nesting" title="Remove nesting" onClick={() => removeParent(p.id)}><X size={12} /></button>
+              )}
             </div>
           ))
         )}
-        {showAddParent ? (
-          <div className="row" style={{ marginTop: 6, gap: 6 }}>
-            <select value={candidateParentId} onChange={(e) => setCandidateParentId(e.target.value)} style={{ flex: 1 }}>
-              <option value="">Choose a strand…</option>
-              {parentOptions.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-            </select>
-            <button className="btn btn-mini" onClick={addParent} disabled={!candidateParentId}>Add</button>
-            <button className="btn btn-mini" aria-label="Cancel" title="Cancel" onClick={() => setShowAddParent(false)}><X size={12} /></button>
-          </div>
-        ) : (
-          <button className="btn btn-mini" style={{ marginTop: 6 }} onClick={() => setShowAddParent(true)}>
-            <Plus size={12} />Nest under another strand
-          </button>
+        {canManage && (
+          showAddParent ? (
+            <div className="row" style={{ marginTop: 6, gap: 6 }}>
+              <select value={candidateParentId} onChange={(e) => setCandidateParentId(e.target.value)} style={{ flex: 1 }}>
+                <option value="">Choose a strand…</option>
+                {parentOptions.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+              </select>
+              <button className="btn btn-mini" onClick={addParent} disabled={!candidateParentId}>Add</button>
+              <button className="btn btn-mini" aria-label="Cancel" title="Cancel" onClick={() => setShowAddParent(false)}><X size={12} /></button>
+            </div>
+          ) : (
+            <button className="btn btn-mini" style={{ marginTop: 6 }} onClick={() => setShowAddParent(true)}>
+              <Plus size={12} />Nest under another strand
+            </button>
+          )
         )}
       </section>
 

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useOutletContext, useSearchParams } from 'react-router-dom'
 import { BookOpen, Plus, Search } from 'lucide-react'
 import { searchOpenAlex, type SearchResult } from '@/lib/api/openalex'
 import { Chip } from '@/components/chip'
@@ -11,6 +11,9 @@ type LiteratureRow = Database['public']['Tables']['literature_references']['Row'
 
 export default function LiteraturePage() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
+  const [searchParams] = useSearchParams()
+  const refParam = searchParams.get('ref')
+  const highlightRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const [items, setItems] = useState<LiteratureRow[] | null>(null)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[] | null>(null)
@@ -31,6 +34,15 @@ export default function LiteraturePage() {
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id])
+
+  // A search-bar hit for a reference in this project's own collection --
+  // jump to and briefly highlight the matching card, since this page has no
+  // separate detail view for one reference to link straight to.
+  useEffect(() => {
+    if (!refParam || !items) return
+    const el = highlightRefs.current.get(refParam)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [refParam, items])
 
   const runSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -139,7 +151,12 @@ export default function LiteraturePage() {
       ) : (
         <div className="grid grid-2">
           {items.map((it) => (
-            <div key={it.id} className="card">
+            <div
+              key={it.id}
+              ref={(el) => { if (el) highlightRefs.current.set(it.id, el); else highlightRefs.current.delete(it.id) }}
+              className="card"
+              style={it.id === refParam ? { outline: '2px solid var(--series-a)' } : undefined}
+            >
               <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h3 style={{ marginBottom: 2 }}>{it.title}</h3>
                 <Chip status={it.status} />

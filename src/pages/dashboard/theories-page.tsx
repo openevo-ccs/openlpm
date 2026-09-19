@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { BookOpen, Info, Lightbulb, Link2, Plus, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
@@ -46,9 +46,11 @@ const MATURITY_GLOSS: Record<NonNullable<EvidentiaryMaturity>, string> = {
 }
 
 export default function TheoriesPage() {
-  const { project, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const canManage = role !== 'viewer'
+  const { theoryId } = useParams<{ theoryId?: string }>()
+  const navigate = useNavigate()
   const [theories, setTheories] = useState<TheoryRow[] | null>(null)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
 
   const reload = async () => setTheories(await listTheories(supabase, project.id))
@@ -70,9 +72,11 @@ export default function TheoriesPage() {
             learning goals, and strands with labeled relations.
           </p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowCreate((v) => !v)}>
-          <Plus size={14} />New theory
-        </button>
+        {canManage && (
+          <button className="btn btn-primary" onClick={() => setShowCreate((v) => !v)}>
+            <Plus size={14} />New theory
+          </button>
+        )}
       </div>
 
       <div className="notice">
@@ -81,11 +85,11 @@ export default function TheoriesPage() {
         ConceptBase. Authoring theories directly here works now.
       </div>
 
-      {showCreate && (
+      {canManage && showCreate && (
         <CreateTheoryForm
           projectId={project.id}
           supabase={supabase}
-          onCreated={async (id) => { setShowCreate(false); await reload(); setSelectedId(id) }}
+          onCreated={async (id) => { setShowCreate(false); await reload(); navigate(`/dashboard/${project.slug}/theories/${id}`) }}
         />
       )}
 
@@ -103,8 +107,8 @@ export default function TheoriesPage() {
               <button
                 key={t.id}
                 className="btn-linklike"
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: t.id === selectedId ? 600 : 400 }}
-                onClick={() => setSelectedId(t.id)}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: t.id === theoryId ? 600 : 400 }}
+                onClick={() => navigate(`/dashboard/${project.slug}/theories/${t.id}`)}
               >
                 {t.label}
                 {t.evidentiary_maturity && (
@@ -114,8 +118,8 @@ export default function TheoriesPage() {
             ))}
           </div>
           <div className="card" style={{ minHeight: 200 }}>
-            {selectedId ? (
-              <TheoryDetail theoryId={selectedId} projectId={project.id} supabase={supabase} />
+            {theoryId ? (
+              <TheoryDetail theoryId={theoryId} projectId={project.id} canManage={canManage} supabase={supabase} />
             ) : (
               <p className="muted">Pick a theory on the left.</p>
             )}
@@ -196,7 +200,7 @@ function CreateTheoryForm({
   )
 }
 
-function TheoryDetail({ theoryId, projectId, supabase }: { theoryId: string; projectId: string; supabase: ProjectOutletContext['supabase'] }) {
+function TheoryDetail({ theoryId, projectId, canManage, supabase }: { theoryId: string; projectId: string; canManage: boolean; supabase: ProjectOutletContext['supabase'] }) {
   const [theory, setTheory] = useState<TheoryRow | null>(null)
   const [links, setLinks] = useState<TheoryLiteratureLinkWithReference[]>([])
   const [relations, setRelations] = useState<TheoryRelationRow[]>([])
@@ -246,7 +250,7 @@ function TheoryDetail({ theoryId, projectId, supabase }: { theoryId: string; pro
             </div>
           ))
         )}
-        <AddLiteratureLink theoryId={theoryId} projectId={projectId} supabase={supabase} onAdded={reload} />
+        <AddLiteratureLink theoryId={theoryId} projectId={projectId} canManage={canManage} supabase={supabase} onAdded={reload} />
       </section>
 
       <section style={{ marginTop: 16 }}>
@@ -264,7 +268,7 @@ function TheoryDetail({ theoryId, projectId, supabase }: { theoryId: string; pro
             </div>
           ))
         )}
-        <AddRelation theoryId={theoryId} projectId={projectId} supabase={supabase} onAdded={reload} />
+        <AddRelation theoryId={theoryId} projectId={projectId} canManage={canManage} supabase={supabase} onAdded={reload} />
       </section>
     </div>
   )
@@ -273,11 +277,13 @@ function TheoryDetail({ theoryId, projectId, supabase }: { theoryId: string; pro
 function AddLiteratureLink({
   theoryId,
   projectId,
+  canManage,
   supabase,
   onAdded,
 }: {
   theoryId: string
   projectId: string
+  canManage: boolean
   supabase: ProjectOutletContext['supabase']
   onAdded: () => void
 }) {
@@ -309,7 +315,7 @@ function AddLiteratureLink({
     onAdded()
   }
 
-  if (!open) return <button className="btn btn-mini" onClick={() => setOpen(true)}><Plus size={12} />Link literature</button>
+  if (!open) return canManage ? <button className="btn btn-mini" onClick={() => setOpen(true)}><Plus size={12} />Link literature</button> : null
 
   return (
     <div className="card" style={{ marginTop: 8 }}>
@@ -358,11 +364,13 @@ const TARGET_TYPE_LABEL: Record<RelationTargetType, string> = {
 function AddRelation({
   theoryId,
   projectId,
+  canManage,
   supabase,
   onAdded,
 }: {
   theoryId: string
   projectId: string
+  canManage: boolean
   supabase: ProjectOutletContext['supabase']
   onAdded: () => void
 }) {
@@ -408,7 +416,7 @@ function AddRelation({
     onAdded()
   }
 
-  if (!open) return <button className="btn btn-mini" onClick={() => setOpen(true)}><Plus size={12} />Link a concept, goal, or strand</button>
+  if (!open) return canManage ? <button className="btn btn-mini" onClick={() => setOpen(true)}><Plus size={12} />Link a concept, goal, or strand</button> : null
 
   return (
     <div className="card" style={{ marginTop: 8 }}>

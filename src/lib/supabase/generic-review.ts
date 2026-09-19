@@ -75,10 +75,12 @@ export async function submitForReview(
   supabase: Client,
   params: { projectId: string; reviewableType: GenericReviewableType; reviewableId: string }
 ) {
+  const { data: { user } } = await supabase.auth.getUser()
   return supabase.from('peer_review_assignments').insert({
     project_id: params.projectId,
     reviewable_type: params.reviewableType,
     reviewable_id: params.reviewableId,
+    submitted_by: user?.id ?? null,
     status: 'pending',
   })
 }

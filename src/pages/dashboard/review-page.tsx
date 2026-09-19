@@ -78,7 +78,14 @@ export default function ReviewPage() {
         </div>
       ) : (
         genericItems.map((item) => (
-          <GenericReviewCard key={item.assignment.id} item={item} canReview={canReview} supabase={supabase} onReviewed={reloadGeneric} />
+          <GenericReviewCard
+            key={item.assignment.id}
+            item={item}
+            canReview={canReview}
+            isOwnProposal={!!session && item.assignment.submitted_by === session.user.id}
+            supabase={supabase}
+            onReviewed={reloadGeneric}
+          />
         ))
       )}
     </div>
@@ -88,11 +95,13 @@ export default function ReviewPage() {
 function GenericReviewCard({
   item,
   canReview,
+  isOwnProposal,
   supabase,
   onReviewed,
 }: {
   item: GenericReviewItem
   canReview: boolean
+  isOwnProposal: boolean
   supabase: ProjectOutletContext['supabase']
   onReviewed: () => void
 }) {
@@ -122,6 +131,8 @@ function GenericReviewCard({
 
       {!canReview ? (
         <p className="muted">Only editors and above can review here.</p>
+      ) : isOwnProposal ? (
+        <div className="notice">You submitted this one — someone else needs to review it.</div>
       ) : (
         <>
           <div className="field">

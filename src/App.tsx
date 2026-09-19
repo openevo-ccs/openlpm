@@ -87,8 +87,11 @@ export default function App() {
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
             <Route path="concepts" element={<ConceptsPage />} />
+            <Route path="concepts/:conceptId" element={<ConceptsPage />} />
             <Route path="theories" element={<TheoriesPage />} />
+            <Route path="theories/:theoryId" element={<TheoriesPage />} />
             <Route path="strands" element={<StrandsPage />} />
+            <Route path="strands/:strandId" element={<StrandsPage />} />
             <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />

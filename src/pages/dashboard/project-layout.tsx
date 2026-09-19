@@ -112,9 +112,9 @@ export default function ProjectLayout() {
   const nav = [
     { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
     { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</>, end: false },
-    { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</> },
-    { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</> },
-    { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</> },
+    { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</>, end: false },
+    { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</>, end: false },
+    { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</>, end: false },
     { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
     { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
     { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },

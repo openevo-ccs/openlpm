@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ChevronDown, ChevronRight, Layers, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
@@ -95,20 +95,32 @@ interface Hit {
 
 function ConceptMapTab() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
+  const { conceptId } = useParams<{ conceptId?: string }>()
+  const navigate = useNavigate()
   const [taxonomy, setTaxonomy] = useState<SchemaElement[] | null>(null)
   const [children, setChildren] = useState<ProjectRow[]>([])
   const [hitsByTaxId, setHitsByTaxId] = useState<Map<string, Hit[]>>(new Map())
   const [hitsByBk, setHitsByBk] = useState<Map<string, Map<string, { sum: number; count: number }>>>(new Map())
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
-  const [selectedNode, setSelectedNode] = useState<SchemaElement | null>(null)
   const [hubName, setHubName] = useState<string>(project.name)
 
   // The shared taxonomy and its full sibling list live on the Project Space
   // -- viewing this tab from inside a regional sub-project (Thuringia,
-  // Bayern, Sachsen...) still needs the Space-level picture, not just that
-  // one sub-project's own (empty) schema rows, so this always resolves up
-  // to the Space first.
+  // Bayern, Sachsen...) still needs the Space-level picture too, not only
+  // that sub-project's own schema rows.
   const hubProjectId = project.parent_project_id ?? project.id
+
+  // 2026-09-19: query BOTH the hub and this project's own id, not just the
+  // hub -- an earlier version assumed a regional sub-project's own schema
+  // rows are always empty and the real taxonomy always lives one level up,
+  // but real content can land directly on a sub-project's own project_id
+  // too (e.g. evomentor-thuringia's Basiskonzepte taxonomy, migration 028,
+  // confirmed still there per migration 016's own live-data audit). Mirrors
+  // the union ManageConceptsTab below already does for the same reason.
+  const taxonomyProjectIds = useMemo(
+    () => Array.from(new Set([hubProjectId, project.id])),
+    [hubProjectId, project.id]
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -119,7 +131,7 @@ function ConceptMapTab() {
       const { data: tax } = await supabase
         .from('lpm_schema_elements')
         .select('*')
-        .eq('project_id', hubProjectId)
+        .in('project_id', taxonomyProjectIds)
         .order('created_at', { ascending: true })
 
       const { data: kids } = await supabase
@@ -183,10 +195,34 @@ function ConceptMapTab() {
     load()
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, hubProjectId])
+  }, [supabase, hubProjectId, taxonomyProjectIds])
 
   const roots = useMemo(() => (taxonomy ?? []).filter((e) => !e.parent_id), [taxonomy])
   const childrenOf = (id: string) => (taxonomy ?? []).filter((e) => e.parent_id === id)
+
+  const selectedNode = useMemo(
+    () => (conceptId ? (taxonomy ?? []).find((e) => e.id === conceptId) ?? null : null),
+    [taxonomy, conceptId]
+  )
+
+  // Refreshing or sharing a link to a specific concept should land on that
+  // concept, not an empty picker -- but a nested node is only visible in the
+  // tree once every ancestor above it is toggled open, so walk the chain up
+  // to the root and expand each one.
+  useEffect(() => {
+    if (!taxonomy || !selectedNode) return
+    const byId = new Map(taxonomy.map((e) => [e.id, e]))
+    const ancestors: string[] = []
+    let parentId = selectedNode.parent_id
+    while (parentId) {
+      ancestors.push(parentId)
+      parentId = byId.get(parentId)?.parent_id ?? null
+    }
+    if (ancestors.length > 0) {
+      setExpanded((prev) => new Set([...prev, ...ancestors]))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taxonomy, selectedNode?.id])
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
@@ -196,6 +232,9 @@ function ConceptMapTab() {
       return next
     })
   }
+
+  const selectNode = (n: SchemaElement) => navigate(`/dashboard/${project.slug}/concepts/${n.id}`)
+  const closeNode = () => navigate(`/dashboard/${project.slug}/concepts`)
 
   if (taxonomy === null) return <p className="muted">Loading…</p>
 
@@ -256,7 +295,7 @@ function ConceptMapTab() {
               childrenOf={childrenOf}
               expanded={expanded}
               onToggle={toggle}
-              onSelect={setSelectedNode}
+              onSelect={selectNode}
               selectedId={selectedNode?.id ?? null}
               hitsByTaxId={hitsByTaxId}
             />
@@ -267,7 +306,7 @@ function ConceptMapTab() {
           {!selectedNode ? (
             <p className="muted">Pick a concept on the left to see which real learning goals, across which states, connect to it.</p>
           ) : (
-            <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={() => setSelectedNode(null)} />
+            <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
           )}
         </div>
       </div>
@@ -349,7 +388,9 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
             {list.map((h) => (
               <div key={h.objectId} style={{ padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <strong style={{ fontSize: 13 }}>{h.title}</strong>
+                  <Link to={`/dashboard/${h.projectSlug}/learning-goals/${h.objectId}`} style={{ fontSize: 13, fontWeight: 600, textDecoration: 'none', color: 'inherit' }}>
+                    {h.title}
+                  </Link>
                   <span className="muted" style={{ fontSize: 11 }}>{h.gradeBand ? `Grade ${h.gradeBand}` : ''} · relevance {h.relevance}/3</span>
                 </div>
                 <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{h.reasoning}</p>

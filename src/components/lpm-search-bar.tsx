@@ -35,8 +35,8 @@ export function LpmSearchBar({ project, slug, supabase }: Pick<ProjectOutletCont
       ])
       setHits([
         ...(goals.data ?? []).map((g): Hit => ({ kind: 'Learning goal', id: g.id, label: g.title, sub: g.grade_band ? `Grade ${g.grade_band}` : null, href: `/dashboard/${slug}/learning-goals/${g.id}` })),
-        ...(concepts.data ?? []).map((c): Hit => ({ kind: 'Concept', id: c.id, label: c.label, sub: c.element_type, href: `/dashboard/${slug}/concepts` })),
-        ...(literature.data ?? []).map((l): Hit => ({ kind: 'Literature', id: l.id, label: l.title, sub: l.year ? String(l.year) : null, href: `/dashboard/${slug}/literature` })),
+        ...(concepts.data ?? []).map((c): Hit => ({ kind: 'Concept', id: c.id, label: c.label, sub: c.element_type, href: `/dashboard/${slug}/concepts/${c.id}` })),
+        ...(literature.data ?? []).map((l): Hit => ({ kind: 'Literature', id: l.id, label: l.title, sub: l.year ? String(l.year) : null, href: `/dashboard/${slug}/literature?ref=${l.id}` })),
       ])
     }, 250)
     return () => clearTimeout(timer)

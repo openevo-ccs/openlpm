@@ -232,6 +232,7 @@ export type Database = {
           reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id: string
           reviewer_id: string | null
+          submitted_by: string | null
           status: 'pending' | 'in_progress' | 'completed'
           recommendation: 'accept' | 'reject' | 'revise' | 'major_revision' | null
           review_text: string | null
@@ -244,6 +245,7 @@ export type Database = {
           reviewable_type: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id: string
           reviewer_id?: string | null
+          submitted_by?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
           recommendation?: 'accept' | 'reject' | 'revise' | 'major_revision' | null
           review_text?: string | null
@@ -256,6 +258,7 @@ export type Database = {
           reviewable_type?: 'literature_reference' | 'lpm_data_object' | 'lpm_connection' | 'lpm_thread' | 'framework_tag' | 'theory' | 'portfolio_item' | 'portfolio_private_node'
           reviewable_id?: string
           reviewer_id?: string | null
+          submitted_by?: string | null
           status?: 'pending' | 'in_progress' | 'completed'
           recommendation?: 'accept' | 'reject' | 'revise' | 'major_revision' | null
           review_text?: string | null
