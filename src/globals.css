@@ -40,6 +40,18 @@
   --good-rgb: 12 163 12;
   --warning-rgb: 250 178 25;
   --critical-rgb: 208 59 59;
+
+  /* A small rotating palette for the Concepts map (concepts-page.tsx) --
+     cycled by index via modulo, not tied to any fixed concept count, so it
+     works whether a project has 3 root concepts or 20. Purely a visual
+     grouping aid (every node shares its top-level ancestor's color), not a
+     semantic status color like the tokens above. */
+  --map-1: #2a78d6;
+  --map-2: #b5560f;
+  --map-3: #7a3ec2;
+  --map-4: #b5238f;
+  --map-5: #0f8a6a;
+  --map-6: #a3861a;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -48,6 +60,7 @@
     --series-a: var(--brand-teal);
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
+    --map-1: #5b9ee8; --map-2: #d98a3f; --map-3: #a374e0; --map-4: #e05bb8; --map-5: #3fc4a0; --map-6: #d1af3f;
   }
 }
 :root[data-theme="dark"] {
@@ -56,6 +69,7 @@
   --series-a: var(--brand-teal);
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
+  --map-1: #5b9ee8; --map-2: #d98a3f; --map-3: #a374e0; --map-4: #e05bb8; --map-5: #3fc4a0; --map-6: #d1af3f;
 }
 
 * { box-sizing: border-box; }

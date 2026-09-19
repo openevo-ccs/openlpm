@@ -1,9 +1,18 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ChevronDown, ChevronRight, Layers, Shapes, X } from 'lucide-react'
+import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
+import { ChevronDown, ChevronRight, LayoutList, Layers, Network, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
+
+function cssVar(name: string, fallback: string) {
+  if (typeof window === 'undefined') return fallback
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  return value || fallback
+}
+
+const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--map-6']
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 type ProjectRow = Database['public']['Tables']['projects']['Row']
@@ -103,6 +112,7 @@ function ConceptMapTab() {
   const [hitsByBk, setHitsByBk] = useState<Map<string, Map<string, { sum: number; count: number }>>>(new Map())
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
   const [hubName, setHubName] = useState<string>(project.name)
+  const [view, setView] = useState<'map' | 'list'>('map')
 
   // The shared taxonomy and its full sibling list live on the Project Space
   // -- viewing this tab from inside a regional sub-project (Thuringia,
@@ -284,32 +294,189 @@ function ConceptMapTab() {
         </div>
       )}
 
-      <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
-        <div className="card">
-          <h3 style={{ marginTop: 0 }}>Browse the concept tree</h3>
-          {roots.map((bk) => (
-            <ConceptNode
-              key={bk.id}
-              node={bk}
-              depth={0}
-              childrenOf={childrenOf}
-              expanded={expanded}
-              onToggle={toggle}
-              onSelect={selectNode}
-              selectedId={selectedNode?.id ?? null}
-              hitsByTaxId={hitsByTaxId}
-            />
-          ))}
-        </div>
-
-        <div className="card" style={{ minHeight: 200 }}>
-          {!selectedNode ? (
-            <p className="muted">Pick a concept on the left to see which real learning goals, across which states, connect to it.</p>
-          ) : (
-            <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
-          )}
-        </div>
+      <div className="row" style={{ gap: 8, marginBottom: 12 }}>
+        <button className={`btn btn-mini${view === 'map' ? ' btn-primary' : ''}`} onClick={() => setView('map')}>
+          <Network size={12} />Map
+        </button>
+        <button className={`btn btn-mini${view === 'list' ? ' btn-primary' : ''}`} onClick={() => setView('list')}>
+          <LayoutList size={12} />List
+        </button>
       </div>
+
+      {view === 'map' ? (
+        <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+          <ConceptGraph taxonomy={taxonomy} hitsByTaxId={hitsByTaxId} roots={roots} selectedId={selectedNode?.id ?? null} onSelect={selectNode} />
+          <div className="drawer-shell wide">
+            <div className="drawer">
+              {!selectedNode ? (
+                <>
+                  <h2>Concept map</h2>
+                  <p className="muted">
+                    Each circle is a concept, sized by how much real content touches it. Click one to see what
+                    connects to it. Scroll to zoom, drag to pan.
+                  </p>
+                </>
+              ) : (
+                <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>Browse the concept tree</h3>
+            {roots.map((bk) => (
+              <ConceptNode
+                key={bk.id}
+                node={bk}
+                depth={0}
+                childrenOf={childrenOf}
+                expanded={expanded}
+                onToggle={toggle}
+                onSelect={selectNode}
+                selectedId={selectedNode?.id ?? null}
+                hitsByTaxId={hitsByTaxId}
+              />
+            ))}
+          </div>
+
+          <div className="card" style={{ minHeight: 200 }}>
+            {!selectedNode ? (
+              <p className="muted">Pick a concept on the left to see which real learning goals, across which states, connect to it.</p>
+            ) : (
+              <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// A real interactive diagram instead of an indented list -- the single
+// biggest gap found comparing this page against EvoMentor DE v1.2's concept
+// map (2026-09-19). Reuses the same graph-drawing library (Cytoscape)
+// already working in Notebooks (portfolio-explorer.tsx) rather than
+// building or learning new drawing tech. Deliberately generic: node count/
+// depth/branching isn't assumed anywhere (no fixed "6 concepts" the way
+// EvoMentor's hex layout hard-codes), and every node's color comes from
+// walking up to its own top-level ancestor, not a hard-typed lookup.
+function ConceptGraph({
+  taxonomy,
+  hitsByTaxId,
+  roots,
+  selectedId,
+  onSelect,
+}: {
+  taxonomy: SchemaElement[]
+  hitsByTaxId: Map<string, Hit[]>
+  roots: SchemaElement[]
+  selectedId: string | null
+  onSelect: (n: SchemaElement) => void
+}) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cyRef = useRef<Core | null>(null)
+
+  const rootIndexOf = useMemo(() => {
+    const byId = new Map(taxonomy.map((e) => [e.id, e]))
+    const rootIndex = new Map(roots.map((r, i) => [r.id, i]))
+    const memo = new Map<string, number>()
+    const resolve = (id: string): number => {
+      if (memo.has(id)) return memo.get(id)!
+      const node = byId.get(id)
+      const idx = node?.parent_id ? resolve(node.parent_id) : (rootIndex.get(id) ?? 0)
+      memo.set(id, idx)
+      return idx
+    }
+    for (const e of taxonomy) resolve(e.id)
+    return memo
+  }, [taxonomy, roots])
+
+  const depthOf = useMemo(() => {
+    const byId = new Map(taxonomy.map((e) => [e.id, e]))
+    const memo = new Map<string, number>()
+    const resolve = (id: string): number => {
+      if (memo.has(id)) return memo.get(id)!
+      const node = byId.get(id)
+      const d = node?.parent_id ? resolve(node.parent_id) + 1 : 0
+      memo.set(id, d)
+      return d
+    }
+    for (const e of taxonomy) resolve(e.id)
+    return memo
+  }, [taxonomy])
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const elements: ElementDefinition[] = [
+      ...taxonomy.map((n) => {
+        const count = hitsByTaxId.get(n.id)?.length ?? 0
+        const depth = depthOf.get(n.id) ?? 0
+        const colorVar = MAP_PALETTE[(rootIndexOf.get(n.id) ?? 0) % MAP_PALETTE.length]
+        const size = Math.max(14, 40 - depth * 10) + Math.min(count, 10) * 1.5
+        return { data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size } }
+      }),
+      ...taxonomy
+        .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
+        .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id } })),
+    ]
+
+    const cy = cytoscape({
+      container: containerRef.current,
+      elements,
+      boxSelectionEnabled: false,
+      layout: { name: 'breadthfirst', circle: true, spacingFactor: 1.15, animate: false },
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': 'data(color)',
+            width: 'data(size)', height: 'data(size)',
+            label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '70px',
+            'text-valign': 'bottom', 'text-margin-y': 4, color: cssVar('--text-primary', '#0b0b0b'),
+          },
+        },
+        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': cssVar('--text-primary', '#0b0b0b') } },
+        {
+          selector: 'edge',
+          style: { width: 1, 'line-color': cssVar('--baseline', '#c3c2b7'), 'curve-style': 'bezier', 'target-arrow-shape': 'none' },
+        },
+      ],
+    })
+
+    cy.on('tap', 'node', (evt) => {
+      const n = taxonomy.find((e) => e.id === evt.target.id())
+      if (n) onSelect(n)
+    })
+
+    cyRef.current = cy
+    return () => { cy.destroy() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taxonomy, hitsByTaxId, rootIndexOf, depthOf])
+
+  // Keep the graph's own selection in sync with the URL-driven selectedId
+  // (a search-bar link, a shared link, or a plain refresh) without
+  // re-running the mount/layout effect above.
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    cy.nodes(':selected').unselect()
+    if (selectedId) {
+      const el = cy.getElementById(selectedId)
+      if (el.length) { el.select(); cy.center(el) }
+    }
+  }, [selectedId])
+
+  return (
+    <div className="graph-host">
+      <div ref={containerRef} className="graph-canvas" />
+      {taxonomy.length === 0 && (
+        <div className="empty" style={{ position: 'absolute', inset: 0 }}>
+          <Network size={32} />
+          <p>No concepts yet.</p>
+        </div>
+      )}
     </div>
   )
 }
