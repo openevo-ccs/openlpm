@@ -1841,6 +1841,7 @@ export type Database = {
           comment: string | null
           context: any
           screenshot_path: string | null
+          status: 'open' | 'resolved'
           created_at: string
         }
         Insert: {
@@ -1851,6 +1852,7 @@ export type Database = {
           comment?: string | null
           context?: any
           screenshot_path?: string | null
+          status?: 'open' | 'resolved'
           created_at?: string
         }
         Update: {
@@ -1861,6 +1863,7 @@ export type Database = {
           comment?: string | null
           context?: any
           screenshot_path?: string | null
+          status?: 'open' | 'resolved'
           created_at?: string
         }
         Relationships: [

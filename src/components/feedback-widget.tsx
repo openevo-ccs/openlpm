@@ -21,7 +21,7 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 //   invisible failure Ask Eva actually hit (see captureScreenshot() below).
 // - There is no local per-session server/transcript to append into here --
 //   OpenLPM is a hosted multi-tenant app, so feedback is a real Postgres
-//   table (supabase/migrations/025_feedback.sql) with its own RLS, not a
+//   table (supabase/migrations/026_feedback.sql) with its own RLS, not a
 //   JSONL file on disk.
 // - The image itself never touches that table. It's resized and
 //   re-encoded as JPEG client-side, then uploaded to a private Supabase

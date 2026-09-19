@@ -50,6 +50,14 @@ const BUCKET: Record<string, string> = {
   allow_full: 'good',
   citation_only: 'draft',
   blocked: 'critical',
+  // Feedback triage status (admin-feedback-page.tsx).
+  open: 'progress',
+  resolved: 'good',
+  // Feedback tag (feedback-widget.tsx / admin-feedback-page.tsx) -- capitalized
+  // to match the DB CHECK constraint's exact values, unlike every other key here.
+  Problem: 'critical',
+  Request: 'progress',
+  Other: 'muted',
 }
 
 export function Chip({ status, children }: { status: string; children?: React.ReactNode }) {

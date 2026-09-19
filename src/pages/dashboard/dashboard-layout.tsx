@@ -1,11 +1,12 @@
 import { Link, Outlet } from 'react-router-dom'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, MessageSquareText, User } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 // import { MemoChatWidget } from '@/components/memo-chat-widget' -- see note below, not mounted yet
 import { FeedbackWidget } from '@/components/feedback-widget'
 import { HelpWidget } from '@/components/help-widget'
+import { ADMIN_EMAIL } from '@/lib/admin'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -29,6 +30,12 @@ export default function DashboardLayout() {
         </Link>
         <div className="whoami" style={{ marginLeft: 'auto' }}>
           <span className="muted">{session?.user.email}</span>
+          {session?.user.email === ADMIN_EMAIL && (
+            <Link to="/dashboard/admin/feedback" className="btn btn-mini">
+              <MessageSquareText size={12} />
+              Feedback
+            </Link>
+          )}
           <HelpWidget />
           <Link to="/dashboard/profile" className="btn btn-mini">
             <User size={12} />

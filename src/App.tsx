@@ -22,6 +22,7 @@ import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
 import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
+import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -81,6 +82,7 @@ export default function App() {
           <Route index element={<ProjectSwitcherPage />} />
           <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="admin/feedback" element={<AdminFeedbackPage />} />
           <Route path=":project" element={<ProjectLayout />}>
             <Route index element={<DashboardPage />} />
             <Route path="new-project" element={<NewProjectWizard />} />
