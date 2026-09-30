@@ -29,7 +29,15 @@ export default function PortfoliosPage() {
 
   const createPortfolio = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+    // Capture the form element before any `await` -- a native DOM event's
+    // `currentTarget` is only valid during synchronous dispatch and reverts
+    // to null once dispatch ends, which happens as soon as this handler
+    // hits its first await. Confirmed live: creating a notebook succeeded
+    // (real row written, "Created ..." shown) but threw "Cannot read
+    // properties of null (reading 'reset')" right after, since
+    // e.currentTarget was already null by the time .reset() ran below.
+    const formEl = e.currentTarget
+    const formData = new FormData(formEl)
     setBusy(true); setNotice(null)
     const {
       data: { user },
@@ -50,7 +58,7 @@ export default function PortfoliosPage() {
     })
 
     if (error) setNotice({ kind: 'bad', text: error.message })
-    else { setNotice({ kind: 'ok', text: `Created "${name}".` }); e.currentTarget.reset(); await reload() }
+    else { setNotice({ kind: 'ok', text: `Created "${name}".` }); formEl.reset(); await reload() }
     setBusy(false)
   }
 

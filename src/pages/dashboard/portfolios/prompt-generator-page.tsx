@@ -98,13 +98,48 @@ function bkEntries(obj: DataObject): BkbEntry[] {
   return ((obj.content as any)?.basiskonzeptbezug ?? []) as BkbEntry[]
 }
 
+// The six-Basiskonzept ids inside content.basiskonzeptbezug (bk_struktur_
+// funktion, bk_evolutive_entwicklung, etc.) are EvoMentor DE's own original
+// identifiers, baked into the imported curriculum data -- confirmed live
+// 2026-09-30, these were showing up raw in the generated prompt and on
+// screen with no lookup anywhere in this file. There's no slug column on
+// lpm_schema_elements to join against directly, and a strict re-slugify of
+// a label (lowercase, drop "und", join with "_") doesn't reliably invert
+// back to the original id -- "Stoff- und Energieumwandlung" -> real id
+// bk_stoff_energie_umwandlung has an extra word-break inside the compound
+// noun "Energieumwandlung" that a mechanical transform can't predict.
+// Token-matching instead: split the id into its underscore-separated
+// tokens and require ALL of them to appear as substrings of a real root
+// concept's own label (normalized: lowercase, umlauts folded, non-letters
+// stripped). Works for the real Thuringia case and degrades honestly (the
+// raw id, not a wrong label) for any project that doesn't have a matching
+// root concept -- not a hardcoded Thuringia-specific table.
+function normalizeGerman(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/[^a-z0-9]+/g, '')
+}
+
+function buildBkLabelMap(bkIds: string[], rootConcepts: { label: string }[]): Record<string, string> {
+  const normalized = rootConcepts.map((c) => ({ label: c.label, norm: normalizeGerman(c.label) }))
+  const map: Record<string, string> = {}
+  for (const id of bkIds) {
+    const tokens = id.replace(/^bk_/, '').split('_').filter(Boolean)
+    const match = normalized.find((c) => tokens.every((t) => c.norm.includes(t)))
+    if (match) map[id] = match.label
+  }
+  return map
+}
+
 function buildPrompt(
   items: DataObject[],
   cfg: Config,
   bkIds: string[],
   library: PromptTemplateLibraryRow,
   labels: SectionLabels,
-  options: PromptOptionLists
+  options: PromptOptionLists,
+  bkLabels: Record<string, string>
 ): string {
   const lines: string[] = []
   lines.push('='.repeat(70))
@@ -119,7 +154,7 @@ function buildPrompt(
   lines.push(labels.concepts_section)
   for (const bkId of bkIds) {
     const vw = options.prior_knowledge_levels.find((v) => v[0] === (cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]))
-    lines.push(`- ${bkId}: ${vw ? vw[1] : '—'}`)
+    lines.push(`- ${bkLabels[bkId] ?? bkId}: ${vw ? vw[1] : '—'}`)
   }
   if (cfg.fachNotizen) lines.push(`${labels.extra_focus_label} ${cfg.fachNotizen}`)
   lines.push('')
@@ -131,7 +166,7 @@ function buildPrompt(
     lines.push(`  ${labels.statement_label} ${c?.originaltext ?? item.description ?? ''}`)
     for (const entry of bkEntries(item)) {
       if (!bkIds.includes(entry.basiskonzept_id)) continue
-      lines.push(`  ${entry.basiskonzept_id} (${labels.relevance_label} ${entry.relevanz_beurteilung}/3): ${entry.begruendung}`)
+      lines.push(`  ${bkLabels[entry.basiskonzept_id] ?? entry.basiskonzept_id} (${labels.relevance_label} ${entry.relevanz_beurteilung}/3): ${entry.begruendung}`)
       const uk = (entry.relevante_unterkonzepte_taxonomie ?? []).map((u) => u.value)
       if (uk.length) lines.push(`    ${labels.subconcepts_label} ${uk.join(', ')}`)
       const ek = (entry.relevante_evolutionskonzepte_taxonomie ?? []).map((e) => e.value)
@@ -188,6 +223,7 @@ export default function PromptGeneratorPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
+  const [rootConcepts, setRootConcepts] = useState<{ label: string }[]>([])
 
   useEffect(() => {
     if (!portfolioId) return
@@ -198,6 +234,17 @@ export default function PromptGeneratorPage() {
       setLibrary(lib)
       if (lib) setCfg(defaultConfig(resolveOptionLists(lib.option_lists)))
     })
+    // Same parent-project union concepts-page.tsx already uses (a regional
+    // sub-project's own taxonomy is normally empty; the real one lives on
+    // the parent) -- needed here too, so a Basiskonzept id can resolve to
+    // its real label regardless of which project level actually holds it.
+    const taxonomyProjectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
+    supabase
+      .from('lpm_schema_elements')
+      .select('label, parent_id')
+      .in('project_id', taxonomyProjectIds)
+      .is('parent_id', null)
+      .then(({ data }) => setRootConcepts(data ?? []))
   }, [supabase, portfolioId, project])
 
   const options = useMemo(() => (library ? resolveOptionLists(library.option_lists) : null), [library])
@@ -209,9 +256,11 @@ export default function PromptGeneratorPage() {
     return Array.from(ids).sort()
   }, [items])
 
+  const bkLabels = useMemo(() => buildBkLabelMap(bkIds, rootConcepts), [bkIds, rootConcepts])
+
   const promptText = useMemo(
-    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, bkIds, library, labels, options) : ''),
-    [items, cfg, bkIds, library, labels, options]
+    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, bkIds, library, labels, options, bkLabels) : ''),
+    [items, cfg, bkIds, library, labels, options, bkLabels]
   )
 
   const reloadExperiments = () => portfolioId && listPromptExperiments(supabase, portfolioId).then(setExperiments)
@@ -292,7 +341,7 @@ export default function PromptGeneratorPage() {
             {bkIds.length === 0 && <p className="muted">No concept tags found on the selected items.</p>}
             {bkIds.map((bkId) => (
               <div key={bkId} className="field">
-                <label>{bkId}</label>
+                <label>{bkLabels[bkId] ?? bkId}</label>
                 <select
                   value={cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]}
                   onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [bkId]: e.target.value } })}
