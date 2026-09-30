@@ -72,7 +72,7 @@ export default function StudentBasiskonzeptePage() {
       </div>
 
       {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
-      {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} contentById={contentById} />}
+      {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} contentById={contentById} topics={topics} />}
       {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} />}
     </div>
   )
@@ -188,16 +188,27 @@ function looksLikeBk(bkId: string, label: string): boolean {
 // semester, not a synthetic demo metric.
 // ============================================================================
 
+// A Lernziel<->Basiskonzept pairing counts as a real edge worth drawing once
+// its own relevance rating reaches "relevant" (2/3) or above -- below that,
+// a 0 or 1 rating is real data too, but showing it as a full edge would
+// bury the meaningful overlap under near-universal noise (most Lernziele
+// score at least 1/3 against most Basiskonzepte). 2/3 is the same
+// real-world threshold a teacher reading the Lernziele cards' own dot
+// indicators would read as "yes, this genuinely relates."
+const RELEVANCE_EDGE_THRESHOLD = 2
+
 function NetzTab({
   project,
   supabase,
   rootConcepts,
   contentById,
+  topics,
 }: {
   project: ProjectOutletContext['project']
   supabase: ProjectOutletContext['supabase']
   rootConcepts: SchemaElement[]
   contentById: Map<string, unknown>
+  topics: TopicListItem[] | null
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -282,60 +293,64 @@ function NetzTab({
   }, [connections, rootConcepts, contentById])
 
   useEffect(() => {
-    if (!containerRef.current || !threads || rootConcepts.length === 0) return
+    if (!containerRef.current || !topics || rootConcepts.length === 0) return
     const width = containerRef.current.clientWidth || 900
     const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
 
-    // Real weighted relevance (relevanz_beurteilung, 0-3) between a specific
-    // Lernziel and a specific Basiskonzept -- the same field the Lernziele
-    // cards' own relevance dots already show. Requested live 2026-09-30: the
-    // spokes below used to all render at the same weight regardless of how
-    // relevant that particular Lernziel actually is to that Basiskonzept, as
-    // if a coherence thread being accepted at all said everything -- it
-    // doesn't say how strongly the two relate. Resolved once against every
-    // real basiskonzept_id in the project's content, same matcher as
-    // everywhere else this gets translated (see buildBkLabelMap).
+    // Real bug found live 2026-09-30 ("it should be that many lernziele
+    // connect to many basiskonzepte... the whole point is to model the
+    // conceptual overlap"): the spokes used to come only from accepted
+    // coherence threads (lpm_thread_stations) -- a real but narrow, curated
+    // construct (4 threads, 24 stations total in this project). The much
+    // richer real data is every Lernziel's own basiskonzeptbezug relevance
+    // rating against ALL SIX Basiskonzepte (the same field the Lernziele
+    // cards' own relevance dots show) -- a Lernziel can genuinely score
+    // "relevant" or "highly relevant" against three or four Basiskonzepte
+    // at once, and that overlap is exactly what wasn't showing. Every real
+    // Lernziel now draws a real edge to every Basiskonzept it scores
+    // RELEVANCE_EDGE_THRESHOLD or higher against -- not just the one thread
+    // curation happened to route it through.
     const allBkIds = Array.from(new Set(Array.from(contentById.values()).flatMap((c) => bkEntries(c).map((e) => e.basiskonzept_id))))
     const resolvedLabel = buildBkLabelMap(allBkIds, rootConcepts)
-    const relevanceFor = (dataObjectId: string, bkRootId: string): number => {
-      const rootLabel = rootConcepts.find((r) => r.id === bkRootId)?.label
-      const entry = bkEntries(contentById.get(dataObjectId)).find((e) => resolvedLabel[e.basiskonzept_id] === rootLabel)
-      return entry?.relevanz_beurteilung ?? 2
-    }
+    const labelToRootId = new Map(rootConcepts.map((r) => [r.label, r.id]))
 
     const leafTitle = new Map<string, string>()
-    const leavesByBk = new Map<string, string[]>()
+    const leavesByBk = new Map<string, string[]>() // primary (highest-scoring) column only, for layout
     const bkLeafEdges: { source: string; target: string; color: string; weight: number }[] = []
-    for (const t of threads) {
-      for (const s of t.stations) {
-        if (!s.via_element_id || !rootIndex.has(s.via_element_id)) continue
-        leafTitle.set(s.data_object_id, s.object_title)
-        const idx = rootIndex.get(s.via_element_id)!
-        bkLeafEdges.push({
-          source: s.via_element_id,
-          target: s.data_object_id,
-          color: cssVar(MAP_PALETTE[idx % 6], '#999'),
-          weight: relevanceFor(s.data_object_id, s.via_element_id),
-        })
-        const arr = leavesByBk.get(s.via_element_id) ?? []
-        if (!arr.includes(s.data_object_id)) arr.push(s.data_object_id)
-        leavesByBk.set(s.via_element_id, arr)
+    for (const t of topics) {
+      const scored = bkEntries(contentById.get(t.id))
+        .map((e) => ({ rootId: labelToRootId.get(resolvedLabel[e.basiskonzept_id] ?? ''), weight: e.relevanz_beurteilung }))
+        .filter((e): e is { rootId: string; weight: number } => !!e.rootId && e.weight >= RELEVANCE_EDGE_THRESHOLD)
+      if (scored.length === 0) continue
+      leafTitle.set(t.id, t.title)
+      const primary = scored.reduce((best, e) => (e.weight > best.weight ? e : best), scored[0])
+      const arr = leavesByBk.get(primary.rootId) ?? []
+      arr.push(t.id)
+      leavesByBk.set(primary.rootId, arr)
+      for (const e of scored) {
+        const idx = rootIndex.get(e.rootId)!
+        bkLeafEdges.push({ source: e.rootId, target: t.id, color: cssVar(MAP_PALETTE[idx % 6], '#999'), weight: e.weight })
       }
     }
 
     // Deterministic positions: Basiskonzepte on a fixed row, each one's own
-    // Lernziele tiered in staggered rows beneath it.
+    // Lernziele (by their strongest concept) tiered in staggered rows
+    // beneath it. A Lernziel that's ALSO relevant to other Basiskonzepte
+    // still draws a real edge across to them from wherever it's anchored --
+    // that's what shows the real overlap between columns.
     const colWidth = width / rootConcepts.length
     const rowY0 = 60
+    const rowHeight = 40
     const positions = new Map<string, { x: number; y: number }>()
     rootConcepts.forEach((c, i) => positions.set(c.id, { x: (i + 0.5) * colWidth, y: rowY0 }))
+    let maxRows = 1
     rootConcepts.forEach((c) => {
       const leaves = leavesByBk.get(c.id) ?? []
-      const cols = Math.max(2, Math.min(4, Math.ceil(Math.sqrt(leaves.length || 1))))
-      const colW = Math.min(90, (colWidth - 16) / cols)
-      const rowHeight = 46
+      const cols = Math.max(2, Math.ceil(Math.sqrt(leaves.length || 1)))
+      const colW = Math.min(80, (colWidth - 16) / cols)
       leaves.forEach((leafId, i) => {
         const row = Math.floor(i / cols)
+        maxRows = Math.max(maxRows, row + 1)
         const col = i % cols
         const rowLeaves = Math.min(cols, leaves.length - row * cols)
         const rowWidth = rowLeaves * colW
@@ -344,6 +359,8 @@ function NetzTab({
         positions.set(leafId, { x: startX + col * colW, y: rowY0 + 110 + row * rowHeight })
       })
     })
+    const neededHeight = Math.min(1400, Math.max(480, rowY0 + 150 + maxRows * rowHeight))
+    containerRef.current.style.height = `${neededHeight}px`
 
     const elements: ElementDefinition[] = [
       ...rootConcepts.map((c, i) => ({
@@ -381,6 +398,26 @@ function NetzTab({
           },
         },
         {
+          // Real bug found live 2026-09-30: once every Lernziel draws a real
+          // edge to every Basiskonzept it's genuinely relevant to (see the
+          // comment above this effect), there can be 200+ Lernziel nodes on
+          // screen -- their labels permanently on, all at once, overlapped
+          // into an unreadable smear. The crossing EDGES are the actual
+          // signal here (that's what shows the real overlap); a label only
+          // needs to appear once someone is actually looking at that one
+          // node.
+          selector: 'node[kind="lz"]',
+          style: { label: '' },
+        },
+        {
+          selector: 'node[kind="lz"].lz-hover',
+          style: {
+            label: 'data(label)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1,
+            'text-background-padding': '3px', 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc'),
+          } as any,
+        },
+        {
           // Weighted by the real relevanz_beurteilung (0-3) between this
           // specific Lernziel and this specific Basiskonzept -- a highly
           // relevant pairing (3/3) draws a visibly thicker, more opaque
@@ -396,10 +433,16 @@ function NetzTab({
       ],
     })
     cy.on('tap', 'node[kind="lz"]', (evt) => navigate(`/dashboard/${project.slug}/${evt.target.id()}`))
-    cy.on('mouseover', 'node[kind="lz"]', () => { if (containerRef.current) containerRef.current.style.cursor = 'pointer' })
-    cy.on('mouseout', 'node[kind="lz"]', () => { if (containerRef.current) containerRef.current.style.cursor = '' })
+    cy.on('mouseover', 'node[kind="lz"]', (evt) => {
+      if (containerRef.current) containerRef.current.style.cursor = 'pointer'
+      evt.target.addClass('lz-hover')
+    })
+    cy.on('mouseout', 'node[kind="lz"]', (evt) => {
+      if (containerRef.current) containerRef.current.style.cursor = ''
+      evt.target.removeClass('lz-hover')
+    })
     return () => cy.destroy()
-  }, [threads, rootConcepts, contentById, project.slug, navigate])
+  }, [topics, rootConcepts, contentById, project.slug, navigate])
 
   const growthWeeks = useMemo(() => {
     if (!threads) return []
@@ -422,12 +465,14 @@ function NetzTab({
   return (
     <div>
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div ref={containerRef} style={{ height: 480 }} />
+        <div ref={containerRef} style={{ height: 480, minHeight: 480 }} />
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
         Große Kreise (obere Reihe) = Basiskonzepte. Kleine Punkte darunter = einzelne Lernziele,
-        verbunden über echte, geprüfte Kohärenzfäden. Dickere, kräftigere Linien = höhere
-        bewertete Relevanz zwischen Lernziel und Basiskonzept — antippen öffnet ein Lernziel.
+        mit einer echten, bewerteten Linie zu jedem Basiskonzept, dem sie wirklich zugeordnet
+        sind — viele Lernziele gehören zu mehreren Basiskonzepten zugleich, deshalb kreuzen
+        manche Linien zwischen den Spalten. Dickere, kräftigere Linien = höhere bewertete
+        Relevanz — antippen öffnet ein Lernziel.
       </p>
 
       {derivedRelations.length > 0 && (
