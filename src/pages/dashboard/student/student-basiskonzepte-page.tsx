@@ -317,6 +317,16 @@ function NetzTab({
     const leafTitle = new Map<string, string>()
     const leavesByBk = new Map<string, string[]>() // primary (highest-scoring) column only, for layout
     const bkLeafEdges: { source: string; target: string; color: string; weight: number }[] = []
+    // Per-Lernziel centrality: the SUM of its kept (>=RELEVANCE_EDGE_THRESHOLD)
+    // relevance weights across every Basiskonzept it connects to -- not a raw
+    // edge count, so one genuine 3/3 connection doesn't score lower than three
+    // near-threshold 2/3s, and a Lernziel relevant to several Basiskonzepte at
+    // once (the real overlap this graph exists to show) scores higher than one
+    // relevant to only one. Drives node size, fill strength, and sort order
+    // below -- Dustin's own explicit ask (feedback 2026-09-30, 18:41): "sort,
+    // size, and/or shade the lernziele nodes in relation to their
+    // basiskonzepte link centrality and strength."
+    const leafMeta = new Map<string, { primaryColor: string; primaryWeight: number; totalWeight: number }>()
     for (const t of topics) {
       const scored = bkEntries(contentById.get(t.id))
         .map((e) => ({ rootId: labelToRootId.get(resolvedLabel[e.basiskonzept_id] ?? ''), weight: e.relevanz_beurteilung }))
@@ -324,6 +334,9 @@ function NetzTab({
       if (scored.length === 0) continue
       leafTitle.set(t.id, t.title)
       const primary = scored.reduce((best, e) => (e.weight > best.weight ? e : best), scored[0])
+      const primaryIdx = rootIndex.get(primary.rootId)!
+      const totalWeight = scored.reduce((sum, e) => sum + e.weight, 0)
+      leafMeta.set(t.id, { primaryColor: cssVar(MAP_PALETTE[primaryIdx % 6], '#999'), primaryWeight: primary.weight, totalWeight })
       const arr = leavesByBk.get(primary.rootId) ?? []
       arr.push(t.id)
       leavesByBk.set(primary.rootId, arr)
@@ -331,6 +344,13 @@ function NetzTab({
         const idx = rootIndex.get(e.rootId)!
         bkLeafEdges.push({ source: e.rootId, target: t.id, color: cssVar(MAP_PALETTE[idx % 6], '#999'), weight: e.weight })
       }
+    }
+    // Most-central Lernziele sort first within their column -- the layout
+    // below fills each column's tiered rows in array order, so this places
+    // the strongest/broadest connections closest to their Basiskonzept.
+    // "Closer to the hub = more central" reads intuitively without a legend.
+    for (const arr of leavesByBk.values()) {
+      arr.sort((a, b) => (leafMeta.get(b)?.totalWeight ?? 0) - (leafMeta.get(a)?.totalWeight ?? 0))
     }
 
     // Deterministic positions: Basiskonzepte on a fixed row, each one's own
@@ -364,13 +384,31 @@ function NetzTab({
 
     const elements: ElementDefinition[] = [
       ...rootConcepts.map((c, i) => ({
-        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 44, kind: 'bk' },
+        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 44, opacity: 1, kind: 'bk' },
         position: positions.get(c.id),
       })),
-      ...Array.from(leafTitle.entries()).map(([id, title]) => ({
-        data: { id, label: title.length > 26 ? title.slice(0, 24) + '…' : title, color: cssVar('--surface-1', '#eee'), size: 14, kind: 'lz' },
-        position: positions.get(id) ?? { x: width / 2, y: rowY0 + 110 },
-      })),
+      ...Array.from(leafTitle.entries()).map(([id, title]) => {
+        const meta = leafMeta.get(id)
+        // Size scales with centrality (sqrt-damped so a handful of
+        // high-overlap outliers don't blow out the rest of the grid); fill
+        // opacity reflects the primary connection's own relevance strength
+        // (the same 0-3 scale the spokes already use), so a node's own
+        // solidity visually agrees with the edge feeding it -- this is the
+        // "colorization" + "size/shade by centrality and strength" fix.
+        const size = meta ? Math.min(26, 9 + Math.sqrt(meta.totalWeight) * 5) : 12
+        const opacity = meta ? Math.max(0.4, meta.primaryWeight / 3) : 0.5
+        return {
+          data: {
+            id,
+            label: title.length > 26 ? title.slice(0, 24) + '…' : title,
+            color: meta?.primaryColor ?? cssVar('--surface-1', '#eee'),
+            size,
+            opacity,
+            kind: 'lz',
+          },
+          position: positions.get(id) ?? { x: width / 2, y: rowY0 + 110 },
+        }
+      }),
       ...bkLeafEdges.map((e, i) => ({ data: { id: `lz-e-${i}`, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: 'lz-edge' } })),
     ]
 
@@ -385,10 +423,11 @@ function NetzTab({
         {
           selector: 'node',
           style: {
-            'background-color': 'data(color)', width: 'data(size)', height: 'data(size)',
+            'background-color': 'data(color)', 'background-opacity': 'data(opacity)',
+            width: 'data(size)', height: 'data(size)',
             label: 'data(label)', 'font-size': 8, 'text-wrap': 'wrap', 'text-max-width': '60px',
             'text-valign': 'bottom', 'text-margin-y': 3, color: cssVar('--text-primary', '#0b0b0b'),
-          },
+          } as any,
         },
         {
           selector: 'node[kind="bk"]',
@@ -472,7 +511,9 @@ function NetzTab({
         mit einer echten, bewerteten Linie zu jedem Basiskonzept, dem sie wirklich zugeordnet
         sind — viele Lernziele gehören zu mehreren Basiskonzepten zugleich, deshalb kreuzen
         manche Linien zwischen den Spalten. Dickere, kräftigere Linien = höhere bewertete
-        Relevanz — antippen öffnet ein Lernziel.
+        Relevanz. Ein Lernziel-Punkt ist in der Farbe seines stärksten Basiskonzepts eingefärbt;
+        größere, kräftigere Punkte hängen insgesamt stärker und mit mehreren Basiskonzepten
+        zugleich zusammen, und stehen näher an ihrem Basiskonzept — antippen öffnet ein Lernziel.
       </p>
 
       {derivedRelations.length > 0 && (

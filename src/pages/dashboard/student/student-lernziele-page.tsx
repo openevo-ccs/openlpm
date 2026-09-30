@@ -154,10 +154,22 @@ export default function StudentLernzielePage() {
               // position in an arbitrary, insertion-ordered raw-id list.
               const rootIdx = rootConcepts.findIndex((r) => r.id === g.rootId)
               return (
-                <label key={g.rootId} className="row" style={{ gap: 6, fontSize: 12.5, marginBottom: 4, cursor: 'pointer' }}>
-                  <input type="checkbox" checked={conceptFilter.has(g.rootId)} onChange={() => toggleConcept(g.rootId)} />
-                  <span className={`bk-dot bk-dot-${rootIdx >= 0 ? rootIdx % 6 : 0}`} />
-                  {g.label}
+                // Real bug found live 2026-09-30: the longest German label
+                // ("Information und Kommunikation") doesn't fit this narrow
+                // sidebar on one line, and `.row`'s own `flex-wrap: wrap`
+                // (globals.css) wraps the WHOLE flex row rather than just the
+                // text -- the checkbox+dot end up on their own line with an
+                // orphaned, unindented label line below. `nowrap` + top-
+                // aligned items keeps the checkbox/dot fixed while the label
+                // itself wraps internally, staying visually attached to them.
+                <label
+                  key={g.rootId}
+                  className="row"
+                  style={{ gap: 6, fontSize: 12.5, marginBottom: 4, cursor: 'pointer', flexWrap: 'nowrap', alignItems: 'flex-start' }}
+                >
+                  <input type="checkbox" checked={conceptFilter.has(g.rootId)} onChange={() => toggleConcept(g.rootId)} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span className={`bk-dot bk-dot-${rootIdx >= 0 ? rootIdx % 6 : 0}`} style={{ flexShrink: 0, marginTop: 4 }} />
+                  <span style={{ minWidth: 0 }}>{g.label}</span>
                 </label>
               )
             })}

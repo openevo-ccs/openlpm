@@ -142,7 +142,21 @@ export function bkAbbreviation(label: string): string {
   return label.slice(0, 6)
 }
 
-/** The project's own real root-level Basiskonzepte, unioned with its parent's (same resolution rule concepts-page.tsx already uses). */
+/**
+ * The project's own real root-level Basiskonzepte, falling back to the
+ * parent's copy only for a label this project doesn't have its own row for.
+ * Real bug found live 2026-09-30 (screenshot feedback: "duplicate
+ * basiskonzepte nodes on the left are not doing anything for us"): a
+ * project that already has its OWN full set (evomentor-thuringia, seeded
+ * 2026-09-09) still gets the parent hub's set unioned in too (evomentor,
+ * seeded 2026-09-12) -- confirmed directly against the live data, 12 rows
+ * back for 6 real concepts, same German labels but different ids. A flat
+ * union is correct for a project that hasn't had its own copy seeded yet
+ * (the original reason this function unions at all) but wrong once a
+ * project has its own -- dedupe by label, preferring this project's own
+ * row, so every consumer (Dashboard/Netz/Detail tabs) sees exactly one row
+ * per real Basiskonzept regardless of which projects happen to hold a copy.
+ */
 export async function getRootConcepts(
   supabase: Client,
   project: { id: string; parent_project_id: string | null }
@@ -153,5 +167,12 @@ export async function getRootConcepts(
     .select('*')
     .in('project_id', projectIds)
     .is('parent_id', null)
-  return data ?? []
+  const byLabel = new Map<string, SchemaElement>()
+  for (const row of data ?? []) {
+    const existing = byLabel.get(row.label)
+    if (!existing || (existing.project_id !== project.id && row.project_id === project.id)) {
+      byLabel.set(row.label, row)
+    }
+  }
+  return Array.from(byLabel.values())
 }
