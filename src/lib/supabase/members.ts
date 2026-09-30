@@ -111,3 +111,76 @@ export async function removeMember(supabase: Client, memberId: string) {
 export async function updateMemberRole(supabase: Client, memberId: string, role: ProjectMemberRole) {
   return supabase.from('project_members').update({ role }).eq('id', memberId)
 }
+
+// ============================================================================
+// Self-join rules (migration 035) -- the admin side of the feature.
+// Complementary to invites above: an invite is a push (an owner names one
+// person ahead of time); a rule is a pull (an owner declares WHO is
+// eligible -- an exact email, or a whole domain like "uni-jena.de" -- and
+// an eligible signed-in user joins themselves from the /join/:slug link or
+// their own profile page). `project_join_rules` isn't in the generated
+// Supabase types yet (it only exists once this migration is actually
+// pushed) -- cast at the query boundary here rather than block the whole
+// file on a type regen that has to happen after a real deploy anyway.
+// ============================================================================
+
+export type JoinRuleType = 'email' | 'domain'
+
+export interface JoinRule {
+  id: string
+  project_id: string
+  rule_type: JoinRuleType
+  value: string
+  role: ProjectMemberRole
+  created_at: string
+}
+
+export async function listJoinRules(supabase: Client, projectId: string): Promise<JoinRule[]> {
+  const { data } = await (supabase as any)
+    .from('project_join_rules')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false })
+  return (data ?? []) as JoinRule[]
+}
+
+/**
+ * A domain rule's `value` is stored bare (no leading '@') so it can be used
+ * directly in the RLS policy's `email LIKE '%@' || value` match -- strip
+ * one off here if someone types "@uni-jena.de" out of habit.
+ */
+export async function addJoinRule(
+  supabase: Client,
+  projectId: string,
+  ruleType: JoinRuleType,
+  rawValue: string,
+  role: ProjectMemberRole
+) {
+  const value = ruleType === 'domain' ? rawValue.trim().toLowerCase().replace(/^@+/, '') : rawValue.trim().toLowerCase()
+  if (!value) return { error: new Error('Enter a value') }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { error } = await (supabase as any)
+    .from('project_join_rules')
+    .insert({ project_id: projectId, rule_type: ruleType, value, role, created_by: user?.id ?? null })
+
+  if (!error) {
+    await logActivity(supabase, { projectId, actionType: 'join_rule_added', details: { rule_type: ruleType, value, role } })
+  }
+  return { error }
+}
+
+export async function removeJoinRule(supabase: Client, rule: JoinRule) {
+  const { error } = await (supabase as any).from('project_join_rules').delete().eq('id', rule.id)
+  if (!error) {
+    await logActivity(supabase, {
+      projectId: rule.project_id,
+      actionType: 'join_rule_removed',
+      details: { rule_type: rule.rule_type, value: rule.value },
+    })
+  }
+  return { error }
+}

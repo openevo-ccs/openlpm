@@ -56,6 +56,9 @@ const ACTION_DESCRIPTIONS: Record<string, string> = {
   literature_added: 'added a paper to the collection',
   member_added: 'added a member',
   member_invited: 'invited someone by email',
+  member_self_joined: 'joined the group',
+  join_rule_added: 'opened self-serve joining for an email or domain',
+  join_rule_removed: 'closed self-serve joining for an email or domain',
 }
 
 export function describeActivity(entry: ActivityEntry): string {

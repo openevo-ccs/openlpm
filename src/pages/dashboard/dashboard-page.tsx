@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, Mail, MessageSquare, Plus, Trash2, UserPlus, Users } from 'lucide-react'
+import { ArrowRight, BookOpen, Check, Clock, Copy, FileText, FolderKanban, Globe, Mail, MessageSquare, Plus, Trash2, UserPlus, Users } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/supabase/activity'
@@ -8,14 +8,19 @@ import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import {
+  addJoinRule,
   inviteMembers,
+  listJoinRules,
   listMembers,
   listPendingInvites,
+  removeJoinRule,
   removeMember,
   revokeInvite,
   updateMemberRole,
   type InviteResult,
   type InviteRow,
+  type JoinRule,
+  type JoinRuleType,
   type MemberWithUser,
   type ProjectMemberRole,
 } from '@/lib/supabase/members'
@@ -262,6 +267,7 @@ function MembersSection({
       <p className="muted" style={{ marginBottom: 12 }}>Who can see and work on {project.name}.</p>
 
       {canManage && <InviteForm projectId={project.id} supabase={supabase} onInvited={reload} />}
+      {canManage && <JoinRulesSection project={project} supabase={supabase} />}
 
       {invites !== null && invites.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
@@ -367,6 +373,146 @@ function InviteForm({ projectId, supabase, onInvited }: { projectId: string; sup
             </div>
           ))}
         </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Self-join rules (migration 035) -- lets people join THEMSELVES if their
+// email matches, instead of an owner naming each one ahead of time above.
+// Built for a real, immediate case: a whole incoming class (Uni Jena's
+// Biologiedidaktik pilot) can't realistically be rostered by exact email
+// before the semester starts. A domain rule ("uni-jena.de") covers the
+// whole class at once; an email rule still covers a specific one-off
+// person, same as before. The shareable link only appears once at least
+// one rule exists -- there's nothing useful to share before then.
+// ============================================================================
+
+function JoinRulesSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [rules, setRules] = useState<JoinRule[] | null>(null)
+  const [ruleType, setRuleType] = useState<JoinRuleType>('domain')
+  const [value, setValue] = useState('')
+  const [role, setRole] = useState<ProjectMemberRole>('contributor')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const reload = () => listJoinRules(supabase, project.id).then(setRules)
+
+  useEffect(() => {
+    setRules(null)
+    reload()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id])
+
+  const joinLink = `${window.location.origin}${import.meta.env.BASE_URL}#/join/${project.slug}`
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setBusy(true)
+    setError(null)
+    const { error } = await addJoinRule(supabase, project.id, ruleType, value, role)
+    setBusy(false)
+    if (error) setError(error.message)
+    else {
+      setValue('')
+      reload()
+    }
+  }
+
+  const remove = async (rule: JoinRule) => {
+    await removeJoinRule(supabase, rule)
+    reload()
+  }
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(joinLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Clipboard access can fail quietly (permissions, insecure context) --
+      // the link is still shown and selectable by hand either way.
+    }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Globe size={16} />Let people join themselves</h3>
+      <p className="muted">
+        Add a whole email domain (e.g. everyone with a real <code>uni-jena.de</code> address) or a specific
+        person&apos;s email. Anyone who matches can join with one click from their own profile — no need to
+        know every student&apos;s email ahead of time.
+      </p>
+
+      <form onSubmit={submit} className="row">
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Type</label>
+          <select value={ruleType} onChange={(e) => setRuleType(e.target.value as JoinRuleType)}>
+            <option value="domain">Email domain</option>
+            <option value="email">Specific email</option>
+          </select>
+        </div>
+        <div className="field" style={{ marginBottom: 0, flex: 1 }}>
+          <label>{ruleType === 'domain' ? 'Domain' : 'Email'}</label>
+          <input
+            type="text"
+            placeholder={ruleType === 'domain' ? 'uni-jena.de' : 'someone@example.org'}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Joins as</label>
+          <select value={role} onChange={(e) => setRole(e.target.value as ProjectMemberRole)}>
+            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <button className="btn btn-primary" type="submit" disabled={busy || !value.trim()} style={{ alignSelf: 'flex-end' }}>
+          {busy ? 'Adding…' : 'Add'}
+        </button>
+      </form>
+      {error && <div className="notice notice-bad" style={{ marginTop: 8 }}>{error}</div>}
+
+      {rules === null ? (
+        <p className="muted">Loading…</p>
+      ) : rules.length === 0 ? (
+        <p className="muted" style={{ marginTop: 8 }}>No self-join rules yet — this group can only be joined by direct invite above.</p>
+      ) : (
+        <>
+          <div style={{ marginTop: 10 }}>
+            {rules.map((r) => (
+              <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                <span className="row">
+                  {r.rule_type === 'domain' ? <Globe size={13} /> : <Mail size={13} />}
+                  {r.rule_type === 'domain' ? `Anyone @${r.value}` : r.value}
+                </span>
+                <span className="row">
+                  <span className="chip capitalize">{r.role}</span>
+                  <button className="btn btn-mini" onClick={() => remove(r)}><Trash2 size={11} />Remove</button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div className="row" style={{ marginTop: 12, padding: '8px 10px', background: 'var(--bg-subtle, #f5f5f5)', borderRadius: 6 }}>
+            <span className="muted" style={{ fontSize: 12, flex: 1, wordBreak: 'break-all' }}>{joinLink}</span>
+            <button className="btn btn-mini" type="button" onClick={copyLink}>
+              {copied ? <Check size={11} /> : <Copy size={11} />}
+              {copied ? 'Copied' : 'Copy link'}
+            </button>
+          </div>
+          <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+            Share this one link — anyone who matches a rule above joins with one click.
+          </p>
+        </>
       )}
     </div>
   )

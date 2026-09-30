@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Github, KeyRound, Link2, Unlink } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Github, KeyRound, Link2, LogIn, Unlink } from 'lucide-react'
 import type { UserIdentity } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -17,8 +17,22 @@ import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 // Auth settings (a Dashboard toggle, off by default) -- if it's not on yet,
 // the button below will show Supabase's own clear error rather than fail
 // silently.
+// A pasted join link looks like ".../#/join/evomentor-thuringia-jena-ws2026"
+// (or someone might just type the slug itself) -- take whatever's after the
+// last '/join/' if present, otherwise the last path segment, so either form
+// works without asking a student to understand the difference.
+function extractJoinSlug(input: string): string {
+  const trimmed = input.trim()
+  const marker = '/join/'
+  const idx = trimmed.lastIndexOf(marker)
+  const tail = idx >= 0 ? trimmed.slice(idx + marker.length) : trimmed
+  return tail.split(/[/?#]/)[0]
+}
+
 export default function ProfilePage() {
   const { session } = useSession()
+  const navigate = useNavigate()
+  const [joinInput, setJoinInput] = useState('')
   const supabase = useMemo(() => createClient(), [])
   const [identities, setIdentities] = useState<UserIdentity[] | null>(null)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
@@ -133,6 +147,32 @@ export default function ProfilePage() {
             )
           })
         )}
+      </div>
+
+      <div className="card">
+        <h3 className="row"><LogIn size={16} />Join a group</h3>
+        <p className="muted">
+          Got a join link from an instructor or research lead? Paste it here — or just type the group&apos;s
+          short name if that&apos;s all you were given.
+        </p>
+        <form
+          className="row"
+          onSubmit={(e) => {
+            e.preventDefault()
+            const slug = extractJoinSlug(joinInput)
+            if (slug) navigate(`/join/${slug}`)
+          }}
+        >
+          <div className="field" style={{ marginBottom: 0, flex: 1 }}>
+            <input
+              type="text"
+              placeholder="e.g. evomentor-thuringia-jena-ws2026, or paste the full link"
+              value={joinInput}
+              onChange={(e) => setJoinInput(e.target.value)}
+            />
+          </div>
+          <button className="btn btn-primary" type="submit" disabled={!joinInput.trim()}>Go</button>
+        </form>
       </div>
 
       <div className="card">

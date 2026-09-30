@@ -23,6 +23,7 @@ import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
 import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
+import JoinPage from '@/pages/join-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -70,6 +71,14 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+        <Route
+          path="/join/:slug"
+          element={
+            <RequireAuth>
+              <JoinPage />
+            </RequireAuth>
+          }
+        />
 
         <Route
           path="/dashboard"
