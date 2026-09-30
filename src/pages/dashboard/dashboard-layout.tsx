@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import { LogOut, MessageSquareText, User } from 'lucide-react'
+import { LogOut, MessageSquareText, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -31,10 +31,16 @@ export default function DashboardLayout() {
         <div className="whoami" style={{ marginLeft: 'auto' }}>
           <span className="muted">{session?.user.email}</span>
           {session?.user.email === ADMIN_EMAIL && (
-            <Link to="/dashboard/admin/feedback" className="btn btn-mini">
-              <MessageSquareText size={12} />
-              Feedback
-            </Link>
+            <>
+              <Link to="/dashboard/admin/users" className="btn btn-mini">
+                <Users size={12} />
+                Users
+              </Link>
+              <Link to="/dashboard/admin/feedback" className="btn btn-mini">
+                <MessageSquareText size={12} />
+                Feedback
+              </Link>
+            </>
           )}
           <HelpWidget />
           <Link to="/dashboard/profile" className="btn btn-mini">

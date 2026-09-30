@@ -23,6 +23,7 @@ import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
 import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
+import AdminUsersPage from '@/pages/dashboard/admin-users-page'
 import JoinPage from '@/pages/join-page'
 import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
@@ -96,6 +97,7 @@ export default function App() {
           <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="admin/feedback" element={<AdminFeedbackPage />} />
+          <Route path="admin/users" element={<AdminUsersPage />} />
           <Route path=":project" element={<ProjectLayout />}>
             <Route index element={<ProjectIndexRouter />} />
             <Route path=":objectId" element={<StudentLernzielePage />} />

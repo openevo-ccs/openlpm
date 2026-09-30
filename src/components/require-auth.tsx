@@ -8,13 +8,24 @@ const REDIRECT_KEY = 'openlpm:post_login_redirect'
 // where the visitor was headed so login can send them back after the OAuth
 // round-trip drops them back at the site root (see App.tsx's redirect effect).
 export function RequireAuth({ children }: { children: React.ReactNode }) {
-  const { session, loading } = useSession()
+  const { session, loading, blocked } = useSession()
   const location = useLocation()
 
   if (loading) {
     return (
       <div className="page">
         <p className="muted">Loading…</p>
+      </div>
+    )
+  }
+
+  if (blocked) {
+    return (
+      <div className="page">
+        <h1>Account blocked</h1>
+        <p className="muted">
+          This account has been blocked from OpenLPM. If you think that&apos;s a mistake, contact the project admin.
+        </p>
       </div>
     )
   }

@@ -17,23 +17,69 @@ interface Ctx {
   // consumePasswordRecovery() so it doesn't re-fire on a later refresh.
   passwordRecovery: boolean
   consumePasswordRecovery: () => void
+  // True for exactly one tick after a blocked account's session is caught and
+  // signed back out (see resolveSession below) -- lets <RequireAuth> show a
+  // real "your account is blocked" message instead of silently bouncing to
+  // the login screen like an ordinary signed-out visitor.
+  blocked: boolean
 }
-const C = createContext<Ctx>({ session: null, loading: true, passwordRecovery: false, consumePasswordRecovery: () => {} })
+const C = createContext<Ctx>({
+  session: null,
+  loading: true,
+  passwordRecovery: false,
+  consumePasswordRecovery: () => {},
+  blocked: false,
+})
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), [])
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [passwordRecovery, setPasswordRecovery] = useState(false)
+  const [blocked, setBlocked] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+    // Reversible admin-set account lock (migration 049, users.blocked_at) --
+    // see lab_manager/docs/design-notes/
+    // openlpm-system-wide-admin-page-scoping-2026-09-30.md. Enforced here,
+    // once, for the whole app, rather than per-page: a real sign-in still
+    // succeeds at the Supabase Auth layer (their password is still correct),
+    // this just immediately signs them back out the moment the session
+    // context notices blocked_at is set, before anything protected ever
+    // renders. blocked_at may not exist yet on the live database if this
+    // code ships before migration 049 is pushed -- fail OPEN (treat as not
+    // blocked) on any query error here, so an unmigrated database never
+    // breaks sign-in for every real user.
+    const resolveSession = async (s: Session | null): Promise<Session | null> => {
+      if (!s) return null
+      const { data, error } = await (supabase as any)
+        .from('users')
+        .select('blocked_at')
+        .eq('id', s.user.id)
+        .maybeSingle()
+      if (!error && data?.blocked_at) {
+        setBlocked(true)
+        await supabase.auth.signOut()
+        return null
+      }
+      return s
+    }
+
+    supabase.auth.getSession().then(async ({ data }) => {
+      setSession(await resolveSession(data.session))
       setLoading(false)
     })
-    const { data } = supabase.auth.onAuthStateChange((event, s) => {
-      setSession(s)
+    const { data } = supabase.auth.onAuthStateChange(async (event, s) => {
       if (event === 'PASSWORD_RECOVERY') setPasswordRecovery(true)
+      // The signOut() inside resolveSession fires its own SIGNED_OUT event
+      // right back into this same listener -- handle it as a plain sign-out
+      // rather than re-running resolveSession(null), which would have no
+      // session to check and would otherwise just be a no-op anyway.
+      if (event === 'SIGNED_OUT') {
+        setSession(null)
+        return
+      }
+      setSession(await resolveSession(s))
     })
 
     // Password-reset links (like the old magic links) are commonly opened in
@@ -43,7 +89,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     // fire a `storage` event here (standard same-origin, cross-tab browser
     // behavior), so re-check on that and on refocus rather than requiring a
     // manual reload.
-    const recheck = () => supabase.auth.getSession().then(({ data }) => setSession(data.session))
+    const recheck = () => supabase.auth.getSession().then(async ({ data }) => setSession(await resolveSession(data.session)))
     const onStorage = (e: StorageEvent) => {
       if (e.key === null || e.key.startsWith('sb-')) recheck()
     }
@@ -61,7 +107,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const consumePasswordRecovery = () => setPasswordRecovery(false)
 
-  return <C.Provider value={{ session, loading, passwordRecovery, consumePasswordRecovery }}>{children}</C.Provider>
+  return <C.Provider value={{ session, loading, passwordRecovery, consumePasswordRecovery, blocked }}>{children}</C.Provider>
 }
 
 export function useSession() {
