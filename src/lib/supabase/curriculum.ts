@@ -48,6 +48,20 @@ export async function getTopic(supabase: Client, id: string): Promise<DataObject
   return data
 }
 
+/**
+ * Every topic's own `content` for a project, in one query -- for a view
+ * that needs to read something out of `content` (Basiskonzept relevance
+ * dots, favorite filtering) for every row on screen at once. The student
+ * Lernziele/Basiskonzepte pages originally fetched this one row at a time
+ * per topic (305 individual requests for the real Thuringia data) --
+ * confirmed live as a genuine, needless slowdown; this is the fix, not the
+ * original design.
+ */
+export async function listTopicContents(supabase: Client, projectId: string): Promise<Map<string, unknown>> {
+  const { data } = await supabase.from('lpm_data_objects').select('id, content').eq('project_id', projectId)
+  return new Map((data ?? []).map((r) => [r.id, r.content]))
+}
+
 export interface ResolvedConnection {
   connection: ConnectionRow
   direction: 'incoming' | 'outgoing'

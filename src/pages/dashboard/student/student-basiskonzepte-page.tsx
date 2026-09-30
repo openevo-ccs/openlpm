@@ -5,9 +5,8 @@ import { Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { bkAbbreviation, bkEntries, getRootConcepts } from '@/lib/supabase/basiskonzepte'
-import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 
-type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
 function cssVar(name: string, fallback: string) {
@@ -34,22 +33,13 @@ export default function StudentBasiskonzeptePage() {
 
   const [rootConcepts, setRootConcepts] = useState<SchemaElement[]>([])
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
-  const [fullById, setFullById] = useState<Map<string, DataObject>>(new Map())
+  const [contentById, setContentById] = useState<Map<string, unknown>>(new Map())
 
   useEffect(() => {
     getRootConcepts(supabase, project).then(setRootConcepts)
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
+    listTopicContents(supabase, project.id).then(setContentById)
   }, [supabase, project, defaultBranchId])
-
-  useEffect(() => {
-    if (!topics) return
-    Promise.all(topics.map((t) => supabase.from('lpm_data_objects').select('*').eq('id', t.id).maybeSingle())).then((rows) => {
-      const map = new Map<string, DataObject>()
-      for (const { data } of rows) if (data) map.set(data.id, data)
-      setFullById(map)
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics])
 
   return (
     <div className="student-page">
@@ -68,7 +58,7 @@ export default function StudentBasiskonzeptePage() {
         ))}
       </div>
 
-      {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} fullById={fullById} />}
+      {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
       {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} />}
       {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} />}
     </div>
@@ -87,16 +77,16 @@ export default function StudentBasiskonzeptePage() {
 function DashboardTab({
   rootConcepts,
   topics,
-  fullById,
+  contentById,
 }: {
   rootConcepts: SchemaElement[]
   topics: TopicListItem[] | null
-  fullById: Map<string, DataObject>
+  contentById: Map<string, unknown>
 }) {
-  const items = Array.from(fullById.values())
-  const konzeptanker = items.filter((o) => (o.content as any)?.ist_konzeptanker).length
-  const praktisch = items.filter((o) => (o.content as any)?.ist_praktisch).length
-  const stundenValues = items.map((o) => (o.content as any)?.geschaetzte_unterrichtsstunden).filter((v) => typeof v === 'number')
+  const contents = Array.from(contentById.values())
+  const konzeptanker = contents.filter((c) => (c as any)?.ist_konzeptanker).length
+  const praktisch = contents.filter((c) => (c as any)?.ist_praktisch).length
+  const stundenValues = contents.map((c) => (c as any)?.geschaetzte_unterrichtsstunden).filter((v) => typeof v === 'number')
   const stundenGesamt = stundenValues.reduce((a, b) => a + b, 0)
   const hasStunden = stundenValues.length > 0
 
@@ -134,10 +124,9 @@ function DashboardTab({
                 <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
                   <td style={{ padding: '4px 8px' }}><span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}</td>
                   {grades.map((g) => {
-                    const count = items.filter((o) => {
-                      const t = (topics ?? []).find((x) => x.id === o.id)
-                      if (t?.grade_band !== g) return false
-                      return bkEntries(o.content).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, c.label))
+                    const count = (topics ?? []).filter((t) => {
+                      if (t.grade_band !== g) return false
+                      return bkEntries(contentById.get(t.id)).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, c.label))
                     }).length
                     return <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>{count || '—'}</td>
                   })}
@@ -224,7 +213,7 @@ function NetzTab({
 
     const elements: ElementDefinition[] = [
       ...rootConcepts.map((c, i) => ({
-        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 44, kind: 'bk' },
+        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 40, kind: 'bk' },
       })),
       ...Array.from(lzNodeIds.entries()).map(([id, title]) => ({
         data: { id, label: title.length > 28 ? title.slice(0, 26) + '…' : title, color: cssVar('--surface-1', '#eee'), size: 16, kind: 'lz' },
@@ -246,7 +235,24 @@ function NetzTab({
             'text-valign': 'bottom', 'text-margin-y': 3, color: cssVar('--text-primary', '#0b0b0b'),
           },
         },
-        { selector: 'node[kind="bk"]', style: { 'font-size': 10, 'font-weight': 700, 'text-valign': 'center', color: '#fff', 'text-outline-width': 0 } },
+        {
+          // Real bug found live 2026-09-30: centering a wrapped multi-line
+          // label inside a small circle (Cytoscape's 'text-valign: center')
+          // clips unpredictably -- which label survives depends on where
+          // the force-directed layout happens to place that specific node,
+          // not on the label's own length, so widening text-max-width only
+          // ever fixed some labels and not others. Moved the label below
+          // the circle instead, the same safe position already used for
+          // the small Lernziel nodes (which never had this problem) --
+          // sidesteps circle-vs-text-box interaction entirely rather than
+          // continuing to tune widths against a layout that moves every
+          // render.
+          selector: 'node[kind="bk"]',
+          style: {
+            'font-size': 11, 'font-weight': 700, 'text-valign': 'bottom', 'text-margin-y': 6,
+            'text-max-width': '100px', color: cssVar('--text-primary', '#0b0b0b'), 'text-outline-width': 0,
+          },
+        },
         { selector: 'edge', style: { width: 1.5, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 0.55 } },
       ],
     })

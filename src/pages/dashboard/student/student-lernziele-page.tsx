@@ -7,6 +7,7 @@ import {
   getFullThread,
   getThreadStationsForTopic,
   getTopic,
+  listTopicContents,
   listTopics,
   type DataObjectRow,
   type FullThread,
@@ -35,7 +36,7 @@ export default function StudentLernzielePage() {
   const navigate = useNavigate()
 
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
-  const [fullById, setFullById] = useState<Map<string, DataObjectRow>>(new Map())
+  const [contentById, setContentById] = useState<Map<string, unknown>>(new Map())
   const [query, setQuery] = useState('')
   const [gradeFilter, setGradeFilter] = useState<string>('all')
   const [conceptFilter, setConceptFilter] = useState<Set<string>>(new Set())
@@ -51,28 +52,19 @@ export default function StudentLernzielePage() {
   }, [supabase, project.id, defaultBranchId])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
-  // per-concept relevance dots need it -- fetched lazily, once, for
-  // whichever topics are actually on screen, and cached so paging through
-  // grade filters doesn't re-fetch.
+  // per-concept relevance dots need it -- one bulk query for every topic's
+  // content, not one request per card (305 individual round trips was the
+  // first real version of this, confirmed live as a genuine, needless
+  // slowdown before this fix).
   useEffect(() => {
-    if (!topics) return
-    const missing = topics.filter((t) => !fullById.has(t.id))
-    if (missing.length === 0) return
-    Promise.all(missing.map((t) => getTopic(supabase, t.id))).then((rows) => {
-      setFullById((prev) => {
-        const next = new Map(prev)
-        for (const r of rows) if (r) next.set(r.id, r)
-        return next
-      })
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics])
+    listTopicContents(supabase, project.id).then(setContentById)
+  }, [supabase, project.id])
 
   const allBkIds = useMemo(() => {
     const ids = new Set<string>()
-    for (const obj of fullById.values()) for (const e of bkEntries(obj.content)) ids.add(e.basiskonzept_id)
+    for (const content of contentById.values()) for (const e of bkEntries(content)) ids.add(e.basiskonzept_id)
     return Array.from(ids)
-  }, [fullById])
+  }, [contentById])
   const bkLabels = useMemo(() => buildBkLabelMap(allBkIds, rootConcepts), [allBkIds, rootConcepts])
 
   const grades = useMemo(() => {
@@ -88,14 +80,13 @@ export default function StudentLernzielePage() {
       if (gradeFilter !== 'all' && t.grade_band !== gradeFilter) return false
       if (favoritesOnly && !favorites.has(t.id)) return false
       if (conceptFilter.size > 0) {
-        const full = fullById.get(t.id)
-        const entries = full ? bkEntries(full.content) : []
+        const entries = bkEntries(contentById.get(t.id))
         if (!entries.some((e) => conceptFilter.has(e.basiskonzept_id))) return false
       }
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, gradeFilter, favoritesOnly, favorites, conceptFilter, fullById])
+  }, [topics, query, gradeFilter, favoritesOnly, favorites, conceptFilter, contentById])
 
   const toggleConcept = (bkId: string) => {
     setConceptFilter((prev) => {
@@ -166,8 +157,7 @@ export default function StudentLernzielePage() {
               </div>
             ) : (
               filtered.map((t) => {
-                const full = fullById.get(t.id)
-                const entries = full ? bkEntries(full.content) : []
+                const entries = bkEntries(contentById.get(t.id))
                 return (
                   <div key={t.id} className="card student-lz-card" onClick={() => navigate(`/dashboard/${project.slug}/${t.id}`)}>
                     <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
