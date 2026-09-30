@@ -108,10 +108,28 @@ code {
 .nav { display: flex; gap: 4px; flex: 1; }
 .nav a { padding: 6px 10px; border-radius: 8px; text-decoration: none; color: var(--text-secondary); font-size: 13px; }
 .nav a.active { background: var(--surface-1); color: var(--series-a); font-weight: 600; }
-.whoami { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; }
+.whoami { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .main { flex: 1; min-height: 0; display: flex; }
 .page { flex: 1; min-height: 0; overflow: auto; padding: 24px; }
 .page-narrow { max-width: 720px; margin: 0 auto; }
+
+/* Real root-cause bug found live 2026-09-30: .whoami (email text + Help/
+   Feedback/Profile/Logout) is a single unwrapped flex row ~420px wide on
+   its own -- on any real phone (390px and narrower) this forces the WHOLE
+   topbar, and with it the whole page, wider than the device, so the
+   browser zooms the entire app out to fit rather than laying it out at
+   the real device width. Confirmed by measuring window.innerWidth (563)
+   against the real visual viewport (390) on a live page: not a rendering
+   quirk, a genuine forced-overflow bug, and the reason a mobile user's
+   whole session looks zoomed out and cramped, not just this one button
+   being hard to reach. The email address itself is the single biggest
+   contributor (long test/real addresses easily run 250px+) and isn't
+   essential chrome -- the Profile page already shows it. */
+@media (max-width: 480px) {
+  .topbar { flex-wrap: wrap; row-gap: 6px; padding: 8px 12px; }
+  .whoami > .muted { display: none; }
+  .whoami { gap: 6px; }
+}
 
 /* ---- project-scoped sidebar (OpenLPM has a hierarchy level -- project ->
    branch/portfolio -- that Eva KGDJ, single-tenant, doesn't need) ---- */

@@ -21,6 +21,14 @@ const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--m
 // constant) -- not paraphrased.
 const KONZEPTANKER_DEF = 'ein Lernziel, das einen besonders konkreten, anschaulichen Einstiegspunkt in ein Basiskonzept bildet.'
 
+// Added 2026-09-30: this page had no explanation anywhere of why teaching is
+// organized around Basiskonzepte at all. Short, plain-language rationale +
+// citation, not a paraphrase of the source's academic language -- see
+// literaturebase/records/neuhaus-2023.yaml and
+// methodsbase/records/methods.yaml (OE-METHOD-basiskonzeptorientierte-unterrichtsplanung).
+const BASISKONZEPTE_RATIONALE =
+  'Wiederkehrende Grundideen wie "Struktur und Funktion" tauchen in ganz verschiedenen Themen wieder auf. Unterricht, der Inhalte immer wieder darauf zurückbezieht, hilft Lernenden, Wissen besser zu vernetzen und zu behalten, statt einzelne Fakten isoliert zu lernen. Quelle: Neuhaus (2023), Fachdidaktik Biologie, Kap. 6.'
+
 const TABS = ['dashboard', 'netz', 'detail'] as const
 type Tab = (typeof TABS)[number]
 const TAB_LABEL: Record<Tab, string> = { dashboard: 'Dashboard', netz: 'Netz', detail: 'Detail' }
@@ -43,7 +51,12 @@ export default function StudentBasiskonzeptePage() {
 
   return (
     <div className="student-page">
-      <h1>Basiskonzepte</h1>
+      <h1>
+        Basiskonzepte{' '}
+        <span title={BASISKONZEPTE_RATIONALE} style={{ cursor: 'help' }}>
+          <Info size={14} style={{ verticalAlign: 'middle' }} />
+        </span>
+      </h1>
       <p className="muted" style={{ marginBottom: 12 }}>Dashboard, Konzeptnetz, Details</p>
 
       <div className="row" style={{ gap: 6, marginBottom: 16 }}>

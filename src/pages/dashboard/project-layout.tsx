@@ -30,13 +30,55 @@ export interface ProjectOutletContext {
   isStudentView: boolean
 }
 
+// Whether an owner/maintainer is currently previewing the student view for
+// this project -- kept in sessionStorage, not the URL. The URL-based
+// version (?view=student) broke the moment anyone clicked a link inside
+// the preview: every nav link only points at its own plain path, so the
+// query param silently dropped and the very next navigation snapped back
+// to the researcher view after just one page -- confirmed live, exactly
+// the bug reported. sessionStorage survives navigation without every link
+// in the app needing to remember to carry a query param forward.
+function previewKey(slug: string) {
+  return `openlpm:preview_student:${slug}`
+}
+
 export default function ProjectLayout() {
   const { project: slug } = useParams<{ project: string }>()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
   const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null } | null>(null)
   const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
   const [defaultBranchId, setDefaultBranchId] = useState<string | null>(null)
+  const [previewing, setPreviewing] = useState(false)
+
+  // ?view=student (from a direct link) starts the preview session; from
+  // then on it's tracked in sessionStorage, independent of the URL.
+  useEffect(() => {
+    if (!slug) return
+    if (searchParams.get('view') === 'student') {
+      sessionStorage.setItem(previewKey(slug), '1')
+      searchParams.delete('view')
+      setSearchParams(searchParams, { replace: true })
+    }
+    try {
+      setPreviewing(sessionStorage.getItem(previewKey(slug)) === '1')
+    } catch {
+      // Private-window/blocked-storage: preview toggle just won't persist
+      // across navigation -- not worth failing the page load over.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug])
+
+  const startPreview = () => {
+    if (!slug) return
+    try { sessionStorage.setItem(previewKey(slug), '1') } catch { /* see above */ }
+    setPreviewing(true)
+  }
+  const exitPreview = () => {
+    if (!slug) return
+    try { sessionStorage.removeItem(previewKey(slug)) } catch { /* see above */ }
+    setPreviewing(false)
+  }
 
   useEffect(() => {
     if (!slug) return
@@ -132,12 +174,17 @@ export default function ProjectLayout() {
   ]
 
   const canManage = role === 'owner' || role === 'maintainer'
-  // A real self-joined member (migration 039) always gets the simple view --
-  // never a toggle they could get lost in. An owner/maintainer gets the
-  // full researcher view by default and can preview the other one with
-  // ?view=student; nobody else can use that param to change anything, since
-  // isStudentView never grants a permission, only picks a presentation.
-  const isStudentView = joinedVia === 'self_join_rule' && !canManage ? true : canManage && searchParams.get('view') === 'student'
+  // student_view_template (migration 045) isn't in the generated types yet.
+  const studentViewTemplate = (project as any).student_view_template as string | null
+  // Real bug found live 2026-09-30: this used to be purely a viewer-role
+  // question (self-joined vs. owner), which meant "Preview as student"
+  // appeared on EVERY project any owner manages, and rendered the SAME
+  // German Jena-pilot UI regardless of which project it was. Whether a
+  // project HAS a student template at all is a property of the project
+  // itself, set explicitly by its own owner (dashboard-page.tsx's Student
+  // view settings card) -- without one, this is never true, no matter who's
+  // viewing or how they joined.
+  const isStudentView = !!studentViewTemplate && ((joinedVia === 'self_join_rule' && !canManage) || (canManage && previewing))
 
   const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView }
   const isSpace = !project.parent_project_id
@@ -157,7 +204,7 @@ export default function ProjectLayout() {
           {canManage && (
             <div className="notice" style={{ marginBottom: 12 }}>
               Vorschau: So sehen echte Studierende diesen Bereich.{' '}
-              <Link to={`/dashboard/${slug}`}>Zur vollen Forschungsansicht</Link>
+              <button type="button" className="btn-linklike" onClick={exitPreview}>Zur vollen Forschungsansicht</button>
             </div>
           )}
           <Outlet context={context} />
@@ -187,10 +234,10 @@ export default function ProjectLayout() {
           <MaturityBadge status={project.maturity} />
           <WorkingLanguagesTag languages={project.working_languages} />
         </div>
-        {canManage && (
-          <Link to={`/dashboard/${slug}?view=student`} className="btn btn-mini" style={{ marginTop: 8 }}>
+        {canManage && studentViewTemplate && (
+          <button type="button" className="btn btn-mini" style={{ marginTop: 8 }} onClick={startPreview}>
             Preview as student
-          </Link>
+          </button>
         )}
         <ProjectNav items={nav} />
       </aside>

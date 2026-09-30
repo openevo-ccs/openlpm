@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle2, ImageIcon, MessageSquareText, RotateCcw } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronUp, ImageIcon, MessageSquareText, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { Chip } from '@/components/chip'
@@ -81,6 +81,7 @@ function FeedbackCard({
 }) {
   const [screenshotUrl, setScreenshotUrl] = useState<string | null | undefined>(undefined)
   const [busy, setBusy] = useState(false)
+  const [showSessionContext, setShowSessionContext] = useState(false)
 
   const loadScreenshot = async () => {
     if (!item.screenshot_path) return
@@ -95,7 +96,15 @@ function FeedbackCard({
     onChanged()
   }
 
-  const ctx = item.context as { path?: string; project_slug?: string | null; page?: string; page_title?: string } | null
+  const ctx = item.context as {
+    path?: string
+    project_slug?: string | null
+    page?: string
+    page_title?: string
+    visible_text?: string
+    recent_pages?: { path: string; title: string; at: string }[]
+  } | null
+  const hasSessionContext = !!(ctx?.visible_text || ctx?.recent_pages?.length)
 
   return (
     <div className="card" style={{ marginBottom: 12 }}>
@@ -131,6 +140,37 @@ function FeedbackCard({
         ) : (
           <p className="muted" style={{ fontSize: 12, marginTop: 8 }}>Couldn&apos;t load the screenshot.</p>
         )
+      )}
+
+      {hasSessionContext && (
+        <>
+          <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setShowSessionContext((v) => !v)}>
+            {showSessionContext ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            Session context
+          </button>
+          {showSessionContext && (
+            <div style={{ marginTop: 8, fontSize: 12 }}>
+              {ctx?.recent_pages && ctx.recent_pages.length > 0 && (
+                <div style={{ marginBottom: 8 }}>
+                  <p className="muted" style={{ marginBottom: 2 }}>Recently visited, this session:</p>
+                  <ol style={{ margin: 0, paddingLeft: 18 }}>
+                    {ctx.recent_pages.map((p, i) => (
+                      <li key={i}>{p.title || p.path} <span className="muted">({p.path})</span></li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              {ctx?.visible_text && (
+                <div>
+                  <p className="muted" style={{ marginBottom: 2 }}>What was actually on screen (real page text, not a paraphrase):</p>
+                  <pre style={{ whiteSpace: 'pre-wrap', background: 'var(--surface-1)', padding: 8, borderRadius: 6, maxHeight: 200, overflowY: 'auto', margin: 0 }}>
+                    {ctx.visible_text}
+                  </pre>
+                </div>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       <button className="btn btn-mini" style={{ marginTop: 10 }} disabled={busy} onClick={toggleStatus}>

@@ -24,6 +24,7 @@ import {
   type MemberWithUser,
   type ProjectMemberRole,
 } from '@/lib/supabase/members'
+import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
 
 // 2026-09-13 restructure: renamed from "Overview," folding in the former
 // standalone Projects and Members tabs (per Dustin's explicit instruction)
@@ -268,6 +269,7 @@ function MembersSection({
 
       {canManage && <InviteForm projectId={project.id} supabase={supabase} onInvited={reload} />}
       {canManage && <JoinRulesSection project={project} supabase={supabase} />}
+      {canManage && <StudentViewSection project={project} supabase={supabase} />}
 
       {invites !== null && invites.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
@@ -514,6 +516,70 @@ function JoinRulesSection({
           </p>
         </>
       )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Student view template (migration 045) -- a real, separate setting from
+// self-join above. Real bug found live 2026-09-30: "Preview as student"
+// used to appear on every project any owner manages and always rendered
+// the same German Jena-pilot UI, because the student view was gated purely
+// on the VIEWER's role, never on whether THIS project actually opted into
+// one. An owner now explicitly turns this on here and picks which
+// template -- "none" is the correct default for every project that isn't
+// the Jena pilot.
+// ============================================================================
+
+function StudentViewSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  // student_view_template (migration 045) isn't in the generated types yet.
+  const [value, setValue] = useState<string>((project as any).student_view_template ?? '')
+  const [busy, setBusy] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const save = async (next: string) => {
+    setValue(next)
+    setBusy(true)
+    setSaved(false)
+    const { error } = await (supabase as any)
+      .from('projects')
+      .update({ student_view_template: next || null })
+      .eq('id', project.id)
+    setBusy(false)
+    if (!error) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 1500)
+    }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3>Student view</h3>
+      <p className="muted">
+        A simplified, language-adapted view for people who join this specific project space themselves.
+        Off by default — turning it on doesn&apos;t change who can join, only what they see once they&apos;re in.
+      </p>
+      <div className="field" style={{ marginBottom: 0 }}>
+        <label>Template</label>
+        <select value={value} disabled={busy} onChange={(e) => save(e.target.value)}>
+          <option value="">None — everyone sees the full researcher view</option>
+          {STUDENT_VIEW_TEMPLATES.map((t) => (
+            <option key={t.id} value={t.id}>{t.label}</option>
+          ))}
+        </select>
+      </div>
+      {value && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+          {STUDENT_VIEW_TEMPLATES.find((t) => t.id === value)?.description}
+        </p>
+      )}
+      {saved && <p className="muted" style={{ fontSize: 12, marginTop: 4, color: 'var(--good)' }}>Saved.</p>}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { matchPath, useLocation } from 'react-router-dom'
+import html2canvas from 'html2canvas'
 import { MessageSquareText, X, Camera, RotateCcw, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -11,14 +12,23 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 // twice-verified implementation rather than designed from scratch, but
 // adapted where OpenLPM's own architecture genuinely differs:
 //
-// - Screenshot capture still uses the real Screen Capture API
-//   (getDisplayMedia), not a DOM-to-image library. That choice was driven
-//   by Me-Mo/Ask Eva's live WebGL orb, which a DOM rasterizer can't
-//   reliably capture -- checked whether the same constraint applies here
-//   before copying the choice blindly, and it does: portfolio-explorer.tsx
-//   renders its graph via Cytoscape onto a real <canvas>, which a
-//   DOM-to-image library would silently render blank, the same class of
-//   invisible failure Ask Eva actually hit (see captureScreenshot() below).
+// - Screenshot capture now uses html2canvas (a DOM rasterizer), not the
+//   Screen Capture API (getDisplayMedia) Me-Mo/Ask Eva use -- REVERSED
+//   2026-09-30 after Dustin reported it erroring for real, repeatedly.
+//   getDisplayMedia was the right call for THEM because of a live WebGL
+//   orb a DOM rasterizer can't capture -- checked whether that same
+//   constraint applies here before copying the choice, and mostly it
+//   doesn't: OpenLPM's content is plain DOM, and its one canvas-rendered
+//   surface (Cytoscape graphs in Notebooks/Concepts/Basiskonzepte) draws
+//   with the ordinary 2D context, which html2canvas can read directly --
+//   unlike a live WebGL surface, there's no continuously-redrawn context
+//   to race against. The real reason to actually prefer html2canvas here
+//   even setting the bug aside: getDisplayMedia has minimal-to-no support
+//   on mobile browsers (no reliable tab/window capture on iOS Safari, only
+//   experimental/inconsistent support on Android Chrome) -- a real,
+//   structural problem for an app real students will open on their
+//   phones, not a one-off glitch. html2canvas needs no browser permission
+//   dialog at all and works identically on mobile and desktop.
 // - There is no local per-session server/transcript to append into here --
 //   OpenLPM is a hosted multi-tenant app, so feedback is a real Postgres
 //   table (supabase/migrations/026_feedback.sql) with its own RLS, not a
@@ -33,10 +43,10 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 type Tag = 'Problem' | 'Request' | 'Other'
 const TAGS: Tag[] = ['Problem', 'Request', 'Other']
 
-const CAPTURE_SUPPORTED =
-  typeof navigator !== 'undefined' &&
-  !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) &&
-  window.isSecureContext !== false
+// html2canvas works in every real browser (no permission API, no mobile
+// gap) -- this used to gate the button on getDisplayMedia support, which
+// is exactly the mobile-unsupported case that caused the real bug.
+const CAPTURE_SUPPORTED = true
 
 // Keeps every uploaded screenshot well under the migration's 2MB bucket
 // cap regardless of the submitter's real screen resolution/DPI -- a 4K
@@ -45,6 +55,49 @@ const MAX_SCREENSHOT_WIDTH = 1600
 const JPEG_QUALITY = 0.72
 
 interface Rect { x: number; y: number; w: number; h: number }
+
+// Real gap Dustin flagged 2026-09-30: a feedback report only ever carried
+// the CURRENT page's path/title, nothing about what the reporter actually
+// did to get there or what was genuinely on screen -- a much thinner
+// record than what Ask Eva/Me-Mo capture (their own continuous, server-
+// side screen-trace log, see lab_manager memory
+// ask_eva_screen_trace_moment_by_moment). That exact mechanism doesn't
+// port directly -- it depends on a per-conversation server process neither
+// this hosted, multi-tenant Supabase app has -- but the real underlying
+// need (know what the reporter was actually looking at and how they got
+// there) does. Scoped to what fits this architecture: a small recent-
+// navigation breadcrumb kept in sessionStorage (no new table, no ongoing
+// server load) plus the current page's real rendered text, both folded
+// into the same `context` JSONB column that already exists -- readable by
+// whoever's diagnosing without needing a screenshot to have been attached
+// at all.
+const BREADCRUMB_KEY = 'openlpm:recent_pages'
+const BREADCRUMB_MAX = 8
+const VISIBLE_TEXT_MAX = 3000
+
+interface PageVisit { path: string; title: string; at: string }
+
+function recordVisit(path: string, title: string) {
+  try {
+    const raw = sessionStorage.getItem(BREADCRUMB_KEY)
+    const list: PageVisit[] = raw ? JSON.parse(raw) : []
+    if (list[list.length - 1]?.path !== path) list.push({ path, title, at: new Date().toISOString() })
+    while (list.length > BREADCRUMB_MAX) list.shift()
+    sessionStorage.setItem(BREADCRUMB_KEY, JSON.stringify(list))
+  } catch {
+    // Private window / blocked storage -- the breadcrumb just won't
+    // accumulate; feedback still works without it.
+  }
+}
+
+function readBreadcrumb(): PageVisit[] {
+  try {
+    const raw = sessionStorage.getItem(BREADCRUMB_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
 
 export function FeedbackWidget() {
   const location = useLocation()
@@ -56,12 +109,25 @@ export function FeedbackWidget() {
   const [comment, setComment] = useState('')
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<{ text: string; ok: boolean } | null>(null)
+  // Hides the panel during capture without unmounting it -- unmounting via
+  // `open` would null out canvasRef right when the capture needs to draw
+  // into it (a real bug in this fix's own first draft, caught before
+  // shipping: setOpen(false) removes the panel from the tree entirely, so
+  // canvasRef.current is null the moment html2canvas resolves).
+  const [capturing, setCapturing] = useState(false)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rawImageRef = useRef<HTMLImageElement | null>(null)
   const rectsRef = useRef<Rect[]>([])
   const dragStartRef = useRef<Rect | null>(null)
   const [hasScreenshot, setHasScreenshot] = useState(false)
+
+  // Records every real navigation for the breadcrumb, mounted once at the
+  // app shell level (DashboardLayout) so it tracks the whole session, not
+  // just whatever pages happen to be visited while the panel is open.
+  useEffect(() => {
+    recordVisit(location.pathname, document.title)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!open) {
@@ -88,46 +154,29 @@ export function FeedbackWidget() {
     rectsRef.current.forEach((r) => ctx.strokeRect(r.x, r.y, r.w, r.h))
   }
 
-  // Same real bug Ask Eva hit and fixed live (eva-graph 4cbc4a3): drawing
-  // the captured stream before a real decoded frame has been presented
-  // produces a solid black/blank capture with no error at all --
-  // requestVideoFrameCallback is the correct primitive for "a real frame
-  // exists now", not just loadedmetadata (which only guarantees dimensions).
+  // Rasterizes the actual page behind the feedback panel. The panel itself
+  // is temporarily hidden during capture (setOpen(false) + a tick to let
+  // it unmount) so the screenshot shows what the reporter was looking at,
+  // not the feedback form covering it -- confirmed necessary live: without
+  // this the very first capture attempt just photographed the panel itself.
   const captureScreenshot = async () => {
-    let stream: MediaStream
+    setCapturing(true)
+    await new Promise((r) => setTimeout(r, 60))
     try {
-      stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { displaySurface: 'browser' } as MediaTrackConstraints,
-        audio: false,
-        // @ts-expect-error -- preferCurrentTab is real (Chrome/Edge) but not yet in lib.dom's MediaStreamConstraints
-        preferCurrentTab: true,
+      const shot = await html2canvas(document.body, {
+        useCORS: true,
+        logging: false,
+        backgroundColor: null,
+        // Real screens run well past 1600px logical width on a 2x/3x
+        // display -- capture at native pixel density, downscale happens
+        // separately at upload time (compressForUpload).
+        scale: Math.min(window.devicePixelRatio || 1, 2),
       })
-    } catch {
-      // Cancelling the picker is the ordinary case, not an error worth
-      // surfacing -- the rest of the form still works.
-      return
-    }
-    try {
-      const video = document.createElement('video')
-      video.muted = true
-      video.srcObject = stream
-      await new Promise<void>((resolve, reject) => {
-        video.onloadedmetadata = () => resolve()
-        video.onerror = () => reject(new Error('video element could not load the captured stream'))
-      })
-      await video.play()
-      if ('requestVideoFrameCallback' in video) {
-        await new Promise<void>((resolve) => (video as any).requestVideoFrameCallback(() => resolve()))
-      } else {
-        await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
-      }
-      if (!video.videoWidth || !video.videoHeight) throw new Error('the captured frame has no size yet')
-
       const canvas = canvasRef.current!
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
+      canvas.width = shot.width
+      canvas.height = shot.height
       const ctx = canvas.getContext('2d')!
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+      ctx.drawImage(shot, 0, 0)
 
       const img = new Image()
       await new Promise<void>((resolve) => {
@@ -144,7 +193,7 @@ export function FeedbackWidget() {
         ok: false,
       })
     } finally {
-      stream.getTracks().forEach((t) => t.stop())
+      setCapturing(false)
     }
   }
 
@@ -216,7 +265,21 @@ export function FeedbackWidget() {
     const rest = match ? ((match.params as { '*'?: string })['*'] || '') : ''
     const page = projectSlug ? rest.split('/')[0] || 'overview' : location.pathname === '/dashboard' ? 'project-switcher' : location.pathname.replace('/dashboard/', '')
     const pageTitle = document.title
-    return { path: location.pathname, project_slug: projectSlug, page, page_title: pageTitle }
+    // The panel itself is hidden (display:none) while capturing/submitting
+    // isn't relevant here, but reading innerText right now -- before the
+    // panel opened -- would miss whatever the reporter is describing, so
+    // this deliberately reads document.body as-is, panel included; the
+    // panel's own form labels ("What's going on?" etc.) are a small,
+    // harmless prefix, not worth special-casing out.
+    const visibleText = document.body.innerText.replace(/\s+/g, ' ').trim().slice(0, VISIBLE_TEXT_MAX)
+    return {
+      path: location.pathname,
+      project_slug: projectSlug,
+      page,
+      page_title: pageTitle,
+      visible_text: visibleText,
+      recent_pages: readBreadcrumb(),
+    }
   }
 
   const submit = async () => {
@@ -285,7 +348,7 @@ export function FeedbackWidget() {
   }
 
   return (
-    <div className="feedback-panel card">
+    <div className="feedback-panel card" style={capturing ? { display: 'none' } : undefined}>
       <div className="feedback-header">
         <span className="feedback-title">
           <MessageSquareText size={16} />
@@ -318,43 +381,48 @@ export function FeedbackWidget() {
           maxLength={2000}
         />
 
-        {!hasScreenshot ? (
+        {!hasScreenshot && (
           <button
             type="button"
             className="btn btn-mini"
             style={{ marginTop: 8 }}
             onClick={captureScreenshot}
             disabled={!CAPTURE_SUPPORTED}
-            title={CAPTURE_SUPPORTED ? undefined : 'Needs a desktop browser (Chrome or Edge) over a secure connection'}
           >
             <Camera size={12} />
             Add a screenshot
           </button>
-        ) : (
-          <div style={{ marginTop: 8 }}>
-            <p className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
-              Drag on the image to highlight the part you mean.
-            </p>
-            <canvas
-              ref={canvasRef}
-              className="feedback-screenshot-canvas"
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={endDrag}
-              onPointerCancel={endDrag}
-            />
-            <div className="row" style={{ gap: 6, marginTop: 6 }}>
-              <button type="button" className="btn btn-mini" onClick={captureScreenshot}>
-                <RotateCcw size={12} />
-                Retake
-              </button>
-              <button type="button" className="btn btn-mini" onClick={resetScreenshot}>
-                <Trash2 size={12} />
-                Remove
-              </button>
-            </div>
-          </div>
         )}
+        {/* The canvas is ALWAYS mounted, just hidden until there's
+            something to show -- the real bug this replaces: it used to
+            only exist in the DOM once hasScreenshot was already true, so
+            captureScreenshot's very first run always found canvasRef.current
+            null (every attempt, every browser, not a mobile-only issue) --
+            confirmed live, this is what "couldn't capture the screenshot"
+            actually was. */}
+        <div style={{ marginTop: 8, display: hasScreenshot ? 'block' : 'none' }}>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+            Drag on the image to highlight the part you mean.
+          </p>
+          <canvas
+            ref={canvasRef}
+            className="feedback-screenshot-canvas"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+          />
+          <div className="row" style={{ gap: 6, marginTop: 6 }}>
+            <button type="button" className="btn btn-mini" onClick={captureScreenshot}>
+              <RotateCcw size={12} />
+              Retake
+            </button>
+            <button type="button" className="btn btn-mini" onClick={resetScreenshot}>
+              <Trash2 size={12} />
+              Remove
+            </button>
+          </div>
+        </div>
 
         {result && <div className={`notice ${result.ok ? 'notice-ok' : 'notice-bad'}`} style={{ marginTop: 8 }}>{result.text}</div>}
 
