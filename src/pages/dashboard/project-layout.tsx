@@ -202,9 +202,20 @@ export default function ProjectLayout() {
         </aside>
         <div className="project-main">
           {canManage && (
-            <div className="notice" style={{ marginBottom: 12 }}>
-              Vorschau: So sehen echte Studierende diesen Bereich.{' '}
-              <button type="button" className="btn-linklike" onClick={exitPreview}>Zur vollen Forschungsansicht</button>
+            // Real bug reported live 2026-09-30: the exit was a small text
+            // link inside a thin gray notice bar -- easy to miss entirely
+            // next to the student view's own bright colored cards/headers,
+            // and once missed, sessionStorage keeps the preview flag set
+            // for that whole browser tab, making it look like there's no
+            // way back at all. Sticky, high-contrast, a real button, and
+            // repeated on every student page (this shell wraps all of
+            // them) -- not something to have to scroll up and hunt for.
+            <div className="preview-exit-bar">
+              <span>👁 You&apos;re previewing this as a student would see it.</span>
+              <button type="button" className="btn btn-primary btn-mini" onClick={exitPreview}>
+                <ArrowLeft size={12} />
+                Exit preview — back to the full researcher view
+              </button>
             </div>
           )}
           <Outlet context={context} />

@@ -470,6 +470,19 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 
 .student-shell .project-side { background: var(--surface-2); }
 
+/* Real bug fixed live 2026-09-30: the old exit control (a small text link
+   in a thin gray bar) was easy to miss against the student view's own
+   bright content, which made it look like there was no way back to the
+   researcher view at all once the preview flag was set. Sticky + high-
+   contrast + a real button fixes that -- always visible regardless of
+   scroll position, on every student page. */
+.preview-exit-bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  background: rgb(var(--warning-rgb) / 0.18); border: 1px solid var(--warning);
+  border-radius: 8px; padding: 8px 12px; margin-bottom: 16px; font-size: 13px; font-weight: 600;
+}
+
 /* The prompt generator's numbered 2-column card layout, matching EvoMentor
    DE v1.2's real "① LERNZIEL-AUSWAHL / ② UNTERRICHTSRAHMEN / ..." grid. */
 .student-prompt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
