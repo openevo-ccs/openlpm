@@ -39,3 +39,6 @@ supabase/.temp/
 
 # Supabase CLI credentials -- never commit (personal access token, DB password)
 .supabase-secrets/
+
+# layout_check screenshots/audits -- generated, not committed
+layout_check/out/
