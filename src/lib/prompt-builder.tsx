@@ -1,6 +1,6 @@
 import type { Database } from './supabase/database.types'
 import type { PromptOptionLists, PromptTemplateLibraryRow, SectionLabels } from './supabase/prompt-libraries'
-import { bkEntries } from './supabase/basiskonzepte'
+import { bkEntries, type BkGroup } from './supabase/basiskonzepte'
 
 type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
 
@@ -46,12 +46,22 @@ export function defaultConfig(options: PromptOptionLists): Config {
 export function buildPrompt(
   items: DataObject[],
   cfg: Config,
-  bkIds: string[],
+  bkGroups: BkGroup[],
   library: PromptTemplateLibraryRow,
   labels: SectionLabels,
   options: PromptOptionLists,
   bkLabels: Record<string, string>
 ): string {
+  // Real bug found live 2026-09-30, reported with a screenshot: the real
+  // Thuringia data has more than one raw id spelling for the same
+  // Basiskonzept (see groupBkIdsByRoot's own comment in basiskonzepte.ts).
+  // Iterating the raw id list here used to print the same real concept
+  // twice in the generated prompt's own "concept focus" section, each with
+  // its own independently-set (and possibly different) prior-knowledge
+  // level -- confusing for whoever reads the generated prompt, and simply
+  // wrong as a summary of what's actually being taught. bkGroups collapses
+  // that before it ever reaches the generated text.
+  const allRawIds = new Set(bkGroups.flatMap((g) => g.rawIds))
   const lines: string[] = []
   lines.push('='.repeat(70))
   lines.push(labels.title)
@@ -63,9 +73,9 @@ export function buildPrompt(
   lines.push(`${labels.grade_label} ${cfg.klassenstufe || '—'}    ${labels.hours_label} ${cfg.stunden} × ${cfg.stundenformat}`)
   lines.push('')
   lines.push(labels.concepts_section)
-  for (const bkId of bkIds) {
-    const vw = options.prior_knowledge_levels.find((v) => v[0] === (cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]))
-    lines.push(`- ${bkLabels[bkId] ?? bkId}: ${vw ? vw[1] : '—'}`)
+  for (const g of bkGroups) {
+    const vw = options.prior_knowledge_levels.find((v) => v[0] === (cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]))
+    lines.push(`- ${g.label}: ${vw ? vw[1] : '—'}`)
   }
   if (cfg.fachNotizen) lines.push(`${labels.extra_focus_label} ${cfg.fachNotizen}`)
   lines.push('')
@@ -76,7 +86,7 @@ export function buildPrompt(
     lines.push(`\n[${item.id.slice(0, 8)}] ${item.title} (${item.grade_band ?? '?'})`)
     lines.push(`  ${labels.statement_label} ${c?.originaltext ?? item.description ?? ''}`)
     for (const entry of bkEntries(item.content)) {
-      if (!bkIds.includes(entry.basiskonzept_id)) continue
+      if (!allRawIds.has(entry.basiskonzept_id)) continue
       lines.push(`  ${bkLabels[entry.basiskonzept_id] ?? entry.basiskonzept_id} (${labels.relevance_label} ${entry.relevanz_beurteilung}/3): ${entry.begruendung}`)
       const uk = (entry.relevante_unterkonzepte_taxonomie ?? []).map((u) => u.value)
       if (uk.length) lines.push(`    ${labels.subconcepts_label} ${uk.join(', ')}`)

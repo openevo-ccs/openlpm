@@ -19,7 +19,7 @@ import {
 } from '@/lib/supabase/prompt-libraries'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
 import { buildPrompt, defaultConfig, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
@@ -91,10 +91,11 @@ export default function PromptGeneratorPage() {
   }, [items])
 
   const bkLabels = useMemo(() => buildBkLabelMap(bkIds, rootConcepts), [bkIds, rootConcepts])
+  const bkGroups = useMemo(() => groupBkIdsByRoot(bkIds, rootConcepts), [bkIds, rootConcepts])
 
   const promptText = useMemo(
-    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, bkIds, library, labels, options, bkLabels) : ''),
-    [items, cfg, bkIds, library, labels, options, bkLabels]
+    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, bkGroups, library, labels, options, bkLabels) : ''),
+    [items, cfg, bkGroups, library, labels, options, bkLabels]
   )
 
   const reloadExperiments = () => portfolioId && listPromptExperiments(supabase, portfolioId).then(setExperiments)
@@ -172,13 +173,13 @@ export default function PromptGeneratorPage() {
             </div>
 
             <h3>Concept focus & prior knowledge</h3>
-            {bkIds.length === 0 && <p className="muted">No concept tags found on the selected items.</p>}
-            {bkIds.map((bkId) => (
-              <div key={bkId} className="field">
-                <label>{bkLabels[bkId] ?? bkId}</label>
+            {bkGroups.length === 0 && <p className="muted">No concept tags found on the selected items.</p>}
+            {bkGroups.map((g) => (
+              <div key={g.rootId} className="field">
+                <label>{g.label}</label>
                 <select
-                  value={cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]}
-                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [bkId]: e.target.value } })}
+                  value={cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]}
+                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: e.target.value } })}
                 >
                   {options.prior_knowledge_levels.map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>

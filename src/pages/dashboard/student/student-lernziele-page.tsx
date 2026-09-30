@@ -15,7 +15,7 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
-import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
 import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
 
 // The German, student-facing Lernziele explorer -- same real data as the
@@ -66,6 +66,19 @@ export default function StudentLernzielePage() {
     return Array.from(ids)
   }, [contentById])
   const bkLabels = useMemo(() => buildBkLabelMap(allBkIds, rootConcepts), [allBkIds, rootConcepts])
+  // Real bug found live 2026-09-30, reported with a screenshot: the real
+  // Thuringia data has more than one raw id spelling for the same
+  // Basiskonzept (see groupBkIdsByRoot's own comment) -- rendering one
+  // filter checkbox per raw id showed "Evolutive Entwicklung" twice, in two
+  // different colors. The filter itself now operates on the resolved root
+  // concept, not the raw string, so ticking one box catches a Lernziel
+  // regardless of which raw id spelling its own entry happens to use.
+  const bkGroups = useMemo(() => groupBkIdsByRoot(allBkIds, rootConcepts), [allBkIds, rootConcepts])
+  const rawIdToGroupKey = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const g of bkGroups) for (const rawId of g.rawIds) map.set(rawId, g.rootId)
+    return map
+  }, [bkGroups])
 
   const grades = useMemo(() => {
     const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
@@ -81,12 +94,12 @@ export default function StudentLernzielePage() {
       if (favoritesOnly && !favorites.has(t.id)) return false
       if (conceptFilter.size > 0) {
         const entries = bkEntries(contentById.get(t.id))
-        if (!entries.some((e) => conceptFilter.has(e.basiskonzept_id))) return false
+        if (!entries.some((e) => conceptFilter.has(rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id))) return false
       }
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, gradeFilter, favoritesOnly, favorites, conceptFilter, contentById])
+  }, [topics, query, gradeFilter, favoritesOnly, favorites, conceptFilter, contentById, rawIdToGroupKey])
 
   const toggleConcept = (bkId: string) => {
     setConceptFilter((prev) => {
@@ -131,13 +144,23 @@ export default function StudentLernzielePage() {
 
           <p className="muted student-filter-label">BASISKONZEPTE &amp; RELEVANZ</p>
           <div className="student-concept-filter">
-            {allBkIds.map((bkId, i) => (
-              <label key={bkId} className="row" style={{ gap: 6, fontSize: 12.5, marginBottom: 4, cursor: 'pointer' }}>
-                <input type="checkbox" checked={conceptFilter.has(bkId)} onChange={() => toggleConcept(bkId)} />
-                <span className={`bk-dot bk-dot-${i % 6}`} />
-                {bkLabels[bkId] ?? bkId}
-              </label>
-            ))}
+            {bkGroups.map((g) => {
+              // Color by the concept's own real position among rootConcepts
+              // (same order used everywhere else it's colored -- Dashboard,
+              // Detail, Netz), not by this deduped list's own order -- the
+              // other real bug in the same screenshot report: the two
+              // duplicate rows for "Evolutive Entwicklung" showed up in two
+              // DIFFERENT colors, because color used to be assigned by
+              // position in an arbitrary, insertion-ordered raw-id list.
+              const rootIdx = rootConcepts.findIndex((r) => r.id === g.rootId)
+              return (
+                <label key={g.rootId} className="row" style={{ gap: 6, fontSize: 12.5, marginBottom: 4, cursor: 'pointer' }}>
+                  <input type="checkbox" checked={conceptFilter.has(g.rootId)} onChange={() => toggleConcept(g.rootId)} />
+                  <span className={`bk-dot bk-dot-${rootIdx >= 0 ? rootIdx % 6 : 0}`} />
+                  {g.label}
+                </label>
+              )
+            })}
           </div>
 
           <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>

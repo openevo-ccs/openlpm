@@ -94,6 +94,38 @@ export function buildBkLabelMap(bkIds: string[], rootConcepts: { id: string; lab
   return map
 }
 
+export interface BkGroup { rootId: string; label: string; rawIds: string[] }
+
+/**
+ * Groups every distinct raw basiskonzept_id actually seen in a project's
+ * content by which REAL root concept it resolves to. Real gap found live
+ * 2026-09-30, reported directly by Dustin with a screenshot: a raw-id list
+ * on its own can hold more than one spelling for the very same concept --
+ * the "weird code" fix above means a UUID-shaped id (a stray one exists in
+ * the real Thuringia data, see buildBkLabelMap's own comment) now resolves
+ * to the correct German label, but a checkbox/selector list built by
+ * rendering "one row per raw id" then shows that one real Basiskonzept
+ * TWICE, with two different colors -- a real regression this introduced
+ * even though each individual label is now correct. Anything building a
+ * concept checkbox list or selector from a raw id list should group through
+ * this first, not map over the raw ids directly. An id that resolves to
+ * nothing keeps its own singleton group (same fallback buildBkLabelMap uses
+ * -- still visible, never silently dropped).
+ */
+export function groupBkIdsByRoot(rawIds: string[], rootConcepts: { id: string; label: string }[]): BkGroup[] {
+  const resolvedLabel = buildBkLabelMap(rawIds, rootConcepts)
+  const labelToRoot = new Map(rootConcepts.map((r) => [r.label, r]))
+  const byKey = new Map<string, BkGroup>()
+  for (const rawId of rawIds) {
+    const label = resolvedLabel[rawId]
+    const root = label ? labelToRoot.get(label) : undefined
+    const key = root?.id ?? rawId
+    if (!byKey.has(key)) byKey.set(key, { rootId: key, label: root?.label ?? rawId, rawIds: [] })
+    byKey.get(key)!.rawIds.push(rawId)
+  }
+  return Array.from(byKey.values())
+}
+
 /**
  * A short (<=8-char) abbreviation for a Basiskonzept label, for compact UI
  * (chips, legends) where the full German name doesn't fit -- "Struktur und

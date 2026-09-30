@@ -4,7 +4,7 @@ import { Copy, Save } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
-import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
 import { buildPrompt, defaultConfig, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { listFavoriteIds } from '@/lib/supabase/favorites'
@@ -106,13 +106,14 @@ export default function StudentPromptPage() {
     return Array.from(ids).sort()
   }, [items])
   const bkLabels = useMemo(() => buildBkLabelMap(bkIds, rootConcepts), [bkIds, rootConcepts])
+  const bkGroups = useMemo(() => groupBkIdsByRoot(bkIds, rootConcepts), [bkIds, rootConcepts])
 
   const options = useMemo(() => (library ? resolveOptionLists(library.option_lists) : null), [library])
   const labels = useMemo(() => (library ? resolveSectionLabels(library.section_labels) : null), [library])
 
   const promptText = useMemo(
-    () => (items.length && cfg && library && labels && options ? buildPrompt(items, cfg, bkIds, library, labels, options, bkLabels) : ''),
-    [items, cfg, bkIds, library, labels, options, bkLabels]
+    () => (items.length && cfg && library && labels && options ? buildPrompt(items, cfg, bkGroups, library, labels, options, bkLabels) : ''),
+    [items, cfg, bkGroups, library, labels, options, bkLabels]
   )
 
   const reloadExperiments = () => userId && listProjectPromptExperiments(supabase, project.id, userId).then(setExperiments)
@@ -199,15 +200,15 @@ export default function StudentPromptPage() {
 
         <div className="card student-prompt-card">
           <h3><span className="num">3</span>Basiskonzeptbezug &amp; Vorwissen</h3>
-          {bkIds.length === 0 ? (
+          {bkGroups.length === 0 ? (
             <p className="muted">Keine Basiskonzept-Bezüge in den ausgewählten Lernzielen gefunden.</p>
           ) : (
-            bkIds.map((bkId) => (
-              <div key={bkId} className="field">
-                <label>{bkLabels[bkId] ?? bkId} — Vorwissen</label>
+            bkGroups.map((g) => (
+              <div key={g.rootId} className="field">
+                <label>{g.label} — Vorwissen</label>
                 <select
-                  value={cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]}
-                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [bkId]: e.target.value } })}
+                  value={cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]}
+                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: e.target.value } })}
                 >
                   {options.prior_knowledge_levels.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                 </select>
