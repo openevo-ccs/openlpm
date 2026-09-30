@@ -397,3 +397,61 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   .feedback-panel { left: 8px; right: 8px; bottom: 8px; width: auto; }
   .feedback-launcher { right: 12px; bottom: 12px; }
 }
+
+/* ============================================================================
+   Student view (Uni Jena pilot) -- a deliberately narrower, German-language
+   presentation of the same real data, modeled on EvoMentor DE v1.2's own
+   sidebar grouping and card layout. Reuses --map-1..6 (the same 6-color
+   rotating palette the researcher Concepts graph already uses) for
+   Basiskonzept color-coding, rather than a second palette.
+   ============================================================================ */
+
+.student-nav { display: flex; flex-direction: column; gap: 2px; margin-top: 10px; }
+.student-nav a { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 13.5px; }
+.student-nav a:hover { background: var(--surface-1); }
+.student-nav a.active { background: var(--surface-2); color: var(--series-a); font-weight: 600; }
+.student-nav-group { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; margin: 12px 0 2px; }
+.student-nav-group:first-child { margin-top: 0; }
+
+.student-page h1 { margin-bottom: 2px; }
+
+.student-lernziele-layout { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: start; }
+.student-filters { position: sticky; top: 0; }
+.student-filter-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 6px; }
+.student-concept-filter { display: flex; flex-direction: column; }
+.student-lernziele-main { display: flex; gap: 16px; min-width: 0; }
+.student-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; flex: 1; align-content: start; }
+.student-lz-card { cursor: pointer; margin-bottom: 0; transition: border-color 0.12s; }
+.student-lz-card:hover { border-color: var(--series-a); }
+
+.chip-btn {
+  border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px;
+  padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--text-primary);
+}
+.chip-btn.active { background: var(--series-a); color: #fff; border-color: var(--series-a); }
+
+.bk-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.bk-dot-0 { background: var(--map-1); } .bk-dot-1 { background: var(--map-2); } .bk-dot-2 { background: var(--map-3); }
+.bk-dot-3 { background: var(--map-4); } .bk-dot-4 { background: var(--map-5); } .bk-dot-5 { background: var(--map-6); }
+
+.student-shell .project-side { background: var(--surface-2); }
+
+/* The prompt generator's numbered 2-column card layout, matching EvoMentor
+   DE v1.2's real "① LERNZIEL-AUSWAHL / ② UNTERRICHTSRAHMEN / ..." grid. */
+.student-prompt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.student-prompt-card h3 { display: flex; align-items: center; gap: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--series-a); }
+.student-prompt-card .num {
+  width: 20px; height: 20px; border-radius: 50%; background: var(--series-a); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;
+}
+
+.bk-stat-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.bk-stat-tile { text-align: center; }
+.bk-stat-tile .n { font-size: 26px; font-weight: 700; }
+.bk-stat-tile .l { font-size: 11.5px; color: var(--text-muted); }
+
+@media (max-width: 760px) {
+  .student-lernziele-layout { grid-template-columns: 1fr; }
+  .student-lernziele-main { flex-direction: column; }
+  .student-prompt-grid { grid-template-columns: 1fr; }
+}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FolderKanban, Plus } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
@@ -18,6 +18,7 @@ const CURATION_GLOSS: Record<Curation, string> = {
 
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
+  const navigate = useNavigate()
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
   // Both on by default -- this only narrows the view, never hides a project
   // space a user hasn't deliberately chosen to filter out.
@@ -29,7 +30,19 @@ export default function ProjectSwitcherPage() {
     getUserProjects(supabase).then(setMemberships)
   }, [supabase])
 
-  if (memberships === null) {
+  // A real student who's only ever joined one group (the common case --
+  // this is exactly the Jena pilot's own shape) shouldn't have to pick from
+  // a switcher with one tile in it every time they sign in -- send them
+  // straight to it. Someone in more than one project space still lands here
+  // to choose, same as before. "All project spaces" stays one click away
+  // from inside that project, so this is a default, not a dead end.
+  useEffect(() => {
+    if (memberships?.length === 1) {
+      navigate(`/dashboard/${memberships[0].project.slug}`, { replace: true })
+    }
+  }, [memberships, navigate])
+
+  if (memberships === null || memberships.length === 1) {
     return <p className="muted">Loading…</p>
   }
 

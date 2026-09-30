@@ -1,0 +1,315 @@
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
+import { ArrowRight, ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
+import type { ProjectOutletContext } from '../project-layout'
+import {
+  getAssertedConnections,
+  getFullThread,
+  getThreadStationsForTopic,
+  getTopic,
+  listTopics,
+  type DataObjectRow,
+  type FullThread,
+  type ResolvedConnection,
+  type ThreadStationWithThread,
+  type TopicListItem,
+} from '@/lib/supabase/curriculum'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
+
+// The German, student-facing Lernziele explorer -- same real data as the
+// researcher Learning Goals page (same listTopics/getTopic/thread helpers),
+// a deliberately simpler presentation modeled directly on EvoMentor DE
+// v1.2's own real "Lernziele" screen: grade-band chips, a concept-relevance
+// filter, a card grid with per-concept relevance dots, and favoriting --
+// none of which the researcher-facing page has, by design (it's built for
+// browsing/importing/connecting, not for a student picking what to study).
+
+function gradeChipLabel(g: string): string {
+  return `Kl. ${g}`
+}
+
+export default function StudentLernzielePage() {
+  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+  const { objectId } = useParams<{ objectId?: string }>()
+  const navigate = useNavigate()
+
+  const [topics, setTopics] = useState<TopicListItem[] | null>(null)
+  const [fullById, setFullById] = useState<Map<string, DataObjectRow>>(new Map())
+  const [query, setQuery] = useState('')
+  const [gradeFilter, setGradeFilter] = useState<string>('all')
+  const [conceptFilter, setConceptFilter] = useState<Set<string>>(new Set())
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [rootConcepts, setRootConcepts] = useState<{ label: string }[]>([])
+
+  useEffect(() => {
+    setTopics(null)
+    listTopics(supabase, project.id, defaultBranchId).then(setTopics)
+    listFavoriteIds(supabase).then(setFavorites)
+    getRootConcepts(supabase, project).then(setRootConcepts)
+  }, [supabase, project.id, defaultBranchId])
+
+  // The list view deliberately doesn't carry `content` (300+ rows), but
+  // per-concept relevance dots need it -- fetched lazily, once, for
+  // whichever topics are actually on screen, and cached so paging through
+  // grade filters doesn't re-fetch.
+  useEffect(() => {
+    if (!topics) return
+    const missing = topics.filter((t) => !fullById.has(t.id))
+    if (missing.length === 0) return
+    Promise.all(missing.map((t) => getTopic(supabase, t.id))).then((rows) => {
+      setFullById((prev) => {
+        const next = new Map(prev)
+        for (const r of rows) if (r) next.set(r.id, r)
+        return next
+      })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topics])
+
+  const allBkIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const obj of fullById.values()) for (const e of bkEntries(obj.content)) ids.add(e.basiskonzept_id)
+    return Array.from(ids)
+  }, [fullById])
+  const bkLabels = useMemo(() => buildBkLabelMap(allBkIds, rootConcepts), [allBkIds, rootConcepts])
+
+  const grades = useMemo(() => {
+    const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
+    const leadingNumber = (s: string) => parseInt(s, 10) || 0
+    return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
+  }, [topics])
+
+  const filtered = useMemo(() => {
+    if (!topics) return []
+    const q = query.trim().toLowerCase()
+    return topics.filter((t) => {
+      if (gradeFilter !== 'all' && t.grade_band !== gradeFilter) return false
+      if (favoritesOnly && !favorites.has(t.id)) return false
+      if (conceptFilter.size > 0) {
+        const full = fullById.get(t.id)
+        const entries = full ? bkEntries(full.content) : []
+        if (!entries.some((e) => conceptFilter.has(e.basiskonzept_id))) return false
+      }
+      if (!q) return true
+      return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
+    })
+  }, [topics, query, gradeFilter, favoritesOnly, favorites, conceptFilter, fullById])
+
+  const toggleConcept = (bkId: string) => {
+    setConceptFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(bkId)) next.delete(bkId)
+      else next.add(bkId)
+      return next
+    })
+  }
+
+  const onToggleFavorite = async (id: string) => {
+    const isFav = favorites.has(id)
+    setFavorites((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(id)
+      else next.add(id)
+      return next
+    })
+    await toggleFavorite(supabase, id, isFav)
+  }
+
+  return (
+    <div className="student-page">
+      <h1>Lernziele</h1>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
+      </p>
+
+      <div className="student-lernziele-layout">
+        <aside className="student-filters">
+          <div className="field">
+            <div className="row"><Search size={14} style={{ color: 'var(--text-muted)' }} /><input type="search" placeholder="Suchen…" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
+          </div>
+
+          <p className="muted student-filter-label">KLASSENSTUFE</p>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+            <button className={`chip-btn${gradeFilter === 'all' ? ' active' : ''}`} onClick={() => setGradeFilter('all')}>Alle</button>
+            {grades.map((g) => (
+              <button key={g} className={`chip-btn${gradeFilter === g ? ' active' : ''}`} onClick={() => setGradeFilter(g)}>{gradeChipLabel(g)}</button>
+            ))}
+          </div>
+
+          <p className="muted student-filter-label">BASISKONZEPTE &amp; RELEVANZ</p>
+          <div className="student-concept-filter">
+            {allBkIds.map((bkId, i) => (
+              <label key={bkId} className="row" style={{ gap: 6, fontSize: 12.5, marginBottom: 4, cursor: 'pointer' }}>
+                <input type="checkbox" checked={conceptFilter.has(bkId)} onChange={() => toggleConcept(bkId)} />
+                <span className={`bk-dot bk-dot-${i % 6}`} />
+                {bkLabels[bkId] ?? bkId}
+              </label>
+            ))}
+          </div>
+
+          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
+            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
+            <Star size={13} />nur Favoriten
+          </label>
+        </aside>
+
+        <div className="student-lernziele-main">
+          <div className="student-card-grid">
+            {topics === null ? (
+              <p className="muted">Lädt…</p>
+            ) : filtered.length === 0 ? (
+              <div className="card empty">
+                <Compass size={28} />
+                <p>Keine Lernziele gefunden.</p>
+              </div>
+            ) : (
+              filtered.map((t) => {
+                const full = fullById.get(t.id)
+                const entries = full ? bkEntries(full.content) : []
+                return (
+                  <div key={t.id} className="card student-lz-card" onClick={() => navigate(`/dashboard/${project.slug}/${t.id}`)}>
+                    <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <span className="chip">{gradeChipLabel(t.grade_band ?? '?')}</span>
+                      <button
+                        className="btn-linklike"
+                        aria-label="Favorit"
+                        onClick={(e) => { e.stopPropagation(); onToggleFavorite(t.id) }}
+                      >
+                        <Star size={16} fill={favorites.has(t.id) ? 'var(--series-a, gold)' : 'none'} />
+                      </button>
+                    </div>
+                    <strong style={{ display: 'block', marginTop: 6 }}>{t.title}</strong>
+                    {t.description && <p className="muted" style={{ fontSize: 12.5 }}>{t.description}</p>}
+                    {entries.length > 0 && (
+                      <div className="row" style={{ flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+                        {entries.map((e) => (
+                          <span key={e.basiskonzept_id} className="row" style={{ gap: 3, fontSize: 11 }} title={bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}>
+                            {bkAbbreviation(bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id)}
+                            <span style={{ letterSpacing: 1 }}>{'●'.repeat(e.relevanz_beurteilung)}{'○'.repeat(3 - e.relevanz_beurteilung)}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {objectId && (
+            <div className="drawer-shell wide">
+              <div className="drawer">
+                <StudentTopicDetail objectId={objectId} projectSlug={project.slug} supabase={supabase} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StudentTopicDetail({
+  objectId,
+  projectSlug,
+  supabase,
+}: {
+  objectId: string
+  projectSlug: string
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const navigate = useNavigate()
+  const [topic, setTopic] = useState<DataObjectRow | null | undefined>(undefined)
+  const [connections, setConnections] = useState<ResolvedConnection[] | null>(null)
+  const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
+
+  useEffect(() => {
+    setTopic(undefined)
+    setConnections(null)
+    setStations(null)
+    getTopic(supabase, objectId).then(setTopic)
+    getAssertedConnections(supabase, objectId).then(setConnections)
+    getThreadStationsForTopic(supabase, objectId).then(setStations)
+  }, [supabase, objectId])
+
+  if (topic === undefined) return <p className="muted">Lädt…</p>
+  if (topic === null) return <div className="notice notice-bad">Lernziel nicht gefunden.</div>
+
+  const before = (connections ?? []).filter((c) => c.direction === 'incoming')
+  const after = (connections ?? []).filter((c) => c.direction === 'outgoing')
+
+  return (
+    <div>
+      <h2 style={{ marginBottom: 2 }}>{topic.title}</h2>
+      {topic.description && (
+        <blockquote style={{ margin: '8px 0 16px', paddingLeft: 10, borderLeft: '3px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13 }}>
+          &bdquo;{topic.description}&ldquo;
+        </blockquote>
+      )}
+
+      {(before.length > 0 || after.length > 0) && (
+        <section style={{ marginBottom: 18 }}>
+          <h3>Reihenfolge im Lehrplan</h3>
+          <p className="muted" style={{ marginTop: -4 }}>So ordnet der Lehrplan selbst diese Lernziele an.</p>
+          {before.map((c) => (
+            <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
+              <span className="muted" style={{ fontSize: 12 }}>Davor</span>
+              <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
+            </button>
+          ))}
+          {after.map((c) => (
+            <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
+              <span className="muted" style={{ fontSize: 12 }}>Danach</span>
+              <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {stations && stations.length > 0 && stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+
+      {connections?.length === 0 && stations?.length === 0 && <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>}
+    </div>
+  )
+}
+
+function StudentThreadCard({ station, supabase }: { station: ThreadStationWithThread; supabase: ProjectOutletContext['supabase'] }) {
+  const [expanded, setExpanded] = useState(false)
+  const [full, setFull] = useState<FullThread | null>(null)
+  const hubLabel = station.thread.explained_by?.label ?? null
+
+  const toggle = async () => {
+    if (!expanded && !full) setFull(await getFullThread(supabase, station.thread_id))
+    setExpanded((v) => !v)
+  }
+
+  return (
+    <div className="card conn-suggested" style={{ marginBottom: 10 }}>
+      {hubLabel && <span className="muted" style={{ fontSize: 12 }}>Verbunden durch: {hubLabel}</span>}
+      <h3 style={{ marginTop: 8, marginBottom: 4 }}>{station.thread.title}</h3>
+      <p style={{ marginBottom: 8 }}>{station.role_note}</p>
+      <button className="btn btn-mini" onClick={toggle}>
+        {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        {expanded ? 'Erklärung ausblenden' : 'Warum hängt das zusammen?'}
+      </button>
+      {expanded && (
+        <div style={{ marginTop: 12 }}>
+          <p><strong>Verbindende Idee:</strong> {station.thread.connecting_idea}</p>
+          <p>{station.thread.narrative}</p>
+          {full && (
+            <ol className="thread-path">
+              {full.stations.map((st) => (
+                <li key={st.id} className="thread-station">
+                  <strong>{st.object.title}</strong>
+                  <p className="muted" style={{ margin: '2px 0 0' }}>{st.role_note}</p>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}

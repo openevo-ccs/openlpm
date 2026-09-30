@@ -36,7 +36,11 @@ export async function selfJoinProject(supabase: Client, projectId: string, role:
   } = await supabase.auth.getUser()
   if (!user) return { error: new Error('Sign in required') }
 
-  const { error } = await supabase.from('project_members').insert({ project_id: projectId, user_id: user.id, role })
+  // joined_via (migration 039) isn't in the generated types yet -- same
+  // not-regenerated-until-real-deploy situation as project_join_rules itself.
+  const { error } = await (supabase as any)
+    .from('project_members')
+    .insert({ project_id: projectId, user_id: user.id, role, joined_via: 'self_join_rule' })
   if (!error) {
     await logActivity(supabase, { projectId, actionType: 'member_self_joined', details: { role } })
   }

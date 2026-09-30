@@ -19,6 +19,8 @@ import {
 } from '@/lib/supabase/prompt-libraries'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
+import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { buildPrompt, defaultConfig, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
 // generalized the same week (2026-09-18 ask): "think about how other users
@@ -55,164 +57,6 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
 
-interface BkbEntry {
-  basiskonzept_id: string
-  relevanz_beurteilung: number
-  begruendung: string
-  relevante_unterkonzepte_taxonomie?: { value: string }[]
-  relevante_evolutionskonzepte_taxonomie?: { value: string }[]
-}
-
-interface Config {
-  klassenstufe: string
-  stunden: number
-  stundenformat: string
-  vorwissenByBk: Record<string, string>
-  fachNotizen: string
-  methoden: string[]
-  differenzierung: string[]
-  didNotizen: string
-  bewertung: string[]
-  evalNotizen: string
-  kontext: string[]
-  kontextNotizen: string
-  ausgabeTyp: string[]
-  ton: string
-  laenge: string
-  sonstigeNotizen: string
-}
-
-function defaultConfig(options: PromptOptionLists): Config {
-  return {
-    klassenstufe: '', stunden: 4, stundenformat: '45',
-    vorwissenByBk: {}, fachNotizen: '',
-    methoden: [], differenzierung: [], didNotizen: '',
-    bewertung: [...options.default_assessment], evalNotizen: '',
-    kontext: [], kontextNotizen: '',
-    ausgabeTyp: [...options.default_output_types],
-    ton: options.default_tone, laenge: options.default_length, sonstigeNotizen: '',
-  }
-}
-
-function bkEntries(obj: DataObject): BkbEntry[] {
-  return ((obj.content as any)?.basiskonzeptbezug ?? []) as BkbEntry[]
-}
-
-// The six-Basiskonzept ids inside content.basiskonzeptbezug (bk_struktur_
-// funktion, bk_evolutive_entwicklung, etc.) are EvoMentor DE's own original
-// identifiers, baked into the imported curriculum data -- confirmed live
-// 2026-09-30, these were showing up raw in the generated prompt and on
-// screen with no lookup anywhere in this file. There's no slug column on
-// lpm_schema_elements to join against directly, and a strict re-slugify of
-// a label (lowercase, drop "und", join with "_") doesn't reliably invert
-// back to the original id -- "Stoff- und Energieumwandlung" -> real id
-// bk_stoff_energie_umwandlung has an extra word-break inside the compound
-// noun "Energieumwandlung" that a mechanical transform can't predict.
-// Token-matching instead: split the id into its underscore-separated
-// tokens and require ALL of them to appear as substrings of a real root
-// concept's own label (normalized: lowercase, umlauts folded, non-letters
-// stripped). Works for the real Thuringia case and degrades honestly (the
-// raw id, not a wrong label) for any project that doesn't have a matching
-// root concept -- not a hardcoded Thuringia-specific table.
-function normalizeGerman(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-    .replace(/[^a-z0-9]+/g, '')
-}
-
-function buildBkLabelMap(bkIds: string[], rootConcepts: { label: string }[]): Record<string, string> {
-  const normalized = rootConcepts.map((c) => ({ label: c.label, norm: normalizeGerman(c.label) }))
-  const map: Record<string, string> = {}
-  for (const id of bkIds) {
-    const tokens = id.replace(/^bk_/, '').split('_').filter(Boolean)
-    const match = normalized.find((c) => tokens.every((t) => c.norm.includes(t)))
-    if (match) map[id] = match.label
-  }
-  return map
-}
-
-function buildPrompt(
-  items: DataObject[],
-  cfg: Config,
-  bkIds: string[],
-  library: PromptTemplateLibraryRow,
-  labels: SectionLabels,
-  options: PromptOptionLists,
-  bkLabels: Record<string, string>
-): string {
-  const lines: string[] = []
-  lines.push('='.repeat(70))
-  lines.push(labels.title)
-  lines.push('='.repeat(70))
-  lines.push('')
-  lines.push(library.role_preamble)
-  lines.push(library.instruction_preamble)
-  lines.push('')
-  lines.push(`${labels.grade_label} ${cfg.klassenstufe || '—'}    ${labels.hours_label} ${cfg.stunden} × ${cfg.stundenformat}`)
-  lines.push('')
-  lines.push(labels.concepts_section)
-  for (const bkId of bkIds) {
-    const vw = options.prior_knowledge_levels.find((v) => v[0] === (cfg.vorwissenByBk[bkId] ?? options.prior_knowledge_levels[1]?.[0]))
-    lines.push(`- ${bkLabels[bkId] ?? bkId}: ${vw ? vw[1] : '—'}`)
-  }
-  if (cfg.fachNotizen) lines.push(`${labels.extra_focus_label} ${cfg.fachNotizen}`)
-  lines.push('')
-  lines.push(`${labels.items_section} (${items.length}):`)
-  lines.push('-'.repeat(70))
-  for (const item of items) {
-    const c = item.content as any
-    lines.push(`\n[${item.id.slice(0, 8)}] ${item.title} (${item.grade_band ?? '?'})`)
-    lines.push(`  ${labels.statement_label} ${c?.originaltext ?? item.description ?? ''}`)
-    for (const entry of bkEntries(item)) {
-      if (!bkIds.includes(entry.basiskonzept_id)) continue
-      lines.push(`  ${bkLabels[entry.basiskonzept_id] ?? entry.basiskonzept_id} (${labels.relevance_label} ${entry.relevanz_beurteilung}/3): ${entry.begruendung}`)
-      const uk = (entry.relevante_unterkonzepte_taxonomie ?? []).map((u) => u.value)
-      if (uk.length) lines.push(`    ${labels.subconcepts_label} ${uk.join(', ')}`)
-      const ek = (entry.relevante_evolutionskonzepte_taxonomie ?? []).map((e) => e.value)
-      if (ek.length) lines.push(`    ${labels.evoconcepts_label} ${ek.join(', ')}`)
-    }
-    if (c?.didaktische_strategien) {
-      const ds = c.didaktische_strategien
-      if (ds.evolutionsdidaktischer_impuls) lines.push(`  ${ds.evolutionsdidaktischer_impuls}`)
-      if (ds.top3_methoden?.length) lines.push(`  ${labels.methods_section} ${ds.top3_methoden.map((m: any) => m.methode).join(', ')}`)
-      if (ds.moegliche_fehlvorstellungen) lines.push(`  ${ds.moegliche_fehlvorstellungen}`)
-    }
-  }
-  lines.push('')
-  lines.push('-'.repeat(70))
-  if (cfg.methoden.length) lines.push(`${labels.methods_section} ${cfg.methoden.join(', ')}`)
-  if (cfg.differenzierung.length) lines.push(`${labels.differentiation_section} ${cfg.differenzierung.join(', ')}`)
-  if (cfg.didNotizen) lines.push(`${labels.didactic_notes_label} ${cfg.didNotizen}`)
-  if (cfg.bewertung.length) lines.push(`${labels.assessment_section} ${cfg.bewertung.join(', ')}`)
-  if (cfg.evalNotizen) lines.push(`${labels.eval_notes_label} ${cfg.evalNotizen}`)
-  if (cfg.kontext.length) lines.push(`${labels.context_section} ${cfg.kontext.join(', ')}`)
-  if (cfg.kontextNotizen) lines.push(`${labels.context_notes_label} ${cfg.kontextNotizen}`)
-  lines.push('')
-  lines.push(labels.output_section)
-  lines.push(`- ${labels.tone_label} ${cfg.ton}, ${labels.length_label} ${cfg.laenge}`)
-  for (const t of cfg.ausgabeTyp) lines.push(`- ${t}`)
-  if (cfg.sonstigeNotizen) lines.push(`- ${labels.other_notes_label} ${cfg.sonstigeNotizen}`)
-  return lines.join('\n')
-}
-
-function toggle(list: string[], value: string): string[] {
-  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
-}
-
-function CheckGroup({ options, selected, onToggle }: { options: string[]; selected: string[]; onToggle: (v: string) => void }) {
-  return (
-    <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
-      {options.map((o) => (
-        <label key={o} className="row" style={{ gap: 4, fontSize: 12 }}>
-          <input type="checkbox" checked={selected.includes(o)} onChange={() => onToggle(o)} />
-          {o}
-        </label>
-      ))}
-    </div>
-  )
-}
-
 export default function PromptGeneratorPage() {
   const { project, slug, supabase } = useOutletContext<ProjectOutletContext>()
   const { portfolioId } = useParams<{ portfolioId: string }>()
@@ -234,17 +78,7 @@ export default function PromptGeneratorPage() {
       setLibrary(lib)
       if (lib) setCfg(defaultConfig(resolveOptionLists(lib.option_lists)))
     })
-    // Same parent-project union concepts-page.tsx already uses (a regional
-    // sub-project's own taxonomy is normally empty; the real one lives on
-    // the parent) -- needed here too, so a Basiskonzept id can resolve to
-    // its real label regardless of which project level actually holds it.
-    const taxonomyProjectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
-    supabase
-      .from('lpm_schema_elements')
-      .select('label, parent_id')
-      .in('project_id', taxonomyProjectIds)
-      .is('parent_id', null)
-      .then(({ data }) => setRootConcepts(data ?? []))
+    getRootConcepts(supabase, project).then(setRootConcepts)
   }, [supabase, portfolioId, project])
 
   const options = useMemo(() => (library ? resolveOptionLists(library.option_lists) : null), [library])
@@ -252,7 +86,7 @@ export default function PromptGeneratorPage() {
 
   const bkIds = useMemo(() => {
     const ids = new Set<string>()
-    for (const item of items ?? []) for (const e of bkEntries(item)) ids.add(e.basiskonzept_id)
+    for (const item of items ?? []) for (const e of bkEntries(item.content)) ids.add(e.basiskonzept_id)
     return Array.from(ids).sort()
   }, [items])
 
@@ -358,9 +192,9 @@ export default function PromptGeneratorPage() {
             </div>
 
             <h3>Methods & differentiation</h3>
-            <CheckGroup options={options.methods} selected={cfg.methoden} onToggle={(v) => setCfg({ ...cfg, methoden: toggle(cfg.methoden, v) })} />
+            <CheckGroup options={options.methods} selected={cfg.methoden} onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })} />
             <div style={{ marginTop: 8 }}>
-              <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggle(cfg.differenzierung, v) })} />
+              <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggleInList(cfg.differenzierung, v) })} />
             </div>
             <div className="field" style={{ marginTop: 8 }}>
               <label>Teaching notes</label>
@@ -368,14 +202,14 @@ export default function PromptGeneratorPage() {
             </div>
 
             <h3>Assessment</h3>
-            <CheckGroup options={options.assessment} selected={cfg.bewertung} onToggle={(v) => setCfg({ ...cfg, bewertung: toggle(cfg.bewertung, v) })} />
+            <CheckGroup options={options.assessment} selected={cfg.bewertung} onToggle={(v) => setCfg({ ...cfg, bewertung: toggleInList(cfg.bewertung, v) })} />
             <div className="field" style={{ marginTop: 8 }}>
               <label>Assessment notes</label>
               <textarea value={cfg.evalNotizen} onChange={(e) => setCfg({ ...cfg, evalNotizen: e.target.value })} />
             </div>
 
             <h3>Societal context</h3>
-            <CheckGroup options={options.societal_context} selected={cfg.kontext} onToggle={(v) => setCfg({ ...cfg, kontext: toggle(cfg.kontext, v) })} />
+            <CheckGroup options={options.societal_context} selected={cfg.kontext} onToggle={(v) => setCfg({ ...cfg, kontext: toggleInList(cfg.kontext, v) })} />
             <div className="field" style={{ marginTop: 8 }}>
               <label>Further notes</label>
               <textarea value={cfg.kontextNotizen} onChange={(e) => setCfg({ ...cfg, kontextNotizen: e.target.value })} />
@@ -400,7 +234,7 @@ export default function PromptGeneratorPage() {
                 </select>
               </div>
             </div>
-            <CheckGroup options={options.output_types} selected={cfg.ausgabeTyp} onToggle={(v) => setCfg({ ...cfg, ausgabeTyp: toggle(cfg.ausgabeTyp, v) })} />
+            <CheckGroup options={options.output_types} selected={cfg.ausgabeTyp} onToggle={(v) => setCfg({ ...cfg, ausgabeTyp: toggleInList(cfg.ausgabeTyp, v) })} />
             <div className="field" style={{ marginTop: 8 }}>
               <label>Other notes</label>
               <textarea value={cfg.sonstigeNotizen} onChange={(e) => setCfg({ ...cfg, sonstigeNotizen: e.target.value })} />
@@ -438,7 +272,7 @@ export default function PromptGeneratorPage() {
   )
 }
 
-function ExperimentCard({
+export function ExperimentCard({
   experiment,
   supabase,
   isOwner,

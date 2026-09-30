@@ -57,26 +57,27 @@ export async function getUserProjects(supabase: Client): Promise<ProjectWithRole
 export async function getProjectBySlug(
   supabase: Client,
   slug: string
-): Promise<{ project: ProjectRow | null; role: ProjectMemberRole | null }> {
+): Promise<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null }> {
   const { data: project } = await supabase
     .from('projects')
     .select('*')
     .eq('slug', slug)
     .maybeSingle()
 
-  if (!project) return { project: null, role: null }
+  if (!project) return { project: null, role: null, joinedVia: null }
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return { project, role: null }
+  if (!user) return { project, role: null, joinedVia: null }
 
-  const { data: membership } = await supabase
+  // joined_via (migration 039) isn't in the generated types yet.
+  const { data: membership } = await (supabase as any)
     .from('project_members')
-    .select('role')
+    .select('role, joined_via')
     .eq('project_id', project.id)
     .eq('user_id', user.id)
     .maybeSingle()
 
-  return { project, role: membership?.role ?? null }
+  return { project, role: membership?.role ?? null, joinedVia: membership?.joined_via ?? null }
 }

@@ -37,6 +37,24 @@ export async function listPromptExperiments(supabase: Client, portfolioId: strin
   return data ?? []
 }
 
+/**
+ * The student Prompt Generator has no Notebook to scope by -- portfolio_id
+ * is null by design there (see migration 027's own comment anticipating
+ * exactly this). Scoped instead to the project and the signed-in user's own
+ * saved prompts, matching a Notebook's private-by-default spirit without
+ * needing one.
+ */
+export async function listProjectPromptExperiments(supabase: Client, projectId: string, userId: string) {
+  const { data } = await supabase
+    .from('prompt_experiments')
+    .select('*')
+    .eq('project_id', projectId)
+    .is('portfolio_id', null)
+    .eq('created_by', userId)
+    .order('created_at', { ascending: false })
+  return data ?? []
+}
+
 export async function createPromptExperiment(
   supabase: Client,
   values: Database['public']['Tables']['prompt_experiments']['Insert']

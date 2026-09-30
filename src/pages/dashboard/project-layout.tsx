@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Outlet, useParams } from 'react-router-dom'
+import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Lightbulb, MessageSquare, Network, ShieldAlert, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
@@ -8,6 +8,7 @@ import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav } from '@/components/project-nav'
 import { LpmSearchBar } from '@/components/lpm-search-bar'
+import { StudentNav } from './student/student-nav'
 
 export interface ProjectOutletContext {
   project: ProjectRow
@@ -20,12 +21,20 @@ export interface ProjectOutletContext {
   // shown, so a Project's Learning Goals/Analytics/Review tabs work the
   // moment you open the Project, with nothing extra to understand first.
   defaultBranchId: string
+  // True for a member who self-joined via a domain/email rule (migration
+  // 035/039) and holds a base role, OR an owner/maintainer explicitly
+  // previewing that experience (?view=student). Drives which sidebar/pages
+  // render -- see the branch below. Never true for an owner/maintainer's
+  // own real session, so an instructor can never be accidentally locked
+  // into the simplified view.
+  isStudentView: boolean
 }
 
 export default function ProjectLayout() {
   const { project: slug } = useParams<{ project: string }>()
+  const [searchParams] = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
-  const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null } | null>(null)
+  const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null } | null>(null)
   const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
   const [defaultBranchId, setDefaultBranchId] = useState<string | null>(null)
 
@@ -62,7 +71,7 @@ export default function ProjectLayout() {
     return <p className="muted">Loading…</p>
   }
 
-  const { project, role } = state
+  const { project, role, joinedVia } = state
 
   if (!project) {
     return (
@@ -122,8 +131,40 @@ export default function ProjectLayout() {
     { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
   ]
 
-  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId }
+  const canManage = role === 'owner' || role === 'maintainer'
+  // A real self-joined member (migration 039) always gets the simple view --
+  // never a toggle they could get lost in. An owner/maintainer gets the
+  // full researcher view by default and can preview the other one with
+  // ?view=student; nobody else can use that param to change anything, since
+  // isStudentView never grants a permission, only picks a presentation.
+  const isStudentView = joinedVia === 'self_join_rule' && !canManage ? true : canManage && searchParams.get('view') === 'student'
+
+  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView }
   const isSpace = !project.parent_project_id
+
+  if (isStudentView) {
+    return (
+      <div className="project-shell student-shell">
+        <aside className="project-side">
+          <Link to="/dashboard" className="row muted">
+            <ArrowLeft size={14} />
+            Alle Bereiche
+          </Link>
+          <h2 style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
+          <StudentNav slug={slug} />
+        </aside>
+        <div className="project-main">
+          {canManage && (
+            <div className="notice" style={{ marginBottom: 12 }}>
+              Vorschau: So sehen echte Studierende diesen Bereich.{' '}
+              <Link to={`/dashboard/${slug}`}>Zur vollen Forschungsansicht</Link>
+            </div>
+          )}
+          <Outlet context={context} />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="project-shell">
@@ -146,6 +187,11 @@ export default function ProjectLayout() {
           <MaturityBadge status={project.maturity} />
           <WorkingLanguagesTag languages={project.working_languages} />
         </div>
+        {canManage && (
+          <Link to={`/dashboard/${slug}?view=student`} className="btn btn-mini" style={{ marginTop: 8 }}>
+            Preview as student
+          </Link>
+        )}
         <ProjectNav items={nav} />
       </aside>
 
