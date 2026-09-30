@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
-import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
+import cytoscape, { type ElementDefinition } from 'cytoscape'
 import { Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { bkAbbreviation, bkEntries, getRootConcepts } from '@/lib/supabase/basiskonzepte'
-import { listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
+import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
@@ -72,7 +72,7 @@ export default function StudentBasiskonzeptePage() {
       </div>
 
       {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
-      {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} />}
+      {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} contentById={contentById} />}
       {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} />}
     </div>
   )
@@ -160,29 +160,51 @@ function looksLikeBk(bkId: string, label: string): boolean {
 }
 
 // ============================================================================
-// Netz: the improved graph -- real Basiskonzept<->Lernziel edges (from
-// lpm_thread_stations.via_element_id, migration 010's real coherence-thread
-// data), not just a static 6-node Basiskonzept-to-Basiskonzept network the
-// way EvoMentor DE's own "Netz" tab is limited to. Colored by which
-// Basiskonzept a Lernziel connects through, sized by how many real
-// connections touch it. A growth-over-time strip beneath it plots real
-// lpm_threads.created_at timestamps -- the class's own coherence work
-// filling in over the semester, not a synthetic demo metric.
+// Netz: Basiskonzepte pinned to a fixed top row, each one's own real
+// Lernziele arranged in tiered/staggered rows beneath it -- Dustin's own
+// explicit, twice-given spec (live feedback 2026-09-30: "basiskonzepte
+// appear as disconnected islands... arranged as nodes on an upper row...
+// lernziele links arranged systematically... in tiered/staggering rows
+// below"). Positions are computed explicitly (Cytoscape's 'preset' layout),
+// not left to a force-directed physics simulation -- the previous 'cose'
+// layout treated each Basiskonzept's star of Lernziel connections as its own
+// disconnected component (there's no real bk-to-bk edge in the base data),
+// which is exactly what a physics layout does with disconnected components:
+// scatters them, unpredictably from render to render.
+//
+// The dashed gray arcs between Basiskonzepte ARE new, and they're real, not
+// fabricated: two Lernziele under different Basiskonzepte that have a real,
+// accepted curriculum connection between them (lpm_connections) count as one
+// piece of evidence those two Basiskonzepte relate. The number on each arc is
+// that real count. This is a DERIVED aggregate, not a first-class OpenLPM
+// construct -- see the crosswalk note atop lib/supabase/basiskonzepte.ts.
+//
+// The solid colored spokes are unchanged from before: real Basiskonzept<->
+// Lernziel edges from lpm_thread_stations.via_element_id (migration 010's
+// real coherence-thread data), colored by which Basiskonzept a Lernziel
+// connects through. Tapping a Lernziel node opens its own detail page. A
+// growth-over-time strip beneath it plots real lpm_threads.created_at
+// timestamps -- the class's own coherence work filling in over the
+// semester, not a synthetic demo metric.
 // ============================================================================
 
 function NetzTab({
   project,
   supabase,
   rootConcepts,
+  contentById,
 }: {
   project: ProjectOutletContext['project']
   supabase: ProjectOutletContext['supabase']
   rootConcepts: SchemaElement[]
+  contentById: Map<string, unknown>
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   const [threads, setThreads] = useState<
     { id: string; created_at: string; title: string; stations: { data_object_id: string; via_element_id: string | null; object_title: string }[] }[] | null
   >(null)
+  const [connections, setConnections] = useState<{ from_object_id: string; to_object_id: string }[] | null>(null)
 
   useEffect(() => {
     const projectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
@@ -208,37 +230,140 @@ function NetzTab({
   }, [supabase, project])
 
   useEffect(() => {
-    if (!containerRef.current || !threads) return
-    const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
-    const bkNodeIds = new Set<string>()
-    const lzNodeIds = new Map<string, string>() // data_object_id -> title
-    const edges: { source: string; target: string; color: string }[] = []
+    listAcceptedConnections(supabase, project.id).then(setConnections)
+  }, [supabase, project.id])
 
+  // Real, derived Basiskonzept<->Basiskonzept relation -- see the crosswalk
+  // comment block above this component. First tried as arced lines drawn
+  // straight into the graph, arcing above a Basiskonzept row that sits too
+  // close to the top of the canvas to fit them -- confirmed visually messy
+  // live (a tangle of overlapping loops), Dustin's own read matched mine.
+  // A short list below the graph carries the same real, counted data
+  // without fighting bezier-curve geometry over six closely-spaced nodes.
+  const derivedRelations = useMemo(() => {
+    if (!connections || rootConcepts.length === 0) return []
+    // Real bug found live 2026-09-30: every Lernziel carries a
+    // basiskonzeptbezug entry for ALL SIX Basiskonzepte (a relevance rating
+    // 0-3 against each one, not just its own "primary" concept) -- counting
+    // every one of those as "this Lernziel belongs to that Basiskonzept"
+    // made every pair's count identical (746 for all 15 possible pairs, the
+    // same connection total inflated by the full 6x6 cross product every
+    // time). Only a high-relevance rating (3/3) counts as real, meaningful
+    // membership -- the same threshold the Dashboard tab's own relevance
+    // table already uses (looksLikeBk's caller, above).
+    const bkIdsForObject = new Map<string, string[]>()
+    for (const [objId, content] of contentById.entries()) {
+      bkIdsForObject.set(objId, bkEntries(content).filter((e) => e.relevanz_beurteilung === 3).map((e) => e.basiskonzept_id))
+    }
+    const allBkIds = Array.from(new Set(Array.from(bkIdsForObject.values()).flat()))
+    const resolvedLabel = buildBkLabelMap(allBkIds, rootConcepts)
+    const labelToRoot = new Map(rootConcepts.map((r, i) => [r.label, { id: r.id, label: r.label, i }]))
+    const pairCounts = new Map<string, number>()
+    for (const conn of connections) {
+      const fromRoots = new Set((bkIdsForObject.get(conn.from_object_id) ?? []).map((id) => labelToRoot.get(resolvedLabel[id] ?? '')).filter((v): v is NonNullable<typeof v> => !!v))
+      const toRoots = new Set((bkIdsForObject.get(conn.to_object_id) ?? []).map((id) => labelToRoot.get(resolvedLabel[id] ?? '')).filter((v): v is NonNullable<typeof v> => !!v))
+      for (const a of fromRoots) {
+        for (const b of toRoots) {
+          if (a.id === b.id) continue
+          const key = [a.id, b.id].sort().join('|')
+          pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1)
+        }
+      }
+    }
+    const byId = new Map(rootConcepts.map((r, i) => [r.id, { label: r.label, i }]))
+    return Array.from(pairCounts.entries())
+      .map(([key, count]) => {
+        const [aId, bId] = key.split('|')
+        const a = byId.get(aId)!
+        const b = byId.get(bId)!
+        return { aId, aLabel: a.label, aColor: cssVar(MAP_PALETTE[a.i % 6], '#999'), bId, bLabel: b.label, bColor: cssVar(MAP_PALETTE[b.i % 6], '#999'), count }
+      })
+      .sort((x, y) => y.count - x.count)
+  }, [connections, rootConcepts, contentById])
+
+  useEffect(() => {
+    if (!containerRef.current || !threads || rootConcepts.length === 0) return
+    const width = containerRef.current.clientWidth || 900
+    const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
+
+    // Real weighted relevance (relevanz_beurteilung, 0-3) between a specific
+    // Lernziel and a specific Basiskonzept -- the same field the Lernziele
+    // cards' own relevance dots already show. Requested live 2026-09-30: the
+    // spokes below used to all render at the same weight regardless of how
+    // relevant that particular Lernziel actually is to that Basiskonzept, as
+    // if a coherence thread being accepted at all said everything -- it
+    // doesn't say how strongly the two relate. Resolved once against every
+    // real basiskonzept_id in the project's content, same matcher as
+    // everywhere else this gets translated (see buildBkLabelMap).
+    const allBkIds = Array.from(new Set(Array.from(contentById.values()).flatMap((c) => bkEntries(c).map((e) => e.basiskonzept_id))))
+    const resolvedLabel = buildBkLabelMap(allBkIds, rootConcepts)
+    const relevanceFor = (dataObjectId: string, bkRootId: string): number => {
+      const rootLabel = rootConcepts.find((r) => r.id === bkRootId)?.label
+      const entry = bkEntries(contentById.get(dataObjectId)).find((e) => resolvedLabel[e.basiskonzept_id] === rootLabel)
+      return entry?.relevanz_beurteilung ?? 2
+    }
+
+    const leafTitle = new Map<string, string>()
+    const leavesByBk = new Map<string, string[]>()
+    const bkLeafEdges: { source: string; target: string; color: string; weight: number }[] = []
     for (const t of threads) {
       for (const s of t.stations) {
-        if (!s.via_element_id) continue
-        bkNodeIds.add(s.via_element_id)
-        lzNodeIds.set(s.data_object_id, s.object_title)
-        const idx = rootIndex.get(s.via_element_id) ?? 0
-        edges.push({ source: s.via_element_id, target: s.data_object_id, color: cssVar(MAP_PALETTE[idx % 6], '#999') })
+        if (!s.via_element_id || !rootIndex.has(s.via_element_id)) continue
+        leafTitle.set(s.data_object_id, s.object_title)
+        const idx = rootIndex.get(s.via_element_id)!
+        bkLeafEdges.push({
+          source: s.via_element_id,
+          target: s.data_object_id,
+          color: cssVar(MAP_PALETTE[idx % 6], '#999'),
+          weight: relevanceFor(s.data_object_id, s.via_element_id),
+        })
+        const arr = leavesByBk.get(s.via_element_id) ?? []
+        if (!arr.includes(s.data_object_id)) arr.push(s.data_object_id)
+        leavesByBk.set(s.via_element_id, arr)
       }
     }
 
+    // Deterministic positions: Basiskonzepte on a fixed row, each one's own
+    // Lernziele tiered in staggered rows beneath it.
+    const colWidth = width / rootConcepts.length
+    const rowY0 = 60
+    const positions = new Map<string, { x: number; y: number }>()
+    rootConcepts.forEach((c, i) => positions.set(c.id, { x: (i + 0.5) * colWidth, y: rowY0 }))
+    rootConcepts.forEach((c) => {
+      const leaves = leavesByBk.get(c.id) ?? []
+      const cols = Math.max(2, Math.min(4, Math.ceil(Math.sqrt(leaves.length || 1))))
+      const colW = Math.min(90, (colWidth - 16) / cols)
+      const rowHeight = 46
+      leaves.forEach((leafId, i) => {
+        const row = Math.floor(i / cols)
+        const col = i % cols
+        const rowLeaves = Math.min(cols, leaves.length - row * cols)
+        const rowWidth = rowLeaves * colW
+        const stagger = row % 2 === 1 ? colW / 2 : 0
+        const startX = positions.get(c.id)!.x - rowWidth / 2 + colW / 2 + stagger
+        positions.set(leafId, { x: startX + col * colW, y: rowY0 + 110 + row * rowHeight })
+      })
+    })
+
     const elements: ElementDefinition[] = [
       ...rootConcepts.map((c, i) => ({
-        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 40, kind: 'bk' },
+        data: { id: c.id, label: c.label, color: cssVar(MAP_PALETTE[i % 6], '#2a78d6'), size: 44, kind: 'bk' },
+        position: positions.get(c.id),
       })),
-      ...Array.from(lzNodeIds.entries()).map(([id, title]) => ({
-        data: { id, label: title.length > 28 ? title.slice(0, 26) + '…' : title, color: cssVar('--surface-1', '#eee'), size: 16, kind: 'lz' },
+      ...Array.from(leafTitle.entries()).map(([id, title]) => ({
+        data: { id, label: title.length > 26 ? title.slice(0, 24) + '…' : title, color: cssVar('--surface-1', '#eee'), size: 14, kind: 'lz' },
+        position: positions.get(id) ?? { x: width / 2, y: rowY0 + 110 },
       })),
-      ...edges.map((e, i) => ({ data: { id: `e-${i}`, source: e.source, target: e.target, color: e.color } })),
+      ...bkLeafEdges.map((e, i) => ({ data: { id: `lz-e-${i}`, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: 'lz-edge' } })),
     ]
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       boxSelectionEnabled: false,
-      layout: { name: 'cose', animate: false, nodeRepulsion: () => 8000 } as any,
+      layout: { name: 'preset' },
+      minZoom: 0.5,
+      maxZoom: 2,
       style: [
         {
           selector: 'node',
@@ -249,28 +374,32 @@ function NetzTab({
           },
         },
         {
-          // Real bug found live 2026-09-30: centering a wrapped multi-line
-          // label inside a small circle (Cytoscape's 'text-valign: center')
-          // clips unpredictably -- which label survives depends on where
-          // the force-directed layout happens to place that specific node,
-          // not on the label's own length, so widening text-max-width only
-          // ever fixed some labels and not others. Moved the label below
-          // the circle instead, the same safe position already used for
-          // the small Lernziel nodes (which never had this problem) --
-          // sidesteps circle-vs-text-box interaction entirely rather than
-          // continuing to tune widths against a layout that moves every
-          // render.
           selector: 'node[kind="bk"]',
           style: {
-            'font-size': 11, 'font-weight': 700, 'text-valign': 'bottom', 'text-margin-y': 6,
+            'font-size': 11, 'font-weight': 700, 'text-valign': 'top', 'text-margin-y': -8,
             'text-max-width': '100px', color: cssVar('--text-primary', '#0b0b0b'), 'text-outline-width': 0,
           },
         },
-        { selector: 'edge', style: { width: 1.5, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 0.55 } },
+        {
+          // Weighted by the real relevanz_beurteilung (0-3) between this
+          // specific Lernziel and this specific Basiskonzept -- a highly
+          // relevant pairing (3/3) draws a visibly thicker, more opaque
+          // spoke than a marginal one (1/3), instead of every accepted
+          // connection looking equally strong regardless of how relevant it
+          // actually is.
+          selector: 'edge[kind="lz-edge"]',
+          style: {
+            width: 'mapData(weight, 0, 3, 1, 4)', 'line-color': 'data(color)', 'curve-style': 'bezier',
+            'target-arrow-shape': 'none', opacity: 'mapData(weight, 0, 3, 0.25, 0.75)',
+          } as any,
+        },
       ],
     })
+    cy.on('tap', 'node[kind="lz"]', (evt) => navigate(`/dashboard/${project.slug}/${evt.target.id()}`))
+    cy.on('mouseover', 'node[kind="lz"]', () => { if (containerRef.current) containerRef.current.style.cursor = 'pointer' })
+    cy.on('mouseout', 'node[kind="lz"]', () => { if (containerRef.current) containerRef.current.style.cursor = '' })
     return () => cy.destroy()
-  }, [threads, rootConcepts])
+  }, [threads, rootConcepts, contentById, project.slug, navigate])
 
   const growthWeeks = useMemo(() => {
     if (!threads) return []
@@ -296,9 +425,32 @@ function NetzTab({
         <div ref={containerRef} style={{ height: 480 }} />
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
-        Große Kreise = Basiskonzepte. Kleine Punkte = einzelne Lernziele, verbunden über echte,
-        geprüfte Kohärenzfäden.
+        Große Kreise (obere Reihe) = Basiskonzepte. Kleine Punkte darunter = einzelne Lernziele,
+        verbunden über echte, geprüfte Kohärenzfäden. Dickere, kräftigere Linien = höhere
+        bewertete Relevanz zwischen Lernziel und Basiskonzept — antippen öffnet ein Lernziel.
       </p>
+
+      {derivedRelations.length > 0 && (
+        <div className="card">
+          <h3>Verwandte Basiskonzepte</h3>
+          <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
+            Wie oft echte, geprüfte Lehrplan-Verbindungen ein Lernziel aus dem einen Basiskonzept
+            mit einem Lernziel aus dem anderen verknüpfen.
+          </p>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+            {derivedRelations.map((r) => (
+              <span key={`${r.aId}-${r.bId}`} className="chip" style={{ fontSize: 12.5 }}>
+                <span className={`bk-dot`} style={{ background: r.aColor }} />
+                {r.aLabel}
+                <span className="muted" style={{ margin: '0 4px' }}>↔</span>
+                <span className={`bk-dot`} style={{ background: r.bColor }} />
+                {r.bLabel}
+                <span className="muted" style={{ marginLeft: 6 }}>× {r.count}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <h3>Wachstum über die Zeit</h3>

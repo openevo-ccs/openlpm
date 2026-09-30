@@ -42,7 +42,7 @@ export default function StudentLernzielePage() {
   const [conceptFilter, setConceptFilter] = useState<Set<string>>(new Set())
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
-  const [rootConcepts, setRootConcepts] = useState<{ label: string }[]>([])
+  const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
 
   useEffect(() => {
     setTopics(null)

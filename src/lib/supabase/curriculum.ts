@@ -62,6 +62,23 @@ export async function listTopicContents(supabase: Client, projectId: string): Pr
   return new Map((data ?? []).map((r) => [r.id, r.content]))
 }
 
+/**
+ * Every real, curriculum-asserted connection in a project -- one bulk query,
+ * same reasoning as listTopicContents above. Used by the student Netz tab to
+ * derive which Basiskonzepte genuinely relate to each other (two Lernziele
+ * under different Basiskonzepte, joined by a real accepted connection) --
+ * see the crosswalk note at the top of lib/supabase/basiskonzepte.ts for why
+ * that derived relation is never treated as a first-class OpenLPM construct.
+ */
+export async function listAcceptedConnections(supabase: Client, projectId: string): Promise<{ from_object_id: string; to_object_id: string }[]> {
+  const { data } = await supabase
+    .from('lpm_connections')
+    .select('from_object_id, to_object_id')
+    .eq('project_id', projectId)
+    .eq('status', 'accepted')
+  return data ?? []
+}
+
 export interface ResolvedConnection {
   connection: ConnectionRow
   direction: 'incoming' | 'outgoing'

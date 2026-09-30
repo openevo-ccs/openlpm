@@ -36,7 +36,7 @@ export default function StudentPromptPage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [fullById, setFullById] = useState<Map<string, DataObject>>(new Map())
   const [library, setLibrary] = useState<PromptTemplateLibraryRow | null | undefined>(undefined)
-  const [rootConcepts, setRootConcepts] = useState<{ label: string }[]>([])
+  const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
   const [cfg, setCfg] = useState<Config | null>(null)
   const [userId, setUserId] = useState<string>()
   const [experiments, setExperiments] = useState<PromptExperimentRow[]>([])

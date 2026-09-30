@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowRight, ChevronDown, ChevronUp, Compass, Info, Link2, Search } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Search } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { TabPanels } from '@/components/tab-panels'
 import {
@@ -61,14 +61,6 @@ export default function LearningGoalsPage() {
         Formally stated, officially recognized learning goals — standards and competency
         frameworks, mandated or optionally chosen within a given jurisdiction.
       </p>
-
-      <div className="notice">
-        <Info size={14} />
-        Real version lineage (which framework a goal came from, whether it's mandated or optional,
-        and comparing revisions of the same standard over time) needs the new standards_documents
-        schema, written but not yet live — see project notes. Browsing and importing real content
-        below already works.
-      </div>
 
       <TabPanels
         tabs={[

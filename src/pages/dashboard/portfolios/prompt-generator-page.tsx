@@ -67,7 +67,7 @@ export default function PromptGeneratorPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
-  const [rootConcepts, setRootConcepts] = useState<{ label: string }[]>([])
+  const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
 
   useEffect(() => {
     if (!portfolioId) return

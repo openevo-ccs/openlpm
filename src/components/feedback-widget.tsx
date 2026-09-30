@@ -171,6 +171,26 @@ export function FeedbackWidget() {
         // display -- capture at native pixel density, downscale happens
         // separately at upload time (compressForUpload).
         scale: Math.min(window.devicePixelRatio || 1, 2),
+        // Real bug found live 2026-09-30: capturing the full scrollable
+        // page (html2canvas's default against `document.body`) rasterizes
+        // its ENTIRE height, not just what's on screen -- on a long page
+        // (305 Lernziele cards) that's tens of thousands of pixels tall,
+        // past the browser's own hard canvas-size ceiling, which is exactly
+        // what "The object exceeded the maximum allowed size" is: the
+        // browser's own error for an over-limit canvas, not a bug in this
+        // code's own retry/compression logic (that only runs afterward).
+        // Clipping to the current viewport avoids the oversized canvas
+        // entirely, and also matches what a reporter actually means by
+        // "screenshot this" far better than the full page ever did --
+        // `windowWidth`/`windowHeight` still tell html2canvas the real
+        // document size so fixed/absolutely-positioned elements lay out
+        // correctly, without rendering any of the off-screen page into it.
+        x: window.scrollX,
+        y: window.scrollY,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
       })
       const canvas = canvasRef.current!
       canvas.width = shot.width

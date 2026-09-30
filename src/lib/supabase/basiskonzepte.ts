@@ -1,6 +1,44 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 
+// ============================================================================
+// Construct crosswalk -- core OpenLPM data model <-> the German, student-
+// facing UI's own vocabulary (student-nav.tsx, student-*-page.tsx). Kept
+// here, next to the functions that actually do the translating, so the
+// mapping can't quietly drift as the student UI grows. Every German label
+// below names a REAL OpenLPM table/column; nothing here is a student-UI-only
+// invention with no backing data.
+//
+//   OpenLPM construct (researcher UI)         Student UI (German)
+//   ---------------------------------         --------------------
+//   lpm_data_objects row                      ein Lernziel (Lernziele page)
+//   lpm_schema_elements, parent_id IS NULL     ein Basiskonzept (Basiskonzepte page)
+//   content.basiskonzeptbezug[] (JSONB)        Relevanz-Punkte je Basiskonzept
+//     .basiskonzept_id                           (see buildBkLabelMap below --
+//                                                  this is the one field that
+//                                                  needs translating, since it's
+//                                                  a free-text id from the
+//                                                  original EvoMentor DE import,
+//                                                  not a real foreign key)
+//   lpm_connections, status='accepted'         "Reihenfolge im Lehrplan"
+//                                                 (Davor/Danach, on a Lernziel's
+//                                                 own detail page)
+//   lpm_threads + lpm_thread_stations,         Kohärenzfäden / "Warum hängt
+//     status='accepted'                          das zusammen?" thread cards
+//   content.ist_konzeptanker (bool)            Konzeptanker badge
+//   content.ist_praktisch (bool)               "praktische Lernziele" stat
+//   content.geschaetzte_unterrichtsstunden     "Unterrichtsstunden gesamt" stat
+//
+// One thing on this list is NOT a first-class OpenLPM construct: the
+// Basiskonzept-to-Basiskonzept relation lines drawn in the Netz tab. There is
+// no `lpm_concept_relations` table (checked directly against the schema
+// 2026-09-30) -- those lines are a DERIVED aggregate over real, accepted
+// lpm_connections rows (two Lernziele under different Basiskonzepte having a
+// real asserted connection), computed client-side, never authored data.
+// Label them as derived wherever they appear -- don't let a reader mistake
+// them for a first-class relation OpenLPM itself stores.
+// ============================================================================
+
 type Client = SupabaseClient<Database>
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
@@ -36,10 +74,19 @@ export function normalizeGerman(s: string): string {
     .replace(/[^a-z0-9]+/g, '')
 }
 
-export function buildBkLabelMap(bkIds: string[], rootConcepts: { label: string }[]): Record<string, string> {
-  const normalized = rootConcepts.map((c) => ({ label: c.label, norm: normalizeGerman(c.label) }))
+export function buildBkLabelMap(bkIds: string[], rootConcepts: { id: string; label: string }[]): Record<string, string> {
+  const normalized = rootConcepts.map((c) => ({ id: c.id, label: c.label, norm: normalizeGerman(c.label) }))
   const map: Record<string, string> = {}
   for (const id of bkIds) {
+    // Real gap found live 2026-09-30 (reported as "weird code instead of the
+    // label"): at least one imported row's basiskonzeptbezug entry uses the
+    // Basiskonzept's own lpm_schema_elements.id (a raw UUID) instead of the
+    // "bk_xxx" string the rest of the import uses -- token-matching a UUID
+    // against a German label never matches anything, so it fell straight
+    // through to the raw id. Check for a direct id match first; only a value
+    // that matches NEITHER convention still falls back to the raw id.
+    const direct = normalized.find((c) => c.id === id)
+    if (direct) { map[id] = direct.label; continue }
     const tokens = id.replace(/^bk_/, '').split('_').filter(Boolean)
     const match = normalized.find((c) => tokens.every((t) => c.norm.includes(t)))
     if (match) map[id] = match.label
