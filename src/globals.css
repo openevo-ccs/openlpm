@@ -524,10 +524,19 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .bk-stat-tile .n { font-size: 26px; font-weight: 700; }
 .bk-stat-tile .l { font-size: 11.5px; color: var(--text-muted); }
 
+/* Netz tab control bar (level/size/density toggles + zoom buttons), added
+   2026-10-01 alongside the 3-tier Basiskonzept/Unterkonzept/Lernziel graph
+   -- a row of small groups that wraps on narrow screens rather than
+   squeezing the chip labels unreadably small. */
+.netz-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 10px; }
+.netz-control-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.netz-insights { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 4px; }
+
 @media (max-width: 760px) {
   .student-lernziele-layout { grid-template-columns: 1fr; }
   .student-lernziele-main { flex-direction: column; }
   .student-prompt-grid { grid-template-columns: 1fr; }
+  .netz-insights { grid-template-columns: 1fr; }
 }
 
 /* Real feedback 2a332362 (2026-10-01): OpenEvo/CCP/Bienenhaus/UniJena

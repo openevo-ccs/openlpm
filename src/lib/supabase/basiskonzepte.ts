@@ -192,3 +192,25 @@ export async function getConceptElementsById(
   const { data } = await supabase.from('lpm_schema_elements').select('*').in('project_id', projectIds)
   return new Map((data ?? []).map((row) => [row.id, row]))
 }
+
+/** 0 for a root Basiskonzept, 1 for a real Unterkonzept, 2 for its finer sub-concept. */
+export function elementDepth(id: string, byId: Map<string, SchemaElement>): number {
+  let depth = 0
+  let cur = byId.get(id)
+  while (cur?.parent_id) {
+    depth++
+    cur = byId.get(cur.parent_id)
+  }
+  return depth
+}
+
+/** Walks up from `id` to its ancestor at exactly `targetDepth` (e.g. depth 1 for a depth-2 node's real Unterkonzept parent). Undefined if `id` is already shallower than `targetDepth`. */
+export function ancestorAtDepth(id: string, targetDepth: number, byId: Map<string, SchemaElement>): SchemaElement | undefined {
+  let cur = byId.get(id)
+  let depth = elementDepth(id, byId)
+  while (cur && depth > targetDepth) {
+    cur = byId.get(cur.parent_id!)
+    depth--
+  }
+  return depth === targetDepth ? cur : undefined
+}

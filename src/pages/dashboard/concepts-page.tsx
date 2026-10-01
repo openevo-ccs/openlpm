@@ -144,6 +144,54 @@ function ConceptMapTab() {
         .in('project_id', taxonomyProjectIds)
         .order('created_at', { ascending: true })
 
+      // Real bug found live 2026-10-01 (Dustin, reported directly: "the
+      // list view has duplicates... the network graph frame makes little
+      // to no sense"): the hub project ("evomentor") has its own full copy
+      // of the 6 root Basiskonzepte (created 2026-09-12), separate from
+      // evomentor-thuringia's own copy -- querying project_id IN (hub,
+      // this project) therefore returns BOTH, 12 root rows for 6 real
+      // concepts. Invisible to a regular project member (RLS correctly
+      // hides hub-only rows from someone who isn't a hub member), which is
+      // why this sat unnoticed since 2026-09-12 -- only an owner/admin, who
+      // can see both, would ever see the duplication. The student-facing
+      // getRootConcepts (lib/supabase/basiskonzepte.ts) already solved this
+      // exact problem 2026-09-30 by deduping-by-label, preferring the
+      // current project's own row; this page did its own separate,
+      // un-deduped query and never got the same fix. Applying the identical
+      // rule here, on the raw taxonomy itself (not just a `roots` filter)
+      // so the graph and tree -- which both walk `taxonomy` directly, not
+      // just its root-level rows -- stop rendering the hub's orphaned,
+      // childless duplicates too.
+      //
+      // Found live while verifying this fix: the hub's own duplicate root
+      // ISN'T childless -- it has its own real sub-concepts too. Dropping
+      // only the duplicate root row left those children in `taxonomy`
+      // pointing at a parent_id that no longer existed, which crashed
+      // Cytoscape outright ("Can not create edge... with nonexistent
+      // source"). The whole dropped root's subtree has to go, not just the
+      // root row itself.
+      const dedupedTax = (() => {
+        const byId = new Map((tax ?? []).map((r) => [r.id, r]))
+        const byLabelAtRoot = new Map<string, string>() // label -> id of the kept root row
+        for (const row of tax ?? []) {
+          if (row.parent_id) continue
+          const existing = byLabelAtRoot.get(row.label)
+          if (!existing) { byLabelAtRoot.set(row.label, row.id); continue }
+          const existingRow = byId.get(existing)
+          if (existingRow && existingRow.project_id !== project.id && row.project_id === project.id) byLabelAtRoot.set(row.label, row.id)
+        }
+        const droppedRootIds = (tax ?? []).filter((r) => !r.parent_id && byLabelAtRoot.get(r.label) !== r.id).map((r) => r.id)
+        const droppedIds = new Set(droppedRootIds)
+        let grew = true
+        while (grew) {
+          grew = false
+          for (const row of tax ?? []) {
+            if (row.parent_id && droppedIds.has(row.parent_id) && !droppedIds.has(row.id)) { droppedIds.add(row.id); grew = true }
+          }
+        }
+        return (tax ?? []).filter((r) => !droppedIds.has(r.id))
+      })()
+
       const { data: kids } = await supabase
         .from('projects')
         .select('*')
@@ -196,7 +244,7 @@ function ConceptMapTab() {
         }
       }
 
-      setTaxonomy(tax ?? [])
+      setTaxonomy(dedupedTax)
       setChildren(kids ?? [])
       setHitsByTaxId(byTaxId)
       setHitsByBk(byBk)
@@ -271,7 +319,17 @@ function ConceptMapTab() {
             </thead>
             <tbody>
               {roots.map((bk) => {
-                const canonicalId = (bk.metadata as any)?.canonical_id
+                // Real bug found live 2026-10-01, surfaced by the dedup fix
+                // above: the hub's own copy of a root concept stores this
+                // cross-project lookup key under metadata.canonical_id, but
+                // evomentor-thuringia's own copy (the one now kept, since it
+                // has the real children) stores the SAME value under
+                // metadata.source_id instead -- two different field names
+                // for what every real Lernziel's basiskonzept_id actually
+                // matches against. Checking both keeps this table working
+                // regardless of which project's copy ends up being the one
+                // kept for a given root.
+                const canonicalId = (bk.metadata as any)?.canonical_id ?? (bk.metadata as any)?.source_id
                 const perProject = hitsByBk.get(canonicalId)
                 return (
                   <tr key={bk.id}>
