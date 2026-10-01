@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowLeft, Copy, Save, Trash2 } from 'lucide-react'
+import { ArrowLeft, Copy, Save, Send, Trash2 } from 'lucide-react'
+import { openMeMoTab, sendPromptToMeMo, type MemoBridgeError } from '@/lib/memo-bridge'
 import {
   createPromptExperiment,
   deletePromptExperiment,
@@ -66,6 +67,8 @@ export default function PromptGeneratorPage() {
   const [cfg, setCfg] = useState<Config | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [memoBusy, setMemoBusy] = useState(false)
+  const [memoError, setMemoError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
 
@@ -100,6 +103,32 @@ export default function PromptGeneratorPage() {
   )
 
   const reloadExperiments = () => portfolioId && listPromptExperiments(supabase, portfolioId).then(setExperiments)
+
+  const sendToMemo = async () => {
+    // Opened synchronously, inside the click, so the browser doesn't treat
+    // it as an unwanted pop-up -- see openMeMoTab()'s own comment.
+    const tab = openMeMoTab()
+    if (!tab) {
+      setMemoError('Your browser blocked the new tab. Please allow pop-ups for this site and try again.')
+      return
+    }
+    setMemoBusy(true)
+    setMemoError(null)
+    try {
+      await sendPromptToMeMo(promptText, tab)
+    } catch (e) {
+      const kind = (e as MemoBridgeError)?.kind
+      setMemoError(
+        kind === 'timeout'
+          ? 'Me-Mo took too long to respond. Try again in a moment.'
+          : kind === 'unreachable'
+            ? "Couldn't reach Me-Mo — it only answers on Dustin's private network right now. Check with him if you need access."
+            : 'Me-Mo had a problem handling that. Try again in a moment.'
+      )
+    } finally {
+      setMemoBusy(false)
+    }
+  }
 
   const save = async () => {
     if (!portfolioId) return
@@ -277,11 +306,18 @@ export default function PromptGeneratorPage() {
           <div className="card" style={{ position: 'sticky', top: 12 }}>
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <h3 style={{ marginTop: 0 }}>Preview</h3>
-              <button className="btn btn-mini" onClick={() => navigator.clipboard.writeText(promptText)}>
-                <Copy size={12} />
-                Copy
-              </button>
+              <div className="row" style={{ gap: 6 }}>
+                <button className="btn btn-mini" onClick={() => navigator.clipboard.writeText(promptText)}>
+                  <Copy size={12} />
+                  Copy
+                </button>
+                <button className="btn btn-mini" onClick={sendToMemo} disabled={memoBusy || !promptText}>
+                  <Send size={12} />
+                  {memoBusy ? 'Sending…' : 'Send to Me-Mo'}
+                </button>
+              </div>
             </div>
+            {memoError && <div className="notice notice-bad" style={{ marginTop: 8 }}>{memoError}</div>}
             <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12, maxHeight: 500, overflowY: 'auto', margin: 0 }}>{promptText}</pre>
           </div>
         </div>

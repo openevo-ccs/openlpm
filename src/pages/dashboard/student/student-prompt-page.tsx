@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { Copy, Save } from 'lucide-react'
+import { Copy, Save, Send } from 'lucide-react'
+import { openMeMoTab, sendPromptToMeMo, type MemoBridgeError } from '@/lib/memo-bridge'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
@@ -62,6 +63,8 @@ export default function StudentPromptPage() {
   const [experiments, setExperiments] = useState<PromptExperimentRow[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [memoBusy, setMemoBusy] = useState(false)
+  const [memoError, setMemoError] = useState<string | null>(null)
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id))
@@ -205,6 +208,32 @@ export default function StudentPromptPage() {
   )
 
   const reloadExperiments = () => userId && listProjectPromptExperiments(supabase, project.id, userId).then(setExperiments)
+
+  const sendToMemo = async () => {
+    // Opened synchronously, inside the click, so the browser doesn't treat
+    // it as an unwanted pop-up -- see openMeMoTab()'s own comment.
+    const tab = openMeMoTab()
+    if (!tab) {
+      setMemoError('Der neue Tab wurde vom Browser blockiert. Bitte Pop-ups für diese Seite erlauben und erneut versuchen.')
+      return
+    }
+    setMemoBusy(true)
+    setMemoError(null)
+    try {
+      await sendPromptToMeMo(promptText, tab)
+    } catch (e) {
+      const kind = (e as MemoBridgeError)?.kind
+      setMemoError(
+        kind === 'timeout'
+          ? 'Me-Mo hat zu lange nicht reagiert. Bitte gleich noch einmal versuchen.'
+          : kind === 'unreachable'
+            ? 'Me-Mo konnte nicht erreicht werden — es funktioniert aktuell nur in Dustins privatem Netzwerk. Bei Bedarf bitte nachfragen.'
+            : 'Bei Me-Mo ist ein Problem aufgetreten. Bitte gleich noch einmal versuchen.'
+      )
+    } finally {
+      setMemoBusy(false)
+    }
+  }
 
   const save = async () => {
     setSaving(true)
@@ -450,6 +479,9 @@ export default function StudentPromptPage() {
             <button className="btn btn-mini" onClick={() => navigator.clipboard.writeText(promptText)}>
               <Copy size={12} />Kopieren
             </button>
+            <button className="btn btn-mini" onClick={sendToMemo} disabled={memoBusy || items.length === 0}>
+              <Send size={12} />{memoBusy ? 'Wird gesendet…' : 'An Me-Mo senden'}
+            </button>
           </div>
         </div>
         {items.length === 0 ? (
@@ -457,6 +489,7 @@ export default function StudentPromptPage() {
         ) : (
           <pre style={{ whiteSpace: 'pre-wrap', fontSize: 12, maxHeight: 420, overflowY: 'auto', margin: 0 }}>{promptText}</pre>
         )}
+        {memoError && <div className="notice notice-bad" style={{ marginTop: 10 }}>{memoError}</div>}
         {error && <div className="notice notice-bad" style={{ marginTop: 10 }}>{error}</div>}
         {items.length > 0 && (
           <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={save} disabled={saving}>
