@@ -117,9 +117,12 @@ export default function ProjectSwitcherPage() {
   // filter is about how a research project's content was made, which
   // doesn't apply to a curated source archive the same way).
   const repoTopLevel = topLevel.filter((m) => isRepository(m.project))
-  const standardTopLevel = topLevel
-    .filter((m) => !isRepository(m.project))
-    .filter((m) => visibleCurations.has(CURATION[m.project.epistemic_status]))
+  const standardTopLevel = topLevel.filter((m) => !isRepository(m.project))
+  // Real feedback a4be05a6 (2026-10-01): differentiate human-curated from
+  // synthetic-theoretical project spaces at the frame level, same split as
+  // the Admin page's own Projects card now uses.
+  const curatedTopLevel = standardTopLevel.filter((m) => CURATION[m.project.epistemic_status] === 'human-curated' && visibleCurations.has('human-curated'))
+  const syntheticTopLevel = standardTopLevel.filter((m) => CURATION[m.project.epistemic_status] === 'synthetic-theoretical' && visibleCurations.has('synthetic-theoretical'))
   const childrenOf = (id: string) => entries.filter((m) => m.project.parent_project_id === id)
 
   const toggleCuration = (c: Curation) => {
@@ -178,20 +181,43 @@ export default function ProjectSwitcherPage() {
             </div>
           )}
 
-          <div className="frame">
-            <h2 style={{ fontSize: 16 }}>Project Spaces</h2>
-            {standardTopLevel.length === 0 ? (
-              <div className="card empty">
-                <p className="muted">No project spaces match the selected filter.</p>
-              </div>
-            ) : (
-              <div className="grid grid-3">
-                {standardTopLevel.map(({ project, role }) => (
-                  <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
-                ))}
-              </div>
-            )}
-          </div>
+          {curatedTopLevel.length === 0 && syntheticTopLevel.length === 0 ? (
+            <div className="card empty">
+              <p className="muted">No project spaces match the selected filter.</p>
+            </div>
+          ) : (
+            <>
+              {curatedTopLevel.length > 0 && (
+                <div className="frame frame-curated">
+                  <h2 style={{ fontSize: 16, marginBottom: 2 }}>Human-Curated</h2>
+                  <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
+                    Made by real teachers and researchers.
+                  </p>
+                  <div className="grid grid-3">
+                    {curatedTopLevel.map(({ project, role }) => (
+                      <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {syntheticTopLevel.length > 0 && (
+                <div className="frame frame-synthetic">
+                  <h2 style={{ fontSize: 16, marginBottom: 2 }}>Synthetic-Theoretical</h2>
+                  <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
+                    Designed by AI as thought experiments — not reviewed by a subject-matter
+                    expert and not tried with real students. Kept visually separate from the
+                    human-curated work above so the two are never confused.
+                  </p>
+                  <div className="grid grid-3">
+                    {syntheticTopLevel.map(({ project, role }) => (
+                      <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </>
       )}
     </div>

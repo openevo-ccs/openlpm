@@ -178,6 +178,16 @@ code {
    stays the brightest surface) so a frame full of cards reads as a group
    sitting slightly off the page, not another card of its own. */
 .frame { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
+
+/* Real feedback a4be05a6 (2026-10-01): "differentiate at the frame level
+   between human-curated LPMs and synthetic LPMs... never to be confused."
+   Reuses this app's own existing solid/dashed, good/warning convention for
+   confirmed-vs-hypothetical content (see .conn-asserted/.conn-suggested
+   above) instead of inventing a new visual language -- a synthetic group
+   reads as "not yet real" the same way a suggested connection already does
+   everywhere else in this app. */
+.frame-curated { border-color: var(--good); }
+.frame-synthetic { border-style: dashed; border-color: var(--warning); }
 .card h2, .card h3 { margin-top: 0; }
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }

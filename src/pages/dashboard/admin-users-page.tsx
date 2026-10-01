@@ -7,7 +7,8 @@ import { ADMIN_EMAIL } from '@/lib/admin'
 import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
-import { projectColorHex, projectColorTint } from '@/lib/project-colors'
+import { projectColorHexOrDefault, projectColorTint } from '@/lib/project-colors'
+import { CURATION } from '@/components/epistemic-status-badge'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -457,6 +458,16 @@ function ProjectsAdminSection({
   const repoTopLevel = topLevel.filter(isRepository)
   const standardTopLevel = topLevel.filter((p) => !isRepository(p))
 
+  // Real feedback a4be05a6 (2026-10-01): differentiate human-curated from
+  // synthetic-theoretical project spaces at the frame level, not just the
+  // small badge on each row -- a sub-project inherits its curation status
+  // from its own top-level space (never set independently, same rule the
+  // bulk-edit panel already follows), so grouping the TOP-LEVEL spaces is
+  // enough to keep each whole subtree together under the right group.
+  const isSynthetic = (p: AdminProjectRow) => CURATION[p.epistemic_status] === 'synthetic-theoretical'
+  const curatedTopLevel = standardTopLevel.filter((p) => !isSynthetic(p))
+  const syntheticTopLevel = standardTopLevel.filter(isSynthetic)
+
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev)
@@ -566,20 +577,53 @@ function ProjectsAdminSection({
               />
             )}
 
-            {standardTopLevel.map((p) => (
-              <ProjectTreeRow
-                key={p.id}
-                project={p}
-                parentName={null}
-                childrenByParent={childrenByParent}
-                memberCountByProject={memberCountByProject}
-                childCountByParent={childCountByParent}
-                supabase={supabase}
-                onChanged={onChanged}
-                selectedIds={selectedIds}
-                onToggleSelect={toggleSelect}
-              />
-            ))}
+            {curatedTopLevel.length > 0 && (
+              <div className="frame frame-curated" style={{ marginBottom: syntheticTopLevel.length > 0 ? 16 : 0 }}>
+                <h4 style={{ fontSize: 13, marginBottom: 2 }}>Human-Curated</h4>
+                <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+                  Made by real teachers and researchers.
+                </p>
+                {curatedTopLevel.map((p) => (
+                  <ProjectTreeRow
+                    key={p.id}
+                    project={p}
+                    parentName={null}
+                    childrenByParent={childrenByParent}
+                    memberCountByProject={memberCountByProject}
+                    childCountByParent={childCountByParent}
+                    supabase={supabase}
+                    onChanged={onChanged}
+                    selectedIds={selectedIds}
+                    onToggleSelect={toggleSelect}
+                  />
+                ))}
+              </div>
+            )}
+
+            {syntheticTopLevel.length > 0 && (
+              <div className="frame frame-synthetic">
+                <h4 style={{ fontSize: 13, marginBottom: 2 }}>Synthetic-Theoretical</h4>
+                <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+                  Designed by AI as thought experiments -- not reviewed by a subject-matter expert
+                  and not tried with real students. Kept visually separate from the human-curated
+                  work above so the two are never confused.
+                </p>
+                {syntheticTopLevel.map((p) => (
+                  <ProjectTreeRow
+                    key={p.id}
+                    project={p}
+                    parentName={null}
+                    childrenByParent={childrenByParent}
+                    memberCountByProject={memberCountByProject}
+                    childCountByParent={childCountByParent}
+                    supabase={supabase}
+                    onChanged={onChanged}
+                    selectedIds={selectedIds}
+                    onToggleSelect={toggleSelect}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -862,9 +906,9 @@ function ProjectTreeRow({
             paddingLeft: 12,
             paddingTop: 6,
             paddingBottom: 2,
-            borderLeft: `2px solid ${projectColorHex((project as any).color) ?? 'var(--series-a, var(--border))'}`,
+            borderLeft: `2px solid ${projectColorHexOrDefault((project as any).color)}`,
             borderRadius: '0 6px 6px 0',
-            background: tint ?? 'var(--bg-subtle, transparent)',
+            background: tint,
           }}
         >
           {children.map((c) => (
@@ -1313,7 +1357,7 @@ function FeedbackAdminSection({ feedback }: { feedback: FeedbackItem[] | null })
     <div className="card">
       <h3 className="row"><MessageSquareText size={16} />Feedback</h3>
       <p className="muted" style={{ marginBottom: 12 }}>
-        Every real submission from the in-app Feedback button, across every project.
+        Every submission from the in-app Feedback button, across every project.
       </p>
 
       {feedback === null ? (
