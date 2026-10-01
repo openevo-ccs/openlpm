@@ -44,6 +44,23 @@ function bandKeyForGrade(g: string): string {
 const RELEVANCE_LEVELS = [1, 2, 3] as const
 const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel', 3: 'hoch' }
 
+// The real, fixed didactic-method vocabulary and icon set from EvoMentor DE
+// v1.2's own source (apps/evomentor_de_v1_2.html, ALL_METHODEN/METHOD_ICON
+// constants) -- not invented here. Every Lernziel's own
+// content.didaktische_strategien.top3_methoden[].methode value is drawn
+// from this same list, so a filter built on it can't offer an option that
+// never matches anything real.
+const ALL_METHODEN = [
+  'Forschendes Lernen', 'Analogien und Vergleiche', 'Konzeptuelles Lernen', 'Diskussion',
+  'Narrativer Zugang', 'Modelle und Simulationen', 'Erfahrungsbasiertes Lernen', 'Digitale Medien',
+  'Einblick in Wissenschaftsgeschichte', 'Recherche', 'Kooperative Lernformen', 'Projektbasiertes Lernen',
+] as const
+const METHOD_ICON: Record<string, string> = {
+  'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩', 'Diskussion': '💬',
+  'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪', 'Erfahrungsbasiertes Lernen': '🖐️', 'Digitale Medien': '💻',
+  'Einblick in Wissenschaftsgeschichte': '🏛️', 'Recherche': '📚', 'Kooperative Lernformen': '👥', 'Projektbasiertes Lernen': '🛠️',
+}
+
 /**
  * Fixed-size CSS dots for a relevance level, always in the given color --
  * replaces the old plain "●●○" text glyphs (see globals.css's .rel-dot
@@ -141,6 +158,7 @@ function exportLernzieleMarkdown(list: TopicListItem[], contentById: Map<string,
 export default function StudentLernzielePage() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
+  const navigate = useNavigate()
 
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
   const [contentById, setContentById] = useState<Map<string, unknown>>(new Map())
@@ -152,6 +170,13 @@ export default function StudentLernzielePage() {
   // entry here doesn't constrain the result at all -- same as the old
   // presence-only checkbox being unchecked.
   const [conceptLevels, setConceptLevels] = useState<Map<string, Set<number>>>(new Map())
+  // Real feedback 2026-10-01 (Susan): "add option to filter by/select-
+  // deselect didactic methods (which should be coded in the knowledge
+  // graph)" -- they already are (content.didaktische_strategien.
+  // top3_methoden[].methode, present on 302 of 306 real Lernziele), just
+  // never exposed as a filter. Empty set = no constraint, same convention
+  // as conceptLevels above.
+  const [methodFilter, setMethodFilter] = useState<Set<string>>(new Set())
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
@@ -294,10 +319,14 @@ export default function StudentLernzielePage() {
         })
         if (!passes) return false
       }
+      if (methodFilter.size > 0) {
+        const methoden: string[] = ((contentById.get(t.id) as any)?.didaktische_strategien?.top3_methoden ?? []).map((m: any) => m?.methode)
+        if (!methoden.some((m) => methodFilter.has(m))) return false
+      }
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, contentById, rawIdToGroupKey])
+  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, methodFilter, contentById, rawIdToGroupKey])
 
   // A deep link (Davor/Danach, or a Netz-tab tap) can point at a Lernziel
   // the current filters would otherwise hide (different grade, excluded
@@ -340,6 +369,15 @@ export default function StudentLernzielePage() {
       else current.add(level)
       if (current.size === 0) next.delete(rootId)
       else next.set(rootId, current)
+      return next
+    })
+  }
+
+  const toggleMethod = (methode: string) => {
+    setMethodFilter((prev) => {
+      const next = new Set(prev)
+      if (next.has(methode)) next.delete(methode)
+      else next.add(methode)
       return next
     })
   }
@@ -461,6 +499,17 @@ export default function StudentLernzielePage() {
             })}
           </div>
 
+          <p className="muted student-filter-label">DIDAKTISCHE METHODEN</p>
+          <div className="student-concept-filter">
+            {ALL_METHODEN.map((m) => (
+              <label key={m} className="row" style={{ gap: 6, fontSize: 12.5, cursor: 'pointer', marginBottom: 3 }}>
+                <input type="checkbox" checked={methodFilter.has(m)} onChange={() => toggleMethod(m)} />
+                <span aria-hidden="true">{METHOD_ICON[m]}</span>
+                <span>{m}</span>
+              </label>
+            ))}
+          </div>
+
           <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
             <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
             <Star size={13} />nur Favoriten
@@ -468,6 +517,15 @@ export default function StudentLernzielePage() {
         </aside>
 
         <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>
+          {objectId && (
+            <button
+              className="btn btn-mini"
+              style={{ alignSelf: 'flex-start', marginBottom: 10 }}
+              onClick={() => { setExpandedIds(new Set()); navigate(`/dashboard/${project.slug}`) }}
+            >
+              ← Zurück zur vollständigen Übersicht
+            </button>
+          )}
           <div className="student-toolbar">
             <div className="student-toolbar-group">
               <label className="muted" style={{ fontSize: 11.5 }}>Sortieren:</label>
@@ -518,6 +576,7 @@ export default function StudentLernzielePage() {
                   onToggleExpand={onToggleExpand}
                   projectSlug={project.slug}
                   supabase={supabase}
+                  compact={viewMode === 'list'}
                 />
               ))
             )}
@@ -542,6 +601,7 @@ function LernzielCard({
   onToggleExpand,
   projectSlug,
   supabase,
+  compact,
 }: {
   topic: TopicListItem
   content: unknown
@@ -556,13 +616,44 @@ function LernzielCard({
   onToggleExpand: (id: string) => void
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
+  compact: boolean
 }) {
+  // Real feedback 2026-10-01 (Susan): "view does not switch back to card
+  // view" -- the real cause was that Listenansicht and Kartenansicht
+  // rendered the exact same markup for a collapsed Lernziel (full
+  // description + relevance chips either way), just in one column instead
+  // of a grid, so toggling the button had no visible effect a student could
+  // notice. A COLLAPSED row in list mode now actually renders as a compact
+  // single line (grade chip, title, favorite star) -- an EXPANDED card
+  // still shows full detail either way, since the detail itself isn't
+  // something "list mode" should hide.
+  if (compact && !isExpanded) {
+    return (
+      <div
+        id={`lz-card-${topic.id}`}
+        key={topic.id}
+        className="card topic-card topic-row-compact"
+        onClick={() => onToggleExpand(topic.id)}
+      >
+        <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
+        <strong style={{ flex: 1, minWidth: 0 }}>{topic.title}</strong>
+        <button
+          className="btn-linklike"
+          aria-label="Favorit"
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(topic.id) }}
+        >
+          <Star size={15} fill={isFavorite ? 'var(--series-a, gold)' : 'none'} />
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div
       id={`lz-card-${topic.id}`}
       key={topic.id}
       className={`card topic-card${isExpanded ? ' active' : ''}`}
-      style={{ gridColumn: isExpanded ? '1 / -1' : undefined }}
+      style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined }}
       onClick={() => onToggleExpand(topic.id)}
     >
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -698,7 +789,16 @@ function DidaktischeStrategienSection({ content }: { content: unknown }) {
   const [open, setOpen] = useState(false)
   const ds = (content as any)?.didaktische_strategien
   if (!ds) return null
-  const methoden = (ds.top3_methoden ?? []).map((m: any) => m?.methode).filter(Boolean)
+  // Real feedback 2026-10-01 (Susan), 2nd pass: "you should expand on each
+  // method... each method should be highlighted on a different line,
+  // possibly with an icon" -- this was previously dropping the real
+  // per-method `beschreibung` text entirely (present on 302 of 306 real
+  // Thuringia Lernziele, already imported, same shape as EvoMentor DE
+  // v1.2's own top3_methoden -- this isn't new content to source, just
+  // data this view was throwing away). Matches v1.2's own real layout:
+  // icon + bold method name + em dash + its topic-specific description,
+  // one per line.
+  const methoden = (ds.top3_methoden ?? []).filter((m: any) => m?.methode)
   return (
     <section style={{ marginBottom: 18 }}>
       <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
@@ -711,7 +811,17 @@ function DidaktischeStrategienSection({ content }: { content: unknown }) {
             <p style={{ margin: '0 0 8px' }}><strong>Leitfrage:</strong> {ds.evolutionsdidaktischer_impuls}</p>
           )}
           {methoden.length > 0 && (
-            <p style={{ margin: '0 0 8px' }}><strong>Methoden:</strong> {methoden.join(', ')}</p>
+            <div style={{ margin: '0 0 8px' }}>
+              <strong>Methoden:</strong>
+              <ul style={{ margin: '4px 0 0', paddingLeft: 0, listStyle: 'none' }}>
+                {methoden.map((m: any, i: number) => (
+                  <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
+                    <span aria-hidden="true">{METHOD_ICON[m.methode] ?? '•'}</span>
+                    <span><strong>{m.methode}</strong>{m.beschreibung ? <> — {m.beschreibung}</> : null}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
           {ds.moegliche_fehlvorstellungen && (
             <p style={{ margin: 0 }}><strong>Mögliche Fehlvorstellungen:</strong> {ds.moegliche_fehlvorstellungen}</p>

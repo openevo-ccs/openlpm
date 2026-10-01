@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Check, Plus, Trash2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listAvailableFrameworks, listFrameworkTags, type FrameworkRow, type FrameworkTagRow } from '@/lib/supabase/frameworks'
+import { PROJECT_COLORS } from '@/lib/project-colors'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -190,6 +191,22 @@ export default function NewProjectWizard() {
 
       const gradeFrameworkId = gradeChoice && gradeChoice !== 'custom-later' ? gradeChoice : null
 
+      // Real feedback 2026-10-01 (Dustin): "lets automatically assign some
+      // color to each project space... and allow users to edit that choice
+      // anytime" -- the edit-anytime half already existed (dashboard
+      // page's own Project color card); this is the missing auto-assign
+      // half. Picks the first palette color none of this project's own
+      // siblings (same parent, among projects this user can already see)
+      // is using yet, so adjacent entries in the switcher/sidebar don't
+      // collide -- falls back to a round-robin pick once the palette is
+      // exhausted, rather than leaving later siblings uncolored.
+      const siblingProjects = (memberships ?? [])
+        .map((m) => m.project as any)
+        .filter((p) => (parentId ? p.parent_project_id === parentId : !p.parent_project_id))
+      const usedColors = new Set(siblingProjects.map((p) => p.color).filter(Boolean))
+      const autoColor = PROJECT_COLORS.find((c) => !usedColors.has(c.key))?.key
+        ?? PROJECT_COLORS[siblingProjects.length % PROJECT_COLORS.length].key
+
       const { data: project, error: insertError } = await supabase
         .from('projects')
         .insert({
@@ -204,7 +221,8 @@ export default function NewProjectWizard() {
           grade_framework_id: gradeFrameworkId,
           is_private: projectIsPrivate,
           created_by: user?.id ?? null,
-        })
+          color: autoColor,
+        } as any)
         .select()
         .single()
 

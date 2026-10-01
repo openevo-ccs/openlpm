@@ -511,6 +511,14 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .topic-card:hover { border-color: var(--series-a); }
 .topic-card.active { border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
 
+/* Real feedback 2026-10-01 (Susan): "view does not switch back to card
+   view" -- a collapsed Listenansicht row used to render identically to a
+   card, just stacked in one column, so the toggle had no visible effect.
+   A genuinely compact row (single line, no description, no relevance
+   chips) so list mode actually looks different from card mode. */
+.topic-row-compact { display: flex; align-items: center; gap: 10px; padding: 7px 12px; }
+.topic-row-compact strong { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .chip-btn {
   border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px;
   padding: 4px 10px; font-size: 12px; cursor: pointer; color: var(--text-primary);

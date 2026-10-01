@@ -115,6 +115,28 @@ function DashboardTab({
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
 
+  // Real feedback 2026-10-01 (Susan), 2nd pass: the split-out Konzeptanker
+  // table below had a real bug -- every row showed the exact same number
+  // per grade column. Root cause: a Konzeptanker topic's basiskonzeptbezug
+  // array carries a relevance ENTRY for all six Basiskonzepte (that's by
+  // design -- every Lernziel is rated against every concept), so matching
+  // "this topic counts toward concept X" on mere presence of an entry
+  // matched every topic to every concept equally. A Konzeptanker's own
+  // definition (KONZEPTANKER_DEF above) is "ein besonders konkreter
+  // Einstiegspunkt in EIN Basiskonzept" -- singular -- so it should only
+  // count toward the concept(s) where its relevance is actually "hoch"
+  // (3/3), not every concept it has any rating for at all.
+  const konzeptankerByRootAndGrade = (rootLabel: string, grade: string) => {
+    let count = 0
+    for (const t of topics ?? []) {
+      if (t.grade_band !== grade) continue
+      const tc = contentById.get(t.id) as any
+      if (!tc?.ist_konzeptanker) continue
+      if (bkEntries(tc).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, rootLabel))) count++
+    }
+    return count
+  }
+
   return (
     <div>
       <div className="bk-stat-tiles">
@@ -125,10 +147,17 @@ function DashboardTab({
         {hasStunden && <div className="card bk-stat-tile"><div className="n">{stundenGesamt}</div><div className="l">Unterrichtsstunden gesamt</div></div>}
       </div>
 
+      {/* Real feedback 2026-10-01 (Susan), 2nd pass: in EvoMentor DE v1.2
+          this was ONE integrated view, not two separate tables -- the
+          Konzeptanker count sits right after each Basiskonzept's name, the
+          anchor count per cell sits under that cell's relevance bar, and the
+          niedrig/mittel/hoch counts are printed directly inside the bar
+          segments themselves rather than in a caption line below. Merged
+          back into one table here to match. */}
       <div className="card">
-        <h3>Relevanzverteilung je Basiskonzept × Klassenstufe</h3>
+        <h3>Basiskonzepte × Klassenstufe</h3>
         <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-          Je Zelle: wie viele Lernziele dieser Klassenstufe für das jeweilige Basiskonzept niedrige, mittlere bzw. hohe Relevanz haben.
+          Je Zelle: Relevanzverteilung (niedrig / mittel / hoch) der Lernziele dieser Klassenstufe, plus Konzeptanker darunter.
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
@@ -139,101 +168,78 @@ function DashboardTab({
               </tr>
             </thead>
             <tbody>
-              {rootConcepts.map((c, i) => (
-                <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
-                  <td style={{ padding: '4px 8px' }}><span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}</td>
-                  {grades.map((g) => {
-                    // Real feedback 2026-10-01: the old cell only counted
-                    // high-relevance (3/3) goals, hiding the real low/medium
-                    // tail entirely. Count all three tiers and render a
-                    // small stacked bar so the real distribution -- not just
-                    // the top of it -- is visible per concept x grade cell.
-                    const counts = [0, 0, 0]
-                    for (const t of topics ?? []) {
-                      if (t.grade_band !== g) continue
-                      for (const e of bkEntries(contentById.get(t.id))) {
-                        if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
-                        if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) counts[e.relevanz_beurteilung - 1]++
+              {rootConcepts.map((c, i) => {
+                const rootKonzeptankerTotal = grades.reduce((sum, g) => sum + konzeptankerByRootAndGrade(c.label, g), 0)
+                return (
+                  <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
+                    <td style={{ padding: '4px 8px' }}>
+                      <span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}
+                      {rootKonzeptankerTotal > 0 && (
+                        <span className="row tip" data-tip={KONZEPTANKER_DEF} style={{ display: 'inline-flex', gap: 2, marginLeft: 6, fontSize: 11, color: 'var(--text-muted)', verticalAlign: 'middle' }}>
+                          <Anchor size={10} />{rootKonzeptankerTotal}
+                        </span>
+                      )}
+                    </td>
+                    {grades.map((g) => {
+                      // Real feedback 2026-10-01: the old cell only counted
+                      // high-relevance (3/3) goals, hiding the real low/medium
+                      // tail entirely. Count all three tiers and render a
+                      // small stacked bar so the real distribution -- not just
+                      // the top of it -- is visible per concept x grade cell.
+                      const counts = [0, 0, 0]
+                      for (const t of topics ?? []) {
+                        if (t.grade_band !== g) continue
+                        for (const e of bkEntries(contentById.get(t.id))) {
+                          if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
+                          if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) counts[e.relevanz_beurteilung - 1]++
+                        }
                       }
-                    }
-                    const total = counts[0] + counts[1] + counts[2]
-                    const color = `var(--map-${(i % 6) + 1})`
-                    return (
-                      <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
-                        {total === 0 ? (
-                          '—'
-                        ) : (
-                          <div
-                            className="tip"
-                            data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
-                            style={{ display: 'inline-block', width: '100%', maxWidth: 70 }}
-                          >
-                            <div style={{ display: 'flex', height: 7, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}>
-                              {counts[0] > 0 && <div style={{ flex: counts[0], background: color, opacity: 0.35 }} />}
-                              {counts[1] > 0 && <div style={{ flex: counts[1], background: color, opacity: 0.65 }} />}
-                              {counts[2] > 0 && <div style={{ flex: counts[2], background: color, opacity: 1 }} />}
+                      const total = counts[0] + counts[1] + counts[2]
+                      const anchorCount = konzeptankerByRootAndGrade(c.label, g)
+                      const color = `var(--map-${(i % 6) + 1})`
+                      return (
+                        <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
+                          {total === 0 ? (
+                            '—'
+                          ) : (
+                            <div style={{ display: 'inline-block', width: '100%', maxWidth: 76 }}>
+                              <div
+                                className="tip"
+                                data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
+                                style={{ display: 'flex', height: 15, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
+                              >
+                                {([0, 1, 2] as const).map((lvl) =>
+                                  counts[lvl] > 0 ? (
+                                    <div
+                                      key={lvl}
+                                      style={{
+                                        flex: counts[lvl], background: color, opacity: 0.35 + lvl * 0.3,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 9.5, color: lvl === 2 ? '#fff' : 'var(--text-primary)', lineHeight: 1,
+                                      }}
+                                    >
+                                      {counts[lvl]}
+                                    </div>
+                                  ) : null
+                                )}
+                              </div>
+                              {anchorCount > 0 && (
+                                <div className="row tip" data-tip={KONZEPTANKER_DEF} style={{ justifyContent: 'center', gap: 2, fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                                  <Anchor size={9} />{anchorCount}
+                                </div>
+                              )}
                             </div>
-                            <div className="muted" style={{ fontSize: 10.5, marginTop: 2 }}>{counts[0]} / {counts[1]} / {counts[2]}</div>
-                          </div>
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
+                          )}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
-        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken und Zahlen: niedrig / mittel / hoch.</p>
-      </div>
-
-      {/* Real feedback 2026-10-01 (Susan): wanted to see WHERE (in which
-          grade) and how many Konzeptanker sit per Basiskonzept, not just the
-          single top-level "43 Konzeptanker" stat tile above -- same table
-          shape as the relevance distribution above, counting
-          ist_konzeptanker instead. */}
-      <div className="card" style={{ marginTop: 16 }}>
-        <h3><Anchor size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />Konzeptanker je Basiskonzept × Klassenstufe</h3>
-        <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-          Je Zelle: wie viele Konzeptanker-Lernziele dieser Klassenstufe zu diesem Basiskonzept gehören.
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Basiskonzept</th>
-                {grades.map((g) => <th key={g} style={{ padding: '4px 8px' }}>Kl. {g}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {rootConcepts.map((c, i) => (
-                <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
-                  <td style={{ padding: '4px 8px' }}><span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}</td>
-                  {grades.map((g) => {
-                    let count = 0
-                    for (const t of topics ?? []) {
-                      if (t.grade_band !== g) continue
-                      const tc = contentById.get(t.id) as any
-                      if (!tc?.ist_konzeptanker) continue
-                      if (bkEntries(tc).some((e) => looksLikeBk(e.basiskonzept_id, c.label))) count++
-                    }
-                    return (
-                      <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
-                        {count === 0 ? (
-                          '—'
-                        ) : (
-                          <span className="row" style={{ justifyContent: 'center', gap: 3 }}>
-                            <Anchor size={10} />{count}
-                          </span>
-                        )}
-                      </td>
-                    )
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker.</p>
       </div>
     </div>
   )
