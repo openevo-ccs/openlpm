@@ -368,7 +368,7 @@ export function FeedbackWidget() {
   }
 
   return (
-    <div className="feedback-panel card" style={capturing ? { display: 'none' } : undefined}>
+    <div className={`feedback-panel card${hasScreenshot ? ' feedback-panel-wide' : ''}`} style={capturing ? { display: 'none' } : undefined}>
       <div className="feedback-header">
         <span className="feedback-title">
           <MessageSquareText size={16} />

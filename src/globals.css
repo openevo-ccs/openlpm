@@ -407,6 +407,10 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   padding: 0; margin: 0;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
+/* Wider once a screenshot is attached (real feedback a6b9d1ba: the
+   markup canvas was too cramped at the base panel width to draw on
+   precisely) -- the plain tag/comment form stays compact. */
+.feedback-panel-wide { width: 640px; max-width: calc(100vw - 40px); }
 .feedback-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 12px; border-bottom: 1px solid var(--border);
