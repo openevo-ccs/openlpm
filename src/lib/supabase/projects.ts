@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
+import { ADMIN_EMAIL } from '@/lib/admin'
 
 type Client = SupabaseClient<Database>
 
@@ -79,7 +80,24 @@ export async function getProjectBySlug(
     .eq('user_id', user.id)
     .maybeSingle()
 
-  return { project, role: membership?.role ?? null, joinedVia: membership?.joined_via ?? null }
+  if (membership) {
+    return { project, role: membership.role, joinedVia: membership.joined_via ?? null }
+  }
+
+  // Real ask 2026-10-01: an admin needs to open ANY project, not just ones
+  // they happen to belong to -- migration 058 already made every content
+  // table's RLS admit an admin the same way it admits a real owner. This is
+  // the matching frontend half: without it, a non-member admin would still
+  // hit the "you don't have access" screen below (ProjectLayout's `if
+  // (!role)` branch) despite the database now actually allowing the reads.
+  // 'owner' gives the same UI capability (canManage, Danger zone, etc.) a
+  // real owner gets -- joinedVia stays null, so this never gets mistaken
+  // for a self-joined student view.
+  if (user.email === ADMIN_EMAIL) {
+    return { project, role: 'owner', joinedVia: null }
+  }
+
+  return { project, role: null, joinedVia: null }
 }
 
 /** How many sub-projects sit inside this project -- deletion must be blocked while any exist (see deleteProject's own comment). */
