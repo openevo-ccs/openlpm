@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Lightbulb, MessageSquare, Network, ShieldAlert, Sparkles } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, ShieldAlert, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
+import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
@@ -50,6 +51,11 @@ export default function ProjectLayout() {
   const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
   const [defaultBranchId, setDefaultBranchId] = useState<string | null>(null)
   const [previewing, setPreviewing] = useState(false)
+  // Not one of the fixed 10 sidebar items below -- only shown for a project
+  // that actually has curriculum-repository content of its own (e.g. the
+  // Germany/New York repository spaces) or has declared grounding in one,
+  // so an ordinary LPM project's nav stays exactly Dustin's 10-item spec.
+  const [hasRepo, setHasRepo] = useState(false)
 
   // ?view=student (from a direct link) starts the preview session; from
   // then on it's tracked in sessionStorage, independent of the URL.
@@ -107,6 +113,12 @@ export default function ProjectLayout() {
       .eq('is_trunk', true)
       .maybeSingle()
       .then(({ data }) => setDefaultBranchId(data?.id ?? null))
+  }, [supabase, state?.project?.id])
+
+  useEffect(() => {
+    setHasRepo(false)
+    if (!state?.project?.id) return
+    hasRepositoryContent(supabase, state.project.id).then(setHasRepo)
   }, [supabase, state?.project?.id])
 
   if (!slug || state === null) {
@@ -171,6 +183,7 @@ export default function ProjectLayout() {
     { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
     { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</>, end: false },
     { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
+    ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
   ]
 
   const canManage = role === 'owner' || role === 'maintainer'

@@ -778,6 +778,191 @@ export type Database = {
         }
         Relationships: []
       }
+      curriculum_repository_records: {
+        Row: {
+          id: string
+          project_id: string
+          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          jurisdiction: string | null
+          source_repo: string
+          source_record_id: string
+          title: string
+          content: any
+          access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          license_or_rights_note: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          jurisdiction?: string | null
+          source_repo: string
+          source_record_id: string
+          title: string
+          content?: any
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          license_or_rights_note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          record_type?: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          jurisdiction?: string | null
+          source_repo?: string
+          source_record_id?: string
+          title?: string
+          content?: any
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          license_or_rights_note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_records_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      project_repository_links: {
+        Row: {
+          id: string
+          project_id: string
+          repository_project_id: string
+          jurisdiction: string | null
+          note: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          repository_project_id: string
+          jurisdiction?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          repository_project_id?: string
+          jurisdiction?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_repository_links_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_repository_links_repository_project_id_fkey",
+            columns: ["repository_project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      curriculum_repository_links: {
+        Row: {
+          id: string
+          project_id: string
+          data_object_id: string
+          repository_record_id: string
+          relation_type: string
+          rationale: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          data_object_id: string
+          repository_record_id: string
+          relation_type?: string
+          rationale?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          data_object_id?: string
+          repository_record_id?: string
+          relation_type?: string
+          rationale?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_links_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_links_repository_record_id_fkey",
+            columns: ["repository_record_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_records",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      curriculum_repository_record_tags: {
+        Row: {
+          id: string
+          repository_record_id: string
+          framework_tag_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          repository_record_id: string
+          framework_tag_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          repository_record_id?: string
+          framework_tag_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_record_tags_repository_record_id_fkey",
+            columns: ["repository_record_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_records",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_record_tags_framework_tag_id_fkey",
+            columns: ["framework_tag_id"],
+            isOneToOne: false,
+            referencedRelation: "framework_tags",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       lpm_connections: {
         Row: {
           id: string
@@ -1230,8 +1415,11 @@ export type Database = {
           source_file: string | null
           format: string | null
           license_or_rights_note: string | null
+          access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           supersedes_document_id: string | null
           adopted_at: string | null
+          effective_from: string | null
+          effective_until: string | null
           created_by: string | null
           created_at: string
         }
@@ -1247,8 +1435,11 @@ export type Database = {
           source_file?: string | null
           format?: string | null
           license_or_rights_note?: string | null
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           supersedes_document_id?: string | null
           adopted_at?: string | null
+          effective_from?: string | null
+          effective_until?: string | null
           created_by?: string | null
           created_at?: string
         }
@@ -1264,8 +1455,11 @@ export type Database = {
           source_file?: string | null
           format?: string | null
           license_or_rights_note?: string | null
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           supersedes_document_id?: string | null
           adopted_at?: string | null
+          effective_from?: string | null
+          effective_until?: string | null
           created_by?: string | null
           created_at?: string
         }
@@ -1457,6 +1651,7 @@ export type Database = {
           source_name: string
           format: string | null
           license_or_rights_note: string | null
+          access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url: string | null
           created_by: string | null
           created_at: string
@@ -1467,6 +1662,7 @@ export type Database = {
           source_name: string
           format?: string | null
           license_or_rights_note?: string | null
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url?: string | null
           created_by?: string | null
           created_at?: string
@@ -1477,6 +1673,7 @@ export type Database = {
           source_name?: string
           format?: string | null
           license_or_rights_note?: string | null
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url?: string | null
           created_by?: string | null
           created_at?: string

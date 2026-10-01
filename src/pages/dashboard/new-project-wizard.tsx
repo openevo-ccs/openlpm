@@ -39,8 +39,24 @@ const COMMON_LANGUAGES: { code: string; label: string }[] = [
   { code: 'ar', label: 'Arabic' },
 ]
 
+type AccessTier = 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+
 interface JurisdictionDraft { countryCode: string; regionCode: string; label: string }
-interface SourceDraft { sourceName: string; format: string; licenseNote: string; url: string }
+interface SourceDraft { sourceName: string; format: string; licenseNote: string; url: string; accessTier: AccessTier | '' }
+
+// Plain-language options for project_source_declarations.access_tier /
+// standards_documents.access_tier (migration 044) -- same underlying values
+// as deutsche_lp/nys_lp's accessTier schema field, added the same day, so a
+// source declared here means the same thing as one recorded in either
+// regional repo. Labels are written for a researcher filling out this form,
+// not for someone who already knows the column name.
+const ACCESS_TIER_OPTIONS: { value: AccessTier | ''; label: string }[] = [
+  { value: '', label: "Not sure yet — decide before importing" },
+  { value: 'full-text-stored', label: 'The full document — we have clear rights to keep all of it' },
+  { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, not the whole document' },
+  { value: 'summary-only', label: "A summary only — described in our own words, no direct quotes" },
+  { value: 'citation-only', label: "Just a citation — we'll link to the original, not store any of its text" },
+]
 
 const STEPS = ['Basics', 'Geography', 'Language', 'Subject area', 'Grade bands', 'Sources & rights', 'Review']
 
@@ -87,7 +103,7 @@ export default function NewProjectWizard() {
   const [gradeChoice, setGradeChoice] = useState<string>('') // framework id, or 'custom-later'
 
   // Sources & rights
-  const [sources, setSources] = useState<SourceDraft[]>([{ sourceName: '', format: '', licenseNote: '', url: '' }])
+  const [sources, setSources] = useState<SourceDraft[]>([{ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' }])
 
   useEffect(() => {
     if (!fixedParent) {
@@ -221,6 +237,7 @@ export default function NewProjectWizard() {
             format: s.format.trim() || null,
             license_or_rights_note: s.licenseNote.trim() || null,
             url: s.url.trim() || null,
+            access_tier: s.accessTier || null,
             created_by: user?.id ?? null,
           }))
         )
@@ -429,6 +446,17 @@ export default function NewProjectWizard() {
                     <input value={s.licenseNote} onChange={(e) => updateSource(i, { licenseNote: e.target.value })} placeholder="e.g. Public domain government document" />
                   </div>
                   <div className="field" style={{ gridColumn: '1 / -1' }}>
+                    <label>How much of this source can we actually keep?</label>
+                    <select value={s.accessTier} onChange={(e) => updateSource(i, { accessTier: e.target.value as AccessTier | '' })}>
+                      {ACCESS_TIER_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <p className="muted" style={{ marginTop: 4, marginBottom: 0, fontSize: '0.85em' }}>
+                      This can differ source by source — some documents we have clear rights to store in full, others only as a short quote or a citation. If you're not sure, leave this as "Not sure yet" and check before importing full text.
+                    </p>
+                  </div>
+                  <div className="field" style={{ gridColumn: '1 / -1' }}>
                     <label>URL (optional)</label>
                     <input value={s.url} onChange={(e) => updateSource(i, { url: e.target.value })} placeholder="https://…" />
                   </div>
@@ -436,7 +464,7 @@ export default function NewProjectWizard() {
                 <button className="btn btn-mini" onClick={() => setSources((prev) => prev.filter((_, idx) => idx !== i))}><Trash2 size={12} />Remove</button>
               </div>
             ))}
-            <button className="btn btn-mini" onClick={() => setSources((prev) => [...prev, { sourceName: '', format: '', licenseNote: '', url: '' }])}>
+            <button className="btn btn-mini" onClick={() => setSources((prev) => [...prev, { sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' }])}>
               <Plus size={12} />Add another source
             </button>
           </div>
@@ -453,7 +481,12 @@ export default function NewProjectWizard() {
             <p className="muted">Regions: {jurisdictions.filter((j) => j.label.trim()).map((j) => j.label).join(', ') || 'none specified'}</p>
             <p className="muted">Subject areas: {subjectTags.filter((t) => selectedSubjectTagIds.has(t.id)).map((t) => t.label).join(', ') || 'none selected'}</p>
             <p className="muted">Grade-band framework: {gradeChoice === 'custom-later' ? 'custom, to be defined later' : gradeFrameworks?.find((f) => f.id === gradeChoice)?.label ?? 'none'}</p>
-            <p className="muted">Sources: {sources.filter((s) => s.sourceName.trim()).map((s) => s.sourceName).join(', ') || 'none specified'}</p>
+            <p className="muted">
+              Sources: {sources.filter((s) => s.sourceName.trim()).map((s) => {
+                const tier = ACCESS_TIER_OPTIONS.find((opt) => opt.value === s.accessTier)
+                return tier && tier.value ? `${s.sourceName} (${tier.label})` : s.sourceName
+              }).join(', ') || 'none specified'}
+            </p>
           </div>
         )}
       </div>
