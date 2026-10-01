@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, FolderTree, Globe, Lock, Mail, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Lock, Mail, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
@@ -101,16 +101,28 @@ export default function AdminUsersPage() {
         {users === null || memberships === null ? (
           <p className="muted">Loading…</p>
         ) : (
-          users.map((u) => (
-            <UserRow
-              key={u.id}
-              user={u}
-              memberships={membershipsByUser.get(u.id) ?? []}
-              supabase={supabase}
-              isSelf={u.email === ADMIN_EMAIL}
-              onChanged={reload}
-            />
-          ))
+          <>
+            {/* Real feedback e1c77a65 (2026-10-01): a 1-row "Quick stats"
+                summary for this section, so the overall shape of the user
+                base is visible at a glance without reading every row. */}
+            <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+              {users.length} account{users.length === 1 ? '' : 's'}
+              {' · '}
+              {users.filter((u) => u.blocked_at).length} blocked
+              {' · '}
+              {users.filter((u) => (membershipsByUser.get(u.id) ?? []).length === 0).length} not in any project
+            </p>
+            {users.map((u) => (
+              <UserRow
+                key={u.id}
+                user={u}
+                memberships={membershipsByUser.get(u.id) ?? []}
+                supabase={supabase}
+                isSelf={u.email === ADMIN_EMAIL}
+                onChanged={reload}
+              />
+            ))}
+          </>
         )}
       </div>
 
@@ -247,16 +259,23 @@ function ProjectsAdminSection({
   memberships: AdminMembershipRow[] | null
   onChanged: () => void
 }) {
-  const childCountByParent = new Map<string, number>()
+  const childrenByParent = new Map<string, AdminProjectRow[]>()
+  const topLevel: AdminProjectRow[] = []
   for (const p of projects ?? []) {
-    if (!p.parent_project_id) continue
-    childCountByParent.set(p.parent_project_id, (childCountByParent.get(p.parent_project_id) ?? 0) + 1)
+    if (p.parent_project_id) {
+      const list = childrenByParent.get(p.parent_project_id) ?? []
+      list.push(p)
+      childrenByParent.set(p.parent_project_id, list)
+    } else {
+      topLevel.push(p)
+    }
   }
+  const childCountByParent = new Map<string, number>()
+  for (const [parentId, kids] of childrenByParent) childCountByParent.set(parentId, kids.length)
   const memberCountByProject = new Map<string, number>()
   for (const m of memberships ?? []) {
     memberCountByProject.set(m.project.id, (memberCountByProject.get(m.project.id) ?? 0) + 1)
   }
-  const parentNameById = new Map((projects ?? []).map((p) => [p.id, p.name]))
 
   return (
     <div className="card" style={{ marginBottom: 20 }}>
@@ -268,17 +287,113 @@ function ProjectsAdminSection({
       {projects === null ? (
         <p className="muted">Loading…</p>
       ) : (
-        projects.map((p) => (
+        <>
+          {/* Real feedback e1c77a65 (2026-10-01): same "Quick stats" ask as
+              the Accounts section above. */}
+          <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+            {projects.length} project{projects.length === 1 ? '' : 's'}
+            {' · '}
+            {topLevel.length} space{topLevel.length === 1 ? '' : 's'}
+            {' · '}
+            {projects.length - topLevel.length} sub-project{projects.length - topLevel.length === 1 ? '' : 's'}
+            {' · '}
+            {(memberships ?? []).length} membership{(memberships ?? []).length === 1 ? '' : 's'} total
+          </p>
+          {topLevel.map((p) => (
+            <ProjectTreeRow
+              key={p.id}
+              project={p}
+              parentName={null}
+              childrenByParent={childrenByParent}
+              memberCountByProject={memberCountByProject}
+              childCountByParent={childCountByParent}
+              supabase={supabase}
+              onChanged={onChanged}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  )
+}
+
+// Real feedback 391551b6 (2026-10-01): "show sub-projects as nested under
+// a (collapsible) project row -- using subtle color and indent to clarify
+// the structures." Wraps ProjectRow (unchanged) with an indented,
+// collapsible block of its own children, recursing in case a sub-project
+// ever has children of its own (the schema doesn't forbid it, even though
+// every real project today is only one level deep).
+function ProjectTreeRow({
+  project,
+  parentName,
+  childrenByParent,
+  memberCountByProject,
+  childCountByParent,
+  supabase,
+  onChanged,
+}: {
+  project: AdminProjectRow
+  parentName: string | null
+  childrenByParent: Map<string, AdminProjectRow[]>
+  memberCountByProject: Map<string, number>
+  childCountByParent: Map<string, number>
+  supabase: ReturnType<typeof createClient>
+  onChanged: () => void
+}) {
+  const [expanded, setExpanded] = useState(true)
+  const children = childrenByParent.get(project.id) ?? []
+
+  return (
+    <div>
+      <div className="row" style={{ alignItems: 'flex-start', gap: 4 }}>
+        {children.length > 0 ? (
+          <button
+            type="button"
+            className="btn-linklike"
+            style={{ marginTop: 10, flexShrink: 0 }}
+            onClick={() => setExpanded((e) => !e)}
+            aria-label={expanded ? 'Collapse sub-projects' : 'Expand sub-projects'}
+            title={expanded ? 'Collapse sub-projects' : 'Expand sub-projects'}
+          >
+            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          </button>
+        ) : (
+          <span style={{ width: 14, flexShrink: 0 }} />
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
           <ProjectRow
-            key={p.id}
-            project={p}
-            parentName={p.parent_project_id ? parentNameById.get(p.parent_project_id) ?? null : null}
-            memberCount={memberCountByProject.get(p.id) ?? 0}
-            childCount={childCountByParent.get(p.id) ?? 0}
+            project={project}
+            parentName={parentName}
+            memberCount={memberCountByProject.get(project.id) ?? 0}
+            childCount={childCountByParent.get(project.id) ?? 0}
             supabase={supabase}
             onChanged={onChanged}
           />
-        ))
+        </div>
+      </div>
+
+      {expanded && children.length > 0 && (
+        <div
+          style={{
+            marginLeft: 26,
+            paddingLeft: 12,
+            borderLeft: '2px solid var(--series-a, var(--border))',
+            opacity: 0.94,
+          }}
+        >
+          {children.map((c) => (
+            <ProjectTreeRow
+              key={c.id}
+              project={c}
+              parentName={project.name}
+              childrenByParent={childrenByParent}
+              memberCountByProject={memberCountByProject}
+              childCountByParent={childCountByParent}
+              supabase={supabase}
+              onChanged={onChanged}
+            />
+          ))}
+        </div>
       )}
     </div>
   )
