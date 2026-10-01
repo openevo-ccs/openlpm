@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { ChevronDown, ChevronRight, LayoutList, Layers, Network, Shapes, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, LayoutList, Layers, Maximize2, Network, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
+import { layoutTier } from '@/lib/graph-layout'
 
 function cssVar(name: string, fallback: string) {
   if (typeof window === 'undefined') return fallback
@@ -467,13 +468,54 @@ function ConceptGraph({
 
   useEffect(() => {
     if (!containerRef.current) return
+    const width = containerRef.current.clientWidth || 700
+
+    // Real bug found live 2026-10-01 (Dustin: "makes little to no sense"):
+    // Cytoscape's 'breadthfirst'+circle layout treats this real tree (a
+    // handful of root concepts, each with a real and sometimes-large
+    // number of its own sub-concepts, no edges between siblings) as a
+    // tangle -- the same category of problem the student Netz tab's own
+    // 'cose' layout had, rejected there 2026-09-30 for the identical
+    // reason. Same fix: a deterministic tiered layout, one row per real
+    // depth level, reusing the exact layoutTier helper Netz already
+    // proved out rather than inventing a second algorithm. Depth isn't
+    // hardcoded to 2 -- this walks however many real levels the taxonomy
+    // actually has, same generality the original code already had.
+    const maxDepth = taxonomy.reduce((m, n) => Math.max(m, depthOf.get(n.id) ?? 0), 0)
+    const positions = new Map<string, { x: number; y: number }>()
+    const ROW_GAP = 64
+    const CHILD_SPACING = 74
+    roots.forEach((r, i) => positions.set(r.id, { x: (i + 0.5) * (width / Math.max(1, roots.length)), y: 36 }))
+    let currentLevel = roots.map((r) => r.id)
+    let y = 36
+    for (let depth = 1; depth <= maxDepth; depth++) {
+      let maxRowsThisLevel = 0
+      const nextLevel: string[] = []
+      for (const parentId of currentLevel) {
+        const kids = taxonomy.filter((n) => n.parent_id === parentId)
+        if (kids.length === 0) continue
+        const parentPos = positions.get(parentId)
+        if (!parentPos) continue
+        const maxWidth = Math.max(CHILD_SPACING, CHILD_SPACING * Math.ceil(Math.sqrt(kids.length)))
+        const { positions: kidPositions, rows } = layoutTier(kids.map((k) => ({ id: k.id })), parentPos.x, y + ROW_GAP, maxWidth, ROW_GAP * 0.65, CHILD_SPACING)
+        for (const [id, pos] of kidPositions) positions.set(id, pos)
+        maxRowsThisLevel = Math.max(maxRowsThisLevel, rows)
+        nextLevel.push(...kids.map((k) => k.id))
+      }
+      y += ROW_GAP + maxRowsThisLevel * (ROW_GAP * 0.65)
+      currentLevel = nextLevel
+    }
+
     const elements: ElementDefinition[] = [
       ...taxonomy.map((n) => {
         const count = hitsByTaxId.get(n.id)?.length ?? 0
         const depth = depthOf.get(n.id) ?? 0
         const colorVar = MAP_PALETTE[(rootIndexOf.get(n.id) ?? 0) % MAP_PALETTE.length]
-        const size = Math.max(14, 40 - depth * 10) + Math.min(count, 10) * 1.5
-        return { data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size } }
+        const size = Math.max(10, 36 - depth * 8) + Math.min(count, 10) * 1.3
+        return {
+          data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size, depth },
+          position: positions.get(n.id) ?? { x: width / 2, y: y + 60 },
+        }
       }),
       ...taxonomy
         .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
@@ -484,7 +526,9 @@ function ConceptGraph({
       container: containerRef.current,
       elements,
       boxSelectionEnabled: false,
-      layout: { name: 'breadthfirst', circle: true, spacingFactor: 1.15, animate: false },
+      layout: { name: 'preset' },
+      minZoom: 0.3,
+      maxZoom: 3,
       style: [
         {
           selector: 'node',
@@ -494,6 +538,22 @@ function ConceptGraph({
             label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '70px',
             'text-valign': 'bottom', 'text-margin-y': 4, color: cssVar('--text-primary', '#0b0b0b'),
           },
+        },
+        {
+          // Real bug found live 2026-10-01: every sub-concept's label
+          // permanently on, all at once, overlapped into unreadable text
+          // -- the same fix Netz already proved: deep (leaf-ish) labels
+          // only show on hover, same as a Lernziel node there.
+          selector: 'node[depth >= 2]',
+          style: { label: '' },
+        },
+        {
+          selector: 'node.hover-label',
+          style: {
+            label: 'data(label)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1,
+            'text-background-padding': '3px', 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc'),
+          } as any,
         },
         { selector: 'node:selected', style: { 'border-width': 3, 'border-color': cssVar('--text-primary', '#0b0b0b') } },
         {
@@ -507,7 +567,16 @@ function ConceptGraph({
       const n = taxonomy.find((e) => e.id === evt.target.id())
       if (n) onSelect(n)
     })
+    cy.on('mouseover', 'node', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'node', (evt) => evt.target.removeClass('hover-label'))
 
+    // `.graph-canvas` fills whatever height its flex parent gives it
+    // (position:absolute; inset:0 -- unlike the student Netz tab's plain
+    // block container, this page's split-pane "explorer" shell drives
+    // height from the viewport, not page scroll), so a real multi-row
+    // tiered tree needs an explicit fit rather than a JS-set pixel height
+    // (which `inset:0` would just override anyway).
+    cy.fit(undefined, 24)
     cyRef.current = cy
     return () => { cy.destroy() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -529,6 +598,14 @@ function ConceptGraph({
   return (
     <div className="graph-host">
       <div ref={containerRef} className="graph-canvas" />
+      <button
+        className="btn btn-mini"
+        style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
+        aria-label="Fit to screen"
+        onClick={() => cyRef.current?.fit(undefined, 24)}
+      >
+        <Maximize2 size={12} />
+      </button>
       {taxonomy.length === 0 && (
         <div className="empty" style={{ position: 'absolute', inset: 0 }}>
           <Network size={32} />

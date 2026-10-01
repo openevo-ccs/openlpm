@@ -6,6 +6,7 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { ancestorAtDepth, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { layoutTier } from '@/lib/graph-layout'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
@@ -265,39 +266,6 @@ interface GraphEdgeDatum {
 }
 interface NetzInsightUk { id: string; label: string; rootLabel: string; rootIdx: number; count: number }
 interface NetzInsightLz { id: string; title: string; rootCount: number; rootLabels: string[] }
-
-// Same tiered/staggered placement rule used for both tiers below: fills
-// rows left-to-right, staggering alternate rows by half a column so dense
-// clusters don't read as a rigid grid -- the exact algorithm Dustin's own
-// 2026-09-30 feedback validated for the Basiskonzept->Lernziel tier,
-// generalized here so the new Basiskonzept->Unterkonzept tier (and
-// Unterkonzept->Lernziel, one level deeper) can reuse it instead of a
-// second hand-written layout.
-function layoutTier(
-  items: { id: string }[],
-  centerX: number,
-  startY: number,
-  maxWidth: number,
-  rowHeight: number,
-  nodeSpacing: number
-): { positions: Map<string, { x: number; y: number }>; rows: number } {
-  const positions = new Map<string, { x: number; y: number }>()
-  if (items.length === 0) return { positions, rows: 0 }
-  const cols = Math.max(1, Math.min(Math.ceil(Math.sqrt(items.length)), Math.max(1, Math.floor(maxWidth / nodeSpacing))))
-  const colW = Math.min(nodeSpacing, maxWidth / cols)
-  let maxRow = 0
-  items.forEach((item, i) => {
-    const row = Math.floor(i / cols)
-    maxRow = Math.max(maxRow, row)
-    const col = i % cols
-    const rowItemCount = Math.min(cols, items.length - row * cols)
-    const rowWidth = rowItemCount * colW
-    const stagger = row % 2 === 1 ? colW / 2 : 0
-    const startX = centerX - rowWidth / 2 + colW / 2 + stagger
-    positions.set(item.id, { x: startX + col * colW, y: startY + row * rowHeight })
-  })
-  return { positions, rows: maxRow + 1 }
-}
 
 function NetzTab({
   project,
