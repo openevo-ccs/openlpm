@@ -172,6 +172,12 @@ code {
 
 /* ---- primitives ---- */
 .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+
+/* Real feedback b4b23580/74e440a3 (2026-10-01): a real visible box around a
+   group of cards, not just a heading -- one step lighter than .card (which
+   stays the brightest surface) so a frame full of cards reads as a group
+   sitting slightly off the page, not another card of its own. */
+.frame { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
 .card h2, .card h3 { margin-top: 0; }
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }

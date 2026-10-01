@@ -7,6 +7,7 @@ import { ADMIN_EMAIL } from '@/lib/admin'
 import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
+import { projectColorHex, projectColorTint } from '@/lib/project-colors'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -275,6 +276,11 @@ function AddToProjectControl({
   )
 }
 
+// Real feedback 50fb138d (2026-10-01): "every row for a given user should
+// be collapsible (default collapsed)". Collapsed, a row is just name, email,
+// blocked status and a membership count -- enough to scan 7+ accounts
+// without a wall of per-project chips. Expanding reveals the same controls
+// that were always here (block/unblock, per-project role, add to project).
 function UserRow({
   user,
   memberships,
@@ -291,6 +297,7 @@ function UserRow({
   onChanged: () => void
 }) {
   const [busy, setBusy] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const blocked = !!user.blocked_at
 
   const toggleBlocked = async () => {
@@ -303,19 +310,32 @@ function UserRow({
   return (
     <div style={{ padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span>
+        <button
+          type="button"
+          className="btn-linklike row"
+          style={{ gap: 6, textDecoration: 'none', color: 'inherit', flexWrap: 'wrap' }}
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? <ChevronDown size={13} style={{ flexShrink: 0 }} /> : <ChevronRight size={13} style={{ flexShrink: 0 }} />}
           <strong>{user.name}</strong>
-          <span className="muted" style={{ marginLeft: 6 }}>{user.email}</span>
-          {blocked && <span className="chip chip-critical" style={{ marginLeft: 6 }}>Blocked</span>}
-        </span>
+          <span className="muted">{user.email}</span>
+          {blocked && <span className="chip chip-critical">Blocked</span>}
+          {!expanded && (
+            <span className="muted" style={{ fontSize: 12 }}>
+              {memberships.length === 0 ? '· not in any project' : `· ${memberships.length} project${memberships.length === 1 ? '' : 's'}`}
+            </span>
+          )}
+        </button>
         {isSelf ? (
-          <span className="muted" style={{ fontSize: 12 }}>This is you</span>
+          <span className="muted" style={{ fontSize: 12, flexShrink: 0 }}>This is you</span>
         ) : (
           <button
             className={`btn btn-mini${blocked ? '' : ' btn-danger'}`}
             disabled={busy}
             onClick={toggleBlocked}
             title={blocked ? 'Let them sign in again' : "Block this account from signing in -- reversible, nothing is deleted"}
+            style={{ flexShrink: 0 }}
           >
             {blocked ? <UserCheck size={11} /> : <UserX size={11} />}
             {blocked ? 'Unblock' : 'Block'}
@@ -323,18 +343,22 @@ function UserRow({
         )}
       </div>
 
-      {memberships.length === 0 ? (
-        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>Not a member of any project.</p>
-      ) : (
-        <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {memberships.map((m) => (
-            <MembershipChip key={m.id} membership={m} supabase={supabase} onChanged={onChanged} />
-          ))}
-        </div>
+      {expanded && (
+        <>
+          {memberships.length === 0 ? (
+            <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>Not a member of any project.</p>
+          ) : (
+            <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              {memberships.map((m) => (
+                <MembershipChip key={m.id} membership={m} supabase={supabase} onChanged={onChanged} />
+              ))}
+            </div>
+          )}
+          <div style={{ marginTop: 6 }}>
+            <AddToProjectControl user={user} memberships={memberships} projects={projects} supabase={supabase} onChanged={onChanged} />
+          </div>
+        </>
       )}
-      <div style={{ marginTop: 6 }}>
-        <AddToProjectControl user={user} memberships={memberships} projects={projects} supabase={supabase} onChanged={onChanged} />
-      </div>
     </div>
   )
 }
@@ -443,85 +467,32 @@ function ProjectsAdminSection({
   }
   const clearSelection = () => { setSelectedIds(new Set()); setBulkEditing(false) }
   const selectedProjects = (projects ?? []).filter((p) => selectedIds.has(p.id))
+  const repoProjects = (projects ?? []).filter(isRepository)
+  const standardProjects = (projects ?? []).filter((p) => !isRepository(p))
 
+  // Real feedback 74e440a3 (2026-10-01): "Curriculum repositories are
+  // different than projects even if they share underlying infrastructure --
+  // they should be in their own frame." Two separate cards now, not two
+  // headings sharing one. Bulk-select/edit stays scoped to real project
+  // spaces below -- a curriculum repository's own metadata is edited
+  // one-at-a-time via its row, same as before.
   return (
-    <div className="card" style={{ marginBottom: 20 }}>
-      <h3 className="row"><FolderTree size={16} />Projects</h3>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        Every project space across OpenLPM. Deleting one is permanent — everything inside it
-        (Learning Goals, Concepts, membership, discussions, and so on) goes with it, with no undo.
-        Check any number of projects below to edit their meta-data together.
-      </p>
-      {projects === null ? (
-        <p className="muted">Loading…</p>
-      ) : (
-        <>
-          {/* Real feedback e1c77a65 (2026-10-01): same "Quick stats" ask as
-              the Accounts section above. */}
-          <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
-            {projects.length} project{projects.length === 1 ? '' : 's'}
-            {' · '}
-            {topLevel.length} space{topLevel.length === 1 ? '' : 's'}
-            {' · '}
-            {projects.length - topLevel.length} sub-project{projects.length - topLevel.length === 1 ? '' : 's'}
-            {' · '}
-            {(memberships ?? []).length} membership{(memberships ?? []).length === 1 ? '' : 's'} total
+    <>
+      {repoTopLevel.length > 0 && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <h3 className="row"><Library size={16} />Curriculum Repositories</h3>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Curated national/regional curriculum-policy source material, kept separate from
+            research project spaces below.
           </p>
-
-          {selectedIds.size > 0 && (
-            <div
-              className="row"
-              style={{
-                justifyContent: 'space-between',
-                padding: '8px 10px',
-                marginBottom: 10,
-                borderRadius: 6,
-                background: 'var(--bg-subtle, transparent)',
-                border: '1px solid var(--border)',
-              }}
-            >
-              <span style={{ fontSize: 13 }}>
-                <strong>{selectedIds.size}</strong> project{selectedIds.size === 1 ? '' : 's'} selected
-              </span>
-              <span className="row" style={{ gap: 6 }}>
-                <button className="btn btn-mini btn-primary" onClick={() => setBulkEditing((v) => !v)}>
-                  <Pencil size={11} />{bulkEditing ? 'Close bulk edit' : 'Bulk edit selected'}
-                </button>
-                <button className="btn btn-mini" onClick={clearSelection}>Clear selection</button>
-              </span>
-            </div>
-          )}
-
-          {bulkEditing && selectedProjects.length > 0 && (
-            <BulkEditPanel
-              projects={selectedProjects}
-              supabase={supabase}
-              onApplied={onChanged}
-              onClose={clearSelection}
-            />
-          )}
-
-          {repoTopLevel.length > 0 && (
-            <>
-              <h4 className="row" style={{ fontSize: 13, marginBottom: 6, gap: 5 }}><Library size={13} />Curriculum Repositories</h4>
-              {repoTopLevel.map((p) => (
-                <ProjectTreeRow
-                  key={p.id}
-                  project={p}
-                  parentName={null}
-                  childrenByParent={childrenByParent}
-                  memberCountByProject={memberCountByProject}
-                  childCountByParent={childCountByParent}
-                  supabase={supabase}
-                  onChanged={onChanged}
-                  selectedIds={selectedIds}
-                  onToggleSelect={toggleSelect}
-                />
-              ))}
-              <h4 className="row" style={{ fontSize: 13, marginTop: 14, marginBottom: 6 }}>Project Spaces</h4>
-            </>
-          )}
-          {standardTopLevel.map((p) => (
+          <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+            {repoProjects.length} repositor{repoProjects.length === 1 ? 'y' : 'ies'}
+            {' · '}
+            {repoTopLevel.length} top-level
+            {' · '}
+            {repoProjects.length - repoTopLevel.length} nested
+          </p>
+          {repoTopLevel.map((p) => (
             <ProjectTreeRow
               key={p.id}
               project={p}
@@ -533,11 +504,86 @@ function ProjectsAdminSection({
               onChanged={onChanged}
               selectedIds={selectedIds}
               onToggleSelect={toggleSelect}
+              selectable={false}
             />
           ))}
-        </>
+        </div>
       )}
-    </div>
+
+      <div className="card" style={{ marginBottom: 20 }}>
+        <h3 className="row"><FolderTree size={16} />Projects</h3>
+        <p className="muted" style={{ marginBottom: 12 }}>
+          Every project space across OpenLPM. Deleting one is permanent — everything inside it
+          (Learning Goals, Concepts, membership, discussions, and so on) goes with it, with no undo.
+          Check any number of projects below to edit their meta-data together.
+        </p>
+        {projects === null ? (
+          <p className="muted">Loading…</p>
+        ) : (
+          <>
+            {/* Real feedback e1c77a65 (2026-10-01): same "Quick stats" ask as
+                the Accounts section above. */}
+            <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+              {standardProjects.length} project{standardProjects.length === 1 ? '' : 's'}
+              {' · '}
+              {standardTopLevel.length} space{standardTopLevel.length === 1 ? '' : 's'}
+              {' · '}
+              {standardProjects.length - standardTopLevel.length} sub-project{(standardProjects.length - standardTopLevel.length) === 1 ? '' : 's'}
+              {' · '}
+              {(memberships ?? []).length} membership{(memberships ?? []).length === 1 ? '' : 's'} total
+            </p>
+
+            {selectedIds.size > 0 && (
+              <div
+                className="row"
+                style={{
+                  justifyContent: 'space-between',
+                  padding: '8px 10px',
+                  marginBottom: 10,
+                  borderRadius: 6,
+                  background: 'var(--bg-subtle, transparent)',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <span style={{ fontSize: 13 }}>
+                  <strong>{selectedIds.size}</strong> project{selectedIds.size === 1 ? '' : 's'} selected
+                </span>
+                <span className="row" style={{ gap: 6 }}>
+                  <button className="btn btn-mini btn-primary" onClick={() => setBulkEditing((v) => !v)}>
+                    <Pencil size={11} />{bulkEditing ? 'Close bulk edit' : 'Bulk edit selected'}
+                  </button>
+                  <button className="btn btn-mini" onClick={clearSelection}>Clear selection</button>
+                </span>
+              </div>
+            )}
+
+            {bulkEditing && selectedProjects.length > 0 && (
+              <BulkEditPanel
+                projects={selectedProjects}
+                supabase={supabase}
+                onApplied={onChanged}
+                onClose={clearSelection}
+              />
+            )}
+
+            {standardTopLevel.map((p) => (
+              <ProjectTreeRow
+                key={p.id}
+                project={p}
+                parentName={null}
+                childrenByParent={childrenByParent}
+                memberCountByProject={memberCountByProject}
+                childCountByParent={childCountByParent}
+                supabase={supabase}
+                onChanged={onChanged}
+                selectedIds={selectedIds}
+                onToggleSelect={toggleSelect}
+              />
+            ))}
+          </>
+        )}
+      </div>
+    </>
   )
 }
 
@@ -752,6 +798,7 @@ function ProjectTreeRow({
   onChanged,
   selectedIds,
   onToggleSelect,
+  selectable = true,
 }: {
   project: AdminProjectRow
   parentName: string | null
@@ -762,20 +809,26 @@ function ProjectTreeRow({
   onChanged: () => void
   selectedIds: Set<string>
   onToggleSelect: (id: string) => void
+  selectable?: boolean
 }) {
   const [expanded, setExpanded] = useState(true)
   const children = childrenByParent.get(project.id) ?? []
+  const tint = projectColorTint((project as any).color)
 
   return (
     <div>
       <div className="row" style={{ alignItems: 'flex-start', gap: 4 }}>
-        <input
-          type="checkbox"
-          checked={selectedIds.has(project.id)}
-          onChange={() => onToggleSelect(project.id)}
-          aria-label={`Select ${project.name} for bulk edit`}
-          style={{ marginTop: 12, flexShrink: 0 }}
-        />
+        {selectable ? (
+          <input
+            type="checkbox"
+            checked={selectedIds.has(project.id)}
+            onChange={() => onToggleSelect(project.id)}
+            aria-label={`Select ${project.name} for bulk edit`}
+            style={{ marginTop: 12, flexShrink: 0 }}
+          />
+        ) : (
+          <span style={{ width: 13, flexShrink: 0 }} />
+        )}
         {children.length > 0 ? (
           <button
             type="button"
@@ -807,8 +860,11 @@ function ProjectTreeRow({
           style={{
             marginLeft: 26,
             paddingLeft: 12,
-            borderLeft: '2px solid var(--series-a, var(--border))',
-            opacity: 0.94,
+            paddingTop: 6,
+            paddingBottom: 2,
+            borderLeft: `2px solid ${projectColorHex((project as any).color) ?? 'var(--series-a, var(--border))'}`,
+            borderRadius: '0 6px 6px 0',
+            background: tint ?? 'var(--bg-subtle, transparent)',
           }}
         >
           {children.map((c) => (
@@ -823,6 +879,7 @@ function ProjectTreeRow({
               onChanged={onChanged}
               selectedIds={selectedIds}
               onToggleSelect={onToggleSelect}
+              selectable={selectable}
             />
           ))}
         </div>
@@ -1172,29 +1229,85 @@ function JoinRulesAdminSection({
 // exactly where it already lives (admin-feedback-page.tsx, unchanged) --
 // this is just the entry point + the real quick-look dashboard, replacing
 // the topbar's own direct link (dashboard-layout.tsx).
+// Catmull-Rom -> cubic Bezier, for a smoothed line through a set of points
+// without pulling in a charting library -- this app hand-rolls every chart.
+function smoothedPath(points: { x: number; y: number }[]): string {
+  if (points.length === 0) return ''
+  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`
+  let d = `M ${points[0].x} ${points[0].y}`
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[i - 1] ?? points[i]
+    const p1 = points[i]
+    const p2 = points[i + 1]
+    const p3 = points[i + 2] ?? p2
+    const c1x = p1.x + (p2.x - p0.x) / 6
+    const c1y = p1.y + (p2.y - p0.y) / 6
+    const c2x = p2.x - (p3.x - p1.x) / 6
+    const c2y = p2.y - (p3.y - p1.y) / 6
+    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`
+  }
+  return d
+}
+
+// Real feedback c0829815 (2026-10-01): "Move 'Feedback' on the header
+// menu into a section on the Admin page - also with its own short
+// dashboard e.g. # open, # resolved total, graph of # open/resolved over
+// last 6 months." The full feedback list + resolve/reopen UI stays
+// exactly where it already lives (admin-feedback-page.tsx, unchanged) --
+// this is just the entry point + the real quick-look dashboard, replacing
+// the topbar's own direct link (dashboard-layout.tsx).
+//
+// Real feedback 54f91ed0 (2026-10-01): "use something better than bar
+// charts - like semi-transparent heavily smoothed line charts... maybe
+// have higher resolution, like at least by week." Weekly buckets (26 of
+// them for 6 months) instead of monthly, two smoothed lines with a
+// semi-transparent fill under each instead of stacked bars. Bucketed the
+// same way the old chart was: by each item's created_at falling in that
+// week, split by its CURRENT status -- this app doesn't record a
+// resolved_at, so "resolved" means "created in that week, already
+// resolved by now," same meaning the bar chart used, just redrawn.
 function FeedbackAdminSection({ feedback }: { feedback: FeedbackItem[] | null }) {
   const openCount = (feedback ?? []).filter((f) => f.status === 'open').length
   const resolvedCount = (feedback ?? []).filter((f) => f.status === 'resolved').length
 
-  // Last 6 calendar months including the current one, oldest first.
-  const months = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date()
-    d.setDate(1)
-    d.setMonth(d.getMonth() - (5 - i))
-    return { year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleDateString(undefined, { month: 'short' }) }
+  // 26 weeks (~6 months), oldest first, each a Monday-start 7-day window
+  // ending today for the most recent bucket.
+  const WEEKS = 26
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const weeks = Array.from({ length: WEEKS }, (_, i) => {
+    const end = new Date(today)
+    end.setDate(end.getDate() - (WEEKS - 1 - i) * 7)
+    const start = new Date(end)
+    start.setDate(start.getDate() - 6)
+    return { start, end, label: start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }
   })
-  const buckets = months.map(({ year, month, label }) => {
-    const inMonth = (feedback ?? []).filter((f) => {
+  const buckets = weeks.map(({ start, end, label }) => {
+    const inWeek = (feedback ?? []).filter((f) => {
       const c = new Date(f.created_at)
-      return c.getFullYear() === year && c.getMonth() === month
+      return c >= start && c <= end
     })
     return {
       label,
-      open: inMonth.filter((f) => f.status === 'open').length,
-      resolved: inMonth.filter((f) => f.status === 'resolved').length,
+      open: inWeek.filter((f) => f.status === 'open').length,
+      resolved: inWeek.filter((f) => f.status === 'resolved').length,
     }
   })
-  const maxTotal = Math.max(1, ...buckets.map((b) => b.open + b.resolved))
+  const maxValue = Math.max(1, ...buckets.map((b) => Math.max(b.open, b.resolved)))
+
+  // Plot geometry: a 0-600 x 0-100 viewBox, y grows downward so invert.
+  const W = 600
+  const H = 100
+  const stepX = W / (buckets.length - 1)
+  const toY = (v: number) => H - (v / maxValue) * (H - 6) - 2
+  const openPoints = buckets.map((b, i) => ({ x: i * stepX, y: toY(b.open) }))
+  const resolvedPoints = buckets.map((b, i) => ({ x: i * stepX, y: toY(b.resolved) }))
+  const openPath = smoothedPath(openPoints)
+  const resolvedPath = smoothedPath(resolvedPoints)
+  const openArea = `${openPath} L ${W} ${H} L 0 ${H} Z`
+  const resolvedArea = `${resolvedPath} L ${W} ${H} L 0 ${H} Z`
+  // Every 4th week labeled (~monthly) so the axis doesn't crowd.
+  const labeledEvery = 4
 
   return (
     <div className="card">
@@ -1222,37 +1335,35 @@ function FeedbackAdminSection({ feedback }: { feedback: FeedbackItem[] | null })
             </div>
           </div>
 
-          <p className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Last 6 months, open vs. resolved</p>
-          <div className="row" style={{ alignItems: 'flex-end', gap: 14, height: 90, marginBottom: 4 }}>
-            {buckets.map((b) => {
-              const total = b.open + b.resolved
-              const totalHeight = total === 0 ? 2 : Math.max(4, (total / maxTotal) * 80)
-              const resolvedHeight = total === 0 ? 0 : (b.resolved / total) * totalHeight
-              const openHeight = totalHeight - resolvedHeight
-              return (
-                <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 80, width: '100%', maxWidth: 28 }}>
-                    {openHeight > 0 && (
-                      <div
-                        style={{ width: '100%', height: openHeight, background: 'var(--warning)', borderRadius: '3px 3px 0 0' }}
-                        title={`${b.open} open`}
-                      />
-                    )}
-                    {resolvedHeight > 0 && (
-                      <div
-                        style={{ width: '100%', height: resolvedHeight, background: 'var(--good)', borderRadius: openHeight > 0 ? 0 : '3px 3px 0 0' }}
-                        title={`${b.resolved} resolved`}
-                      />
-                    )}
-                  </div>
-                  <span className="muted" style={{ fontSize: 10.5 }}>{b.label}</span>
-                </div>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Last 6 months, by week -- open vs. resolved</p>
+          <svg viewBox={`0 0 ${W} ${H + 16}`} style={{ width: '100%', height: 110 }} role="img" aria-label="Feedback submitted per week, open vs. resolved, last 6 months">
+            <line x1={0} y1={H} x2={W} y2={H} stroke="var(--border)" strokeWidth={1} />
+            <path d={openArea} fill="var(--warning)" fillOpacity={0.12} stroke="none" />
+            <path d={resolvedArea} fill="var(--good)" fillOpacity={0.12} stroke="none" />
+            {/* Open: dashed stroke -- a secondary, non-color cue from Resolved's solid line, since amber/green sit close together for red-green color blindness. */}
+            <path d={openPath} fill="none" stroke="var(--warning)" strokeWidth={2} strokeDasharray="5 3" strokeLinecap="round" />
+            <path d={resolvedPath} fill="none" stroke="var(--good)" strokeWidth={2} strokeLinecap="round" />
+            {buckets.map((b, i) => (
+              <g key={`hit-${i}`}>
+                <circle cx={i * stepX} cy={toY(b.open)} r={7} fill="transparent"><title>{`${b.label}: ${b.open} open`}</title></circle>
+                <circle cx={i * stepX} cy={toY(b.resolved)} r={7} fill="transparent"><title>{`${b.label}: ${b.resolved} resolved`}</title></circle>
+              </g>
+            ))}
+            {buckets.map((b, i) => (
+              i % labeledEvery === 0 && (
+                <text key={`lbl-${i}`} x={i * stepX} y={H + 13} fontSize={9} fill="var(--text-muted)" textAnchor="middle">{b.label}</text>
               )
-            })}
-          </div>
-          <div className="row" style={{ gap: 14, fontSize: 11.5, marginBottom: 14 }}>
-            <span className="row" style={{ gap: 4 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--warning)', display: 'inline-block' }} />Open</span>
-            <span className="row" style={{ gap: 4 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--good)', display: 'inline-block' }} />Resolved</span>
+            ))}
+          </svg>
+          <div className="row" style={{ gap: 14, fontSize: 11.5, marginTop: 4, marginBottom: 14 }}>
+            <span className="row" style={{ gap: 4 }}>
+              <svg width={14} height={9}><line x1={0} y1={4.5} x2={14} y2={4.5} stroke="var(--warning)" strokeWidth={2} strokeDasharray="4 2.5" /></svg>
+              Open
+            </span>
+            <span className="row" style={{ gap: 4 }}>
+              <svg width={14} height={9}><line x1={0} y1={4.5} x2={14} y2={4.5} stroke="var(--good)" strokeWidth={2} /></svg>
+              Resolved
+            </span>
           </div>
         </>
       )}

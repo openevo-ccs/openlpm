@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, ShieldAlert, Sparkles } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
@@ -211,10 +211,16 @@ export default function ProjectLayout() {
   // browser itself (still gated on hasRepo -- the PARENT "Curriculum
   // Repositories" space holds no records of its own, just two
   // sub-repositories, so it doesn't get that tab either).
+  // Real feedback 67375983 (2026-10-01): "settings page should be at the
+  // bottom of the sidebar menu." Shown to every member, not just
+  // owners/maintainers -- same as today's Members list, the page itself
+  // still gates each editable section (color, invites, self-join, student
+  // view, danger zone) to canManage/owner exactly as before.
   const nav = isRepository
     ? [
         { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
+        { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
       ]
     : [
         { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
@@ -228,6 +234,7 @@ export default function ProjectLayout() {
         { href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
         { href: `/dashboard/${slug}/analytics`, icon: <BarChart3 size={14} />, label: 'Analytics' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
+        { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
       ]
 
   const canManage = role === 'owner' || role === 'maintainer'

@@ -19,3 +19,17 @@ export function projectColorHex(key: string | null | undefined): string | null {
   if (!key) return null
   return PROJECT_COLORS.find((c) => c.key === key)?.hex ?? null
 }
+
+// Real feedback 95a618c0 (2026-10-01): "make the distinction between
+// project and sub-project a little more clear... using the project space
+// color selection, subtly." A very low-alpha fill behind a sub-project
+// group, using that same project's own color -- distinct from the fuller-
+// strength left border the color already draws elsewhere.
+export function projectColorTint(key: string | null | undefined, alpha = 0.06): string | null {
+  const hex = projectColorHex(key)
+  if (!hex) return null
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
