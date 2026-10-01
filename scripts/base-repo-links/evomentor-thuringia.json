@@ -1,0 +1,131 @@
+{
+  "project_slug": "evomentor-thuringia",
+  "_note": "Manifest for scripts/link_base_repo_content.mjs. Every real theory/literature id here was read directly from TheoryBase/LiteratureBase, not reconstructed from memory -- see lab_manager docs/design-notes/evomentor-thuringia-theorybase-literaturebase-integration-2026-10-01.md for the full sourcing trail. Dustin Eirdosh decided 2026-10-01 to show the ICR/DCR dispute two-sided in the researcher view rather than citing only the supportive side -- that decision is encoded in the theory_relations entry linking them below, not just in prose.",
+
+  "literature": [
+    { "doi": "10.1007/s11191-020-00157-z", "title": "Causal Mapping as a Teaching Tool for Reflecting on Causation in Human Evolution", "authors": ["Hanisch, Susan", "Eirdosh, Dustin"], "year": 2021, "venue": "Science & Education", "type": "article" },
+    { "doi": "10.1007/978-3-031-33358-3_8", "title": "Teaching for the Interdisciplinary Understanding of Evolutionary Concepts", "authors": ["Hanisch, Susan", "Eirdosh, Dustin"], "year": 2023, "venue": "Synthese Library", "type": "chapter" },
+    { "doi": "10.1080/00219266.2025.2486963", "title": "Understanding agency in evolutionary explanations: an assessment tool for biology education", "authors": ["Hanisch, Susan", "Eirdosh, Dustin", "González Galli, Leonardo", "Hartelt, Tim", "Pérez, Gastón", "Cupo, Betina"], "year": 2025, "venue": "Journal of Biological Education", "type": "article" },
+    { "doi": "10.1007/978-3-031-33358-3_7", "title": "A Community Science Model for Inter-disciplinary Evolution Education and School Improvement", "authors": ["Eirdosh, Dustin", "Hanisch, Susan"], "year": 2023, "venue": "Synthese Library", "type": "chapter" },
+    { "doi": "10.1186/s12052-020-00120-0", "title": "The self-regulation of teleological thinking in natural selection learning", "authors": ["González Galli, Leonardo", "Peréz, Gastón", "Gómez Galindo, Alma Adrianna"], "year": 2020, "venue": "Evolution: Education and Outreach", "type": "article" },
+    { "doi": "10.1016/j.cognition.2009.01.001", "title": "The Human Function Compunction: Teleological explanation in adults", "authors": ["Kelemen, Deborah", "Rosset, Evelyn"], "year": 2009, "venue": "Cognition", "type": "article" },
+    { "doi": "10.1186/s12052-019-0116-z", "title": "Students' \"teleological misconceptions\" in evolution education: why the underlying design stance, not teleology per se, is the problem", "authors": ["Kampourakis, Kostas"], "year": 2020, "venue": "Evolution: Education and Outreach", "type": "article" },
+    { "doi": null, "title": "Evolution Education and Outreach — Important Things to Know About How to Teach About Evolution", "authors": ["Nehm, Ross", "Kampourakis, Kostas"], "year": 2022, "venue": null, "type": "chapter", "_note": "LiteratureBase's own record (OE-LITERATURE-nehm-2022) had its original DOI removed 2026-07-30 after it was found to resolve to an unrelated paper -- almost certainly a hallucinated extraction. No real DOI is known yet. Inserted here without one rather than guessing." },
+    { "doi": null, "title": "Restructurations: Reformulations of knowledge disciplines through new representational forms", "authors": ["Wilensky, Uri", "Papert, Seymour"], "year": 2010, "venue": "Proceedings of the Constructionism 2010 Conference", "type": null, "_note": "Conference proceedings, genuinely no DOI (not a gap in sourcing) -- local schema also has no 'conference-paper' type option, so type is left null rather than mis-typed as 'article'." }
+  ],
+
+  "theories": [
+    {
+      "base_repo_ref": "OE-THEORY-integrated-causal-reasoning",
+      "label": "Integrated Causal Reasoning / Contextually Flexible Causal Reasoning (ICR/CFCR)",
+      "description": "OpenEvo's own research position (Hanisch, Eirdosh, González Galli, Hartelt, Pérez & Cupo). Claims a scientifically complete evolutionary explanation must include organism agency as a real cause in cases where it's a documented contributor (e.g. niche selection, niche construction, behavioral plasticity) rather than relying on the decentralized Modern Synthesis mechanism alone. This project's own content -- the split between the 'Individuelle Entwicklung' and 'Evolutive Entwicklung' Basiskonzepte -- follows this position.",
+      "evidentiary_maturity": "empirically-recovered",
+      "evidentiary_maturity_note": "The 2025 EvoFlex paper (linked below) found real empirical evidence that the agency/mentalism distinction this theory relies on is measurable and teachable -- not yet tested head-to-head against DCR-taught classroom outcomes specifically."
+    },
+    {
+      "base_repo_ref": "OE-THEORY-dichotomized-causal-reasoning",
+      "label": "Dichotomized Causal Reasoning (DCR)",
+      "description": "A rival position associated with researchers Kostas Kampourakis and Ross Nehm. Claims a complete evolutionary explanation should rely only on the decentralized Modern Synthesis mechanism (random heritable variation + differential reproduction); organism agency is deliberately excluded from the explanation to avoid reinforcing anthropomorphic misconceptions. Written here as OpenEvo's own characterization of Kampourakis's and Nehm's published position, for comparison -- not confirmed or reviewed by either of them. Shown here deliberately, not omitted: this project's researcher view is meant to show the real, live academic disagreement, not just the side it follows.",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": "Not rated -- this project doesn't hold this position, so rating its own evidentiary maturity isn't this project's call to make."
+    },
+    {
+      "base_repo_ref": "OE-THEORY-german-basiskonzept-didactics",
+      "label": "German 'Basiskonzept' Biology-Didactics Tradition (Kattmann/Gropengießer)",
+      "description": "The German biology-education research tradition behind the KMK Bildungsstandards Biologie's 'Basiskonzept' framework -- the recurring core concepts this project's entire six-concept structure is organized around. Deliberately a lightweight placeholder: TheoryBase has no real, sourced citation for this tradition yet, and this record intentionally names no specific publication rather than guess at one. See TheoryBase's own record for the full placeholder note.",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": "Not rated -- unsourced placeholder, see description."
+    },
+    {
+      "base_repo_ref": "OE-MISCONCEPTION-anthropomorphic-intention",
+      "label": "Anthropomorphic Intentionality in Evolutionary Change (documented misconception, not a theory)",
+      "description": "Attributing conscious deliberation, awareness of future evolutionary consequences, and intentional planning toward an evolutionary outcome to a non-human organism. Example student statement: \"Some ancestors of the cheetahs recognized that they could not catch enough prey. Hence, they trained to run faster.\" Both ICR and DCR agree this specific statement is a misconception -- their real disagreement is about a different, more subtle case (see the DCR/ICR relation below).",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": null
+    },
+    {
+      "base_repo_ref": "OE-MISCONCEPTION-essentialism",
+      "label": "Species Essentialism / Typological Thinking (documented misconception, not a theory)",
+      "description": "The belief that all members of a species share one fixed 'true nature,' and that variation between individuals is a deviation from that type rather than the raw material evolution works on. Example: \"All cheetahs are built to run fast -- that's just what cheetahs are like.\"",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": null
+    },
+    {
+      "base_repo_ref": "OE-MISCONCEPTION-agency-binary",
+      "label": "Agency as Binary: Humans Have It, Other Organisms Don't (documented misconception, not a theory)",
+      "description": "Treating agency as all-or-nothing -- crediting humans with goals and choices while categorically denying any non-human organism the same, sometimes inconsistently within the same student's own other answers. Found directly in the EvoFlex research: students who credited human behavior as an evolutionary cause chose that same option less often when the identical question was asked about a non-human case.",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": null
+    },
+    {
+      "base_repo_ref": "OE-DIVERGENCE-agency-negation",
+      "label": "Agency Negation: Correct Response vs. Novel Misconception (a live, concrete assessment dispute)",
+      "description": "The same real student response -- \"organism behavior played no role in the evolution of this trait,\" for the classic cheetah-running-speed case -- is scored CORRECT by a real DCR-aligned assessment tool (KAEVO 2.0) and INCORRECT by a real ICR-aligned assessment tool (EvoFlex). This isn't a scoring bug in either tool. It's the direct, concrete consequence of the DCR/ICR disagreement above: both instruments cannot be correct at once for the same case. Not a theory itself -- a documented point of live disagreement between the two theories in this list.",
+      "evidentiary_maturity": null,
+      "evidentiary_maturity_note": null
+    }
+  ],
+
+  "theory_literature_links": [
+    { "theory_ref": "OE-THEORY-integrated-causal-reasoning", "literature_doi": "10.1080/00219266.2025.2486963", "relation_type": "empirical-support", "note": "The EvoFlex paper itself -- this theory's own primary empirical source." },
+    { "theory_ref": "OE-THEORY-integrated-causal-reasoning", "literature_doi": "10.1007/s11191-020-00157-z", "relation_type": "theoretical-clarification", "note": "The causal-mapping teaching tool this theory's assessment work later grew out of." },
+    { "theory_ref": "OE-THEORY-integrated-causal-reasoning", "literature_doi": "10.1007/978-3-031-33358-3_8", "relation_type": "theoretical-clarification", "note": "Makes the broader case for teaching evolution as genuinely interdisciplinary, the framing this theory extends." },
+    { "theory_ref": "OE-THEORY-integrated-causal-reasoning", "literature_doi": "10.1007/978-3-031-33358-3_7", "relation_type": "theoretical-clarification", "note": "Same author pair's companion chapter, on the design-based-research/community-science model this theory's own research program follows." },
+    { "theory_ref": "OE-THEORY-integrated-causal-reasoning", "literature_doi": "10.1186/s12052-020-00120-0", "relation_type": "empirical-support", "note": "LiteratureBase's own cross-reference: the metacognitive-regulation basis for this theory's Contextually Flexible Causal Reasoning (CFCR) component." },
+    { "theory_ref": "OE-THEORY-dichotomized-causal-reasoning", "literature_doi": "10.1186/s12052-019-0116-z", "relation_type": "theoretical-clarification", "note": "The primary source for this reconstructed position." },
+    { "theory_ref": "OE-THEORY-dichotomized-causal-reasoning", "literature_doi": null, "literature_title": "Evolution Education and Outreach — Important Things to Know About How to Teach About Evolution", "relation_type": "theoretical-clarification", "note": "A co-authored follow-up restating the same position for a practitioner audience (no verified DOI -- see this record's own literature entry)." },
+    { "theory_ref": "OE-THEORY-dichotomized-causal-reasoning", "literature_doi": "10.1016/j.cognition.2009.01.001", "relation_type": "empirical-support", "note": "LiteratureBase's own cross-reference: the cognitive-science basis for the design-stance construct central to this position." }
+  ],
+
+  "theory_relations": [
+    {
+      "theory_ref": "OE-THEORY-dichotomized-causal-reasoning",
+      "target_type": "theory",
+      "target_ref": "OE-THEORY-integrated-causal-reasoning",
+      "relation_label": "is empirically challenged, in this project's own adopted framework, by",
+      "annotation": "The same real student answer about cheetah running speed is scored correct under this theory and incorrect under ICR -- see the 'Agency Negation' entry in this list for the concrete case. DCR is OpenEvo's own characterization of Kampourakis's and Nehm's published position, not their own words -- shown here deliberately, not hidden, per Dustin Eirdosh's 2026-10-01 decision to present this as a live two-sided dispute in the researcher view."
+    },
+    {
+      "theory_ref": "OE-THEORY-integrated-causal-reasoning",
+      "target_type": "schema_element",
+      "target_label_like": "Evolutive Entwicklung",
+      "relation_label": "is the framework this project's treatment of this Basiskonzept follows",
+      "annotation": "This Basiskonzept exists as its own concept, separate from 'Individuelle Entwicklung', specifically because this project's content follows ICR's view that organism agency can be a legitimate evolutionary cause."
+    },
+    {
+      "theory_ref": "OE-THEORY-dichotomized-causal-reasoning",
+      "target_type": "schema_element",
+      "target_label_like": "Evolutive Entwicklung",
+      "relation_label": "is the rival framework this Basiskonzept's own split was weighed against",
+      "annotation": "Shown for comparison, not because this project's content follows it."
+    },
+    {
+      "theory_ref": "OE-MISCONCEPTION-anthropomorphic-intention",
+      "target_type": "schema_element",
+      "target_label_like": "Struktur und Funktion",
+      "relation_label": "is a documented misconception already named in this Basiskonzept's own content",
+      "annotation": "This Basiskonzept's first listed student misconception (teleological thinking: structures exist because an organism 'needs' them) is exactly this TheoryBase record. This link gives that existing, previously-unsourced teaching note a real citation."
+    },
+    {
+      "theory_ref": "OE-MISCONCEPTION-essentialism",
+      "target_type": "schema_element",
+      "target_label_like": "Evolutive Entwicklung",
+      "relation_label": "is a documented misconception relevant to",
+      "annotation": null
+    },
+    {
+      "theory_ref": "OE-MISCONCEPTION-agency-binary",
+      "target_type": "schema_element",
+      "target_label_like": "Evolutive Entwicklung",
+      "relation_label": "is a documented misconception relevant to",
+      "annotation": null
+    },
+    {
+      "theory_ref": "OE-DIVERGENCE-agency-negation",
+      "target_type": "schema_element",
+      "target_label_like": "Evolutive Entwicklung",
+      "relation_label": "is a live assessment dispute directly relevant to",
+      "annotation": null
+    }
+  ]
+}

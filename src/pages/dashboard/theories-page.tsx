@@ -25,7 +25,28 @@ import type { Database } from '@/lib/supabase/database.types'
 // local authoring below works today regardless.
 
 type EvidentiaryMaturity = TheoryRow['evidentiary_maturity']
+type BaseRepo = TheoryRow['base_repo']
 type LiteratureRow = Database['public']['Tables']['literature_references']['Row']
+
+// Cross-reference to the OpenEvo CCS ecosystem's own shared Foundational
+// Repos -- the columns exist on this table since migration 020 but had
+// never been wired into this UI until EvoMentor Thuringia's researcher
+// view needed a real way to say "this local theory corresponds to that
+// TheoryBase record" (2026-10-01). Deliberately a label, not a live link:
+// most of these repos are still private, so this records provenance for
+// a human reader rather than fetching anything.
+const BASE_REPO_LABEL: Record<NonNullable<BaseRepo>, string> = {
+  conceptbase: 'ConceptBase',
+  theorybase: 'TheoryBase',
+  questionbase: 'QuestionBase',
+  literaturebase: 'LiteratureBase',
+  competencybase: 'CompetencyBase',
+  methodsbase: 'MethodsBase',
+  quotebase: 'QuoteBase',
+  humanbase: 'HumanBase',
+  projectbase: 'ProjectBase',
+  teachingbase: 'TeachingBase',
+}
 
 const MATURITY_LABEL: Record<NonNullable<EvidentiaryMaturity>, string> = {
   'theoretically-developed': 'Theoretically developed',
@@ -143,6 +164,8 @@ function CreateTheoryForm({
   const [description, setDescription] = useState('')
   const [maturity, setMaturity] = useState<EvidentiaryMaturity>(null)
   const [maturityNote, setMaturityNote] = useState('')
+  const [baseRepo, setBaseRepo] = useState<BaseRepo>(null)
+  const [baseRepoRef, setBaseRepoRef] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -159,6 +182,8 @@ function CreateTheoryForm({
         description: description.trim(),
         evidentiary_maturity: maturity,
         evidentiary_maturity_note: maturityNote.trim() || null,
+        base_repo: baseRepoRef.trim() ? baseRepo : null,
+        base_repo_ref: baseRepoRef.trim() || null,
         created_by: user?.id ?? null,
       })
       .select('id')
@@ -194,6 +219,27 @@ function CreateTheoryForm({
             <input value={maturityNote} onChange={(e) => setMaturityNote(e.target.value)} placeholder="Why this stage?" />
           </div>
         </div>
+        <div className="grid grid-2">
+          <div className="field">
+            <label>Shared ecosystem repo (optional)</label>
+            <select value={baseRepo ?? ''} onChange={(e) => setBaseRepo((e.target.value || null) as BaseRepo)}>
+              <option value="">Not linked</option>
+              {Object.entries(BASE_REPO_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Record id (optional)</label>
+            <input
+              value={baseRepoRef}
+              onChange={(e) => { setBaseRepoRef(e.target.value); if (e.target.value.trim() && !baseRepo) setBaseRepo('theorybase') }}
+              placeholder="e.g. OE-THEORY-integrated-causal-reasoning"
+            />
+          </div>
+        </div>
+        <p className="muted" style={{ fontSize: 11, marginTop: -4, marginBottom: 10 }}>
+          A label only, not a live link — most of these repos are still private, so this records
+          where this theory really comes from for a human reader rather than fetching anything.
+        </p>
         <button className="btn btn-primary" type="submit" disabled={busy}>{busy ? 'Creating…' : 'Create theory'}</button>
       </form>
     </div>
@@ -201,6 +247,8 @@ function CreateTheoryForm({
 }
 
 function TheoryDetail({ theoryId, projectId, canManage, supabase }: { theoryId: string; projectId: string; canManage: boolean; supabase: ProjectOutletContext['supabase'] }) {
+  const { project } = useOutletContext<ProjectOutletContext>()
+  const navigate = useNavigate()
   const [theory, setTheory] = useState<TheoryRow | null>(null)
   const [links, setLinks] = useState<TheoryLiteratureLinkWithReference[]>([])
   const [relations, setRelations] = useState<TheoryRelationRow[]>([])
@@ -233,6 +281,11 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase }: { theoryId: 
           {MATURITY_LABEL[theory.evidentiary_maturity]}{theory.evidentiary_maturity_note ? ` — ${theory.evidentiary_maturity_note}` : ''}
         </p>
       )}
+      {theory.base_repo && theory.base_repo_ref && (
+        <p className="chip" style={{ fontSize: 11, display: 'inline-block', marginBottom: 8 }} title="A label only, not a live link -- most Foundational Repos are still private.">
+          {BASE_REPO_LABEL[theory.base_repo]} · {theory.base_repo_ref}
+        </p>
+      )}
       <p>{theory.description}</p>
 
       <section style={{ marginTop: 16 }}>
@@ -261,7 +314,16 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase }: { theoryId: 
           relations.map((r) => (
             <div key={r.id} style={{ padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13 }}><strong>{r.relation_label}</strong> {relationLabels.get(r.target_id) ?? '(unknown)'}</span>
+                <span style={{ fontSize: 13 }}>
+                  <strong>{r.relation_label}</strong>{' '}
+                  {(r.target_type as string) === 'theory' ? (
+                    <button className="btn-linklike" onClick={() => navigate(`/dashboard/${project.slug}/theories/${r.target_id}`)}>
+                      {relationLabels.get(r.target_id) ?? '(unknown)'}
+                    </button>
+                  ) : (
+                    relationLabels.get(r.target_id) ?? '(unknown)'
+                  )}
+                </span>
                 <span className="chip" style={{ fontSize: 10 }}>{r.target_type.replace('_', ' ')}</span>
               </div>
               {r.annotation && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{r.annotation}</p>}
@@ -352,13 +414,14 @@ function AddLiteratureLink({
   )
 }
 
-type RelationTargetType = 'schema_element' | 'data_object' | 'thread' | 'framework_tag'
+type RelationTargetType = 'schema_element' | 'data_object' | 'thread' | 'framework_tag' | 'theory'
 
 const TARGET_TYPE_LABEL: Record<RelationTargetType, string> = {
   schema_element: 'Concept',
   data_object: 'Learning goal',
   thread: 'Strand',
   framework_tag: 'Framework term',
+  theory: 'Another theory in this project',
 }
 
 function AddRelation({
@@ -394,6 +457,9 @@ function AddRelation({
       } else if (targetType === 'thread') {
         const { data } = await supabase.from('lpm_threads').select('id, title').eq('project_id', projectId).ilike('title', like).limit(8)
         setResults((data ?? []).map((d) => ({ id: d.id, label: d.title })))
+      } else if (targetType === 'theory') {
+        const { data } = await supabase.from('theories').select('id, label').eq('project_id', projectId).neq('id', theoryId).ilike('label', like).limit(8)
+        setResults((data ?? []).map((d) => ({ id: d.id, label: d.label })))
       } else {
         const { data } = await supabase.from('framework_tags').select('id, label').ilike('label', like).limit(8)
         setResults((data ?? []).map((d) => ({ id: d.id, label: d.label })))
@@ -404,7 +470,9 @@ function AddRelation({
 
   const add = async (target: { id: string; label: string }) => {
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('theory_relations').insert({
+    // target_type: 'theory' is a real value as of migration 071, not yet in the
+    // generated database.types.ts until that migration is actually pushed.
+    await (supabase as any).from('theory_relations').insert({
       theory_id: theoryId,
       target_type: targetType,
       target_id: target.id,

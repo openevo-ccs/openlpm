@@ -42,16 +42,19 @@ export async function resolveRelationLabels(
     schema_element: relations.filter((r) => r.target_type === 'schema_element').map((r) => r.target_id),
     data_object: relations.filter((r) => r.target_type === 'data_object').map((r) => r.target_id),
     thread: relations.filter((r) => r.target_type === 'thread').map((r) => r.target_id),
+    theory: relations.filter((r) => (r.target_type as string) === 'theory').map((r) => r.target_id),
   }
-  const [tags, elements, objects, threads] = await Promise.all([
+  const [tags, elements, objects, threads, theories] = await Promise.all([
     byType.framework_tag.length ? supabase.from('framework_tags').select('id, label').in('id', byType.framework_tag) : Promise.resolve({ data: [] }),
     byType.schema_element.length ? supabase.from('lpm_schema_elements').select('id, label').in('id', byType.schema_element) : Promise.resolve({ data: [] }),
     byType.data_object.length ? supabase.from('lpm_data_objects').select('id, title').in('id', byType.data_object) : Promise.resolve({ data: [] }),
     byType.thread.length ? supabase.from('lpm_threads').select('id, title').in('id', byType.thread) : Promise.resolve({ data: [] }),
+    byType.theory.length ? supabase.from('theories').select('id, label').in('id', byType.theory) : Promise.resolve({ data: [] }),
   ])
   for (const t of tags.data ?? []) labels.set(t.id, t.label)
   for (const e of elements.data ?? []) labels.set(e.id, e.label)
   for (const o of objects.data ?? []) labels.set(o.id, o.title)
   for (const th of threads.data ?? []) labels.set(th.id, th.title)
+  for (const th of theories.data ?? []) labels.set(th.id, th.label)
   return labels
 }
