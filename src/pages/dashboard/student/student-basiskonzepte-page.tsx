@@ -345,6 +345,11 @@ function NetzTab({
   const [sizeBy, setSizeBy] = useState<SizeBy>('count')
   const [density, setDensity] = useState<Density>('kompakt')
   const [highlightId, setHighlightId] = useState<string | null>(null)
+  // Tracks the real rendered width so column sizing actually adapts when
+  // the window/pane is resized, not just once at first mount -- the real
+  // gap the 2026-10-01 "adaptive spacing in relation to the screen size"
+  // feedback named.
+  const [containerWidth, setContainerWidth] = useState(0)
 
   useEffect(() => {
     const projectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
@@ -372,6 +377,17 @@ function NetzTab({
   useEffect(() => {
     listAcceptedConnections(supabase, project.id).then(setConnections)
   }, [supabase, project.id])
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect.width
+      if (w) setContainerWidth((prev) => (Math.abs(prev - w) > 4 ? w : prev))
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   // Real, derived Basiskonzept<->Basiskonzept relation -- see the crosswalk
   // comment block above this component. First tried as arced lines drawn
@@ -434,7 +450,7 @@ function NetzTab({
     ukCoverage: { total: number; covered: number }
   } | null => {
     if (!topics || rootConcepts.length === 0) return null
-    const width = containerRef.current?.clientWidth || 900
+    const width = containerWidth || containerRef.current?.clientWidth || 900
     const scale = DENSITY_SCALE[density]
     const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
     const rootColor = (rootId: string) => cssVar(MAP_PALETTE[(rootIndex.get(rootId) ?? 0) % 6], '#2a78d6')
@@ -516,10 +532,40 @@ function NetzTab({
       primaryByTopic.set(topicId, { targetId: strongest.targetId, rootId: strongest.rootId, totalWeight })
     }
 
-    // ---- Layout: tier 0 (Basiskonzepte, fixed row) ----
-    const colWidth = width / rootConcepts.length
+    // Real, total Lernziel count anchored under each Basiskonzept (direct or
+    // via one of its Unterkonzepte) -- drives both that root's own node size
+    // (below) and, more importantly, its column width. Real bug this fixes
+    // (2026-10-01 feedback): every root used to get the same fixed 1/6 share
+    // of the canvas regardless of how much it actually holds --
+    // "Evolutive Entwicklung" carries roughly 3x the Unterkonzepte/Lernziele
+    // of the other five, so its equal-width column rendered as an
+    // illegible solid block while the others sat mostly empty.
+    const lzCountByRoot = new Map(rootConcepts.map((c) => {
+      const seen = new Set<string>()
+      for (const [id, agg] of byTarget) {
+        if (id === c.id || ancestorAtDepth(id, 0, conceptElementsById)?.id === c.id) for (const t of agg.topicIds) seen.add(t)
+      }
+      return [c.id, seen.size] as const
+    }))
+
+    // ---- Layout: tier 0 (Basiskonzepte, proportionally-sized columns) ----
+    // Weighted by sqrt(content + 1), not raw count, so one very dense root
+    // doesn't starve the others down to nothing; a floor keeps every column
+    // usable even for a root that doesn't have much content yet.
+    const rootWeights = rootConcepts.map((c) => Math.sqrt((lzCountByRoot.get(c.id) ?? 0) + 1))
+    const totalRootWeight = rootWeights.reduce((s, w) => s + w, 0) || 1
+    const minColWidth = width / (rootConcepts.length * 1.8)
+    const rawColWidths = rootWeights.map((w) => Math.max(minColWidth, (w / totalRootWeight) * width))
+    const rawColTotal = rawColWidths.reduce((s, w) => s + w, 0) || 1
+    const colWidthByRoot = new Map<string, number>()
     const nodePositions = new Map<string, { x: number; y: number }>()
-    rootConcepts.forEach((c, i) => nodePositions.set(c.id, { x: (i + 0.5) * colWidth, y: BK_ROW_Y }))
+    let colCursor = 0
+    rootConcepts.forEach((c, i) => {
+      const colWidth = (rawColWidths[i] / rawColTotal) * width
+      colWidthByRoot.set(c.id, colWidth)
+      nodePositions.set(c.id, { x: colCursor + colWidth / 2, y: BK_ROW_Y })
+      colCursor += colWidth
+    })
 
     // ---- Tier 1 (Unterkonzepte, toggleable) ----
     const ukRowHeight = UK_ROW_HEIGHT_BASE * scale
@@ -532,7 +578,7 @@ function NetzTab({
           .sort((a, b) => b[1].topicIds.size - a[1].topicIds.size)
           .map(([id]) => ({ id }))
         usedUkIds.push(...ukForThisRoot.map((u) => u.id))
-        const { positions, rows } = layoutTier(ukForThisRoot, nodePositions.get(c.id)!.x, BK_ROW_Y + UK_ROW_GAP * scale, colWidth - 16, ukRowHeight, 78)
+        const { positions, rows } = layoutTier(ukForThisRoot, nodePositions.get(c.id)!.x, BK_ROW_Y + UK_ROW_GAP * scale, (colWidthByRoot.get(c.id) ?? width / rootConcepts.length) - 16, ukRowHeight, 78)
         for (const [id, pos] of positions) nodePositions.set(id, pos)
         maxUkRows = Math.max(maxUkRows, rows)
       })
@@ -554,7 +600,7 @@ function NetzTab({
         const anchorPos = nodePositions.get(anchorId)
         if (!anchorPos) continue
         const isRootAnchor = rootIndex.has(anchorId)
-        const maxWidth = isRootAnchor ? colWidth - 16 : UK_CHILD_WIDTH_BASE * scale
+        const maxWidth = isRootAnchor ? (colWidthByRoot.get(anchorId) ?? width / rootConcepts.length) - 16 : UK_CHILD_WIDTH_BASE * scale
         const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, isRootAnchor ? 34 : 24)
         for (const [id, pos] of positions) nodePositions.set(id, pos)
         maxLzRows = Math.max(maxLzRows, rows)
@@ -564,16 +610,9 @@ function NetzTab({
     const neededHeight = Math.min(1600, Math.max(480, lzStartY + 90 + maxLzRows * lzRowHeight))
 
     // ---- Nodes ----
-    const totalLzForRoot = (rootId: string) => {
-      const seen = new Set<string>()
-      for (const [id, agg] of byTarget) {
-        if (id === rootId || ancestorAtDepth(id, 0, conceptElementsById)?.id === rootId) for (const t of agg.topicIds) seen.add(t)
-      }
-      return seen.size
-    }
     const nodes: GraphNodeDatum[] = []
     rootConcepts.forEach((c) => {
-      const count = totalLzForRoot(c.id)
+      const count = lzCountByRoot.get(c.id) ?? 0
       const weight = Array.from(byTarget.entries()).filter(([id]) => id === c.id || ancestorAtDepth(id, 0, conceptElementsById)?.id === c.id).reduce((s, [, a]) => s + a.totalWeight, 0)
       const metricVal = sizeBy === 'count' ? count : weight
       const def = (c as any).didactic_definition as string | undefined
@@ -664,7 +703,7 @@ function NetzTab({
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
     return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, sizeBy, density])
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, sizeBy, density, containerWidth])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
@@ -723,15 +762,18 @@ function NetzTab({
           } as any,
         },
         {
+          // Lighter range than before (was 0.2-0.7) -- a dense cluster (many
+          // overlapping edges) now reads as "busy" rather than stacking up
+          // into a near-solid block of color. Real 2026-10-01 feedback.
           selector: 'edge[kind="relevance"]',
           style: {
             width: 'mapData(weight, 0, 3, 1, 4)', 'line-color': 'data(color)', 'curve-style': 'bezier',
-            'target-arrow-shape': 'none', opacity: 'mapData(weight, 0, 3, 0.2, 0.7)', 'transition-property': 'opacity', 'transition-duration': 180,
+            'target-arrow-shape': 'none', opacity: 'mapData(weight, 0, 3, 0.12, 0.5)', 'transition-property': 'opacity', 'transition-duration': 180,
           } as any,
         },
         {
           selector: 'edge[kind="hierarchy"]',
-          style: { width: 1, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 0.5, 'line-style': 'dashed' } as any,
+          style: { width: 1, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 0.35, 'line-style': 'dashed' } as any,
         },
         { selector: '.dimmed', style: { opacity: 0.08 } },
       ],
