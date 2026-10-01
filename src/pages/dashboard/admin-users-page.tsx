@@ -4,7 +4,7 @@ import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Lock, Mail
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
-import { removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
+import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
 import {
@@ -30,6 +30,22 @@ import {
 // renders, migration 049's RLS is the real boundary underneath.
 
 const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
+
+// Real feedback ede6dade (2026-10-01): "no way to sort between real human
+// users and test accounts." A plain heuristic, not a stored flag -- every
+// real test/QA account in this app so far (the standing QA account, its
+// mailinator throwaways) matches one of these three patterns, and nothing
+// real does. Visual grouping only; blocking/deleting still works exactly
+// the same regardless of which group an account lands in.
+function looksLikeTestAccount(email: string): boolean {
+  const lower = email.toLowerCase()
+  const [local, domain] = lower.split('@')
+  if (!domain) return false
+  if (local.includes('+')) return true
+  if (domain === 'mailinator.com') return true
+  if (/(^|[-_.])(test|qa|nonexistent|dummy)([-_.]|\d|$)/.test(local)) return true
+  return false
+}
 
 // Same list new-project-wizard.tsx offers at creation time -- kept in sync
 // by hand rather than shared, since it's an 8-entry constant, not logic.
@@ -115,16 +131,24 @@ export default function AdminUsersPage() {
               {' · '}
               {users.filter((u) => (membershipsByUser.get(u.id) ?? []).length === 0).length} not in any project
             </p>
-            {users.map((u) => (
+            {users.filter((u) => !looksLikeTestAccount(u.email)).map((u) => (
               <UserRow
                 key={u.id}
                 user={u}
                 memberships={membershipsByUser.get(u.id) ?? []}
+                projects={projects ?? []}
                 supabase={supabase}
                 isSelf={u.email === ADMIN_EMAIL}
                 onChanged={reload}
               />
             ))}
+            <TestAccountsSection
+              users={users.filter((u) => looksLikeTestAccount(u.email))}
+              membershipsByUser={membershipsByUser}
+              projects={projects ?? []}
+              supabase={supabase}
+              onChanged={reload}
+            />
           </>
         )}
       </div>
@@ -148,15 +172,120 @@ export default function AdminUsersPage() {
   )
 }
 
+// Real feedback ede6dade (2026-10-01): "no way to sort between real human
+// users and test accounts." Collapsed by default -- these accounts exist
+// on purpose (the standing QA account, this skill's mint_qa_session.mjs
+// tooling) but shouldn't compete for attention with the real people above.
+function TestAccountsSection({
+  users,
+  membershipsByUser,
+  projects,
+  supabase,
+  onChanged,
+}: {
+  users: AdminUserRow[]
+  membershipsByUser: Map<string, AdminMembershipRow[]>
+  projects: AdminProjectRow[]
+  supabase: ReturnType<typeof createClient>
+  onChanged: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  if (users.length === 0) return null
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button
+        className="btn btn-mini"
+        onClick={() => setOpen((v) => !v)}
+        style={{ color: 'var(--text-muted)' }}
+      >
+        {open ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+        Test &amp; placeholder accounts ({users.length})
+      </button>
+      {open && (
+        <div style={{ marginTop: 6, opacity: 0.75 }}>
+          {users.map((u) => (
+            <UserRow
+              key={u.id}
+              user={u}
+              memberships={membershipsByUser.get(u.id) ?? []}
+              projects={projects}
+              supabase={supabase}
+              isSelf={u.email === ADMIN_EMAIL}
+              onChanged={onChanged}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AddToProjectControl({
+  user,
+  memberships,
+  projects,
+  supabase,
+  onChanged,
+}: {
+  user: AdminUserRow
+  memberships: AdminMembershipRow[]
+  projects: AdminProjectRow[]
+  supabase: ReturnType<typeof createClient>
+  onChanged: () => void
+}) {
+  const [adding, setAdding] = useState(false)
+  const [projectId, setProjectId] = useState('')
+  const [role, setRole] = useState<ProjectMemberRole>('contributor')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const memberProjectIds = new Set(memberships.map((m) => m.project.id))
+  const available = projects.filter((p) => !memberProjectIds.has(p.id)).sort((a, b) => a.name.localeCompare(b.name))
+
+  if (!adding) {
+    return (
+      <button className="btn btn-mini" onClick={() => { setAdding(true); setProjectId(available[0]?.id ?? '') }} disabled={available.length === 0}>
+        <FolderTree size={10} />Add to project
+      </button>
+    )
+  }
+
+  const confirmAdd = async () => {
+    if (!projectId) return
+    setBusy(true)
+    setError(null)
+    const results = await inviteMembers(supabase, projectId, [user.email], role)
+    setBusy(false)
+    if (results[0]?.outcome === 'error') setError(results[0].detail ?? 'Could not add them.')
+    else { setAdding(false); onChanged() }
+  }
+
+  return (
+    <span className="row" style={{ gap: 4 }}>
+      <select value={projectId} onChange={(e) => setProjectId(e.target.value)} style={{ fontSize: 12 }}>
+        {available.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+      </select>
+      <select value={role} onChange={(e) => setRole(e.target.value as ProjectMemberRole)} style={{ fontSize: 12 }}>
+        {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+      </select>
+      <button className="btn btn-mini btn-primary" disabled={busy || !projectId} onClick={confirmAdd}>{busy ? 'Adding…' : 'Add'}</button>
+      <button className="btn btn-mini" disabled={busy} onClick={() => { setAdding(false); setError(null) }}>Cancel</button>
+      {error && <span style={{ color: 'var(--critical)', fontSize: 11 }}>{error}</span>}
+    </span>
+  )
+}
+
 function UserRow({
   user,
   memberships,
+  projects,
   supabase,
   isSelf,
   onChanged,
 }: {
   user: AdminUserRow
   memberships: AdminMembershipRow[]
+  projects: AdminProjectRow[]
   supabase: ReturnType<typeof createClient>
   isSelf: boolean
   onChanged: () => void
@@ -203,6 +332,9 @@ function UserRow({
           ))}
         </div>
       )}
+      <div style={{ marginTop: 6 }}>
+        <AddToProjectControl user={user} memberships={memberships} projects={projects} supabase={supabase} onChanged={onChanged} />
+      </div>
     </div>
   )
 }
