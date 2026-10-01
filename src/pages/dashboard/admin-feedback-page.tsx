@@ -45,7 +45,7 @@ export default function AdminFeedbackPage() {
     <div>
       <h1 className="row"><MessageSquareText size={18} style={{ color: 'var(--text-muted)' }} />Feedback</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
-        Every real submission from the Feedback button, across every project.
+        Every submission from the Feedback button, across every project.
       </p>
 
       <div className="row" style={{ gap: 8, marginBottom: 16 }}>

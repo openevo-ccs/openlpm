@@ -20,16 +20,34 @@ export function projectColorHex(key: string | null | undefined): string | null {
   return PROJECT_COLORS.find((c) => c.key === key)?.hex ?? null
 }
 
-// Real feedback 95a618c0 (2026-10-01): "make the distinction between
-// project and sub-project a little more clear... using the project space
-// color selection, subtly." A very low-alpha fill behind a sub-project
-// group, using that same project's own color -- distinct from the fuller-
-// strength left border the color already draws elsewhere.
-export function projectColorTint(key: string | null | undefined, alpha = 0.06): string | null {
-  const hex = projectColorHex(key)
-  if (!hex) return null
+// Real feedback 8cedeb04 (2026-10-01): "why is the one sub-project space
+// all white and the other has a light grey?" -- a project with no color
+// picked fell through to no tint at all, so two sibling groups looked
+// structurally different from each other for a reason (whether an owner
+// happened to pick a color) that means nothing to the viewer. Slate is the
+// palette's own "no specific color" entry, so it's the natural default for
+// "a color wasn't chosen" rather than silently defaulting to the brand
+// teal, which would read as if teal had actually been picked.
+const DEFAULT_GROUP_HEX = PROJECT_COLORS.find((c) => c.key === 'slate')!.hex
+
+export function projectColorHexOrDefault(key: string | null | undefined): string {
+  return projectColorHex(key) ?? DEFAULT_GROUP_HEX
+}
+
+function hexToRgba(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16)
   const g = parseInt(hex.slice(3, 5), 16)
   const b = parseInt(hex.slice(5, 7), 16)
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+// Real feedback 95a618c0 (2026-10-01): "make the distinction between
+// project and sub-project a little more clear... using the project space
+// color selection, subtly." A very low-alpha fill behind a sub-project
+// group, using that same project's own color -- distinct from the fuller-
+// strength left border the color already draws elsewhere. Always returns a
+// real value now (see DEFAULT_GROUP_HEX above) so every sub-project group
+// gets the same consistent treatment, colored or not.
+export function projectColorTint(key: string | null | undefined, alpha = 0.06): string {
+  return hexToRgba(projectColorHexOrDefault(key), alpha)
 }
