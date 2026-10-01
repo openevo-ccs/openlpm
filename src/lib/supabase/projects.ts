@@ -100,7 +100,20 @@ export async function countSubProjects(supabase: Client, projectId: string): Pro
  * proceed while any exist, rather than relying on that DB behavior. No undo
  * once this succeeds. Needs migration 052's owner/admin DELETE policies on
  * `projects` to be live.
+ *
+ * Returns an explicit error when RLS allowed the request but matched no row
+ * -- a DELETE a policy doesn't cover isn't a Postgres-level error, it's a
+ * silent 0-row delete (confirmed live, 2026-10-01: before migration 052 was
+ * pushed, this returned no `error` at all, so a caller checking only `error`
+ * would wrongly treat "nothing happened" as success and navigate away as if
+ * the project were actually gone). Checking the real row count here means
+ * every caller gets a trustworthy result without having to know this.
  */
 export async function deleteProject(supabase: Client, projectId: string) {
-  return supabase.from('projects').delete().eq('id', projectId)
+  const { data, error } = await supabase.from('projects').delete().eq('id', projectId).select('id')
+  if (error) return { error }
+  if (!data || data.length === 0) {
+    return { error: new Error("Nothing was deleted -- you may not have permission, or it's already gone.") }
+  }
+  return { error: null }
 }
