@@ -44,6 +44,100 @@ function bandKeyForGrade(g: string): string {
 const RELEVANCE_LEVELS = [1, 2, 3] as const
 const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel', 3: 'hoch' }
 
+/**
+ * Fixed-size CSS dots for a relevance level, always in the given color --
+ * replaces the old plain "●●○" text glyphs (see globals.css's .rel-dot
+ * comment for why: inconsistent glyph size, and one call site rendered
+ * these in grey instead of the Basiskonzept's own color). One shared
+ * component so both real call sites on this page (the card summary row and
+ * the expanded detail section) can't drift from each other again.
+ */
+function RelevanceDots({ level, color }: { level: number; color?: string }) {
+  return (
+    <span className="rel-dots" style={{ color }}>
+      {RELEVANCE_LEVELS.map((lvl) => (
+        <span key={lvl} className={`rel-dot${lvl > level ? ' rel-dot-empty' : ''}`} />
+      ))}
+    </span>
+  )
+}
+
+type SortBy = 'default' | 'grade' | 'thema' | 'favorites'
+type ViewMode = 'cards' | 'list'
+
+// Real feedback 2026-10-01 (Susan): the space above the card grid was just
+// empty -- EvoMentor DE v1.2 has sorting, a list/card view toggle, expand/
+// collapse-all, and export (JSON/CSV/Markdown/print), modeled directly on
+// its own real `EM.openExportModal`/`toCsv`/`toMarkdownPlan` -- same four
+// formats, same "export respects the current filter, favorites get called
+// out in the Markdown plan" behavior, re-expressed against OpenLPM's own
+// real field names since there's no shared module to import from.
+function downloadFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: `${mime};charset=utf-8` })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000)
+}
+
+function csvEscape(v: unknown): string {
+  const s = String(v ?? '')
+  return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+function exportLernzieleJson(list: TopicListItem[], contentById: Map<string, unknown>, favorites: Set<string>) {
+  const payload = {
+    exportiert: new Date().toISOString(),
+    anzahl: list.length,
+    lernziele: list.map((t) => ({ ...t, favorit: favorites.has(t.id), content: contentById.get(t.id) ?? null })),
+  }
+  downloadFile('lernziele_export.json', JSON.stringify(payload, null, 2), 'application/json')
+}
+
+function exportLernzieleCsv(list: TopicListItem[], contentById: Map<string, unknown>, favorites: Set<string>, bkLabels: Record<string, string>) {
+  const header = ['id', 'klassenstufe', 'thema', 'unterthema', 'titel', 'beschreibung', 'basiskonzepte', 'favorit']
+  const rows = [header.join(';')]
+  for (const t of list) {
+    const bks = bkEntries(contentById.get(t.id)).map((e) => bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id)
+    rows.push(
+      [t.id, t.grade_band ?? '', t.thema ?? '', t.unterthema ?? '', t.title, t.description ?? '', bks.join('|'), favorites.has(t.id) ? 'ja' : 'nein']
+        .map(csvEscape)
+        .join(';')
+    )
+  }
+  downloadFile('lernziele_export.csv', rows.join('\r\n'), 'text/csv')
+}
+
+function exportLernzieleMarkdown(list: TopicListItem[], contentById: Map<string, unknown>, favorites: Set<string>, bkLabels: Record<string, string>) {
+  const favs = list.filter((t) => favorites.has(t.id))
+  const useList = favs.length ? favs : list
+  const byThema = new Map<string, TopicListItem[]>()
+  for (const t of useList) {
+    const key = t.thema ?? 'Ohne Thema'
+    if (!byThema.has(key)) byThema.set(key, [])
+    byThema.get(key)!.push(t)
+  }
+  let md = `# Lernziele-Export\n\n_Erstellt: ${new Date().toLocaleString('de-DE')}_\n\n`
+  if (favs.length) md += `> Nur Favoriten (${favs.length} von ${list.length} Lernzielen im aktuellen Filter)\n\n`
+  for (const [thema, items] of byThema) {
+    md += `## ${thema}\n\n`
+    for (const t of items) {
+      md += `### Kl. ${t.grade_band ?? '?'} — ${t.title}\n\n`
+      if (t.description) md += `${t.description}\n\n`
+      for (const e of bkEntries(contentById.get(t.id))) {
+        md += `**${bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}** (Relevanz ${e.relevanz_beurteilung}/3): ${e.begruendung}\n\n`
+      }
+      const ds = (contentById.get(t.id) as any)?.didaktische_strategien
+      if (ds?.evolutionsdidaktischer_impuls) md += `**Leitfrage:** ${ds.evolutionsdidaktischer_impuls}\n\n`
+      md += `---\n\n`
+    }
+  }
+  downloadFile('lernziele_export.md', md, 'text/markdown')
+}
+
 export default function StudentLernzielePage() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
@@ -71,6 +165,8 @@ export default function StudentLernzielePage() {
   // a card that's no longer in `filtered` just doesn't render, instead of a
   // separate panel staying stuck on screen referencing it.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const [sortBy, setSortBy] = useState<SortBy>('default')
+  const [viewMode, setViewMode] = useState<ViewMode>('cards')
 
   useEffect(() => {
     setTopics(null)
@@ -215,6 +311,18 @@ export default function StudentLernzielePage() {
     return filtered
   }, [filtered, deepLinkedTopic])
 
+  const sortedDisplayed = useMemo(() => {
+    if (sortBy === 'default') return displayed
+    const arr = [...displayed]
+    if (sortBy === 'grade') arr.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
+    else if (sortBy === 'thema') arr.sort((a, b) => (a.thema ?? '').localeCompare(b.thema ?? '', 'de'))
+    else if (sortBy === 'favorites') arr.sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)))
+    return arr
+  }, [displayed, sortBy, favorites])
+
+  const allExpanded = sortedDisplayed.length > 0 && sortedDisplayed.every((t) => expandedIds.has(t.id))
+  const toggleExpandAll = () => setExpandedIds(allExpanded ? new Set() : new Set(sortedDisplayed.map((t) => t.id)))
+
   const toggleConceptAll = (rootId: string) => {
     setConceptLevels((prev) => {
       const next = new Map(prev)
@@ -333,16 +441,17 @@ export default function StudentLernzielePage() {
                       levels; these let a level be excluded without dropping
                       the concept entirely. */}
                   {activeLevels && (
-                    <div className="row" style={{ gap: 3, marginLeft: 21, marginTop: 3 }}>
+                    <div className="row" style={{ gap: 5, marginLeft: 21, marginTop: 3, alignItems: 'center' }}>
+                      <span className="muted" style={{ fontSize: 10 }}>Relevanz:</span>
                       {RELEVANCE_LEVELS.map((lvl) => (
                         <button
                           key={lvl}
                           className={`chip-btn${activeLevels.has(lvl) ? ' active' : ''}`}
-                          style={{ padding: '1px 6px', fontSize: 10.5 }}
+                          style={{ padding: '1px 7px', fontSize: 10.5 }}
                           title={RELEVANCE_LEVEL_LABEL[lvl]}
                           onClick={() => toggleConceptLevel(g.rootId, lvl)}
                         >
-                          {lvl}
+                          <RelevanceDots level={lvl} />
                         </button>
                       ))}
                     </div>
@@ -358,20 +467,46 @@ export default function StudentLernzielePage() {
           </label>
         </aside>
 
-        <div className="student-lernziele-main">
-          <div className="topic-card-grid">
+        <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>
+          <div className="student-toolbar">
+            <div className="student-toolbar-group">
+              <label className="muted" style={{ fontSize: 11.5 }}>Sortieren:</label>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} style={{ fontSize: 12.5 }}>
+                <option value="default">Standard</option>
+                <option value="grade">Klassenstufe</option>
+                <option value="thema">Thema</option>
+                <option value="favorites">Favoriten zuerst</option>
+              </select>
+              <button className={`chip-btn${viewMode === 'list' ? ' active' : ''}`} onClick={() => setViewMode(viewMode === 'cards' ? 'list' : 'cards')}>
+                {viewMode === 'cards' ? 'Listenansicht' : 'Kartenansicht'}
+              </button>
+              <button className="chip-btn" onClick={toggleExpandAll} disabled={sortedDisplayed.length === 0}>
+                {allExpanded ? 'Alle einklappen' : 'Alle ausklappen'}
+              </button>
+            </div>
+            <div className="student-toolbar-group">
+              <span className="muted" style={{ fontSize: 11.5 }}>Export:</span>
+              <button className="btn btn-mini" onClick={() => exportLernzieleJson(sortedDisplayed, contentById, favorites)} disabled={sortedDisplayed.length === 0}>JSON</button>
+              <button className="btn btn-mini" onClick={() => exportLernzieleCsv(sortedDisplayed, contentById, favorites, bkLabels)} disabled={sortedDisplayed.length === 0}>CSV</button>
+              <button className="btn btn-mini" onClick={() => exportLernzieleMarkdown(sortedDisplayed, contentById, favorites, bkLabels)} disabled={sortedDisplayed.length === 0}>Markdown</button>
+              <button className="btn btn-mini" onClick={() => window.print()} disabled={sortedDisplayed.length === 0}>Drucken / PDF</button>
+            </div>
+          </div>
+
+          <div className={viewMode === 'cards' ? 'topic-card-grid' : 'topic-list-rows'}>
             {topics === null ? (
               <p className="muted">Lädt…</p>
-            ) : displayed.length === 0 ? (
+            ) : sortedDisplayed.length === 0 ? (
               <div className="card empty">
                 <Compass size={28} />
                 <p>Keine Lernziele gefunden.</p>
               </div>
             ) : (
-              displayed.map((t) => (
+              sortedDisplayed.map((t) => (
                 <LernzielCard
                   key={t.id}
                   topic={t}
+                  content={contentById.get(t.id)}
                   entries={bkEntries(contentById.get(t.id))}
                   bkLabels={bkLabels}
                   rootIdxById={rootIdxById}
@@ -395,6 +530,7 @@ export default function StudentLernzielePage() {
 
 function LernzielCard({
   topic,
+  content,
   entries,
   bkLabels,
   rootIdxById,
@@ -408,6 +544,7 @@ function LernzielCard({
   supabase,
 }: {
   topic: TopicListItem
+  content: unknown
   entries: BkbEntry[]
   bkLabels: Record<string, string>
   rootIdxById: Map<string, number>
@@ -448,9 +585,7 @@ function LernzielCard({
             return (
               <span key={e.basiskonzept_id} className="row" style={{ gap: 3, fontSize: 11 }} title={bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}>
                 {bkAbbreviation(bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id)}
-                <span style={{ letterSpacing: 1, color: rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined }}>
-                  {'●'.repeat(e.relevanz_beurteilung)}{'○'.repeat(3 - e.relevanz_beurteilung)}
-                </span>
+                <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
               </span>
             )
           })}
@@ -459,7 +594,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} projectSlug={projectSlug} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
+          <LernzielCardDetail objectId={topic.id} content={content} projectSlug={projectSlug} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
         </div>
       )}
     </div>
@@ -468,6 +603,7 @@ function LernzielCard({
 
 function LernzielCardDetail({
   objectId,
+  content,
   projectSlug,
   supabase,
   entries,
@@ -477,6 +613,7 @@ function LernzielCardDetail({
   conceptElementsById,
 }: {
   objectId: string
+  content: unknown
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
   entries: BkbEntry[]
@@ -488,6 +625,12 @@ function LernzielCardDetail({
   const navigate = useNavigate()
   const [connections, setConnections] = useState<ResolvedConnection[] | null>(null)
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
+  // Real feedback 2026-10-01 (Susan): the curriculum-ordering info below
+  // ("Davor"/"Danach") isn't that important right now, and should be
+  // minimized -- collapsed by default and moved after the new Didaktische
+  // Strategien section, rather than removed (the data is still real and
+  // worth having one click away).
+  const [orderOpen, setOrderOpen] = useState(false)
 
   // Fetched once per expand (this component only mounts while the card is
   // expanded) -- no separate re-fetch-on-filter-change logic needed, unlike
@@ -499,36 +642,83 @@ function LernzielCardDetail({
 
   const before = (connections ?? []).filter((c) => c.direction === 'incoming')
   const after = (connections ?? []).filter((c) => c.direction === 'outgoing')
+  const hasOrder = before.length > 0 || after.length > 0
 
   return (
     <div>
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
-      {(before.length > 0 || after.length > 0) && (
-        <section style={{ marginBottom: 18 }}>
-          <h3>Reihenfolge im Lehrplan</h3>
-          <p className="muted" style={{ marginTop: -4 }}>So ordnet der Lehrplan selbst diese Lernziele an.</p>
-          {before.map((c) => (
-            <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
-              <span className="muted" style={{ fontSize: 12 }}>Davor</span>
-              <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
-            </button>
-          ))}
-          {after.map((c) => (
-            <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
-              <span className="muted" style={{ fontSize: 12 }}>Danach</span>
-              <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
-            </button>
-          ))}
-        </section>
-      )}
+      <DidaktischeStrategienSection content={content} />
 
       {stations && stations.length > 0 && stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+
+      {hasOrder && (
+        <section style={{ marginBottom: 18 }}>
+          <button className="btn btn-mini" onClick={() => setOrderOpen((v) => !v)}>
+            {orderOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+            {orderOpen ? 'Reihenfolge im Lehrplan ausblenden' : 'Reihenfolge im Lehrplan anzeigen'}
+          </button>
+          {orderOpen && (
+            <div style={{ marginTop: 10 }}>
+              <p className="muted" style={{ marginTop: 0, fontSize: 12.5 }}>So ordnet der Lehrplan selbst diese Lernziele an.</p>
+              {before.map((c) => (
+                <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
+                  <span className="muted" style={{ fontSize: 12 }}>Davor</span>
+                  <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
+                </button>
+              ))}
+              {after.map((c) => (
+                <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
+                  <span className="muted" style={{ fontSize: 12 }}>Danach</span>
+                  <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {connections?.length === 0 && stations?.length === 0 && entries.length === 0 && (
         <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>
       )}
     </div>
+  )
+}
+
+// Real feedback 2026-10-01 (Susan): wanted a "Didaktische Strategien"
+// section, collapsible like the Basiskonzept-Bezüge one above it, with an
+// example guiding question (Leitfrage), 3 method suggestions, and possible
+// student misconceptions -- as in EvoMentor DE v1.2. The underlying field
+// (content.didaktische_strategien) already exists and is already read by
+// the AI Prompt Generator (prompt-builder.tsx) -- this just surfaces the
+// same real content here. Read defensively: not every imported Lernziel
+// has this field populated, same discipline as prompt-builder.tsx's own
+// comment about didaktische_strategien/originaltext.
+function DidaktischeStrategienSection({ content }: { content: unknown }) {
+  const [open, setOpen] = useState(false)
+  const ds = (content as any)?.didaktische_strategien
+  if (!ds) return null
+  const methoden = (ds.top3_methoden ?? []).map((m: any) => m?.methode).filter(Boolean)
+  return (
+    <section style={{ marginBottom: 18 }}>
+      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
+        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+        {open ? 'Didaktische Strategien ausblenden' : 'Didaktische Strategien anzeigen'}
+      </button>
+      {open && (
+        <div style={{ marginTop: 10 }}>
+          {ds.evolutionsdidaktischer_impuls && (
+            <p style={{ margin: '0 0 8px' }}><strong>Leitfrage:</strong> {ds.evolutionsdidaktischer_impuls}</p>
+          )}
+          {methoden.length > 0 && (
+            <p style={{ margin: '0 0 8px' }}><strong>Methoden:</strong> {methoden.join(', ')}</p>
+          )}
+          {ds.moegliche_fehlvorstellungen && (
+            <p style={{ margin: 0 }}><strong>Mögliche Fehlvorstellungen:</strong> {ds.moegliche_fehlvorstellungen}</p>
+          )}
+        </div>
+      )}
+    </section>
   )
 }
 
@@ -582,7 +772,7 @@ function BkRelevanceSection({
                 <div className="row" style={{ gap: 6 }}>
                   <span className="bk-dot" style={{ background: rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined }} />
                   <strong style={{ fontSize: 13 }}>{bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}</strong>
-                  <span className="muted" style={{ fontSize: 11 }}>{'●'.repeat(e.relevanz_beurteilung)}{'○'.repeat(3 - e.relevanz_beurteilung)}</span>
+                  <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
                 </div>
                 {e.begruendung && <p className="muted" style={{ fontSize: 12.5, margin: '4px 0 0' }}>{e.begruendung}</p>}
                 {subTags.length > 0 && (

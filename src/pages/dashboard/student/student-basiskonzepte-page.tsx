@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { Info, Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
+import { Anchor, Info, Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { ancestorAtDepth, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
@@ -185,6 +185,55 @@ function DashboardTab({
           </table>
         </div>
         <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken und Zahlen: niedrig / mittel / hoch.</p>
+      </div>
+
+      {/* Real feedback 2026-10-01 (Susan): wanted to see WHERE (in which
+          grade) and how many Konzeptanker sit per Basiskonzept, not just the
+          single top-level "43 Konzeptanker" stat tile above -- same table
+          shape as the relevance distribution above, counting
+          ist_konzeptanker instead. */}
+      <div className="card" style={{ marginTop: 16 }}>
+        <h3><Anchor size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />Konzeptanker je Basiskonzept × Klassenstufe</h3>
+        <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
+          Je Zelle: wie viele Konzeptanker-Lernziele dieser Klassenstufe zu diesem Basiskonzept gehören.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Basiskonzept</th>
+                {grades.map((g) => <th key={g} style={{ padding: '4px 8px' }}>Kl. {g}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {rootConcepts.map((c, i) => (
+                <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '4px 8px' }}><span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}</td>
+                  {grades.map((g) => {
+                    let count = 0
+                    for (const t of topics ?? []) {
+                      if (t.grade_band !== g) continue
+                      const tc = contentById.get(t.id) as any
+                      if (!tc?.ist_konzeptanker) continue
+                      if (bkEntries(tc).some((e) => looksLikeBk(e.basiskonzept_id, c.label))) count++
+                    }
+                    return (
+                      <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
+                        {count === 0 ? (
+                          '—'
+                        ) : (
+                          <span className="row" style={{ justifyContent: 'center', gap: 3 }}>
+                            <Anchor size={10} />{count}
+                          </span>
+                        )}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

@@ -19,8 +19,8 @@ import {
 } from '@/lib/supabase/prompt-libraries'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
+import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
 // generalized the same week (2026-09-18 ask): "think about how other users
@@ -92,10 +92,11 @@ export default function PromptGeneratorPage() {
 
   const bkLabels = useMemo(() => buildBkLabelMap(bkIds, rootConcepts), [bkIds, rootConcepts])
   const bkGroups = useMemo(() => groupBkIdsByRoot(bkIds, rootConcepts), [bkIds, rootConcepts])
+  const focusedBkGroups = useMemo(() => (cfg ? bkGroups.filter((g) => isBkFocused(cfg, g.rootId)) : bkGroups), [bkGroups, cfg])
 
   const promptText = useMemo(
-    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, bkGroups, library, labels, options, bkLabels) : ''),
-    [items, cfg, bkGroups, library, labels, options, bkLabels]
+    () => (items && cfg && library && labels && options ? buildPrompt(items, cfg, focusedBkGroups, library, labels, options, bkLabels) : ''),
+    [items, cfg, focusedBkGroups, library, labels, options, bkLabels]
   )
 
   const reloadExperiments = () => portfolioId && listPromptExperiments(supabase, portfolioId).then(setExperiments)
@@ -171,10 +172,35 @@ export default function PromptGeneratorPage() {
                 <input value={cfg.stundenformat} onChange={(e) => setCfg({ ...cfg, stundenformat: e.target.value })} />
               </div>
             </div>
+            <div className="field">
+              <label>Evolution-content share</label>
+              <select value={cfg.anteilEvolutionsbezug} onChange={(e) => setCfg({ ...cfg, anteilEvolutionsbezug: e.target.value })}>
+                <option value="">Not specified</option>
+                {['5', '25', '50', '75', '100'].map((v) => <option key={v} value={v}>{v}%</option>)}
+              </select>
+            </div>
 
             <h3>Concept focus & prior knowledge</h3>
-            {bkGroups.length === 0 && <p className="muted">No concept tags found on the selected items.</p>}
-            {bkGroups.map((g) => (
+            {rootConcepts.length > 0 && (
+              <div className="field">
+                <label>Included Basiskonzepte</label>
+                <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                  {rootConcepts.map((c, i) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      className={`chip-btn bk-chip${isBkFocused(cfg, c.id) ? ' active' : ''}`}
+                      onClick={() => setCfg({ ...cfg, focusBks: toggleBkFocus(cfg, c.id, rootConcepts.map((r) => r.id)) })}
+                    >
+                      <span className={`bk-dot bk-dot-${i % 6}`} />
+                      {bkAbbreviation(c.label)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {focusedBkGroups.length === 0 && <p className="muted">No concept tags found on the selected items in focus.</p>}
+            {focusedBkGroups.map((g) => (
               <div key={g.rootId} className="field">
                 <label>{g.label}</label>
                 <select

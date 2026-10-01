@@ -55,11 +55,25 @@ export async function listProjectPromptExperiments(supabase: Client, projectId: 
   return data ?? []
 }
 
+/**
+ * Real bug, reported live by Susan Hanisch 2026-10-01 with a screenshot:
+ * "new row violates row-level security policy for table prompt_experiments".
+ * Root cause -- neither caller (the researcher or student Prompt Generator
+ * page) ever passed `created_by`, and the column has no DB default, so the
+ * insert's `created_by` was NULL. Migration 027's own INSERT policy requires
+ * `created_by = auth.uid()`, and NULL never equals anything in SQL, so every
+ * save was always going to fail this check -- confirmed via code review, not
+ * a DB read (027_prompt_experiments.sql's cleanup comment that "no saved
+ * rows exist... the walkthrough only previewed prompts, never clicked Save"
+ * is exactly why this was never caught before). Filled in here, once, so
+ * neither caller needs to remember to pass it.
+ */
 export async function createPromptExperiment(
   supabase: Client,
   values: Database['public']['Tables']['prompt_experiments']['Insert']
 ) {
-  return supabase.from('prompt_experiments').insert(values).select().single()
+  const { data: userData } = await supabase.auth.getUser()
+  return supabase.from('prompt_experiments').insert({ ...values, created_by: userData.user?.id }).select().single()
 }
 
 export async function updatePromptExperiment(

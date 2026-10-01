@@ -80,7 +80,7 @@ function fmt(entry) {
     (entry.project ? `  project: ${entry.project.name} (${entry.project.slug})` : '  project: (none)'))
   if (ctx.page_title || ctx.path) lines.push(`page: "${ctx.page_title ?? ''}" (${ctx.path ?? ''})`)
   if (entry.comment) lines.push(`comment: ${entry.comment}`)
-  if (entry.screenshot_path) lines.push(`screenshot: yes (${entry.screenshot_path}) -- fetch with --screenshot ${entry.id}`)
+  if (entry.screenshot_path) lines.push(`screenshot: yes (${entry.screenshot_path}) -- fetch with --screenshot "${entry.screenshot_path}"`)
   if (Array.isArray(ctx.recent_pages) && ctx.recent_pages.length) {
     lines.push(`recent pages: ${ctx.recent_pages.map((p) => p.path).join(' -> ')}`)
   }
