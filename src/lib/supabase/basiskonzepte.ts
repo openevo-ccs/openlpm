@@ -46,8 +46,8 @@ export interface BkbEntry {
   basiskonzept_id: string
   relevanz_beurteilung: number
   begruendung: string
-  relevante_unterkonzepte_taxonomie?: { value: string }[]
-  relevante_evolutionskonzepte_taxonomie?: { value: string }[]
+  relevante_unterkonzepte_taxonomie?: { value: string; taxonomyElementId: string | null }[]
+  relevante_evolutionskonzepte_taxonomie?: { value: string; taxonomyElementId: string | null }[]
 }
 
 export function bkEntries(content: unknown): BkbEntry[] {
@@ -175,4 +175,20 @@ export async function getRootConcepts(
     }
   }
   return Array.from(byLabel.values())
+}
+
+/**
+ * Every schema element for a project (and its parent hub) -- root
+ * Basiskonzepte AND their real sub-concepts, keyed by id. Unlike
+ * getRootConcepts above, no dedup-by-label here: a student view resolving
+ * a Lernziel's own relevante_unterkonzepte_taxonomie[].taxonomyElementId
+ * needs the EXACT row that id points to, not a label-deduped stand-in.
+ */
+export async function getConceptElementsById(
+  supabase: Client,
+  project: { id: string; parent_project_id: string | null }
+): Promise<Map<string, SchemaElement>> {
+  const projectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
+  const { data } = await supabase.from('lpm_schema_elements').select('*').in('project_id', projectIds)
+  return new Map((data ?? []).map((row) => [row.id, row]))
 }

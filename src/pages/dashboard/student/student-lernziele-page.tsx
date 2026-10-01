@@ -13,7 +13,10 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
-import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import type { Database } from '@/lib/supabase/database.types'
+
+type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
 
 // The German, student-facing Lernziele explorer -- same real data as the
@@ -58,6 +61,10 @@ export default function StudentLernzielePage() {
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
+  // Every schema element (root Basiskonzepte AND their real sub-concepts),
+  // keyed by id -- resolves relevante_unterkonzepte_taxonomie[].
+  // taxonomyElementId to its real label+definition+example for display.
+  const [conceptElementsById, setConceptElementsById] = useState<Map<string, SchemaElement>>(new Map())
   // Replaces the old objectId-driven side drawer (real bug, feedback
   // 2026-10-01: changing Klassenstufe left a mismatched drawer stuck open).
   // Expand state now lives here, keyed by topic id, decoupled from the URL --
@@ -70,6 +77,7 @@ export default function StudentLernzielePage() {
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
     listFavoriteIds(supabase).then(setFavorites)
     getRootConcepts(supabase, project).then(setRootConcepts)
+    getConceptElementsById(supabase, project).then(setConceptElementsById)
   }, [supabase, project.id, defaultBranchId])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
@@ -368,6 +376,7 @@ export default function StudentLernzielePage() {
                   bkLabels={bkLabels}
                   rootIdxById={rootIdxById}
                   rawIdToGroupKey={rawIdToGroupKey}
+                  conceptElementsById={conceptElementsById}
                   isFavorite={favorites.has(t.id)}
                   onToggleFavorite={onToggleFavorite}
                   isExpanded={expandedIds.has(t.id)}
@@ -390,6 +399,7 @@ function LernzielCard({
   bkLabels,
   rootIdxById,
   rawIdToGroupKey,
+  conceptElementsById,
   isFavorite,
   onToggleFavorite,
   isExpanded,
@@ -402,6 +412,7 @@ function LernzielCard({
   bkLabels: Record<string, string>
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
+  conceptElementsById: Map<string, SchemaElement>
   isFavorite: boolean
   onToggleFavorite: (id: string) => void
   isExpanded: boolean
@@ -448,7 +459,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} projectSlug={projectSlug} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} />
+          <LernzielCardDetail objectId={topic.id} projectSlug={projectSlug} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
         </div>
       )}
     </div>
@@ -463,6 +474,7 @@ function LernzielCardDetail({
   bkLabels,
   rootIdxById,
   rawIdToGroupKey,
+  conceptElementsById,
 }: {
   objectId: string
   projectSlug: string
@@ -471,6 +483,7 @@ function LernzielCardDetail({
   bkLabels: Record<string, string>
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
+  conceptElementsById: Map<string, SchemaElement>
 }) {
   const navigate = useNavigate()
   const [connections, setConnections] = useState<ResolvedConnection[] | null>(null)
@@ -489,7 +502,7 @@ function LernzielCardDetail({
 
   return (
     <div>
-      <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} />
+      <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
       {(before.length > 0 || after.length > 0) && (
         <section style={{ marginBottom: 18 }}>
@@ -530,11 +543,13 @@ function BkRelevanceSection({
   bkLabels,
   rootIdxById,
   rawIdToGroupKey,
+  conceptElementsById,
 }: {
   entries: BkbEntry[]
   bkLabels: Record<string, string>
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
+  conceptElementsById: Map<string, SchemaElement>
 }) {
   const [open, setOpen] = useState(false)
   if (entries.length === 0) return null
@@ -549,6 +564,19 @@ function BkRelevanceSection({
           {entries.map((e) => {
             const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
             const rootIdx = rootIdxById.get(rootKey)
+            // Real feedback 2026-10-01 (Dustin, after checking the real
+            // Basiskonzepte data against a richer EvoMentor_DE taxonomy):
+            // this is where the SPECIFIC sub-concept each Lernziel is
+            // tagged against belongs -- a Lernziel can genuinely relate to
+            // "Multilevel-Selektion" generally, but what it's REALLY about
+            // is the one specific sub-concept ("Evolution von Einzellern
+            // zu Vielzellern") tagged at authoring time. Those tags
+            // (relevante_unterkonzepte_taxonomie/
+            // relevante_evolutionskonzepte_taxonomie) were broken for
+            // nearly all real Lernziele until migrations 059/060 -- a
+            // sub-concept chip below that shows nothing resolved means
+            // those migrations haven't been applied to this database yet.
+            const subTags = [...(e.relevante_unterkonzepte_taxonomie ?? []), ...(e.relevante_evolutionskonzepte_taxonomie ?? [])]
             return (
               <div key={e.basiskonzept_id} style={{ marginBottom: 10 }}>
                 <div className="row" style={{ gap: 6 }}>
@@ -557,12 +585,50 @@ function BkRelevanceSection({
                   <span className="muted" style={{ fontSize: 11 }}>{'●'.repeat(e.relevanz_beurteilung)}{'○'.repeat(3 - e.relevanz_beurteilung)}</span>
                 </div>
                 {e.begruendung && <p className="muted" style={{ fontSize: 12.5, margin: '4px 0 0' }}>{e.begruendung}</p>}
+                {subTags.length > 0 && (
+                  <div className="row" style={{ flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                    {subTags.map((tag, i) => (
+                      <SubConceptChip key={`${tag.taxonomyElementId ?? tag.value}-${i}`} tag={tag} element={tag.taxonomyElementId ? conceptElementsById.get(tag.taxonomyElementId) : undefined} />
+                    ))}
+                  </div>
+                )}
               </div>
             )
           })}
         </div>
       )}
     </section>
+  )
+}
+
+// A small, independently-toggleable chip for ONE specific sub-concept tag
+// (e.g. "Evolution von Einzellern zu Vielzellern") -- shows just the label
+// by default, expands in place to the real definition + worked example
+// from the source taxonomy (migration 059). `element` is undefined when
+// the tag's own taxonomyElementId doesn't resolve (migrations 059/060 not
+// applied yet, or a genuinely unresolvable tag) -- falls back to the
+// tag's own preserved text rather than showing nothing, since that text
+// is real content either way.
+function SubConceptChip({ tag, element }: { tag: { value: string; taxonomyElementId: string | null }; element: SchemaElement | undefined }) {
+  const [open, setOpen] = useState(false)
+  const beispiel = (element?.metadata as any)?.beispiel as string | undefined
+  const hasDetail = !!(element?.definition || beispiel)
+  return (
+    <div style={{ maxWidth: '100%' }}>
+      <button
+        className={`chip-btn${open ? ' active' : ''}`}
+        style={{ fontSize: 11, padding: '2px 8px', cursor: hasDetail ? 'pointer' : 'default' }}
+        onClick={() => hasDetail && setOpen((v) => !v)}
+      >
+        {element?.label ?? tag.value}
+      </button>
+      {open && hasDetail && (
+        <div style={{ fontSize: 12, margin: '4px 0 2px', padding: '6px 8px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 420 }}>
+          {element?.definition && <p style={{ margin: 0 }}>{element.definition}</p>}
+          {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
+        </div>
+      )}
+    </div>
   )
 }
 
