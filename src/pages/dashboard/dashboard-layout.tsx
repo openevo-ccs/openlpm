@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import { LogOut, MessageSquareText, User, Users } from 'lucide-react'
+import { LogOut, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -30,17 +30,17 @@ export default function DashboardLayout() {
         </Link>
         <div className="whoami" style={{ marginLeft: 'auto' }}>
           <span className="muted">{session?.user.email}</span>
+          {/* Real feedback c0829815 (2026-10-01): "Move 'Feedback' on the
+              header menu into a section on the Admin page" -- it now lives
+              as a card on /dashboard/admin/users (FeedbackAdminSection)
+              instead of its own topbar button. The full feedback list page
+              itself (admin-feedback-page.tsx) is unchanged, just no longer
+              linked from here directly. */}
           {session?.user.email === ADMIN_EMAIL && (
-            <>
-              <Link to="/dashboard/admin/users" className="btn btn-mini">
-                <Users size={12} />
-                Admin
-              </Link>
-              <Link to="/dashboard/admin/feedback" className="btn btn-mini">
-                <MessageSquareText size={12} />
-                Feedback
-              </Link>
-            </>
+            <Link to="/dashboard/admin/users" className="btn btn-mini">
+              <Users size={12} />
+              Admin
+            </Link>
           )}
           <HelpWidget />
           <Link to="/dashboard/profile" className="btn btn-mini">

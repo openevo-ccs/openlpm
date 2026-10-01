@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Lock, Mail, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
 import { removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
+import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -56,6 +57,7 @@ export default function AdminUsersPage() {
   const [memberships, setMemberships] = useState<AdminMembershipRow[] | null>(null)
   const [projects, setProjects] = useState<AdminProjectRow[] | null>(null)
   const [joinRules, setJoinRules] = useState<AdminJoinRule[] | null>(null)
+  const [feedback, setFeedback] = useState<FeedbackItem[] | null>(null)
 
   const isAdmin = session?.user.email === ADMIN_EMAIL
 
@@ -64,6 +66,7 @@ export default function AdminUsersPage() {
     listAllMemberships(supabase).then(setMemberships)
     listAllProjects(supabase).then(setProjects)
     listAllJoinRules(supabase).then(setJoinRules)
+    listFeedback(supabase).then(setFeedback)
   }
 
   useEffect(() => {
@@ -139,6 +142,8 @@ export default function AdminUsersPage() {
         joinRules={joinRules}
         onChanged={reload}
       />
+
+      <FeedbackAdminSection feedback={feedback} />
     </div>
   )
 }
@@ -729,6 +734,106 @@ function JoinRulesAdminSection({
           </div>
         ))
       )}
+    </div>
+  )
+}
+
+// Real feedback c0829815 (2026-10-01): "Move 'Feedback' on the header
+// menu into a section on the Admin page - also with its own short
+// dashboard e.g. # open, # resolved total, graph of # open/resolved over
+// last 6 months." The full feedback list + resolve/reopen UI stays
+// exactly where it already lives (admin-feedback-page.tsx, unchanged) --
+// this is just the entry point + the real quick-look dashboard, replacing
+// the topbar's own direct link (dashboard-layout.tsx).
+function FeedbackAdminSection({ feedback }: { feedback: FeedbackItem[] | null }) {
+  const openCount = (feedback ?? []).filter((f) => f.status === 'open').length
+  const resolvedCount = (feedback ?? []).filter((f) => f.status === 'resolved').length
+
+  // Last 6 calendar months including the current one, oldest first.
+  const months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date()
+    d.setDate(1)
+    d.setMonth(d.getMonth() - (5 - i))
+    return { year: d.getFullYear(), month: d.getMonth(), label: d.toLocaleDateString(undefined, { month: 'short' }) }
+  })
+  const buckets = months.map(({ year, month, label }) => {
+    const inMonth = (feedback ?? []).filter((f) => {
+      const c = new Date(f.created_at)
+      return c.getFullYear() === year && c.getMonth() === month
+    })
+    return {
+      label,
+      open: inMonth.filter((f) => f.status === 'open').length,
+      resolved: inMonth.filter((f) => f.status === 'resolved').length,
+    }
+  })
+  const maxTotal = Math.max(1, ...buckets.map((b) => b.open + b.resolved))
+
+  return (
+    <div className="card">
+      <h3 className="row"><MessageSquareText size={16} />Feedback</h3>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Every real submission from the in-app Feedback button, across every project.
+      </p>
+
+      {feedback === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        <>
+          <div className="bk-stat-tiles" style={{ marginBottom: 16 }}>
+            <div className="bk-stat-tile">
+              <div className="n">{openCount}</div>
+              <div className="l">Open</div>
+            </div>
+            <div className="bk-stat-tile">
+              <div className="n">{resolvedCount}</div>
+              <div className="l">Resolved total</div>
+            </div>
+            <div className="bk-stat-tile">
+              <div className="n">{(feedback ?? []).length}</div>
+              <div className="l">All-time total</div>
+            </div>
+          </div>
+
+          <p className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Last 6 months, open vs. resolved</p>
+          <div className="row" style={{ alignItems: 'flex-end', gap: 14, height: 90, marginBottom: 4 }}>
+            {buckets.map((b) => {
+              const total = b.open + b.resolved
+              const totalHeight = total === 0 ? 2 : Math.max(4, (total / maxTotal) * 80)
+              const resolvedHeight = total === 0 ? 0 : (b.resolved / total) * totalHeight
+              const openHeight = totalHeight - resolvedHeight
+              return (
+                <div key={b.label} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 80, width: '100%', maxWidth: 28 }}>
+                    {openHeight > 0 && (
+                      <div
+                        style={{ width: '100%', height: openHeight, background: 'var(--warning)', borderRadius: '3px 3px 0 0' }}
+                        title={`${b.open} open`}
+                      />
+                    )}
+                    {resolvedHeight > 0 && (
+                      <div
+                        style={{ width: '100%', height: resolvedHeight, background: 'var(--good)', borderRadius: openHeight > 0 ? 0 : '3px 3px 0 0' }}
+                        title={`${b.resolved} resolved`}
+                      />
+                    )}
+                  </div>
+                  <span className="muted" style={{ fontSize: 10.5 }}>{b.label}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="row" style={{ gap: 14, fontSize: 11.5, marginBottom: 14 }}>
+            <span className="row" style={{ gap: 4 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--warning)', display: 'inline-block' }} />Open</span>
+            <span className="row" style={{ gap: 4 }}><span style={{ width: 9, height: 9, borderRadius: 2, background: 'var(--good)', display: 'inline-block' }} />Resolved</span>
+          </div>
+        </>
+      )}
+
+      <Link to="/dashboard/admin/feedback" className="btn btn-mini">
+        <MessageSquareText size={12} />
+        Open full feedback list
+      </Link>
     </div>
   )
 }
