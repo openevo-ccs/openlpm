@@ -1,7 +1,7 @@
 -- Curriculum Repository: a new project-scoped content type for curated
 -- national/regional curriculum-policy source material (institutional actors,
 -- policy timelines, mandates, coherence findings, crosswalks, etc.) ported
--- from the deutsche_lp/nys_lp/india_lp sibling repos -- plus linking at three
+-- from the deutsche-lpm/nys-lpm sibling repos -- plus linking at three
 -- different levels, since a single flat link table can't honestly represent
 -- how a project actually relates to a repository:
 --
@@ -29,15 +29,6 @@
 -- source schema already validates), so the import script just carries those
 -- records over like any other -- see curriculum_repository_records below.
 --
--- record_type values match the 9 schema filenames deutsche_lp/nys_lp/
--- india_lp already use (schema/*.schema.json in each repo), so the import
--- script can carry the source repo's own type name across unchanged.
--- access_tier/license_or_rights_note reuse the exact 4-value vocabulary
--- 044_source_access_tier.sql already established for standards_documents and
--- project_source_declarations -- same question ("how much of this are we
--- allowed to keep"), same answer shape, every time it's asked anywhere in
--- this app.
---
 -- Deliberately NOT modeled as more lpm_data_objects rows (the precedent set
 -- by 053_eva_lpm_seed.sql, which mapped CASE document types onto the
 -- existing strand/substrand/performance_indicator/assessment_item
@@ -45,6 +36,23 @@
 -- genuinely curriculum content. An institutional actor or a policy timeline
 -- event is not -- it's a source-document fact, structurally closer to this
 -- app's own standards_documents (019) than to anything in lpm_data_objects.
+--
+-- Renumbered 062 -> 066 (real version-number collision with a concurrent
+-- session's own migration today -- see that session's 063_relink_
+-- basiskonzept_subconcept_tags_fix.sql). Every CREATE POLICY/TRIGGER below
+-- is now written drop-first so this file is safe to re-run regardless of
+-- how far an earlier, differently-numbered push attempt got -- CREATE TABLE/
+-- INDEX were already IF NOT EXISTS; policies and the trigger were not,
+-- which is exactly what failed in this same session's other concurrent
+-- migration (065_project_color.sql, "column already exists"). Also fixes a
+-- real wrong assumption in the original version of this file's closing
+-- comment: service_role gets NOTHING automatically in this project (confirmed
+-- directly from 047/048/051/054, every one of which grants it something
+-- explicit) -- "Data API grants extend automatically via 006's ALTER DEFAULT
+-- PRIVILEGES" was true for the anon/authenticated roles the app itself uses,
+-- not for service_role, which scripts/import_curriculum_repository.py needs
+-- for its own writes. Added those grants at the bottom, narrowly, matching
+-- 047/048/051/054's own precedent.
 SET search_path = public, extensions;
 
 -- ============================================================================
@@ -59,27 +67,10 @@ CREATE TABLE IF NOT EXISTS curriculum_repository_records (
     'coherence-finding', 'latent-connection', 'curriculum-crosswalk',
     'synthetic-curriculum-redesign', 'policy-principle', 'policy-brief-manifest'
   )),
-  -- ISO-3166-1/-2-style, same free-text convention project_jurisdictions
-  -- already uses (019) -- no controlled geography vocabulary exists yet.
   jurisdiction TEXT,
-  -- Traceability back to the source repo this was ported from -- a
-  -- 'deutsche_lp'/'nys_lp'/'india_lp' slug today; not FK'd anywhere, since
-  -- those are sibling repos, not rows in this database.
   source_repo TEXT NOT NULL,
-  -- The record's own id field in its source repo's YAML, preserved so a
-  -- re-import can detect "this record already exists" instead of
-  -- duplicating, and so a reviewer can find the original file.
   source_record_id TEXT NOT NULL,
-  -- Each of the 9 schemas names its own identifying field differently
-  -- (an actor's name, a timeline event's headline, a mandate's title) --
-  -- flattened here into one display label so the browsing UI never needs to
-  -- know all 9 shapes just to render a list.
   title TEXT NOT NULL,
-  -- The full original record, validated schema and all, preserved as-is.
-  -- This table is a browsing/linking surface over that content, not a
-  -- reinterpretation of it. A 'curriculum-crosswalk' record's own two sides
-  -- (level 4 above) live inside this JSONB exactly as the source schema
-  -- already shapes them.
   content JSONB NOT NULL DEFAULT '{}'::jsonb,
   access_tier TEXT NOT NULL DEFAULT 'citation-only' CHECK (access_tier IN (
     'full-text-stored', 'excerpt-only', 'summary-only', 'citation-only'
@@ -92,25 +83,13 @@ CREATE TABLE IF NOT EXISTS curriculum_repository_records (
 );
 
 -- ============================================================================
--- Level 1 -- project-to-repository. One LPM project can ground itself in
--- more than one repository (e.g. a comparative US/Germany unit), and more
--- than one LPM project can point at the same repository -- hence its own
--- table rather than a single column on `projects`.
+-- Level 1 -- project-to-repository.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS project_repository_links (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  -- The LPM project declaring the grounding.
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-  -- The curriculum-repository project space (e.g. "Germany Curriculum
-  -- Repository") being drawn on. Both sides are ordinary `projects` rows --
-  -- a repository space is not a different kind of entity at the schema
-  -- level, just a project whose content happens to live in
-  -- curriculum_repository_records instead of lpm_data_objects.
   repository_project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-  -- Optional narrowing, e.g. 'DE-SN' -- "this project draws specifically on
-  -- Saxony," not all 16 Länder the repository happens to hold. Null means
-  -- the whole repository.
   jurisdiction TEXT,
   note TEXT,
   created_by UUID REFERENCES users(id) ON DELETE SET NULL,
@@ -120,21 +99,7 @@ CREATE TABLE IF NOT EXISTS project_repository_links (
 );
 
 -- ============================================================================
--- Level 2 -- record-to-content. The "browse + connect" feature: a project
--- member links their own project's curriculum content to a specific
--- repository record, without needing write access to the repository itself.
--- Kept separate from lpm_connections (010) rather than widened into it --
--- that table's own header comment scopes it to "two data objects," and a
--- Kohärenzfäden-style UI built around it shouldn't have to learn a second
--- kind of endpoint.
---
--- Ownership: the link row belongs to the LINKING project (project_id below),
--- same convention lpm_connections already uses -- its RLS only checks the
--- connection's own project_id, not what the endpoints belong to. This table
--- follows that same precedent deliberately: a member can only ever pick a
--- repository_record_id they can already see (gated separately by
--- curriculum_repository_records' own SELECT policy below), so the link
--- table doesn't need to re-check cross-project visibility itself.
+-- Level 2 -- record-to-content ("browse + connect").
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS curriculum_repository_links (
@@ -150,12 +115,7 @@ CREATE TABLE IF NOT EXISTS curriculum_repository_links (
 );
 
 -- ============================================================================
--- Level 3 -- shared vocabulary. Tags a repository record against the same
--- frameworks (018) every LPM project already crosswalks its own content
--- against (grade-band, subject-area), so "show me everything in my
--- project's grade band across this repository" works by query, not by
--- requiring a human to have drawn an explicit Level-2 link for every item
--- first. Mirrors project_subject_area_tags' shape exactly (019).
+-- Level 3 -- shared vocabulary.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS curriculum_repository_record_tags (
@@ -182,38 +142,45 @@ ALTER TABLE project_repository_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE curriculum_repository_links ENABLE ROW LEVEL SECURITY;
 ALTER TABLE curriculum_repository_record_tags ENABLE ROW LEVEL SECURITY;
 
--- Same is_project_member() convention as every other content table (004) --
--- a 'viewer'-role invite is enough to read, matching the "invite-only,
--- per-person browsing" decision this table was built for.
+DROP POLICY IF EXISTS "Project members can view repository records" ON curriculum_repository_records;
 CREATE POLICY "Project members can view repository records" ON curriculum_repository_records
   FOR SELECT USING (is_project_member(project_id));
+DROP POLICY IF EXISTS "Maintainers can create repository records" ON curriculum_repository_records;
 CREATE POLICY "Maintainers can create repository records" ON curriculum_repository_records
   FOR INSERT WITH CHECK (has_project_role(project_id, ARRAY['owner', 'maintainer']::project_member_role[]));
+DROP POLICY IF EXISTS "Maintainers can update repository records" ON curriculum_repository_records;
 CREATE POLICY "Maintainers can update repository records" ON curriculum_repository_records
   FOR UPDATE USING (has_project_role(project_id, ARRAY['owner', 'maintainer']::project_member_role[]));
+DROP POLICY IF EXISTS "Maintainers can delete repository records" ON curriculum_repository_records;
 CREATE POLICY "Maintainers can delete repository records" ON curriculum_repository_records
   FOR DELETE USING (has_project_role(project_id, ARRAY['owner', 'maintainer']::project_member_role[]));
 
--- Visible from either side -- a repository's own members can see which LPM
--- projects reference it, not only the referencing project's own members.
+DROP POLICY IF EXISTS "Either side's members can view project repository links" ON project_repository_links;
 CREATE POLICY "Either side's members can view project repository links" ON project_repository_links
   FOR SELECT USING (is_project_member(project_id) OR is_project_member(repository_project_id));
+DROP POLICY IF EXISTS "Maintainers can create project repository links" ON project_repository_links;
 CREATE POLICY "Maintainers can create project repository links" ON project_repository_links
   FOR INSERT WITH CHECK (has_project_role(project_id, ARRAY['owner', 'maintainer']::project_member_role[]));
+DROP POLICY IF EXISTS "Maintainers can delete project repository links" ON project_repository_links;
 CREATE POLICY "Maintainers can delete project repository links" ON project_repository_links
   FOR DELETE USING (has_project_role(project_id, ARRAY['owner', 'maintainer']::project_member_role[]));
 
+DROP POLICY IF EXISTS "Project members can view repository links" ON curriculum_repository_links;
 CREATE POLICY "Project members can view repository links" ON curriculum_repository_links
   FOR SELECT USING (is_project_member(project_id));
+DROP POLICY IF EXISTS "Project members can create repository links" ON curriculum_repository_links;
 CREATE POLICY "Project members can create repository links" ON curriculum_repository_links
   FOR INSERT WITH CHECK (is_project_member(project_id));
+DROP POLICY IF EXISTS "Project members can delete their own repository links" ON curriculum_repository_links;
 CREATE POLICY "Project members can delete their own repository links" ON curriculum_repository_links
   FOR DELETE USING (is_project_member(project_id));
 
+DROP POLICY IF EXISTS "Project members can view repository record tags" ON curriculum_repository_record_tags;
 CREATE POLICY "Project members can view repository record tags" ON curriculum_repository_record_tags
   FOR SELECT USING (
     EXISTS (SELECT 1 FROM curriculum_repository_records r WHERE r.id = repository_record_id AND is_project_member(r.project_id))
   );
+DROP POLICY IF EXISTS "Maintainers can manage repository record tags" ON curriculum_repository_record_tags;
 CREATE POLICY "Maintainers can manage repository record tags" ON curriculum_repository_record_tags
   FOR ALL USING (
     EXISTS (
@@ -227,8 +194,21 @@ CREATE POLICY "Maintainers can manage repository record tags" ON curriculum_repo
     )
   );
 
+DROP TRIGGER IF EXISTS update_curriculum_repository_records_updated_at ON curriculum_repository_records;
 CREATE TRIGGER update_curriculum_repository_records_updated_at
   BEFORE UPDATE ON curriculum_repository_records
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Data API grants extend automatically via 006's ALTER DEFAULT PRIVILEGES.
+-- ============================================================================
+-- service_role grants -- this project grants nothing to service_role
+-- automatically (confirmed against 047/048/051/054); scripts/
+-- import_curriculum_repository.py needs these specific, narrow ones to
+-- create the two repository project spaces and upsert records into them.
+-- ============================================================================
+
+GRANT INSERT ON public.projects TO service_role;
+GRANT INSERT ON public.project_members TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.curriculum_repository_records TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.project_repository_links TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.curriculum_repository_links TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.curriculum_repository_record_tags TO service_role;
