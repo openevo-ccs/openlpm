@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { REDIRECT_KEY } from '@/components/require-auth'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
+import { listMyJoinableProjects, selfJoinProject, type JoinableProject } from '@/lib/supabase/join'
 
 // Lets a user end up with either or both sign-in methods, added whenever
 // they want rather than only at sign-up -- a GitHub-first user can set a
@@ -38,6 +39,8 @@ export default function ProfilePage() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [busy, setBusy] = useState(false)
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
+  const [joinable, setJoinable] = useState<JoinableProject[] | null>(null)
+  const [joiningId, setJoiningId] = useState<string | null>(null)
 
   const [newPassword, setNewPassword] = useState('')
 
@@ -47,10 +50,27 @@ export default function ProfilePage() {
     if (!error) setIdentities(data.identities)
   }
 
+  const reloadMemberships = () => {
+    getUserProjects(supabase).then(setMemberships)
+    listMyJoinableProjects(supabase).then(setJoinable)
+  }
+
   useEffect(() => {
     reload()
-    getUserProjects(supabase).then(setMemberships)
+    reloadMemberships()
   }, [supabase])
+
+  const joinNow = async (jp: JoinableProject) => {
+    setJoiningId(jp.project.id)
+    setNotice(null)
+    const { error } = await selfJoinProject(supabase, jp.project.id, jp.role)
+    setJoiningId(null)
+    if (error) setNotice({ kind: 'bad', text: error.message })
+    else {
+      setNotice({ kind: 'ok', text: `Joined ${jp.project.name}.` })
+      reloadMemberships()
+    }
+  }
 
   // Same grouping convention as project-switcher-page.tsx: a top-level entry
   // is a Project Space, everything nested under one is a Project -- a user
@@ -62,6 +82,7 @@ export default function ProfilePage() {
     (m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id)
   )
   const childMembershipsOf = (id: string) => (memberships ?? []).filter((m) => m.project.parent_project_id === id)
+  const availableToJoin = (joinable ?? []).filter((jp) => !byId.has(jp.project.id))
 
   const hasEmailPassword = (identities ?? []).some((i) => i.provider === 'email')
   const hasGithub = (identities ?? []).some((i) => i.provider === 'github')
@@ -151,9 +172,41 @@ export default function ProfilePage() {
 
       <div className="card">
         <h3 className="row"><LogIn size={16} />Join a group</h3>
+
+        {availableToJoin.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <p className="muted" style={{ marginBottom: 6 }}>
+              Your account&apos;s email is eligible to join {availableToJoin.length === 1 ? 'this group' : 'these groups'} right
+              away:
+            </p>
+            {availableToJoin.map((jp) => (
+              <div
+                key={jp.project.id}
+                className="row"
+                style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}
+              >
+                <span>
+                  <strong>{jp.project.name}</strong>
+                  {jp.project.description && (
+                    <span className="muted" style={{ display: 'block', fontSize: 12.5 }}>{jp.project.description}</span>
+                  )}
+                </span>
+                <button
+                  className="btn btn-mini btn-primary"
+                  disabled={joiningId === jp.project.id}
+                  onClick={() => joinNow(jp)}
+                >
+                  {joiningId === jp.project.id ? 'Joining…' : `Join as ${jp.role}`}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
         <p className="muted">
-          Got a join link from an instructor or research lead? Paste it here — or just type the group&apos;s
-          short name if that&apos;s all you were given.
+          {availableToJoin.length > 0
+            ? 'Have a join link or code for something else? Paste it here.'
+            : "Got a join link from an instructor or research lead? Paste it here — or just type the group's short name if that's all you were given."}
         </p>
         <form
           className="row"

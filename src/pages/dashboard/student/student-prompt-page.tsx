@@ -12,7 +12,7 @@ import { createPromptExperiment, listProjectPromptExperiments, type PromptExperi
 import { ExperimentCard } from '../portfolios/prompt-generator-page'
 
 type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
-type Scope = 'favoriten' | 'alle' | 'klassenstufe'
+type Scope = 'favoriten' | 'alle' | 'klassenstufe' | 'auswahl'
 
 // EvoMentor DE v1.2's own real KI-Prompt-Generator picks its scope
 // (Umfang: Favoriten / Alle / nach Klassenstufe) directly inside the
@@ -28,10 +28,25 @@ type Scope = 'favoriten' | 'alle' | 'klassenstufe'
 // silently generate a ~167,000-character prompt with zero warning
 // (confirmed live, 2026-09-30 review) -- a live character counter below
 // makes that visible before a student copies it out.
+//
+// Real feedback 2026-10-01 (Susan, previewing as a student): "Klassenstufe"
+// alone still left too many Lernziele to make sense of ("all learning goals
+// of one grade is too many") -- she wanted to narrow by individual topic,
+// subtopic, and learning goal. Two additions, not a replacement: Thema/
+// Unterthema dropdowns narrow "Klassenstufe" further (reusing the real
+// thema/unterthema fields listTopics already reads out of each row's own
+// content, the same fields the researcher Browse tab's search already
+// matches against), and a new "Direkt auswählen" scope adds a real
+// pick-any-combination checklist for full manual control, independent of
+// favoriting.
 export default function StudentPromptPage() {
   const { project, supabase } = useOutletContext<ProjectOutletContext>()
   const [scope, setScope] = useState<Scope>('favoriten')
   const [gradeFilter, setGradeFilter] = useState<string>('')
+  const [themaFilter, setThemaFilter] = useState<string>('')
+  const [unterthemaFilter, setUnterthemaFilter] = useState<string>('')
+  const [manualSelection, setManualSelection] = useState<Set<string>>(new Set())
+  const [auswahlQuery, setAuswahlQuery] = useState('')
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [fullById, setFullById] = useState<Map<string, DataObject>>(new Map())
@@ -78,12 +93,52 @@ export default function StudentPromptPage() {
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
 
+  // Thema options narrow to the currently-picked grade (if any); Unterthema
+  // options narrow to the currently-picked grade AND thema -- each level
+  // only ever offers choices that can actually return something.
+  const themen = useMemo(() => {
+    const relevant = (topics ?? []).filter((t) => !gradeFilter || t.grade_band === gradeFilter)
+    return Array.from(new Set(relevant.map((t) => t.thema).filter(Boolean) as string[])).sort()
+  }, [topics, gradeFilter])
+
+  const unterthemen = useMemo(() => {
+    if (!themaFilter) return []
+    const relevant = (topics ?? []).filter((t) => (!gradeFilter || t.grade_band === gradeFilter) && t.thema === themaFilter)
+    return Array.from(new Set(relevant.map((t) => t.unterthema).filter(Boolean) as string[])).sort()
+  }, [topics, gradeFilter, themaFilter])
+
+  const auswahlResults = useMemo(() => {
+    if (!topics) return []
+    const q = auswahlQuery.trim().toLowerCase()
+    return topics.filter((t) => {
+      if (gradeFilter && t.grade_band !== gradeFilter) return false
+      if (!q) return true
+      return t.title.toLowerCase().includes(q) || (t.thema ?? '').toLowerCase().includes(q) || (t.unterthema ?? '').toLowerCase().includes(q)
+    })
+  }, [topics, gradeFilter, auswahlQuery])
+
+  const toggleManual = (id: string) => {
+    setManualSelection((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   const scopedIds = useMemo(() => {
     if (!topics) return []
     if (scope === 'favoriten') return topics.filter((t) => favorites.has(t.id)).map((t) => t.id)
-    if (scope === 'klassenstufe') return topics.filter((t) => t.grade_band === gradeFilter).map((t) => t.id)
+    if (scope === 'auswahl') return topics.filter((t) => manualSelection.has(t.id)).map((t) => t.id)
+    if (scope === 'klassenstufe') {
+      return topics
+        .filter((t) => t.grade_band === gradeFilter)
+        .filter((t) => !themaFilter || t.thema === themaFilter)
+        .filter((t) => !unterthemaFilter || t.unterthema === unterthemaFilter)
+        .map((t) => t.id)
+    }
     return topics.map((t) => t.id)
-  }, [topics, scope, favorites, gradeFilter])
+  }, [topics, scope, favorites, gradeFilter, themaFilter, unterthemaFilter, manualSelection])
 
   useEffect(() => {
     const missing = scopedIds.filter((id) => !fullById.has(id))
@@ -162,15 +217,76 @@ export default function StudentPromptPage() {
               <option value="favoriten">Meine Favoriten (★)</option>
               <option value="alle">Alle Lernziele</option>
               <option value="klassenstufe">Nach Klassenstufe</option>
+              <option value="auswahl">Direkt auswählen</option>
             </select>
           </div>
           {scope === 'klassenstufe' && (
+            <>
+              <div className="field">
+                <label>Klassenstufe</label>
+                <select value={gradeFilter} onChange={(e) => { setGradeFilter(e.target.value); setThemaFilter(''); setUnterthemaFilter('') }}>
+                  <option value="">Bitte wählen…</option>
+                  {grades.map((g) => <option key={g} value={g}>Kl. {g}</option>)}
+                </select>
+              </div>
+              {gradeFilter && themen.length > 0 && (
+                <div className="field">
+                  <label>Thema</label>
+                  <select value={themaFilter} onChange={(e) => { setThemaFilter(e.target.value); setUnterthemaFilter('') }}>
+                    <option value="">Alle Themen</option>
+                    {themen.map((th) => <option key={th} value={th}>{th}</option>)}
+                  </select>
+                </div>
+              )}
+              {themaFilter && unterthemen.length > 0 && (
+                <div className="field">
+                  <label>Unterthema</label>
+                  <select value={unterthemaFilter} onChange={(e) => setUnterthemaFilter(e.target.value)}>
+                    <option value="">Alle Unterthemen</option>
+                    {unterthemen.map((u) => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
+          {scope === 'auswahl' && (
             <div className="field">
-              <label>Klassenstufe</label>
-              <select value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)}>
-                <option value="">Bitte wählen…</option>
+              <label>Vorfiltern nach Klassenstufe (optional)</label>
+              <select value={gradeFilter} onChange={(e) => setGradeFilter(e.target.value)} style={{ marginBottom: 8 }}>
+                <option value="">Alle Klassenstufen</option>
                 {grades.map((g) => <option key={g} value={g}>Kl. {g}</option>)}
               </select>
+              <input
+                type="search"
+                placeholder="Lernziele durchsuchen…"
+                value={auswahlQuery}
+                onChange={(e) => setAuswahlQuery(e.target.value)}
+                style={{ marginBottom: 8 }}
+              />
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 8, padding: 6 }}>
+                {auswahlResults.length === 0 ? (
+                  <p className="muted" style={{ fontSize: 12.5, margin: 4 }}>Keine Treffer.</p>
+                ) : (
+                  auswahlResults.map((t) => (
+                    <label key={t.id} className="row" style={{ gap: 6, fontSize: 12.5, padding: '3px 2px', cursor: 'pointer', alignItems: 'flex-start' }}>
+                      <input type="checkbox" checked={manualSelection.has(t.id)} onChange={() => toggleManual(t.id)} style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span style={{ minWidth: 0 }}>
+                        {t.title}
+                        {(t.thema || t.unterthema) && (
+                          <span className="muted" style={{ display: 'block', fontSize: 11 }}>
+                            {[t.thema, t.unterthema].filter(Boolean).join(' › ')}
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  ))
+                )}
+              </div>
+              {manualSelection.size > 0 && (
+                <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setManualSelection(new Set())}>
+                  Auswahl zurücksetzen ({manualSelection.size})
+                </button>
+              )}
             </div>
           )}
           <p className="muted" style={{ fontSize: 12.5 }}>

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
-import type { ProjectMemberRole } from './projects'
+import type { ProjectMemberRole, ProjectRow } from './projects'
 import { logActivity } from './activity'
 
 type Client = SupabaseClient<Database>
@@ -8,6 +8,36 @@ type Client = SupabaseClient<Database>
 export interface JoinEligibility {
   eligible: boolean
   role: ProjectMemberRole | null
+}
+
+export interface JoinableProject {
+  project: ProjectRow
+  role: ProjectMemberRole
+}
+
+/**
+ * Every project the signed-in user is eligible to self-join right now --
+ * the same real data `checkJoinEligibility` checks one project at a time,
+ * surfaced as a real list instead of requiring someone to already know a
+ * slug or link (real feedback 2026-10-01: "should provide a drop down list
+ * ... not complicated codes"). RLS (migration 035) already restricts
+ * `project_join_rules` to just the rows matching the caller's own email, so
+ * this can't be used to browse any other project's allowlist. A project can
+ * carry more than one matching rule (e.g. a domain rule plus a narrower
+ * email rule) -- deduped by project id, first match wins.
+ */
+export async function listMyJoinableProjects(supabase: Client): Promise<JoinableProject[]> {
+  const { data } = await (supabase as any)
+    .from('project_join_rules')
+    .select('role, project:projects(*)')
+  const seen = new Set<string>()
+  const result: JoinableProject[] = []
+  for (const row of (data ?? []) as { role: ProjectMemberRole; project: ProjectRow | null }[]) {
+    if (!row.project || seen.has(row.project.id)) continue
+    seen.add(row.project.id)
+    result.push({ project: row.project, role: row.role })
+  }
+  return result
 }
 
 /**

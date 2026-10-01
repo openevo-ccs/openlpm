@@ -182,7 +182,7 @@ export default function StudentLernzielePage() {
         </aside>
 
         <div className="student-lernziele-main">
-          <div className="student-card-grid">
+          <div className="topic-card-grid">
             {topics === null ? (
               <p className="muted">Lädt…</p>
             ) : filtered.length === 0 ? (
@@ -194,7 +194,7 @@ export default function StudentLernzielePage() {
               filtered.map((t) => {
                 const entries = bkEntries(contentById.get(t.id))
                 return (
-                  <div key={t.id} className="card student-lz-card" onClick={() => navigate(`/dashboard/${project.slug}/${t.id}`)}>
+                  <div key={t.id} className="card topic-card" onClick={() => navigate(`/dashboard/${project.slug}/${t.id}`)}>
                     <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <span className="chip">{gradeChipLabel(t.grade_band ?? '?')}</span>
                       <button

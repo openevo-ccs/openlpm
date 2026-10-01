@@ -297,20 +297,15 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 .help:hover, .help:focus { border-color: var(--series-a); color: var(--series-a); outline: none; }
 
-/* ---- curriculum explorer: topic list + connection/thread styling.
+/* ---- curriculum explorer: connection/thread styling. The topic list
+   itself used to live here (.topic-list/.topic-list-item) -- replaced
+   2026-10-01 by the .topic-card-grid cards below (real feedback c7d13f30),
+   removed rather than left dead since nothing references it anymore.
    Asserted (curriculum-required) vs. suggested (didactic proposal)
    connections get a deliberately different visual language -- solid vs.
    dashed border, matching curriculum-mapping literature's own
    hard-wired/soft-wired convention -- so the distinction survives even if a
    reader skips every label. ---- */
-.topic-list { list-style: none; margin: 0; padding: 0; }
-.topic-list-item {
-  width: 100%; text-align: left; display: flex; gap: 10px; align-items: flex-start;
-  padding: 8px 10px; border: 1px solid transparent; border-radius: 8px;
-  background: transparent; cursor: pointer; font: inherit; color: var(--text-primary);
-}
-.topic-list-item:hover { background: var(--surface-1); }
-.topic-list-item.active { background: rgb(var(--primary-rgb) / 0.1); border-color: var(--series-a); }
 
 .conn-line {
   display: block; padding: 8px 10px; border-radius: 8px; margin-bottom: 6px;
@@ -454,9 +449,16 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .student-filter-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 6px; }
 .student-concept-filter { display: flex; flex-direction: column; }
 .student-lernziele-main { display: flex; gap: 16px; min-width: 0; }
-.student-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; flex: 1; align-content: start; }
-.student-lz-card { cursor: pointer; margin-bottom: 0; transition: border-color 0.12s; }
-.student-lz-card:hover { border-color: var(--series-a); }
+
+/* Shared by the German student Lernziele explorer AND (2026-10-01) the
+   researcher Learning Goals Browse tab -- real feedback asked for the
+   researcher list to look like this same visually-appealing card grid
+   rather than inventing a second style. Generic name on purpose: nothing
+   below is student-specific. */
+.topic-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; flex: 1; align-content: start; }
+.topic-card { cursor: pointer; margin-bottom: 0; transition: border-color 0.12s; }
+.topic-card:hover { border-color: var(--series-a); }
+.topic-card.active { border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
 
 .chip-btn {
   border: 1px solid var(--border); background: var(--surface-2); border-radius: 999px;

@@ -150,22 +150,33 @@ function BrowseTab() {
               <p>No learning goals match.</p>
             </div>
           ) : (
-            <ul className="topic-list">
+            // Real feedback 2026-09-18 (c7d13f30): wanted a visually appealing
+            // card layout like EvoMentor DE v1.2, with only relevant info per
+            // card -- reuses the exact card grid built 2026-09-30 for the
+            // German student Lernziele explorer (globals.css's .topic-card*
+            // rules), renamed generic since it's no longer student-only. Light/
+            // dark mode comes free from the same var(--...) tokens every other
+            // card in the app already uses. The rich detail (required order,
+            // suggested connections, import/export) stays exactly where it was,
+            // in the drawer -- this only replaces the plain list on the left.
+            <div className="topic-card-grid">
               {filtered.map((t) => (
-                <li key={t.id}>
-                  <button
-                    className={`topic-list-item${t.id === objectId ? ' active' : ''}`}
-                    onClick={() => navigate(`/dashboard/${project.slug}/learning-goals/${t.id}`)}
-                  >
-                    <span className="chip" style={{ flexShrink: 0 }}>{gradeLabel(t.grade_band)}</span>
-                    <span>
-                      <strong style={{ display: 'block' }}>{t.title}</strong>
-                      {t.unterthema && <span className="muted">{t.unterthema}</span>}
+                <div
+                  key={t.id}
+                  className={`card topic-card${t.id === objectId ? ' active' : ''}`}
+                  onClick={() => navigate(`/dashboard/${project.slug}/learning-goals/${t.id}`)}
+                >
+                  <span className="chip">{gradeLabel(t.grade_band)}</span>
+                  <strong style={{ display: 'block', marginTop: 6 }}>{t.title}</strong>
+                  {(t.thema || t.unterthema) && (
+                    <span className="muted" style={{ display: 'block', fontSize: 12.5 }}>
+                      {[t.thema, t.unterthema].filter(Boolean).join(' › ')}
                     </span>
-                  </button>
-                </li>
+                  )}
+                  {t.description && <p className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{t.description}</p>}
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
 
