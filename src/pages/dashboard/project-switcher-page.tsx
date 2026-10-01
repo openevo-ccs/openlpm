@@ -17,6 +17,20 @@ interface SwitcherEntry {
 }
 import { EpistemicStatusBadge, CURATION, type Curation } from '@/components/epistemic-status-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
+import { projectColorHex } from '@/lib/project-colors'
+
+// Real feedback 2371cbf7 (2026-10-01): "set a standard character display
+// cut off to ensure project descriptions are displayed at the same
+// length" -- a card with a long description used to dwarf its row-mates
+// (confirmed against Dustin's own screenshot: eva-lpm's long migration
+// note made its card 4x the height of EvoMentor's, right next to it).
+// Full text stays in the title tooltip rather than being lost.
+const DESCRIPTION_MAX = 140
+function truncateDescription(text: string | null): string {
+  if (!text) return ''
+  if (text.length <= DESCRIPTION_MAX) return text
+  return `${text.slice(0, DESCRIPTION_MAX).trimEnd()}…`
+}
 
 const CURATION_LABEL: Record<Curation, string> = {
   'human-curated': 'Human-Curated',
@@ -146,8 +160,13 @@ export default function ProjectSwitcherPage() {
         <div className="grid grid-3">
           {topLevel.map(({ project, role }) => {
             const children = childrenOf(project.id)
+            const colorHex = projectColorHex((project as any).color)
             return (
-              <div key={project.id} className="card" style={{ height: '100%' }}>
+              <div
+                key={project.id}
+                className="card"
+                style={{ height: '100%', borderLeft: colorHex ? `4px solid ${colorHex}` : undefined }}
+              >
                 <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h3>{project.name}</h3>
@@ -162,7 +181,7 @@ export default function ProjectSwitcherPage() {
                       )}
                     </div>
                   </div>
-                  <p className="muted">{project.description}</p>
+                  <p className="muted" title={project.description ?? undefined}>{truncateDescription(project.description)}</p>
                   <div className="row" style={{ flexWrap: 'wrap' }}>
                     <EpistemicStatusBadge status={project.epistemic_status} />
                     <WorkingLanguagesTag languages={project.working_languages} />

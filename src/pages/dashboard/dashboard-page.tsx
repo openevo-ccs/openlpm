@@ -26,6 +26,7 @@ import {
   type ProjectMemberRole,
 } from '@/lib/supabase/members'
 import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
+import { PROJECT_COLORS } from '@/lib/project-colors'
 
 // 2026-09-13 restructure: renamed from "Overview," folding in the former
 // standalone Projects and Members tabs (per Dustin's explicit instruction)
@@ -136,6 +137,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {canManage && <ProjectColorSection project={project} supabase={supabase} />}
       <ProjectsSection project={project} canManage={canManage} supabase={supabase} />
       <MembersSection project={project} role={role} supabase={supabase} />
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
@@ -603,6 +605,78 @@ function JoinRulesSection({
           </p>
         </>
       )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Project color (migration 064) -- a small fixed palette, not a free
+// picker, shown as a subtle left-border accent on this project's own card
+// in the project switcher. Real feedback 2371cbf7 (2026-10-01).
+// ============================================================================
+
+function ProjectColorSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  // color (migration 064) isn't in the generated types yet.
+  const [value, setValue] = useState<string | null>((project as any).color ?? null)
+  const [busy, setBusy] = useState(false)
+
+  const save = async (next: string | null) => {
+    setValue(next)
+    setBusy(true)
+    const { error } = await (supabase as any)
+      .from('projects')
+      .update({ color: next })
+      .eq('id', project.id)
+    setBusy(false)
+    if (error) setValue((project as any).color ?? null)
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3>Project color</h3>
+      <p className="muted">
+        A subtle accent border on this project&apos;s card in the project switcher — purely visual,
+        doesn&apos;t need to be unique to this project.
+      </p>
+      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          className="btn-linklike"
+          disabled={busy}
+          onClick={() => save(null)}
+          title="No color"
+          style={{
+            width: 26, height: 26, borderRadius: '50%', padding: 0,
+            border: value === null ? '2px solid var(--series-a)' : '1px dashed var(--border)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, color: 'var(--text-muted)',
+          }}
+        >
+          ×
+        </button>
+        {PROJECT_COLORS.map((c) => (
+          <button
+            key={c.key}
+            type="button"
+            className="btn-linklike"
+            disabled={busy}
+            onClick={() => save(c.key)}
+            title={c.label}
+            aria-pressed={value === c.key}
+            style={{
+              width: 26, height: 26, borderRadius: '50%', padding: 0,
+              background: c.hex,
+              border: value === c.key ? '2px solid var(--text-primary)' : '2px solid transparent',
+              boxShadow: value === c.key ? '0 0 0 2px var(--surface-1)' : 'none',
+            }}
+          />
+        ))}
+      </div>
     </div>
   )
 }
