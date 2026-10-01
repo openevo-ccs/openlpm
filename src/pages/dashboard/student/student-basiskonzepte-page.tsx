@@ -122,7 +122,7 @@ function DashboardTab({
       <div className="card">
         <h3>Relevanzverteilung je Basiskonzept × Klassenstufe</h3>
         <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-          Je Zelle: Anzahl der Lernziele dieser Klassenstufe mit hoher Relevanz (3/3) für das jeweilige Basiskonzept.
+          Je Zelle: wie viele Lernziele dieser Klassenstufe für das jeweilige Basiskonzept niedrige, mittlere bzw. hohe Relevanz haben.
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
@@ -137,17 +137,48 @@ function DashboardTab({
                 <tr key={c.id} style={{ borderTop: '1px solid var(--border)' }}>
                   <td style={{ padding: '4px 8px' }}><span className={`bk-dot bk-dot-${i % 6}`} style={{ marginRight: 6 }} />{c.label}</td>
                   {grades.map((g) => {
-                    const count = (topics ?? []).filter((t) => {
-                      if (t.grade_band !== g) return false
-                      return bkEntries(contentById.get(t.id)).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, c.label))
-                    }).length
-                    return <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>{count || '—'}</td>
+                    // Real feedback 2026-10-01: the old cell only counted
+                    // high-relevance (3/3) goals, hiding the real low/medium
+                    // tail entirely. Count all three tiers and render a
+                    // small stacked bar so the real distribution -- not just
+                    // the top of it -- is visible per concept x grade cell.
+                    const counts = [0, 0, 0]
+                    for (const t of topics ?? []) {
+                      if (t.grade_band !== g) continue
+                      for (const e of bkEntries(contentById.get(t.id))) {
+                        if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
+                        if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) counts[e.relevanz_beurteilung - 1]++
+                      }
+                    }
+                    const total = counts[0] + counts[1] + counts[2]
+                    const color = `var(--map-${(i % 6) + 1})`
+                    return (
+                      <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
+                        {total === 0 ? (
+                          '—'
+                        ) : (
+                          <div
+                            className="tip"
+                            data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
+                            style={{ display: 'inline-block', width: '100%', maxWidth: 70 }}
+                          >
+                            <div style={{ display: 'flex', height: 7, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}>
+                              {counts[0] > 0 && <div style={{ flex: counts[0], background: color, opacity: 0.35 }} />}
+                              {counts[1] > 0 && <div style={{ flex: counts[1], background: color, opacity: 0.65 }} />}
+                              {counts[2] > 0 && <div style={{ flex: counts[2], background: color, opacity: 1 }} />}
+                            </div>
+                            <div className="muted" style={{ fontSize: 10.5, marginTop: 2 }}>{counts[0]} / {counts[1]} / {counts[2]}</div>
+                          </div>
+                        )}
+                      </td>
+                    )
                   })}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken und Zahlen: niedrig / mittel / hoch.</p>
       </div>
     </div>
   )

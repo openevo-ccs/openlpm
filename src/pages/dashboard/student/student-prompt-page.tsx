@@ -45,6 +45,11 @@ export default function StudentPromptPage() {
   const [gradeFilter, setGradeFilter] = useState<string>('')
   const [themaFilter, setThemaFilter] = useState<string>('')
   const [unterthemaFilter, setUnterthemaFilter] = useState<string>('')
+  // Real feedback 2026-10-01: narrowing by Klassenstufe/Thema/Unterthema was
+  // all-or-nothing -- Susan wanted to exclude a handful of individual
+  // Lernziele from within that already-narrowed range, not just accept the
+  // whole set or switch to the separate "Direkt auswählen" scope.
+  const [deselectedInRange, setDeselectedInRange] = useState<Set<string>>(new Set())
   const [manualSelection, setManualSelection] = useState<Set<string>>(new Set())
   const [auswahlQuery, setAuswahlQuery] = useState('')
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
@@ -126,19 +131,41 @@ export default function StudentPromptPage() {
     })
   }
 
+  const rangeMatches = useMemo(() => {
+    if (!topics || !gradeFilter) return []
+    return topics
+      .filter((t) => t.grade_band === gradeFilter)
+      .filter((t) => !themaFilter || t.thema === themaFilter)
+      .filter((t) => !unterthemaFilter || t.unterthema === unterthemaFilter)
+  }, [topics, gradeFilter, themaFilter, unterthemaFilter])
+
+  // A range match that gets excluded drops out when the range itself
+  // changes underneath it (new grade/thema/unterthema) -- an id excluded
+  // from one range shouldn't silently stay excluded from an unrelated one.
+  useEffect(() => {
+    setDeselectedInRange((prev) => {
+      const validIds = new Set(rangeMatches.map((t) => t.id))
+      const next = new Set(Array.from(prev).filter((id) => validIds.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [rangeMatches])
+
+  const toggleDeselected = (id: string) => {
+    setDeselectedInRange((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   const scopedIds = useMemo(() => {
     if (!topics) return []
     if (scope === 'favoriten') return topics.filter((t) => favorites.has(t.id)).map((t) => t.id)
     if (scope === 'auswahl') return topics.filter((t) => manualSelection.has(t.id)).map((t) => t.id)
-    if (scope === 'klassenstufe') {
-      return topics
-        .filter((t) => t.grade_band === gradeFilter)
-        .filter((t) => !themaFilter || t.thema === themaFilter)
-        .filter((t) => !unterthemaFilter || t.unterthema === unterthemaFilter)
-        .map((t) => t.id)
-    }
+    if (scope === 'klassenstufe') return rangeMatches.filter((t) => !deselectedInRange.has(t.id)).map((t) => t.id)
     return topics.map((t) => t.id)
-  }, [topics, scope, favorites, gradeFilter, themaFilter, unterthemaFilter, manualSelection])
+  }, [topics, scope, favorites, manualSelection, rangeMatches, deselectedInRange])
 
   useEffect(() => {
     const missing = scopedIds.filter((id) => !fullById.has(id))
@@ -245,6 +272,24 @@ export default function StudentPromptPage() {
                     <option value="">Alle Unterthemen</option>
                     {unterthemen.map((u) => <option key={u} value={u}>{u}</option>)}
                   </select>
+                </div>
+              )}
+              {gradeFilter && rangeMatches.length > 0 && (
+                <div className="field">
+                  <label>Lernziele in diesem Bereich ({rangeMatches.length - deselectedInRange.size} von {rangeMatches.length} ausgewählt)</label>
+                  <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 8, padding: 6 }}>
+                    {rangeMatches.map((t) => (
+                      <label key={t.id} className="row" style={{ gap: 6, fontSize: 12.5, padding: '3px 2px', cursor: 'pointer', alignItems: 'flex-start' }}>
+                        <input type="checkbox" checked={!deselectedInRange.has(t.id)} onChange={() => toggleDeselected(t.id)} style={{ flexShrink: 0, marginTop: 2 }} />
+                        <span style={{ minWidth: 0 }}>{t.title}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {deselectedInRange.size > 0 && (
+                    <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setDeselectedInRange(new Set())}>
+                      Alle wieder auswählen
+                    </button>
+                  )}
                 </div>
               )}
             </>
