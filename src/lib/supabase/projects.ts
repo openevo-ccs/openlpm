@@ -135,3 +135,35 @@ export async function deleteProject(supabase: Client, projectId: string) {
   }
   return { error: null }
 }
+
+export interface ProjectMetadataPatch {
+  name: string
+  description: string | null
+  working_languages: string[]
+  // Undefined (not just omitted) on a nested sub-project -- inherited from
+  // its parent at creation time (new-project-wizard.tsx), never independently
+  // editable, same rule the wizard itself already enforces.
+  epistemic_status?: ProjectRow['epistemic_status']
+  is_private?: boolean
+}
+
+/**
+ * Edits a project's own identity fields -- name/description/languages always,
+ * epistemic_status/is_private only for a top-level project space (a nested
+ * sub-project inherits both from its parent, same as at creation time). RLS
+ * (migration 004's "Owners and maintainers can update their project", plus
+ * migration 058's admin bypass) is the real boundary; this is a plain update.
+ */
+export async function updateProjectMetadata(supabase: Client, projectId: string, patch: ProjectMetadataPatch) {
+  const { epistemic_status, is_private, ...rest } = patch
+  const row: Record<string, unknown> = { ...rest }
+  if (epistemic_status !== undefined) row.epistemic_status = epistemic_status
+  if (is_private !== undefined) row.is_private = is_private
+
+  const { data, error } = await (supabase as any).from('projects').update(row).eq('id', projectId).select('id')
+  if (error) return { error }
+  if (!data || data.length === 0) {
+    return { error: new Error("Nothing was updated -- you may not have permission, or it's already gone.") }
+  }
+  return { error: null }
+}

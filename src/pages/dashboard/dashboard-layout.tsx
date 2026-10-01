@@ -34,7 +34,7 @@ export default function DashboardLayout() {
             <>
               <Link to="/dashboard/admin/users" className="btn btn-mini">
                 <Users size={12} />
-                Users
+                Admin
               </Link>
               <Link to="/dashboard/admin/feedback" className="btn btn-mini">
                 <MessageSquareText size={12} />

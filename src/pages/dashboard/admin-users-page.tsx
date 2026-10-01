@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, FolderTree, Globe, Lock, Mail, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, FolderTree, Globe, Lock, Mail, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
 import { removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
-import { deleteProject } from '@/lib/supabase/projects'
+import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -29,6 +29,25 @@ import {
 // renders, migration 049's RLS is the real boundary underneath.
 
 const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
+
+// Same list new-project-wizard.tsx offers at creation time -- kept in sync
+// by hand rather than shared, since it's an 8-entry constant, not logic.
+const COMMON_LANGUAGES: { code: string; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'German' },
+  { code: 'fr', label: 'French' },
+  { code: 'es', label: 'Spanish' },
+  { code: 'pt', label: 'Portuguese' },
+  { code: 'zh', label: 'Chinese' },
+  { code: 'ja', label: 'Japanese' },
+  { code: 'ar', label: 'Arabic' },
+]
+
+const EPISTEMIC_STATUS_OPTIONS: { value: AdminProjectRow['epistemic_status']; label: string }[] = [
+  { value: 'in-development', label: 'Human-curated — real content, still being built' },
+  { value: 'field-validated-curriculum', label: 'Human-curated — already in real classroom use' },
+  { value: 'designed-thought-experiment', label: 'Synthetic-theoretical — a designed comparison or research construct' },
+]
 
 export default function AdminUsersPage() {
   const { session } = useSession()
@@ -56,7 +75,7 @@ export default function AdminUsersPage() {
   if (!isAdmin) {
     return (
       <div>
-        <h1>Users</h1>
+        <h1>Admin</h1>
         <p className="muted">This page isn&apos;t available to your account.</p>
       </div>
     )
@@ -71,9 +90,10 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="row"><Users size={18} style={{ color: 'var(--text-muted)' }} />Users</h1>
+      <h1 className="row"><Users size={18} style={{ color: 'var(--text-muted)' }} />Admin</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
-        Every real account across OpenLPM, which project(s) they&apos;re in, and what role they hold in each.
+        Every real account and every project across all of OpenLPM, in one place — regardless of
+        which projects your own account happens to belong to.
       </p>
 
       <div className="card" style={{ marginBottom: 20 }}>
@@ -264,6 +284,119 @@ function ProjectsAdminSection({
   )
 }
 
+function ProjectEditForm({
+  project,
+  isSpace,
+  supabase,
+  onSaved,
+  onCancel,
+}: {
+  project: AdminProjectRow
+  isSpace: boolean
+  supabase: ReturnType<typeof createClient>
+  onSaved: () => void
+  onCancel: () => void
+}) {
+  const [name, setName] = useState(project.name)
+  const [description, setDescription] = useState(project.description ?? '')
+  const [epistemicStatus, setEpistemicStatus] = useState(project.epistemic_status)
+  const [isPrivate, setIsPrivate] = useState(project.is_private)
+  const [languages, setLanguages] = useState<Set<string>>(new Set(project.working_languages ?? []))
+  const [customLanguage, setCustomLanguage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const toggleLanguage = (code: string) => {
+    setLanguages((prev) => {
+      const next = new Set(prev)
+      if (next.has(code)) next.delete(code)
+      else next.add(code)
+      return next
+    })
+  }
+
+  const save = async () => {
+    setBusy(true)
+    setError(null)
+    const patch: ProjectMetadataPatch = {
+      name: name.trim(),
+      description: description.trim() || null,
+      working_languages: Array.from(languages),
+      ...(isSpace ? { epistemic_status: epistemicStatus, is_private: isPrivate } : {}),
+    }
+    const { error: err } = await updateProjectMetadata(supabase, project.id, patch)
+    setBusy(false)
+    if (err) setError(err.message)
+    else onSaved()
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 8, background: 'var(--bg-subtle, transparent)' }}>
+      <div className="field">
+        <label>Name</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} />
+      </div>
+      <div className="field">
+        <label>Description</label>
+        <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What is this for?" />
+      </div>
+
+      {isSpace ? (
+        <>
+          <div className="field">
+            <label>Is this real, human-curated curriculum content, or a synthetic/theoretical construct?</label>
+            <select value={epistemicStatus} onChange={(e) => setEpistemicStatus(e.target.value as AdminProjectRow['epistemic_status'])}>
+              {EPISTEMIC_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label className="row" style={{ gap: 6, alignItems: 'center' }}>
+              <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
+              Private — only members can see this project exists
+            </label>
+          </div>
+        </>
+      ) : (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Curation status and privacy are inherited from this project&apos;s parent space — edit those there.
+        </p>
+      )}
+
+      <div className="field">
+        <label>Languages</label>
+        <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+          {COMMON_LANGUAGES.map((l) => (
+            <label key={l.code} className="row" style={{ gap: 4 }}>
+              <input type="checkbox" checked={languages.has(l.code)} onChange={() => toggleLanguage(l.code)} />
+              {l.label}
+            </label>
+          ))}
+        </div>
+        <div className="row" style={{ marginTop: 6 }}>
+          <input value={customLanguage} onChange={(e) => setCustomLanguage(e.target.value)} placeholder="Other language code, e.g. sw, hi" style={{ width: 200 }} />
+          <button type="button" className="btn btn-mini" onClick={() => { if (customLanguage.trim()) { toggleLanguage(customLanguage.trim()); setCustomLanguage('') } }}>
+            Add
+          </button>
+        </div>
+        {Array.from(languages).filter((c) => !COMMON_LANGUAGES.some((l) => l.code === c)).length > 0 && (
+          <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+            Also added: {Array.from(languages).filter((c) => !COMMON_LANGUAGES.some((l) => l.code === c)).join(', ')}
+          </p>
+        )}
+      </div>
+
+      {error && <div className="notice notice-bad" style={{ marginBottom: 8 }}>{error}</div>}
+
+      <div className="row">
+        <button className="btn btn-primary" disabled={busy || !name.trim()} onClick={save}>
+          {busy ? 'Saving…' : 'Save changes'}
+        </button>
+        <button className="btn btn-mini" disabled={busy} onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  )
+}
+
 function ProjectRow({
   project,
   parentName,
@@ -281,6 +414,7 @@ function ProjectRow({
 }) {
   const [confirming, setConfirming] = useState(false)
   const [typedSlug, setTypedSlug] = useState('')
+  const [editing, setEditing] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -314,12 +448,27 @@ function ProjectRow({
           </span>
         </span>
         {!confirming && (
-          <button className="btn btn-mini btn-danger" onClick={() => setConfirming(true)} disabled={childCount > 0}
-            title={childCount > 0 ? 'Delete or move its sub-projects first' : 'Permanently delete this project'}>
-            <Trash2 size={11} />Delete
-          </button>
+          <span className="row" style={{ gap: 6 }}>
+            <button className="btn btn-mini" onClick={() => setEditing((e) => !e)}>
+              <Pencil size={11} />{editing ? 'Close' : 'Edit'}
+            </button>
+            <button className="btn btn-mini btn-danger" onClick={() => setConfirming(true)} disabled={childCount > 0}
+              title={childCount > 0 ? 'Delete or move its sub-projects first' : 'Permanently delete this project'}>
+              <Trash2 size={11} />Delete
+            </button>
+          </span>
         )}
       </div>
+
+      {editing && !confirming && (
+        <ProjectEditForm
+          project={project}
+          isSpace={!project.parent_project_id}
+          supabase={supabase}
+          onSaved={() => { setEditing(false); onChanged() }}
+          onCancel={() => setEditing(false)}
+        />
+      )}
 
       {childCount > 0 && !confirming && (
         <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
