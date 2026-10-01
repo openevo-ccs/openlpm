@@ -11,13 +11,17 @@
 // Usage:
 //   node layout_check/capture.mjs [--base <url>] [--devices phone,tablet,desktop] [--out <dir>]
 //
-// Needs a real signed-in session to reach anything past the login page --
-// pass credentials via env (never hardcode a real password into a
-// committed script): OPENLPM_TEST_EMAIL / OPENLPM_TEST_PASSWORD.
+// Needs a real signed-in session to reach anything past the login page.
+// Default (no setup needed): mints a one-time session for the standing QA
+// account via scripts/mint_qa_session.mjs (see the openlpm-design-session
+// skill's Step 0) -- no password, no email round-trip, works every time.
+// OPENLPM_TEST_EMAIL / OPENLPM_TEST_PASSWORD still work if set, for testing
+// as a specific other account instead.
 
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { mintQaSession } from '../scripts/mint_qa_session.mjs'
 
 const DEVICES = {
   phone: { width: 390, height: 844, deviceScaleFactor: 3, isMobile: true, hasTouch: true, label: 'Phone (390x844)' },
@@ -84,10 +88,7 @@ async function main() {
   const args = parseArgs(process.argv.slice(2))
   const email = process.env.OPENLPM_TEST_EMAIL
   const password = process.env.OPENLPM_TEST_PASSWORD
-  if (!email || !password) {
-    console.error('Set OPENLPM_TEST_EMAIL and OPENLPM_TEST_PASSWORD (a real, already-confirmed account) before running this.')
-    process.exit(1)
-  }
+  const usePasswordLogin = !!(email && password)
   const outDir = args.out || path.join(process.cwd(), 'layout_check', 'out', new Date().toISOString().replace(/[:.]/g, '-'))
   mkdirSync(outDir, { recursive: true })
 
@@ -108,11 +109,16 @@ async function main() {
     const pageErrors = []
     page.on('pageerror', (e) => pageErrors.push(e.message))
 
-    await page.goto(args.base + '#/auth/login', { waitUntil: 'networkidle' })
-    await page.fill('input[type="email"]', email)
-    await page.fill('input[type="password"]', password)
-    await page.click('button[type="submit"]')
-    await page.waitForTimeout(1200)
+    if (usePasswordLogin) {
+      await page.goto(args.base + '#/auth/login', { waitUntil: 'networkidle' })
+      await page.fill('input[type="email"]', email)
+      await page.fill('input[type="password"]', password)
+      await page.click('button[type="submit"]')
+      await page.waitForTimeout(1200)
+    } else {
+      await page.goto(args.base, { waitUntil: 'networkidle' })
+      await mintQaSession(page, args.base)
+    }
 
     report.devices[deviceKey] = { label: device.label, pages: {} }
     for (const p of PAGES) {
