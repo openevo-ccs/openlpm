@@ -4,8 +4,8 @@ import { Copy, Save } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
-import { bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
+import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
+import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { listFavoriteIds } from '@/lib/supabase/favorites'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
@@ -189,13 +189,19 @@ export default function StudentPromptPage() {
   }, [items])
   const bkLabels = useMemo(() => buildBkLabelMap(bkIds, rootConcepts), [bkIds, rootConcepts])
   const bkGroups = useMemo(() => groupBkIdsByRoot(bkIds, rootConcepts), [bkIds, rootConcepts])
+  // The real "Einbezogene Basiskonzepte" focus chips (EvoMentor DE v1.2,
+  // real feedback 2026-10-01) only ever narrow bkGroups down, never add a
+  // concept that isn't actually referenced by the selected items -- a
+  // Vorwissen field or prompt line for a concept with zero relevance here
+  // would be noise, not a real focus choice.
+  const focusedBkGroups = useMemo(() => (cfg ? bkGroups.filter((g) => isBkFocused(cfg, g.rootId)) : bkGroups), [bkGroups, cfg])
 
   const options = useMemo(() => (library ? resolveOptionLists(library.option_lists) : null), [library])
   const labels = useMemo(() => (library ? resolveSectionLabels(library.section_labels) : null), [library])
 
   const promptText = useMemo(
-    () => (items.length && cfg && library && labels && options ? buildPrompt(items, cfg, bkGroups, library, labels, options, bkLabels) : ''),
-    [items, cfg, bkGroups, library, labels, options, bkLabels]
+    () => (items.length && cfg && library && labels && options ? buildPrompt(items, cfg, focusedBkGroups, library, labels, options, bkLabels) : ''),
+    [items, cfg, focusedBkGroups, library, labels, options, bkLabels]
   )
 
   const reloadExperiments = () => userId && listProjectPromptExperiments(supabase, project.id, userId).then(setExperiments)
@@ -357,14 +363,39 @@ export default function StudentPromptPage() {
               <input value={cfg.stundenformat} onChange={(e) => setCfg({ ...cfg, stundenformat: e.target.value })} />
             </div>
           </div>
+          <div className="field">
+            <label>Anteil Evolutionsbezug</label>
+            <select value={cfg.anteilEvolutionsbezug} onChange={(e) => setCfg({ ...cfg, anteilEvolutionsbezug: e.target.value })}>
+              <option value="">Nicht angegeben</option>
+              {['5', '25', '50', '75', '100'].map((v) => <option key={v} value={v}>{v}%</option>)}
+            </select>
+          </div>
         </div>
 
         <div className="card student-prompt-card">
           <h3><span className="num">3</span>Basiskonzeptbezug &amp; Vorwissen</h3>
-          {bkGroups.length === 0 ? (
-            <p className="muted">Keine Basiskonzept-Bezüge in den ausgewählten Lernzielen gefunden.</p>
+          {rootConcepts.length > 0 && (
+            <div className="field">
+              <label>Einbezogene Basiskonzepte</label>
+              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                {rootConcepts.map((c, i) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={`chip-btn bk-chip${isBkFocused(cfg, c.id) ? ' active' : ''}`}
+                    onClick={() => setCfg({ ...cfg, focusBks: toggleBkFocus(cfg, c.id, rootConcepts.map((r) => r.id)) })}
+                  >
+                    <span className={`bk-dot bk-dot-${i % 6}`} />
+                    {bkAbbreviation(c.label)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {focusedBkGroups.length === 0 ? (
+            <p className="muted">Keine Basiskonzept-Bezüge in den ausgewählten Lernzielen im Fokus.</p>
           ) : (
-            bkGroups.map((g) => (
+            focusedBkGroups.map((g) => (
               <div key={g.rootId} className="field">
                 <label>{g.label} — Vorwissen</label>
                 <select
@@ -397,6 +428,15 @@ export default function StudentPromptPage() {
         <div className="card student-prompt-card">
           <h3><span className="num">6</span>Evaluation und Leistungserhebung</h3>
           <CheckGroup options={options.assessment} selected={cfg.bewertung} onToggle={(v) => setCfg({ ...cfg, bewertung: toggleInList(cfg.bewertung, v) })} />
+        </div>
+
+        <div className="card student-prompt-card">
+          <h3><span className="num">7</span>Gesellschaftliche Bezüge</h3>
+          <CheckGroup options={options.societal_context} selected={cfg.kontext} onToggle={(v) => setCfg({ ...cfg, kontext: toggleInList(cfg.kontext, v) })} />
+          <div className="field" style={{ marginTop: 8 }}>
+            <label>Weitere Hinweise (z. B. andere Bezüge)</label>
+            <textarea value={cfg.kontextNotizen} onChange={(e) => setCfg({ ...cfg, kontextNotizen: e.target.value })} />
+          </div>
         </div>
       </div>
 

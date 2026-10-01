@@ -8,7 +8,22 @@ export interface Config {
   klassenstufe: string
   stunden: number
   stundenformat: string
+  // How much of the lesson/unit time should actually involve evolutionary
+  // concepts -- real feedback from Susan Hanisch 2026-10-01, modeled on
+  // EvoMentor DE v1.2's own grade/hours line but with no v1.2 precedent to
+  // port (this field doesn't exist there). '' means "not specified" --
+  // omitted from the generated prompt entirely rather than printing a blank.
+  anteilEvolutionsbezug: string
   vorwissenByBk: Record<string, string>
+  // Which root Basiskonzepte are actually in focus for this prompt --
+  // EvoMentor DE v1.2's own real "Einbezogene Basiskonzepte" chip picker
+  // (cfg.selectedBks there), ALWAYS offered for all 6 real root concepts
+  // regardless of which ones the currently-selected items happen to touch.
+  // Empty array means "no explicit narrowing yet" -- every concept actually
+  // referenced by the selected items is in focus, same as this tool's
+  // original auto-detect-only behavior. A non-empty array is the real,
+  // deliberate subset a teacher narrowed down to.
+  focusBks: string[]
   fachNotizen: string
   methoden: string[]
   differenzierung: string[]
@@ -25,14 +40,25 @@ export interface Config {
 
 export function defaultConfig(options: PromptOptionLists): Config {
   return {
-    klassenstufe: '', stunden: 4, stundenformat: '45',
-    vorwissenByBk: {}, fachNotizen: '',
+    klassenstufe: '', stunden: 4, stundenformat: '45', anteilEvolutionsbezug: '',
+    vorwissenByBk: {}, focusBks: [], fachNotizen: '',
     methoden: [], differenzierung: [], didNotizen: '',
     bewertung: [...options.default_assessment], evalNotizen: '',
     kontext: [], kontextNotizen: '',
     ausgabeTyp: [...options.default_output_types],
     ton: options.default_tone, laenge: options.default_length, sonstigeNotizen: '',
   }
+}
+
+/** True if a root Basiskonzept is in focus: explicit if focusBks is non-empty, otherwise everything is (see Config.focusBks' own comment). */
+export function isBkFocused(cfg: Config, rootId: string): boolean {
+  return cfg.focusBks.length === 0 || cfg.focusBks.includes(rootId)
+}
+
+/** Toggles one root concept in/out of focus, expanding an empty ("everything") selection to the real full list first so the very first click narrows rather than starting from nothing. */
+export function toggleBkFocus(cfg: Config, rootId: string, allRootIds: string[]): string[] {
+  const current = cfg.focusBks.length ? cfg.focusBks : allRootIds
+  return current.includes(rootId) ? current.filter((id) => id !== rootId) : [...current, rootId]
 }
 
 /**
@@ -71,6 +97,11 @@ export function buildPrompt(
   lines.push(library.instruction_preamble)
   lines.push('')
   lines.push(`${labels.grade_label} ${cfg.klassenstufe || '—'}    ${labels.hours_label} ${cfg.stunden} × ${cfg.stundenformat}`)
+  // Not library-driven like the siblings above -- EvoMentor DE v1.2 has no
+  // equivalent field to port a real German label from, and this codebase's
+  // only real library today is German anyway, so the plain requested label
+  // IS the right default. Revisit if a non-German library ever needs this.
+  if (cfg.anteilEvolutionsbezug) lines.push(`Anteil Evolutionsbezug: ${cfg.anteilEvolutionsbezug}%`)
   lines.push('')
   lines.push(labels.concepts_section)
   for (const g of bkGroups) {

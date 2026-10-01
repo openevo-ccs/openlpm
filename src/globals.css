@@ -495,6 +495,31 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .bk-dot-0 { background: var(--map-1); } .bk-dot-1 { background: var(--map-2); } .bk-dot-2 { background: var(--map-3); }
 .bk-dot-3 { background: var(--map-4); } .bk-dot-4 { background: var(--map-5); } .bk-dot-5 { background: var(--map-6); }
 
+/* The "Einbezogene Basiskonzepte" focus chips (prompt generator, both
+   researcher and student pages) -- a .chip-btn with a colored .bk-dot
+   inside it, so the dot and label stay aligned regardless of .chip-btn's
+   own default inline layout. */
+.bk-chip { display: inline-flex; align-items: center; gap: 5px; }
+
+/* Fixed-size CSS circles for a relevance indicator (low/mid/high), used
+   wherever a Lernziel's relevance to a Basiskonzept is shown. Real feedback
+   2026-10-01 (Susan): the old plain-text "●●○" glyphs render at visibly
+   different sizes across a filled vs. an outline character in most fonts,
+   and one real call site (the expanded card detail) rendered them in plain
+   muted grey instead of the Basiskonzept's own color while the compact card
+   header rendered them colored -- same information, two different looks.
+   Real CSS-drawn dots of a fixed size sidestep the font-glyph problem, and
+   always take a `color` so every call site can be consistent. */
+.rel-dots { display: inline-flex; gap: 2px; vertical-align: middle; }
+.rel-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; background: currentColor; }
+.rel-dot.rel-dot-empty { background: none; border: 1.3px solid currentColor; opacity: 0.55; }
+
+/* Lernziele toolbar (sort/view/export), real feedback 2026-10-01: this
+   space above the card grid used to just be empty. */
+.student-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.student-toolbar-group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.topic-list-rows { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
 .student-shell .project-side { background: var(--surface-2); }
 
 /* Real bug fixed live 2026-09-30: the old exit control (a small text link
