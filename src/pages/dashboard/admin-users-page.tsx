@@ -385,6 +385,14 @@ function MembershipChip({
   )
 }
 
+// Real feedback 016e4a19 + b1345486 (2026-10-01): "select multiple projects
+// and conduct bulk edits across the meta-data of selected projects or
+// sub-project spaces (including self-join allow lists)." Design decision
+// recorded in lab_manager/docs/design-notes/openlpm-admin-bulk-project-edit-
+// 2026-10-01.md -- Dustin chose all four offered fields (privacy, curation
+// status, self-join rules, working languages); name/description stay
+// single-project-only since a shared value across dissimilar projects isn't
+// meaningful.
 function ProjectsAdminSection({
   supabase,
   projects,
@@ -396,6 +404,9 @@ function ProjectsAdminSection({
   memberships: AdminMembershipRow[] | null
   onChanged: () => void
 }) {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkEditing, setBulkEditing] = useState(false)
+
   const childrenByParent = new Map<string, AdminProjectRow[]>()
   const topLevel: AdminProjectRow[] = []
   for (const p of projects ?? []) {
@@ -414,12 +425,24 @@ function ProjectsAdminSection({
     memberCountByProject.set(m.project.id, (memberCountByProject.get(m.project.id) ?? 0) + 1)
   }
 
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+  const clearSelection = () => { setSelectedIds(new Set()); setBulkEditing(false) }
+  const selectedProjects = (projects ?? []).filter((p) => selectedIds.has(p.id))
+
   return (
     <div className="card" style={{ marginBottom: 20 }}>
       <h3 className="row"><FolderTree size={16} />Projects</h3>
       <p className="muted" style={{ marginBottom: 12 }}>
         Every project space across OpenLPM. Deleting one is permanent — everything inside it
         (Learning Goals, Concepts, membership, discussions, and so on) goes with it, with no undo.
+        Check any number of projects below to edit their meta-data together.
       </p>
       {projects === null ? (
         <p className="muted">Loading…</p>
@@ -436,6 +459,40 @@ function ProjectsAdminSection({
             {' · '}
             {(memberships ?? []).length} membership{(memberships ?? []).length === 1 ? '' : 's'} total
           </p>
+
+          {selectedIds.size > 0 && (
+            <div
+              className="row"
+              style={{
+                justifyContent: 'space-between',
+                padding: '8px 10px',
+                marginBottom: 10,
+                borderRadius: 6,
+                background: 'var(--bg-subtle, transparent)',
+                border: '1px solid var(--border)',
+              }}
+            >
+              <span style={{ fontSize: 13 }}>
+                <strong>{selectedIds.size}</strong> project{selectedIds.size === 1 ? '' : 's'} selected
+              </span>
+              <span className="row" style={{ gap: 6 }}>
+                <button className="btn btn-mini btn-primary" onClick={() => setBulkEditing((v) => !v)}>
+                  <Pencil size={11} />{bulkEditing ? 'Close bulk edit' : 'Bulk edit selected'}
+                </button>
+                <button className="btn btn-mini" onClick={clearSelection}>Clear selection</button>
+              </span>
+            </div>
+          )}
+
+          {bulkEditing && selectedProjects.length > 0 && (
+            <BulkEditPanel
+              projects={selectedProjects}
+              supabase={supabase}
+              onApplied={onChanged}
+              onClose={clearSelection}
+            />
+          )}
+
           {topLevel.map((p) => (
             <ProjectTreeRow
               key={p.id}
@@ -446,10 +503,207 @@ function ProjectsAdminSection({
               childCountByParent={childCountByParent}
               supabase={supabase}
               onChanged={onChanged}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
             />
           ))}
         </>
       )}
+    </div>
+  )
+}
+
+// Real feedback b1345486 (2026-10-01): "bulk edits of such meta-data
+// (including self-join allow lists) across a selection of project and/or
+// sub-project spaces." Privacy/curation status only apply to a top-level
+// project space, mirroring ProjectEditForm's own single-project rule (a
+// sub-project inherits both from its parent, never edits them independently)
+// -- a sub-project in the selection is silently skipped for those two fields
+// and counted in the summary. Languages and the self-join rule are always
+// additive (never replace a project's existing languages or rules), matching
+// how both already work one-at-a-time elsewhere in this app.
+function BulkEditPanel({
+  projects,
+  supabase,
+  onApplied,
+  onClose,
+}: {
+  projects: AdminProjectRow[]
+  supabase: ReturnType<typeof createClient>
+  onApplied: () => void
+  onClose: () => void
+}) {
+  const NO_CHANGE = '__no_change__'
+  const [privacyChoice, setPrivacyChoice] = useState<string>(NO_CHANGE)
+  const [statusChoice, setStatusChoice] = useState<string>(NO_CHANGE)
+  const [addLanguages, setAddLanguages] = useState<Set<string>>(new Set())
+  const [customLanguage, setCustomLanguage] = useState('')
+  const [addJoinRule, setAddJoinRule] = useState(false)
+  const [ruleType, setRuleType] = useState<'domain' | 'email'>('domain')
+  const [ruleValue, setRuleValue] = useState('')
+  const [ruleRole, setRuleRole] = useState<ProjectMemberRole>('contributor')
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState<string | null>(null)
+  const [resultHadErrors, setResultHadErrors] = useState(false)
+
+  const subProjectCount = projects.filter((p) => p.parent_project_id).length
+  const touchesPrivacyOrStatus = privacyChoice !== NO_CHANGE || statusChoice !== NO_CHANGE
+
+  const toggleLanguage = (code: string) => {
+    setAddLanguages((prev) => {
+      const next = new Set(prev)
+      if (next.has(code)) next.delete(code)
+      else next.add(code)
+      return next
+    })
+  }
+
+  const hasChanges = touchesPrivacyOrStatus || addLanguages.size > 0 || (addJoinRule && ruleValue.trim().length > 0)
+
+  const apply = async () => {
+    setBusy(true)
+    setResult(null)
+    let metadataUpdated = 0
+    let metadataSkipped = 0
+    let ruleRowsAdded = 0
+    const errors: string[] = []
+
+    for (const project of projects) {
+      const isSubProject = !!project.parent_project_id
+      const patch: ProjectMetadataPatch = {}
+      if (touchesPrivacyOrStatus) {
+        if (isSubProject) {
+          metadataSkipped += 1
+        } else {
+          if (privacyChoice !== NO_CHANGE) patch.is_private = privacyChoice === 'private'
+          if (statusChoice !== NO_CHANGE) patch.epistemic_status = statusChoice as AdminProjectRow['epistemic_status']
+        }
+      }
+      if (addLanguages.size > 0) {
+        const merged = new Set([...(project.working_languages ?? []), ...addLanguages])
+        patch.working_languages = Array.from(merged)
+      }
+      if (Object.keys(patch).length > 0) {
+        const { error } = await updateProjectMetadata(supabase, project.id, patch)
+        if (error) errors.push(`${project.name}: ${error.message}`)
+        else metadataUpdated += 1
+      }
+      if (addJoinRule && ruleValue.trim()) {
+        const { error } = await addAdminJoinRule(supabase, project.id, ruleType, ruleValue, ruleRole)
+        if (error) errors.push(`${project.name} (self-join rule): ${error.message}`)
+        else ruleRowsAdded += 1
+      }
+    }
+
+    setBusy(false)
+    const parts: string[] = []
+    if (metadataUpdated > 0) parts.push(`${metadataUpdated} project${metadataUpdated === 1 ? '' : 's'} updated`)
+    if (metadataSkipped > 0) parts.push(`${metadataSkipped} sub-project${metadataSkipped === 1 ? '' : 's'} skipped for privacy/curation status (inherited from parent)`)
+    if (ruleRowsAdded > 0) parts.push(`self-join rule added to ${ruleRowsAdded} project${ruleRowsAdded === 1 ? '' : 's'}`)
+    if (errors.length > 0) parts.push(`${errors.length} error${errors.length === 1 ? '' : 's'}: ${errors.join('; ')}`)
+    setResult(parts.join(' · ') || 'Nothing to apply.')
+    setResultHadErrors(errors.length > 0)
+    // Reload the underlying project list right away (so it reflects the
+    // change even while this panel's summary is still showing), but leave
+    // the panel itself open until the user dismisses it -- closing
+    // immediately would unmount this summary before anyone could read it.
+    onApplied()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 12, background: 'var(--bg-subtle, transparent)' }}>
+      <h4 style={{ marginTop: 0 }}>Bulk edit {projects.length} project{projects.length === 1 ? '' : 's'}</h4>
+      <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+        {projects.map((p) => p.name).join(', ')}
+      </p>
+      {subProjectCount > 0 && (
+        <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+          {subProjectCount} of these {subProjectCount === 1 ? 'is a sub-project' : 'are sub-projects'} — privacy and
+          curation status are inherited from a sub-project&apos;s parent space, so any change to those two fields
+          below will skip {subProjectCount === 1 ? 'it' : 'them'}. Languages and self-join rules still apply.
+        </p>
+      )}
+
+      <div className="field">
+        <label>Public / Private</label>
+        <select value={privacyChoice} onChange={(e) => setPrivacyChoice(e.target.value)}>
+          <option value={NO_CHANGE}>Don&apos;t change</option>
+          <option value="private">Make private</option>
+          <option value="public">Make public</option>
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Curation status</label>
+        <select value={statusChoice} onChange={(e) => setStatusChoice(e.target.value)}>
+          <option value={NO_CHANGE}>Don&apos;t change</option>
+          {EPISTEMIC_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+      </div>
+
+      <div className="field">
+        <label>Add working language(s)</label>
+        <div className="row" style={{ gap: 10, flexWrap: 'wrap' }}>
+          {COMMON_LANGUAGES.map((l) => (
+            <label key={l.code} className="row" style={{ gap: 4 }}>
+              <input type="checkbox" checked={addLanguages.has(l.code)} onChange={() => toggleLanguage(l.code)} />
+              {l.label}
+            </label>
+          ))}
+        </div>
+        <div className="row" style={{ marginTop: 6 }}>
+          <input value={customLanguage} onChange={(e) => setCustomLanguage(e.target.value)} placeholder="Other language code, e.g. sw, hi" style={{ width: 200 }} />
+          <button type="button" className="btn btn-mini" onClick={() => { if (customLanguage.trim()) { toggleLanguage(customLanguage.trim()); setCustomLanguage('') } }}>
+            Add
+          </button>
+        </div>
+        <p className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>
+          Only adds — a project&apos;s existing languages are never removed by this.
+        </p>
+      </div>
+
+      <div className="field">
+        <label className="row" style={{ gap: 6, alignItems: 'center' }}>
+          <input type="checkbox" checked={addJoinRule} onChange={(e) => setAddJoinRule(e.target.checked)} />
+          Add a self-join rule to all selected projects
+        </label>
+        {addJoinRule && (
+          <div className="row" style={{ marginTop: 6, flexWrap: 'wrap' }}>
+            <select value={ruleType} onChange={(e) => setRuleType(e.target.value as 'domain' | 'email')} style={{ fontSize: 12 }}>
+              <option value="domain">Email domain</option>
+              <option value="email">Specific email</option>
+            </select>
+            <input
+              type="text"
+              placeholder={ruleType === 'domain' ? 'uni-jena.de' : 'someone@example.org'}
+              value={ruleValue}
+              onChange={(e) => setRuleValue(e.target.value)}
+              style={{ width: 200 }}
+            />
+            <select value={ruleRole} onChange={(e) => setRuleRole(e.target.value as ProjectMemberRole)} style={{ fontSize: 12 }}>
+              {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+          </div>
+        )}
+        <p className="muted" style={{ fontSize: 11.5, marginTop: 4 }}>
+          Added on top of whatever self-join rules each project already has — nothing existing is removed.
+        </p>
+      </div>
+
+      {result && <div className={`notice ${resultHadErrors ? 'notice-bad' : 'notice-ok'}`} style={{ marginBottom: 8 }}>{result}</div>}
+
+      <div className="row">
+        {result ? (
+          <button className="btn btn-primary" onClick={onClose}>Done</button>
+        ) : (
+          <>
+            <button className="btn btn-primary" disabled={busy || !hasChanges} onClick={apply}>
+              {busy ? 'Applying…' : `Apply to ${projects.length} project${projects.length === 1 ? '' : 's'}`}
+            </button>
+            <button className="btn btn-mini" disabled={busy} onClick={onClose}>Cancel</button>
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -468,6 +722,8 @@ function ProjectTreeRow({
   childCountByParent,
   supabase,
   onChanged,
+  selectedIds,
+  onToggleSelect,
 }: {
   project: AdminProjectRow
   parentName: string | null
@@ -476,6 +732,8 @@ function ProjectTreeRow({
   childCountByParent: Map<string, number>
   supabase: ReturnType<typeof createClient>
   onChanged: () => void
+  selectedIds: Set<string>
+  onToggleSelect: (id: string) => void
 }) {
   const [expanded, setExpanded] = useState(true)
   const children = childrenByParent.get(project.id) ?? []
@@ -483,6 +741,13 @@ function ProjectTreeRow({
   return (
     <div>
       <div className="row" style={{ alignItems: 'flex-start', gap: 4 }}>
+        <input
+          type="checkbox"
+          checked={selectedIds.has(project.id)}
+          onChange={() => onToggleSelect(project.id)}
+          aria-label={`Select ${project.name} for bulk edit`}
+          style={{ marginTop: 12, flexShrink: 0 }}
+        />
         {children.length > 0 ? (
           <button
             type="button"
@@ -528,6 +793,8 @@ function ProjectTreeRow({
               childCountByParent={childCountByParent}
               supabase={supabase}
               onChanged={onChanged}
+              selectedIds={selectedIds}
+              onToggleSelect={onToggleSelect}
             />
           ))}
         </div>

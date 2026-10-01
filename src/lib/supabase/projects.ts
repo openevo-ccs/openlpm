@@ -137,9 +137,16 @@ export async function deleteProject(supabase: Client, projectId: string) {
 }
 
 export interface ProjectMetadataPatch {
-  name: string
-  description: string | null
-  working_languages: string[]
+  // All fields optional: the single-project edit form (ProjectEditForm)
+  // always supplies name/description/working_languages since it starts from
+  // a full pre-filled form, but bulk edit (admin-users-page.tsx's
+  // BulkEditPanel) only ever touches the handful of fields it's actually
+  // changing across a selection -- an omitted field here is left alone, not
+  // cleared. Never send `undefined` to mean "clear it"; use `null` for
+  // description.
+  name?: string
+  description?: string | null
+  working_languages?: string[]
   // Undefined (not just omitted) on a nested sub-project -- inherited from
   // its parent at creation time (new-project-wizard.tsx), never independently
   // editable, same rule the wizard itself already enforces.
@@ -148,17 +155,21 @@ export interface ProjectMetadataPatch {
 }
 
 /**
- * Edits a project's own identity fields -- name/description/languages always,
- * epistemic_status/is_private only for a top-level project space (a nested
- * sub-project inherits both from its parent, same as at creation time). RLS
- * (migration 004's "Owners and maintainers can update their project", plus
- * migration 058's admin bypass) is the real boundary; this is a plain update.
+ * Edits a project's own identity fields. Only the fields present in `patch`
+ * are written -- epistemic_status/is_private only make sense for a top-level
+ * project space (a nested sub-project inherits both from its parent, same as
+ * at creation time); callers decide whether to include them. RLS (migration
+ * 004's "Owners and maintainers can update their project", plus migration
+ * 058's admin bypass) is the real boundary; this is a plain partial update.
  */
 export async function updateProjectMetadata(supabase: Client, projectId: string, patch: ProjectMetadataPatch) {
-  const { epistemic_status, is_private, ...rest } = patch
-  const row: Record<string, unknown> = { ...rest }
-  if (epistemic_status !== undefined) row.epistemic_status = epistemic_status
-  if (is_private !== undefined) row.is_private = is_private
+  const row: Record<string, unknown> = {}
+  if (patch.name !== undefined) row.name = patch.name
+  if (patch.description !== undefined) row.description = patch.description
+  if (patch.working_languages !== undefined) row.working_languages = patch.working_languages
+  if (patch.epistemic_status !== undefined) row.epistemic_status = patch.epistemic_status
+  if (patch.is_private !== undefined) row.is_private = patch.is_private
+  if (Object.keys(row).length === 0) return { error: null }
 
   const { data, error } = await (supabase as any).from('projects').update(row).eq('id', projectId).select('id')
   if (error) return { error }
