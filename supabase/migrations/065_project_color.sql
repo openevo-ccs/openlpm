@@ -8,5 +8,15 @@ SET search_path = public, extensions;
 -- frontend offers a small fixed palette (not a free color picker, per
 -- Dustin's own framing "not necessarily unique"), but the column itself
 -- doesn't enforce that set, so the palette can grow without a migration.
-ALTER TABLE projects ADD COLUMN color TEXT;
+--
+-- IF NOT EXISTS, not a plain ADD COLUMN: a real, uncommitted concurrent
+-- session (2026-10-01, same day) independently built this exact same
+-- feature and already pushed a `color TEXT` column to the live database
+-- under a migration numbered 064 that was never committed to git (and
+-- the "EvoMentor" project already has color='blue' set live, from their
+-- own working UI) -- confirmed via REST before writing this version.
+-- This migration exists so git history actually reflects what's live on
+-- production; it must not error just because the column already got
+-- there a different way.
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS color TEXT;
 COMMENT ON COLUMN projects.color IS 'Optional accent color key for this project''s card border (e.g. "teal", "rose") -- cosmetic only, not unique, picked from a small fixed palette in the frontend (src/lib/project-colors.ts).';
