@@ -167,6 +167,10 @@ export function FeedbackWidget() {
         useCORS: true,
         logging: false,
         backgroundColor: null,
+        // The "Capturing…" indicator shown below replaces the panel for
+        // the real multi-second duration of this call -- never let it end
+        // up in its own screenshot.
+        ignoreElements: (el) => el.classList?.contains('feedback-capturing-indicator'),
         // Real screens run well past 1600px logical width on a 2x/3x
         // display -- capture at native pixel density, downscale happens
         // separately at upload time (compressForUpload).
@@ -181,16 +185,29 @@ export function FeedbackWidget() {
         // code's own retry/compression logic (that only runs afterward).
         // Clipping to the current viewport avoids the oversized canvas
         // entirely, and also matches what a reporter actually means by
-        // "screenshot this" far better than the full page ever did --
-        // `windowWidth`/`windowHeight` still tell html2canvas the real
-        // document size so fixed/absolutely-positioned elements lay out
-        // correctly, without rendering any of the off-screen page into it.
+        // "screenshot this" far better than the full page ever did.
+        // Real bug found live 2026-10-01 (Dustin: "the screenshot is not
+        // exactly where I am in the screen"): `windowWidth`/`windowHeight`
+        // were set to the FULL scrollable document size, not the real
+        // browser viewport -- these two options tell html2canvas how big
+        // the outer *browsing context* is (for responsive CSS/fixed-element
+        // layout), a completely different thing from the document's own
+        // content height, which html2canvas already measures from the DOM
+        // itself. Telling it the window is 28,000+px tall still forces an
+        // internal render pass at that full height even though only an
+        // 800px-tall slice of it ever reaches the output canvas -- on any
+        // page long enough to trigger the original oversized-canvas bug
+        // this comment used to describe, that internal pass now silently
+        // produces a blank capture instead of throwing. The real browser
+        // viewport (innerWidth/innerHeight) is what `windowWidth`/
+        // `windowHeight` are actually for; confirmed live against the
+        // Lernziele page (305 cards, ~28,800px tall) both scrolled and not.
         x: window.scrollX,
         y: window.scrollY,
         width: window.innerWidth,
         height: window.innerHeight,
-        windowWidth: document.documentElement.scrollWidth,
-        windowHeight: document.documentElement.scrollHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
       })
       const canvas = canvasRef.current!
       canvas.width = shot.width
@@ -367,8 +384,31 @@ export function FeedbackWidget() {
     )
   }
 
+  // Real bug found live 2026-10-01 (Dustin: "the screenshot is not exactly
+  // where I am in the screen"): on a long page (e.g. 305 Lernziele cards)
+  // html2canvas genuinely takes several real seconds to render, and while
+  // `capturing` is true the whole panel -- the ONLY UI this widget ever
+  // shows -- is display:none, so there's nothing at all on screen for that
+  // whole stretch. Confirmed empirically (local dev against real
+  // production data, Playwright capture compared pixel-for-pixel against
+  // a ground-truth screenshot) that the capture itself is correct once it
+  // actually finishes; the real gap was having no way to tell it hadn't
+  // yet. This small indicator renders as a SIBLING of the panel, not in
+  // place of it -- the panel (and the canvas inside it) must stay mounted
+  // throughout capture, same reasoning as the canvas's own "always
+  // mounted" comment below: an early return here would unmount canvasRef
+  // right as captureScreenshot needs to draw into it. Excluded from the
+  // capture itself via `ignoreElements` above, so it never ends up in the
+  // screenshot.
   return (
-    <div className={`feedback-panel card${hasScreenshot ? ' feedback-panel-wide' : ''}`} style={capturing ? { display: 'none' } : undefined}>
+    <>
+      {capturing && (
+        <div className="feedback-capturing-indicator">
+          <span className="feedback-capturing-spinner" aria-hidden="true" />
+          Capturing…
+        </div>
+      )}
+      <div className={`feedback-panel card${hasScreenshot ? ' feedback-panel-wide' : ''}`} style={capturing ? { display: 'none' } : undefined}>
       <div className="feedback-header">
         <span className="feedback-title">
           <MessageSquareText size={16} />
@@ -450,6 +490,7 @@ export function FeedbackWidget() {
           {busy ? 'Sending…' : 'Send feedback'}
         </button>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

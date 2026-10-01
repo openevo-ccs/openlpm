@@ -411,6 +411,27 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
    markup canvas was too cramped at the base panel width to draw on
    precisely) -- the plain tag/comment form stays compact. */
 .feedback-panel-wide { width: 640px; max-width: calc(100vw - 40px); }
+
+/* Shown in place of the panel for the real multi-second span while
+   html2canvas is rendering a long page -- the panel itself has to be
+   hidden during capture (it would otherwise photograph itself), but
+   showing NOTHING for several real seconds looked exactly like a frozen
+   or broken app (real feedback de6b268e, 2026-10-01). Excluded from the
+   capture itself via ignoreElements in feedback-widget.tsx. */
+.feedback-capturing-indicator {
+  position: fixed; right: 20px; bottom: 20px; z-index: 50;
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  font-size: 13px; color: var(--text-secondary);
+}
+.feedback-capturing-spinner {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid var(--border); border-top-color: var(--series-b, var(--series-a));
+  animation: feedback-capturing-spin 0.7s linear infinite;
+}
+@keyframes feedback-capturing-spin { to { transform: rotate(360deg); } }
 .feedback-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 12px; border-bottom: 1px solid var(--border);
