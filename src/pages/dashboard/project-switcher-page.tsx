@@ -137,8 +137,8 @@ export default function ProjectSwitcherPage() {
         <div>
           <h1>Your project spaces</h1>
           <p className="muted" style={{ marginBottom: 12 }}>
-            Pick a project space to open it. Everything inside — the curriculum, the literature, the
-            people — belongs to that space alone.
+            Open a project space below to work inside it. Each one keeps its own curriculum,
+            literature, and members separate from the others.
           </p>
         </div>
         <Link to="/dashboard/new-project" className="btn btn-primary">
@@ -164,11 +164,11 @@ export default function ProjectSwitcherPage() {
       ) : (
         <>
           {repoTopLevel.length > 0 && (
-            <div style={{ marginBottom: 24 }}>
+            <div className="frame">
               <h2 className="row" style={{ fontSize: 16, gap: 6 }}><Library size={16} style={{ color: 'var(--text-muted)' }} />Curriculum Repositories</h2>
               <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
-                Curated national/regional curriculum-policy source material — not research project
-                workspaces, so they don&apos;t have the same tabs.
+                Reference curriculum documents for a country or region, kept separate from the
+                research project spaces below.
               </p>
               <div className="grid grid-3">
                 {repoTopLevel.map(({ project, role }) => (
@@ -178,18 +178,20 @@ export default function ProjectSwitcherPage() {
             </div>
           )}
 
-          <h2 style={{ fontSize: 16 }}>Your project spaces</h2>
-          {standardTopLevel.length === 0 ? (
-            <div className="card empty">
-              <p className="muted">No project spaces match the selected filter.</p>
-            </div>
-          ) : (
-            <div className="grid grid-3">
-              {standardTopLevel.map(({ project, role }) => (
-                <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
-              ))}
-            </div>
-          )}
+          <div className="frame">
+            <h2 style={{ fontSize: 16 }}>Project Spaces</h2>
+            {standardTopLevel.length === 0 ? (
+              <div className="card empty">
+                <p className="muted">No project spaces match the selected filter.</p>
+              </div>
+            ) : (
+              <div className="grid grid-3">
+                {standardTopLevel.map(({ project, role }) => (
+                  <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
@@ -207,6 +209,14 @@ function ProjectCard({
 }) {
   const children = childrenOf(project.id)
   const colorHex = projectColorHex((project as any).color)
+  // Real feedback b4b23580 (2026-10-01): an always-expanded children list
+  // made a card with many sub-projects (EvoMentor's 6) tower over a
+  // one-child neighbor. Capped and collapsible instead, same shape as the
+  // Admin page's own project tree.
+  const CAP = 3
+  const [expanded, setExpanded] = useState(false)
+  const visibleChildren = expanded ? children : children.slice(0, CAP)
+  const hiddenCount = children.length - visibleChildren.length
   return (
     <div
       className="card"
@@ -235,11 +245,31 @@ function ProjectCard({
       {children.length > 0 && (
         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
           <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
-          {children.map((c) => (
+          {visibleChildren.map((c) => (
             <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
               {c.project.name}
             </Link>
           ))}
+          {hiddenCount > 0 && (
+            <button
+              type="button"
+              className="btn-linklike"
+              style={{ marginTop: 4, fontSize: 12 }}
+              onClick={(e) => { e.preventDefault(); setExpanded(true) }}
+            >
+              +{hiddenCount} more
+            </button>
+          )}
+          {expanded && children.length > CAP && (
+            <button
+              type="button"
+              className="btn-linklike"
+              style={{ marginTop: 4, fontSize: 12 }}
+              onClick={(e) => { e.preventDefault(); setExpanded(false) }}
+            >
+              Show less
+            </button>
+          )}
         </div>
       )}
     </div>
