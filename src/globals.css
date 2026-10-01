@@ -134,7 +134,8 @@ code {
 /* ---- project-scoped sidebar (OpenLPM has a hierarchy level -- project ->
    branch/portfolio -- that Eva KGDJ, single-tenant, doesn't need) ---- */
 .project-shell { display: flex; gap: 24px; flex: 1; min-height: 0; }
-.project-side { width: 200px; flex-shrink: 0; }
+.project-side { width: 200px; flex-shrink: 0; transition: width 0.15s ease; }
+.project-side-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .project-side nav { display: flex; flex-direction: column; gap: 2px; margin-top: 12px; }
 .project-side nav a {
   display: flex; align-items: center; gap: 8px;
@@ -143,6 +144,31 @@ code {
 }
 .project-side nav a.active { background: var(--surface-2); color: var(--series-a); font-weight: 600; }
 .project-main { flex: 1; min-width: 0; }
+
+/* Icon-only collapse (real feedback bbf55cf2, 2026-10-01) -- the toggle
+   button and back-link icon always stay visible; .nav-label and the
+   project name/badges/preview-button block (.project-side-info) hide
+   via CSS rather than unmounting, so collapsing never loses React state
+   or re-fetches anything. Width shrinks just enough for a centered
+   16px icon with real padding, not the narrowest possible rail. */
+.project-side.collapsed { width: 52px; }
+.project-side.collapsed .project-side-info,
+.project-side.collapsed .project-side-title,
+.project-side.collapsed .nav-label,
+.project-side.collapsed .student-nav-group { display: none; }
+.project-side.collapsed .project-side-top { justify-content: center; flex-direction: column; gap: 4px; }
+.project-side.collapsed nav a { justify-content: center; padding: 8px 0; }
+
+.sidebar-toggle {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-2); color: var(--text-secondary); cursor: pointer;
+}
+.sidebar-toggle:hover { border-color: var(--series-a); color: var(--series-a); }
+@media (pointer: coarse) {
+  .sidebar-toggle { width: 40px; height: 40px; }
+}
 
 /* ---- primitives ---- */
 .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }

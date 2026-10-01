@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, ShieldAlert, Sparkles } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, ShieldAlert, Sparkles } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
@@ -43,6 +43,21 @@ function previewKey(slug: string) {
   return `openlpm:preview_student:${slug}`
 }
 
+// Real feedback bbf55cf2 (2026-10-01): "make all sidebar menus adjustable
+// and collapsible." Scoped to the device (localStorage), not the
+// project or account -- this is a display preference like a window size,
+// the same researcher/student toggle either way regardless of which
+// project you're in.
+const SIDEBAR_COLLAPSED_KEY = 'openlpm:sidebar_collapsed'
+
+function readStoredSidebarCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export default function ProjectLayout() {
   const { project: slug } = useParams<{ project: string }>()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -56,6 +71,19 @@ export default function ProjectLayout() {
   // Germany/New York repository spaces) or has declared grounding in one,
   // so an ordinary LPM project's nav stays exactly Dustin's 10-item spec.
   const [hasRepo, setHasRepo] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  useEffect(() => {
+    setSidebarCollapsed(readStoredSidebarCollapsed())
+  }, [])
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => {
+      const next = !prev
+      try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0') } catch { /* private window */ }
+      return next
+    })
+  }
 
   // ?view=student (from a direct link) starts the preview session; from
   // then on it's tracked in sessionStorage, independent of the URL.
@@ -185,21 +213,21 @@ export default function ProjectLayout() {
   // sub-repositories, so it doesn't get that tab either).
   const nav = isRepository
     ? [
-        { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
-        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
+        { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
+        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
       ]
     : [
-        { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
-        { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</>, end: false },
-        { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</>, end: false },
-        { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</>, end: false },
-        { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</>, end: false },
-        { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
-        { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
-        { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
-        { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</>, end: false },
-        { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
-        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
+        { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
+        { href: `/dashboard/${slug}/learning-goals`, icon: <Layers size={14} />, label: 'Learning Goals', end: false },
+        { href: `/dashboard/${slug}/concepts`, icon: <Sparkles size={14} />, label: 'Concepts', end: false },
+        { href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
+        { href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
+        { href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
+        { href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
+        { href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
+        { href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
+        { href: `/dashboard/${slug}/analytics`, icon: <BarChart3 size={14} />, label: 'Analytics' },
+        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
       ]
 
   const canManage = role === 'owner' || role === 'maintainer'
@@ -221,12 +249,17 @@ export default function ProjectLayout() {
   if (isStudentView) {
     return (
       <div className="project-shell student-shell">
-        <aside className="project-side">
-          <Link to="/dashboard" className="row muted">
-            <ArrowLeft size={14} />
-            Alle Bereiche
-          </Link>
-          <h2 style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
+        <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`}>
+          <div className="project-side-top">
+            <Link to="/dashboard" className="row muted" title="Alle Bereiche">
+              <ArrowLeft size={14} />
+              <span className="nav-label">Alle Bereiche</span>
+            </Link>
+            <button type="button" className="sidebar-toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'}>
+              {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+            </button>
+          </div>
+          <h2 className="project-side-title" style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
           <StudentNav slug={slug} />
         </aside>
         <div className="project-main">
@@ -255,30 +288,37 @@ export default function ProjectLayout() {
 
   return (
     <div className="project-shell">
-      <aside className="project-side">
-        <Link to="/dashboard" className="row muted">
-          <ArrowLeft size={14} />
-          All project spaces
-        </Link>
-        <p className="muted" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 10, marginBottom: 0 }}>
-          {isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
-        </p>
-        <h2 style={{ marginTop: 2, marginBottom: 2 }}>{project.name}</h2>
-        {parent && (
-          <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
-            Part of the <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link> {isRepository ? 'Curriculum Repository' : 'Project Space'}
-          </p>
-        )}
-        <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>
-          <EpistemicStatusBadge status={project.epistemic_status} />
-          <MaturityBadge status={project.maturity} />
-          <WorkingLanguagesTag languages={project.working_languages} />
-        </div>
-        {canManage && studentViewTemplate && (
-          <button type="button" className="btn btn-mini" style={{ marginTop: 8 }} onClick={startPreview}>
-            Preview as student
+      <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`}>
+        <div className="project-side-top">
+          <Link to="/dashboard" className="row muted" title="All project spaces">
+            <ArrowLeft size={14} />
+            <span className="nav-label">All project spaces</span>
+          </Link>
+          <button type="button" className="sidebar-toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
-        )}
+        </div>
+        <div className="project-side-info">
+          <p className="muted" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 10, marginBottom: 0 }}>
+            {isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
+          </p>
+          <h2 style={{ marginTop: 2, marginBottom: 2 }}>{project.name}</h2>
+          {parent && (
+            <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
+              Part of the <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link> {isRepository ? 'Curriculum Repository' : 'Project Space'}
+            </p>
+          )}
+          <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>
+            <EpistemicStatusBadge status={project.epistemic_status} />
+            <MaturityBadge status={project.maturity} />
+            <WorkingLanguagesTag languages={project.working_languages} />
+          </div>
+          {canManage && studentViewTemplate && (
+            <button type="button" className="btn btn-mini" style={{ marginTop: 8 }} onClick={startPreview}>
+              Preview as student
+            </button>
+          )}
+        </div>
         <ProjectNav items={nav} />
       </aside>
 

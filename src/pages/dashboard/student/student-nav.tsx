@@ -13,15 +13,15 @@ export function StudentNav({ slug }: { slug: string }) {
   return (
     <nav className="student-nav">
       <p className="muted student-nav-group">ERKUNDEN</p>
-      <NavLink to={base} end className={({ isActive }) => (isActive ? 'active' : '')}>
-        <ClipboardList size={14} />Lernziele
+      <NavLink to={base} end title="Lernziele" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <ClipboardList size={14} /><span className="nav-label">Lernziele</span>
       </NavLink>
-      <NavLink to={`${base}/basiskonzepte`} className={({ isActive }) => (isActive ? 'active' : '')}>
-        <Dna size={14} />Basiskonzepte
+      <NavLink to={`${base}/basiskonzepte`} title="Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <Dna size={14} /><span className="nav-label">Basiskonzepte</span>
       </NavLink>
       <p className="muted student-nav-group">PLANEN</p>
-      <NavLink to={`${base}/planen`} className={({ isActive }) => (isActive ? 'active' : '')}>
-        <Sparkles size={14} />KI-Prompt-Generator
+      <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <Sparkles size={14} /><span className="nav-label">KI-Prompt-Generator</span>
       </NavLink>
     </nav>
   )
