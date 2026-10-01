@@ -58,6 +58,17 @@ export default function DashboardLayout() {
         <Outlet />
       </main>
 
+      {/* Real feedback 2a332362 (2026-10-01): German legal-notice duty
+          (TMG/DDG) applies to the whole service, not just the page before
+          sign-in -- these two links stay reachable from every signed-in
+          page without the full logo footer (login-page.tsx) eating real
+          working space on every dashboard screen. */}
+      <div className="app-legal-footer">
+        <Link to="/impressum">Impressum</Link>
+        {' · '}
+        <Link to="/privacy">Datenschutz</Link>
+      </div>
+
       {/* Not mounted for the live deploy: its backend (curriculum-agents/
           tools/lpm-chat-bridge) only runs on a developer's own machine, not
           anywhere real visitors can reach -- built during the now-dropped

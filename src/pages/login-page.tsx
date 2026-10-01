@@ -4,7 +4,6 @@ import { Github, KeyRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { REDIRECT_KEY } from '@/components/require-auth'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
-import { OpenEvoAttribution } from '@/components/openevo-mark'
 
 type Mode = 'signin' | 'signup' | 'forgot'
 
@@ -176,8 +175,24 @@ export default function LoginPage() {
           <Link to="/">Back to home</Link>
         </p>
 
-        <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <OpenEvoAttribution />
+        {/* Real feedback 2a332362 (2026-10-01): OpenEvo/CCP/Bienenhaus/
+            UniJena logo footer + legal links, matching openevo.net's own
+            real footer -- scoped to this page only (Dustin's own call,
+            2026-10-01), not the whole signed-in app. */}
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+          <div className="login-footer-logos">
+            <img src={`${import.meta.env.BASE_URL}assets/logos/openevo-wordmark.png`} alt="OpenEvo" />
+            <img src={`${import.meta.env.BASE_URL}assets/logos/mpg-logo.png`} alt="Max Planck Society and the Department of Comparative Cultural Psychology" />
+            <img src={`${import.meta.env.BASE_URL}assets/logos/bienenhaus-logo.png`} alt="Bienenhaus, AG Biologiedidaktik, Friedrich-Schiller-Universität Jena" />
+            <img src={`${import.meta.env.BASE_URL}assets/logos/unijena-logo.png`} alt="Friedrich-Schiller-Universität Jena" />
+          </div>
+          <p className="muted" style={{ textAlign: 'center', fontSize: 11.5, margin: 0 }}>
+            A project of the OpenEvo Computational Curriculum Studies Lab
+          </p>
+          <div className="login-footer-legal">
+            <Link to="/impressum">Impressum</Link>
+            <Link to="/privacy">Datenschutzerklärung / Privacy Policy</Link>
+          </div>
         </div>
       </div>
     </div>

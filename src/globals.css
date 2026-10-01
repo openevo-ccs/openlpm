@@ -529,3 +529,29 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   .student-lernziele-main { flex-direction: column; }
   .student-prompt-grid { grid-template-columns: 1fr; }
 }
+
+/* Real feedback 2a332362 (2026-10-01): OpenEvo/CCP/Bienenhaus/UniJena
+   logo footer on the sign-in page, matching the real pattern already
+   live on openevo.net (css/styles.css's .footer-logos/.footer-legal) --
+   same visual language, scoped here to the one page Dustin asked for
+   rather than the whole app (confirmed with him 2026-10-01). */
+.login-footer-logos {
+  display: flex; align-items: center; justify-content: center;
+  gap: 20px; flex-wrap: wrap; margin-bottom: 14px;
+}
+.login-footer-logos img { height: 26px; width: auto; opacity: 0.85; }
+.login-footer-logos img:hover { opacity: 1; }
+.login-footer-legal {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  font-size: 11.5px; margin-top: 8px;
+}
+.login-footer-legal a { color: var(--text-muted); }
+
+/* Small, text-only legal links reachable from every signed-in page --
+   German TMG/DDG imprint-duty applies to the whole service, not just the
+   page before sign-in, but the full logo footer above would eat real
+   working space on every dashboard screen, so this stays minimal. */
+.app-legal-footer {
+  text-align: center; padding: 8px 12px; font-size: 11px; color: var(--text-muted);
+}
+.app-legal-footer a { color: var(--text-muted); }

@@ -5,6 +5,8 @@ import { RequireAuth, REDIRECT_KEY } from '@/components/require-auth'
 import HomePage from '@/pages/home-page'
 import LoginPage from '@/pages/login-page'
 import UpdatePasswordPage from '@/pages/update-password-page'
+import ImpressumPage from '@/pages/impressum-page'
+import PrivacyPage from '@/pages/privacy-page'
 import DashboardLayout from '@/pages/dashboard/dashboard-layout'
 import ProjectSwitcherPage from '@/pages/dashboard/project-switcher-page'
 import ProfilePage from '@/pages/dashboard/profile-page'
@@ -76,6 +78,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/login" element={<LoginPage />} />
         <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
+        <Route path="/impressum" element={<ImpressumPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route
           path="/join/:slug"
           element={
