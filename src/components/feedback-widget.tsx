@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { matchPath, useLocation } from 'react-router-dom'
 import html2canvas from 'html2canvas'
-import { MessageSquareText, X, Camera, RotateCcw, Trash2 } from 'lucide-react'
+import { MessageSquareText, X, Camera, RotateCcw, Trash2, Mic, MicOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { getProjectBySlug } from '@/lib/supabase/projects'
@@ -42,6 +42,30 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 
 type Tag = 'Problem' | 'Request' | 'Other'
 const TAGS: Tag[] = ['Problem', 'Request', 'Other']
+
+// Real feedback 29fed82b (2026-10-01): "Enable efficient effective
+// multilingual voice to speech on feedback form." The Web Speech API's
+// SpeechRecognition isn't in TypeScript's own DOM lib (it's still a
+// non-standard API, Chrome/Edge/Safari only -- no real Firefox support),
+// so these are the handful of fields this file actually touches, not a
+// full spec. Scoped with Dustin (2026-10-01): auto-detect which language
+// is being spoken from the browser's own locale (navigator.language) --
+// one click, no extra picker -- rather than a manual language switch.
+interface MinimalSpeechRecognition extends EventTarget {
+  lang: string
+  continuous: boolean
+  interimResults: boolean
+  start(): void
+  stop(): void
+  onresult: ((event: { resultIndex: number; results: ArrayLike<{ 0: { transcript: string }; isFinal: boolean }> }) => void) | null
+  onerror: ((event: { error: string }) => void) | null
+  onend: (() => void) | null
+}
+type SpeechRecognitionCtor = new () => MinimalSpeechRecognition
+function getSpeechRecognitionCtor(): SpeechRecognitionCtor | null {
+  const w = window as unknown as { SpeechRecognition?: SpeechRecognitionCtor; webkitSpeechRecognition?: SpeechRecognitionCtor }
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
+}
 
 // html2canvas works in every real browser (no permission API, no mobile
 // gap) -- this used to gate the button on getDisplayMedia support, which
@@ -121,6 +145,46 @@ export function FeedbackWidget() {
   const rectsRef = useRef<Rect[]>([])
   const dragStartRef = useRef<Rect | null>(null)
   const [hasScreenshot, setHasScreenshot] = useState(false)
+
+  const [listening, setListening] = useState(false)
+  const recognitionRef = useRef<MinimalSpeechRecognition | null>(null)
+  const speechSupported = getSpeechRecognitionCtor() !== null
+
+  const toggleVoiceInput = () => {
+    if (listening) {
+      recognitionRef.current?.stop()
+      return
+    }
+    const Ctor = getSpeechRecognitionCtor()
+    if (!Ctor) return
+    const recognition = new Ctor()
+    // Auto-detect: matches whatever language the browser/device is
+    // already set to, rather than a manual picker -- Dustin's own call,
+    // 2026-10-01.
+    recognition.lang = navigator.language
+    recognition.continuous = true
+    recognition.interimResults = false
+    recognition.onresult = (event) => {
+      let addition = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i]
+        if (result.isFinal) addition += result[0].transcript
+      }
+      if (addition) {
+        setComment((prev) => (prev && !prev.endsWith(' ') && !prev.endsWith('\n') ? `${prev} ` : prev) + addition.trim() + ' ')
+      }
+    }
+    recognition.onerror = () => setListening(false)
+    recognition.onend = () => setListening(false)
+    recognitionRef.current = recognition
+    recognition.start()
+    setListening(true)
+  }
+
+  // Stop any in-progress dictation if the panel closes mid-recording.
+  useEffect(() => {
+    if (!open) recognitionRef.current?.stop()
+  }, [open])
 
   // Records every real navigation for the breadcrumb, mounted once at the
   // app shell level (DashboardLayout) so it tracks the whole session, not
@@ -441,18 +505,31 @@ export function FeedbackWidget() {
           maxLength={2000}
         />
 
-        {!hasScreenshot && (
-          <button
-            type="button"
-            className="btn btn-mini"
-            style={{ marginTop: 8 }}
-            onClick={captureScreenshot}
-            disabled={!CAPTURE_SUPPORTED}
-          >
-            <Camera size={12} />
-            Add a screenshot
-          </button>
-        )}
+        <div className="row" style={{ gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+          {!hasScreenshot && (
+            <button
+              type="button"
+              className="btn btn-mini"
+              onClick={captureScreenshot}
+              disabled={!CAPTURE_SUPPORTED}
+            >
+              <Camera size={12} />
+              Add a screenshot
+            </button>
+          )}
+          {speechSupported && (
+            <button
+              type="button"
+              className={`btn btn-mini${listening ? ' btn-danger' : ''}`}
+              onClick={toggleVoiceInput}
+              title={listening ? 'Stop dictating' : 'Dictate your comment by voice'}
+              aria-pressed={listening}
+            >
+              {listening ? <MicOff size={12} /> : <Mic size={12} />}
+              {listening ? 'Listening…' : 'Dictate'}
+            </button>
+          )}
+        </div>
         {/* The canvas is ALWAYS mounted, just hidden until there's
             something to show -- the real bug this replaces: it used to
             only exist in the DOM once hasScreenshot was already true, so
