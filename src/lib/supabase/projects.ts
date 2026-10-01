@@ -81,3 +81,26 @@ export async function getProjectBySlug(
 
   return { project, role: membership?.role ?? null, joinedVia: membership?.joined_via ?? null }
 }
+
+/** How many sub-projects sit inside this project -- deletion must be blocked while any exist (see deleteProject's own comment). */
+export async function countSubProjects(supabase: Client, projectId: string): Promise<number> {
+  const { count } = await supabase
+    .from('projects')
+    .select('*', { count: 'exact', head: true })
+    .eq('parent_project_id', projectId)
+  return count ?? 0
+}
+
+/**
+ * Permanently deletes a project. Every project-scoped table cascades on
+ * projects.id (migrations 004/010/011/013/018/019/020/027/030/035, etc.)
+ * EXCEPT sub-projects (parent_project_id is ON DELETE SET NULL, migration
+ * 015) -- they'd silently become orphaned, top-level projects instead of
+ * being deleted. Callers must call countSubProjects() first and refuse to
+ * proceed while any exist, rather than relying on that DB behavior. No undo
+ * once this succeeds. Needs migration 052's owner/admin DELETE policies on
+ * `projects` to be live.
+ */
+export async function deleteProject(supabase: Client, projectId: string) {
+  return supabase.from('projects').delete().eq('id', projectId)
+}

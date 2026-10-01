@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
-import { ArrowRight, BookOpen, Check, Clock, Copy, FileText, FolderKanban, Globe, Mail, MessageSquare, Plus, Trash2, UserPlus, Users } from 'lucide-react'
+import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { AlertTriangle, ArrowRight, BookOpen, Check, Clock, Copy, FileText, FolderKanban, Globe, Mail, MessageSquare, Plus, Trash2, UserPlus, Users } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/supabase/activity'
+import { countSubProjects, deleteProject } from '@/lib/supabase/projects'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
@@ -137,6 +138,7 @@ export default function DashboardPage() {
 
       <ProjectsSection project={project} canManage={canManage} supabase={supabase} />
       <MembersSection project={project} role={role} supabase={supabase} />
+      {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
 
       <h2 style={{ marginTop: 8 }}>Recent activity</h2>
       {activity === null ? (
@@ -313,6 +315,91 @@ function MembersSection({
         )}
       </div>
     </>
+  )
+}
+
+// Owner-only (not maintainer -- more destructive than anything else a
+// maintainer can already do, migration 052's own comment). The admin page's
+// Projects section is the cross-project counterpart for an admin acting on
+// a project they don't themselves own.
+function DangerZoneSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const navigate = useNavigate()
+  const [subCount, setSubCount] = useState<number | null>(null)
+  const [confirming, setConfirming] = useState(false)
+  const [typedSlug, setTypedSlug] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    countSubProjects(supabase, project.id).then(setSubCount)
+  }, [supabase, project.id])
+
+  const confirmDelete = async () => {
+    if (typedSlug.trim() !== project.slug) return
+    setBusy(true)
+    setError(null)
+    const { error: err } = await deleteProject(supabase, project.id)
+    setBusy(false)
+    if (err) setError(err.message)
+    else navigate('/dashboard')
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 20, borderColor: 'var(--critical)' }}>
+      <h3 className="row" style={{ color: 'var(--critical)' }}><AlertTriangle size={16} />Danger zone</h3>
+
+      {subCount === null ? (
+        <p className="muted">Loading…</p>
+      ) : subCount > 0 ? (
+        <p className="muted">
+          This project can&apos;t be deleted while it still has {subCount} sub-project{subCount === 1 ? '' : 's'} inside it —
+          delete or move {subCount === 1 ? 'it' : 'those'} first.
+        </p>
+      ) : !confirming ? (
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <p className="muted" style={{ margin: 0 }}>
+            Permanently delete {project.name} and everything in it. This cannot be undone.
+          </p>
+          <button className="btn btn-mini btn-danger" onClick={() => setConfirming(true)}>
+            <Trash2 size={11} />Delete this project
+          </button>
+        </div>
+      ) : (
+        <div>
+          <p>
+            This permanently deletes <strong>{project.name}</strong> — its Learning Goals, Concepts,
+            Theories, Strands, Literature, discussions, and membership. There is no undo.
+          </p>
+          <p style={{ marginBottom: 4 }}>Type <strong>{project.slug}</strong> to confirm:</p>
+          <div className="row">
+            <input
+              type="text"
+              value={typedSlug}
+              onChange={(e) => setTypedSlug(e.target.value)}
+              placeholder={project.slug}
+              style={{ maxWidth: 240 }}
+            />
+            <button
+              className="btn btn-mini btn-danger"
+              disabled={busy || typedSlug.trim() !== project.slug}
+              onClick={confirmDelete}
+            >
+              {busy ? 'Deleting…' : 'Permanently delete'}
+            </button>
+            <button className="btn btn-mini" onClick={() => { setConfirming(false); setTypedSlug(''); setError(null) }} disabled={busy}>
+              Cancel
+            </button>
+          </div>
+          {error && <p style={{ marginTop: 6, color: 'var(--critical)' }}>{error}</p>}
+        </div>
+      )}
+    </div>
   )
 }
 

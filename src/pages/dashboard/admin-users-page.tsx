@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Globe, Mail, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, FolderTree, Globe, Lock, Mail, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
 import { removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
+import { deleteProject } from '@/lib/supabase/projects'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -92,6 +93,13 @@ export default function AdminUsersPage() {
           ))
         )}
       </div>
+
+      <ProjectsAdminSection
+        supabase={supabase}
+        projects={projects}
+        memberships={memberships}
+        onChanged={reload}
+      />
 
       <JoinRulesAdminSection
         supabase={supabase}
@@ -205,6 +213,152 @@ function MembershipChip({
         <Trash2 size={10} />
       </button>
     </span>
+  )
+}
+
+function ProjectsAdminSection({
+  supabase,
+  projects,
+  memberships,
+  onChanged,
+}: {
+  supabase: ReturnType<typeof createClient>
+  projects: AdminProjectRow[] | null
+  memberships: AdminMembershipRow[] | null
+  onChanged: () => void
+}) {
+  const childCountByParent = new Map<string, number>()
+  for (const p of projects ?? []) {
+    if (!p.parent_project_id) continue
+    childCountByParent.set(p.parent_project_id, (childCountByParent.get(p.parent_project_id) ?? 0) + 1)
+  }
+  const memberCountByProject = new Map<string, number>()
+  for (const m of memberships ?? []) {
+    memberCountByProject.set(m.project.id, (memberCountByProject.get(m.project.id) ?? 0) + 1)
+  }
+  const parentNameById = new Map((projects ?? []).map((p) => [p.id, p.name]))
+
+  return (
+    <div className="card" style={{ marginBottom: 20 }}>
+      <h3 className="row"><FolderTree size={16} />Projects</h3>
+      <p className="muted" style={{ marginBottom: 12 }}>
+        Every project space across OpenLPM. Deleting one is permanent — everything inside it
+        (Learning Goals, Concepts, membership, discussions, and so on) goes with it, with no undo.
+      </p>
+      {projects === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        projects.map((p) => (
+          <ProjectRow
+            key={p.id}
+            project={p}
+            parentName={p.parent_project_id ? parentNameById.get(p.parent_project_id) ?? null : null}
+            memberCount={memberCountByProject.get(p.id) ?? 0}
+            childCount={childCountByParent.get(p.id) ?? 0}
+            supabase={supabase}
+            onChanged={onChanged}
+          />
+        ))
+      )}
+    </div>
+  )
+}
+
+function ProjectRow({
+  project,
+  parentName,
+  memberCount,
+  childCount,
+  supabase,
+  onChanged,
+}: {
+  project: AdminProjectRow
+  parentName: string | null
+  memberCount: number
+  childCount: number
+  supabase: ReturnType<typeof createClient>
+  onChanged: () => void
+}) {
+  const [confirming, setConfirming] = useState(false)
+  const [typedSlug, setTypedSlug] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const cancel = () => {
+    setConfirming(false)
+    setTypedSlug('')
+    setError(null)
+  }
+
+  const confirmDelete = async () => {
+    if (typedSlug.trim() !== project.slug) return
+    setBusy(true)
+    setError(null)
+    const { error: err } = await deleteProject(supabase, project.id)
+    setBusy(false)
+    if (err) setError(err.message)
+    else onChanged()
+  }
+
+  return (
+    <div style={{ padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <span>
+          <Link to={`/dashboard/${project.slug}`}><strong>{project.name}</strong></Link>
+          <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>{project.slug}</span>
+          {project.is_private && <span className="chip" style={{ marginLeft: 6 }}><Lock size={10} />Private</span>}
+          {parentName && <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>Inside {parentName}</span>}
+          <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>
+            {memberCount} member{memberCount === 1 ? '' : 's'}
+            {childCount > 0 ? `, ${childCount} sub-project${childCount === 1 ? '' : 's'}` : ''}
+          </span>
+        </span>
+        {!confirming && (
+          <button className="btn btn-mini btn-danger" onClick={() => setConfirming(true)} disabled={childCount > 0}
+            title={childCount > 0 ? 'Delete or move its sub-projects first' : 'Permanently delete this project'}>
+            <Trash2 size={11} />Delete
+          </button>
+        )}
+      </div>
+
+      {childCount > 0 && !confirming && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+          Has {childCount} sub-project{childCount === 1 ? '' : 's'} — delete or move {childCount === 1 ? 'it' : 'those'} first.
+        </p>
+      )}
+
+      {confirming && (
+        <div className="notice notice-bad" style={{ marginTop: 8, alignItems: 'flex-start' }}>
+          <AlertTriangle size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0 }}>
+              This permanently deletes <strong>{project.name}</strong> and everything in it —
+              Learning Goals, Concepts, Theories, Strands, Literature, discussions, and all
+              {memberCount === 1 ? ' 1 membership' : ` ${memberCount} memberships`}. This cannot be undone.
+            </p>
+            <p style={{ margin: '6px 0 4px' }}>Type <strong>{project.slug}</strong> to confirm:</p>
+            <div className="row">
+              <input
+                type="text"
+                value={typedSlug}
+                onChange={(e) => setTypedSlug(e.target.value)}
+                placeholder={project.slug}
+                style={{ maxWidth: 240 }}
+              />
+              <button
+                className="btn btn-mini btn-danger"
+                disabled={busy || typedSlug.trim() !== project.slug}
+                onClick={confirmDelete}
+              >
+                {busy ? 'Deleting…' : 'Permanently delete'}
+              </button>
+              <button className="btn btn-mini" onClick={cancel} disabled={busy}>Cancel</button>
+            </div>
+            {error && <p style={{ margin: '6px 0 0', color: 'var(--critical)' }}>{error}</p>}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

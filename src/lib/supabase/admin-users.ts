@@ -38,13 +38,20 @@ export interface AdminProjectRow {
   id: string
   name: string
   slug: string
+  parent_project_id: string | null
+  is_private: boolean
+  created_at: string
 }
 
-/** Every project that exists, for the join-rule project picker -- needs migration 049's admin SELECT policy on projects to include ones the admin isn't a member of. */
+/** Every project that exists, for the join-rule project picker and the Projects admin section -- needs migration 049's admin SELECT policy on projects to include ones the admin isn't a member of. */
 export async function listAllProjects(supabase: Client): Promise<AdminProjectRow[]> {
-  const { data } = await supabase.from('projects').select('id, name, slug').order('name', { ascending: true })
+  const { data } = await supabase
+    .from('projects')
+    .select('id, name, slug, parent_project_id, is_private, created_at')
+    .order('name', { ascending: true })
   return (data ?? []) as AdminProjectRow[]
 }
+
 
 export interface AdminMembershipRow {
   id: string
