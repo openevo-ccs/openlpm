@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 import type { JoinRule, JoinRuleType, ProjectMemberRole } from './members'
+import type { ProjectRow } from './projects'
 
 type Client = SupabaseClient<Database>
 
@@ -34,21 +35,22 @@ export async function listAllUsers(supabase: Client): Promise<AdminUserRow[]> {
   return (data ?? []) as AdminUserRow[]
 }
 
-export interface AdminProjectRow {
-  id: string
-  name: string
-  slug: string
-  parent_project_id: string | null
-  is_private: boolean
-  created_at: string
-}
+/** The full project row -- kept as its own name since this module's callers already import it this way. */
+export type AdminProjectRow = ProjectRow
 
-/** Every project that exists, for the join-rule project picker and the Projects admin section -- needs migration 049's admin SELECT policy on projects to include ones the admin isn't a member of. */
+/**
+ * Every project that exists -- the join-rule project picker, the admin
+ * Projects section, and (2026-10-01) the admin's own "Your project spaces"
+ * page, which shows every real project platform-wide for the admin account
+ * specifically, not just the ones it happens to belong to (real need: "I
+ * need to always be able to see all projects on the platform"). Full row
+ * (not a narrow column list) so the switcher page can render it with the
+ * exact same card it already uses for a real membership. Needs migration
+ * 049's admin SELECT policy on projects to include ones the admin isn't a
+ * member of.
+ */
 export async function listAllProjects(supabase: Client): Promise<AdminProjectRow[]> {
-  const { data } = await supabase
-    .from('projects')
-    .select('id, name, slug, parent_project_id, is_private, created_at')
-    .order('name', { ascending: true })
+  const { data } = await supabase.from('projects').select('*').order('name', { ascending: true })
   return (data ?? []) as AdminProjectRow[]
 }
 
