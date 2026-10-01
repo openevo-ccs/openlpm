@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Library, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
@@ -414,6 +414,14 @@ function ProjectsAdminSection({
     memberCountByProject.set(m.project.id, (memberCountByProject.get(m.project.id) ?? 0) + 1)
   }
 
+  // Curriculum Repositories are a distinct part of the ontology, not just
+  // another project space -- real feedback 8e9545c6. Listed in their own
+  // group here rather than interleaved into the same tree as ordinary
+  // project spaces (project_kind, migration 072).
+  const isRepository = (p: AdminProjectRow) => (p as any).project_kind === 'curriculum-repository'
+  const repoTopLevel = topLevel.filter(isRepository)
+  const standardTopLevel = topLevel.filter((p) => !isRepository(p))
+
   return (
     <div className="card" style={{ marginBottom: 20 }}>
       <h3 className="row"><FolderTree size={16} />Projects</h3>
@@ -436,7 +444,26 @@ function ProjectsAdminSection({
             {' · '}
             {(memberships ?? []).length} membership{(memberships ?? []).length === 1 ? '' : 's'} total
           </p>
-          {topLevel.map((p) => (
+
+          {repoTopLevel.length > 0 && (
+            <>
+              <h4 className="row" style={{ fontSize: 13, marginBottom: 6, gap: 5 }}><Library size={13} />Curriculum Repositories</h4>
+              {repoTopLevel.map((p) => (
+                <ProjectTreeRow
+                  key={p.id}
+                  project={p}
+                  parentName={null}
+                  childrenByParent={childrenByParent}
+                  memberCountByProject={memberCountByProject}
+                  childCountByParent={childCountByParent}
+                  supabase={supabase}
+                  onChanged={onChanged}
+                />
+              ))}
+              <h4 className="row" style={{ fontSize: 13, marginTop: 14, marginBottom: 6 }}>Project Spaces</h4>
+            </>
+          )}
+          {standardTopLevel.map((p) => (
             <ProjectTreeRow
               key={p.id}
               project={p}

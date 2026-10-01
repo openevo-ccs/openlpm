@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FolderKanban, Plus, ShieldCheck } from 'lucide-react'
+import { FolderKanban, Library, Plus, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
@@ -108,8 +108,17 @@ export default function ProjectSwitcherPage() {
   // (see [[openlpm-project-hierarchy-architecture]] -- this is the entry
   // point that list is meant to serve).
   const byId = new Map(entries.map((m) => [m.project.id, m]))
-  const topLevel = entries
-    .filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+  const isRepository = (p: ProjectRow) => (p as any).project_kind === 'curriculum-repository'
+  const topLevel = entries.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+  // Curriculum Repositories are a different part of the ontology, not a
+  // filtered subset of "project spaces" -- real feedback 8e9545c6 ("needs
+  // its own distinct section"). Shown in full, every time any exist, never
+  // narrowed by the human-curated/synthetic-theoretical filter below (that
+  // filter is about how a research project's content was made, which
+  // doesn't apply to a curated source archive the same way).
+  const repoTopLevel = topLevel.filter((m) => isRepository(m.project))
+  const standardTopLevel = topLevel
+    .filter((m) => !isRepository(m.project))
     .filter((m) => visibleCurations.has(CURATION[m.project.epistemic_status]))
   const childrenOf = (id: string) => entries.filter((m) => m.project.parent_project_id === id)
 
@@ -152,54 +161,85 @@ export default function ProjectSwitcherPage() {
           <p>You aren&apos;t a member of any project space yet.</p>
           <p className="muted">Ask an owner to add you, or create a new one.</p>
         </div>
-      ) : topLevel.length === 0 ? (
-        <div className="card empty">
-          <p className="muted">No project spaces match the selected filter.</p>
-        </div>
       ) : (
-        <div className="grid grid-3">
-          {topLevel.map(({ project, role }) => {
-            const children = childrenOf(project.id)
-            const colorHex = projectColorHex((project as any).color)
-            return (
-              <div
-                key={project.id}
-                className="card"
-                style={{ height: '100%', borderLeft: colorHex ? `4px solid ${colorHex}` : undefined }}
-              >
-                <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <h3>{project.name}</h3>
-                    <div className="row" style={{ gap: 4 }}>
-                      {project.is_private && <span className="chip" title="Only members can see this project exists">Private</span>}
-                      {role ? (
-                        <span className="chip capitalize">{role}</span>
-                      ) : (
-                        <span className="chip" title="You can see this because you're the admin -- you aren't a member" style={{ gap: 3 }}>
-                          <ShieldCheck size={10} />Admin view
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <p className="muted" title={project.description ?? undefined}>{truncateDescription(project.description)}</p>
-                  <div className="row" style={{ flexWrap: 'wrap' }}>
-                    <EpistemicStatusBadge status={project.epistemic_status} />
-                    <WorkingLanguagesTag languages={project.working_languages} />
-                  </div>
-                </Link>
-                {children.length > 0 && (
-                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-                    <span className="muted" style={{ fontSize: 12 }}>Projects inside:</span>
-                    {children.map((c) => (
-                      <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
-                        {c.project.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+        <>
+          {repoTopLevel.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <h2 className="row" style={{ fontSize: 16, gap: 6 }}><Library size={16} style={{ color: 'var(--text-muted)' }} />Curriculum Repositories</h2>
+              <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
+                Curated national/regional curriculum-policy source material — not research project
+                workspaces, so they don&apos;t have the same tabs.
+              </p>
+              <div className="grid grid-3">
+                {repoTopLevel.map(({ project, role }) => (
+                  <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+                ))}
               </div>
-            )
-          })}
+            </div>
+          )}
+
+          <h2 style={{ fontSize: 16 }}>Your project spaces</h2>
+          {standardTopLevel.length === 0 ? (
+            <div className="card empty">
+              <p className="muted">No project spaces match the selected filter.</p>
+            </div>
+          ) : (
+            <div className="grid grid-3">
+              {standardTopLevel.map(({ project, role }) => (
+                <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+function ProjectCard({
+  project,
+  role,
+  childrenOf,
+}: {
+  project: ProjectRow
+  role: ProjectMemberRole | null
+  childrenOf: (id: string) => SwitcherEntry[]
+}) {
+  const children = childrenOf(project.id)
+  const colorHex = projectColorHex((project as any).color)
+  return (
+    <div
+      className="card"
+      style={{ height: '100%', borderLeft: colorHex ? `4px solid ${colorHex}` : undefined }}
+    >
+      <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <h3>{project.name}</h3>
+          <div className="row" style={{ gap: 4 }}>
+            {project.is_private && <span className="chip" title="Only members can see this project exists">Private</span>}
+            {role ? (
+              <span className="chip capitalize">{role}</span>
+            ) : (
+              <span className="chip" title="You can see this because you're the admin -- you aren't a member" style={{ gap: 3 }}>
+                <ShieldCheck size={10} />Admin view
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="muted" title={project.description ?? undefined}>{truncateDescription(project.description)}</p>
+        <div className="row" style={{ flexWrap: 'wrap' }}>
+          <EpistemicStatusBadge status={project.epistemic_status} />
+          <WorkingLanguagesTag languages={project.working_languages} />
+        </div>
+      </Link>
+      {children.length > 0 && (
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
+          <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
+          {children.map((c) => (
+            <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+              {c.project.name}
+            </Link>
+          ))}
         </div>
       )}
     </div>

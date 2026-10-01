@@ -271,6 +271,13 @@ def apply_import(by_repo, owner_email):
             "epistemic_status_note": "Real, sourced curriculum-policy material; individual records carry their own verificationStatus/review_status for finer-grained trust.",
             "is_private": True,
             "focus_type": "regional",
+            # migration 072 -- marks this as a Curriculum Repository rather
+            # than an ordinary LPM project, so it gets the reduced sidebar
+            # and its own section in both project listings. Set here so a
+            # brand-new repository (e.g. a future india-curriculum-repository)
+            # is tagged correctly from creation, with no manual DB fix-up
+            # needed the way 067's constraint fix was.
+            "project_kind": "curriculum-repository",
         }, owner_id,
     )
     print(f"Parent project 'Curriculum Repositories': {parent_id}")
@@ -289,6 +296,7 @@ def apply_import(by_repo, owner_email):
                 "focus_type": "regional",
                 "region_tags": cfg["region_tags"],
                 "parent_project_id": parent_id,
+                "project_kind": "curriculum-repository",
             }, owner_id,
         )
         print(f"{cfg['project_name']}: {project_id}")

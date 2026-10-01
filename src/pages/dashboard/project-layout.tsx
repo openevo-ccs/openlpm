@@ -166,25 +166,41 @@ export default function ProjectLayout() {
     return <p className="muted">Loading…</p>
   }
 
+  // project_kind (migration 072) isn't in the generated types yet.
+  const isRepository = (project as any).project_kind === 'curriculum-repository'
+
   // Exactly these 10 items, in this order -- Dustin's explicit, final sidebar
   // spec for the 2026-09-13 restructure. Projects and Members are folded into
   // Dashboard; Schema is folded into Concepts; Explore is replaced by the
   // project-scoped search bar below (not a nav item); Import/export is now a
   // function inside Learning Goals (and, later, Literature/Concepts/Theories)
   // rather than its own tab.
-  const nav = [
-    { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
-    { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</>, end: false },
-    { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</>, end: false },
-    { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</>, end: false },
-    { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</>, end: false },
-    { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
-    { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
-    { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
-    { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</>, end: false },
-    { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
-    ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
-  ]
+  //
+  // A Curriculum Repository gets a deliberately different, much shorter
+  // nav -- real feedback d9522fb3: "they won't have theories, literature,
+  // review, etc. necessarily." It still gets Dashboard (which already
+  // folds in Members/Projects-in-this-Space) and the Curriculum Repository
+  // browser itself (still gated on hasRepo -- the PARENT "Curriculum
+  // Repositories" space holds no records of its own, just two
+  // sub-repositories, so it doesn't get that tab either).
+  const nav = isRepository
+    ? [
+        { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
+        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
+      ]
+    : [
+        { href: `/dashboard/${slug}`, content: <><FileText size={14} />Dashboard</> },
+        { href: `/dashboard/${slug}/learning-goals`, content: <><Layers size={14} />Learning Goals</>, end: false },
+        { href: `/dashboard/${slug}/concepts`, content: <><Sparkles size={14} />Concepts</>, end: false },
+        { href: `/dashboard/${slug}/theories`, content: <><Lightbulb size={14} />Theories</>, end: false },
+        { href: `/dashboard/${slug}/strands`, content: <><GitBranch size={14} />Strands</>, end: false },
+        { href: `/dashboard/${slug}/literature`, content: <><BookOpen size={14} />Literature</> },
+        { href: `/dashboard/${slug}/review`, content: <><Clock size={14} />Review</> },
+        { href: `/dashboard/${slug}/discussions`, content: <><MessageSquare size={14} />Discussions</> },
+        { href: `/dashboard/${slug}/notebooks`, content: <><Network size={14} />Notebooks</>, end: false },
+        { href: `/dashboard/${slug}/analytics`, content: <><BarChart3 size={14} />Analytics</> },
+        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, content: <><Library size={14} />Curriculum Repository</>, end: false }] : []),
+      ]
 
   const canManage = role === 'owner' || role === 'maintainer'
   // student_view_template (migration 045) isn't in the generated types yet.
@@ -245,12 +261,12 @@ export default function ProjectLayout() {
           All project spaces
         </Link>
         <p className="muted" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 10, marginBottom: 0 }}>
-          {isSpace ? 'Project Space' : 'Project'}
+          {isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
         </p>
         <h2 style={{ marginTop: 2, marginBottom: 2 }}>{project.name}</h2>
         {parent && (
           <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
-            Part of the <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link> Project Space
+            Part of the <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link> {isRepository ? 'Curriculum Repository' : 'Project Space'}
           </p>
         )}
         <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>
