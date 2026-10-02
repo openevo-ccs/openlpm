@@ -11,6 +11,8 @@ export interface MemberWithUser {
   id: string
   role: ProjectMemberRole
   user: { id: string; email: string; name: string; avatar_url: string | null }
+  // source_federation_id (migration 083) isn't in the generated types yet.
+  source_federation_id?: string | null
 }
 
 export async function listMembers(supabase: Client, projectId: string): Promise<MemberWithUser[]> {
@@ -18,7 +20,7 @@ export async function listMembers(supabase: Client, projectId: string): Promise<
   // (user_id and invited_by), so a bare `users(...)` embed is ambiguous.
   const { data } = await supabase
     .from('project_members')
-    .select('id, role, user:users!project_members_user_id_fkey(id, email, name, avatar_url)')
+    .select('id, role, source_federation_id, user:users!project_members_user_id_fkey(id, email, name, avatar_url)')
     .eq('project_id', projectId)
     .order('created_at', { ascending: true })
   return (data ?? []) as unknown as MemberWithUser[]

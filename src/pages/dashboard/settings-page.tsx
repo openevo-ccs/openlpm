@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, Globe, Mail, Trash2, UserPlus, Users } from 'lucide-react'
+import { AlertTriangle, Check, Copy, Globe, Link2, Mail, Trash2, UserPlus, Users } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { countSubProjects, deleteProject } from '@/lib/supabase/projects'
@@ -24,6 +24,20 @@ import {
 import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
 import { PROJECT_COLORS } from '@/lib/project-colors'
 import { groupsSettings, setGroupCreatorRoles, setGroupsEnabled } from '@/lib/supabase/groups'
+import {
+  acceptFederation,
+  federationCounterparty,
+  federationPreviewMembers,
+  federationSourceName,
+  findProjectForFederation,
+  listIncomingFederations,
+  listOutgoingFederations,
+  proposeFederation,
+  revokeFederation,
+  type Federation,
+  type FederationPreviewMember,
+  type ResolvedProject,
+} from '@/lib/supabase/federations'
 
 const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
 
@@ -48,6 +62,7 @@ export default function SettingsPage() {
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
       <MembersSection project={project} role={role} supabase={supabase} />
       {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
+      {canManage && <FederationSection project={project} supabase={supabase} />}
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
     </div>
   )
@@ -69,10 +84,23 @@ function MembersSection({
 }) {
   const [members, setMembers] = useState<MemberWithUser[] | null>(null)
   const [invites, setInvites] = useState<InviteRow[] | null>(null)
+  const [federationLabels, setFederationLabels] = useState<Record<string, string>>({})
   const canManage = role === 'owner' || role === 'maintainer'
 
   const reload = () => {
-    listMembers(supabase, project.id).then(setMembers)
+    listMembers(supabase, project.id).then((rows) => {
+      setMembers(rows)
+      // Resolve "via federation with <source project>" labels for any
+      // federation-sourced rows, one lookup per distinct federation (not
+      // per member) since several members can share the same source.
+      const ids = Array.from(new Set(rows.map((m) => m.source_federation_id).filter((id): id is string => !!id)))
+      ids.forEach((id) => {
+        if (federationLabels[id]) return
+        federationSourceName(supabase, id).then((name) => {
+          if (name) setFederationLabels((prev) => ({ ...prev, [id]: name }))
+        })
+      })
+    })
     if (canManage) listPendingInvites(supabase, project.id).then(setInvites)
   }
 
@@ -118,6 +146,11 @@ function MembersSection({
               <span>
                 <strong>{m.user.name}</strong>
                 <span className="muted" style={{ marginLeft: 6 }}>{m.user.email}</span>
+                {m.source_federation_id && (
+                  <span className="chip" style={{ marginLeft: 6 }} title="Added automatically because their project federates with this one">
+                    <Link2 size={10} />via federation{federationLabels[m.source_federation_id] ? ` with ${federationLabels[m.source_federation_id]}` : ''}
+                  </span>
+                )}
               </span>
               {canManage ? (
                 <span className="row">
@@ -642,6 +675,328 @@ function GroupsSettingsSection({
         </div>
       )}
       {saved && <p className="muted" style={{ fontSize: 12, marginTop: 6, color: 'var(--good)' }}>Saved.</p>}
+    </div>
+  )
+}
+
+// ============================================================================
+// Project federation (migration 083, feedback 20450401) -- a lateral
+// relationship between two fully independent projects, distinct from
+// parent/child nesting. "Propose" here means THIS project's owner/maintainer
+// offering its own members into another project; the real admission only
+// happens once that OTHER project's own owner/maintainer explicitly accepts
+// (and sees exactly who's about to be added first) -- see this project's own
+// Settings page on the other side for that half of the flow. Full design:
+// lab_manager/docs/design-notes/openlpm-project-federation-2026-10-02.md.
+// ============================================================================
+
+function FederationSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [outgoing, setOutgoing] = useState<Federation[] | null>(null)
+  const [incoming, setIncoming] = useState<Federation[] | null>(null)
+  const [names, setNames] = useState<Record<string, ResolvedProject | null>>({})
+
+  const reload = () => {
+    listOutgoingFederations(supabase, project.id).then(setOutgoing)
+    listIncomingFederations(supabase, project.id).then(setIncoming)
+  }
+
+  useEffect(() => {
+    setOutgoing(null)
+    setIncoming(null)
+    reload()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id])
+
+  useEffect(() => {
+    const otherIds = [
+      ...(outgoing ?? []).map((f) => f.target_project_id),
+      ...(incoming ?? []).map((f) => f.source_project_id),
+    ]
+    const unresolved = Array.from(new Set(otherIds)).filter((id) => !(id in names))
+    unresolved.forEach((id) => {
+      federationCounterparty(supabase, id).then((p) => setNames((prev) => ({ ...prev, [id]: p })))
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [outgoing, incoming])
+
+  const revoke = async (f: Federation) => {
+    await revokeFederation(supabase, f)
+    reload()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Link2 size={16} />Federation</h3>
+      <p className="muted">
+        Extend {project.name}&apos;s own members into another, fully separate project space — or let another
+        project&apos;s members reach into this one. Not nesting: both projects stay independent, and either
+        side can end it at any time.
+      </p>
+
+      <ProposeFederationForm projectId={project.id} supabase={supabase} onProposed={reload} />
+
+      <h4 style={{ marginTop: 16, marginBottom: 6 }}>Outgoing — {project.name}&apos;s members reaching elsewhere</h4>
+      {outgoing === null ? (
+        <p className="muted">Loading…</p>
+      ) : outgoing.length === 0 ? (
+        <p className="muted">Not offered into any other project.</p>
+      ) : (
+        outgoing.map((f) => (
+          <FederationRow key={f.id} federation={f} otherProject={names[f.target_project_id]} direction="outgoing" onRevoke={() => revoke(f)} />
+        ))
+      )}
+
+      <h4 style={{ marginTop: 16, marginBottom: 6 }}>Incoming — other projects&apos; members reaching into {project.name}</h4>
+      {incoming === null ? (
+        <p className="muted">Loading…</p>
+      ) : incoming.length === 0 ? (
+        <p className="muted">No other project has proposed federating into this one.</p>
+      ) : (
+        incoming.map((f) => (
+          <IncomingFederationRow key={f.id} federation={f} otherProject={names[f.source_project_id]} supabase={supabase} onChanged={reload} />
+        ))
+      )}
+    </div>
+  )
+}
+
+function ProposeFederationForm({
+  projectId,
+  supabase,
+  onProposed,
+}: {
+  projectId: string
+  supabase: ProjectOutletContext['supabase']
+  onProposed: () => void
+}) {
+  const [slug, setSlug] = useState('')
+  const [role, setRole] = useState<ProjectMemberRole>('viewer')
+  const [resolved, setResolved] = useState<ResolvedProject | null | undefined>(undefined)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const lookup = async () => {
+    setError(null)
+    setResolved(undefined)
+    const slugTrim = slug.trim()
+    if (!slugTrim) return
+    const project = await findProjectForFederation(supabase, slugTrim)
+    if (!project) {
+      setError(`No project with the slug "${slugTrim}" — check the exact slug with that project's owner.`)
+      setResolved(null)
+      return
+    }
+    if (project.id === projectId) {
+      setError("That's this project — pick a different one to federate with.")
+      setResolved(null)
+      return
+    }
+    setResolved(project)
+  }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!resolved) return
+    setBusy(true)
+    setError(null)
+    const { error } = await proposeFederation(supabase, projectId, resolved.id, role)
+    setBusy(false)
+    if (error) setError(error.message)
+    else {
+      setSlug('')
+      setResolved(undefined)
+      onProposed()
+    }
+  }
+
+  return (
+    <div className="card" style={{ background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <h4 style={{ marginTop: 0 }}>Propose a new federation</h4>
+      <p className="muted" style={{ fontSize: 12.5 }}>
+        You&apos;ll need the exact project slug (ask its owner — e.g. the end of its URL,{' '}
+        <code>/dashboard/their-project-slug</code>). The other project&apos;s owner still has to accept before
+        anyone actually gets access.
+      </p>
+      <form onSubmit={submit} className="row" style={{ flexWrap: 'wrap' }}>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Project slug</label>
+          <input
+            type="text"
+            placeholder="evomentor-sachsen"
+            value={slug}
+            onChange={(e) => { setSlug(e.target.value); setResolved(undefined) }}
+            onBlur={lookup}
+          />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Role they get here</label>
+          <select value={role} onChange={(e) => setRole(e.target.value as ProjectMemberRole)}>
+            {FEDERATION_ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+        <button className="btn btn-primary" type="submit" disabled={busy || !resolved} style={{ alignSelf: 'flex-end' }}>
+          {busy ? 'Proposing…' : 'Propose'}
+        </button>
+      </form>
+      {resolved && <p className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>Found: <strong>{resolved.name}</strong></p>}
+      {error && <div className="notice notice-bad" style={{ marginTop: 8 }}>{error}</div>}
+    </div>
+  )
+}
+
+// Never 'owner' -- capped the same way the database CHECK constraint caps
+// it (migration 083's own comment on why).
+const FEDERATION_ROLES: ProjectMemberRole[] = ['maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
+
+const FEDERATION_STATUS_LABEL: Record<Federation['status'], string> = {
+  proposed: 'Proposed — waiting on the other side',
+  accepted: 'Active',
+  revoked: 'Ended',
+}
+
+function FederationRow({
+  federation,
+  otherProject,
+  direction,
+  onRevoke,
+}: {
+  federation: Federation
+  otherProject: ResolvedProject | null | undefined
+  direction: 'outgoing' | 'incoming'
+  onRevoke: () => void
+}) {
+  return (
+    <div className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+      <span>
+        <strong>{otherProject === undefined ? 'Loading…' : otherProject?.name ?? '(project no longer exists)'}</strong>
+        <span className="muted" style={{ marginLeft: 6 }}>
+          {direction === 'outgoing' ? `their members get ${federation.granted_role} here` : `members here get ${federation.granted_role} there`}
+        </span>
+      </span>
+      <span className="row">
+        <span className={`chip ${federation.status === 'accepted' ? 'notice-ok' : ''}`}>{FEDERATION_STATUS_LABEL[federation.status]}</span>
+        {federation.status !== 'revoked' && (
+          <button className="btn btn-mini btn-danger" onClick={onRevoke}>
+            <Trash2 size={11} />{federation.status === 'proposed' ? 'Withdraw' : 'End'}
+          </button>
+        )}
+      </span>
+    </div>
+  )
+}
+
+function IncomingFederationRow({
+  federation,
+  otherProject,
+  supabase,
+  onChanged,
+}: {
+  federation: Federation
+  otherProject: ResolvedProject | null | undefined
+  supabase: ProjectOutletContext['supabase']
+  onChanged: () => void
+}) {
+  const [reviewing, setReviewing] = useState(false)
+  const [preview, setPreview] = useState<FederationPreviewMember[] | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  const startReview = async () => {
+    setReviewing(true)
+    setPreview(null)
+    const rows = await federationPreviewMembers(supabase, federation.id)
+    setPreview(rows)
+  }
+
+  const confirmAccept = async () => {
+    setBusy(true)
+    await acceptFederation(supabase, federation)
+    setBusy(false)
+    setReviewing(false)
+    onChanged()
+  }
+
+  const decline = async () => {
+    setBusy(true)
+    await revokeFederation(supabase, federation)
+    setBusy(false)
+    onChanged()
+  }
+
+  const end = async () => {
+    setBusy(true)
+    await revokeFederation(supabase, federation)
+    setBusy(false)
+    onChanged()
+  }
+
+  if (federation.status === 'accepted') {
+    return (
+      <div className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+        <span>
+          <strong>{otherProject === undefined ? 'Loading…' : otherProject?.name ?? '(project no longer exists)'}</strong>
+          <span className="muted" style={{ marginLeft: 6 }}>their members have {federation.granted_role} access here</span>
+        </span>
+        <span className="row">
+          <span className="chip notice-ok">Active</span>
+          <button className="btn btn-mini btn-danger" disabled={busy} onClick={end}><Trash2 size={11} />End</button>
+        </span>
+      </div>
+    )
+  }
+
+  if (federation.status === 'revoked') {
+    return (
+      <div className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+        <span className="muted">{otherProject?.name ?? '(project no longer exists)'}</span>
+        <span className="chip">Ended</span>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <span>
+          <strong>{otherProject === undefined ? 'Loading…' : otherProject?.name ?? '(project no longer exists)'}</strong>
+          <span className="muted" style={{ marginLeft: 6 }}>wants their members to get {federation.granted_role} access here</span>
+        </span>
+        {!reviewing && (
+          <span className="row">
+            <button className="btn btn-mini btn-primary" onClick={startReview}>Review & accept</button>
+            <button className="btn btn-mini" disabled={busy} onClick={decline}>Decline</button>
+          </span>
+        )}
+      </div>
+      {reviewing && (
+        <div style={{ marginTop: 8, padding: 10, background: 'var(--bg-subtle, #f5f5f5)', borderRadius: 6 }}>
+          <p style={{ marginTop: 0, marginBottom: 6 }}>
+            {preview === null
+              ? 'Loading who would be added…'
+              : preview.length === 0
+                ? 'They currently have no members — accepting adds nobody right now, but anyone who joins them later will be added automatically while this stays active.'
+                : `Accepting adds these ${preview.length} ${preview.length === 1 ? 'person' : 'people'} at ${federation.granted_role}, plus anyone who joins them later:`}
+          </p>
+          {preview && preview.length > 0 && (
+            <ul style={{ margin: '0 0 10px', paddingLeft: 18, fontSize: 13 }}>
+              {preview.map((m) => (
+                <li key={m.user_id}>{m.name} <span className="muted">({m.email})</span></li>
+              ))}
+            </ul>
+          )}
+          <div className="row">
+            <button className="btn btn-mini btn-primary" disabled={busy || preview === null} onClick={confirmAccept}>
+              {busy ? 'Accepting…' : `Confirm & accept these ${preview?.length ?? 0}`}
+            </button>
+            <button className="btn btn-mini" disabled={busy} onClick={() => setReviewing(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
