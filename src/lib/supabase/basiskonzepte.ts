@@ -123,7 +123,12 @@ export function groupBkIdsByRoot(rawIds: string[], rootConcepts: { id: string; l
     if (!byKey.has(key)) byKey.set(key, { rootId: key, label: root?.label ?? rawId, rawIds: [] })
     byKey.get(key)!.rawIds.push(rawId)
   }
-  return Array.from(byKey.values())
+  // Real feedback 478397f9 (Susan, 2026-10-02): sorted to match
+  // rootConcepts' own order (see getRootConcepts' own comment) rather than
+  // "whichever raw id this Set happened to see first" -- the Lernziele
+  // sidebar's Basiskonzepte filter list reads this order directly.
+  const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
+  return Array.from(byKey.values()).sort((a, b) => (rootIndex.get(a.rootId) ?? 999) - (rootIndex.get(b.rootId) ?? 999))
 }
 
 /**
@@ -157,6 +162,31 @@ export function bkAbbreviation(label: string): string {
  * row, so every consumer (Dashboard/Netz/Detail tabs) sees exactly one row
  * per real Basiskonzept regardless of which projects happen to hold a copy.
  */
+// Real feedback 478397f9 (Susan, 2026-10-02): the Basiskonzepte Dashboard
+// showed a different order (and, since every view colors a root concept by
+// its position among rootConcepts, different colors) than the Lernziele
+// window. Root cause checked directly against the real data: the query
+// below has no ORDER BY, and lpm_schema_elements has no sequence/position
+// column to sort by either (all 6 real Thuringia root rows share the exact
+// same created_at, a single seed-time batch insert) -- so its result order
+// was never guaranteed, and different pages' own independent queries were
+// free to come back in different native row order. The real Thuringia
+// Basiskonzepte vocabulary (KMK's own six) has one conventional sequence,
+// named directly by Susan -- sorted to it here, once, so every page that
+// colors/orders by position in this array (Dashboard, Netz, Detail,
+// Lernziele) is now consistent by construction. A project using different
+// root-concept labels (unrecognized here) keeps the query's own order for
+// those -- this never hides or reorders-wrong a concept this list doesn't
+// know about.
+const ROOT_CONCEPT_ORDER = [
+  'Evolutive Entwicklung',
+  'Individuelle Entwicklung',
+  'Struktur und Funktion',
+  'Steuerung und Regelung',
+  'Stoff- und Energieumwandlung',
+  'Information und Kommunikation',
+]
+
 export async function getRootConcepts(
   supabase: Client,
   project: { id: string; parent_project_id: string | null }
@@ -174,7 +204,14 @@ export async function getRootConcepts(
       byLabel.set(row.label, row)
     }
   }
-  return Array.from(byLabel.values())
+  return Array.from(byLabel.values()).sort((a, b) => {
+    const ai = ROOT_CONCEPT_ORDER.indexOf(a.label)
+    const bi = ROOT_CONCEPT_ORDER.indexOf(b.label)
+    if (ai === -1 && bi === -1) return 0
+    if (ai === -1) return 1
+    if (bi === -1) return -1
+    return ai - bi
+  })
 }
 
 /**
