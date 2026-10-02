@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 import { logActivity } from './activity'
+import { bkEntries, getRootConcepts, groupBkIdsByRoot, type BkGroup } from './basiskonzepte'
 
 type Client = SupabaseClient<Database>
 
@@ -137,6 +138,208 @@ export async function getGradeBandMatrix(supabase: Client, projectId: string, br
   const orphanObjectIds = objs.filter((o) => !touched.has(o.id)).map((o) => o.id)
 
   return { grades, cells, totalObjects: objs.length, orphanObjectIds }
+}
+
+// ============================================================================
+// Horizontal coherence -- real feedback ae39e124 (Dustin Eirdosh,
+// 2026-10-02): "develop vertical and horizontal coherence analytics...
+// primarily same grade across subjects, but also plan for higher-level
+// comparative analyses... secondary and more advanced." This covers the
+// primary case: within one grade, does a real connection span two
+// different Basiskonzepte (the closest real stand-in for "subject" this
+// single-subject-today dataset actually has -- see horizontal-coherence
+// section of coherence-page.tsx for the longer version of this note).
+// Reuses the exact same lpm_connections/lpm_threads/lpm_coherence_reviews
+// mechanism as the vertical matrix above -- migration 011's own top
+// comment already called this out as deliberately axis-generic -- just a
+// new axis value ('strand_same_grade') and a different grouping key.
+//
+// An object's grade_band is one real column; its Basiskonzept is not --
+// an object can carry several (content.basiskonzeptbezug), each with its
+// own relevance score. "Primary strand" here is the one with the highest
+// relevanz_beurteilung, resolved to a real root concept the same way
+// prompt-builder.tsx's buildPrompt does (bkEntries + groupBkIdsByRoot) --
+// never lpm_object_tags, which the real Thuringia data doesn't actually
+// populate (see basiskonzepte.ts's own top comment: the real association
+// lives in content.basiskonzeptbezug).
+// ============================================================================
+
+function computePrimaryStrands(
+  objs: { id: string; content: unknown }[],
+  rootConcepts: { id: string; label: string }[]
+): Map<string, BkGroup> {
+  const allRawIds = Array.from(new Set(objs.flatMap((o) => bkEntries(o.content).map((e) => e.basiskonzept_id))))
+  const groups = groupBkIdsByRoot(allRawIds, rootConcepts)
+  const groupByRawId = new Map<string, BkGroup>()
+  for (const g of groups) for (const rawId of g.rawIds) groupByRawId.set(rawId, g)
+
+  const primaryGroupOf = new Map<string, BkGroup>()
+  for (const o of objs) {
+    const entries = bkEntries(o.content)
+    if (entries.length === 0) continue
+    const best = entries.reduce((a, b) => (b.relevanz_beurteilung > a.relevanz_beurteilung ? b : a))
+    const group = groupByRawId.get(best.basiskonzept_id)
+    if (group) primaryGroupOf.set(o.id, group)
+  }
+  return primaryGroupOf
+}
+
+export interface StrandCell {
+  rootA: string
+  rootB: string
+  labelA: string
+  labelB: string
+  assertedCount: number
+  suggestedThreads: { id: string; title: string }[]
+  pendingCount: number
+  reviewedNoConnection: CoherenceReviewRow | null
+}
+
+export interface StrandMatrix {
+  grade: string
+  roots: { id: string; label: string }[]
+  cells: StrandCell[]
+  totalObjects: number
+  orphanObjectIds: string[]
+}
+
+export async function listGradesWithObjects(supabase: Client, projectId: string, branchId: string): Promise<string[]> {
+  const { data } = await supabase.from('lpm_data_objects').select('grade_band').eq('project_id', projectId).eq('branch_id', branchId)
+  return Array.from(new Set((data ?? []).map((o) => o.grade_band).filter((g): g is string => !!g))).sort((a, b) => Number(a) - Number(b))
+}
+
+export async function getSameGradeStrandMatrix(
+  supabase: Client,
+  project: { id: string; parent_project_id: string | null },
+  branchId: string,
+  grade: string
+): Promise<StrandMatrix> {
+  const [{ data: objects }, rootConcepts] = await Promise.all([
+    supabase.from('lpm_data_objects').select('id, content').eq('project_id', project.id).eq('branch_id', branchId).eq('grade_band', grade),
+    getRootConcepts(supabase, project),
+  ])
+
+  const objs = objects ?? []
+  const primaryGroupOf = computePrimaryStrands(objs, rootConcepts)
+  const presentGroups = new Map<string, BkGroup>()
+  for (const g of primaryGroupOf.values()) presentGroups.set(g.rootId, g)
+  const roots = Array.from(presentGroups.values())
+    .map((g) => ({ id: g.rootId, label: g.label }))
+    .sort((a, b) => a.label.localeCompare(b.label))
+
+  const objectIds = new Set(objs.map((o) => o.id))
+  const [{ data: connections }, { data: threads }] = await Promise.all([
+    supabase.from('lpm_connections').select('from_object_id, to_object_id, status').eq('project_id', project.id).eq('branch_id', branchId),
+    supabase.from('lpm_threads').select('id, title').eq('project_id', project.id).eq('branch_id', branchId).eq('status', 'accepted'),
+  ])
+
+  const pairKey = (a: string, b: string) => (a <= b ? `${a}|${b}` : `${b}|${a}`)
+  const assertedCounts = new Map<string, number>()
+  const pendingCounts = new Map<string, number>()
+  const touched = new Set<string>()
+
+  for (const c of connections ?? []) {
+    if (!objectIds.has(c.from_object_id) || !objectIds.has(c.to_object_id)) continue
+    touched.add(c.from_object_id)
+    touched.add(c.to_object_id)
+    const ga = primaryGroupOf.get(c.from_object_id)
+    const gb = primaryGroupOf.get(c.to_object_id)
+    if (!ga || !gb || ga.rootId === gb.rootId) continue
+    const key = pairKey(ga.rootId, gb.rootId)
+    if (c.status === 'accepted') assertedCounts.set(key, (assertedCounts.get(key) ?? 0) + 1)
+    else if (c.status === 'proposed' || c.status === 'under_review') pendingCounts.set(key, (pendingCounts.get(key) ?? 0) + 1)
+  }
+
+  const threadIds = (threads ?? []).map((t) => t.id)
+  const { data: stations } = threadIds.length
+    ? await supabase.from('lpm_thread_stations').select('thread_id, data_object_id').in('thread_id', threadIds)
+    : { data: [] as { thread_id: string; data_object_id: string }[] }
+  const threadById = new Map((threads ?? []).map((t) => [t.id, t]))
+  const stationsByThread = new Map<string, string[]>()
+  for (const s of stations ?? []) {
+    if (!objectIds.has(s.data_object_id)) continue
+    const list = stationsByThread.get(s.thread_id) ?? []
+    list.push(s.data_object_id)
+    stationsByThread.set(s.thread_id, list)
+  }
+
+  const suggestedThreadsByPair = new Map<string, Set<string>>()
+  for (const [threadId, ids] of stationsByThread) {
+    const rootsInThread = new Set(ids.map((id) => primaryGroupOf.get(id)?.rootId).filter((r): r is string => !!r))
+    for (const id of ids) touched.add(id)
+    const list = Array.from(rootsInThread)
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const key = pairKey(list[i], list[j])
+        const set = suggestedThreadsByPair.get(key) ?? new Set()
+        set.add(threadId)
+        suggestedThreadsByPair.set(key, set)
+      }
+    }
+  }
+
+  const { data: reviews } = await supabase
+    .from('lpm_coherence_reviews').select('*').eq('project_id', project.id).eq('branch_id', branchId).eq('axis', 'strand_same_grade')
+  const reviewByKey = new Map<string, CoherenceReviewRow>()
+  for (const r of reviews ?? []) {
+    const a = r.scope_a as Record<string, string>
+    const b = r.scope_b as Record<string, string>
+    if (a.grade_band === grade && b.grade_band === grade && a.basiskonzept_id && b.basiskonzept_id) {
+      reviewByKey.set(pairKey(a.basiskonzept_id, b.basiskonzept_id), r)
+    }
+  }
+
+  const cells: StrandCell[] = []
+  for (let i = 0; i < roots.length; i++) {
+    for (let j = i + 1; j < roots.length; j++) {
+      const [a, b] = [roots[i], roots[j]]
+      const key = pairKey(a.id, b.id)
+      cells.push({
+        rootA: a.id, rootB: b.id, labelA: a.label, labelB: b.label,
+        assertedCount: assertedCounts.get(key) ?? 0,
+        suggestedThreads: Array.from(suggestedThreadsByPair.get(key) ?? []).map((id) => threadById.get(id)!).filter(Boolean),
+        pendingCount: pendingCounts.get(key) ?? 0,
+        reviewedNoConnection: reviewByKey.get(key) ?? null,
+      })
+    }
+  }
+
+  const orphanObjectIds = objs.filter((o) => !primaryGroupOf.has(o.id)).map((o) => o.id)
+  return { grade, roots, cells, totalObjects: objs.length, orphanObjectIds }
+}
+
+export async function listObjectsInGradeAndStrand(
+  supabase: Client,
+  project: { id: string; parent_project_id: string | null },
+  branchId: string,
+  grade: string,
+  rootId: string
+): Promise<GradeBandObject[]> {
+  const [{ data: objects }, rootConcepts] = await Promise.all([
+    supabase.from('lpm_data_objects').select('id, title, content').eq('project_id', project.id).eq('branch_id', branchId).eq('grade_band', grade),
+    getRootConcepts(supabase, project),
+  ])
+  const objs = objects ?? []
+  const primaryGroupOf = computePrimaryStrands(objs, rootConcepts)
+  return objs
+    .filter((o) => primaryGroupOf.get(o.id)?.rootId === rootId)
+    .map((o) => ({ id: o.id, title: o.title }))
+    .sort((a, b) => a.title.localeCompare(b.title))
+}
+
+export async function markStrandReviewedNoConnection(
+  supabase: Client,
+  params: { projectId: string; branchId: string; grade: string; rootA: string; rootB: string; note: string }
+) {
+  const [rootA, rootB] = params.rootA <= params.rootB ? [params.rootA, params.rootB] : [params.rootB, params.rootA]
+  return supabase.from('lpm_coherence_reviews').insert({
+    project_id: params.projectId,
+    branch_id: params.branchId,
+    axis: 'strand_same_grade',
+    scope_a: { grade_band: params.grade, basiskonzept_id: rootA },
+    scope_b: { grade_band: params.grade, basiskonzept_id: rootB },
+    note: params.note,
+  })
 }
 
 export interface ConceptCandidate {
