@@ -250,6 +250,13 @@ code {
 .chip-good, .chip-accepted, .chip-canonical, .chip-promoted, .chip-completed { color: var(--good); border-color: var(--good); background: rgb(var(--good-rgb) / 0.12); }
 .chip-muted, .chip-rejected, .chip-deprecated, .chip-archived, .chip-merged, .chip-discontinued, .chip-paused, .chip-planning { color: var(--text-muted); }
 .chip-flag, .chip-critical { color: var(--critical); border-color: var(--critical); background: rgb(var(--critical-rgb) / 0.1); }
+/* Real feedback fd88f0cd (Susan, 2026-10-02): the Thema/Unterthema line on a
+   student Lernziel card needed to read as more than plain grey text -- same
+   chip shape as the status chips above, colored with the app's own primary
+   accent so it's visually distinct from the grade chip next to it. Truncates
+   with an ellipsis rather than wrapping the whole card wider; full text is
+   in the chip's own title attribute. */
+.chip-thema { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }

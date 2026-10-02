@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowRight, ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
+import { ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
-  getAssertedConnections,
   getFullThread,
   getThreadStationsForTopic,
+  listAcceptedConnections,
   listTopicContents,
   listTopics,
   type FullThread,
-  type ResolvedConnection,
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
@@ -79,8 +78,55 @@ function RelevanceDots({ level, color }: { level: number; color?: string }) {
   )
 }
 
-type SortBy = 'default' | 'grade' | 'thema' | 'favorites'
+type SortBy = 'default' | 'grade' | 'thema' | 'favorites' | 'sequence'
 type ViewMode = 'cards' | 'list'
+
+// Real feedback fba146fa (Susan, 2026-10-02): the curriculum-order info
+// ("Davor"/"Danach") shouldn't live on the Lernziel card at all -- she wants
+// it as a sort option instead. The real data behind it (lpm_connections,
+// 'accepted' status) is a sparse, curriculum-asserted graph, not a single
+// field to sort by: checked live against the real Thuringia data before
+// building this (306 topics, 373 accepted connections, 272 topics touched by
+// at least one, 52 connections crossing a Thema boundary) -- common enough to
+// be worth a real topological sort across the whole filtered list (not just
+// within one Thema), rare enough on the cross-Thema edges that restricting
+// to one Thema at a time would silently drop real curriculum sequencing.
+// Kahn's algorithm, stably tie-broken by each topic's current position (so a
+// topic with no connection info at all stays near its original place instead
+// of being pushed to one end) -- a real cycle in asserted data shouldn't
+// happen, but falls back to original order for whatever's left rather than
+// dropping topics if it ever does.
+function sortByCurriculumOrder(items: TopicListItem[], connections: { from_object_id: string; to_object_id: string }[]): TopicListItem[] {
+  const idToIndex = new Map(items.map((t, i) => [t.id, i]))
+  const indegree = new Map(items.map((t) => [t.id, 0]))
+  const outEdges = new Map<string, string[]>(items.map((t) => [t.id, []]))
+  for (const c of connections) {
+    if (!idToIndex.has(c.from_object_id) || !idToIndex.has(c.to_object_id)) continue
+    outEdges.get(c.from_object_id)!.push(c.to_object_id)
+    indegree.set(c.to_object_id, (indegree.get(c.to_object_id) ?? 0) + 1)
+  }
+  const remaining = new Set(items.map((t) => t.id))
+  const result: TopicListItem[] = []
+  while (remaining.size > 0) {
+    let bestId: string | null = null
+    let bestIdx = Infinity
+    for (const id of remaining) {
+      if ((indegree.get(id) ?? 0) === 0) {
+        const idx = idToIndex.get(id)!
+        if (idx < bestIdx) { bestIdx = idx; bestId = id }
+      }
+    }
+    if (bestId === null) {
+      bestId = Array.from(remaining).sort((a, b) => idToIndex.get(a)! - idToIndex.get(b)!)[0]
+    }
+    result.push(items[idToIndex.get(bestId)!])
+    remaining.delete(bestId)
+    for (const next of outEdges.get(bestId) ?? []) {
+      if (remaining.has(next)) indegree.set(next, (indegree.get(next) ?? 0) - 1)
+    }
+  }
+  return result
+}
 
 // Real feedback 2026-10-01 (Susan): the space above the card grid was just
 // empty -- EvoMentor DE v1.2 has sorting, a list/card view toggle, expand/
@@ -192,6 +238,11 @@ export default function StudentLernzielePage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [sortBy, setSortBy] = useState<SortBy>('default')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
+  // Real, curriculum-asserted Davor/Danach edges -- fetched once per project,
+  // same bulk-query reasoning as listTopicContents below. Only used for the
+  // 'sequence' sort option now (feedback fba146fa); no longer rendered on
+  // the card itself.
+  const [connections, setConnections] = useState<{ from_object_id: string; to_object_id: string }[]>([])
 
   useEffect(() => {
     setTopics(null)
@@ -199,6 +250,7 @@ export default function StudentLernzielePage() {
     listFavoriteIds(supabase).then(setFavorites)
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
+    listAcceptedConnections(supabase, project.id).then(setConnections)
   }, [supabase, project.id, defaultBranchId])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
@@ -346,8 +398,9 @@ export default function StudentLernzielePage() {
     if (sortBy === 'grade') arr.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
     else if (sortBy === 'thema') arr.sort((a, b) => (a.thema ?? '').localeCompare(b.thema ?? '', 'de'))
     else if (sortBy === 'favorites') arr.sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)))
+    else if (sortBy === 'sequence') return sortByCurriculumOrder(arr, connections)
     return arr
-  }, [displayed, sortBy, favorites])
+  }, [displayed, sortBy, favorites, connections])
 
   const allExpanded = sortedDisplayed.length > 0 && sortedDisplayed.every((t) => expandedIds.has(t.id))
   const toggleExpandAll = () => setExpandedIds(allExpanded ? new Set() : new Set(sortedDisplayed.map((t) => t.id)))
@@ -534,6 +587,7 @@ export default function StudentLernzielePage() {
                 <option value="grade">Klassenstufe</option>
                 <option value="thema">Thema</option>
                 <option value="favorites">Favoriten zuerst</option>
+                <option value="sequence">Reihenfolge im Lehrplan</option>
               </select>
               <button className={`chip-btn${viewMode === 'list' ? ' active' : ''}`} onClick={() => setViewMode(viewMode === 'cards' ? 'list' : 'cards')}>
                 {viewMode === 'cards' ? 'Listenansicht' : 'Kartenansicht'}
@@ -574,7 +628,6 @@ export default function StudentLernzielePage() {
                   onToggleFavorite={onToggleFavorite}
                   isExpanded={expandedIds.has(t.id)}
                   onToggleExpand={onToggleExpand}
-                  projectSlug={project.slug}
                   supabase={supabase}
                   compact={viewMode === 'list'}
                 />
@@ -599,7 +652,6 @@ function LernzielCard({
   onToggleFavorite,
   isExpanded,
   onToggleExpand,
-  projectSlug,
   supabase,
   compact,
 }: {
@@ -614,7 +666,6 @@ function LernzielCard({
   onToggleFavorite: (id: string) => void
   isExpanded: boolean
   onToggleExpand: (id: string) => void
-  projectSlug: string
   supabase: ProjectOutletContext['supabase']
   compact: boolean
 }) {
@@ -656,8 +707,20 @@ function LernzielCard({
       style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined }}
       onClick={() => onToggleExpand(topic.id)}
     >
-      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+        <div className="row" style={{ gap: 6, flexWrap: 'wrap', minWidth: 0 }}>
+          <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
+          {/* Real feedback fd88f0cd (Susan, 2026-10-02): "the listing of
+              topic - subtopic fits better above the learning goal title,
+              next to the grade, and maybe highlight the topic-subtopic some
+              more, e.g. by colored tag" -- moved out of the plain muted line
+              below the title into a colored chip next to the grade chip. */}
+          {(topic.thema || topic.unterthema) && (
+            <span className="chip chip-thema" title={[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}>
+              {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
+            </span>
+          )}
+        </div>
         <button
           className="btn-linklike"
           aria-label="Favorit"
@@ -667,11 +730,6 @@ function LernzielCard({
         </button>
       </div>
       <strong style={{ display: 'block', marginTop: 6 }}>{topic.title}</strong>
-      {(topic.thema || topic.unterthema) && (
-        <p className="muted" style={{ fontSize: 11, marginTop: 2, marginBottom: 0 }}>
-          {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
-        </p>
-      )}
       {topic.description && <p className="muted" style={{ fontSize: 12.5 }}>{topic.description}</p>}
       {entries.length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
@@ -690,7 +748,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} content={content} projectSlug={projectSlug} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
+          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
         </div>
       )}
     </div>
@@ -700,7 +758,6 @@ function LernzielCard({
 function LernzielCardDetail({
   objectId,
   content,
-  projectSlug,
   supabase,
   entries,
   bkLabels,
@@ -710,7 +767,6 @@ function LernzielCardDetail({
 }: {
   objectId: string
   content: unknown
-  projectSlug: string
   supabase: ProjectOutletContext['supabase']
   entries: BkbEntry[]
   bkLabels: Record<string, string>
@@ -718,27 +774,14 @@ function LernzielCardDetail({
   rawIdToGroupKey: Map<string, string>
   conceptElementsById: Map<string, SchemaElement>
 }) {
-  const navigate = useNavigate()
-  const [connections, setConnections] = useState<ResolvedConnection[] | null>(null)
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
-  // Real feedback 2026-10-01 (Susan): the curriculum-ordering info below
-  // ("Davor"/"Danach") isn't that important right now, and should be
-  // minimized -- collapsed by default and moved after the new Didaktische
-  // Strategien section, rather than removed (the data is still real and
-  // worth having one click away).
-  const [orderOpen, setOrderOpen] = useState(false)
 
   // Fetched once per expand (this component only mounts while the card is
   // expanded) -- no separate re-fetch-on-filter-change logic needed, unlike
   // the old URL-objectId-driven drawer.
   useEffect(() => {
-    getAssertedConnections(supabase, objectId).then(setConnections)
     getThreadStationsForTopic(supabase, objectId).then(setStations)
   }, [supabase, objectId])
-
-  const before = (connections ?? []).filter((c) => c.direction === 'incoming')
-  const after = (connections ?? []).filter((c) => c.direction === 'outgoing')
-  const hasOrder = before.length > 0 || after.length > 0
 
   return (
     <div>
@@ -748,33 +791,7 @@ function LernzielCardDetail({
 
       {stations && stations.length > 0 && stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
 
-      {hasOrder && (
-        <section style={{ marginBottom: 18 }}>
-          <button className="btn btn-mini" onClick={() => setOrderOpen((v) => !v)}>
-            {orderOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            {orderOpen ? 'Reihenfolge im Lehrplan ausblenden' : 'Reihenfolge im Lehrplan anzeigen'}
-          </button>
-          {orderOpen && (
-            <div style={{ marginTop: 10 }}>
-              <p className="muted" style={{ marginTop: 0, fontSize: 12.5 }}>So ordnet der Lehrplan selbst diese Lernziele an.</p>
-              {before.map((c) => (
-                <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
-                  <span className="muted" style={{ fontSize: 12 }}>Davor</span>
-                  <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
-                </button>
-              ))}
-              {after.map((c) => (
-                <button key={c.connection.id} className="conn-line conn-asserted" style={{ width: '100%', textAlign: 'left' }} onClick={() => navigate(`/dashboard/${projectSlug}/${c.other.id}`)}>
-                  <span className="muted" style={{ fontSize: 12 }}>Danach</span>
-                  <span className="row" style={{ justifyContent: 'space-between' }}><strong>{c.other.title}</strong><ArrowRight size={13} /></span>
-                </button>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {connections?.length === 0 && stations?.length === 0 && entries.length === 0 && (
+      {stations?.length === 0 && entries.length === 0 && (
         <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>
       )}
     </div>

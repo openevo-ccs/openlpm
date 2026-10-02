@@ -54,6 +54,13 @@ export default function ProjectSwitcherPage() {
   const [visibleCurations, setVisibleCurations] = useState<Set<Curation>>(
     new Set(['human-curated', 'synthetic-theoretical'])
   )
+  // Real feedback 4dee2e08 (Dustin, 2026-10-02): "add 'Curriculum
+  // Repositories' toggle option" -- the Curriculum Repositories frame below
+  // was deliberately exempted from the human-curated/synthetic-theoretical
+  // filter (feedback 8e9545c6, see repoTopLevel below), but that left it with
+  // no toggle of its own at all. On by default, same convention as the two
+  // curation checkboxes.
+  const [showRepos, setShowRepos] = useState(true)
 
   useEffect(() => {
     getUserProjects(supabase).then(setMemberships)
@@ -156,6 +163,10 @@ export default function ProjectSwitcherPage() {
             {CURATION_LABEL[c]}
           </label>
         ))}
+        <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Reference curriculum documents for a country or region.">
+          <input type="checkbox" checked={showRepos} onChange={() => setShowRepos((v) => !v)} />
+          Curriculum Repositories
+        </label>
       </div>
 
       {entries.length === 0 ? (
@@ -166,7 +177,7 @@ export default function ProjectSwitcherPage() {
         </div>
       ) : (
         <>
-          {repoTopLevel.length > 0 && (
+          {showRepos && repoTopLevel.length > 0 && (
             <div className="frame">
               <h2 className="row" style={{ fontSize: 16, gap: 6 }}><Library size={16} style={{ color: 'var(--text-muted)' }} />Curriculum Repositories</h2>
               <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
