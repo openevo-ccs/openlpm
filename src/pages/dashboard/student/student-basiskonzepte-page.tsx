@@ -6,6 +6,7 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { ancestorAtDepth, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
@@ -317,7 +318,8 @@ interface GraphEdgeDatum {
   target: string
   color: string
   weight: number
-  kind: 'hierarchy' | 'relevance'
+  kind: 'hierarchy' | 'relevance' | 'relation'
+  tooltip?: string
 }
 interface NetzInsightUk { id: string; label: string; rootLabel: string; rootIdx: number; count: number }
 interface NetzInsightLz { id: string; title: string; rootCount: number; rootLabels: string[] }
@@ -348,6 +350,11 @@ function NetzTab({
   const [showUk, setShowUk] = useState(true)
   const [showUk2, setShowUk2] = useState(false)
   const [showLz, setShowLz] = useState(true)
+  // Real feedback e7333af2 (Susan, 2026-10-02): named, directed links
+  // between any two concepts, not just the parent/child tree -- off by
+  // default so a project with none yet doesn't add visual noise.
+  const [showRelations, setShowRelations] = useState(false)
+  const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [sizeBy, setSizeBy] = useState<SizeBy>('count')
   const [density, setDensity] = useState<Density>('kompakt')
   const [highlightId, setHighlightId] = useState<string | null>(null)
@@ -382,6 +389,12 @@ function NetzTab({
 
   useEffect(() => {
     listAcceptedConnections(supabase, project.id).then(setConnections)
+  }, [supabase, project.id])
+
+  const reloadRelations = () => listConceptRelations(supabase, project.id).then(setRelations)
+  useEffect(() => {
+    reloadRelations()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id])
 
   useEffect(() => {
@@ -735,6 +748,22 @@ function NetzTab({
         edges.push({ id: `r-${i}`, source: e.targetId, target: e.topicId, color: rootColor(e.rootId), weight: e.weight, kind: 'relevance' })
       })
     }
+    // Real feedback e7333af2 (Susan, 2026-10-02): named, directed links
+    // between any two concepts. Only rendered when BOTH endpoints are
+    // already positioned (i.e. currently visible under the Unterkonzepte/
+    // Feinere toggles) -- same "don't invent a node that isn't otherwise
+    // shown" rule the rest of this graph already follows.
+    if (showRelations) {
+      for (const rel of relations) {
+        const fromPos = nodePositions.get(rel.from_element_id)
+        const toPos = nodePositions.get(rel.to_element_id)
+        if (!fromPos || !toPos) continue
+        edges.push({
+          id: `rel-${rel.id}`, source: rel.from_element_id, target: rel.to_element_id,
+          color: cssVar('--series-a', '#006c66'), weight: 1, kind: 'relation', tooltip: rel.relation_type,
+        })
+      }
+    }
 
     // ---- Insights ----
     const topUkByCount: NetzInsightUk[] = usedUkIds
@@ -770,7 +799,7 @@ function NetzTab({
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
     return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, sizeBy, density, containerWidth])
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, density, containerWidth])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
@@ -778,7 +807,7 @@ function NetzTab({
 
     const elements: ElementDefinition[] = [
       ...model.nodes.map((n) => ({ data: { id: n.id, label: n.label, color: n.color, size: n.size, opacity: n.opacity, kind: n.kind, tooltip: n.tooltip }, position: { x: n.x, y: n.y } })),
-      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind } })),
+      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '' } })),
     ]
 
     const cy = cytoscape({
@@ -842,6 +871,26 @@ function NetzTab({
           selector: 'edge[kind="hierarchy"]',
           style: { width: 1, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 0.35, 'line-style': 'dashed' } as any,
         },
+        {
+          // Real feedback e7333af2 (Susan, 2026-10-02): a named, directed
+          // cross-link -- solid and arrowed, unlike the dashed hierarchy
+          // lines and the thin relevance lines, so it visually reads as its
+          // own real category of connection rather than either of those.
+          selector: 'edge[kind="relation"]',
+          style: {
+            width: 2, 'line-color': 'data(color)', 'target-arrow-color': 'data(color)', 'curve-style': 'bezier',
+            'target-arrow-shape': 'triangle', 'arrow-scale': 1.1, opacity: 0.75,
+          } as any,
+        },
+        {
+          selector: 'edge.hover-label',
+          style: {
+            label: 'data(tooltip)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1,
+            'text-background-padding': '4px', 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc'),
+            'text-wrap': 'wrap', 'text-max-width': '160px', 'text-rotation': 'autorotate',
+          } as any,
+        },
         { selector: '.dimmed', style: { opacity: 0.08 } },
       ],
     })
@@ -858,6 +907,8 @@ function NetzTab({
       if (containerRef.current) containerRef.current.style.cursor = ''
       evt.target.removeClass('hover-label')
     })
+    cy.on('mouseover', 'edge[kind="relation"]', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'edge[kind="relation"]', (evt) => evt.target.removeClass('hover-label'))
     return () => { cy.destroy(); cyRef.current = null }
   }, [model, project.slug, navigate])
 
@@ -918,6 +969,7 @@ function NetzTab({
           <button className={`chip-btn${showUk ? ' active' : ''}`} onClick={() => setShowUk((v) => !v)}>Unterkonzepte</button>
           <button className={`chip-btn${showUk2 ? ' active' : ''}`} disabled={!showUk} style={{ opacity: showUk ? 1 : 0.45 }} onClick={() => setShowUk2((v) => !v)}>Feinere Unterkonzepte</button>
           <button className={`chip-btn${showLz ? ' active' : ''}`} onClick={() => setShowLz((v) => !v)}>Lernziele</button>
+          <button className={`chip-btn${showRelations ? ' active' : ''}`} onClick={() => setShowRelations((v) => !v)}>Querverbindungen</button>
         </div>
         <div className="netz-control-group">
           <span className="muted" style={{ fontSize: 11 }}>Größe nach:</span>
@@ -946,6 +998,18 @@ function NetzTab({
         {showLz && ', dem sie wirklich zugeordnet sind — viele Lernziele gehören zu mehreren Konzepten zugleich, deshalb kreuzen manche Linien.'}
         {' '}Dickere, kräftigere Linien = höhere bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
       </p>
+
+      {showRelations && (
+        <RelationPanel
+          supabase={supabase}
+          projectId={project.id}
+          highlightId={highlightId}
+          conceptElementsById={conceptElementsById}
+          rootConcepts={rootConcepts}
+          relations={relations}
+          onChanged={reloadRelations}
+        />
+      )}
 
       {(model && (model.topUkByCount.length > 0 || model.mostCrossCutting.length > 0)) && (
         <div className="netz-insights">
@@ -1033,6 +1097,127 @@ function NetzTab({
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+// Real feedback e7333af2 (Susan, 2026-10-02): create/review named, directed
+// links between any two concepts. Tap a concept in the graph above (sets
+// highlightId) to open the "create a link from this concept" form; every
+// relation touching the tapped concept is listed below it with a way to
+// remove it. A plain <select>, not a click-two-nodes graph gesture -- more
+// reliable to build correctly, and 125 real concepts is navigable with
+// optgroups by root.
+function RelationPanel({
+  supabase,
+  projectId,
+  highlightId,
+  conceptElementsById,
+  rootConcepts,
+  relations,
+  onChanged,
+}: {
+  supabase: ProjectOutletContext['supabase']
+  projectId: string
+  highlightId: string | null
+  conceptElementsById: Map<string, SchemaElement>
+  rootConcepts: SchemaElement[]
+  relations: ConceptRelation[]
+  onChanged: () => void
+}) {
+  const [targetId, setTargetId] = useState('')
+  const [label, setLabel] = useState('')
+  const [reverse, setReverse] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    setTargetId('')
+    setLabel('')
+    setReverse(false)
+  }, [highlightId])
+
+  if (!highlightId) {
+    return <p className="muted" style={{ fontSize: 12.5, marginTop: -4 }}>Ein Basiskonzept oder Unterkonzept antippen, um eine Querverbindung zu erstellen.</p>
+  }
+  const highlighted = conceptElementsById.get(highlightId)
+  if (!highlighted) return null
+
+  // One option per real concept except the highlighted one itself, grouped
+  // by root the same way the Lernziele sidebar's Basiskonzepte filter is --
+  // a flat 125-item list would be unusable otherwise.
+  const byRoot = new Map<string, SchemaElement[]>()
+  for (const el of conceptElementsById.values()) {
+    if (el.id === highlightId) continue
+    const root = ancestorAtDepth(el.id, 0, conceptElementsById) ?? el
+    if (!byRoot.has(root.id)) byRoot.set(root.id, [])
+    byRoot.get(root.id)!.push(el)
+  }
+
+  const touching = relations.filter((r) => r.from_element_id === highlightId || r.to_element_id === highlightId)
+
+  const submit = async () => {
+    if (!targetId || !label.trim()) return
+    setSaving(true)
+    const [fromId, toId] = reverse ? [targetId, highlightId] : [highlightId, targetId]
+    await createConceptRelation(supabase, projectId, fromId, toId, label.trim())
+    setSaving(false)
+    setTargetId('')
+    setLabel('')
+    onChanged()
+  }
+
+  const remove = async (id: string) => {
+    await deleteConceptRelation(supabase, id)
+    onChanged()
+  }
+
+  return (
+    <div className="card" style={{ marginTop: -4, marginBottom: 16 }}>
+      <strong style={{ fontSize: 13 }}>Querverbindung von {highlighted.label}</strong>
+      <div className="row" style={{ gap: 8, marginTop: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+        <button
+          type="button"
+          className="chip-btn"
+          title="Richtung umkehren"
+          onClick={() => setReverse((v) => !v)}
+          style={{ fontFamily: 'monospace' }}
+        >
+          {reverse ? '←' : '→'}
+        </button>
+        <select value={targetId} onChange={(e) => setTargetId(e.target.value)} style={{ maxWidth: 260 }}>
+          <option value="">Konzept wählen…</option>
+          {rootConcepts.map((root) => (
+            <optgroup key={root.id} label={root.label}>
+              {(byRoot.get(root.id) ?? []).map((el) => (
+                <option key={el.id} value={el.id}>{el.label}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <input
+          type="text"
+          placeholder="Art der Verbindung (z. B. „ist ein Mechanismus von“)"
+          value={label}
+          onChange={(e) => setLabel(e.target.value)}
+          style={{ minWidth: 220, flex: 1 }}
+        />
+        <button className="btn btn-mini" disabled={!targetId || !label.trim() || saving} onClick={submit}>Verknüpfen</button>
+      </div>
+
+      {touching.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          {touching.map((r) => {
+            const outgoing = r.from_element_id === highlightId
+            const other = conceptElementsById.get(outgoing ? r.to_element_id : r.from_element_id)
+            return (
+              <div key={r.id} className="row" style={{ justifyContent: 'space-between', fontSize: 12.5, padding: '3px 0' }}>
+                <span>{outgoing ? '→' : '←'} <strong>{r.relation_type}</strong> {other?.label ?? '?'}</span>
+                <button className="btn-linklike" aria-label="Entfernen" onClick={() => remove(r.id)}>✕</button>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
