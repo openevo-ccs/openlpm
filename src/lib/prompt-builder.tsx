@@ -1,3 +1,4 @@
+import { Star } from 'lucide-react'
 import type { Database } from './supabase/database.types'
 import type { PromptOptionLists, PromptTemplateLibraryRow, SectionLabels } from './supabase/prompt-libraries'
 import { bkEntries, type BkGroup } from './supabase/basiskonzepte'
@@ -152,14 +153,71 @@ export function toggleInList(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
 }
 
-export function CheckGroup({ options, selected, onToggle }: { options: string[]; selected: string[]; onToggle: (v: string) => void }) {
+// favoritedMethods/onToggleFavoriteMethod are optional -- only the Methods
+// list (real feedback 7b32d01c) passes them; every other CheckGroup call
+// (differentiation/assessment/kontext/output_types) renders exactly as
+// before.
+export function CheckGroup({
+  options,
+  selected,
+  onToggle,
+  favoritedMethods,
+  onToggleFavoriteMethod,
+}: {
+  options: string[]
+  selected: string[]
+  onToggle: (v: string) => void
+  favoritedMethods?: Set<string>
+  onToggleFavoriteMethod?: (v: string) => void
+}) {
   return (
     <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
       {options.map((o) => (
         <label key={o} className="row" style={{ gap: 4, fontSize: 12 }}>
           <input type="checkbox" checked={selected.includes(o)} onChange={() => onToggle(o)} />
           {o}
+          {onToggleFavoriteMethod && (
+            <button
+              type="button"
+              className="btn-linklike"
+              aria-label="Favorite method"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteMethod(o) }}
+              style={{ padding: 0, display: 'inline-flex' }}
+            >
+              <Star size={11} fill={favoritedMethods?.has(o) ? 'var(--series-a, gold)' : 'none'} />
+            </button>
+          )}
         </label>
+      ))}
+    </div>
+  )
+}
+
+// Real feedback bdd96114 (Susan Hanisch, 2026-10-02): "the Anteil
+// Evolutionsbezug choice is better as selectable tags than drop down."
+// Single-select, like the dropdown it replaces -- "tags" here means the
+// chip-button look already used elsewhere in this app (e.g. the BK focus
+// chips), not a multi-select.
+export function PercentChips({
+  value,
+  onChange,
+  percentages,
+  notSpecifiedLabel,
+}: {
+  value: string
+  onChange: (v: string) => void
+  percentages: string[]
+  notSpecifiedLabel: string
+}) {
+  return (
+    <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+      <button type="button" className={`chip-btn${value === '' ? ' active' : ''}`} onClick={() => onChange('')}>
+        {notSpecifiedLabel}
+      </button>
+      {percentages.map((p) => (
+        <button key={p} type="button" className={`chip-btn${value === p ? ' active' : ''}`} onClick={() => onChange(p)}>
+          {p}%
+        </button>
       ))}
     </div>
   )

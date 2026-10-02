@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, Clock, FileText, GitBranch, Layers, Library, Lightbulb, MessageSquare, Network, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
+import { groupsSettings } from '@/lib/supabase/groups'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
@@ -232,6 +233,7 @@ export default function ProjectLayout() {
         { href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
         { href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
         { href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
+        ...(groupsSettings(project).enabled ? [{ href: `/dashboard/${slug}/groups`, icon: <Users size={14} />, label: 'Groups', end: false }] : []),
         { href: `/dashboard/${slug}/analytics`, icon: <BarChart3 size={14} />, label: 'Analytics' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
         { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
@@ -267,7 +269,7 @@ export default function ProjectLayout() {
             </button>
           </div>
           <h2 className="project-side-title" style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
-          <StudentNav slug={slug} />
+          <StudentNav slug={slug} groupsEnabled={groupsSettings(project).enabled} />
         </aside>
         <div className="project-main">
           {canManage && (

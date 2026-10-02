@@ -26,6 +26,8 @@ import DiscussionsPage from '@/pages/dashboard/discussions-page'
 import PortfoliosPage from '@/pages/dashboard/portfolios/portfolios-page'
 import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-page'
 import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
+import GroupsPage from '@/pages/dashboard/groups-page'
+import GroupDetailPage from '@/pages/dashboard/groups/group-detail-page'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
 import JoinPage from '@/pages/join-page'
@@ -127,6 +129,8 @@ export default function App() {
             <Route path="notebooks" element={<PortfoliosPage />} />
             <Route path="notebooks/:portfolioId" element={<PortfolioDetailPage />} />
             <Route path="notebooks/:portfolioId/prompt" element={<PromptGeneratorPage />} />
+            <Route path="groups" element={<GroupsPage />} />
+            <Route path="groups/:groupId" element={<GroupDetailPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

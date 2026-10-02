@@ -23,6 +23,7 @@ import {
 } from '@/lib/supabase/members'
 import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
 import { PROJECT_COLORS } from '@/lib/project-colors'
+import { groupsSettings, setGroupCreatorRoles, setGroupsEnabled } from '@/lib/supabase/groups'
 
 const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
 
@@ -46,6 +47,7 @@ export default function SettingsPage() {
 
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
       <MembersSection project={project} role={role} supabase={supabase} />
+      {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
     </div>
   )
@@ -556,6 +558,90 @@ function StudentViewSection({
         </p>
       )}
       {saved && <p className="muted" style={{ fontSize: 12, marginTop: 4, color: 'var(--good)' }}>Saved.</p>}
+    </div>
+  )
+}
+
+// ============================================================================
+// Groups (migration 075) -- real middle tier between "just me" and "the
+// whole project," decided with Dustin 2026-10-02 (see lab_manager's
+// docs/design-notes/openlpm-groups-feature-2026-10-02.md). Off by default.
+// Owner/maintainer can always create/delete a group regardless of this
+// setting -- the role picker below only EXTENDS that to other roles too,
+// same additive spirit as self-join rules alongside direct invites.
+// ============================================================================
+
+const EXTRA_CREATOR_ROLES: ProjectMemberRole[] = ['editor', 'reviewer', 'contributor', 'viewer']
+
+function GroupsSettingsSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const initial = groupsSettings(project)
+  const [enabled, setEnabled] = useState(initial.enabled)
+  const [creatorRoles, setCreatorRoles] = useState<ProjectMemberRole[]>(initial.creatorRoles)
+  const [busy, setBusy] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  const flashSaved = () => {
+    setSaved(true)
+    setTimeout(() => setSaved(false), 1500)
+  }
+
+  const toggleEnabled = async () => {
+    const next = !enabled
+    setEnabled(next)
+    setBusy(true)
+    const { error } = await setGroupsEnabled(supabase, project.id, next)
+    setBusy(false)
+    if (error) setEnabled(!next)
+    else flashSaved()
+  }
+
+  const toggleRole = async (r: ProjectMemberRole) => {
+    const next = creatorRoles.includes(r) ? creatorRoles.filter((x) => x !== r) : [...creatorRoles, r]
+    setCreatorRoles(next)
+    setBusy(true)
+    const { error } = await setGroupCreatorRoles(supabase, project.id, next)
+    setBusy(false)
+    if (error) setCreatorRoles(creatorRoles)
+    else flashSaved()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Users size={16} />Groups</h3>
+      <p className="muted">
+        Lets project members sort themselves into smaller teams within {project.name}. Each group gets its
+        own shared view built from its members&apos; own Notebooks or Favorites — off by default.
+      </p>
+      <label className="row" style={{ gap: 6, cursor: 'pointer' }}>
+        <input type="checkbox" checked={enabled} disabled={busy} onChange={toggleEnabled} />
+        Turn Groups on for this project
+      </label>
+      {enabled && (
+        <div style={{ marginTop: 10 }}>
+          <p className="muted" style={{ marginBottom: 4 }}>
+            Owners and maintainers can always create or delete a group. Who else may?
+          </p>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+            {EXTRA_CREATOR_ROLES.map((r) => (
+              <label key={r} className="row" style={{ gap: 4, fontSize: 12.5, cursor: 'pointer' }}>
+                <input type="checkbox" checked={creatorRoles.includes(r)} disabled={busy} onChange={() => toggleRole(r)} />
+                <span className="capitalize">{r}</span>
+              </label>
+            ))}
+          </div>
+          <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+            Any member, any role, can join a group once it exists — this only controls who may create or
+            delete one.
+          </p>
+        </div>
+      )}
+      {saved && <p className="muted" style={{ fontSize: 12, marginTop: 6, color: 'var(--good)' }}>Saved.</p>}
     </div>
   )
 }

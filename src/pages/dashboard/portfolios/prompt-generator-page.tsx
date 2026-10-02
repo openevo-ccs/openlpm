@@ -20,7 +20,8 @@ import {
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
 // generalized the same week (2026-09-18 ask): "think about how other users
@@ -68,6 +69,7 @@ export default function PromptGeneratorPage() {
   const [error, setError] = useState<string | null>(null)
   const [userId, setUserId] = useState<string>()
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
+  const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (!portfolioId) return
@@ -79,7 +81,19 @@ export default function PromptGeneratorPage() {
       if (lib) setCfg(defaultConfig(resolveOptionLists(lib.option_lists)))
     })
     getRootConcepts(supabase, project).then(setRootConcepts)
+    listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
   }, [supabase, portfolioId, project])
+
+  const onToggleFavoriteMethod = async (methodKey: string) => {
+    const isFav = favoriteMethods.has(methodKey)
+    setFavoriteMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(methodKey)
+      else next.add(methodKey)
+      return next
+    })
+    await toggleFavoriteMethod(supabase, methodKey, isFav)
+  }
 
   const options = useMemo(() => (library ? resolveOptionLists(library.option_lists) : null), [library])
   const labels = useMemo(() => (library ? resolveSectionLabels(library.section_labels) : null), [library])
@@ -168,16 +182,18 @@ export default function PromptGeneratorPage() {
                 <input type="number" min={1} value={cfg.stunden} onChange={(e) => setCfg({ ...cfg, stunden: Number(e.target.value) || 1 })} />
               </div>
               <div className="field" style={{ flex: 1 }}>
-                <label>Format</label>
+                <label>Format (min)</label>
                 <input value={cfg.stundenformat} onChange={(e) => setCfg({ ...cfg, stundenformat: e.target.value })} />
               </div>
             </div>
             <div className="field">
               <label>Evolution-content share</label>
-              <select value={cfg.anteilEvolutionsbezug} onChange={(e) => setCfg({ ...cfg, anteilEvolutionsbezug: e.target.value })}>
-                <option value="">Not specified</option>
-                {['5', '25', '50', '75', '100'].map((v) => <option key={v} value={v}>{v}%</option>)}
-              </select>
+              <PercentChips
+                value={cfg.anteilEvolutionsbezug}
+                onChange={(v) => setCfg({ ...cfg, anteilEvolutionsbezug: v })}
+                percentages={['5', '25', '50', '75', '100']}
+                notSpecifiedLabel="Not specified"
+              />
             </div>
 
             <h3>Concept focus & prior knowledge</h3>
@@ -219,7 +235,13 @@ export default function PromptGeneratorPage() {
             </div>
 
             <h3>Methods & differentiation</h3>
-            <CheckGroup options={options.methods} selected={cfg.methoden} onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })} />
+            <CheckGroup
+              options={options.methods}
+              selected={cfg.methoden}
+              onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })}
+              favoritedMethods={favoriteMethods}
+              onToggleFavoriteMethod={onToggleFavoriteMethod}
+            />
             <div style={{ marginTop: 8 }}>
               <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggleInList(cfg.differenzierung, v) })} />
             </div>

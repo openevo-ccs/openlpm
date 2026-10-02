@@ -667,6 +667,11 @@ function LernzielCard({
         </button>
       </div>
       <strong style={{ display: 'block', marginTop: 6 }}>{topic.title}</strong>
+      {(topic.thema || topic.unterthema) && (
+        <p className="muted" style={{ fontSize: 11, marginTop: 2, marginBottom: 0 }}>
+          {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
+        </p>
+      )}
       {topic.description && <p className="muted" style={{ fontSize: 12.5 }}>{topic.description}</p>}
       {entries.length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8, marginTop: 8 }}>

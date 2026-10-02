@@ -35,3 +35,39 @@ export async function toggleFavorite(supabase: Client, dataObjectId: string, isF
     .from('user_favorite_learning_goals')
     .insert({ user_id: user.id, data_object_id: dataObjectId })
 }
+
+// user_favorite_methods (migration 077) -- real feedback 7b32d01c (Susan
+// Hanisch, 2026-10-02): "add possibility to tag individual methods as
+// favorits." A teaching method (prompt-builder.tsx's options.methods) is a
+// plain string, not a row with an id, so method_key IS that string --
+// same convention as cfg.methoden already storing the exact option text.
+
+export async function listFavoriteMethodKeys(supabase: Client): Promise<Set<string>> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return new Set()
+  const { data } = await (supabase as any)
+    .from('user_favorite_methods')
+    .select('method_key')
+    .eq('user_id', user.id)
+  return new Set((data ?? []).map((r: { method_key: string }) => r.method_key))
+}
+
+export async function toggleFavoriteMethod(supabase: Client, methodKey: string, isFavorite: boolean) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: new Error('Sign in required') }
+
+  if (isFavorite) {
+    return (supabase as any)
+      .from('user_favorite_methods')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('method_key', methodKey)
+  }
+  return (supabase as any)
+    .from('user_favorite_methods')
+    .insert({ user_id: user.id, method_key: methodKey })
+}

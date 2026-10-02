@@ -3,6 +3,7 @@ import { Link, useOutletContext, useParams } from 'react-router-dom'
 import { ArrowLeft, Sparkles, Trash2, UserPlus } from 'lucide-react'
 import { addShare, getPortfolioGraph, listShares, removeShare, type PortfolioEdge, type PortfolioNode, type ShareGrant } from '@/lib/supabase/portfolios'
 import { PortfolioExplorer } from '@/components/portfolio-explorer'
+import { listGroupsWithMyMembership, type ProjectGroup } from '@/lib/supabase/groups'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -62,11 +63,97 @@ export default function PortfolioDetailPage() {
             <span className="chip capitalize">{portfolio.visibility}</span>
           </div>
         </div>
+        {portfolio.owner_id === userId && (
+          <VisibilityEditor
+            portfolio={portfolio}
+            project={project}
+            supabase={supabase}
+            onChanged={(next) => setPortfolio((p) => (p ? ({ ...p, ...next } as any) : p))}
+          />
+        )}
         {portfolio.visibility === 'shared' && portfolio.owner_id === userId && (
           <ShareManager portfolioId={portfolioId} supabase={supabase} />
         )}
       </div>
       <PortfolioExplorer portfolioId={portfolioId} projectId={project.id} initialNodes={graph.nodes} initialEdges={graph.edges} />
+    </div>
+  )
+}
+
+// Visibility (including the new 'group' tier, migration 076) was only ever
+// settable at creation time (portfolios-page.tsx's "New notebook" form) --
+// nothing let an owner change it on an EXISTING notebook, which would have
+// left 'group' visibility with no real way to use it on anything already
+// created. The group picker only lists groups the OWNER is themselves a
+// member of -- sharing "my notebook" with a group I'm not part of isn't a
+// real case here.
+function VisibilityEditor({
+  portfolio,
+  project,
+  supabase,
+  onChanged,
+}: {
+  portfolio: Portfolio
+  project: ProjectOutletContext['project']
+  supabase: ProjectOutletContext['supabase']
+  onChanged: (next: { visibility: string; group_id: string | null }) => void
+}) {
+  const current = portfolio as any as { visibility: string; group_id: string | null }
+  const [visibility, setVisibility] = useState(current.visibility)
+  const [groupId, setGroupId] = useState<string | null>(current.group_id ?? null)
+  const [myGroups, setMyGroups] = useState<{ group: ProjectGroup; membership: { id: string } | null }[] | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    listGroupsWithMyMembership(supabase, project.id).then(setMyGroups)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id])
+
+  const joinedGroups = (myGroups ?? []).filter((r) => r.membership).map((r) => r.group)
+
+  const save = async (nextVisibility: string, nextGroupId: string | null) => {
+    setBusy(true)
+    const patch: Record<string, unknown> = { visibility: nextVisibility }
+    patch.group_id = nextVisibility === 'group' ? nextGroupId : null
+    const { error } = await (supabase as any).from('portfolios').update(patch).eq('id', portfolio.id)
+    setBusy(false)
+    if (!error) onChanged({ visibility: nextVisibility, group_id: patch.group_id as string | null })
+  }
+
+  const onVisibilityChange = (v: string) => {
+    setVisibility(v)
+    if (v === 'group') {
+      const fallback = groupId ?? joinedGroups[0]?.id ?? null
+      setGroupId(fallback)
+      if (fallback) save(v, fallback)
+    } else {
+      save(v, null)
+    }
+  }
+
+  return (
+    <div className="row" style={{ gap: 10, marginTop: 8, flexWrap: 'wrap' }}>
+      <div className="field" style={{ marginBottom: 0 }}>
+        <label>Visibility</label>
+        <select value={visibility} disabled={busy} onChange={(e) => onVisibilityChange(e.target.value)}>
+          <option value="private">Private (just you)</option>
+          <option value="shared">Shared (explicit grants)</option>
+          <option value="project">Project (any member)</option>
+          <option value="group">Group</option>
+        </select>
+      </div>
+      {visibility === 'group' && (
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Which group</label>
+          {joinedGroups.length === 0 ? (
+            <p className="muted" style={{ fontSize: 12 }}>You&apos;re not in a group yet in this project.</p>
+          ) : (
+            <select value={groupId ?? ''} disabled={busy} onChange={(e) => { setGroupId(e.target.value); save('group', e.target.value) }}>
+              {joinedGroups.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
+            </select>
+          )}
+        </div>
+      )}
     </div>
   )
 }

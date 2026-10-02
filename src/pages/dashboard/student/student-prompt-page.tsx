@@ -5,9 +5,9 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
-import { listFavoriteIds } from '@/lib/supabase/favorites'
+import { listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
 import { ExperimentCard } from '../portfolios/prompt-generator-page'
 
@@ -54,6 +54,7 @@ export default function StudentPromptPage() {
   const [auswahlQuery, setAuswahlQuery] = useState('')
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
   const [fullById, setFullById] = useState<Map<string, DataObject>>(new Map())
   const [library, setLibrary] = useState<PromptTemplateLibraryRow | null | undefined>(undefined)
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
@@ -90,7 +91,19 @@ export default function StudentPromptPage() {
     if (!branchId) return
     listTopics(supabase, project.id, branchId).then(setTopics)
     listFavoriteIds(supabase).then(setFavorites)
+    listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
   }, [supabase, project.id, branchId])
+
+  const onToggleFavoriteMethod = async (methodKey: string) => {
+    const isFav = favoriteMethods.has(methodKey)
+    setFavoriteMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(methodKey)
+      else next.add(methodKey)
+      return next
+    })
+    await toggleFavoriteMethod(supabase, methodKey, isFav)
+  }
 
   const grades = useMemo(() => {
     const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
@@ -359,16 +372,18 @@ export default function StudentPromptPage() {
               <input type="number" min={1} value={cfg.stunden} onChange={(e) => setCfg({ ...cfg, stunden: Number(e.target.value) || 1 })} />
             </div>
             <div className="field" style={{ flex: 1 }}>
-              <label>Stundenformat</label>
+              <label>Stundenformat (min)</label>
               <input value={cfg.stundenformat} onChange={(e) => setCfg({ ...cfg, stundenformat: e.target.value })} />
             </div>
           </div>
           <div className="field">
             <label>Anteil Evolutionsbezug</label>
-            <select value={cfg.anteilEvolutionsbezug} onChange={(e) => setCfg({ ...cfg, anteilEvolutionsbezug: e.target.value })}>
-              <option value="">Nicht angegeben</option>
-              {['5', '25', '50', '75', '100'].map((v) => <option key={v} value={v}>{v}%</option>)}
-            </select>
+            <PercentChips
+              value={cfg.anteilEvolutionsbezug}
+              onChange={(v) => setCfg({ ...cfg, anteilEvolutionsbezug: v })}
+              percentages={['5', '25', '50', '75', '100']}
+              notSpecifiedLabel="Nicht angegeben"
+            />
           </div>
         </div>
 
@@ -419,7 +434,13 @@ export default function StudentPromptPage() {
 
         <div className="card student-prompt-card">
           <h3><span className="num">5</span>Didaktische Methoden</h3>
-          <CheckGroup options={options.methods} selected={cfg.methoden} onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })} />
+          <CheckGroup
+            options={options.methods}
+            selected={cfg.methoden}
+            onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })}
+            favoritedMethods={favoriteMethods}
+            onToggleFavoriteMethod={onToggleFavoriteMethod}
+          />
           <div style={{ marginTop: 8 }}>
             <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggleInList(cfg.differenzierung, v) })} />
           </div>
