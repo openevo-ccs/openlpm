@@ -573,20 +573,74 @@ function NetzTab({
       colCursor += colWidth
     })
 
-    // ---- Tier 1 (Unterkonzepte, toggleable) ----
+    // ---- Tier 1+ (Unterkonzepte, toggleable, one pass per real depth) ----
+    // Real bug fixed here (feedback 50a7983a, Susan 2026-10-02): every used
+    // sub-concept under a root, at ANY real depth (the real Thuringia data
+    // goes 3 deep -- checked directly: 46 depth-1, 71 depth-2, 2 depth-3
+    // elements), used to be flattened into one row and edged straight to
+    // the root -- "balancierende Selektion" (a real depth-2 child of
+    // depth-1 "natürliche Selektion") rendered as if it split directly off
+    // the root "Evolutive Entwicklung" instead of off its own real parent.
+    // Laid out one real depth at a time instead: each depth's nodes are
+    // grouped by their own real parent_id and placed with layoutTier under
+    // THAT parent's already-computed position, not the root's -- so the
+    // rendered tree matches the real conceptElementsById hierarchy.
+    // parentOfUk records each node's real immediate parent for the edges
+    // section below, so an edge is drawn to the true parent too.
     const ukRowHeight = UK_ROW_HEIGHT_BASE * scale
     let maxUkRows = 0
     const usedUkIds: string[] = []
+    const parentOfUk = new Map<string, string>()
+    // Zero-weight aggregate for a node that's only here as a real connector
+    // (nothing directly anchored to it, but a real descendant needs it to
+    // have somewhere true to attach) -- see the ancestor-closure note below.
+    const EMPTY_AGG = { topicIds: new Set<string>(), totalWeight: 0 }
     if (showUk) {
       rootConcepts.forEach((c) => {
-        const ukForThisRoot = Array.from(byTarget.entries())
+        const directlyUsed = Array.from(byTarget.entries())
           .filter(([id]) => id !== c.id && conceptElementsById.get(id) && ancestorAtDepth(id, 0, conceptElementsById)?.id === c.id)
-          .sort((a, b) => b[1].topicIds.size - a[1].topicIds.size)
-          .map(([id]) => ({ id }))
-        usedUkIds.push(...ukForThisRoot.map((u) => u.id))
-        const { positions, rows } = layoutTier(ukForThisRoot, nodePositions.get(c.id)!.x, BK_ROW_Y + UK_ROW_GAP * scale, (colWidthByRoot.get(c.id) ?? width / rootConcepts.length) - 16, ukRowHeight, 78)
-        for (const [id, pos] of positions) nodePositions.set(id, pos)
-        maxUkRows = Math.max(maxUkRows, rows)
+        // A directly-tagged depth-2+ node's own real parent might never have
+        // been tagged by any Lernziel itself -- without this closure, that
+        // parent (and so its whole subtree) would never get positioned, and
+        // the child would either vanish or (the original bug) get wired
+        // straight to the root. Walk every directly-used node's real
+        // ancestor chain up to (not including) the root, adding each as a
+        // real, positioned connector node with zero weight of its own.
+        const includedById = new Map<string, { topicIds: Set<string>; totalWeight: number }>(directlyUsed)
+        for (const [id] of directlyUsed) {
+          let cur = conceptElementsById.get(id)?.parent_id
+          while (cur && cur !== c.id && !includedById.has(cur)) {
+            includedById.set(cur, byTarget.get(cur) ?? EMPTY_AGG)
+            cur = conceptElementsById.get(cur)?.parent_id
+          }
+        }
+        const included = Array.from(includedById.entries())
+        const maxDepth = included.reduce((m, [id]) => Math.max(m, elementDepth(id, conceptElementsById)), 0)
+        const colWidth = (colWidthByRoot.get(c.id) ?? width / rootConcepts.length) - 16
+        let rowsSoFar = 0
+        for (let depth = 1; depth <= maxDepth; depth++) {
+          const atThisDepth = included.filter(([id]) => elementDepth(id, conceptElementsById) === depth)
+          if (atThisDepth.length === 0) continue
+          const byParent = new Map<string, [string, { topicIds: Set<string>; totalWeight: number }][]>()
+          for (const entry of atThisDepth) {
+            const parentId = depth === 1 ? c.id : (conceptElementsById.get(entry[0])?.parent_id ?? c.id)
+            if (!byParent.has(parentId)) byParent.set(parentId, [])
+            byParent.get(parentId)!.push(entry)
+          }
+          let rowsAtThisDepth = 0
+          for (const [parentId, entries] of byParent) {
+            const parentPos = nodePositions.get(parentId)
+            if (!parentPos) continue // parent is at a shallower depth that hasn't laid out yet this pass only if maxDepth tracking is wrong -- defensive, shouldn't trigger given the closure above
+            const items = entries.sort((a, b) => b[1].topicIds.size - a[1].topicIds.size).map(([id]) => ({ id }))
+            usedUkIds.push(...items.map((u) => u.id))
+            for (const item of items) parentOfUk.set(item.id, parentId)
+            const { positions, rows } = layoutTier(items, parentPos.x, BK_ROW_Y + UK_ROW_GAP * scale + rowsSoFar * ukRowHeight, colWidth, ukRowHeight, 78)
+            for (const [id, pos] of positions) nodePositions.set(id, pos)
+            rowsAtThisDepth = Math.max(rowsAtThisDepth, rows)
+          }
+          rowsSoFar += rowsAtThisDepth
+        }
+        maxUkRows = Math.max(maxUkRows, rowsSoFar)
       })
     }
 
@@ -633,8 +687,12 @@ function NetzTab({
       for (const ukId of usedUkIds) {
         const el = conceptElementsById.get(ukId)
         const pos = nodePositions.get(ukId)
-        const agg = byTarget.get(ukId)
-        if (!el || !pos || !agg) continue
+        // A real connector node (see the ancestor-closure note above) has
+        // no byTarget entry of its own -- rendered anyway, at the floor
+        // size, so its real children have a real node to visibly nest
+        // under instead of being dropped or misattached to the root.
+        const agg = byTarget.get(ukId) ?? EMPTY_AGG
+        if (!el || !pos) continue
         const root = ancestorAtDepth(ukId, 0, conceptElementsById)
         const metricVal = sizeBy === 'count' ? agg.topicIds.size : agg.totalWeight
         const beispiel = (el.metadata as any)?.beispiel as string | undefined
@@ -663,10 +721,13 @@ function NetzTab({
     // ---- Edges ----
     const edges: GraphEdgeDatum[] = []
     if (showUk) {
+      // Real fix for feedback 50a7983a: each hierarchy edge now goes to the
+      // node's REAL immediate parent (parentOfUk, built during layout above),
+      // not blindly to the root every time.
       for (const ukId of usedUkIds) {
-        const root = ancestorAtDepth(ukId, 0, conceptElementsById)
-        if (!root) continue
-        edges.push({ id: `h-${ukId}`, source: root.id, target: ukId, color: cssVar('--border', '#ccc'), weight: 1, kind: 'hierarchy' })
+        const parentId = parentOfUk.get(ukId)
+        if (!parentId) continue
+        edges.push({ id: `h-${ukId}`, source: parentId, target: ukId, color: cssVar('--border', '#ccc'), weight: 1, kind: 'hierarchy' })
       }
     }
     if (showLz) {
