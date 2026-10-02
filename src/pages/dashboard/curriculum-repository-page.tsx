@@ -222,13 +222,24 @@ function RecordDetail({
   )
 }
 
+// Real feedback 14a58a23 (Dustin, 2026-10-02): "text runs over the card
+// box" -- a real, sourced record's own URL field (e.g.
+// https://services.ebalbharati.in/copyright/pdfs/Revised_Policy_26_Oct_2020.pdf)
+// is one long unbroken token with no spaces, so `white-space: pre-wrap`
+// alone never had a place to break it -- it just overflowed the card's
+// right edge instead of wrapping. `overflowWrap: 'anywhere'` lets a long
+// token like a URL break wherever it needs to while leaving normal word
+// wrapping alone everywhere else -- applied to every real render path here
+// since any field (not just a URL) could contain one.
+const LONG_VALUE_STYLE = { overflowWrap: 'anywhere' as const }
+
 function FieldValue({ value }: { value: unknown }) {
   if (Array.isArray(value)) {
     if (value.every((v) => typeof v === 'string')) {
-      return <span style={{ fontSize: 13 }}>{value.join(', ')}</span>
+      return <span style={{ fontSize: 13, ...LONG_VALUE_STYLE }}>{value.join(', ')}</span>
     }
     return (
-      <div style={{ fontSize: 12 }}>
+      <div style={{ fontSize: 12, ...LONG_VALUE_STYLE }}>
         {value.map((v, i) => (
           <div key={i} style={{ padding: '3px 0 3px 8px', borderLeft: '2px solid var(--border)', marginBottom: 4 }}>
             {typeof v === 'object' && v !== null
@@ -241,12 +252,12 @@ function FieldValue({ value }: { value: unknown }) {
   }
   if (typeof value === 'object' && value !== null) {
     return (
-      <div style={{ fontSize: 12 }}>
+      <div style={{ fontSize: 12, ...LONG_VALUE_STYLE }}>
         {Object.entries(value as Record<string, unknown>).map(([k, v]) => v ? <div key={k}><em>{k}:</em> {String(v)}</div> : null)}
       </div>
     )
   }
-  return <span style={{ fontSize: 13, whiteSpace: 'pre-wrap' }}>{String(value)}</span>
+  return <span style={{ fontSize: 13, whiteSpace: 'pre-wrap', ...LONG_VALUE_STYLE }}>{String(value)}</span>
 }
 
 // Lets the viewer pick one of their OWN other projects (where they can
