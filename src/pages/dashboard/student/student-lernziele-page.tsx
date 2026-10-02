@@ -13,6 +13,7 @@ import {
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
@@ -43,22 +44,30 @@ function bandKeyForGrade(g: string): string {
 const RELEVANCE_LEVELS = [1, 2, 3] as const
 const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel', 3: 'hoch' }
 
-// The real, fixed didactic-method vocabulary and icon set from EvoMentor DE
-// v1.2's own source (apps/evomentor_de_v1_2.html, ALL_METHODEN/METHOD_ICON
-// constants) -- not invented here. Every Lernziel's own
-// content.didaktische_strategien.top3_methoden[].methode value is drawn
-// from this same list, so a filter built on it can't offer an option that
-// never matches anything real.
-const ALL_METHODEN = [
-  'Forschendes Lernen', 'Analogien und Vergleiche', 'Konzeptuelles Lernen', 'Diskussion',
-  'Narrativer Zugang', 'Modelle und Simulationen', 'Erfahrungsbasiertes Lernen', 'Digitale Medien',
-  'Einblick in Wissenschaftsgeschichte', 'Recherche', 'Kooperative Lernformen', 'Projektbasiertes Lernen',
-] as const
+// Real feedback ee644d5d (Susan, 2026-10-02): "I see you incorporated the
+// didactic methods I suggest here [the AI Prompt Generator's own methods
+// checklist], but they are not yet integrated in the learning goals window,
+// i.e. in the search function there." The root cause: the Prompt
+// Generator's own method vocabulary is real, live, database-driven data
+// (prompt_template_libraries.option_lists.methods, read via
+// getLibraryForProject/resolveOptionLists) -- it had already been expanded
+// and renamed there (15 real methods, including her more specific
+// "(bioethische) Diskussion" and "Erfahrungs-/handlungsorientiertes Lernen"
+// in place of the plainer originals, plus 4 genuinely new ones). This
+// filter was a SEPARATE, hand-copied, hardcoded list that was never updated
+// to match -- fetched live here from the same source instead, so the two
+// can't drift apart again. Falls back to whatever methods are actually
+// present in the real data if no library resolves for this project (same
+// "never offer an option that matches nothing real" spirit as the original
+// hardcoded list's own comment).
 const METHOD_ICON: Record<string, string> = {
-  'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩', 'Diskussion': '💬',
-  'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪', 'Erfahrungsbasiertes Lernen': '🖐️', 'Digitale Medien': '💻',
-  'Einblick in Wissenschaftsgeschichte': '🏛️', 'Recherche': '📚', 'Kooperative Lernformen': '👥', 'Projektbasiertes Lernen': '🛠️',
+  'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩',
+  '(bioethische) Diskussion': '💬', 'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪',
+  'Erfahrungs-/handlungsorientiertes Lernen': '🖐️', 'Digitale Medien': '💻', 'Recherche': '📚',
+  'Kooperative Lernformen': '👥', 'Projektbasiertes Lernen': '🛠️', 'Problembasiertes Lernen': '🧠',
+  'Außerschulische Lernorte': '🏞️', 'Stationenlernen': '📍', 'Gestalterische/kreative Aufgaben': '🎨',
 }
+const DEFAULT_METHOD_ICON = '•'
 
 /**
  * Fixed-size CSS dots for a relevance level, always in the given color --
@@ -243,6 +252,10 @@ export default function StudentLernzielePage() {
   // 'sequence' sort option now (feedback fba146fa); no longer rendered on
   // the card itself.
   const [connections, setConnections] = useState<{ from_object_id: string; to_object_id: string }[]>([])
+  // The real, live method vocabulary -- see METHOD_ICON's own comment above.
+  // Empty until the project's prompt library resolves; the filter falls
+  // back to whatever methods are actually tagged in the real data below.
+  const [libraryMethods, setLibraryMethods] = useState<string[]>([])
 
   useEffect(() => {
     setTopics(null)
@@ -251,6 +264,7 @@ export default function StudentLernzielePage() {
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
     listAcceptedConnections(supabase, project.id).then(setConnections)
+    getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
   }, [supabase, project.id, defaultBranchId])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
@@ -279,6 +293,16 @@ export default function StudentLernzielePage() {
     for (const content of contentById.values()) for (const e of bkEntries(content)) ids.add(e.basiskonzept_id)
     return Array.from(ids)
   }, [contentById])
+  const methodOptions = useMemo(() => {
+    if (libraryMethods.length > 0) return libraryMethods
+    const ids = new Set<string>()
+    for (const content of contentById.values()) {
+      for (const m of (content as any)?.didaktische_strategien?.top3_methoden ?? []) {
+        if (m?.methode) ids.add(m.methode)
+      }
+    }
+    return Array.from(ids).sort()
+  }, [libraryMethods, contentById])
   const bkLabels = useMemo(() => buildBkLabelMap(allBkIds, rootConcepts), [allBkIds, rootConcepts])
   // Real bug found live 2026-09-30, reported with a screenshot: the real
   // Thuringia data has more than one raw id spelling for the same
@@ -554,10 +578,10 @@ export default function StudentLernzielePage() {
 
           <p className="muted student-filter-label">DIDAKTISCHE METHODEN</p>
           <div className="student-concept-filter">
-            {ALL_METHODEN.map((m) => (
+            {methodOptions.map((m) => (
               <label key={m} className="row" style={{ gap: 6, fontSize: 12.5, cursor: 'pointer', marginBottom: 3 }}>
                 <input type="checkbox" checked={methodFilter.has(m)} onChange={() => toggleMethod(m)} />
-                <span aria-hidden="true">{METHOD_ICON[m]}</span>
+                <span aria-hidden="true">{METHOD_ICON[m] ?? DEFAULT_METHOD_ICON}</span>
                 <span>{m}</span>
               </label>
             ))}
