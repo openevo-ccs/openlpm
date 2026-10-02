@@ -1088,7 +1088,7 @@ function ProjectRow({
         <span>
           <Link to={`/dashboard/${project.slug}`}><strong>{project.name}</strong></Link>
           <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>{project.slug}</span>
-          {project.is_private && <span className="chip" style={{ marginLeft: 6 }}><Lock size={10} />Private</span>}
+          {project.is_private && <span className="chip chip-draft" style={{ marginLeft: 6 }}><Lock size={10} />Private</span>}
           {parentName && <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>Inside {parentName}</span>}
           <span className="muted" style={{ marginLeft: 6, fontSize: 12 }}>
             {memberCount} member{memberCount === 1 ? '' : 's'}
@@ -1256,7 +1256,7 @@ function JoinRulesAdminSection({
               <Link to={`/dashboard/${r.project.slug}`} className="muted" style={{ marginLeft: 6 }}>{r.project.name}</Link>
             </span>
             <span className="row">
-              <span className="chip capitalize">{r.role}</span>
+              <span className={`chip capitalize${r.role === 'owner' ? ' chip-progress' : ''}`}>{r.role}</span>
               <button className="btn btn-mini" onClick={() => remove(r)}><Trash2 size={11} />Remove</button>
             </span>
           </div>

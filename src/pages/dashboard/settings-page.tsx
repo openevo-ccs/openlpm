@@ -403,7 +403,7 @@ function JoinRulesSection({
                   {r.rule_type === 'domain' ? `Anyone @${r.value}` : r.value}
                 </span>
                 <span className="row">
-                  <span className="chip capitalize">{r.role}</span>
+                  <span className={`chip capitalize${r.role === 'owner' ? ' chip-progress' : ''}`}>{r.role}</span>
                   <button className="btn btn-mini" onClick={() => remove(r)}><Trash2 size={11} />Remove</button>
                 </span>
               </div>
