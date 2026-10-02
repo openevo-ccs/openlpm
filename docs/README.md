@@ -27,6 +27,10 @@ See [Level 3's closing section](architecture/3-full-reference.md#keeping-this-cu
 
 A second, complementary check goes further than route/table counts: [`self-model/manifest.json`](../self-model/manifest.json) states which real tables realize which named design decision (an RFC or a 2026-10-02-style feature), each tagged `implemented`, `proposed`, or `retired` — checked against `supabase/migrations` by a script kept in the `lab_manager` repo (`npm run self-model:check`). See [Level 3 § Status](architecture/3-full-reference.md#status-what-was-decided-whats-actually-built).
 
+## Pilots
+
+- **[Thuringia / University of Jena pilot](pilots/evomentor-thuringia-jena-pilot.md)** — a plain-language overview plus the technical trace of exactly which real curriculum documents went into this specific pilot and how, written for Susan Hanisch's team as much as for a future session. Also lays out what a proposed PDF-first comparison study would actually need, clearly separated from what's already built and live.
+
 ## Other documents in this folder
 
 - **[openevo-ccs-learning-loop.md](openevo-ccs-learning-loop.md)** — how OpenLPM and the broader OpenEvo CCS Lab ecosystem learn from each other. Not about OpenLPM's own architecture — see above for that.
