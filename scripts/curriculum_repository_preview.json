@@ -3548,7 +3548,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-ethik-biologie-mensch-tier-gap",
       "title": "Sachsen: 'Mensch und Tier' answered twice, years apart, with no cross-reference",
@@ -3605,7 +3605,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-geographie-biologie-population-gap",
       "title": "Sachsen: population thinking taught at the same grade band in two subjects, never connected",
@@ -3660,7 +3660,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-grw-geographie-incomplete-crossref",
       "title": "Sachsen: G/R/W does cross-reference Geographie's population content, but stops one grade band short",
@@ -3721,7 +3721,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-vs-sachsen-anhalt-demographic-transition-divergence",
       "title": "The identical named demographic-transition model, two grade-bands apart in neighboring states",
@@ -3776,7 +3776,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-thueringen-inverted-grade-placements",
       "title": "Th\u00fcringen inverts the pattern: latest 'human nature' unit, earliest population-thinking unit of any state checked",
@@ -3830,7 +3830,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-anhalt-grundsatzband-grain-confirmed",
       "title": "Sachsen-Anhalt's cross-reference mechanism is confirmed, at the system level, to operate only at subject-per-theme grain",
@@ -3877,7 +3877,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-three-state-hominisation-grade-divergence",
       "title": "Human-evolution content itself: Th\u00fcringen a full grade-band earlier than Sachsen and Sachsen-Anhalt",
@@ -3941,7 +3941,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-informatik-modellieren-convergence",
       "title": "All three states independently center Informatik on the same 'Modellieren' competency, despite differing on compulsory status and grade",
@@ -4002,7 +4002,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-sachsen-anhalt-biologie-misdirected-crossreference",
       "title": "Sachsen-Anhalt's cross-reference mechanism names Biologie as 'connected' to human-origins units, but never for the reason that matters",
@@ -4080,7 +4080,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-thueringen-sozialkunde-ethik-individuum-gap",
       "title": "Th\u00fcringen: Sozialkunde and Ethik ask overlapping nature-vs-nurture questions at the same grade level, unlinked, despite a real working cross-reference mechanism",
@@ -4137,7 +4137,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-gymnasium-only-scope-gap-schulart-tracks",
       "title": "Every state's Gymnasium curriculum has a parallel non-Gymnasium track this project had never read -- and one of them contains explicit human-phylogeny content",
@@ -4213,7 +4213,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-sachsen-oberschule-biologie-earlier-than-gym",
       "title": "Sachsen: Oberschule teaches human evolution a full grade earlier than Gymnasium, not later",
@@ -4269,7 +4269,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-sachsen-anhalt-sekundarschule-biologie-earlier-than-gym",
       "title": "Sachsen-Anhalt: Sekundarschule teaches human phylogeny a full grade-band earlier than Gymnasium",
@@ -4324,7 +4324,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-thueringen-regelschule-evolution-realschul-only",
       "title": "Th\u00fcringen: Regelschule's human-evolution content is guaranteed only for the Realschulabschluss track, not Hauptschulabschluss",
@@ -4389,7 +4389,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-sachsen-ethik-mensch-tier-restructured-not-shifted",
       "title": "Sachsen: Oberschule Ethik never asks Gymnasium's 'Unterschiede von Mensch und Tier' question -- it is restructured into environmental ethics, not moved in time",
@@ -4444,7 +4444,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-sachsen-oberschule-bio-ethik-working-crossref",
       "title": "Sachsen Oberschule: a real, reciprocal Biologie<->Ethik cross-reference confirmed working -- on a different question than the Gymnasium gap",
@@ -4497,7 +4497,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-geschichte-prehistory-track-aligned-three-states",
       "title": "Geschichte's prehistory content is grade-aligned across Gymnasium and non-Gymnasium tracks in all three states -- a methodological control on the Biologie divergence",
@@ -4561,7 +4561,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-thueringen-ethik-no-mensch-tier-unit",
       "title": "Th\u00fcringen Regelschule Ethik: the Kantian 'Was ist der Mensch?' thread never reaches the nature/culture question, in any grade through Klassenstufe 10",
@@ -4620,7 +4620,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-geografie-sachsen-oberschule-earlier-and-full",
       "title": "Sachsen Oberschule Geographie: the full demographic-transition-model content, a full year earlier than Gymnasium, and no thinner",
@@ -4676,7 +4676,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-geografie-sachsen-anhalt-sekundarschule-earlier",
       "title": "Sachsen-Anhalt Sekundarschule Geographie: Bev\u00f6lkerungsentwicklung in two touches, both at or before Gymnasium's placement",
@@ -4742,7 +4742,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-geografie-thueringen-thinner-unnamed",
       "title": "Th\u00fcringen Regelschule Geographie: population content exists at a comparable grade, but stays thinner and unnamed compared to Sachsen or Sachsen-Anhalt",
@@ -4799,7 +4799,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST, DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-nongym-sozialkunde-grw-no-human-origins-three-states",
       "title": "Sozialkunde/G-R-W's absence of human-origins content is confirmed across all three states' non-Gymnasium tracks, closing the last subject-coverage gap",
@@ -4864,7 +4864,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-informatik-mensch-gesellschaft-not-human-origins",
       "title": "Resolved: Th\u00fcringen's 'Informatik-Mensch-Gesellschaft' Wahlpflichtthema is technology-and-society history, not human-origins content",
@@ -4909,7 +4909,7 @@
     {
       "project_id": null,
       "record_type": "coherence-finding-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN, DE-ST",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-FINDING-informatik-modellieren-convergence-nongym-extension",
       "title": "The cross-state 'Modellieren' Informatik convergence extends to two more non-Gymnasium tracks",
@@ -5389,7 +5389,7 @@
     {
       "project_id": null,
       "record_type": "latent-connection-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-LATENT-sachsen-internationale-sicherheit-evolutionaeres-konfliktverhalten",
       "title": "Internationale Politik (Jgst. 11) <-> evolved intergroup cooperation/conflict and the security dilemma",
@@ -5462,7 +5462,7 @@
     {
       "project_id": null,
       "record_type": "latent-connection-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-LATENT-sachsen-wirtschaftsordnung-verhaltensoekonomik-fairness",
       "title": "Wirtschaft und Wirtschaftsordnung (Kl. 10) <-> evolved fairness/reciprocity psychology vs. the idealtypische homo-oeconomicus model",
@@ -5534,7 +5534,7 @@
     {
       "project_id": null,
       "record_type": "latent-connection-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-SN",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-LATENT-sachsen-institutionen-grosse-kooperation-nicht-verwandte",
       "title": "G/R/W's own foundational categories (Macht, Institutionen, Recht...) <-> evolved reliance on institutions for large-scale non-kin cooperation",
@@ -5826,7 +5826,7 @@
     {
       "project_id": null,
       "record_type": "synthetic-curriculum-redesign-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-SYNTHETIC-thueringen-biologie-informatik-information-processing-bridge",
       "title": "A Proposed Biologie/Informatik Bridge: Modeling the Hormone System as an Information-Processing System",
@@ -5890,7 +5890,7 @@
     {
       "project_id": null,
       "record_type": "synthetic-curriculum-redesign-record",
-      "jurisdiction": "DE",
+      "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-SYNTHETIC-thueringen-information-kommunikation-domain-pure-redesign",
       "title": "A DCR-Consonant Counterpart: Removing the Incidental Cross-Basiskonzept Threading From Information/Kommunikation",
@@ -7854,6 +7854,301 @@
       },
       "access_tier": "citation-only",
       "license_or_rights_note": null
+    }
+  ],
+  "india-lpm": [
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-ministry-of-education-india",
+      "title": "Ministry of Education, Government of India",
+      "content": {
+        "id": "INLP-ACTOR-ministry-of-education-india",
+        "slug": "ministry-of-education-india",
+        "label": "Ministry of Education, Government of India",
+        "actorType": "ministry",
+        "jurisdiction": "IN",
+        "role": "The central government ministry that NCERT and CBSE both operate under (as \"autonomous\" bodies, per NCERT's own description of its relationship to the Ministry). Oversees national implementation of the National Education Policy (NEP) 2020.\n",
+        "url": "https://dsel.education.gov.in/index.php/cbse",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Basic institutional-hierarchy fact (Ministry oversees NCERT/CBSE), confirmed via dsel.education.gov.in (an official Ministry of Education subdomain) and cross-checked against NCERT's and CBSE's own \"autonomous body\" self-descriptions.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-ncert",
+      "title": "National Council of Educational Research and Training (NCERT)",
+      "content": {
+        "id": "INLP-ACTOR-ncert",
+        "slug": "ncert",
+        "label": "National Council of Educational Research and Training (NCERT)",
+        "actorType": "autonomous-statutory-body",
+        "jurisdiction": "IN",
+        "legalForm": "registered society under the Societies Registration Act, 1860 (Act XXI) -- not a government department itself, though set up by the Government of India in 1961 and described as autonomous under the Ministry of Education",
+        "role": "Prepares the National Curriculum Framework (most recently NCF 2023, under NEP 2020, covering ages 3-18) and publishes India's standard national textbooks. Also actively asserts and enforces copyright over its own textbook and curriculum-framework text: its own state-adoption license agreement states \"The NCERT is the sole owner of copyright of the WORK\" and that copyright \"shall vest with the NCERT in perpetuity,\" and NCERT has publicly warned that unauthorized reproduction \"will face legal action under the Copyright Act 1957.\" This repo's own founding research found NCERT's legal-society status (rather than being a literal government department) leaves it a genuinely open question whether Copyright Act 1957 Section 2(k)'s \"government work\" provision applies to its output by plain statutory text -- see docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#2 for the unresolved-legal-question flag.\n",
+        "url": "https://ncert.nic.in",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The quoted license-agreement language (\"sole owner... in perpetuity\") was read directly from NCERT's own state-adoption license agreement PDF, not a secondary summary. The legal-form/registered-society fact is corroborated by three independent sources (Vajiram & Ravi, understandupsc.com, Wikipedia) in the research session, none of which is itself a primary NCERT document -- flagging that the legal-form claim rests on secondary characterization even though the license-text quote is primary.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1-2"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-cbse",
+      "title": "Central Board of Secondary Education (CBSE)",
+      "content": {
+        "id": "INLP-ACTOR-cbse",
+        "slug": "cbse",
+        "label": "Central Board of Secondary Education (CBSE)",
+        "actorType": "autonomous-statutory-body",
+        "jurisdiction": "IN",
+        "legalForm": "autonomous body registered under the Societies Registration Act, 1860, under the Ministry of Education -- not a government department itself",
+        "role": "Sets curricula/syllabi for its affiliated schools nationwide and administers board exams. Search-engine excerpts of CBSE's own curriculum PDFs (cbseacademic.nic.in) suggest they carry a reproduction-restriction notice similar in spirit to NCERT's, but this repo's founding session could not independently confirm that specific wording by reading a CBSE PDF directly -- treat the reproduction-notice claim as likely-but-unverified until a future session reads one directly.\n",
+        "url": "https://dsel.education.gov.in/index.php/cbse",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The basic institutional facts (autonomous society, sets national curricula, under Ministry of Education) are confirmed via dsel.education.gov.in (an official government page) and corroborated by Wikipedia. The specific reproduction-notice wording attributed to CBSE curriculum PDFs was found only via search-engine excerpt, not a PDF read directly this session -- see role field's own caveat.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1-3"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-ncert-license-agreement-perpetual-copyright",
+      "title": "NCERT's state-adoption license agreement asserts perpetual, sole copyright ownership",
+      "content": {
+        "id": "INLP-EVENT-ncert-license-agreement-perpetual-copyright",
+        "slug": "ncert-license-agreement-perpetual-copyright",
+        "label": "NCERT's state-adoption license agreement asserts perpetual, sole copyright ownership",
+        "jurisdiction": "IN",
+        "eventType": "licensing-policy-change",
+        "dateStart": "2019-01-01",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "NCERT's own template contract for licensing its textbooks to state textbook boards for adaptation/republication states verbatim: \"The NCERT is the sole owner of copyright of the WORK,\" confines resale to the licensed state only, requires a 5% royalty plus 12% GST, and states \"The Word 'Copyright' for the listed books... shall vest with the NCERT in perpetuity.\" This is the single clearest primary-source data point this repo's founding research found on NCERT's own asserted rights position over its curriculum text.\n",
+        "involvedActors": [
+          "INLP-ACTOR-ncert"
+        ],
+        "sourceUrl": "https://ncert.nic.in/pdf/announcement/otherannouncements/teachersandresearchers/agreement-2019.pdf",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "The quoted phrases here are from NCERT's own license/rights notice, quoted briefly to identify and describe that notice's terms -- not a reproduction of NCERT's curriculum content itself. This is the \"quoting a rights notice to describe it\" exception named in CONTRIBUTING.md, not a claim that NCERT's curriculum text itself may be excerpted at this tier.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Read directly from the actual PDF, not a summary. The exact publication/effective date of this specific template agreement is not stated on the document itself beyond the filename (\"agreement-2019.pdf\"); dateStart is set to 2019-01-01 with dateGranularity 'year' as an approximation from the filename, not a confirmed effective date -- treat as approximate.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "The quoted phrases here are from NCERT's own license/rights notice, quoted briefly to identify and describe that notice's terms -- not a reproduction of NCERT's curriculum content itself. This is the \"quoting a rights notice to describe it\" exception named in CONTRIBUTING.md, not a claim that NCERT's curriculum text itself may be excerpted at this tier.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-nroer-cc-by-sa-launch-2013",
+      "title": "NCERT/CIET launch NROER under CC BY-SA, later inactive",
+      "content": {
+        "id": "INLP-EVENT-nroer-cc-by-sa-launch-2013",
+        "slug": "nroer-cc-by-sa-launch-2013",
+        "label": "NCERT/CIET launch NROER under CC BY-SA, later inactive",
+        "jurisdiction": "IN",
+        "eventType": "licensing-policy-change",
+        "dateStart": "2013-08-14",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "NCERT/CIET launched the National Repository of Open Educational Resources (NROER) in August 2013, defaulting its hosted resources to a CC BY-SA license -- a real, if narrower, precedent for NCERT publishing under an open license, in real tension with the all-rights-reserved language in NCERT's own state-adoption agreement (see INLP-EVENT-ncert-license-agreement-perpetual-copyright). The repository appears now inactive; no precise retirement date was found. A follow-up review of Karnataka's KOER (see state/karnataka/local_policy/records/timeline.yaml) found that NROER's own hosting was itself incomplete -- several chapters missing -- even during its active period.\n",
+        "involvedActors": [
+          "INLP-ACTOR-ncert"
+        ],
+        "sourceUrl": "https://creativecommons.org/2013/08/14/india-launches-national-repository-of-open-educational-resources/",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Description is paraphrase of Creative Commons' own 2013 announcement and Wikipedia's NROER page, not a verbatim quotation from NCERT curriculum content.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "NROER's current \"inactive\" status and lack of a confirmed retirement date both come from Wikipedia's own NROER page, not an NCERT source -- flagged as secondary-source-derived for that specific claim even though the 2013 launch date/license itself is primary-source-confirmed via the Creative Commons announcement.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Description is paraphrase of Creative Commons' own 2013 announcement and Wikipedia's NROER page, not a verbatim quotation from NCERT curriculum content.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KA",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-dsert-karnataka",
+      "title": "Department of State Educational Research and Training (DSERT), Karnataka",
+      "content": {
+        "id": "INLP-ACTOR-dsert-karnataka",
+        "slug": "dsert-karnataka",
+        "label": "Department of State Educational Research and Training (DSERT), Karnataka",
+        "actorType": "state-education-board",
+        "jurisdiction": "IN-KA",
+        "role": "Karnataka's state curriculum-research body. Runs Karnataka Open Educational Resources (KOER), which licenses the state's own textbooks and curriculum materials under Creative Commons CC BY-SA 4.0 -- a real, checkable, already-open license, in direct contrast to NCERT's own all-rights-reserved default (see national_ccs_policy/records/institutional-actors.yaml, INLP-ACTOR-ncert) and to Maharashtra's fee-gated approach (see state/maharashtra/local_policy/records/institutional-actors.yaml, INLP-ACTOR-balbharati-maharashtra). Karnataka's DSERT has also set up its own curriculum-design expert bodies partly independent of national NCF/NEP 2020 content, reflecting India's constitutional \"Concurrent List\" status for education, which lets states diverge both in curriculum content and in licensing posture.\n",
+        "url": "https://karnatakaeducation.org.in/KOER/en/index.php/Text_Books",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The CC BY-SA 4.0 licensing claim and the \"hosted in full, unlike NROER\" comparison both come from a SpicyIP legal-scholarship piece (Dhonchak, 2021), corroborated by the KOER portal itself, which this repo's founding session viewed directly. The \"own curriculum design expert bodies\" / NEP-divergence claim comes from an ORF policy-analysis piece, a secondary source -- flagged as somewhat less certain than the licensing claim itself.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KA",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-karnataka-koer-cc-by-sa-license",
+      "title": "Karnataka's DSERT licenses KOER curriculum materials under CC BY-SA 4.0",
+      "content": {
+        "id": "INLP-EVENT-karnataka-koer-cc-by-sa-license",
+        "slug": "karnataka-koer-cc-by-sa-license",
+        "label": "Karnataka's DSERT licenses KOER curriculum materials under CC BY-SA 4.0",
+        "jurisdiction": "IN-KA",
+        "eventType": "licensing-policy-change",
+        "temporalStatus": "current-in-progress",
+        "description": "Karnataka's Department of State Educational Research and Training runs Karnataka Open Educational Resources (KOER), hosting the state's own textbooks and curriculum materials in full under an explicit Creative Commons CC BY-SA 4.0 license. A 2021 legal-scholarship review (SpicyIP, Dhonchak) found this more permissive than NCERT's own National Repository of Open Educational Resources, which hosted several chapters incomplete even during its active period.\n",
+        "involvedActors": [
+          "INLP-ACTOR-dsert-karnataka"
+        ],
+        "sourceUrl": "https://karnatakaeducation.org.in/KOER/en/index.php/Text_Books",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Description is this repo's own paraphrase of KOER's publicly-stated licensing terms, not a verbatim reproduction of KOER's actual curriculum text -- the underlying materials are themselves CC BY-SA 4.0, so a future record could reproduce them at a higher tier with that license cited directly as grounds, without needing the broader legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Corroborated across the KOER portal itself and a SpicyIP legal-scholarship piece (Dhonchak, 2021); no exact license-adoption date was found in either source, so dateStart is left unset rather than guessed.\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Description is this repo's own paraphrase of KOER's publicly-stated licensing terms, not a verbatim reproduction of KOER's actual curriculum text -- the underlying materials are themselves CC BY-SA 4.0, so a future record could reproduce them at a higher tier with that license cited directly as grounds, without needing the broader legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-MH",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-balbharati-maharashtra",
+      "title": "Maharashtra State Bureau of Textbook Production and Curriculum Research (Balbharati)",
+      "content": {
+        "id": "INLP-ACTOR-balbharati-maharashtra",
+        "slug": "balbharati-maharashtra",
+        "label": "Maharashtra State Bureau of Textbook Production and Curriculum Research (Balbharati)",
+        "actorType": "state-textbook-board",
+        "jurisdiction": "IN-MH",
+        "role": "Maharashtra's state textbook-publishing and curriculum-research bureau. Asserts copyright over its own textbooks and licenses third-party reproduction for a fee: a 2020 policy revision raised third-party publisher registration fees from Rs. 1,000 to Rs. 17,700, and drew public objection from the Association of Publishers and Distributors, who argued Balbharati should not be able to copyright material that is \"just compiled facts.\" Sits at the restrictive end of the state-to-state licensing spectrum this repo's founding research found -- contrast with Karnataka's DSERT (see state/karnataka/local_policy/records/institutional-actors.yaml, INLP-ACTOR-dsert-karnataka), which licenses equivalent material openly under CC BY-SA 4.0.\n",
+        "url": "https://services.ebalbharati.in/copyright/pdfs/Revised_Policy_26_Oct_2020.pdf",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The fee figures and the Revised Policy PDF were read directly. The Association of Publishers and Distributors' \"just compiled facts\" objection is corroborated by two independent secondary sources (SpicyIP's 2021 analysis, The Bridge Chronicle's news coverage of the dispute).\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-MH",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-balbharati-2020-fee-revision",
+      "title": "Balbharati revises third-party licensing fees, drawing public objection",
+      "content": {
+        "id": "INLP-EVENT-balbharati-2020-fee-revision",
+        "slug": "balbharati-2020-fee-revision",
+        "label": "Balbharati revises third-party licensing fees, drawing public objection",
+        "jurisdiction": "IN-MH",
+        "eventType": "licensing-policy-change",
+        "dateStart": "2020-10-26",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Maharashtra's Balbharati revised its copyright/licensing policy, raising third-party publisher registration fees from Rs. 1,000 to Rs. 17,700 -- a roughly seventeen-fold increase. The Association of Publishers and Distributors publicly objected, arguing Balbharati should not be able to copyright material that is \"just compiled facts,\" and separately objected to a reported Rs. 63,000 per-subject-per-standard-per-medium fee.\n",
+        "involvedActors": [
+          "INLP-ACTOR-balbharati-maharashtra"
+        ],
+        "sourceUrl": "https://services.ebalbharati.in/copyright/pdfs/Revised_Policy_26_Oct_2020.pdf",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "The one quoted phrase (\"just compiled facts\") is a third party's (APD's) public objection, quoted briefly for identification -- ordinary journalistic/commentary quotation, not a reproduction of Balbharati's own curriculum content. The fee figures themselves are factual/numeric, not copyrightable expression.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-09-30",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Date taken from the Revised Policy PDF's own filename (\"Revised_Policy_26_Oct_2020.pdf\"), read directly. The APD objection and the Rs. 63,000 figure are corroborated across two independent secondary sources (SpicyIP, The Bridge Chronicle).\n",
+          "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "The one quoted phrase (\"just compiled facts\") is a third party's (APD's) public objection, quoted briefly for identification -- ordinary journalistic/commentary quotation, not a reproduction of Balbharati's own curriculum content. The fee figures themselves are factual/numeric, not copyrightable expression.\n"
     }
   ]
 }

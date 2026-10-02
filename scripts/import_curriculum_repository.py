@@ -56,6 +56,21 @@ REPOS = {
         "project_name": "Germany Curriculum Repository",
         "region_tags": ["DE"],
         "default_jurisdiction": "DE",
+        # 2026-10-02: the 3 states with real, deep research (same 6 KoMet
+        # subjects checked in each, already directly compared against each
+        # other) get their own real sub-project, matching how New York
+        # already works -- a record whose inferred jurisdiction is EXACTLY
+        # one of these keys (a clean single-state tag, not a multi-state
+        # comparison) is routed there instead of staying on the flat
+        # national project. The other 13 states stay jurisdiction-tagged
+        # inside the national project for now (background depth only,
+        # per deutsche_lp/README.md) -- splitting them out is real future
+        # work, not attempted here.
+        "state_projects": {
+            "DE-SN": {"slug": "saxony-curriculum-repository", "name": "Saxony Curriculum Repository", "region_tags": ["DE-SN"]},
+            "DE-TH": {"slug": "thuringia-curriculum-repository", "name": "Thuringia Curriculum Repository", "region_tags": ["DE-TH"]},
+            "DE-ST": {"slug": "saxony-anhalt-curriculum-repository", "name": "Saxony-Anhalt Curriculum Repository", "region_tags": ["DE-ST"]},
+        },
     },
     "nys-lpm": {
         "path": LAB_ROOT / "nys_lp",  # same pending local rename as deutsche_lp
@@ -64,16 +79,22 @@ REPOS = {
         "region_tags": ["US-NY"],
         "default_jurisdiction": "US-NY",
     },
-}
-
-PARENT_PROJECT = {
-    "slug": "curriculum-repositories",
-    "name": "Curriculum Repositories",
-    "description": (
-        "Curated national/regional curriculum-policy source material, ported from "
-        "the deutsche-lpm/nys-lpm (and future india-lpm) sibling repos, browsable by "
-        "invited OpenLPM users and linkable from any LPM project's own content."
-    ),
+    "india-lpm": {
+        "path": LAB_ROOT / "india_lp",
+        "project_slug": "india-curriculum-repository",
+        "project_name": "India Curriculum Repository",
+        "region_tags": ["IN"],
+        "default_jurisdiction": "IN",
+        # Karnataka (confirmed CC BY-SA 4.0 -- safe to build out in real
+        # depth) and Maharashtra (restrictive -- deliberately kept thin,
+        # institutional-actor-level only) both get real sub-projects from
+        # day one, per Dustin's 2026-10-02 call -- showing the access-tier
+        # model actually doing its job side by side, not a gap to fix later.
+        "state_projects": {
+            "IN-KA": {"slug": "karnataka-curriculum-repository", "name": "Karnataka Curriculum Repository", "region_tags": ["IN-KA"]},
+            "IN-MH": {"slug": "maharashtra-curriculum-repository", "name": "Maharashtra Curriculum Repository", "region_tags": ["IN-MH"]},
+        },
+    },
 }
 
 GERMAN_STATE_ISO = {
@@ -83,6 +104,10 @@ GERMAN_STATE_ISO = {
     "nordrhein_westfalen": "DE-NW", "rheinland_pfalz": "DE-RP", "saarland": "DE-SL",
     "sachsen": "DE-SN", "sachsen-anhalt": "DE-ST", "schleswig_holstein": "DE-SH",
     "thuringia": "DE-TH",
+}
+
+INDIA_STATE_ISO = {
+    "karnataka": "IN-KA", "maharashtra": "IN-MH",
 }
 
 
@@ -102,13 +127,34 @@ def load_service_role_key():
 
 
 def infer_jurisdiction(record, file_path, default_jurisdiction):
-    if record.get("jurisdiction"):
-        return record["jurisdiction"]
-    scope = record.get("jurisdictionScope")
-    if isinstance(scope, list) and scope:
-        return ", ".join(scope)
-    if isinstance(scope, str) and scope:
-        return scope
+    # Collect every jurisdiction/jurisdictionScope tag found ANYWHERE in the
+    # record, not just a top-level field. This matters a lot in practice:
+    # coherence-finding/latent-connection/synthetic-curriculum-redesign
+    # records (deutsche_lp's richest, most distinctive content) carry no
+    # top-level jurisdiction field at all -- only per-grounding-object tags
+    # nested under `objects`/`groundedIn`-shaped arrays -- so the original
+    # top-level-only check silently fell through to `default_jurisdiction`
+    # ("DE") for every one of them, regardless of which state they were
+    # actually about. Reuses find_recursive, the same helper already used
+    # for accessTier/licenseOrRightsNote, for the same reason: a record is
+    # only correctly describable by what's really inside it, not by whether
+    # a tag happens to sit at the top level or several layers down.
+    found = set()
+    for key in ("jurisdiction", "jurisdictionScope"):
+        for value in find_recursive(record, key):
+            if isinstance(value, list):
+                found.update(v for v in value if isinstance(v, str) and v)
+            elif isinstance(value, str) and value:
+                found.add(value)
+    if found:
+        # A single distinct tag -> a genuine single-jurisdiction record,
+        # returned as-is. Two or more -> a genuine cross-jurisdiction
+        # comparison (e.g. a Sachsen/Sachsen-Anhalt/Thueringen three-way
+        # finding) -- joined, sorted for determinism, deliberately left
+        # unable to exact-match any single state_projects key, so it stays
+        # on the national project rather than being misfiled under just one
+        # of the states it's actually comparing.
+        return ", ".join(sorted(found))
     parts = file_path.parts
     if "land" in parts:
         state = parts[parts.index("land") + 1]
@@ -118,6 +164,8 @@ def infer_jurisdiction(record, file_path, default_jurisdiction):
         state = parts[parts.index("state") + 1]
         if state == "ny":
             return "US-NY"
+        if state in INDIA_STATE_ISO:
+            return INDIA_STATE_ISO[state]
     return default_jurisdiction
 
 
@@ -220,6 +268,10 @@ def summarize(by_repo):
             by_type[r["record_type"]] += 1
         for t, n in sorted(by_type.items()):
             print(f"  {t:35s} {n}")
+        jur_counts = {}
+        for r in records:
+            jur_counts[r["jurisdiction"]] = jur_counts.get(r["jurisdiction"], 0) + 1
+        print(f"  jurisdictions: {dict(sorted(jur_counts.items(), key=lambda kv: -kv[1]))}")
         tier_counts = {}
         for r in records:
             tier_counts[r["access_tier"]] = tier_counts.get(r["access_tier"], 0) + 1
@@ -256,6 +308,19 @@ def get_or_create_project(key, slug, fields, owner_user_id):
     return created[0]["id"]
 
 
+def upsert_records(key, records):
+    CHUNK = 200
+    for i in range(0, len(records), CHUNK):
+        chunk = records[i:i + CHUNK]
+        rest(
+            "POST", "curriculum_repository_records", key,
+            headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
+            params={"on_conflict": "source_repo,source_record_id"},
+            json=chunk,
+        )
+        print(f"  upserted {i + len(chunk)}/{len(records)}")
+
+
 def apply_import(by_repo, owner_email):
     key = load_service_role_key()
     owner = rest("GET", f"users?email=eq.{owner_email}&select=id", key)
@@ -263,30 +328,20 @@ def apply_import(by_repo, owner_email):
         sys.exit(f"No OpenLPM user found with email {owner_email} -- create/confirm the account first.")
     owner_id = owner[0]["id"]
 
-    parent_id = get_or_create_project(
-        key, PARENT_PROJECT["slug"], key_fields := {
-            "name": PARENT_PROJECT["name"],
-            "description": PARENT_PROJECT["description"],
-            "epistemic_status": "field-validated-curriculum",
-            "epistemic_status_note": "Real, sourced curriculum-policy material; individual records carry their own verificationStatus/review_status for finer-grained trust.",
-            "is_private": True,
-            "focus_type": "regional",
-            # migration 072 -- marks this as a Curriculum Repository rather
-            # than an ordinary LPM project, so it gets the reduced sidebar
-            # and its own section in both project listings. Set here so a
-            # brand-new repository (e.g. a future india-curriculum-repository)
-            # is tagged correctly from creation, with no manual DB fix-up
-            # needed the way 067's constraint fix was.
-            "project_kind": "curriculum-repository",
-        }, owner_id,
-    )
-    print(f"Parent project 'Curriculum Repositories': {parent_id}")
-
+    # 2026-10-02: no more shared "Curriculum Repositories" hub project --
+    # migration 081 already retired that (feedback 283570ae: nations are
+    # real top-level entries, states nest under their own nation, not under
+    # a generic hub). Each repo's main project is created top-level
+    # (parent_project_id left unset/null) to match; get_or_create_project
+    # only INSERTs when a slug is genuinely new, so this is a no-op for
+    # germany-curriculum-repository/new-york-curriculum-repository, which
+    # already exist live with parent_project_id already fixed by 081.
     for source_repo, cfg in REPOS.items():
         records = by_repo.get(source_repo, [])
         if not records:
             print(f"Skipping {source_repo}: no records parsed")
             continue
+
         project_id = get_or_create_project(
             key, cfg["project_slug"], {
                 "name": cfg["project_name"],
@@ -295,24 +350,47 @@ def apply_import(by_repo, owner_email):
                 "is_private": True,
                 "focus_type": "regional",
                 "region_tags": cfg["region_tags"],
-                "parent_project_id": parent_id,
                 "project_kind": "curriculum-repository",
             }, owner_id,
         )
         print(f"{cfg['project_name']}: {project_id}")
-        for r in records:
-            r["project_id"] = project_id
 
-        CHUNK = 200
-        for i in range(0, len(records), CHUNK):
-            chunk = records[i:i + CHUNK]
-            rest(
-                "POST", "curriculum_repository_records", key,
-                headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
-                params={"on_conflict": "source_repo,source_record_id"},
-                json=chunk,
+        state_projects = cfg.get("state_projects", {})
+        national_records = []
+        state_records = {}  # jurisdiction key -> list of records
+        for r in records:
+            state_cfg = state_projects.get(r["jurisdiction"])
+            if state_cfg:
+                state_records.setdefault(r["jurisdiction"], []).append(r)
+            else:
+                national_records.append(r)
+
+        for r in national_records:
+            r["project_id"] = project_id
+        if national_records:
+            upsert_records(key, national_records)
+
+        for jurisdiction, state_cfg in state_projects.items():
+            recs = state_records.get(jurisdiction, [])
+            if not recs:
+                print(f"  {state_cfg['name']}: no records with jurisdiction == {jurisdiction!r}, skipping")
+                continue
+            state_project_id = get_or_create_project(
+                key, state_cfg["slug"], {
+                    "name": state_cfg["name"],
+                    "epistemic_status": "field-validated-curriculum",
+                    "epistemic_status_note": "Real, sourced curriculum-policy material; individual records carry their own verificationStatus/review_status for finer-grained trust.",
+                    "is_private": True,
+                    "focus_type": "regional",
+                    "region_tags": state_cfg["region_tags"],
+                    "parent_project_id": project_id,
+                    "project_kind": "curriculum-repository",
+                }, owner_id,
             )
-            print(f"  upserted {i + len(chunk)}/{len(records)}")
+            print(f"  {state_cfg['name']}: {state_project_id} ({len(recs)} records)")
+            for r in recs:
+                r["project_id"] = state_project_id
+            upsert_records(key, recs)
 
 
 def main():
