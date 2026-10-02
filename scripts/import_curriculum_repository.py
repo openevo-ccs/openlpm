@@ -86,13 +86,17 @@ REPOS = {
         "region_tags": ["IN"],
         "default_jurisdiction": "IN",
         # Karnataka (confirmed CC BY-SA 4.0 -- safe to build out in real
-        # depth) and Maharashtra (restrictive -- deliberately kept thin,
-        # institutional-actor-level only) both get real sub-projects from
-        # day one, per Dustin's 2026-10-02 call -- showing the access-tier
-        # model actually doing its job side by side, not a gap to fix later.
+        # depth), Maharashtra (restrictive -- deliberately kept thin,
+        # institutional-actor-level only), and Kerala (restrictive but
+        # uncontested -- added 2026-10-02 at a partner's request, also kept
+        # to structural/citation-level detail, no quoted textbook text)
+        # all get real sub-projects, per Dustin's 2026-10-02 calls -- the
+        # access-tier model doing its job across three real, different
+        # cases, not a gap to fix later.
         "state_projects": {
             "IN-KA": {"slug": "karnataka-curriculum-repository", "name": "Karnataka Curriculum Repository", "region_tags": ["IN-KA"]},
             "IN-MH": {"slug": "maharashtra-curriculum-repository", "name": "Maharashtra Curriculum Repository", "region_tags": ["IN-MH"]},
+            "IN-KL": {"slug": "kerala-curriculum-repository", "name": "Kerala Curriculum Repository", "region_tags": ["IN-KL"]},
         },
     },
 }
@@ -107,7 +111,7 @@ GERMAN_STATE_ISO = {
 }
 
 INDIA_STATE_ISO = {
-    "karnataka": "IN-KA", "maharashtra": "IN-MH",
+    "karnataka": "IN-KA", "maharashtra": "IN-MH", "kerala": "IN-KL",
 }
 
 
@@ -179,6 +183,26 @@ def find_recursive(obj, key):
     elif isinstance(obj, list):
         for item in obj:
             yield from find_recursive(item, key)
+
+
+def effective_state_key(jurisdiction, default_jurisdiction):
+    """Reduces a (possibly comma-joined) jurisdiction tag to a single
+    state_projects routing key, where that's actually what the record is
+    about. A record tagged only the bare national default alongside one
+    real state (e.g. "IN, IN-KL" -- a national-vs-one-state comparison) is
+    routed to that one state: the national side is context/baseline, not a
+    second peer being compared, the same way this repo's own Karnataka
+    coherence-finding keeps NCERT in prose rather than as a competing
+    jurisdiction. A genuine multi-STATE comparison (e.g. "DE-SN, DE-ST,
+    DE-TH", no bare national code involved) has no single reduction and
+    stays at the national project, since picking one state would misfile
+    a comparison that is genuinely about several.
+    """
+    parts = [p.strip() for p in jurisdiction.split(",")]
+    non_national = [p for p in parts if p != default_jurisdiction]
+    if len(non_national) == 1:
+        return non_national[0]
+    return jurisdiction
 
 
 def most_conservative_tier(tiers):
@@ -359,9 +383,10 @@ def apply_import(by_repo, owner_email):
         national_records = []
         state_records = {}  # jurisdiction key -> list of records
         for r in records:
-            state_cfg = state_projects.get(r["jurisdiction"])
+            key = effective_state_key(r["jurisdiction"], cfg["default_jurisdiction"])
+            state_cfg = state_projects.get(key)
             if state_cfg:
-                state_records.setdefault(r["jurisdiction"], []).append(r)
+                state_records.setdefault(key, []).append(r)
             else:
                 national_records.append(r)
 

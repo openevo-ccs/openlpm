@@ -3444,6 +3444,81 @@
       "record_type": "policy-timeline-event",
       "jurisdiction": "DE-TH",
       "source_repo": "deutsche-lpm",
+      "source_record_id": "DELP-EVENT-thueringen-biologie-gymnasium-1999",
+      "title": "Lehrplan Biologie, Gymnasium (1999) -- the edition replaced by 2024",
+      "content": {
+        "id": "DELP-EVENT-thueringen-biologie-gymnasium-1999",
+        "slug": "thueringen-biologie-gymnasium-1999",
+        "label": "Lehrplan Biologie, Gymnasium (1999) -- the edition replaced by 2024",
+        "jurisdiction": "DE-TH",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "1999-08-01",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "The Th\u00fcringen Gymnasium Biologie curriculum in force from 1999 until its 2024 replacement -- a 25-year span, unusually long compared to the roughly decade-long cycle seen in other subjects' archived editions (e.g. Darstellen und Gestalten's 2006-2013 edition). Confirmed to exist via the Th\u00fcringer Schulportal's own official \"Archiv der nicht mehr g\u00fcltigen Th\u00fcringer Lehrpl\u00e4ne\" (archive of no-longer-valid Thuringia Lehrpl\u00e4ne, covering Gymnasium documents from 1999 onward), which lists exactly one Biologie entry (\"gy_lp_bi_1999.pdf\", 231 kB) and no intermediate edition between it and 2024. The PDF's own title page / Inkraftsetzung wording could not be independently extracted (older scanned-era PDF, not reliably OCR'd by the tools available this session) -- the existence and 1999 dating are primary-source-confirmed via the portal's archive listing itself; the exact original effective-date wording is not.\n",
+        "involvedActors": [
+          "DELP-ACTOR-thillm"
+        ],
+        "sourceUrl": "https://www.schulportal-thueringen.de/media/detail?tspi=5491",
+        "accessTier": "citation-only",
+        "licenseOrRightsNote": "No text from the 1999 document itself is reproduced here -- only the fact of its existence and dating, sourced from the portal's own archive listing.",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Checked directly against the Th\u00fcringer Schulportal's own curriculum archive (tspi=5491), which lists Gymnasium Lehrpl\u00e4ne \"no longer valid\" back to 1999, organized alphabetically by subject. Biologie has exactly one archived entry (1999); no entry for a 2011/2012-era edition was found there despite that year surfacing repeatedly in general web search results for \"Lehrplan Biologie Th\u00fcringen 2012\" -- those search hits could not be confirmed against any primary source (the official archive doesn't list one, and the hits themselves look like they may conflate this with a different subject/track, e.g. a 2012 Regelschule Geschichte document that surfaced in the same searches). Deliberately NOT asserting a 2012 Biologie Gymnasium edition exists -- better to leave a real gap flagged than fabricate an intermediate record this repo's own verification discipline wouldn't support. A future session with better access to older, scanned PDFs (or a direct ThILLM/Schulportal inquiry) could resolve this definitively.\n",
+          "sourceProvenance": "docs/source-notes/2026-10-02-thueringen-biologie-lehrplan-geschichte-recherche.md"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": "No text from the 1999 document itself is reproduced here -- only the fact of its existence and dating, sourced from the portal's own archive listing."
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "DE-TH",
+      "source_repo": "deutsche-lpm",
+      "source_record_id": "DELP-EVENT-thueringen-biologie-gymnasium-2024",
+      "title": "Lehrplan Biologie, Gymnasium (2024) published by ThILLM -- replaced the 1999 edition",
+      "content": {
+        "id": "DELP-EVENT-thueringen-biologie-gymnasium-2024",
+        "slug": "thueringen-biologie-gymnasium-2024",
+        "label": "Lehrplan Biologie, Gymnasium (2024) published by ThILLM -- replaced the 1999 edition",
+        "jurisdiction": "DE-TH",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "2024-11-13",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "supersedes": "DELP-EVENT-thueringen-biologie-gymnasium-1999",
+        "description": "The edition directly preceding the 2026 Erprobungsfassung (see DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung, whose own 2024-to-2026 wording diff this repo and EvoMentor_DE/OpenLPM already track). PDF dated 2024-11-13 (\"Biologie_Lehrplan_AHR_2024-11-13.pdf\", ~1 MB). Staged rollout: Klassenstufen 7, 9, 11 in school year 2025/26; Klassenstufe 8 in 2026/27; Klassenstufen 9, 10 further staged through 2028/29. Ends the 1999 edition's unusually long, 25-year run. The portal's own detail page for this document does not itself name 1999 as what it replaces -- that chain is reconstructed here from the archive listing (see the 1999 record above), not from an explicit ministry statement.\n",
+        "involvedActors": [
+          "DELP-ACTOR-thillm"
+        ],
+        "sourceUrl": "https://www.schulportal-thueringen.de/media/detail?tspi=17947",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Paraphrase/summary only, no substantial verbatim reproduction of the ministry document's own text.",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Fetched directly from the official Th\u00fcringer Schulportal detail page (tspi=17947), which gives the exact PDF filename/date and the staged grade-rollout schedule but does not itself state what edition it supersedes.\n",
+          "sourceProvenance": "docs/source-notes/2026-10-02-thueringen-biologie-lehrplan-geschichte-recherche.md"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Paraphrase/summary only, no substantial verbatim reproduction of the ministry document's own text."
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "DE-TH",
+      "source_repo": "deutsche-lpm",
       "source_record_id": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "title": "Lehrplan Biologie, Gymnasium 2026 (Erprobungsfassung) published by ThILLM",
       "content": {
@@ -3455,6 +3530,7 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
+        "supersedes": "DELP-EVENT-thueringen-biologie-gymnasium-2024",
         "description": "The specific Biologie Gymnasium curriculum within the broader \"over 100 new Lehrpl\u00e4ne\" 2026 batch (see DELP-EVENT-thueringen-lehrplaene-2026-batch). Published by ThILLM as a trial version (Erprobungsfassung), PDF dated 2026-08-13, in effect since 2026-08-01 but not yet finally adopted. Staged rollout by grade: Klassenstufen 7, 11, 12 in school year 2026/27; Klassenstufe 8 in 2027/28; Klassenstufe 9 in 2028/29; Klassenstufe 10 in 2029/30. Compared against the prior 2024 version, changes are concentrated at the individual learning-objective level rather than the six core Basiskonzepte themselves, which remain unchanged.\n",
         "involvedActors": [
           "DELP-ACTOR-thillm"
@@ -3473,6 +3549,44 @@
       },
       "access_tier": "citation-only",
       "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "DE-TH",
+      "source_repo": "deutsche-lpm",
+      "source_record_id": "DELP-EVENT-thueringen-mnt-gymnasium-2026-erprobungsfassung",
+      "title": "Lehrplan Mensch-Natur-Technik (MNT), Gymnasium 2026 (Erprobungsfassung) published by ThILLM",
+      "content": {
+        "id": "DELP-EVENT-thueringen-mnt-gymnasium-2026-erprobungsfassung",
+        "slug": "thueringen-mnt-gymnasium-2026-erprobungsfassung",
+        "label": "Lehrplan Mensch-Natur-Technik (MNT), Gymnasium 2026 (Erprobungsfassung) published by ThILLM",
+        "jurisdiction": "DE-TH",
+        "eventType": "curriculum-revision-begins",
+        "dateStart": "2026-08-01",
+        "dateGranularity": "day",
+        "temporalStatus": "current-in-progress",
+        "partOf": "DELP-EVENT-thueringen-lehrplaene-2026-batch",
+        "description": "The grade 5/6 integrated-science Mensch-Natur-Technik (MNT) curriculum, within the broader \"over 100 new Lehrpl\u00e4ne\" 2026 batch (see DELP-EVENT-thueringen-lehrplaene-2026-batch). Published by ThILLM as a trial version (Erprobungsfassung), in effect for Klassenstufe 5 in school year 2026/27 and Klassenstufe 6 in 2027/28. Real, confirmed feedback from Susan Hanisch (Uni Jena): the restructuring is \"not so much in content but in the arrangement of topics/subtopics\" -- compared against the prior 2015 version, the new document pulls the chemistry/physics content that used to be woven into the biology-themed modules (seed plants, vertebrates, human health) out into their own separate, earlier units, and adds one genuinely new named unit (Koh\u00e4sion, Adh\u00e4sion, Kapillarit\u00e4t) plus a substantially expanded Bionik unit (four full case studies replacing one general example list). A handful of 2015 physics/ technology topics (levers, heat transfer, a standalone \"life in a habitat\" ecosystem unit) have no visible counterpart in the new document's Klassenstufe-5/6 table of contents -- not confirmed as dropped vs. moved to a later grade, since MNT continues through Klassenstufe 10 in Thuringia.\n",
+        "involvedActors": [
+          "DELP-ACTOR-thillm"
+        ],
+        "sourceUrl": "https://www.schulportal-thueringen.de/web/guest/media/detail?tspi=20581",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Paraphrase/summary only, no substantial verbatim reproduction of the ministry document's own text in this record.",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Full document (37 pages) provided directly by Dustin (received from Susan Hanisch), read in full, then cross-checked against the Thuringia Schulportal directly (fetched the Gymnasium Lehrplaene listing page, confirmed this document's own detail page and its distinction from the still-valid-for-Kl.6 2015 version at tspi=1393) -- stronger standing than the Biologie 2026 sibling record above, which was read via an AI summarization tool rather than a direct fetch. Full transcription and a row-by-row old-structure-to-new-structure comparison sit in EvoMentor_DE/data/thuringia_2026_lp_data/ (added 2026-10-02), matching the precedent this repo's siblings above already documented for the Biologie 2026 ingestion.\n",
+          "sourceProvenance": "docs/source-notes/2026-10-02-thueringen-mnt-gymnasium-2026-erprobungsfassung.md"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Paraphrase/summary only, no substantial verbatim reproduction of the ministry document's own text in this record."
     },
     {
       "project_id": null,
@@ -7988,6 +8102,43 @@
       "record_type": "policy-timeline-event",
       "jurisdiction": "IN",
       "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-ncert-rationalisation-evolution-deletion",
+      "title": "NCERT's 2023-2024 'rationalisation' deletes evolution/Darwin content nationally",
+      "content": {
+        "id": "INLP-EVENT-ncert-rationalisation-evolution-deletion",
+        "slug": "ncert-rationalisation-evolution-deletion",
+        "label": "NCERT's 2023-2024 'rationalisation' deletes evolution/Darwin content nationally",
+        "jurisdiction": "IN",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "2023",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "As part of a broader national-textbook \"rationalisation\" exercise, NCERT deleted entire chapters covering Darwin's theory of evolution from its textbooks, alongside separate deletions of Mughal-history and caste-system content. This is a curriculum-content decision, not a new fact about NCERT's copyright/licensing posture (see INLP-EVENT-ncert-license-agreement-perpetual-copyright for that), but directly relevant to this project's evolution-education focus -- and the direct trigger for at least one state's own public pushback (see state/kerala/local_policy/records/timeline.yaml, INLP-EVENT-kerala-rejects-ncert-evolution-deletion).\n",
+        "involvedActors": [
+          "INLP-ACTOR-ncert"
+        ],
+        "sourceUrl": "https://news.careers360.com/",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Paraphrased from news coverage of the rationalisation exercise and the state-level reaction to it, not a reproduction of NCERT's own curriculum text or rationalisation notification.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Confirmed via the same careers360.com news coverage cited in Kerala's own timeline event, which reports the deletion as context for Kerala's reaction -- this repo has not yet independently read NCERT's own rationalisation notification directly. Treat the exact list of deleted content and precise dates as approximate pending a primary-source check.\n",
+          "sourceProvenance": "state/kerala/local_policy/records/coherence-findings.yaml#INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Paraphrased from news coverage of the rationalisation exercise and the state-level reaction to it, not a reproduction of NCERT's own curriculum text or rationalisation notification.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
       "source_record_id": "INLP-EVENT-nroer-cc-by-sa-launch-2013",
       "title": "NCERT/CIET launch NROER under CC BY-SA, later inactive",
       "content": {
@@ -8022,6 +8173,51 @@
     },
     {
       "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "IN-KA",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-FINDING-karnataka-heredity-open-license-vs-ncert-default",
+      "title": "Karnataka's own Class 10 Science 'Heredity' chapter is openly licensed; the national default is not",
+      "content": {
+        "id": "INLP-FINDING-karnataka-heredity-open-license-vs-ncert-default",
+        "slug": "karnataka-heredity-open-license-vs-ncert-default",
+        "label": "Karnataka's own Class 10 Science 'Heredity' chapter is openly licensed; the national default is not",
+        "findingType": "licensing-terms-divergence",
+        "themes": [
+          "licensing-and-redistribution-rights",
+          "human-origins-nature"
+        ],
+        "objects": [
+          {
+            "jurisdiction": "IN-KA",
+            "subject": "Science",
+            "gradeLevel": "Class 10 (English medium)",
+            "excerptText": "Hybridisation is the process of combining different varieties of an organism to create a hybrid.",
+            "sourceDocument": "KOER Class 10 Science, Chapter 21 'Heredity'",
+            "sourceUrl": "https://koer-en.karnatakaeducation.org.in/index.php/Heredity",
+            "accessTier": "excerpt-only",
+            "licenseOrRightsNote": "KOER states directly, on its own \"Brief note on KOER\" page, that its content is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) -- confirmed by two independent direct fetches (this repo's founding session, 2026-09-30, and again 2026-10-02). Safe to quote verbatim on that basis.\n"
+          }
+        ],
+        "summary": "Karnataka's own Class 10 Science textbook, as mirrored on KOER, covers heredity at Chapter 21 -- a different number from NCERT's own similarly-named national chapter, which this repo has not directly re-confirmed this session (see exhaustivenessCaveat) -- and does so under an explicit, checkable open license. NCERT's own curriculum text, by contrast, defaults to all-rights-reserved across the board (see national_ccs_policy/records/institutional-actors.yaml, INLP-ACTOR-ncert, and docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3). The same underlying school-science topic therefore sits at two genuinely different redistribution-rights tiers depending on which jurisdiction's own version of it is in hand -- a concrete, specific instance of the state-to-state (and state-to-national) licensing variation this repo's founding research already found in the abstract, now anchored to one real, named chapter rather than stated only as a general pattern.\n",
+        "policyRelevance": "Demonstrates the accessTier/licenseOrRightsNote model doing real work: the same curriculum topic can be stored at a materially higher tier in one jurisdiction's records than another, for a stated, real, checkable reason, with neither tier being an accident of effort rather than law.\n",
+        "exhaustivenessCaveat": "Two honest limits, so this finding isn't overclaimed. First: this repo has not directly re-confirmed NCERT's own current Class 10 Science chapter numbering/title this session (its all-rights-reserved default is independently well-sourced elsewhere in this repo, but the specific \"different chapter number\" comparison rests on general background knowledge, not a fresh primary-source check) -- treat the NCERT side of this comparison as plausible, not verified, until someone reads NCERT's current textbook directly. Second, and more important: KOER's own CC BY-SA licensing is real and confirmed, but the wiki page behind this specific chapter is, as of 2026-10-02, a thin structural stub -- a short definition plus outbound links, not a fully-authored treatment -- and a same-session check of the most likely adjacent human-origins page (Class 8 Social Science, \"Geographical Features And Pre-Historic India\") found the same thing. Open licensing and content maturity are different axes; this finding is about the first, not a claim about the second.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "excerptText and the license claim were both read directly from koer-en.karnatakaeducation.org.in's own live pages this session, independent of (and consistent with) the founding session's 2026-09-30 licensing research. The NCERT-side chapter-numbering comparison is this record's one unverified claim -- see exhaustivenessCaveat -- and should be checked directly before this finding is cited in anything leaving this repo (a brief, outreach, or an exported public example repo).\n",
+          "sourceProvenance": "https://koer-en.karnatakaeducation.org.in/index.php/Heredity"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "KOER states directly, on its own \"Brief note on KOER\" page, that its content is licensed under Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) -- confirmed by two independent direct fetches (this repo's founding session, 2026-09-30, and again 2026-10-02). Safe to quote verbatim on that basis.\n"
+    },
+    {
+      "project_id": null,
       "record_type": "institutional-actor-record",
       "jurisdiction": "IN-KA",
       "source_repo": "india-lpm",
@@ -8044,6 +8240,35 @@
           "version": "1.0.0",
           "contributor_notes": "The CC BY-SA 4.0 licensing claim and the \"hosted in full, unlike NROER\" comparison both come from a SpicyIP legal-scholarship piece (Dhonchak, 2021), corroborated by the KOER portal itself, which this repo's founding session viewed directly. The \"own curriculum design expert bodies\" / NEP-divergence claim comes from an ORF policy-analysis piece, a secondary source -- flagged as somewhat less certain than the licensing claim itself.\n",
           "sourceProvenance": "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KA",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-it-for-change",
+      "title": "IT for Change",
+      "content": {
+        "id": "INLP-ACTOR-it-for-change",
+        "slug": "it-for-change",
+        "label": "IT for Change",
+        "actorType": "advocacy-body",
+        "jurisdiction": "IN-KA",
+        "role": "Bangalore-based NGO that served as DSERT's resource/implementation partner in building Karnataka Open Educational Resources (KOER) under the national RMSA Karnataka (Rashtriya Madhyamik Shiksha Abhiyan) scheme, 2013-14 -- designed the cascading teacher-training model that produced KOER's own content (see state/karnataka/local_policy/records/timeline.yaml, INLP-EVENT-koer-rmsa-pilot-launch). Recorded here as its own actor, distinct from DSERT itself (INLP-ACTOR-dsert-karnataka), because the content-creation mechanism -- a civil-society partner training a cascading chain of teachers, rather than the state board authoring material centrally -- is a structurally different model from how Maharashtra's Balbharati or NCERT itself produce curriculum content, and that difference is part of what makes KOER's open-license posture possible in practice, not just on paper.\n",
+        "url": "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Confirmed by a direct fetch of KOER's own \"Brief note on KOER\" page, which names IT for Change as the resource institution and describes the RMSA Karnataka-funded cascading training model (30 core teachers per subject across 19 districts, training roughly 30 more each, who then trained teachers at roughly 1,000 high schools) directly.\n",
+          "sourceProvenance": "state/karnataka/local_policy/records/timeline.yaml#INLP-EVENT-koer-rmsa-pilot-launch"
         }
       },
       "access_tier": "citation-only",
@@ -8083,6 +8308,195 @@
       },
       "access_tier": "summary-only",
       "license_or_rights_note": "Description is this repo's own paraphrase of KOER's publicly-stated licensing terms, not a verbatim reproduction of KOER's actual curriculum text -- the underlying materials are themselves CC BY-SA 4.0, so a future record could reproduce them at a higher tier with that license cited directly as grounds, without needing the broader legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KA",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-koer-rmsa-pilot-launch",
+      "title": "KOER launches as a Class-IX-only pilot under RMSA Karnataka, then grows",
+      "content": {
+        "id": "INLP-EVENT-koer-rmsa-pilot-launch",
+        "slug": "koer-rmsa-pilot-launch",
+        "label": "KOER launches as a Class-IX-only pilot under RMSA Karnataka, then grows",
+        "jurisdiction": "IN-KA",
+        "eventType": "pilot-program",
+        "temporalStatus": "past-completed",
+        "dateStart": "2013",
+        "dateGranularity": "year",
+        "description": "DSERT built Karnataka Open Educational Resources (KOER) with IT for Change as resource/implementation partner, under the national RMSA (Rashtriya Madhyamik Shiksha Abhiyan) secondary-education scheme. Deliberately scoped at launch to Class IX topics only, in Mathematics, Science, and Social Science, in English and Kannada -- built via a cascading teacher-training model (roughly 30 \"core\" teachers per subject across 19 districts, each training roughly 30 more, who in turn trained teachers at roughly 1,000 high schools), with an explicit stated goal to expand to all classes, subjects, and media of instruction over time. As of 2026-10-02, KOER's own textbook directory shows populated content for Class 8, 9, and 10 -- grown past the original Class-IX-only scope, but still short of the original full-K-12 ambition.\n",
+        "involvedActors": [
+          "INLP-ACTOR-dsert-karnataka",
+          "INLP-ACTOR-it-for-change"
+        ],
+        "sourceUrl": "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "This description is this repo's own paraphrase of KOER's \"Brief note on KOER\" page, itself CC BY-SA 4.0-licensed content, so a fuller excerpt would be safe to add later if useful -- paraphrased here only because a historical-summary record doesn't need verbatim text to be useful.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Confirmed by a direct fetch of koer-en.karnatakaeducation.org.in's \"Brief note on KOER\" page (the karnatakaeducation.org.in/KOER/... URLs this repo originally cited now redirect, HTTP 301, to the koer-en. subdomain -- both still resolve). The \"populated through Class 8-10 as of today\" claim comes from directly checking KOER's own Science_Textbooks page and Social_Science:_Topics index the same session, not from the Brief Note page itself, which only states the original 2013-14 scope and ambition.\n",
+          "sourceProvenance": "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "This description is this repo's own paraphrase of KOER's \"Brief note on KOER\" page, itself CC BY-SA 4.0-licensed content, so a fuller excerpt would be safe to add later if useful -- paraphrased here only because a historical-summary record doesn't need verbatim text to be useful.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "IN, IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-FINDING-kerala-retains-evolution-content-ncert-deleted",
+      "title": "Kerala's Class 10 Biology retains full evolution/human-origins content NCERT deleted nationally",
+      "content": {
+        "id": "INLP-FINDING-kerala-retains-evolution-content-ncert-deleted",
+        "slug": "kerala-retains-evolution-content-ncert-deleted",
+        "label": "Kerala's Class 10 Biology retains full evolution/human-origins content NCERT deleted nationally",
+        "findingType": "state-vs-national-divergence",
+        "themes": [
+          "human-origins-nature",
+          "curriculum-content-deletion-and-retention"
+        ],
+        "objects": [
+          {
+            "jurisdiction": "IN",
+            "subject": "Science (Biology)",
+            "gradeLevel": "National (NCERT textbooks)",
+            "sourceDocument": "NCERT 2023-2024 textbook 'rationalisation' exercise",
+            "sourceUrl": "https://news.careers360.com/",
+            "accessTier": "summary-only",
+            "licenseOrRightsNote": "Paraphrased from news coverage of NCERT's own rationalisation exercise, not a reproduction of NCERT's curriculum text or internal notification.\n"
+          },
+          {
+            "jurisdiction": "IN-KL",
+            "subject": "Biology",
+            "gradeLevel": "Class 10 (Standard X), Part 2, 2019 edition",
+            "sourceDocument": "SCERT Kerala Class 10 Biology textbook, Chapter 8, 'The Paths Traversed by Life' (pp. 123-137)",
+            "sourceUrl": "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf",
+            "accessTier": "summary-only",
+            "licenseOrRightsNote": "SCERT Kerala's textbooks carry a bare copyright notice (\"\u00a9 Department of General Education, Government of Kerala\") with no stated reuse license anywhere checked (the textbook's own imprint, the KCF 2023 landing page, the Samagra distribution portal) -- unlike Karnataka's CC BY-SA-licensed KOER content, this is described here only at the structural/paraphrase level, not quoted verbatim, pending the same kind of legal review this repo already applies to NCERT/CBSE content.\n"
+          }
+        ],
+        "summary": "Kerala's Class 10 Biology textbook devotes a full chapter (pp. 123-137) to evolution, covering chemical-origin-of-life theories (Oparin-Haldane, Panspermia, the Urey-Miller experiment), a geological timeline from life's origin through multicellularity, Lamarckism and Darwinism (including the Galapagos finches and Malthus's influence), Neo-Darwinism, and four independent lines of evidence for evolution (fossil, comparative-morphology, biochemical, and molecular -- including a beta-hemoglobin amino-acid-difference comparison table showing chimpanzee at zero differences from humans, gorilla at one, and rat at thirty-one). A dedicated section, \"Evolution of Human beings\" (p.134), places humans within Anthropoidea and Hominoidea and includes a named hominin-lineage diagram: Ardipithecus ramidus, Australopithecus afarensis, Homo habilis, Homo erectus, Homo neanderthalensis, Homo sapiens, each with a fossil- discovery location. This is the exact category of content NCERT removed from its own national textbooks in the 2023-2024 rationalisation exercise -- Kerala's own chapter was not itself revised in response (it is the pre-existing 2019 edition), but Kerala's state-level decision to keep teaching this content, formalized as a public stance against the national deletion, makes this specific chapter's continued existence a directly relevant data point, not incidental.\n",
+        "policyRelevance": "A concrete instance of state-level curriculum autonomy (India's constitutional \"Concurrent List\" status for education, already noted elsewhere in this repo re: Karnataka/Tamil Nadu) being exercised specifically to preserve evolution-education content against a national deletion -- directly relevant to this project's own mission, independent of the separate licensing-rights question this repo otherwise tracks state by state.\n",
+        "exhaustivenessCaveat": "This repo has not independently read NCERT's own rationalisation notification or its post-deletion textbook text directly this session -- the national side of this comparison rests on news coverage, not a primary NCERT document (see INLP-EVENT-ncert-rationalisation-evolution-deletion's own caveat). No verbatim text from Kerala's textbook is reproduced here, by design -- see each object's own licenseOrRightsNote. The chapter summary above describes real, page-cited structure and topic coverage, not Kerala's own sentences.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Kerala's chapter content (title, page range, section structure, topic list, the hemoglobin comparison figures, the named hominin lineage) was read directly from the actual 2019-edition PDF on Kerala's own Samagra portal, both volumes. The national side rests on secondary news coverage, not a primary NCERT document -- see exhaustivenessCaveat.\n",
+          "sourceProvenance": "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Paraphrased from news coverage of NCERT's own rationalisation exercise, not a reproduction of NCERT's curriculum text or internal notification.\n"
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-dept-general-education-kerala",
+      "title": "Department of General Education, Government of Kerala",
+      "content": {
+        "id": "INLP-ACTOR-dept-general-education-kerala",
+        "slug": "dept-general-education-kerala",
+        "label": "Department of General Education, Government of Kerala",
+        "actorType": "ministry",
+        "jurisdiction": "IN-KL",
+        "role": "Kerala's state education department -- the literal Government of Kerala department that SCERT Kerala (INLP-ACTOR-scert-kerala) operates inside, and the entity actually named as copyright holder on Kerala's own textbooks (\"\u00a9 Department of General Education, Government of Kerala,\" read directly from the Class 10 Biology textbook's own imprint page). This matters for the same reason NCERT/CBSE's legal form matters nationally: a literal government department asserting copyright is a more straightforward \"government work\" case under Copyright Act 1957 Section 2(k) than a registered society's claim is -- the opposite kind of legal question from NCERT's, not the same one restated at state level.\n",
+        "legalForm": "a department of the Government of Kerala itself, not a separate registered society -- confirmed by SCERT Kerala's own self-description as 'an autonomous body of the Department,' not a body standing apart from it, and by the textbook imprint naming the Department, not SCERT, as copyright holder.",
+        "url": "https://education.kerala.gov.in/",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Confirmed by direct reads of scert.kerala.gov.in's own \"about\" pages (all describing SCERT as \"an autonomous body of the Department of General Education, Government of Kerala\") and the Class 10 Biology textbook's own copyright-imprint page (both volumes, 2019 edition, read directly from samagra.kite.kerala.gov.in). No government order or gazette notification establishing SCERT's precise legal instrument was found -- the \"department, not a society\" reading rests on consistent public self-description plus the textbook's own imprint, not a single definitive legal-instrument document.\n",
+          "sourceProvenance": "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-scert-kerala",
+      "title": "State Council of Educational Research and Training (SCERT), Kerala",
+      "content": {
+        "id": "INLP-ACTOR-scert-kerala",
+        "slug": "scert-kerala",
+        "label": "State Council of Educational Research and Training (SCERT), Kerala",
+        "actorType": "state-education-board",
+        "jurisdiction": "IN-KL",
+        "parentActor": "INLP-ACTOR-dept-general-education-kerala",
+        "role": "Kerala's state curriculum-research body -- publishes the Kerala Curriculum Framework (most recently KCF 2023, succeeding a 2007 version built on stated critical-pedagogy/issue-based/social- constructivist foundations, explicitly positioned by Kerala's Education Department as a state-level alternative to NEP 2020 rather than an implementation of it) and Kerala's own state textbooks. Unlike Karnataka's DSERT, SCERT Kerala has no confirmed open license on its own curriculum text or textbooks -- its Class 10 Biology textbook's copyright page carries a bare copyright notice only, no Creative Commons mark or stated reuse permission, and the same is true of the KCF 2023 landing page itself. No KOER-equivalent open platform was found in Kerala's own education-technology ecosystem (IT@School/KITE's open-source commitment covers software/ infrastructure, not a license on curriculum text; the Samagra portal is a plain PDF-distribution site with no license statement; School Wiki's own license could not be confirmed, site unreachable this session).\n",
+        "url": "https://scert.kerala.gov.in/",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "SCERT's own \"about\" self-description, the KCF 2023 landing page, and the Samagra portal were all read directly, as was the Class 10 Biology textbook's own copyright-imprint page. The critical- pedagogy/constructivist framing is well-corroborated for KCF generally (multiple independent secondary sources) but was not independently confirmed from the KCF 2023 document's own primary text this session (its direct download link was not reachable) -- treat that specific continuity claim as very likely, not verified.\n",
+          "sourceProvenance": "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-kerala-rejects-ncert-evolution-deletion",
+      "title": "Kerala directs schools to keep teaching evolution content NCERT deleted nationally",
+      "content": {
+        "id": "INLP-EVENT-kerala-rejects-ncert-evolution-deletion",
+        "slug": "kerala-rejects-ncert-evolution-deletion",
+        "label": "Kerala directs schools to keep teaching evolution content NCERT deleted nationally",
+        "jurisdiction": "IN-KL",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "2023",
+        "dateGranularity": "year",
+        "temporalStatus": "current-in-progress",
+        "description": "Following NCERT's 2023-2024 national \"rationalisation\" exercise, which deleted entire chapters on Darwin's theory of evolution (along with Mughal-history and caste-system content) from national textbooks, Kerala's Chief Minister publicly criticized the deletions and SCERT Kerala directed state schools to continue teaching the removed content, releasing its own supplementary textbooks and forming a review committee. This is a curriculum-content dispute, not a copyright dispute -- Kerala is not asserting a licensing claim here, it is rejecting a national content decision on substantive grounds. Filed as its own event rather than folded into the licensing-history events above because it is a different kind of fact, directly relevant to this project's own evolution-education focus: a real instance of a state-level body actively defending evolution content against removal, not a hypothetical concern.\n",
+        "involvedActors": [
+          "INLP-ACTOR-scert-kerala",
+          "INLP-ACTOR-ncert"
+        ],
+        "sourceUrl": "https://news.careers360.com/",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Paraphrased from news coverage (careers360.com reporting on Kerala CM/SCERT statements), not a verbatim reproduction of any curriculum text or official notification.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-02",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Confirmed via direct reads of two careers360.com news articles (\"Kerala CM releases supplementary textbooks; attacks NCERT over removal of portions\" and \"Kerala schools likely to teach deleted parts of NCERT history, social science textbooks: SCERT\"). News coverage, not a primary government order or SCERT notification -- treat the exact sequence/dates as approximate pending a primary source. See INLP-EVENT-ncert-rationalisation-evolution-deletion (national timeline) for the deletion this responds to, and state/kerala/local_policy/records/coherence-findings.yaml for how Kerala's own retained content compares in actual depth.\n",
+          "sourceProvenance": "state/kerala/local_policy/records/coherence-findings.yaml#INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Paraphrased from news coverage (careers360.com reporting on Kerala CM/SCERT statements), not a verbatim reproduction of any curriculum text or official notification.\n"
     },
     {
       "project_id": null,
