@@ -156,12 +156,12 @@ export default function ProfilePage() {
               <div key={project.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
                 <div className="row" style={{ justifyContent: 'space-between' }}>
                   <Link to={`/dashboard/${project.slug}`}>{project.name}</Link>
-                  <span className="chip capitalize">{role}</span>
+                  <span className={`chip capitalize${role === 'owner' ? ' chip-progress' : ''}`}>{role}</span>
                 </div>
                 {children.map((c) => (
                   <div key={c.project.id} className="row" style={{ justifyContent: 'space-between', paddingLeft: 16, marginTop: 4, fontSize: 13 }}>
                     <Link to={`/dashboard/${c.project.slug}`} className="muted">{c.project.name}</Link>
-                    <span className="chip capitalize">{c.role}</span>
+                    <span className={`chip capitalize${c.role === 'owner' ? ' chip-progress' : ''}`}>{c.role}</span>
                   </div>
                 ))}
               </div>

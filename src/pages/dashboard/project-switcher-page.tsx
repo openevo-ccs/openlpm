@@ -246,15 +246,34 @@ function ProjectCard({
   return (
     <div
       className="card"
-      style={{ height: '100%', borderLeft: colorHex ? `4px solid ${colorHex}` : undefined }}
+      style={{
+        height: '100%',
+        // Real feedback 7f8bc960 (2026-10-02): "a dash of color across the
+        // core UI," grounded in openevo.net's own site -- its real card
+        // style reserves a splash of the brand teal for things worth
+        // noticing. Pairs the existing left-edge accent (project color,
+        // feedback 2371cbf7) with a matching top edge, so a card with a
+        // color actually set reads as a colored frame, not a single stray line.
+        borderLeft: colorHex ? `4px solid ${colorHex}` : undefined,
+        borderTop: colorHex ? `3px solid ${colorHex}` : undefined,
+      }}
     >
       <Link to={`/dashboard/${project.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <h3>{project.name}</h3>
           <div className="row" style={{ gap: 4 }}>
-            {project.is_private && <span className="chip" title="Only members can see this project exists">Private</span>}
+            {/* Real feedback 7f8bc960: colored visibility badges, same
+                teal-for-public/tan-for-private pairing openevo.net's own
+                repo-grid pills use (app/css/styles.css .pill-public/
+                .pill-private) -- reusing this app's existing progress/draft
+                chip tints rather than inventing a third color pair. */}
+            {project.is_private ? (
+              <span className="chip chip-draft" title="Only members can see this project exists">Private</span>
+            ) : (
+              <span className="chip chip-progress" title="Anyone can see this project exists">Public</span>
+            )}
             {role ? (
-              <span className="chip capitalize">{role}</span>
+              <span className={`chip capitalize${role === 'owner' ? ' chip-progress' : ''}`}>{role}</span>
             ) : (
               <span className="chip" title="You can see this because you're the admin -- you aren't a member" style={{ gap: 3 }}>
                 <ShieldCheck size={10} />Admin view
