@@ -59,11 +59,21 @@ $$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
 -- group_creator_roles. Owners/maintainers also use this to open any group's
 -- synthesis view without joining it (decided 2026-10-02) -- see its use in
 -- migrations 076/077.
+-- `= ANY((SELECT array_col FROM ...))` (an earlier, broken draft of this
+-- function) parses as "equal to ANY row returned by the subquery," where
+-- each row's single column must itself be the SAME scalar type being
+-- compared -- not as array-membership, even though the subquery's column
+-- happens to hold an array. Confirmed live by Dustin's own migration run,
+-- 2026-10-02: "operator does not exist: project_member_role =
+-- project_member_role[]". Referencing the array column directly inside an
+-- EXISTS (not through a bare scalar subquery passed to ANY) is what makes
+-- Postgres treat it as a real array value instead.
 CREATE OR REPLACE FUNCTION can_manage_groups(p_project_id UUID)
 RETURNS BOOLEAN AS $$
   SELECT has_project_role(p_project_id, ARRAY['owner', 'maintainer']::project_member_role[])
-    OR project_role(p_project_id) = ANY(
-      (SELECT group_creator_roles FROM projects WHERE id = p_project_id)
+    OR EXISTS (
+      SELECT 1 FROM projects p
+      WHERE p.id = p_project_id AND project_role(p_project_id) = ANY(p.group_creator_roles)
     );
 $$ LANGUAGE sql SECURITY DEFINER STABLE SET search_path = public;
 

@@ -5,7 +5,26 @@ SET search_path = public, extensions;
 -- member) and not dependent on naming individual people like 'shared'.
 -- See lab_manager's docs/design-notes/openlpm-groups-feature-2026-10-02.md.
 
-ALTER TABLE portfolios DROP CONSTRAINT IF EXISTS portfolios_visibility_check;
+-- Looks up the real constraint name rather than assuming Postgres's default
+-- <table>_<column>_check (true here, but not worth a second live failure
+-- over, after migration 075's ANY(subquery) mistake) -- drops whatever
+-- CHECK constraint actually governs this column, by inspecting the
+-- catalog directly, then adds the replacement with the new 'group' value.
+DO $$
+DECLARE
+  existing_check TEXT;
+BEGIN
+  SELECT con.conname INTO existing_check
+  FROM pg_constraint con
+  JOIN pg_class rel ON rel.oid = con.conrelid
+  JOIN pg_attribute att ON att.attrelid = rel.oid AND att.attnum = ANY(con.conkey)
+  WHERE rel.relname = 'portfolios' AND att.attname = 'visibility' AND con.contype = 'c';
+
+  IF existing_check IS NOT NULL THEN
+    EXECUTE format('ALTER TABLE portfolios DROP CONSTRAINT %I', existing_check);
+  END IF;
+END $$;
+
 ALTER TABLE portfolios ADD CONSTRAINT portfolios_visibility_check
   CHECK (visibility IN ('private', 'shared', 'project', 'group'));
 
