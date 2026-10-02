@@ -5,9 +5,10 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, deriveKlassenstufe, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listMethodConceptLinks, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
 import { ExperimentCard } from '../portfolios/prompt-generator-page'
 
@@ -63,6 +64,7 @@ export default function StudentPromptPage() {
   const [experiments, setExperiments] = useState<PromptExperimentRow[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [methodLinks, setMethodLinks] = useState<MethodConceptLink[]>([])
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id))
@@ -71,8 +73,11 @@ export default function StudentPromptPage() {
       if (lib) setCfg(defaultConfig(resolveOptionLists(lib.option_lists)))
     })
     getRootConcepts(supabase, project).then(setRootConcepts)
+    listMethodConceptLinks(supabase, project.id).then(setMethodLinks)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project])
+
+  const linksByMethod = useMemo(() => groupLinksByMethod(methodLinks), [methodLinks])
 
   useEffect(() => {
     if (!userId) return
@@ -447,6 +452,9 @@ export default function StudentPromptPage() {
             onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })}
             favoritedMethods={favoriteMethods}
             onToggleFavoriteMethod={onToggleFavoriteMethod}
+            renderExtra={(method) => (
+              <MethodConceptChips rootConcepts={rootConcepts} links={linksByMethod.get(method) ?? new Map()} editable={false} />
+            )}
           />
           <div style={{ marginTop: 8 }}>
             <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggleInList(cfg.differenzierung, v) })} />

@@ -20,8 +20,9 @@ import {
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, deriveKlassenstufe, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listMethodConceptLinks, setMethodConceptKonzeptanker, setMethodConceptLink, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
 // generalized the same week (2026-09-18 ask): "think about how other users
@@ -59,7 +60,7 @@ import { listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/fav
 type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
 
 export default function PromptGeneratorPage() {
-  const { project, slug, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, slug, supabase, role } = useOutletContext<ProjectOutletContext>()
   const { portfolioId } = useParams<{ portfolioId: string }>()
   const [items, setItems] = useState<DataObject[] | null>(null)
   const [library, setLibrary] = useState<PromptTemplateLibraryRow | null | undefined>(undefined)
@@ -70,6 +71,8 @@ export default function PromptGeneratorPage() {
   const [userId, setUserId] = useState<string>()
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
   const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
+  const [methodLinks, setMethodLinks] = useState<MethodConceptLink[]>([])
+  const canEditMethodLinks = role !== 'viewer'
 
   useEffect(() => {
     if (!portfolioId) return
@@ -82,6 +85,7 @@ export default function PromptGeneratorPage() {
     })
     getRootConcepts(supabase, project).then(setRootConcepts)
     listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
+    listMethodConceptLinks(supabase, project.id).then(setMethodLinks)
   }, [supabase, portfolioId, project])
 
   useEffect(() => {
@@ -89,6 +93,24 @@ export default function PromptGeneratorPage() {
     const derived = deriveKlassenstufe(items)
     if (derived !== cfg.klassenstufe) setCfg({ ...cfg, klassenstufe: derived })
   }, [items, cfg])
+
+  const linksByMethod = useMemo(() => groupLinksByMethod(methodLinks), [methodLinks])
+
+  const handleToggleMethodLink = async (methodKey: string, basiskonzeptId: string, linked: boolean) => {
+    setMethodLinks((prev) =>
+      linked
+        ? [...prev, { method_key: methodKey, basiskonzept_id: basiskonzeptId, is_konzeptanker: false }]
+        : prev.filter((l) => !(l.method_key === methodKey && l.basiskonzept_id === basiskonzeptId))
+    )
+    await setMethodConceptLink(supabase, project.id, methodKey, basiskonzeptId, linked)
+  }
+
+  const handleToggleKonzeptanker = async (methodKey: string, basiskonzeptId: string, isKonzeptanker: boolean) => {
+    setMethodLinks((prev) =>
+      prev.map((l) => (l.method_key === methodKey && l.basiskonzept_id === basiskonzeptId ? { ...l, is_konzeptanker: isKonzeptanker } : l))
+    )
+    await setMethodConceptKonzeptanker(supabase, project.id, methodKey, basiskonzeptId, isKonzeptanker)
+  }
 
   const onToggleFavoriteMethod = async (methodKey: string) => {
     const isFav = favoriteMethods.has(methodKey)
@@ -248,7 +270,21 @@ export default function PromptGeneratorPage() {
               onToggle={(v) => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, v) })}
               favoritedMethods={favoriteMethods}
               onToggleFavoriteMethod={onToggleFavoriteMethod}
+              renderExtra={(method) => (
+                <MethodConceptChips
+                  rootConcepts={rootConcepts}
+                  links={linksByMethod.get(method) ?? new Map()}
+                  editable={canEditMethodLinks}
+                  onToggleLink={(bkId, linked) => handleToggleMethodLink(method, bkId, linked)}
+                  onToggleKonzeptanker={(bkId, isAnchor) => handleToggleKonzeptanker(method, bkId, isAnchor)}
+                />
+              )}
             />
+            {canEditMethodLinks && (
+              <p className="muted" style={{ fontSize: 11, marginTop: 4 }}>
+                Click a concept abbreviation to link a method to it; click the anchor icon on a linked concept to mark it a Konzeptanker.
+              </p>
+            )}
             <div style={{ marginTop: 8 }}>
               <CheckGroup options={options.differentiation} selected={cfg.differenzierung} onToggle={(v) => setCfg({ ...cfg, differenzierung: toggleInList(cfg.differenzierung, v) })} />
             </div>

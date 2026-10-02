@@ -1,7 +1,8 @@
-import { Star } from 'lucide-react'
+import { Anchor, Star } from 'lucide-react'
 import type { Database } from './supabase/database.types'
 import type { PromptOptionLists, PromptTemplateLibraryRow, SectionLabels } from './supabase/prompt-libraries'
-import { bkEntries, type BkGroup } from './supabase/basiskonzepte'
+import { bkAbbreviation, bkEntries, type BkGroup } from './supabase/basiskonzepte'
+import type { MethodConceptLink } from './supabase/method-concept-links'
 
 type DataObject = Database['public']['Tables']['lpm_data_objects']['Row']
 
@@ -180,22 +181,24 @@ export function toggleInList(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
 }
 
-// favoritedMethods/onToggleFavoriteMethod are optional -- only the Methods
-// list (real feedback 7b32d01c) passes them; every other CheckGroup call
-// (differentiation/assessment/kontext/output_types) renders exactly as
-// before.
+// favoritedMethods/onToggleFavoriteMethod/renderExtra are optional -- only
+// the Methods list (real feedback 7b32d01c, 459423b6) passes them; every
+// other CheckGroup call (differentiation/assessment/kontext/output_types)
+// renders exactly as before.
 export function CheckGroup({
   options,
   selected,
   onToggle,
   favoritedMethods,
   onToggleFavoriteMethod,
+  renderExtra,
 }: {
   options: string[]
   selected: string[]
   onToggle: (v: string) => void
   favoritedMethods?: Set<string>
   onToggleFavoriteMethod?: (v: string) => void
+  renderExtra?: (option: string) => React.ReactNode
 }) {
   return (
     <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
@@ -214,10 +217,81 @@ export function CheckGroup({
               <Star size={11} fill={favoritedMethods?.has(o) ? 'var(--series-a, gold)' : 'none'} />
             </button>
           )}
+          {renderExtra?.(o)}
         </label>
       ))}
     </div>
   )
+}
+
+// Real feedback 459423b6 (Susan Hanisch, 2026-10-02): show, and let an
+// editor set, which root Basiskonzepte a given method actually strengthens
+// -- and flag a link as a "Konzeptanker" (her words: "a way to generally
+// introduce" that concept). `links` only has entries for concepts already
+// linked to this method (basiskonzept_id -> is_konzeptanker).
+// `editable=false` (the student view) renders nothing for an unlinked
+// concept, so a method with no links yet shows no chips at all rather than
+// a row of dead toggles a student can't use anyway.
+export function MethodConceptChips({
+  rootConcepts,
+  links,
+  editable,
+  onToggleLink,
+  onToggleKonzeptanker,
+}: {
+  rootConcepts: { id: string; label: string }[]
+  links: Map<string, boolean>
+  editable: boolean
+  onToggleLink?: (basiskonzeptId: string, linked: boolean) => void
+  onToggleKonzeptanker?: (basiskonzeptId: string, isKonzeptanker: boolean) => void
+}) {
+  const shown = editable ? rootConcepts : rootConcepts.filter((c) => links.has(c.id))
+  if (shown.length === 0) return null
+  return (
+    <span className="row" style={{ gap: 3, marginLeft: 2 }}>
+      {shown.map((c) => {
+        const linked = links.has(c.id)
+        const isAnchor = links.get(c.id) === true
+        return (
+          <span key={c.id} className="row" style={{ gap: 1 }}>
+            <button
+              type="button"
+              className={`chip-btn${linked ? ' active' : ''}`}
+              title={editable ? `${linked ? 'Unlink' : 'Link'} ${c.label}` : c.label}
+              style={{ fontSize: 9, padding: '1px 4px', lineHeight: '14px' }}
+              disabled={!editable}
+              onClick={editable ? (e) => { e.preventDefault(); e.stopPropagation(); onToggleLink?.(c.id, !linked) } : undefined}
+            >
+              {bkAbbreviation(c.label)}
+            </button>
+            {linked && (editable || isAnchor) && (
+              <button
+                type="button"
+                className="btn-linklike"
+                aria-label="Konzeptanker"
+                title={isAnchor ? `Konzeptanker for ${c.label}` : `Mark as Konzeptanker for ${c.label}`}
+                style={{ padding: 0, display: 'inline-flex', opacity: isAnchor ? 1 : 0.3 }}
+                disabled={!editable}
+                onClick={editable ? (e) => { e.preventDefault(); e.stopPropagation(); onToggleKonzeptanker?.(c.id, !isAnchor) } : undefined}
+              >
+                <Anchor size={9} />
+              </button>
+            )}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+/** Groups links.basiskonzept_id -> is_konzeptanker, per method_key, for MethodConceptChips. */
+export function groupLinksByMethod(links: MethodConceptLink[]): Map<string, Map<string, boolean>> {
+  const byMethod = new Map<string, Map<string, boolean>>()
+  for (const l of links) {
+    if (!byMethod.has(l.method_key)) byMethod.set(l.method_key, new Map())
+    byMethod.get(l.method_key)!.set(l.basiskonzept_id, l.is_konzeptanker)
+  }
+  return byMethod
 }
 
 // Real feedback bdd96114 (Susan Hanisch, 2026-10-02): "the Anteil
