@@ -258,7 +258,6 @@ export default function StudentPromptPage() {
   }
 
   const charCount = promptText.length
-  const isLarge = charCount > 20000
 
   return (
     <div className="student-page">
@@ -480,8 +479,15 @@ export default function StudentPromptPage() {
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <h3 style={{ marginTop: 0 }}>Vorschau</h3>
           <div className="row">
-            <span className="muted" style={{ fontSize: 11.5, color: isLarge ? 'var(--critical)' : undefined }}>
-              {charCount.toLocaleString('de-DE')} Zeichen{isLarge ? ' — sehr lang, evtl. Auswahl verkleinern' : ''}
+            {/* Real feedback 7a066ddd (Dustin, 2026-10-02): a real,
+                well-formed, detailed prompt at this length is well within
+                what any current LLM handles -- the old 20,000-character
+                threshold flagged it as "sehr lang, evtl. Auswahl
+                verkleinern" anyway, in alarm red, with no real reason to.
+                Plain character count stays (harmless, sometimes useful),
+                the false alarm doesn't. */}
+            <span className="muted" style={{ fontSize: 11.5 }}>
+              {charCount.toLocaleString('de-DE')} Zeichen
             </span>
             <button className="btn btn-mini" onClick={() => navigator.clipboard.writeText(promptText)}>
               <Copy size={12} />Kopieren
