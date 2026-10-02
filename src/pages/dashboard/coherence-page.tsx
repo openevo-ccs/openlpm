@@ -227,7 +227,7 @@ function PairPanel({
     const { error } = await markReviewedNoConnection(supabase, { projectId, branchId, axis: 'grade_band', gradeA: cell.gradeA, gradeB: cell.gradeB, note: note.trim() })
     setBusy(false)
     if (error) setNotice(error.message)
-    else { setNotice('Recorded — this pair will show as checked, not open.'); onChanged() }
+    else { setNotice('Recorded — this pair now shows as checked instead of open.'); onChanged() }
   }
 
   return (
@@ -260,7 +260,7 @@ function PairPanel({
       ) : (
         <ul style={{ marginTop: 0 }}>
           {candidates.map((c) => (
-            <li key={c.schemaElementId}>{c.label} — {c.countA} topic(s) in grade {cell.gradeA}, {c.countB} in grade {cell.gradeB}. Worth checking for a real bridge, not evidence of one on its own.</li>
+            <li key={c.schemaElementId}>{c.label} — {c.countA} topic(s) in grade {cell.gradeA}, {c.countB} in grade {cell.gradeB}. Worth checking for a real bridge — on its own this isn&apos;t evidence of one.</li>
           ))}
         </ul>
       )}
@@ -472,7 +472,7 @@ function StrandPairPanel({
     const { error } = await markStrandReviewedNoConnection(supabase, { projectId: project.id, branchId, grade, rootA: cell.rootA, rootB: cell.rootB, note: note.trim() })
     setBusy(false)
     if (error) setNotice(error.message)
-    else { setNotice('Recorded — this pair will show as checked, not open.'); onChanged() }
+    else { setNotice('Recorded — this pair now shows as checked instead of open.'); onChanged() }
   }
 
   return (
@@ -541,9 +541,9 @@ function CrossCurriculumStub() {
         <p>Comparing coherence across different curricula isn&apos;t built yet.</p>
         <p className="muted" style={{ maxWidth: 440, margin: '4px auto 0' }}>
           The idea: e.g. how coherent is grade 7 across every German state&apos;s own curriculum
-          repository, not just within one project. That needs real thinking about access first —
-          comparing against a project you&apos;re not a member of isn&apos;t a small addition to
-          the matrix above. Planned as a real next step, not started this session.
+          repository, across projects rather than within just one. That needs real thinking about
+          access first — comparing against a project you&apos;re not a member of isn&apos;t a small
+          addition to the matrix above. Planned as a real next step; nothing built on it this session.
         </p>
       </div>
     </div>
@@ -613,12 +613,12 @@ function ConnectForm({
       <div className="field">
         <label>Kind</label>
         <select value={kind} onChange={(e) => setKind(e.target.value as 'asserted' | 'suggested')}>
-          <option value="suggested">Suggested — a proposed connection, not required by the curriculum</option>
+          <option value="suggested">Suggested — a proposed connection the curriculum doesn&apos;t require</option>
           <option value="asserted">Asserted — the curriculum itself requires this order</option>
         </select>
       </div>
       <div className="field">
-        <label>Why — a real, checkable reason, not a vague gloss</label>
+        <label>Why — a real, checkable reason, never a vague gloss</label>
         <textarea value={rationale} onChange={(e) => setRationale(e.target.value)} />
       </div>
       <div className="field">

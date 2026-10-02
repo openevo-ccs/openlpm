@@ -54,9 +54,9 @@ interface SourceDraft { sourceName: string; format: string; licenseNote: string;
 const ACCESS_TIER_OPTIONS: { value: AccessTier | ''; label: string }[] = [
   { value: '', label: "Not sure yet — decide before importing" },
   { value: 'full-text-stored', label: 'The full document — we have clear rights to keep all of it' },
-  { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, not the whole document' },
+  { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, never the whole document' },
   { value: 'summary-only', label: "A summary only — described in our own words, no direct quotes" },
-  { value: 'citation-only', label: "Just a citation — we'll link to the original, not store any of its text" },
+  { value: 'citation-only', label: "Just a citation — we'll link to the original without storing any of its text" },
 ]
 
 const STEPS = ['Basics', 'Geography', 'Language', 'Subject area', 'Grade bands', 'Sources & rights', 'Review']
@@ -333,9 +333,9 @@ export default function NewProjectWizard() {
                   Make this project private
                 </label>
                 <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  A private project doesn&apos;t appear to anyone outside it — not in the project
-                  directory, not by name. Only people you add as members can see that it exists at
-                  all. Leave unchecked for a normal, browsable project space.
+                  A private project is invisible to anyone outside it, both in the project directory
+                  and by name. Only people you add as members can see that it exists at all. Leave
+                  unchecked for a normal, browsable project space.
                 </p>
               </div>
             )}

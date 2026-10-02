@@ -162,7 +162,7 @@ function FeedbackCard({
               )}
               {ctx?.visible_text && (
                 <div>
-                  <p className="muted" style={{ marginBottom: 2 }}>What was actually on screen (real page text, not a paraphrase):</p>
+                  <p className="muted" style={{ marginBottom: 2 }}>What was on screen (the real page text, no paraphrase):</p>
                   <pre style={{ whiteSpace: 'pre-wrap', background: 'var(--surface-1)', padding: 8, borderRadius: 6, maxHeight: 200, overflowY: 'auto', margin: 0 }}>
                     {ctx.visible_text}
                   </pre>

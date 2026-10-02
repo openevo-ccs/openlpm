@@ -43,9 +43,9 @@ export const CURATION: Record<EpistemicStatus, Curation> = {
 // tooltip -- "Human-Curated"/"Synthetic-Theoretical" reads as jargon to a
 // teacher seeing it for the first time.
 const GLOSS: Record<EpistemicStatus, string> = {
-  'designed-thought-experiment': 'A designed thought experiment -- not yet tried with real students.',
+  'designed-thought-experiment': 'A designed thought experiment. Not yet tried with real students.',
   'field-validated-curriculum': 'Made by real teachers and researchers, and already tried in a classroom.',
-  'in-development': 'Made by real teachers and researchers, not yet tried in a classroom.',
+  'in-development': 'Made by real teachers and researchers. Not yet tried in a classroom.',
 }
 
 export function EpistemicStatusBadge({ status }: { status: EpistemicStatus }) {

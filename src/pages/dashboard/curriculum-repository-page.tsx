@@ -62,7 +62,7 @@ export default function CurriculumRepositoryPage() {
           <p className="muted" style={{ marginBottom: 12, maxWidth: 640 }}>
             Real, sourced curriculum-policy material for this jurisdiction. Each item is shown only as
             much as its own source allows — some are full excerpts, most today are citation only (a
-            pointer to the source, not the text itself) until someone reviews them for more.
+            pointer to the source rather than the text itself) until someone reviews them for more.
           </p>
         </div>
       </div>
@@ -186,7 +186,7 @@ function RecordDetail({
       {gated.length > 0 && (
         <div className="notice" style={{ marginTop: 10 }}>
           <Info size={14} />
-          {gated.length} more field{gated.length === 1 ? '' : 's'} on this record ({gated.map((f) => f.label).join(', ')}) aren&apos;t shown — this record is marked &ldquo;{ACCESS_TIER_LABEL[record.access_tier]}&rdquo;, so only the facts above are shown, not the fuller wording.
+          {gated.length} more field{gated.length === 1 ? '' : 's'} on this record ({gated.map((f) => f.label).join(', ')}) aren&apos;t shown — this record is marked &ldquo;{ACCESS_TIER_LABEL[record.access_tier]}&rdquo;, so only the facts above are shown — the fuller wording stays hidden.
         </div>
       )}
 

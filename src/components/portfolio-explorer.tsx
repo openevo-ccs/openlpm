@@ -379,7 +379,7 @@ export function PortfolioExplorer({
                   {selected.annotation && <p style={{ marginTop: 10 }}>{selected.annotation}</p>}
                   {selected.kind === 'canonical' && (
                     <p className="muted" style={{ marginTop: 10 }}>
-                      This references a canonical item from the project&apos;s Schema page — edit it there, not here.
+                      This references a canonical item from the project&apos;s Schema page. Edit it there instead.
                     </p>
                   )}
 

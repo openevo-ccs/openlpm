@@ -29,7 +29,7 @@ export default function PrivacyPage() {
 
       <div className="notice notice-bad" style={{ alignItems: 'flex-start' }}>
         <div>
-          <strong>Draft, not yet reviewed by a data protection officer.</strong> This describes
+          <strong>Draft. Not yet reviewed by a data protection officer.</strong> This describes
           OpenLPM&apos;s actual technical setup as built, in plain terms — it has not been checked
           by the institute&apos;s Datenschutzbeauftragte(r) or a lawyer. Please have it reviewed
           before treating it as final. It replaces, for this specific service, the general{' '}
@@ -53,8 +53,8 @@ export default function PrivacyPage() {
         Creating an account requires an email address and a password (handled by Supabase Auth,
         OpenLPM&apos;s authentication provider — your password itself is never visible to us, only
         to Supabase). You can also sign in with a GitHub account instead. Staying signed in works
-        by storing a session token in your browser&apos;s own local storage, not a tracking cookie
-        — it identifies your session to OpenLPM only, and is cleared when you sign out.
+        by storing a session token in your browser&apos;s own local storage. This isn&apos;t a
+        tracking cookie — it identifies your session to OpenLPM only, and is cleared when you sign out.
       </p>
 
       <h2>What we store about you</h2>
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
         button, we also store the comment you write, which page you were on, a short excerpt of
         that page&apos;s visible text, a short list of pages you recently visited in that session,
         and — if you attach one — a screenshot image. All of this is held in OpenLPM&apos;s own
-        database and file storage (provided by Supabase), not shared with any other OpenEvo app.
+        database and file storage (provided by Supabase). It is never shared with any other OpenEvo app.
       </p>
 
       <h2>Hosting</h2>
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
       <h2>Links to other sites</h2>
       <p>
         OpenLPM links out to GitHub repositories and partner institutions. Each of those operates
-        under its own privacy policy, not this one.
+        under its own privacy policy — this page doesn&apos;t cover them.
       </p>
 
       <h2>Your rights</h2>
