@@ -8,6 +8,17 @@
 
 **A note on sources:** `src/lib/supabase/database.types.ts` (the auto-generated TypeScript types) is useful but was confirmed stale as of this writing — it predates the last ~10 migrations (project groups, project federation, several others) and is even missing a real foreign key on a table it does cover (`evidence_links.reference_id`). Everything below is drawn from the actual SQL migration files, which are the real source of truth, not from the generated types. See [Known gotchas](#known-gotchas) for what this means practically.
 
+## Status: what was decided, what's actually built
+
+Everything above traces OpenLPM's software — tables, functions, routes — not the curricula, theories, and learning progressions that researchers *build inside* OpenLPM. Those are a separate kind of model entirely (a strand is itself a small model of how understanding should develop); this reference is about the platform that holds them, not their content.
+
+A diagram of "what exists" tends to go stale exactly where it matters most: a feature gets proposed, written up, half-built, or quietly retired, and the diagram doesn't notice. [`self-model/manifest.json`](../../self-model/manifest.json) states, element by element, whether something was **decided** (an RFC or a named design call), what **behavior** it's supposed to produce, and which real **tables** store it — each one tagged `implemented`, `proposed`, or `retired`, checked by a script (`scripts/self_model_check.py`, kept in the `lab_manager` repo rather than copied here, so there's one copy to keep correct) that actually reads `supabase/migrations` rather than trusting the label. Running it (`npm run self-model:check`) regenerates [`self-model.generated.md`](self-model.generated.md) — never edit that file by hand.
+
+Two things it already caught that are easy to get wrong by reading prose alone:
+
+- **"Federation" and "Commons" are two different ideas that sound alike.** RFC-0004 (2026-09-06) proposed *Commons*: one project referencing another project's curriculum *content*. That was never built — confirmed directly: `project_commons_links` and `commons_item_references` don't exist in any migration. What *did* get built 2026-10-02, under a different name, is *federation*: sharing project *membership* laterally between two projects. Reading the schema without the RFC history, it would be easy to assume the newer feature was Commons finally shipping. It isn't.
+- **A `retired` decision can still have a present, real table** — `branches` (RFC-0002 §3) is exactly this case, and the manifest records it as an acknowledged exception with a reason (migration 016's own reasoning for keeping it), not a silently-passing check or an unexplained error.
+
 ## 1. Project, access, and federation
 
 This is the layer that decides who can see and touch what.

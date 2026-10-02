@@ -1,0 +1,1151 @@
+{
+  "system": "openlpm",
+  "root": "..",
+  "description": "OpenLPM's own model of ITSELF as software (why each part was decided, what it actually enforces, what tables store it) -- not a model of the curricula/theories that researchers build INSIDE OpenLPM (strands, learning goals, theories). Layers run most-abstract (Decided) to most-concrete (Structure); the mappings between them are checked by scripts/self_model_check.py in the lab_manager repo (not copied here, to avoid drift).",
+  "layers": [
+    {
+      "id": "L0",
+      "name": "Decided",
+      "question": "What was decided, by whom, and is it still the plan?"
+    },
+    {
+      "id": "L1",
+      "name": "Behavior",
+      "question": "What does OpenLPM actually enforce or allow once running?"
+    },
+    {
+      "id": "L2",
+      "name": "Structure",
+      "question": "What tables actually exist in the database?"
+    }
+  ],
+  "diagram_layers": [
+    "L0",
+    "L1"
+  ],
+  "elements": [
+    {
+      "id": "decided.platform-foundation",
+      "layer": "L0",
+      "label": "Core platform: literature management, schema co-design, LPM data objects, peer review, evidence linking, discussion forums (the README's own feature list; migration 001)",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.rfc0001-self-host-default",
+      "layer": "L0",
+      "label": "RFC-0001: every group self-hosts its own instance by default",
+      "status": "retired",
+      "note": "superseded by RFC-0002's hybrid hosting model (shared hosted instance by default; self-host is still possible but loses live Commons/federation)"
+    },
+    {
+      "id": "decided.rfc0002-branches",
+      "layer": "L0",
+      "label": "RFC-0002 §3: a two-tier branch/fork/promote mechanism for drafting project content",
+      "status": "retired",
+      "note": "migration 016 (2026-09) checked live data directly, found every real project had exactly one branch (its trunk), and replaced branching with nested sub-projects plus a plain maturity flip; no branches UI remains in the frontend",
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "branches"
+        }
+      ],
+      "acknowledged": {
+        "kinds": [
+          "retired-but-present"
+        ],
+        "reason": "migration 016 deliberately kept the table and one historical non-trunk branch record as real provenance, not live data -- not a regression",
+        "on": "2026-10-02"
+      }
+    },
+    {
+      "id": "decided.rfc0002-projects-and-portfolios",
+      "layer": "L0",
+      "label": "RFC-0002 §1-2,6: multi-tenant projects, membership roles, personal portfolios referencing canonical content",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.rfc0002-base-linking",
+      "layer": "L0",
+      "label": "RFC-0002 §5: linking a project to the wider OpenEvo Foundational Repos for import",
+      "status": "implemented",
+      "note": "import-only; contribute-back (proposing changes into a Foundational Repo) was never built"
+    },
+    {
+      "id": "decided.rfc0003-frameworks-and-standards",
+      "layer": "L0",
+      "label": "RFC-0003: versioned external frameworks/standards and how OpenLPM content maps to them",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.rfc0004-structured-scope",
+      "layer": "L0",
+      "label": "RFC-0004 §1: structured, queryable project scope (jurisdiction, subject, school type)",
+      "status": "implemented",
+      "note": "built as normalized tables (migration 019) rather than the plain columns RFC-0004 originally sketched"
+    },
+    {
+      "id": "decided.rfc0004-commons",
+      "layer": "L0",
+      "label": "RFC-0004 §4: Commons — cross-project permission grants plus reference-not-copy links between two projects' curriculum content (project_commons_links, commons_item_references)",
+      "status": "proposed",
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_commons_links"
+        }
+      ]
+    },
+    {
+      "id": "decided.rfc0006-commons-spaces",
+      "layer": "L0",
+      "label": "RFC-0006: the revised Commons mechanism (audit-logged, role-gated propose/review/decide), superseding RFC-0004 §3’s simpler can_edit flag",
+      "status": "proposed",
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "audit_log"
+        }
+      ]
+    },
+    {
+      "id": "decided.project-maturity-2026-09",
+      "layer": "L0",
+      "label": "Migrations 015-016: nested sub-projects plus a plain draft/established status flip, replacing branching as how a project matures",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.groups-2026-10-02",
+      "layer": "L0",
+      "label": "Groups: member-run sub-teams within one project, each with a shared view",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.federation-2026-10-02",
+      "layer": "L0",
+      "label": "Project federation: an owner shares some members' access laterally into a separate, independent project — distinct from RFC-0004's content-only Commons idea despite the similar motivation",
+      "status": "implemented"
+    },
+    {
+      "id": "decided.github-publication-strategy",
+      "layer": "L0",
+      "label": "Publish a project's content as an independent repo on the owner's own GitHub account",
+      "status": "proposed",
+      "note": "strategy and technical design locked 2026-10-01; nothing built"
+    },
+    {
+      "id": "decided.incremental-utility-features",
+      "layer": "L0",
+      "label": "Small additions with no dedicated RFC: feedback widget, tutorials, audit log, personal favorites/annotations, method-to-concept links, AI prompt generator templates",
+      "status": "implemented"
+    },
+    {
+      "id": "behavior.project-membership-gate",
+      "layer": "L1",
+      "label": "is_project_member() / has_project_role(): the central membership and role check used across most tables",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/004_projects_branches_portfolios.sql",
+          "pattern": "CREATE OR REPLACE FUNCTION is_project_member"
+        }
+      ]
+    },
+    {
+      "id": "behavior.portfolio-sharing-gate",
+      "layer": "L1",
+      "label": "is_portfolio_owner() / has_portfolio_share(): portfolio access, rewritten once already to fix a live infinite-recursion bug",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/009_fix_portfolios_rls_recursion.sql",
+          "pattern": "CREATE OR REPLACE FUNCTION is_portfolio_owner"
+        }
+      ]
+    },
+    {
+      "id": "behavior.group-management-gate",
+      "layer": "L1",
+      "label": "is_group_member() / can_manage_groups(): group membership and who may create or delete a group",
+      "status": "implemented",
+      "realizes": [
+        "decided.groups-2026-10-02"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/075_project_groups.sql",
+          "pattern": "CREATE OR REPLACE FUNCTION is_group_member"
+        }
+      ]
+    },
+    {
+      "id": "behavior.admin-override-gate",
+      "layer": "L1",
+      "label": "is_admin(): bypasses ordinary membership checks for lab-wide administration",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/049_admin_user_management.sql",
+          "pattern": "CREATE OR REPLACE FUNCTION is_admin"
+        }
+      ]
+    },
+    {
+      "id": "behavior.federation-lifecycle",
+      "layer": "L1",
+      "label": "proposed -> accepted -> revoked federation status; granted_role can never be owner; acceptance creates a real project_members row",
+      "status": "implemented",
+      "realizes": [
+        "decided.federation-2026-10-02"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/084_project_federation.sql",
+          "pattern": "CREATE TABLE IF NOT EXISTS project_federations"
+        }
+      ]
+    },
+    {
+      "id": "behavior.project-maturity-flip",
+      "layer": "L1",
+      "label": "draft -> established status flip replacing branch/fork/promote",
+      "status": "implemented",
+      "realizes": [
+        "decided.project-maturity-2026-09"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/016_project_maturity.sql",
+          "pattern": "maturity"
+        }
+      ]
+    },
+    {
+      "id": "behavior.review-workflow",
+      "layer": "L1",
+      "label": "peer_review_assignments: pending -> in_progress -> completed, with an accept/reject/revise recommendation, across 8 different kinds of reviewable object",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/001_initial_schema.sql",
+          "pattern": "peer_review_assignments"
+        }
+      ]
+    },
+    {
+      "id": "behavior.evidence-maturity-staging",
+      "layer": "L1",
+      "label": "theories.evidentiary_maturity: theoretically-developed -> empirically-recovered -> tested-against-alternatives -> efficacy-demonstrated",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "text_contains",
+          "path": "supabase/migrations/020_theories_strands_discussions.sql",
+          "pattern": "evidentiary_maturity"
+        }
+      ]
+    },
+    {
+      "id": "table.users",
+      "layer": "L2",
+      "label": "users",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "users"
+        }
+      ]
+    },
+    {
+      "id": "table.projects",
+      "layer": "L2",
+      "label": "projects",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "projects"
+        }
+      ]
+    },
+    {
+      "id": "table.project_members",
+      "layer": "L2",
+      "label": "project_members",
+      "status": "implemented",
+      "realizes": [
+        "behavior.project-membership-gate"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_members"
+        }
+      ]
+    },
+    {
+      "id": "table.project_invites",
+      "layer": "L2",
+      "label": "project_invites",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_invites"
+        }
+      ]
+    },
+    {
+      "id": "table.project_join_rules",
+      "layer": "L2",
+      "label": "project_join_rules",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_join_rules"
+        }
+      ]
+    },
+    {
+      "id": "table.branches",
+      "layer": "L2",
+      "label": "branches",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-branches"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "branches"
+        }
+      ]
+    },
+    {
+      "id": "table.project_groups",
+      "layer": "L2",
+      "label": "project_groups",
+      "status": "implemented",
+      "realizes": [
+        "behavior.group-management-gate"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_groups"
+        }
+      ]
+    },
+    {
+      "id": "table.group_members",
+      "layer": "L2",
+      "label": "group_members",
+      "status": "implemented",
+      "realizes": [
+        "behavior.group-management-gate"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "group_members"
+        }
+      ]
+    },
+    {
+      "id": "table.project_federations",
+      "layer": "L2",
+      "label": "project_federations",
+      "status": "implemented",
+      "realizes": [
+        "behavior.federation-lifecycle"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_federations"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_schema_elements",
+      "layer": "L2",
+      "label": "lpm_schema_elements",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_schema_elements"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_data_objects",
+      "layer": "L2",
+      "label": "lpm_data_objects",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_data_objects"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_connections",
+      "layer": "L2",
+      "label": "lpm_connections",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_connections"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_threads",
+      "layer": "L2",
+      "label": "lpm_threads",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_threads"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_thread_stations",
+      "layer": "L2",
+      "label": "lpm_thread_stations",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_thread_stations"
+        }
+      ]
+    },
+    {
+      "id": "table.strand_parents",
+      "layer": "L2",
+      "label": "strand_parents",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "strand_parents"
+        }
+      ]
+    },
+    {
+      "id": "table.literature_references",
+      "layer": "L2",
+      "label": "literature_references",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "literature_references"
+        }
+      ]
+    },
+    {
+      "id": "table.evidence_links",
+      "layer": "L2",
+      "label": "evidence_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "evidence_links"
+        }
+      ]
+    },
+    {
+      "id": "table.peer_review_assignments",
+      "layer": "L2",
+      "label": "peer_review_assignments",
+      "status": "implemented",
+      "realizes": [
+        "behavior.review-workflow"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "peer_review_assignments"
+        }
+      ]
+    },
+    {
+      "id": "table.discussion_topics",
+      "layer": "L2",
+      "label": "discussion_topics",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "discussion_topics"
+        }
+      ]
+    },
+    {
+      "id": "table.discussion_posts",
+      "layer": "L2",
+      "label": "discussion_posts",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "discussion_posts"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_coherence_reviews",
+      "layer": "L2",
+      "label": "lpm_coherence_reviews",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_coherence_reviews"
+        }
+      ]
+    },
+    {
+      "id": "table.portfolios",
+      "layer": "L2",
+      "label": "portfolios",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "portfolios"
+        }
+      ]
+    },
+    {
+      "id": "table.portfolio_items",
+      "layer": "L2",
+      "label": "portfolio_items",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "portfolio_items"
+        }
+      ]
+    },
+    {
+      "id": "table.portfolio_private_nodes",
+      "layer": "L2",
+      "label": "portfolio_private_nodes",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "portfolio_private_nodes"
+        }
+      ]
+    },
+    {
+      "id": "table.portfolio_links",
+      "layer": "L2",
+      "label": "portfolio_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-projects-and-portfolios"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "portfolio_links"
+        }
+      ]
+    },
+    {
+      "id": "table.portfolio_shares",
+      "layer": "L2",
+      "label": "portfolio_shares",
+      "status": "implemented",
+      "realizes": [
+        "behavior.portfolio-sharing-gate"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "portfolio_shares"
+        }
+      ]
+    },
+    {
+      "id": "table.theories",
+      "layer": "L2",
+      "label": "theories",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "theories"
+        }
+      ]
+    },
+    {
+      "id": "table.theory_relations",
+      "layer": "L2",
+      "label": "theory_relations",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "theory_relations"
+        }
+      ]
+    },
+    {
+      "id": "table.theory_literature_links",
+      "layer": "L2",
+      "label": "theory_literature_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "theory_literature_links"
+        }
+      ]
+    },
+    {
+      "id": "table.frameworks",
+      "layer": "L2",
+      "label": "frameworks",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "frameworks"
+        }
+      ]
+    },
+    {
+      "id": "table.framework_tags",
+      "layer": "L2",
+      "label": "framework_tags",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "framework_tags"
+        }
+      ]
+    },
+    {
+      "id": "table.framework_crosswalks",
+      "layer": "L2",
+      "label": "framework_crosswalks",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "framework_crosswalks"
+        }
+      ]
+    },
+    {
+      "id": "table.project_base_links",
+      "layer": "L2",
+      "label": "project_base_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0002-base-linking"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_base_links"
+        }
+      ]
+    },
+    {
+      "id": "table.curriculum_repository_records",
+      "layer": "L2",
+      "label": "curriculum_repository_records",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "curriculum_repository_records"
+        }
+      ]
+    },
+    {
+      "id": "table.curriculum_repository_links",
+      "layer": "L2",
+      "label": "curriculum_repository_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "curriculum_repository_links"
+        }
+      ]
+    },
+    {
+      "id": "table.curriculum_repository_record_tags",
+      "layer": "L2",
+      "label": "curriculum_repository_record_tags",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "curriculum_repository_record_tags"
+        }
+      ]
+    },
+    {
+      "id": "table.standards_documents",
+      "layer": "L2",
+      "label": "standards_documents",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "standards_documents"
+        }
+      ]
+    },
+    {
+      "id": "table.standards_item_changes",
+      "layer": "L2",
+      "label": "standards_item_changes",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "standards_item_changes"
+        }
+      ]
+    },
+    {
+      "id": "table.standards_item_framework_relevance",
+      "layer": "L2",
+      "label": "standards_item_framework_relevance",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0003-frameworks-and-standards"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "standards_item_framework_relevance"
+        }
+      ]
+    },
+    {
+      "id": "table.project_jurisdictions",
+      "layer": "L2",
+      "label": "project_jurisdictions",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0004-structured-scope"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_jurisdictions"
+        }
+      ]
+    },
+    {
+      "id": "table.project_subject_area_tags",
+      "layer": "L2",
+      "label": "project_subject_area_tags",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0004-structured-scope"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_subject_area_tags"
+        }
+      ]
+    },
+    {
+      "id": "table.project_repository_links",
+      "layer": "L2",
+      "label": "project_repository_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0004-structured-scope"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_repository_links"
+        }
+      ]
+    },
+    {
+      "id": "table.project_source_declarations",
+      "layer": "L2",
+      "label": "project_source_declarations",
+      "status": "implemented",
+      "realizes": [
+        "decided.rfc0004-structured-scope"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "project_source_declarations"
+        }
+      ]
+    },
+    {
+      "id": "table.activity_log",
+      "layer": "L2",
+      "label": "activity_log",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "activity_log"
+        }
+      ]
+    },
+    {
+      "id": "table.feedback",
+      "layer": "L2",
+      "label": "feedback",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "feedback"
+        }
+      ]
+    },
+    {
+      "id": "table.tutorials",
+      "layer": "L2",
+      "label": "tutorials",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "tutorials"
+        }
+      ]
+    },
+    {
+      "id": "table.prompt_template_libraries",
+      "layer": "L2",
+      "label": "prompt_template_libraries",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "prompt_template_libraries"
+        }
+      ]
+    },
+    {
+      "id": "table.prompt_experiments",
+      "layer": "L2",
+      "label": "prompt_experiments",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "prompt_experiments"
+        }
+      ]
+    },
+    {
+      "id": "table.lpm_object_tags",
+      "layer": "L2",
+      "label": "lpm_object_tags",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "lpm_object_tags"
+        }
+      ]
+    },
+    {
+      "id": "table.discussion_topic_tags",
+      "layer": "L2",
+      "label": "discussion_topic_tags",
+      "status": "implemented",
+      "realizes": [
+        "decided.platform-foundation"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "discussion_topic_tags"
+        }
+      ]
+    },
+    {
+      "id": "table.literature_annotations",
+      "layer": "L2",
+      "label": "literature_annotations",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "literature_annotations"
+        }
+      ]
+    },
+    {
+      "id": "table.method_basiskonzept_links",
+      "layer": "L2",
+      "label": "method_basiskonzept_links",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "method_basiskonzept_links"
+        }
+      ]
+    },
+    {
+      "id": "table.user_favorite_learning_goals",
+      "layer": "L2",
+      "label": "user_favorite_learning_goals",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "user_favorite_learning_goals"
+        }
+      ]
+    },
+    {
+      "id": "table.user_favorite_methods",
+      "layer": "L2",
+      "label": "user_favorite_methods",
+      "status": "implemented",
+      "realizes": [
+        "decided.incremental-utility-features"
+      ],
+      "realized_by": [
+        {
+          "type": "sql_table",
+          "migrations": "supabase/migrations",
+          "name": "user_favorite_methods"
+        }
+      ]
+    }
+  ],
+  "coverage": [
+    {
+      "id": "sql-tables",
+      "severity": "warn",
+      "enumerate": {
+        "type": "sql_tables",
+        "migrations": "supabase/migrations",
+        "exclude": [
+          "^schema_migrations$",
+          "^supabase_"
+        ]
+      }
+    }
+  ]
+}

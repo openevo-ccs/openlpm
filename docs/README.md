@@ -25,6 +25,8 @@ node scripts/check_docs_freshness.mjs
 
 See [Level 3's closing section](architecture/3-full-reference.md#keeping-this-current) for how it works and when to re-run it with `--update`.
 
+A second, complementary check goes further than route/table counts: [`self-model/manifest.json`](../self-model/manifest.json) states which real tables realize which named design decision (an RFC or a 2026-10-02-style feature), each tagged `implemented`, `proposed`, or `retired` — checked against `supabase/migrations` by a script kept in the `lab_manager` repo (`npm run self-model:check`). See [Level 3 § Status](architecture/3-full-reference.md#status-what-was-decided-whats-actually-built).
+
 ## Other documents in this folder
 
 - **[openevo-ccs-learning-loop.md](openevo-ccs-learning-loop.md)** — how OpenLPM and the broader OpenEvo CCS Lab ecosystem learn from each other. Not about OpenLPM's own architecture — see above for that.
