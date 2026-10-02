@@ -45,13 +45,23 @@
      cycled by index via modulo, not tied to any fixed concept count, so it
      works whether a project has 3 root concepts or 20. Purely a visual
      grouping aid (every node shares its top-level ancestor's color), not a
-     semantic status color like the tokens above. */
-  --map-1: #2a78d6;
-  --map-2: #b5560f;
-  --map-3: #7a3ec2;
-  --map-4: #b5238f;
-  --map-5: #0f8a6a;
-  --map-6: #a3861a;
+     semantic status color like the tokens above.
+
+     Real feedback 478397f9 (Susan, 2026-10-02): wanted the 6 real Thuringia
+     Basiskonzepte colored green/red/blue/brown/orange/purple, in that
+     order. Dustin's call (2026-10-02): change this shared palette itself
+     rather than build a separate name-to-color mapping -- every view that
+     colors a concept by its position in rootConcepts (now a stable,
+     canonical order, see basiskonzepte.ts's getRootConcepts) picks this up
+     automatically. Red (--map-2) deliberately isn't identical to
+     --critical-rgb above -- a different, slightly deeper red, so a concept
+     dot never reads as a status/error indicator at a glance. */
+  --map-1: #1c8a4e;
+  --map-2: #b3372e;
+  --map-3: #2a78d6;
+  --map-4: #8a5a2a;
+  --map-5: #d9791f;
+  --map-6: #7a3ec2;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -60,7 +70,7 @@
     --series-a: var(--brand-teal);
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
-    --map-1: #5b9ee8; --map-2: #d98a3f; --map-3: #a374e0; --map-4: #e05bb8; --map-5: #3fc4a0; --map-6: #d1af3f;
+    --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
   }
 }
 :root[data-theme="dark"] {
@@ -69,7 +79,7 @@
   --series-a: var(--brand-teal);
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
-  --map-1: #5b9ee8; --map-2: #d98a3f; --map-3: #a374e0; --map-4: #e05bb8; --map-5: #3fc4a0; --map-6: #d1af3f;
+  --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
 }
 
 * { box-sizing: border-box; }
