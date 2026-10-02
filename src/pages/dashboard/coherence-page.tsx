@@ -54,10 +54,9 @@ export default function CoherencePage() {
     <div>
       <h1 className="row"><Grid3x3 size={18} style={{ color: 'var(--text-muted)' }} />Vertical coherence</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
-        Does each grade genuinely build on the one before it, not just superficially follow it in
-        file order? Every cell below is measured from real connections and threads — never
-        eyeballed. An empty cell is an open question, not a verdict: check it, and either record a
-        real connection or explicitly note that none exists.
+        This checks whether each grade's content actually builds on the one before it, based on
+        real connections traced between them. An empty cell just hasn't been checked yet — review
+        it to record a connection, or note that none exists.
       </p>
 
       {!canManage && (

@@ -241,7 +241,7 @@ function TopicDetail({
       {(requiredBefore.length > 0 || leadsTo.length > 0) && (
         <section style={{ marginBottom: 18 }}>
           <h3 className="row"><Link2 size={13} />Required order in the curriculum</h3>
-          <p className="muted" style={{ marginTop: -4 }}>The curriculum itself sequences these — not a suggestion.</p>
+          <p className="muted" style={{ marginTop: -4 }}>This order comes from the curriculum's own structure.</p>
           {requiredBefore.map((c) => (
             <ConnLine key={c.connection.id} kind="asserted" arrow="in" object={c.other} projectSlug={projectSlug} />
           ))}

@@ -5,7 +5,7 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
@@ -195,6 +195,12 @@ export default function StudentPromptPage() {
 
   const items = useMemo(() => scopedIds.map((id) => fullById.get(id)).filter((o): o is DataObject => !!o), [scopedIds, fullById])
 
+  useEffect(() => {
+    if (!cfg) return
+    const derived = deriveKlassenstufe(items)
+    if (derived !== cfg.klassenstufe) setCfg({ ...cfg, klassenstufe: derived })
+  }, [items, cfg])
+
   const bkIds = useMemo(() => {
     const ids = new Set<string>()
     for (const item of items) for (const e of bkEntries(item.content)) ids.add(e.basiskonzept_id)
@@ -364,7 +370,8 @@ export default function StudentPromptPage() {
           <h3><span className="num">2</span>Unterrichtsrahmen</h3>
           <div className="field">
             <label>Klassenstufe(n)</label>
-            <input value={cfg.klassenstufe} onChange={(e) => setCfg({ ...cfg, klassenstufe: e.target.value })} placeholder="z. B. 7 oder 7–8" />
+            <input value={cfg.klassenstufe || '—'} disabled />
+            <span className="muted" style={{ fontSize: 11 }}>Wird automatisch aus den gewählten Lernzielen übernommen.</span>
           </div>
           <div className="row" style={{ gap: 8 }}>
             <div className="field" style={{ flex: 1 }}>

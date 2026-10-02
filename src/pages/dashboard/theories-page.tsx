@@ -42,7 +42,7 @@ const MATURITY_GLOSS: Record<NonNullable<EvidentiaryMaturity>, string> = {
   'theoretically-developed': 'A well-reasoned idea, but not yet checked against real evidence.',
   'empirically-recovered': 'Someone has found real evidence for this, but it hasn\'t been tested head-to-head against other explanations yet.',
   'tested-against-alternatives': 'Checked directly against competing explanations, and this one held up better.',
-  'efficacy-demonstrated': 'Shown to actually work in real, practical use, not just in theory.',
+  'efficacy-demonstrated': 'Demonstrated to work in real classroom use.',
 }
 
 export default function TheoriesPage() {

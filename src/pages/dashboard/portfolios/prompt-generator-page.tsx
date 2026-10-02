@@ -20,7 +20,7 @@ import {
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, isBkFocused, toggleBkFocus, CheckGroup, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 
 // Built for the Uni Jena Biologiedidaktik pilot (2026-09-17 ask), then
@@ -83,6 +83,12 @@ export default function PromptGeneratorPage() {
     getRootConcepts(supabase, project).then(setRootConcepts)
     listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
   }, [supabase, portfolioId, project])
+
+  useEffect(() => {
+    if (!items || !cfg) return
+    const derived = deriveKlassenstufe(items)
+    if (derived !== cfg.klassenstufe) setCfg({ ...cfg, klassenstufe: derived })
+  }, [items, cfg])
 
   const onToggleFavoriteMethod = async (methodKey: string) => {
     const isFav = favoriteMethods.has(methodKey)
@@ -174,7 +180,8 @@ export default function PromptGeneratorPage() {
 
             <div className="field">
               <label>Grade level(s)</label>
-              <input value={cfg.klassenstufe} onChange={(e) => setCfg({ ...cfg, klassenstufe: e.target.value })} placeholder="e.g. 8" />
+              <input value={cfg.klassenstufe || '—'} disabled />
+              <span className="muted" style={{ fontSize: 11 }}>Set automatically from this notebook's items.</span>
             </div>
             <div className="row" style={{ gap: 8 }}>
               <div className="field" style={{ flex: 1 }}>

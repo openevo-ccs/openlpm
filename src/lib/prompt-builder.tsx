@@ -149,6 +149,33 @@ export function buildPrompt(
   return lines.join('\n')
 }
 
+// Real feedback bdd96114 (Susan Hanisch, 2026-10-02): a separately
+// hand-typed grade field was redundant with the grade(s) the chosen
+// learning goals already carry via their own grade_band. Collapses the
+// distinct grade_band values actually present in the current item set into
+// a compact display string -- a contiguous run reads "7–9", separate runs
+// join with ", " (e.g. "5–6, 9").
+export function deriveKlassenstufe(items: { grade_band: string | null }[]): string {
+  const grades = Array.from(new Set(items.map((i) => i.grade_band).filter((g): g is string => !!g)))
+    .map(Number)
+    .filter((n) => !Number.isNaN(n))
+    .sort((a, b) => a - b)
+  if (grades.length === 0) return ''
+  const runs: string[] = []
+  let start = grades[0]
+  let prev = grades[0]
+  for (let i = 1; i <= grades.length; i++) {
+    const g = grades[i]
+    if (g === prev + 1) {
+      prev = g
+      continue
+    }
+    runs.push(start === prev ? `${start}` : `${start}–${prev}`)
+    if (i < grades.length) { start = g; prev = g }
+  }
+  return runs.join(', ')
+}
+
 export function toggleInList(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
 }

@@ -309,7 +309,7 @@ function ConceptMapTab() {
         <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
           <h3 style={{ marginTop: 0 }}>How much each state emphasizes each concept</h3>
           <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-            Average relevance (1 = not relevant, 3 = central), from every real item's own judgment — not a guess.
+            Average relevance (1 = not relevant, 3 = central), computed from every item's own judgment.
           </p>
           <table>
             <thead>
