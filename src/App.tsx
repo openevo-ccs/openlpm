@@ -21,6 +21,7 @@ import StrandsPage from '@/pages/dashboard/strands-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
 import TimelinePage from '@/pages/dashboard/timeline-page'
 import ContextItemsPage from '@/pages/dashboard/context-items-page'
+import MapPage from '@/pages/dashboard/map-page'
 import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
 import AnalyticsPage from '@/pages/dashboard/analytics-page'
 import ReviewPage from '@/pages/dashboard/review-page'
@@ -127,6 +128,7 @@ export default function App() {
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
             <Route path="timeline" element={<TimelinePage />} />
             <Route path="context" element={<ContextItemsPage />} />
+            <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />
