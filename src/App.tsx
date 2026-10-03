@@ -19,6 +19,7 @@ import ConceptsPage from '@/pages/dashboard/concepts-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
+import TimelinePage from '@/pages/dashboard/timeline-page'
 import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
 import AnalyticsPage from '@/pages/dashboard/analytics-page'
 import ReviewPage from '@/pages/dashboard/review-page'
@@ -123,6 +124,7 @@ export default function App() {
             <Route path="strands/:strandId" element={<StrandsPage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
+            <Route path="timeline" element={<TimelinePage />} />
             <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />

@@ -676,3 +676,29 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   text-align: center; padding: 8px 12px; font-size: 11px; color: var(--text-muted);
 }
 .app-legal-footer a { color: var(--text-muted); }
+
+/* Curriculum Repository timeline (2026-10-03): a fixed label column next to
+   a horizontally-scrolling time axis + lanes -- both columns render the
+   same lane rows at the same height, so no independent vertical scroll is
+   needed to keep them aligned. */
+.timeline-wrap { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface-2); }
+.timeline-labels { width: 180px; flex-shrink: 0; border-right: 1px solid var(--border); }
+.timeline-lane-label {
+  display: flex; align-items: center; padding: 0 10px; font-size: 12px; color: var(--text-secondary);
+  border-bottom: 1px solid var(--gridline); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.timeline-scroll { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; position: relative; }
+.timeline-axis { position: relative; border-bottom: 1px solid var(--border); }
+.timeline-tick {
+  position: absolute; top: 0; height: 100%; display: flex; align-items: center; font-size: 11px;
+  color: var(--text-muted); padding-left: 4px; border-left: 1px solid var(--gridline); white-space: nowrap;
+}
+.timeline-lane-row { position: relative; border-bottom: 1px solid var(--gridline); }
+.timeline-gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gridline); pointer-events: none; }
+.timeline-mark { position: absolute; top: 50%; border: none; cursor: pointer; padding: 0; }
+.timeline-mark-point {
+  width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 3px;
+  transform: rotate(45deg); box-shadow: 0 0 0 2px var(--surface-2);
+}
+.timeline-mark-bar { height: 14px; margin-top: -7px; border-radius: 4px; box-shadow: 0 0 0 2px var(--surface-2); }
+.timeline-today { position: absolute; width: 0; border-left: 2px dashed var(--series-a); pointer-events: none; }
