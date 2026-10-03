@@ -1,3 +1,5 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+
 export type Database = {
   public: {
     // @supabase/postgrest-js's GenericSchema requires all three keys (even
@@ -1707,6 +1709,9 @@ export type Database = {
           evidentiary_maturity_note: string | null
           base_repo: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
           base_repo_ref: string | null
+          held_by: string[] | null
+          authorship_provenance: 'native' | 'openevo_reconstruction_of_external_position' | null
+          characterization_status: 'author_stated' | 'openevo_reconstruction_unreviewed' | 'openevo_reconstruction_reviewed' | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -1720,6 +1725,9 @@ export type Database = {
           evidentiary_maturity_note?: string | null
           base_repo?: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
           base_repo_ref?: string | null
+          held_by?: string[] | null
+          authorship_provenance?: 'native' | 'openevo_reconstruction_of_external_position' | null
+          characterization_status?: 'author_stated' | 'openevo_reconstruction_unreviewed' | 'openevo_reconstruction_reviewed' | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -1733,6 +1741,9 @@ export type Database = {
           evidentiary_maturity_note?: string | null
           base_repo?: 'conceptbase' | 'theorybase' | 'questionbase' | 'literaturebase' | 'competencybase' | 'methodsbase' | 'quotebase' | 'humanbase' | 'projectbase' | 'teachingbase' | null
           base_repo_ref?: string | null
+          held_by?: string[] | null
+          authorship_provenance?: 'native' | 'openevo_reconstruction_of_external_position' | null
+          characterization_status?: 'author_stated' | 'openevo_reconstruction_unreviewed' | 'openevo_reconstruction_reviewed' | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -1832,6 +1843,143 @@ export type Database = {
             referencedColumns: ["id"]
           }
         ]
+      }
+      theory_propositions: {
+        Row: {
+          id: string
+          theory_id: string
+          kind: 'proposition' | 'assumption'
+          label: string
+          statement: string
+          sort_order: number
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          theory_id: string
+          kind: 'proposition' | 'assumption'
+          label: string
+          statement: string
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          theory_id?: string
+          kind?: 'proposition' | 'assumption'
+          label?: string
+          statement?: string
+          sort_order?: number
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theory_propositions_theory_id_fkey",
+            columns: ["theory_id"],
+            isOneToOne: false,
+            referencedRelation: "theories",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      theory_contributions: {
+        Row: {
+          id: string
+          theory_id: string
+          project_id: string
+          status: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml: string
+          target_branch: string | null
+          target_record_id: string | null
+          note: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          theory_id: string
+          project_id: string
+          status?: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml: string
+          target_branch?: string | null
+          target_record_id?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          theory_id?: string
+          project_id?: string
+          status?: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml?: string
+          target_branch?: string | null
+          target_record_id?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theory_contributions_theory_id_fkey",
+            columns: ["theory_id"],
+            isOneToOne: false,
+            referencedRelation: "theories",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "theory_contributions_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      theorybase_snapshot: {
+        Row: {
+          id: string
+          record_type: 'theory' | 'proposition' | 'assumption' | 'competing_proposition' | 'misconception' | 'cross_domain_construct' | 'design_principle' | 'curriculum_decision'
+          label: string
+          short_label: string | null
+          summary: string | null
+          data: Json
+          status: string | null
+          authorship_provenance: string | null
+          characterization_status: string | null
+          synced_at: string
+        }
+        Insert: {
+          id: string
+          record_type: 'theory' | 'proposition' | 'assumption' | 'competing_proposition' | 'misconception' | 'cross_domain_construct' | 'design_principle' | 'curriculum_decision'
+          label: string
+          short_label?: string | null
+          summary?: string | null
+          data: Json
+          status?: string | null
+          authorship_provenance?: string | null
+          characterization_status?: string | null
+          synced_at?: string
+        }
+        Update: {
+          id?: string
+          record_type?: 'theory' | 'proposition' | 'assumption' | 'competing_proposition' | 'misconception' | 'cross_domain_construct' | 'design_principle' | 'curriculum_decision'
+          label?: string
+          short_label?: string | null
+          summary?: string | null
+          data?: Json
+          status?: string | null
+          authorship_provenance?: string | null
+          characterization_status?: string | null
+          synced_at?: string
+        }
+        Relationships: []
       }
       strand_parents: {
         Row: {
