@@ -58,6 +58,16 @@ DELETE FROM lpm_data_objects WHERE id = 'bbe26b00-b905-43ff-bdb2-786ed53d5b24'; 
 -- frontend fix in this same commit) to actually stop showing it in Browse
 -- -- archiving alone did nothing before that fix, since nothing ever
 -- filtered on status.
+--
+-- Fix, caught live 2026-10-03 (this migration failed on first attempt,
+-- SQLSTATE 23514): 'archived' was never a legal value of this column's own
+-- status_check constraint (001_initial_schema.sql only ever defined draft/
+-- submitted/under_review/accepted/rejected). Widening it here, in the same
+-- migration that's the first to actually need the new value.
+ALTER TABLE lpm_data_objects DROP CONSTRAINT lpm_data_objects_status_check;
+ALTER TABLE lpm_data_objects ADD CONSTRAINT lpm_data_objects_status_check
+  CHECK (status IN ('draft', 'submitted', 'under_review', 'accepted', 'rejected', 'archived'));
+
 UPDATE lpm_data_objects SET status = 'archived', updated_at = now()
 WHERE id = 'b056e65a-efa0-5b00-863a-1cf38d5863ef'; -- "Angepasstheit: Feucht- und Trockenlufttiere"
 
