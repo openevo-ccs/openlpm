@@ -5,7 +5,6 @@ import type { ProjectOutletContext } from '../project-layout'
 import {
   getFullThread,
   getThreadStationsForTopic,
-  listAcceptedConnections,
   listTopicContents,
   listTopics,
   type FullThread,
@@ -92,49 +91,21 @@ type ViewMode = 'cards' | 'list'
 
 // Real feedback fba146fa (Susan, 2026-10-02): the curriculum-order info
 // ("Davor"/"Danach") shouldn't live on the Lernziel card at all -- she wants
-// it as a sort option instead. The real data behind it (lpm_connections,
-// 'accepted' status) is a sparse, curriculum-asserted graph, not a single
-// field to sort by: checked live against the real Thuringia data before
-// building this (306 topics, 373 accepted connections, 272 topics touched by
-// at least one, 52 connections crossing a Thema boundary) -- common enough to
-// be worth a real topological sort across the whole filtered list (not just
-// within one Thema), rare enough on the cross-Thema edges that restricting
-// to one Thema at a time would silently drop real curriculum sequencing.
-// Kahn's algorithm, stably tie-broken by each topic's current position (so a
-// topic with no connection info at all stays near its original place instead
-// of being pushed to one end) -- a real cycle in asserted data shouldn't
-// happen, but falls back to original order for whatever's left rather than
-// dropping topics if it ever does.
-function sortByCurriculumOrder(items: TopicListItem[], connections: { from_object_id: string; to_object_id: string }[]): TopicListItem[] {
-  const idToIndex = new Map(items.map((t, i) => [t.id, i]))
-  const indegree = new Map(items.map((t) => [t.id, 0]))
-  const outEdges = new Map<string, string[]>(items.map((t) => [t.id, []]))
-  for (const c of connections) {
-    if (!idToIndex.has(c.from_object_id) || !idToIndex.has(c.to_object_id)) continue
-    outEdges.get(c.from_object_id)!.push(c.to_object_id)
-    indegree.set(c.to_object_id, (indegree.get(c.to_object_id) ?? 0) + 1)
-  }
-  const remaining = new Set(items.map((t) => t.id))
-  const result: TopicListItem[] = []
-  while (remaining.size > 0) {
-    let bestId: string | null = null
-    let bestIdx = Infinity
-    for (const id of remaining) {
-      if ((indegree.get(id) ?? 0) === 0) {
-        const idx = idToIndex.get(id)!
-        if (idx < bestIdx) { bestIdx = idx; bestId = id }
-      }
-    }
-    if (bestId === null) {
-      bestId = Array.from(remaining).sort((a, b) => idToIndex.get(a)! - idToIndex.get(b)!)[0]
-    }
-    result.push(items[idToIndex.get(bestId)!])
-    remaining.delete(bestId)
-    for (const next of outEdges.get(bestId) ?? []) {
-      if (remaining.has(next)) indegree.set(next, (indegree.get(next) ?? 0) - 1)
-    }
-  }
-  return result
+// it as a sort option instead. That first version (now replaced, feedback
+// 84b6a55f, 2026-10-03) reconstructed order from the sparse lpm_connections
+// graph via a topological sort -- a reasonable fallback at the time, but not
+// a real document position, and the only information two topics with no
+// direct connection between them had was an arbitrary tie-break. This
+// version sorts directly on curriculum_sequence (migration 091), a real
+// per-item position built from each item's own source id in the original
+// curriculum files, cross-checked against the actual government PDF --
+// see that migration's own header for the full method. Items with no
+// sequence value (a different project, or content this project adds
+// outside the sourced curriculum) sort to the end rather than disappearing.
+function sortByCurriculumOrder(items: TopicListItem[]): TopicListItem[] {
+  const grade = (t: TopicListItem) => parseInt(t.grade_band ?? '', 10) || 0
+  const seq = (t: TopicListItem) => t.curriculum_sequence ?? Infinity
+  return [...items].sort((a, b) => grade(a) - grade(b) || seq(a) - seq(b))
 }
 
 // Real feedback 2026-10-01 (Susan): the space above the card grid was just
@@ -247,11 +218,6 @@ export default function StudentLernzielePage() {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [sortBy, setSortBy] = useState<SortBy>('default')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
-  // Real, curriculum-asserted Davor/Danach edges -- fetched once per project,
-  // same bulk-query reasoning as listTopicContents below. Only used for the
-  // 'sequence' sort option now (feedback fba146fa); no longer rendered on
-  // the card itself.
-  const [connections, setConnections] = useState<{ from_object_id: string; to_object_id: string }[]>([])
   // The real, live method vocabulary -- see METHOD_ICON's own comment above.
   // Empty until the project's prompt library resolves; the filter falls
   // back to whatever methods are actually tagged in the real data below.
@@ -263,7 +229,6 @@ export default function StudentLernzielePage() {
     listFavoriteIds(supabase).then(setFavorites)
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
-    listAcceptedConnections(supabase, project.id).then(setConnections)
     getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
   }, [supabase, project.id, defaultBranchId])
 
@@ -422,9 +387,9 @@ export default function StudentLernzielePage() {
     if (sortBy === 'grade') arr.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
     else if (sortBy === 'thema') arr.sort((a, b) => (a.thema ?? '').localeCompare(b.thema ?? '', 'de'))
     else if (sortBy === 'favorites') arr.sort((a, b) => Number(favorites.has(b.id)) - Number(favorites.has(a.id)))
-    else if (sortBy === 'sequence') return sortByCurriculumOrder(arr, connections)
+    else if (sortBy === 'sequence') return sortByCurriculumOrder(arr)
     return arr
-  }, [displayed, sortBy, favorites, connections])
+  }, [displayed, sortBy, favorites])
 
   const allExpanded = sortedDisplayed.length > 0 && sortedDisplayed.every((t) => expandedIds.has(t.id))
   const toggleExpandAll = () => setExpandedIds(allExpanded ? new Set() : new Set(sortedDisplayed.map((t) => t.id)))

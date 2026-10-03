@@ -15,6 +15,11 @@ export type SchemaElementRow = Database['public']['Tables']['lpm_schema_elements
 export type TopicListItem = Pick<DataObjectRow, 'id' | 'title' | 'description' | 'grade_band' | 'object_type'> & {
   thema: string | null
   unterthema: string | null
+  // Not yet in database.types.ts -- added by migration 091, not pushed to
+  // production yet at the time of this commit. Real document position
+  // (see that migration's own header); null for a project/item that hasn't
+  // been given one, which the 'sequence' sort falls back to end-of-list for.
+  curriculum_sequence: number | null
 }
 
 /**
@@ -40,11 +45,30 @@ export async function listTopics(supabase: Client, projectId: string, branchId: 
   // content") showed up in the browse list exactly like real, reviewed
   // content. Excluding anything not 'accepted' -- there's no separate
   // draft-review UI anywhere in the app that depends on seeing them here.
-  const { data } = await (supabase.from('lpm_data_objects') as any)
-    .select('id, title, description, grade_band, object_type, thema:content->>thema, unterthema:content->>unterthema')
+  // curriculum_sequence (migration 091) is selected defensively: this code
+  // can reach production before Dustin's own `supabase db push` lands (the
+  // standing deploy order in this repo -- frontend and migration commit
+  // together, the db push follows by hand). Confirmed live, 2026-10-03:
+  // selecting an unknown column makes PostgREST fail the WHOLE query
+  // (error 42703), so without this fallback every topic would vanish from
+  // every Lernziele page -- not a missing sort, a missing list -- for
+  // however long that gap lasts. Retrying without the column once, on
+  // exactly that error code, keeps the page working in the meantime; the
+  // 'sequence' sort just can't do better than its old grade-only ordering
+  // until the real column is live.
+  let { data, error } = await (supabase.from('lpm_data_objects') as any)
+    .select('id, title, description, grade_band, object_type, curriculum_sequence, thema:content->>thema, unterthema:content->>unterthema')
     .eq('project_id', projectId)
     .eq('branch_id', branchId)
     .eq('status', 'accepted')
+
+  if (error?.code === '42703') {
+    ;({ data } = await (supabase.from('lpm_data_objects') as any)
+      .select('id, title, description, grade_band, object_type, thema:content->>thema, unterthema:content->>unterthema')
+      .eq('project_id', projectId)
+      .eq('branch_id', branchId)
+      .eq('status', 'accepted'))
+  }
 
   const items = (data ?? []) as unknown as TopicListItem[]
   // Real bug, feedback 78e4e0ca (Susan, 2026-10-03): grade_band is TEXT, so
