@@ -33,7 +33,7 @@ export interface ProjectOutletContext {
 }
 
 // Whether an owner/maintainer is currently previewing the student view for
-// this project -- kept in sessionStorage, not the URL. The URL-based
+// this project -- kept in sessionStorage rather than the URL. The URL-based
 // version (?view=student) broke the moment anyone clicked a link inside
 // the preview: every nav link only points at its own plain path, so the
 // query param silently dropped and the very next navigation snapped back
@@ -45,7 +45,7 @@ function previewKey(slug: string) {
 }
 
 // Real feedback bbf55cf2 (2026-10-01): "make all sidebar menus adjustable
-// and collapsible." Scoped to the device (localStorage), not the
+// and collapsible." Scoped to the device (localStorage) rather than the
 // project or account -- this is a display preference like a window size,
 // the same researcher/student toggle either way regardless of which
 // project you're in.
@@ -147,7 +147,16 @@ export default function ProjectLayout() {
   useEffect(() => {
     setHasRepo(false)
     if (!state?.project?.id) return
-    hasRepositoryContent(supabase, state.project.id).then(setHasRepo)
+    // A curriculum-repository-custom-view (migration 094) never holds
+    // records of its own -- it's a view of its parent Curriculum
+    // Repository's content, so this checks the PARENT's id rather than the
+    // view's own, or the Repository browser tab would wrongly never appear
+    // for it.
+    const repoCheckId =
+      (state.project as any).project_kind === 'curriculum-repository-custom-view'
+        ? (state.project as any).parent_project_id ?? state.project.id
+        : state.project.id
+    hasRepositoryContent(supabase, repoCheckId).then(setHasRepo)
   }, [supabase, state?.project?.id])
 
   if (!slug || state === null) {
@@ -195,8 +204,9 @@ export default function ProjectLayout() {
     return <p className="muted">Loading…</p>
   }
 
-  // project_kind (migration 072) isn't in the generated types yet.
+  // project_kind (migration 072/094) isn't in the generated types yet.
   const isRepository = (project as any).project_kind === 'curriculum-repository'
+  const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
 
   // Exactly these 10 items, in this order -- Dustin's explicit, final sidebar
   // spec for the 2026-09-13 restructure. Projects and Members are folded into
@@ -211,13 +221,17 @@ export default function ProjectLayout() {
   // folds in Members/Projects-in-this-Space) and the Curriculum Repository
   // browser itself (still gated on hasRepo -- the PARENT "Curriculum
   // Repositories" space holds no records of its own, just two
-  // sub-repositories, so it doesn't get that tab either).
+  // sub-repositories, so it doesn't get that tab either). A
+  // curriculum-repository-custom-view (migration 094) gets the exact same
+  // reduced nav -- it's a view of the same underlying content, just with
+  // its own membership and never listed in the main switcher (see
+  // project-switcher-page.tsx).
   // Real feedback 67375983 (2026-10-01): "settings page should be at the
-  // bottom of the sidebar menu." Shown to every member, not just
-  // owners/maintainers -- same as today's Members list, the page itself
+  // bottom of the sidebar menu." Shown to every member, including
+  // non-owners/maintainers -- same as today's Members list, the page itself
   // still gates each editable section (color, invites, self-join, student
   // view, danger zone) to canManage/owner exactly as before.
-  const nav = isRepository
+  const nav = isRepository || isCustomView
     ? [
         { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
@@ -309,12 +323,14 @@ export default function ProjectLayout() {
         </div>
         <div className="project-side-info">
           <p className="muted" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 10, marginBottom: 0 }}>
-            {isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
+            {isCustomView ? 'Custom View' : isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
           </p>
           <h2 style={{ marginTop: 2, marginBottom: 2 }}>{project.name}</h2>
           {parent && (
             <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>
-              Part of the <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link> {isRepository ? 'Curriculum Repository' : 'Project Space'}
+              {isCustomView ? 'A view of ' : 'Part of the '}
+              <Link to={`/dashboard/${parent.slug}`}>{parent.name}</Link>
+              {isCustomView ? '' : ` ${isRepository ? 'Curriculum Repository' : 'Project Space'}`}
             </p>
           )}
           <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>

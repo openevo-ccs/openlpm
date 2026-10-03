@@ -32,21 +32,29 @@ export default function CurriculumRepositoryPage() {
   const [jurisdiction, setJurisdiction] = useState('')
   const [search, setSearch] = useState('')
 
+  // A curriculum-repository-custom-view (migration 094) holds no records of
+  // its own -- it's a view of its parent Curriculum Repository's content --
+  // so browsing here resolves to the PARENT's id instead.
+  const repoProjectId =
+    (project as any).project_kind === 'curriculum-repository-custom-view'
+      ? ((project as any).parent_project_id ?? project.id)
+      : project.id
+
   useEffect(() => {
-    listJurisdictions(supabase, project.id).then(setJurisdictions)
-  }, [supabase, project.id])
+    listJurisdictions(supabase, repoProjectId).then(setJurisdictions)
+  }, [supabase, repoProjectId])
 
   useEffect(() => {
     setRecords(null)
     const timer = setTimeout(() => {
-      listRepositoryRecords(supabase, project.id, {
+      listRepositoryRecords(supabase, repoProjectId, {
         recordType: recordType || undefined,
         jurisdiction: jurisdiction || undefined,
         search: search.trim() || undefined,
       }).then(setRecords)
     }, search ? 250 : 0)
     return () => clearTimeout(timer)
-  }, [supabase, project.id, recordType, jurisdiction, search])
+  }, [supabase, repoProjectId, recordType, jurisdiction, search])
 
   const countsByType = useMemo(() => {
     const m = new Map<string, number>()
@@ -229,8 +237,9 @@ function RecordDetail({
 // alone never had a place to break it -- it just overflowed the card's
 // right edge instead of wrapping. `overflowWrap: 'anywhere'` lets a long
 // token like a URL break wherever it needs to while leaving normal word
-// wrapping alone everywhere else -- applied to every real render path here
-// since any field (not just a URL) could contain one.
+// wrapping alone everywhere else -- applied to every real render path here,
+// since a URL is simply the most common example of a field that could
+// contain a long unbroken token like this.
 const LONG_VALUE_STYLE = { overflowWrap: 'anywhere' as const }
 
 function FieldValue({ value }: { value: unknown }) {
@@ -264,8 +273,8 @@ function FieldValue({ value }: { value: unknown }) {
 // actually write) and a piece of its content to connect this repository
 // record to -- the "connect" half of browse + connect. Deliberately scoped
 // to the CURRENT project's own content only for v1 (searching across every
-// project the user belongs to is a reasonable next step, not built here;
-// most real uses so far are a single researcher connecting a repository
+// project the user belongs to is left for a later pass rather than built
+// here; most real uses so far are a single researcher connecting a repository
 // record to their own current project's content).
 function ConnectForm({
   recordId,

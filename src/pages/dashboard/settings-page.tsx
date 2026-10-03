@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, Globe, Link2, Mail, Trash2, UserPlus, Users } from 'lucide-react'
+import { Link, useNavigate, useOutletContext } from 'react-router-dom'
+import { AlertTriangle, Check, Copy, ExternalLink, Globe, Layers, Link2, Mail, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { countSubProjects, deleteProject } from '@/lib/supabase/projects'
+import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
+import { CUSTOM_VIEW_AUDIENCES, CUSTOM_VIEW_LANGUAGES } from '@/lib/custom-views'
+import { createCustomView, listCustomViews } from '@/lib/supabase/custom-views'
 import {
   addJoinRule,
   inviteMembers,
@@ -53,6 +55,8 @@ const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer',
 export default function SettingsPage() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
   const canManage = role === 'owner' || role === 'maintainer'
+  // project_kind (migration 072) isn't in the generated types yet.
+  const isRepository = (project as any).project_kind === 'curriculum-repository'
 
   return (
     <div>
@@ -61,9 +65,165 @@ export default function SettingsPage() {
 
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
       <MembersSection project={project} role={role} supabase={supabase} />
+      {canManage && isRepository && <CustomViewsSection project={project} supabase={supabase} />}
       {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
       {canManage && <FederationSection project={project} supabase={supabase} />}
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
+    </div>
+  )
+}
+
+// ============================================================================
+// Curriculum Repository Custom Views (migration 094) -- decided 2026-10-03,
+// see lab_manager's openlpm-curriculum-context-modeling-2026-10-03.md. Only
+// shown on a Curriculum Repository's own Settings page (never on an
+// ordinary project, and never on a custom view's OWN Settings page -- a
+// view doesn't get views of itself, since isRepository above is only ever
+// true for the real repository). Each row listed here is an ordinary
+// project with its own separate membership, created via createCustomView --
+// never inherited or synced from this repository's own Members section
+// above.
+// ============================================================================
+
+function CustomViewsSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [views, setViews] = useState<ProjectRow[] | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
+
+  const reload = () => listCustomViews(supabase, project.id).then(setViews)
+
+  useEffect(() => {
+    setViews(null)
+    reload()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id])
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Layers size={16} style={{ color: 'var(--text-muted)' }} />Custom Views</h3>
+      <p className="muted">
+        An audience- or language-specific view of {project.name}&apos;s content — its own URL, its
+        own members, never listed alongside ordinary project spaces in the switcher. Useful for
+        opening this repository up to a much wider group (e.g. all teachers) or sharing a
+        translated version, without giving that group access to everything here.
+      </p>
+
+      {views === null ? (
+        <p className="muted">Loading…</p>
+      ) : views.length === 0 ? (
+        <p className="muted">No custom views yet.</p>
+      ) : (
+        <div style={{ marginBottom: 10 }}>
+          {views.map((v) => (
+            <div key={v.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{v.name}</strong>
+                {(v as any).view_audience && <span className="chip" style={{ marginLeft: 6 }}>{(v as any).view_audience}</span>}
+                {(v as any).view_language && <span className="chip" style={{ marginLeft: 4 }}>{(v as any).view_language}</span>}
+              </span>
+              <Link to={`/dashboard/${v.slug}`} className="btn btn-mini">
+                <ExternalLink size={11} />Open
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!showCreate ? (
+        <button className="btn btn-mini" onClick={() => setShowCreate(true)}><Plus size={12} />New custom view</button>
+      ) : (
+        <NewCustomViewForm
+          project={project}
+          supabase={supabase}
+          onDone={() => { setShowCreate(false); reload() }}
+          onCancel={() => setShowCreate(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function NewCustomViewForm({
+  project,
+  supabase,
+  onDone,
+  onCancel,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+  onDone: () => void
+  onCancel: () => void
+}) {
+  const [name, setName] = useState('')
+  const [slug, setSlug] = useState('')
+  const [audience, setAudience] = useState('')
+  const [language, setLanguage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !slug.trim()) return
+    setBusy(true)
+    setError(null)
+    const { data: { user } } = await supabase.auth.getUser()
+    const { error: err } = await createCustomView(supabase, {
+      parentProjectId: project.id,
+      slug: slug.trim(),
+      name: name.trim(),
+      audience: audience.trim() || null,
+      language: language.trim() || null,
+      epistemicStatus: project.epistemic_status,
+      createdBy: user?.id ?? null,
+    })
+    setBusy(false)
+    if (err) { setError(err.message); return }
+    setName(''); setSlug(''); setAudience(''); setLanguage('')
+    onDone()
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 8, background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <strong style={{ fontSize: 13 }}>New custom view</strong>
+        <button type="button" className="btn-linklike" onClick={onCancel}><X size={12} /></button>
+      </div>
+      <form onSubmit={submit} className="row" style={{ flexWrap: 'wrap' }}>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Name</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Germany Repository — Teachers" />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Short address</label>
+          <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g. germany-repository-teachers" />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Audience (optional)</label>
+          <input list="custom-view-audiences" value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="e.g. teachers" />
+          <datalist id="custom-view-audiences">
+            {CUSTOM_VIEW_AUDIENCES.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
+          </datalist>
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Language (optional)</label>
+          <input list="custom-view-languages" value={language} onChange={(e) => setLanguage(e.target.value)} placeholder="e.g. fr" />
+          <datalist id="custom-view-languages">
+            {CUSTOM_VIEW_LANGUAGES.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+          </datalist>
+        </div>
+        <button className="btn btn-primary" type="submit" disabled={busy || !name.trim() || !slug.trim()} style={{ alignSelf: 'flex-end' }}>
+          {busy ? 'Creating…' : 'Create'}
+        </button>
+      </form>
+      {error && <div className="notice notice-bad" style={{ marginTop: 8 }}>{error}</div>}
+      <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+        Starts with no members but you — add people from this new view&apos;s own Settings page once it&apos;s created.
+      </p>
     </div>
   )
 }
@@ -460,8 +620,8 @@ function JoinRulesSection({
 }
 
 // ============================================================================
-// Project color (migration 064) -- a small fixed palette, not a free
-// picker, shown as a subtle left-border accent on this project's own card
+// Project color (migration 064) -- a small fixed palette rather than a
+// free picker, shown as a subtle left-border accent on this project's own card
 // in the project switcher. Real feedback 2371cbf7 (2026-10-01).
 // ============================================================================
 
