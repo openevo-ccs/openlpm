@@ -73,7 +73,7 @@ export default function ProjectSwitcherPage() {
   // `role` is null for a project the admin can see but isn't actually a
   // member of -- opening one of those still hits ProjectLayout's own "you
   // aren't a member" wall (content RLS is a separate, bigger boundary this
-  // doesn't touch); this fixes visibility of what exists, not content access.
+  // doesn't touch); this fixes visibility of what exists rather than content access.
   useEffect(() => {
     if (!isAdmin) { setAllProjects(null); return }
     listAllProjects(supabase).then(setAllProjects)
@@ -91,7 +91,7 @@ export default function ProjectSwitcherPage() {
   // a switcher with one tile in it every time they sign in -- send them
   // straight to it. Someone in more than one project space still lands here
   // to choose, same as before. "All project spaces" stays one click away
-  // from inside that project, so this is a default, not a dead end. Never
+  // from inside that project, so this is a default rather than a dead end. Never
   // applies to the admin account -- it should always land on the full
   // platform-wide view, even on a day it happens to have just one real
   // membership of its own.
@@ -114,11 +114,17 @@ export default function ProjectSwitcherPage() {
   // entry here is a Project Space; everything nested under one is a Project
   // (see [[openlpm-project-hierarchy-architecture]] -- this is the entry
   // point that list is meant to serve).
-  const byId = new Map(entries.map((m) => [m.project.id, m]))
+  // A curriculum-repository-custom-view (migration 095) never appears here
+  // at all -- not as a top-level entry, and not nested under its parent's
+  // card either (childrenOf below draws from this same filtered list).
+  // Dustin's own ask: it's only ever reachable from its parent's Settings
+  // "Custom Views" card, or its own direct URL once created.
+  const switchableEntries = entries.filter((m) => (m.project as any).project_kind !== 'curriculum-repository-custom-view')
+  const byId = new Map(switchableEntries.map((m) => [m.project.id, m]))
   const isRepository = (p: ProjectRow) => (p as any).project_kind === 'curriculum-repository'
-  const topLevel = entries.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
-  // Curriculum Repositories are a different part of the ontology, not a
-  // filtered subset of "project spaces" -- real feedback 8e9545c6 ("needs
+  const topLevel = switchableEntries.filter((m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id))
+  // Curriculum Repositories are a different part of the ontology rather
+  // than a filtered subset of "project spaces" -- real feedback 8e9545c6 ("needs
   // its own distinct section"). Shown in full, every time any exist, never
   // narrowed by the human-curated/synthetic-theoretical filter below (that
   // filter is about how a research project's content was made, which
@@ -130,7 +136,7 @@ export default function ProjectSwitcherPage() {
   // the Admin page's own Projects card now uses.
   const curatedTopLevel = standardTopLevel.filter((m) => CURATION[m.project.epistemic_status] === 'human-curated' && visibleCurations.has('human-curated'))
   const syntheticTopLevel = standardTopLevel.filter((m) => CURATION[m.project.epistemic_status] === 'synthetic-theoretical' && visibleCurations.has('synthetic-theoretical'))
-  const childrenOf = (id: string) => entries.filter((m) => m.project.parent_project_id === id)
+  const childrenOf = (id: string) => switchableEntries.filter((m) => m.project.parent_project_id === id)
 
   const toggleCuration = (c: Curation) => {
     setVisibleCurations((prev) => {
@@ -264,7 +270,7 @@ function ProjectCard({
         // style reserves a splash of the brand teal for things worth
         // noticing. Pairs the existing left-edge accent (project color,
         // feedback 2371cbf7) with a matching top edge, so a card with a
-        // color actually set reads as a colored frame, not a single stray line.
+        // color actually set reads as a colored frame rather than a single stray line.
         borderLeft: colorHex ? `4px solid ${colorHex}` : undefined,
         borderTop: colorHex ? `3px solid ${colorHex}` : undefined,
       }}
