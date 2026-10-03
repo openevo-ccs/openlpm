@@ -147,7 +147,7 @@ export default function ProjectLayout() {
   useEffect(() => {
     setHasRepo(false)
     if (!state?.project?.id) return
-    // A curriculum-repository-custom-view (migration 094) never holds
+    // A curriculum-repository-custom-view (migration 095) never holds
     // records of its own -- it's a view of its parent Curriculum
     // Repository's content, so this checks the PARENT's id rather than the
     // view's own, or the Repository browser tab would wrongly never appear
@@ -222,7 +222,7 @@ export default function ProjectLayout() {
   // browser itself (still gated on hasRepo -- the PARENT "Curriculum
   // Repositories" space holds no records of its own, just two
   // sub-repositories, so it doesn't get that tab either). A
-  // curriculum-repository-custom-view (migration 094) gets the exact same
+  // curriculum-repository-custom-view (migration 095) gets the exact same
   // reduced nav -- it's a view of the same underlying content, just with
   // its own membership and never listed in the main switcher (see
   // project-switcher-page.tsx).

@@ -32,7 +32,7 @@ export default function CurriculumRepositoryPage() {
   const [jurisdiction, setJurisdiction] = useState('')
   const [search, setSearch] = useState('')
 
-  // A curriculum-repository-custom-view (migration 094) holds no records of
+  // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
   // so browsing here resolves to the PARENT's id instead.
   const repoProjectId =

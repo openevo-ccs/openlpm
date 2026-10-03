@@ -4,7 +4,7 @@ import type { ProjectRow } from './projects'
 
 type Client = SupabaseClient<Database>
 
-// project_kind/view_audience/view_language (migration 094) aren't in the
+// project_kind/view_audience/view_language (migration 095) aren't in the
 // generated types yet -- cast at the query boundary, same convention as
 // project_kind/student_view_template/color elsewhere in this file set.
 

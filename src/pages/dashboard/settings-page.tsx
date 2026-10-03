@@ -74,7 +74,7 @@ export default function SettingsPage() {
 }
 
 // ============================================================================
-// Curriculum Repository Custom Views (migration 094) -- decided 2026-10-03,
+// Curriculum Repository Custom Views (migration 095) -- decided 2026-10-03,
 // see lab_manager's openlpm-curriculum-context-modeling-2026-10-03.md. Only
 // shown on a Curriculum Repository's own Settings page (never on an
 // ordinary project, and never on a custom view's OWN Settings page -- a

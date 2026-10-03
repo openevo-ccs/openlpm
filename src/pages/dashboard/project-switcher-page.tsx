@@ -114,7 +114,7 @@ export default function ProjectSwitcherPage() {
   // entry here is a Project Space; everything nested under one is a Project
   // (see [[openlpm-project-hierarchy-architecture]] -- this is the entry
   // point that list is meant to serve).
-  // A curriculum-repository-custom-view (migration 094) never appears here
+  // A curriculum-repository-custom-view (migration 095) never appears here
   // at all -- not as a top-level entry, and not nested under its parent's
   // card either (childrenOf below draws from this same filtered list).
   // Dustin's own ask: it's only ever reachable from its parent's Settings

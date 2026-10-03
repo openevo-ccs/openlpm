@@ -1,5 +1,5 @@
 // The small, open registry a Curriculum Repository owner picks from when
-// naming a new Custom View's audience/language (migration 094) -- same
+// naming a new Custom View's audience/language (migration 095) -- same
 // spirit as student-view-templates.ts: a real new audience or language is a
 // new entry here, never a migration, since view_audience/view_language are
 // plain open-vocabulary text columns rather than enums.
