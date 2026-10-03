@@ -333,7 +333,20 @@ def get_or_create_project(key, slug, fields, owner_user_id):
 
 
 def upsert_records(key, records):
-    CHUNK = 200
+    # 2026-10-03: lowered from 200 after a real, reproducible failure --
+    # Germany's 95-record national batch (sent as one single request at
+    # CHUNK=200, since 95 < 200) consistently failed with a 401 "Invalid
+    # API key" error, 3 times in a row at the exact same point, while a
+    # tiny single-record write to the same table succeeded immediately
+    # after. Some of these records carry a lot of text (full policy-brief
+    # write-ups, multi-paragraph excerpts), so the combined payload for a
+    # 95-record batch can be large. A request that size being rejected by
+    # something ahead of the actual database logic (a gateway/edge layer),
+    # with a misleading generic auth-shaped error instead of a clear "too
+    # large" one, is a known failure shape for exactly this kind of setup
+    # -- smaller batches cost nothing (still one script run, just more
+    # requests) and directly test/avoid that.
+    CHUNK = 20
     for i in range(0, len(records), CHUNK):
         chunk = records[i:i + CHUNK]
         rest(
