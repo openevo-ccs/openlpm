@@ -58,11 +58,19 @@ export default function TimelinePage() {
   const [jurisdiction, setJurisdiction] = useState('')
   const [selected, setSelected] = useState<TimelineItem | null>(null)
 
+  // A curriculum-repository-custom-view (migration 095) holds no records of
+  // its own -- it's a view of its parent Curriculum Repository's content --
+  // so this resolves to the PARENT's id, same as curriculum-repository-page.tsx.
+  const repoProjectId =
+    (project as any).project_kind === 'curriculum-repository-custom-view'
+      ? ((project as any).parent_project_id ?? project.id)
+      : project.id
+
   useEffect(() => {
     setItems(null)
     setSelected(null)
-    listTimelineItems(supabase, project.id).then(setItems)
-  }, [supabase, project.id])
+    listTimelineItems(supabase, repoProjectId).then(setItems)
+  }, [supabase, repoProjectId])
 
   const lanesAll = useMemo(() => sortLanes(items ?? []), [items])
   const jurisdictions = useMemo(() => {
