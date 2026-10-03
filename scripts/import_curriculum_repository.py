@@ -396,10 +396,19 @@ def apply_import(by_repo, owner_email):
         national_records = []
         state_records = {}  # jurisdiction key -> list of records
         for r in records:
-            key = effective_state_key(r["jurisdiction"], cfg["default_jurisdiction"])
-            state_cfg = state_projects.get(key)
+            # NOT `key` -- `key` in this function's outer scope is the
+            # service_role secret itself. A prior version of this loop used
+            # `key` here too, silently overwriting that secret with
+            # whatever jurisdiction string the LAST record resolved to, for
+            # the rest of this function. Every write after this loop then
+            # authenticated with a jurisdiction code instead of the real
+            # key -- exactly why every write failed with a generic
+            # "Invalid API key" error while every read before this loop
+            # (which still ran before the overwrite) kept working.
+            route_key = effective_state_key(r["jurisdiction"], cfg["default_jurisdiction"])
+            state_cfg = state_projects.get(route_key)
             if state_cfg:
-                state_records.setdefault(key, []).append(r)
+                state_records.setdefault(route_key, []).append(r)
             else:
                 national_records.append(r)
 
