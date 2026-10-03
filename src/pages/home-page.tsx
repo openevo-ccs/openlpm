@@ -1,8 +1,78 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, GitBranch, Layers, MessageSquare, Network, Search } from 'lucide-react'
+import {
+  BookOpen,
+  GitBranch,
+  GraduationCap,
+  Landmark,
+  Layers,
+  MessageSquare,
+  Microscope,
+  Network,
+  Search,
+} from 'lucide-react'
 import { useSession } from '@/state/session'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { OpenEvoAttribution } from '@/components/openevo-mark'
+
+const AUDIENCES = [
+  {
+    icon: Microscope,
+    color: 'var(--map-3)',
+    title: 'Researchers',
+    text: 'Build learning progressions on evidence from the research literature, with every source traceable back to its original study.',
+  },
+  {
+    icon: GraduationCap,
+    color: 'var(--map-1)',
+    title: 'Educators',
+    text: 'See the thinking and classroom context behind a learning goal before you bring it into your own teaching, then suggest changes based on what you learn from using it.',
+  },
+  {
+    icon: Landmark,
+    color: 'var(--map-4)',
+    title: 'Curriculum policy makers',
+    text: 'See how learning goals connect across grades and subjects, and track how a curriculum improves as classroom experience comes in.',
+  },
+]
+
+const FEATURES = [
+  {
+    icon: Search,
+    color: 'var(--series-a)',
+    title: 'Literature management',
+    text: 'Search and organize the research behind a learning progression, with built-in checks that catch broken or incorrect citations.',
+  },
+  {
+    icon: GitBranch,
+    color: 'var(--good)',
+    title: 'Concepts & strands',
+    text: 'Build out curriculum concepts and learning progression strands together. Every change is saved as its own version, so a team can try new ideas, compare drafts, and never lose earlier work.',
+  },
+  {
+    icon: BookOpen,
+    color: 'var(--serious)',
+    title: 'Peer review',
+    text: 'Get structured feedback from colleagues on a learning progression before it reaches classrooms, with a clear record of what changed and why.',
+  },
+  {
+    icon: MessageSquare,
+    color: 'var(--warning)',
+    title: 'Discussion forums',
+    text: 'Discuss a specific concept or learning goal directly, with replies, notes, and a link back to the exact material under discussion.',
+  },
+  {
+    icon: Layers,
+    color: 'var(--series-a)',
+    title: 'Learning goals',
+    text: 'Track learning goals by grade level and connect each one to the concepts and standards it builds on.',
+  },
+  {
+    icon: Network,
+    color: 'var(--good)',
+    title: 'Notebooks & AI prompts',
+    text: 'Collect the curriculum material you are working with, then generate and test AI-assisted teaching prompts built directly from it.',
+  },
+]
 
 export default function HomePage() {
   const { session } = useSession()
@@ -26,50 +96,51 @@ export default function HomePage() {
         </nav>
       </header>
 
-      <main className="page page-narrow">
-        <section style={{ textAlign: 'center', padding: '48px 0' }}>
-          <h1 style={{ fontSize: 32 }}>Collaborative Learning Progression Management</h1>
-          <p className="muted" style={{ fontSize: 15, maxWidth: 560, margin: '0 auto 20px' }}>
-            A cost-free, scientifically rigorous platform for collaborative development of learning progressions.
+      <section className="home-hero">
+        <div className="page page-narrow" style={{ textAlign: 'center', padding: '56px 24px' }}>
+          <span className="chip" style={{ marginBottom: 16 }}>Open source · Free for schools, universities, and ministries</span>
+          <h1 style={{ fontSize: 34, marginTop: 14 }}>Collaborative Learning Progression Management</h1>
+          <p className="muted" style={{ fontSize: 16, maxWidth: 600, margin: '0 auto 24px' }}>
+            A free, open platform for researchers, teachers, and curriculum policy makers to build learning
+            progressions together, and keep improving them as classroom experience comes in.
           </p>
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login?mode=signup'}>
               {session ? 'Go to dashboard' : 'Start collaborating'}
             </Link>
           </div>
+        </div>
+      </section>
+
+      <main className="page page-narrow">
+        <section style={{ marginBottom: 36 }}>
+          <h2 style={{ textAlign: 'center', marginBottom: 4 }}>Built for research, teaching, and policy together</h2>
+          <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>
+            Each group gets what it needs from the same shared learning progression.
+          </p>
+          <div className="grid grid-3">
+            {AUDIENCES.map(({ icon: Icon, color, title, text }) => (
+              <div className="card home-feature-card" key={title}>
+                <div className="home-feature-icon" style={{ background: color }}>
+                  <Icon size={18} color="#fff" />
+                </div>
+                <h3>{title}</h3>
+                <p className="muted">{text}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="grid grid-2" style={{ marginBottom: 24 }}>
-          <div className="card">
-            <Search size={20} style={{ color: 'var(--series-a)' }} />
-            <h3>Literature management</h3>
-            <p className="muted">Search, verify, and organize scientific literature with DOI verification and evidence linking.</p>
-          </div>
-          <div className="card">
-            <GitBranch size={20} style={{ color: 'var(--good)' }} />
-            <h3>Concepts &amp; strands</h3>
-            <p className="muted">Collaboratively build out curriculum concepts and learning progression strands, with version tracking.</p>
-          </div>
-          <div className="card">
-            <BookOpen size={20} style={{ color: 'var(--serious)' }} />
-            <h3>Peer review</h3>
-            <p className="muted">Structured peer review workflows with transparent feedback and revision tracking.</p>
-          </div>
-          <div className="card">
-            <MessageSquare size={20} style={{ color: 'var(--warning)' }} />
-            <h3>Discussion forums</h3>
-            <p className="muted">Rich discussions with threading, annotations, and linking to specific content elements.</p>
-          </div>
-          <div className="card">
-            <Layers size={20} style={{ color: 'var(--series-a)' }} />
-            <h3>Learning goals</h3>
-            <p className="muted">Track grade-band learning goals and connect them to the concepts and standards behind them.</p>
-          </div>
-          <div className="card">
-            <Network size={20} style={{ color: 'var(--good)' }} />
-            <h3>Notebooks &amp; AI prompts</h3>
-            <p className="muted">Collect curriculum items into a notebook, then generate and test AI teaching prompts from them.</p>
-          </div>
+          {FEATURES.map(({ icon: Icon, color, title, text }) => (
+            <div className="card home-feature-card" key={title}>
+              <div className="home-feature-icon" style={{ background: color }}>
+                <Icon size={18} color="#fff" />
+              </div>
+              <h3>{title}</h3>
+              <p className="muted">{text}</p>
+            </div>
+          ))}
         </section>
       </main>
 
