@@ -34,10 +34,17 @@ export async function listTopics(supabase: Client, projectId: string, branchId: 
   // select syntax (content->>thema) sends TypeScript's overload resolution
   // into infinite recursion against the generated Database type. The result
   // is cast back to a concrete shape below regardless.
+  // Real gap, feedback b70e39a5 (Susan, 2026-10-03): nothing here ever
+  // filtered on status, so a 'draft' row (migration 028's own stated intent:
+  // "a human reviews from Browse before these count as real, visible
+  // content") showed up in the browse list exactly like real, reviewed
+  // content. Excluding anything not 'accepted' -- there's no separate
+  // draft-review UI anywhere in the app that depends on seeing them here.
   const { data } = await (supabase.from('lpm_data_objects') as any)
     .select('id, title, description, grade_band, object_type, thema:content->>thema, unterthema:content->>unterthema')
     .eq('project_id', projectId)
     .eq('branch_id', branchId)
+    .eq('status', 'accepted')
 
   const items = (data ?? []) as unknown as TopicListItem[]
   // Real bug, feedback 78e4e0ca (Susan, 2026-10-03): grade_band is TEXT, so
