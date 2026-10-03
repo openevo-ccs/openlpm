@@ -38,9 +38,15 @@ export async function listTopics(supabase: Client, projectId: string, branchId: 
     .select('id, title, description, grade_band, object_type, thema:content->>thema, unterthema:content->>unterthema')
     .eq('project_id', projectId)
     .eq('branch_id', branchId)
-    .order('grade_band', { ascending: true })
 
-  return (data ?? []) as unknown as TopicListItem[]
+  const items = (data ?? []) as unknown as TopicListItem[]
+  // Real bug, feedback 78e4e0ca (Susan, 2026-10-03): grade_band is TEXT, so
+  // Postgres's own ORDER BY sorted it lexicographically ("10" before "5").
+  // Sorting numerically here instead -- every consumer of this list (the
+  // default view, the "Reihenfolge im Lehrplan" sort, everything else) was
+  // silently inheriting that broken order, since nothing re-sorted it later.
+  items.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
+  return items
 }
 
 export async function getTopic(supabase: Client, id: string): Promise<DataObjectRow | null> {
