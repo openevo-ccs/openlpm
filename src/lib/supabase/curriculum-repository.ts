@@ -26,6 +26,17 @@ export const ACCESS_TIER_LABEL: Record<RepositoryRecordRow['access_tier'], strin
   'citation-only': 'Source citation only',
 }
 
+// Same four values and researcher-facing wording as new-project-wizard.tsx's
+// own ACCESS_TIER_OPTIONS (project_source_declarations/standards_documents,
+// migration 044) -- kept as a separate copy here rather than a shared import
+// since this table's access_tier is NOT NULL with no "not sure yet" state.
+export const ACCESS_TIER_OPTIONS: { value: RepositoryRecordRow['access_tier']; label: string }[] = [
+  { value: 'full-text-stored', label: 'The full document — we have clear rights to keep all of it' },
+  { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, never the whole document' },
+  { value: 'summary-only', label: 'A summary only — described in our own words, no direct quotes' },
+  { value: 'citation-only', label: "Just a citation — we'll link to the original without storing any of its text" },
+]
+
 /** Fields shown even at the most restrictive (citation-only) tier -- facts about the record, not quoted/paraphrased source text. */
 const SAFE_ALWAYS_KEYS = new Set([
   'actorType', 'eventType', 'mandateType', 'findingType', 'domain', 'status',
@@ -86,6 +97,70 @@ export async function listRepositoryRecords(
 export async function getRepositoryRecord(supabase: Client, recordId: string): Promise<RepositoryRecordRow | null> {
   const { data } = await supabase.from('curriculum_repository_records').select('*').eq('id', recordId).maybeSingle()
   return data ?? null
+}
+
+export interface RepositoryRecordDraft {
+  recordType: RepositoryRecordRow['record_type']
+  title: string
+  jurisdiction: string | null
+  accessTier: RepositoryRecordRow['access_tier']
+  licenseOrRightsNote: string | null
+  // Alternatives, not both: a point-in-time record sets eventDate; a
+  // standing one sets effectiveFrom/effectiveUntil. Enforced by the form,
+  // not here -- this layer just writes whatever it's given.
+  eventDate: string | null
+  effectiveFrom: string | null
+  effectiveUntil: string | null
+}
+
+/** Maintainer/owner only (RLS-enforced) -- a hand-entered record never produced by scripts/import_curriculum_repository.py, so it gets its own source_repo marker and a generated source_record_id rather than colliding with a real import's (source_repo, source_record_id) identity. */
+export async function createRepositoryRecord(
+  supabase: Client,
+  projectId: string,
+  draft: RepositoryRecordDraft
+): Promise<{ id: string | null; error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('curriculum_repository_records')
+    .insert({
+      project_id: projectId,
+      record_type: draft.recordType,
+      title: draft.title.trim(),
+      jurisdiction: draft.jurisdiction?.trim() || null,
+      source_repo: 'openlpm-manual',
+      source_record_id: crypto.randomUUID(),
+      access_tier: draft.accessTier,
+      license_or_rights_note: draft.licenseOrRightsNote?.trim() || null,
+      event_date: draft.eventDate || null,
+      effective_from: draft.effectiveFrom || null,
+      effective_until: draft.effectiveUntil || null,
+      created_by: user?.id ?? null,
+    })
+    .select('id')
+    .single()
+  return { id: data?.id ?? null, error: error?.message ?? null }
+}
+
+/** Maintainer/owner only (RLS-enforced). Never touches source_repo/source_record_id -- a record's import identity (or its manual-entry marker) doesn't change after creation. */
+export async function updateRepositoryRecord(
+  supabase: Client,
+  recordId: string,
+  draft: RepositoryRecordDraft
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('curriculum_repository_records')
+    .update({
+      record_type: draft.recordType,
+      title: draft.title.trim(),
+      jurisdiction: draft.jurisdiction?.trim() || null,
+      access_tier: draft.accessTier,
+      license_or_rights_note: draft.licenseOrRightsNote?.trim() || null,
+      event_date: draft.eventDate || null,
+      effective_from: draft.effectiveFrom || null,
+      effective_until: draft.effectiveUntil || null,
+    })
+    .eq('id', recordId)
+  return { error: error?.message ?? null }
 }
 
 export async function listJurisdictions(supabase: Client, projectId: string): Promise<string[]> {
