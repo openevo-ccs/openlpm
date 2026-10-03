@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { ChevronDown, ChevronRight, LayoutList, Layers, Maximize2, Network, Shapes, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, LayoutList, Layers, Loader2, Maximize2, Network, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
@@ -55,7 +55,17 @@ function mapStatus(cbStatus: string): 'proposed' | 'discussed' | 'accepted' | 'd
 type Tab = 'explore' | 'manage'
 
 export default function ConceptsPage() {
+  const { conceptId } = useParams<{ conceptId?: string }>()
   const [tab, setTab] = useState<Tab>('explore')
+
+  // A concept link only ever points at the Explore tab's tree+detail view
+  // (where real cross-project connections live) -- land there regardless of
+  // which tab was open before, whether the link came from the Manage tab's
+  // own "see how this connects to real content" button, a shared link, or
+  // the search bar.
+  useEffect(() => {
+    if (conceptId) setTab('explore')
+  }, [conceptId])
 
   return (
     <div>
@@ -712,10 +722,12 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
 
 function ManageConceptsTab() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const navigate = useNavigate()
   const [elements, setElements] = useState<SchemaElement[]>([])
   const [baseLink, setBaseLink] = useState<ProjectBaseLink | null>(null)
-  const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
 
   const reload = async () => {
     const projectIds = [project.id, project.parent_project_id].filter((id): id is string => !!id)
@@ -741,78 +753,83 @@ function ManageConceptsTab() {
 
   const canManage = role === 'owner' || role === 'maintainer'
 
-  const importConcepts = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const vocabulary = String(formData.get('vocabulary') ?? '').trim()
-    if (!vocabulary) return
-    setBusy(true); setNotice(null)
+  // A root is a top-level concept, OR a concept whose parent lives on a row
+  // this tab never fetched (e.g. a cross-project parent) -- same orphan
+  // guard as the Explore tab's dedup logic, just without needing the full
+  // hub/dedup machinery since this tab only ever shows one project's rows.
+  const roots = useMemo(
+    () => elements.filter((e) => !e.parent_id || !elements.some((x) => x.id === e.parent_id)),
+    [elements]
+  )
+  const childrenOf = (id: string) => elements.filter((e) => e.parent_id === id)
+  const selected = useMemo(() => elements.find((e) => e.id === selectedId) ?? null, [elements, selectedId])
+  const selectedParent = useMemo(
+    () => (selected?.parent_id ? elements.find((e) => e.id === selected.parent_id) ?? null : null),
+    [elements, selected]
+  )
 
-    try {
-      const treeRes = await fetch(`https://api.github.com/repos/${CONCEPTBASE_REPO}/git/trees/main?recursive=1`, {
-        headers: { Accept: 'application/vnd.github+json' },
-      })
-      if (!treeRes.ok) throw new Error(`GitHub API error (${treeRes.status})`)
-      const tree: { tree: { path: string; type: string }[] } = await treeRes.json()
+  // Short taxonomies (the common case) read better fully open than requiring
+  // a click per root to see there's anything underneath them at all.
+  const rootKey = roots.map((r) => r.id).join(',')
+  useEffect(() => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      for (const r of roots) next.add(r.id)
+      return next
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootKey])
 
-      const conceptPaths = tree.tree
-        .filter((entry) => entry.type === 'blob' && entry.path.startsWith('registry/concept/') && entry.path.endsWith('.json'))
-        .map((entry) => entry.path)
+  const toggle = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
-      const concepts = await Promise.all(
-        conceptPaths.map(async (path) => {
-          const res = await fetch(`https://raw.githubusercontent.com/${CONCEPTBASE_REPO}/main/${path}`)
-          if (!res.ok) return null
-          return (await res.json()) as ConceptBaseConcept
-        })
-      )
+  const importConcepts = async (vocabulary: string, matching: ConceptBaseConcept[]) => {
+    for (const concept of matching) {
+      const label = concept.labels?.en ?? concept.id
+      const definitionsForLang = concept.definitions?.en ?? {}
+      const definition = Object.values(definitionsForLang)[0] ?? null
 
-      const matching = concepts.filter((c): c is ConceptBaseConcept => c !== null && c.definedInVocabulary === vocabulary)
+      const { data: existing } = await supabase
+        .from('lpm_schema_elements')
+        .select('id')
+        .eq('project_id', project.id)
+        .eq('metadata->>conceptbase_id', concept.id)
+        .maybeSingle()
 
-      for (const concept of matching) {
-        const label = concept.labels?.en ?? concept.id
-        const definitionsForLang = concept.definitions?.en ?? {}
-        const definition = Object.values(definitionsForLang)[0] ?? null
-
-        const { data: existing } = await supabase
-          .from('lpm_schema_elements')
-          .select('id')
-          .eq('project_id', project.id)
-          .eq('metadata->>conceptbase_id', concept.id)
-          .maybeSingle()
-
-        const row = {
-          project_id: project.id,
-          element_type: 'concept' as const,
-          label,
-          definition,
-          status: mapStatus(concept.status),
-          metadata: {
-            conceptbase_id: concept.id,
-            vocabulary: concept.definedInVocabulary,
-            version: concept.version,
-            relations: concept.relations ?? {},
-            source: 'conceptbase',
-          },
-        }
-
-        if (existing) await supabase.from('lpm_schema_elements').update(row).eq('id', existing.id)
-        else await supabase.from('lpm_schema_elements').insert(row)
+      const row = {
+        project_id: project.id,
+        element_type: 'concept' as const,
+        label,
+        definition,
+        status: mapStatus(concept.status),
+        metadata: {
+          conceptbase_id: concept.id,
+          vocabulary: concept.definedInVocabulary,
+          version: concept.version,
+          relations: concept.relations ?? {},
+          source: 'conceptbase',
+        },
       }
 
-      setNotice({ kind: 'ok', text: `Imported ${matching.length} concept(s) from "${vocabulary}".` })
-      await reload()
-    } catch (err) {
-      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+      if (existing) await supabase.from('lpm_schema_elements').update(row).eq('id', existing.id)
+      else await supabase.from('lpm_schema_elements').insert(row)
     }
-    setBusy(false)
+
+    setNotice({ kind: 'ok', text: `Imported ${matching.length} concept${matching.length === 1 ? '' : 's'} from "${vocabulary}".` })
+    await reload()
   }
 
   return (
     <div>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Concepts, competencies, and grade bands used across this project — imported from
-        ConceptBase or added directly.
+        The concepts, competencies, and grade bands this project is organized around — some added
+        directly, some imported from ConceptBase — shown here as the tree they form.
       </p>
 
       {notice && (
@@ -828,37 +845,295 @@ function ManageConceptsTab() {
           <p>No schema elements yet.</p>
         </div>
       ) : (
-        <div className="grid grid-3" style={{ marginBottom: 20 }}>
-          {elements.map((el) => (
-            <div key={el.id} className="card">
-              <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h3>{el.label}</h3>
-                <Chip status={el.status} />
-              </div>
-              <span className="muted capitalize">{el.element_type}</span>
-              {el.definition && <p style={{ marginTop: 8 }}>{el.definition}</p>}
-            </div>
-          ))}
+        <div className="grid grid-2" style={{ alignItems: 'flex-start', marginBottom: 20 }}>
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>Taxonomy</h3>
+            {roots.map((el) => (
+              <ManageConceptNode
+                key={el.id}
+                node={el}
+                depth={0}
+                childrenOf={childrenOf}
+                expanded={expanded}
+                onToggle={toggle}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
+            ))}
+          </div>
+
+          <div className="card" style={{ minHeight: 200 }}>
+            {!selected ? (
+              <p className="muted">
+                Pick a concept on the left to see its full definition, where it came from, and how
+                it connects to real content.
+              </p>
+            ) : (
+              <ManageConceptDetail
+                node={selected}
+                parent={selectedParent}
+                kids={childrenOf(selected.id)}
+                onSelect={setSelectedId}
+                onViewInMap={() => navigate(`/dashboard/${project.slug}/concepts/${selected.id}`)}
+              />
+            )}
+          </div>
         </div>
       )}
 
       {canManage && (
-        <div className="card">
-          <h3>Import from ConceptBase</h3>
-          <p className="muted">
-            {baseLink?.can_import
-              ? 'Pulls real oe:Concept records for one vocabulary from the public ConceptBase registry. Read-only — never writes back.'
-              : "This project isn't linked to ConceptBase for import yet (see project_base_links)."}
-          </p>
-          <form onSubmit={importConcepts} className="row">
-            <div className="field" style={{ marginBottom: 0 }}>
-              <input name="vocabulary" placeholder="e.g. BIO-CORE-v1.0.0" style={{ width: 220 }} required />
-            </div>
-            <button type="submit" className="btn btn-primary" disabled={!baseLink?.can_import || busy}>
-              Import concepts
-            </button>
-          </form>
+        <ImportFromConceptBase baseLink={baseLink} onImport={importConcepts} onNotice={setNotice} />
+      )}
+    </div>
+  )
+}
+
+function ManageConceptNode({
+  node,
+  depth,
+  childrenOf,
+  expanded,
+  onToggle,
+  selectedId,
+  onSelect,
+}: {
+  node: SchemaElement
+  depth: number
+  childrenOf: (id: string) => SchemaElement[]
+  expanded: Set<string>
+  onToggle: (id: string) => void
+  selectedId: string | null
+  onSelect: (id: string) => void
+}) {
+  const kids = childrenOf(node.id)
+  const isOpen = expanded.has(node.id)
+  return (
+    <div style={{ marginLeft: depth * 16 }}>
+      <div className="row" style={{ gap: 6, padding: '4px 0' }}>
+        {kids.length > 0 ? (
+          <button className="btn-linklike" onClick={() => onToggle(node.id)} style={{ textDecoration: 'none' }}>
+            {isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+          </button>
+        ) : (
+          <span style={{ width: 13 }} />
+        )}
+        <button
+          className="btn-linklike"
+          style={{ textDecoration: node.id === selectedId ? 'underline' : 'none', fontWeight: depth === 0 ? 600 : 400 }}
+          onClick={() => onSelect(node.id)}
+        >
+          {node.label}
+        </button>
+        <Chip status={node.status} />
+        {kids.length > 0 && <span className="chip" style={{ fontSize: 10 }}>{kids.length}</span>}
+      </div>
+      {isOpen && kids.map((k) => (
+        <ManageConceptNode key={k.id} node={k} depth={depth + 1} childrenOf={childrenOf} expanded={expanded} onToggle={onToggle} selectedId={selectedId} onSelect={onSelect} />
+      ))}
+    </div>
+  )
+}
+
+function ManageConceptDetail({
+  node,
+  parent,
+  kids,
+  onSelect,
+  onViewInMap,
+}: {
+  node: SchemaElement
+  parent: SchemaElement | null
+  kids: SchemaElement[]
+  onSelect: (id: string) => void
+  onViewInMap: () => void
+}) {
+  const metadata = (node.metadata ?? {}) as Record<string, unknown>
+  const source =
+    metadata.source === 'conceptbase'
+      ? `Imported from ConceptBase — ${(metadata.vocabulary as string) ?? 'vocabulary unknown'}${metadata.version ? ` v${metadata.version}` : ''}`
+      : 'Added directly to this project.'
+
+  return (
+    <div>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <h3 style={{ marginTop: 0 }}>{node.label}</h3>
+        <Chip status={node.status} />
+      </div>
+      <p className="muted capitalize" style={{ marginTop: -8, fontSize: 12 }}>{node.element_type}</p>
+      {parent && (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Part of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>
+        </p>
+      )}
+      <p style={{ marginTop: 8 }}>{node.definition || 'No definition yet.'}</p>
+      <p className="muted" style={{ fontSize: 12 }}>{source}</p>
+
+      {kids.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <h4 style={{ marginBottom: 4 }}>{kids.length} sub-concept{kids.length === 1 ? '' : 's'}</h4>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
+            {kids.map((k) => (
+              <button key={k.id} className="btn btn-mini" onClick={() => onSelect(k.id)}>{k.label}</button>
+            ))}
+          </div>
         </div>
+      )}
+
+      <button className="btn btn-mini" style={{ marginTop: 14 }} onClick={onViewInMap}>
+        <Network size={12} />See how this connects to real content
+      </button>
+    </div>
+  )
+}
+
+// Was a single blind text field (type the exact vocabulary id, hit Import,
+// find out afterward what happened) -- real feedback 5f48d774 (2026-10-03,
+// Dustin): "the Import from conceptbase needs a better ui/ux." Now a
+// three-step flow sharing one registry fetch: browse what's actually in
+// ConceptBase, pick a vocabulary from what's really there (no typing an id
+// from memory), see exactly which concepts will be added before committing
+// to anything.
+function ImportFromConceptBase({
+  baseLink,
+  onImport,
+  onNotice,
+}: {
+  baseLink: ProjectBaseLink | null
+  onImport: (vocabulary: string, matching: ConceptBaseConcept[]) => Promise<void>
+  onNotice: (notice: { kind: 'ok' | 'bad'; text: string } | null) => void
+}) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle')
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [allConcepts, setAllConcepts] = useState<ConceptBaseConcept[]>([])
+  const [vocabularies, setVocabularies] = useState<{ name: string; count: number }[]>([])
+  const [selectedVocab, setSelectedVocab] = useState('')
+  const [importing, setImporting] = useState(false)
+
+  const browse = async () => {
+    setStatus('loading'); setLoadError(null); onNotice(null)
+    try {
+      const treeRes = await fetch(`https://api.github.com/repos/${CONCEPTBASE_REPO}/git/trees/main?recursive=1`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      })
+      if (!treeRes.ok) throw new Error(`Couldn't reach the ConceptBase registry (error ${treeRes.status}).`)
+      const tree: { tree: { path: string; type: string }[] } = await treeRes.json()
+
+      const conceptPaths = tree.tree
+        .filter((entry) => entry.type === 'blob' && entry.path.startsWith('registry/concept/') && entry.path.endsWith('.json'))
+        .map((entry) => entry.path)
+
+      const fetched = await Promise.all(
+        conceptPaths.map(async (path) => {
+          const res = await fetch(`https://raw.githubusercontent.com/${CONCEPTBASE_REPO}/main/${path}`)
+          if (!res.ok) return null
+          return (await res.json()) as ConceptBaseConcept
+        })
+      )
+      const concepts = fetched.filter((c): c is ConceptBaseConcept => c !== null)
+
+      const counts = new Map<string, number>()
+      for (const c of concepts) counts.set(c.definedInVocabulary, (counts.get(c.definedInVocabulary) ?? 0) + 1)
+      const vocabList = Array.from(counts.entries())
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+
+      setAllConcepts(concepts)
+      setVocabularies(vocabList)
+      setSelectedVocab(vocabList[0]?.name ?? '')
+      setStatus('loaded')
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Couldn't reach the ConceptBase registry.")
+      setStatus('error')
+    }
+  }
+
+  const reset = () => {
+    setStatus('idle'); setAllConcepts([]); setVocabularies([]); setSelectedVocab('')
+  }
+
+  const previewMatches = useMemo(
+    () => allConcepts.filter((c) => c.definedInVocabulary === selectedVocab),
+    [allConcepts, selectedVocab]
+  )
+
+  const confirmImport = async () => {
+    if (!selectedVocab || previewMatches.length === 0) return
+    setImporting(true)
+    try {
+      await onImport(selectedVocab, previewMatches)
+      reset()
+    } catch (err) {
+      onNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+    }
+    setImporting(false)
+  }
+
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>Import from ConceptBase</h3>
+      <p className="muted">
+        {baseLink?.can_import
+          ? "Brings concept definitions from the shared ConceptBase registry into this project. It only reads from ConceptBase — nothing here is ever written back to it."
+          : "This project isn't connected to ConceptBase for importing yet. Ask a lab admin to connect it."}
+      </p>
+
+      {baseLink?.can_import && (
+        <>
+          {status === 'idle' && (
+            <button className="btn btn-primary" onClick={browse}>Browse ConceptBase vocabularies</button>
+          )}
+
+          {status === 'loading' && (
+            <p className="row muted">
+              <Loader2 size={14} style={{ animation: 'feedback-capturing-spin 0.9s linear infinite' }} />
+              Looking up what's available in ConceptBase…
+            </p>
+          )}
+
+          {status === 'error' && (
+            <div className="notice notice-bad">
+              {loadError}
+              <button className="btn btn-mini" onClick={browse} style={{ marginLeft: 'auto' }}>Try again</button>
+            </div>
+          )}
+
+          {status === 'loaded' && (
+            vocabularies.length === 0 ? (
+              <p className="muted">No concept vocabularies found in the ConceptBase registry.</p>
+            ) : (
+              <div>
+                <div className="field" style={{ maxWidth: 320 }}>
+                  <label>Vocabulary</label>
+                  <select value={selectedVocab} onChange={(e) => setSelectedVocab(e.target.value)}>
+                    {vocabularies.map((v) => (
+                      <option key={v.name} value={v.name}>{v.name} ({v.count} concept{v.count === 1 ? '' : 's'})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {previewMatches.length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <p className="muted" style={{ marginBottom: 4 }}>
+                      This will add or update {previewMatches.length} concept{previewMatches.length === 1 ? '' : 's'} in this project:
+                    </p>
+                    <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
+                      {previewMatches.map((c) => (
+                        <span key={c.id} className="chip">{c.labels?.en ?? c.id}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="row" style={{ marginTop: 12, gap: 8 }}>
+                  <button className="btn btn-primary" disabled={importing || previewMatches.length === 0} onClick={confirmImport}>
+                    {importing ? 'Importing…' : `Import ${previewMatches.length} concept${previewMatches.length === 1 ? '' : 's'}`}
+                  </button>
+                  <button className="btn btn-mini" onClick={reset} disabled={importing}>Cancel</button>
+                </div>
+              </div>
+            )
+          )}
+        </>
       )}
     </div>
   )
