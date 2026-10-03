@@ -648,6 +648,26 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 .login-footer-legal a { color: var(--text-muted); }
 
+/* ---- pre-login landing page (home-page.tsx) -- visual refresh, real
+   feedback 54268c78 (Dustin, 2026-10-03): the page read as too plain and
+   as researcher-only. The hero gets a soft tinted band (reusing the
+   existing primary-rgb tint rather than a new color) and each feature/
+   audience card gets a colored icon tile instead of a bare icon. ---- */
+.home-hero {
+  background: linear-gradient(180deg, rgb(var(--primary-rgb) / 0.08), transparent);
+  border-bottom: 1px solid var(--border);
+}
+.home-hero .chip {
+  color: var(--series-a); border-color: var(--series-a);
+  background: rgb(var(--primary-rgb) / 0.1); font-weight: 600;
+}
+.home-feature-card { display: flex; flex-direction: column; gap: 4px; }
+.home-feature-icon {
+  width: 34px; height: 34px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
+}
+
 /* Small, text-only legal links reachable from every signed-in page --
    German TMG/DDG imprint-duty applies to the whole service, not just the
    page before sign-in, but the full logo footer above would eat real
