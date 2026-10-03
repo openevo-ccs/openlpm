@@ -790,6 +790,9 @@ export type Database = {
           content: any
           access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
           license_or_rights_note: string | null
+          event_date: string | null
+          effective_from: string | null
+          effective_until: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -805,6 +808,9 @@ export type Database = {
           content?: any
           access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
           license_or_rights_note?: string | null
+          event_date?: string | null
+          effective_from?: string | null
+          effective_until?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -820,6 +826,9 @@ export type Database = {
           content?: any
           access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
           license_or_rights_note?: string | null
+          event_date?: string | null
+          effective_from?: string | null
+          effective_until?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -2069,6 +2078,118 @@ export type Database = {
             columns: ["project_id"],
             isOneToOne: false,
             referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      geo_places: {
+        Row: {
+          place_code: string
+          display_name: string
+          latitude: number | null
+          longitude: number | null
+          parent_place_code: string | null
+          created_at: string
+        }
+        Insert: {
+          place_code: string
+          display_name: string
+          latitude?: number | null
+          longitude?: number | null
+          parent_place_code?: string | null
+          created_at?: string
+        }
+        Update: {
+          place_code?: string
+          display_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          parent_place_code?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geo_places_parent_place_code_fkey",
+            columns: ["parent_place_code"],
+            isOneToOne: false,
+            referencedRelation: "geo_places",
+            referencedColumns: ["place_code"]
+          }
+        ]
+      }
+      context_items: {
+        Row: {
+          id: string
+          project_id: string
+          item_type: string
+          title: string
+          url: string | null
+          summary: string | null
+          source_outlet: string | null
+          published_at: string | null
+          place_code: string | null
+          data_object_id: string | null
+          repository_record_id: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          item_type: string
+          title: string
+          url?: string | null
+          summary?: string | null
+          source_outlet?: string | null
+          published_at?: string | null
+          place_code?: string | null
+          data_object_id?: string | null
+          repository_record_id?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          item_type?: string
+          title?: string
+          url?: string | null
+          summary?: string | null
+          source_outlet?: string | null
+          published_at?: string | null
+          place_code?: string | null
+          data_object_id?: string | null
+          repository_record_id?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "context_items_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "context_items_place_code_fkey",
+            columns: ["place_code"],
+            isOneToOne: false,
+            referencedRelation: "geo_places",
+            referencedColumns: ["place_code"]
+          },
+          {
+            foreignKeyName: "context_items_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "context_items_repository_record_id_fkey",
+            columns: ["repository_record_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_records",
             referencedColumns: ["id"]
           }
         ]
