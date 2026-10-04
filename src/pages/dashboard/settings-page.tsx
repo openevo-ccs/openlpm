@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, ExternalLink, Globe, Layers, Link2, Mail, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
+import { AlertTriangle, Check, Copy, ExternalLink, Globe, Layers, Library, Link2, Mail, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
 import { CUSTOM_VIEW_AUDIENCES, CUSTOM_VIEW_LANGUAGES } from '@/lib/custom-views'
 import { createCustomView, listCustomViews } from '@/lib/supabase/custom-views'
+import {
+  listProjectRepositoryLinks,
+  listRepositoryLinkSummaryForProject,
+  type ProjectRepositoryLinkSummary,
+  type ProjectRepositoryLinkRow,
+} from '@/lib/supabase/curriculum-repository'
 import {
   addJoinRule,
   inviteMembers,
@@ -57,6 +63,7 @@ export default function SettingsPage() {
   const canManage = role === 'owner' || role === 'maintainer'
   // project_kind (migration 072) isn't in the generated types yet.
   const isRepository = (project as any).project_kind === 'curriculum-repository'
+  const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
 
   return (
     <div>
@@ -66,6 +73,7 @@ export default function SettingsPage() {
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
       <MembersSection project={project} role={role} supabase={supabase} />
       {canManage && isRepository && <CustomViewsSection project={project} supabase={supabase} />}
+      {!isRepository && !isCustomView && <CurriculumSourcesSection project={project} supabase={supabase} />}
       {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
       {canManage && <FederationSection project={project} supabase={supabase} />}
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
@@ -224,6 +232,105 @@ function NewCustomViewForm({
       <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
         Starts with no members but you — add people from this new view&apos;s own Settings page once it&apos;s created.
       </p>
+    </div>
+  )
+}
+
+// ============================================================================
+// Curriculum sources (migration 105, 2026-10-04) -- the content side of
+// migration 066's "browse + connect" feature. Shows which Curriculum
+// Repository document(s) this project's own content was built from, and
+// flags it directly when the Repository already has a newer edition --
+// built after a real incident where EvoMentor Thuringia and the Germany
+// Curriculum Repository drifted out of sync with nothing to flag it. See
+// lab_manager's germany-curriculum-repository-vs-evomentor-thuringia-
+// relation-2026-10-04.md for the full story. Read-only here deliberately --
+// creating a new connection already has a home on the Repository's own
+// record-detail page (the existing "Connect" button); this just makes the
+// result of that visible from the content side too, which previously had
+// no way to see it at all.
+// ============================================================================
+
+function CurriculumSourcesSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [projectLinks, setProjectLinks] = useState<(ProjectRepositoryLinkRow & { repository: { id: string; name: string; slug: string } })[] | null>(null)
+  const [recordLinks, setRecordLinks] = useState<ProjectRepositoryLinkSummary[] | null>(null)
+
+  useEffect(() => {
+    setProjectLinks(null)
+    setRecordLinks(null)
+    listProjectRepositoryLinks(supabase, project.id).then(setProjectLinks)
+    listRepositoryLinkSummaryForProject(supabase, project.id).then(setRecordLinks)
+  }, [supabase, project.id])
+
+  const loading = projectLinks === null || recordLinks === null
+  const nothingYet = !loading && projectLinks!.length === 0 && recordLinks!.length === 0
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Library size={16} style={{ color: 'var(--text-muted)' }} />Curriculum Repository sources</h3>
+      <p className="muted">
+        Which official curriculum document(s) {project.name}&apos;s content is grounded in, and whether the
+        Repository already has a newer edition than what it was built from.
+      </p>
+
+      {loading ? (
+        <p className="muted">Loading…</p>
+      ) : nothingYet ? (
+        <p className="muted">
+          No Curriculum Repository connections yet. These are made from a repository record&apos;s own page
+          (the &quot;Connect&quot; button there), not from here.
+        </p>
+      ) : (
+        <>
+          {projectLinks!.length > 0 && (
+            <div style={{ marginBottom: recordLinks!.length > 0 ? 14 : 0 }}>
+              <p className="muted" style={{ marginBottom: 4, fontSize: 12.5 }}>Grounded in, project-wide:</p>
+              {projectLinks!.map((l) => (
+                <div key={l.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+                  <span>
+                    <strong>{l.repository.name}</strong>
+                    {l.jurisdiction && <span className="chip" style={{ marginLeft: 6 }}>{l.jurisdiction}</span>}
+                  </span>
+                  <Link to={`/dashboard/${l.repository.slug}`} className="btn btn-mini">
+                    <ExternalLink size={11} />Open
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {recordLinks!.length > 0 && (
+            <div>
+              <p className="muted" style={{ marginBottom: 4, fontSize: 12.5 }}>Specific content connected to a Repository record:</p>
+              {recordLinks!.map(({ record, linkedContentCount, supersession }) => (
+                <div key={record.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                  <div className="row" style={{ justifyContent: 'space-between' }}>
+                    <span>
+                      <strong>{record.title}</strong>
+                      <span className="muted" style={{ marginLeft: 6 }}>
+                        {linkedContentCount} linked item{linkedContentCount === 1 ? '' : 's'}
+                      </span>
+                    </span>
+                  </div>
+                  {supersession.successor && (
+                    <p className="notice notice-bad" style={{ marginTop: 6, marginBottom: 0, fontSize: 12.5 }}>
+                      <AlertTriangle size={11} style={{ marginRight: 4, verticalAlign: 'text-bottom' }} />
+                      The Repository shows a newer edition — <strong>{supersession.successor.title}</strong> — worth
+                      checking whether this content still matches.
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }

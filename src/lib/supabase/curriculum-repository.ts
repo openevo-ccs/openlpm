@@ -237,6 +237,44 @@ export async function listContentLinksForRecord(supabase: Client, repositoryReco
   return (data ?? []) as unknown as (RepositoryContentLinkRow & { data_object: { id: string; title: string; project_id: string } })[]
 }
 
+export interface ProjectRepositoryLinkSummary {
+  record: RepositoryRecordRow
+  linkedContentCount: number
+  supersession: SupersessionInfo
+}
+
+// The content side of the "browse + connect" feature (migration 066's
+// curriculum_repository_links, Level 2) -- which Repository record(s) THIS
+// project's own content points at, with a count of how many of its items
+// point at each one, and whether a newer edition already exists. Needs
+// migration 105's read-access policy to actually see the records
+// themselves (this project's members aren't necessarily Repository
+// members) -- without it, record comes back null and this silently drops
+// that row.
+export async function listRepositoryLinkSummaryForProject(supabase: Client, projectId: string): Promise<ProjectRepositoryLinkSummary[]> {
+  const { data } = await supabase
+    .from('curriculum_repository_links')
+    .select('repository_record_id, record:curriculum_repository_records(*)')
+    .eq('project_id', projectId)
+  const rows = (data ?? []) as unknown as { repository_record_id: string; record: RepositoryRecordRow | null }[]
+
+  const counts = new Map<string, number>()
+  const records = new Map<string, RepositoryRecordRow>()
+  for (const row of rows) {
+    counts.set(row.repository_record_id, (counts.get(row.repository_record_id) ?? 0) + 1)
+    if (row.record && !records.has(row.repository_record_id)) records.set(row.repository_record_id, row.record)
+  }
+
+  const summaries = await Promise.all(
+    Array.from(records.values()).map(async (record) => ({
+      record,
+      linkedContentCount: counts.get(record.id) ?? 0,
+      supersession: await getSupersessionInfo(supabase, record),
+    }))
+  )
+  return summaries.sort((a, b) => a.record.title.localeCompare(b.record.title))
+}
+
 export async function createContentLink(
   supabase: Client,
   params: { projectId: string; dataObjectId: string; repositoryRecordId: string; rationale?: string | null; relationType?: string }
