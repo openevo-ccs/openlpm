@@ -224,7 +224,52 @@ def record_type_from_schema_ref(schema_ref):
     return None
 
 
-def parse_file(file_path, source_repo, default_jurisdiction, warnings):
+# Real-world dates, mapped onto curriculum_repository_records' event_date/
+# effective_from/effective_until (migration 094) and supersedes_record_id
+# (migration 100). Only two of the nine deutsche-lpm/nys-lpm record schemas
+# carry real-world dates at all: policy-timeline-event (dateStart/dateEnd/
+# eventType/temporalStatus/supersedes) and institutional-mandate-record
+# (adoptionDate/targetDate/status/supersededBy) -- every other type returns
+# all-null here and simply won't appear on the Timeline view, same as today.
+#
+# This function handles the STANDALONE case only (a record with no sibling
+# edition before or after it). A record that's part of a real edition chain
+# (e.g. Thuringia Biologie's 1999 -> 2024 -> 2026-Erprobungsfassung) gets its
+# effective_from/effective_until overridden afterward in
+# resolve_supersession_chains, once both ends of each link are known --
+# that's what actually turns "three disconnected points in time" into "three
+# adjacent bars showing which edition was in force when."
+def compute_standalone_dates(record_type, content):
+    if record_type == "policy-timeline-event":
+        date_start = content.get("dateStart")
+        if not date_start:
+            return (None, None, None)
+        date_end = content.get("dateEnd")
+        if date_end:
+            return (None, date_start, date_end)
+        event_type = content.get("eventType")
+        temporal_status = content.get("temporalStatus")
+        # A completed, dateless-end event (a milestone, a revision that's
+        # already finished and not part of any tracked chain) is a single
+        # point. An ongoing or future-starting one, with no end yet, is an
+        # open-ended bar (drawn to "today" by the Timeline view) -- still
+        # genuinely in force/in progress, not a one-off moment.
+        if event_type == "milestone-target" or temporal_status == "past-completed":
+            return (date_start, None, None)
+        return (None, date_start, None)
+    if record_type == "institutional-mandate-record":
+        adoption = content.get("adoptionDate")
+        if not adoption:
+            return (None, None, None)
+        target = content.get("targetDate")
+        status = content.get("status")
+        if target and status == "proposed":
+            return (None, adoption, target)
+        return (None, adoption, None)
+    return (None, None, None)
+
+
+def parse_file(file_path, source_repo, default_jurisdiction, warnings, edges):
     try:
         doc = yaml.safe_load(file_path.read_text(encoding="utf-8"))
     except yaml.YAMLError as e:
@@ -252,6 +297,7 @@ def parse_file(file_path, source_repo, default_jurisdiction, warnings):
             continue
         tiers = list(find_recursive(r, "accessTier"))
         notes = list(find_recursive(r, "licenseOrRightsNote"))
+        event_date, effective_from, effective_until = compute_standalone_dates(record_type, r)
         out.append({
             "project_id": None,  # filled in once the target project exists
             "record_type": record_type,
@@ -262,12 +308,75 @@ def parse_file(file_path, source_repo, default_jurisdiction, warnings):
             "content": r,
             "access_tier": most_conservative_tier(tiers),
             "license_or_rights_note": notes[0] if notes else None,
+            "event_date": event_date,
+            "effective_from": effective_from,
+            "effective_until": effective_until,
         })
+        # policy-timeline-event points backward at what IT replaces
+        # (`supersedes: OLD_ID` on the NEW record); institutional-mandate-
+        # record points forward at what replaces IT (`supersededBy: NEW_ID`
+        # on the OLD record). Normalized here into one direction -- an
+        # (source_repo, successor_source_id, predecessor_source_id) edge --
+        # so resolve_supersession_chains only has to walk one shape.
+        if record_type == "policy-timeline-event" and r.get("supersedes"):
+            edges.append((source_repo, r["id"], r["supersedes"]))
+        if record_type == "institutional-mandate-record" and r.get("supersededBy"):
+            edges.append((source_repo, r["supersededBy"], r["id"]))
     return out
+
+
+# Turns each predecessor/successor edge into real adjacent bars: the
+# predecessor's effective_until becomes the successor's own start date (it
+# was in force right up until the new edition began), and the successor
+# itself gets an open bar (effective_from set, effective_until left null --
+# "still in force" -- unless ITS OWN successor edge sets it in a later
+# iteration of this same loop). Both ends' event_date is cleared when
+# converted to a range, since a record that's part of a chain is a standing
+# edition, not a one-off point. Mutates `records_by_key` in place; returns
+# the count of edges actually resolved (an edge whose other end didn't parse
+# -- e.g. a typo'd id -- is silently skipped, surfaced only via the summary
+# count, not a hard failure, since one bad link shouldn't block every other
+# record from importing).
+def resolve_supersession_chains(by_repo, edges):
+    by_key = {}
+    for source_repo, records in by_repo.items():
+        for r in records:
+            by_key[(source_repo, r["source_record_id"])] = r
+
+    def own_date(rec):
+        c = rec["content"]
+        return c.get("dateStart") or c.get("adoptionDate")
+
+    resolved = 0
+    unresolved = []
+    for source_repo, successor_id, predecessor_id in edges:
+        successor = by_key.get((source_repo, successor_id))
+        predecessor = by_key.get((source_repo, predecessor_id))
+        if not successor or not predecessor:
+            unresolved.append((source_repo, successor_id, predecessor_id))
+            continue
+        successor_start = own_date(successor)
+        predecessor_start = own_date(predecessor)
+        if not successor_start or not predecessor_start:
+            unresolved.append((source_repo, successor_id, predecessor_id))
+            continue
+        predecessor["event_date"] = None
+        predecessor["effective_from"] = predecessor_start
+        predecessor["effective_until"] = successor_start
+        successor["event_date"] = None
+        successor["effective_from"] = successor_start
+        # Deliberately NOT touching successor["effective_until"] here -- if
+        # this successor is itself someone's predecessor, that edge (processed
+        # in its own turn, order doesn't matter since each edge only ever
+        # writes its own two ends) will set it; otherwise it stays null,
+        # correctly rendering as still-in-force.
+        resolved += 1
+    return resolved, unresolved
 
 
 def collect_all():
     warnings = []
+    edges = []
     by_repo = {}
     for source_repo, cfg in REPOS.items():
         repo_path = cfg["path"]
@@ -278,9 +387,17 @@ def collect_all():
         files = sorted(repo_path.glob("**/records/*.yaml"))
         records = []
         for f in files:
-            records.extend(parse_file(f, source_repo, cfg["default_jurisdiction"], warnings))
+            records.extend(parse_file(f, source_repo, cfg["default_jurisdiction"], warnings, edges))
         by_repo[source_repo] = records
-    return by_repo, warnings
+    resolved, unresolved = resolve_supersession_chains(by_repo, edges)
+    if resolved:
+        print(f"Resolved {resolved} supersession chain link(s) into adjacent effective_from/until ranges.")
+    for source_repo, successor_id, predecessor_id in unresolved:
+        warnings.append(
+            f"{source_repo}: could not resolve supersession link {predecessor_id} -> {successor_id} "
+            f"(one or both records missing, or missing a usable date) -- left as standalone dates."
+        )
+    return by_repo, warnings, edges
 
 
 def summarize(by_repo):
@@ -358,7 +475,36 @@ def upsert_records(key, records):
         print(f"  upserted {i + len(chunk)}/{len(records)}")
 
 
-def apply_import(by_repo, owner_email):
+def resolve_supersedes_fk(key, by_repo, edges):
+    # The chain's effective_from/until ranges were already set in memory
+    # before upload (resolve_supersession_chains), but supersedes_record_id
+    # (migration 100) is a real foreign key to another row's UUID -- which
+    # only exists once that row has actually been written. This is the one
+    # part of the whole import that genuinely needs a round-trip after the
+    # main upsert, not just in-memory bookkeeping.
+    if not edges:
+        return
+    id_map = {}
+    for source_repo in by_repo:
+        rows = rest("GET", f"curriculum_repository_records?source_repo=eq.{source_repo}&select=id,source_record_id", key)
+        for row in rows:
+            id_map[(source_repo, row["source_record_id"])] = row["id"]
+    linked = 0
+    for source_repo, successor_id, predecessor_id in edges:
+        successor_uuid = id_map.get((source_repo, successor_id))
+        predecessor_uuid = id_map.get((source_repo, predecessor_id))
+        if not successor_uuid or not predecessor_uuid:
+            continue
+        rest(
+            "PATCH", f"curriculum_repository_records?id=eq.{successor_uuid}", key,
+            headers={"Prefer": "return=minimal"},
+            json={"supersedes_record_id": predecessor_uuid},
+        )
+        linked += 1
+    print(f"\nLinked {linked}/{len(edges)} supersedes_record_id reference(s).")
+
+
+def apply_import(by_repo, owner_email, edges):
     key = load_service_role_key()
     owner = rest("GET", f"users?email=eq.{owner_email}&select=id", key)
     if not owner:
@@ -439,6 +585,8 @@ def apply_import(by_repo, owner_email):
                 r["project_id"] = state_project_id
             upsert_records(key, recs)
 
+    resolve_supersedes_fk(key, by_repo, edges)
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -447,7 +595,7 @@ def main():
     ap.add_argument("--preview-out", default=str(ROOT / "scripts" / "curriculum_repository_preview.json"))
     args = ap.parse_args()
 
-    by_repo, warnings = collect_all()
+    by_repo, warnings, edges = collect_all()
     summarize(by_repo)
 
     if warnings:
@@ -462,7 +610,7 @@ def main():
         print("Re-run with --apply to actually create the project spaces and upsert these records.")
         return
 
-    apply_import(by_repo, args.owner_email)
+    apply_import(by_repo, args.owner_email, edges)
     print("\nDone.")
 
 

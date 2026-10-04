@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { Info, Library, Link2, Pencil, Plus, Save, Search, X } from 'lucide-react'
+import { ArrowLeftRight, Info, Library, Link2, Pencil, Plus, Save, Search, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
   ACCESS_TIER_LABEL,
@@ -9,6 +9,7 @@ import {
   createContentLink,
   createRepositoryRecord,
   getRepositoryRecord,
+  getSupersessionInfo,
   listContentLinksForRecord,
   listJurisdictions,
   listRepositoryRecords,
@@ -16,6 +17,7 @@ import {
   updateRepositoryRecord,
   type RepositoryRecordDraft,
   type RepositoryRecordRow,
+  type SupersessionInfo,
 } from '@/lib/supabase/curriculum-repository'
 
 // "Browse + connect" -- real sourced national/regional curriculum-policy
@@ -179,17 +181,22 @@ function RecordDetail({
 }) {
   const [record, setRecord] = useState<RepositoryRecordRow | null>(null)
   const [links, setLinks] = useState<Awaited<ReturnType<typeof listContentLinksForRecord>>>([])
+  const [supersession, setSupersession] = useState<SupersessionInfo>({ predecessor: null, successor: null })
   const [showConnect, setShowConnect] = useState(false)
   const [editing, setEditing] = useState(false)
 
   const reload = async () => {
-    const [rec, l] = await Promise.all([getRepositoryRecord(supabase, recordId), listContentLinksForRecord(supabase, recordId)])
+    const rec = await getRepositoryRecord(supabase, recordId)
     setRecord(rec)
+    if (!rec) return
+    const [l, s] = await Promise.all([listContentLinksForRecord(supabase, recordId), getSupersessionInfo(supabase, rec)])
     setLinks(l)
+    setSupersession(s)
   }
 
   useEffect(() => {
     setRecord(null)
+    setSupersession({ predecessor: null, successor: null })
     setEditing(false)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -211,6 +218,8 @@ function RecordDetail({
 
   const { visible, gated } = splitContentFields(record)
   const sourceUrl = (record.content as Record<string, unknown> | null)?.sourceUrl ?? (record.content as Record<string, unknown> | null)?.url
+  const navigate = useNavigate()
+  const goTo = (id: string) => navigate(`/dashboard/${currentProject.slug}/curriculum-repository/${id}`)
 
   return (
     <div>
@@ -233,6 +242,30 @@ function RecordDetail({
           <button className="btn btn-mini" onClick={() => setEditing(true)}><Pencil size={12} />Edit</button>
         )}
       </div>
+
+      {(supersession.predecessor || supersession.successor) && (
+        <div className="card" style={{ marginTop: 10, marginBottom: 10, padding: '8px 10px' }}>
+          <div className="row" style={{ gap: 6, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 2 }}>
+            <ArrowLeftRight size={13} />Part of an edition history
+          </div>
+          {supersession.predecessor && (
+            <p style={{ fontSize: 13, margin: '2px 0' }}>
+              Replaced{' '}
+              <button type="button" className="btn-linklike" onClick={() => goTo(supersession.predecessor!.id)}>
+                {supersession.predecessor.title}
+              </button>
+            </p>
+          )}
+          {supersession.successor && (
+            <p style={{ fontSize: 13, margin: '2px 0' }}>
+              Later replaced by{' '}
+              <button type="button" className="btn-linklike" onClick={() => goTo(supersession.successor!.id)}>
+                {supersession.successor.title}
+              </button>
+            </p>
+          )}
+        </div>
+      )}
 
       {visible.length === 0 && gated.length === 0 && (
         <p className="muted" style={{ fontSize: 13 }}>No further details recorded for this item yet.</p>

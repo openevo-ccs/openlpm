@@ -52,7 +52,12 @@ const NARRATIVE_KEYS = new Set([
   'objects', 'baselineCurriculumObject',
 ])
 
-const ALWAYS_HIDDEN_KEYS = new Set(['id', 'slug', 'label', '$schema', 'provenance', 'accessTier', 'licenseOrRightsNote'])
+// `supersedes`/`supersededBy` are the raw source-repo ids the import script
+// already resolves into the real `supersedes_record_id` foreign key
+// (migration 100) -- hidden here so a record shows the one real, clickable
+// link (see getSupersessionInfo) instead of also listing the bare
+// unresolved source id as an ordinary text field.
+const ALWAYS_HIDDEN_KEYS = new Set(['id', 'slug', 'label', '$schema', 'provenance', 'accessTier', 'licenseOrRightsNote', 'supersedes', 'supersededBy'])
 
 function humanizeKey(key: string): string {
   return key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase())
@@ -97,6 +102,29 @@ export async function listRepositoryRecords(
 export async function getRepositoryRecord(supabase: Client, recordId: string): Promise<RepositoryRecordRow | null> {
   const { data } = await supabase.from('curriculum_repository_records').select('*').eq('id', recordId).maybeSingle()
   return data ?? null
+}
+
+export interface SupersessionInfo {
+  predecessor: { id: string; title: string } | null
+  successor: { id: string; title: string } | null
+}
+
+// A record's place in an edition chain (migration 100), e.g. Thuringia
+// Biologie's 1999 -> 2024 -> 2026-Erprobungsfassung -- which prior edition
+// this one directly replaced, and (the reverse lookup, since the FK only
+// points one direction) which later edition replaced this one, if any.
+// Most records are in no chain at all and get both sides null.
+export async function getSupersessionInfo(supabase: Client, record: RepositoryRecordRow): Promise<SupersessionInfo> {
+  const [predecessorRes, successorRes] = await Promise.all([
+    record.supersedes_record_id
+      ? supabase.from('curriculum_repository_records').select('id, title').eq('id', record.supersedes_record_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase.from('curriculum_repository_records').select('id, title').eq('supersedes_record_id', record.id).maybeSingle(),
+  ])
+  return {
+    predecessor: predecessorRes.data ?? null,
+    successor: successorRes.data ?? null,
+  }
 }
 
 export interface RepositoryRecordDraft {
