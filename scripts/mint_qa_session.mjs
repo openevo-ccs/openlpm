@@ -78,16 +78,21 @@ async function cli() {
   const base = process.argv[2] || 'http://localhost:5173/'
   const out = process.argv[3] || path.join(ROOT, 'layout_check', 'out', 'qa-session-check.png')
   const route = process.argv[4] || '#/dashboard/evomentor-thuringia'
+  // Optional 5th arg: sign in as a different real member instead of the
+  // standing QA account -- same use case already documented for the
+  // exported mintQaSession(page, base, email) signature, just reachable
+  // from the CLI too now instead of only from an importing script.
+  const email = process.argv[5] || QA_EMAIL
 
   const browser = await chromium.launch()
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
   await page.goto(base, { waitUntil: 'networkidle' })
-  await mintQaSession(page, base)
+  await mintQaSession(page, base, email)
 
   await page.goto(`${base}${route}`, { waitUntil: 'networkidle' })
   await page.waitForTimeout(2000)
   await page.screenshot({ path: out, fullPage: true })
-  console.log('Signed in as', QA_EMAIL, '-- saved', out)
+  console.log('Signed in as', email, '-- saved', out)
   await browser.close()
 }
 
