@@ -53,6 +53,21 @@ function gradeLabel(grade: string | null): string {
   return grade ? `Grade ${grade}` : 'Grade —'
 }
 
+// A combined band like "5/6" (MNT's real Doppeljahrgangsstufe structure --
+// the Thuringia curriculum itself leaves sequencing within the two years to
+// the teacher, per LP Thueringen MNT 2026's own "ueber die Anordnung der
+// Lerninhalte innerhalb der... Doppelklassenstufe entscheidet die
+// Lehrkraft") should show up when a teacher picks EITHER single grade it
+// spans, not only under its own separate "Grade 5/6" filter option -- a
+// real gap confirmed live: 37 grade-5/6 items were invisible to anyone
+// filtering to "Grade 5" or "Grade 6" specifically, which is how a teacher
+// actually browses.
+function matchesGrade(band: string | null, filter: string): boolean {
+  if (!band) return false
+  if (band === filter) return true
+  return band.split('/').map((s) => s.trim()).includes(filter)
+}
+
 export default function LearningGoalsPage() {
   return (
     <div>
@@ -103,7 +118,7 @@ function BrowseTab() {
     if (!topics) return []
     const q = query.trim().toLowerCase()
     return topics.filter((t) => {
-      if (gradeFilter !== 'all' && t.grade_band !== gradeFilter) return false
+      if (gradeFilter !== 'all' && !matchesGrade(t.grade_band, gradeFilter)) return false
       if (!q) return true
       return (
         t.title.toLowerCase().includes(q) ||
