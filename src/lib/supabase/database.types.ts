@@ -795,6 +795,7 @@ export type Database = {
           event_date: string | null
           effective_from: string | null
           effective_until: string | null
+          supersedes_record_id: string | null
           created_by: string | null
           created_at: string
           updated_at: string
@@ -813,6 +814,7 @@ export type Database = {
           event_date?: string | null
           effective_from?: string | null
           effective_until?: string | null
+          supersedes_record_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -831,6 +833,7 @@ export type Database = {
           event_date?: string | null
           effective_from?: string | null
           effective_until?: string | null
+          supersedes_record_id?: string | null
           created_by?: string | null
           created_at?: string
           updated_at?: string
@@ -841,6 +844,13 @@ export type Database = {
             columns: ["project_id"],
             isOneToOne: false,
             referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_records_supersedes_record_id_fkey",
+            columns: ["supersedes_record_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_records",
             referencedColumns: ["id"]
           }
         ]
