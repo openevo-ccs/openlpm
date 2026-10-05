@@ -163,16 +163,21 @@ export function FeedbackWidget() {
     // 2026-10-01.
     recognition.lang = navigator.language
     recognition.continuous = true
-    recognition.interimResults = false
+    recognition.interimResults = true
+    const baseComment = comment
+    const prefix = baseComment && !baseComment.endsWith(' ') && !baseComment.endsWith('\n') ? `${baseComment} ` : baseComment
+    let finalTranscript = ''
     recognition.onresult = (event) => {
-      let addition = ''
+      let interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i]
-        if (result.isFinal) addition += result[0].transcript
+        if (result.isFinal) finalTranscript += result[0].transcript.trim() + ' '
+        else interimTranscript += result[0].transcript
       }
-      if (addition) {
-        setComment((prev) => (prev && !prev.endsWith(' ') && !prev.endsWith('\n') ? `${prev} ` : prev) + addition.trim() + ' ')
-      }
+      // Rewrites the whole value each time so the box always shows exactly
+      // what's been heard so far, interim words included -- Dustin asked
+      // to see live text while speaking, not just the committed phrases.
+      setComment(prefix + finalTranscript + interimTranscript)
     }
     recognition.onerror = () => setListening(false)
     recognition.onend = () => setListening(false)
