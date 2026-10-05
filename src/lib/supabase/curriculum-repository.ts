@@ -229,12 +229,28 @@ export async function createProjectRepositoryLink(
   return { error: error?.message ?? null }
 }
 
-export async function listContentLinksForRecord(supabase: Client, repositoryRecordId: string): Promise<(RepositoryContentLinkRow & { data_object: { id: string; title: string; project_id: string } })[]> {
+export interface ContentLinkWithContext extends RepositoryContentLinkRow {
+  data_object: { id: string; title: string; project_id: string }
+  // The record's own project_id column (same one listRepositoryLinkSummaryForProject
+  // filters on below), joined here so "which OpenLPM projects actually use
+  // this" (real feedback ea3a4c01) never has to be inferred from the data
+  // object's own project_id in two different places.
+  project: { id: string; name: string; slug: string } | null
+}
+
+export async function listContentLinksForRecord(supabase: Client, repositoryRecordId: string): Promise<ContentLinkWithContext[]> {
   const { data } = await supabase
     .from('curriculum_repository_links')
-    .select('*, data_object:lpm_data_objects(id, title, project_id)')
+    .select('*, data_object:lpm_data_objects(id, title, project_id), project:projects(id, name, slug)')
     .eq('repository_record_id', repositoryRecordId)
-  return (data ?? []) as unknown as (RepositoryContentLinkRow & { data_object: { id: string; title: string; project_id: string } })[]
+  return (data ?? []) as unknown as ContentLinkWithContext[]
+}
+
+/** Distinct projects that have linked content to this record -- the compact "used by" summary, e.g. for the Timeline's detail panel. */
+export function distinctLinkedProjects(links: ContentLinkWithContext[]): { id: string; name: string; slug: string }[] {
+  const seen = new Map<string, { id: string; name: string; slug: string }>()
+  for (const l of links) if (l.project && !seen.has(l.project.id)) seen.set(l.project.id, l.project)
+  return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export interface ProjectRepositoryLinkSummary {

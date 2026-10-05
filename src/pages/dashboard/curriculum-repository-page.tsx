@@ -323,6 +323,7 @@ function RecordDetail({
           links.map((l) => (
             <div key={l.id} style={{ padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
               <span style={{ fontSize: 13 }}>{l.data_object.title}</span>
+              {l.project && <span className="muted" style={{ fontSize: 11, marginLeft: 6 }}>in {l.project.name}</span>}
               {l.rationale && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{l.rationale}</p>}
             </div>
           ))
