@@ -14,7 +14,7 @@
 -- own account, and only becomes real membership once they accept.
 
 CREATE TABLE project_member_requests (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role project_member_role NOT NULL DEFAULT 'contributor',
