@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { CalendarRange } from 'lucide-react'
+import { CalendarRange, Info } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { listTimelineItems, sortLanes, type TimelineItem } from '@/lib/supabase/timeline'
+import { RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import type { RepositoryRecordRow } from '@/lib/supabase/curriculum-repository'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const LANE_HEIGHT = 40
@@ -54,6 +56,7 @@ function buildTicks(min: Date, max: Date): { date: Date; label: string }[] {
 export default function TimelinePage() {
   const { project, supabase, slug } = useOutletContext<ProjectOutletContext>()
   const [items, setItems] = useState<TimelineItem[] | null>(null)
+  const [undatedCount, setUndatedCount] = useState(0)
   const [kind, setKind] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [selected, setSelected] = useState<TimelineItem | null>(null)
@@ -69,7 +72,10 @@ export default function TimelinePage() {
   useEffect(() => {
     setItems(null)
     setSelected(null)
-    listTimelineItems(supabase, repoProjectId).then(setItems)
+    listTimelineItems(supabase, repoProjectId).then(({ items: result, undatedRecordCount }) => {
+      setItems(result)
+      setUndatedCount(undatedRecordCount)
+    })
   }, [supabase, repoProjectId])
 
   const lanesAll = useMemo(() => sortLanes(items ?? []), [items])
@@ -127,6 +133,15 @@ export default function TimelinePage() {
         version history. A span is something in force over a period; a marker is a single
         point-in-time event.
       </p>
+      {undatedCount > 0 && (
+        <div className="notice" style={{ marginBottom: 12, maxWidth: 640 }}>
+          <Info size={14} />
+          {undatedCount} more record{undatedCount === 1 ? '' : 's'} {undatedCount === 1 ? "isn't" : "aren't"} shown here
+          — {undatedCount === 1 ? 'it has' : 'they have'} no real-world date (an analytical finding or a proposed
+          redesign, for example, isn&apos;t something that &ldquo;happened&rdquo; on a day). See the Curriculum
+          Repository list for the full set.
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: 12 }}>
         <div className="grid grid-3">
@@ -174,7 +189,8 @@ export default function TimelinePage() {
             <div className="timeline-labels">
               <div style={{ height: HEADER_HEIGHT }} />
               {lanes.map((l) => (
-                <div key={l.laneKey} className="timeline-lane-label" style={{ height: LANE_HEIGHT }} title={l.laneLabel}>
+                <div key={l.laneKey} className="timeline-lane-label row" style={{ height: LANE_HEIGHT, gap: 5, alignItems: 'center' }} title={l.laneLabel}>
+                  {l.source === 'repository-record' && <RecordKindIcon type={l.laneKey as RepositoryRecordRow['record_type']} />}
                   {l.laneLabel}
                 </div>
               ))}
@@ -258,6 +274,9 @@ function TimelineDetail({ item, slug }: { item: TimelineItem; slug: string }) {
   return (
     <div>
       <h3 style={{ marginTop: 0, marginBottom: 4 }}>{item.title}</h3>
+      {item.source === 'repository-record' && (
+        <div style={{ marginBottom: 4 }}><RecordKindLine type={item.laneKey as RepositoryRecordRow['record_type']} withBlurb /></div>
+      )}
       <div className="row" style={{ gap: 6, marginBottom: 8 }}>
         <span className="chip" style={{ fontSize: 10 }}>{item.laneLabel}</span>
         {item.jurisdiction && <span className="chip" style={{ fontSize: 10 }}>{item.jurisdiction}</span>}

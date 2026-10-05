@@ -123,8 +123,18 @@ export function sortLanes(items: TimelineItem[]): { laneKey: string; laneLabel: 
 // with undated placeholders. Errors (e.g. the schema-foundation columns not
 // deployed to this environment yet) resolve to an empty list, same
 // swallow-and-return-empty convention `listRepositoryRecords` already uses.
-export async function listTimelineItems(supabase: Client, projectId: string): Promise<TimelineItem[]> {
-  const [{ data: records }, { data: documents }] = await Promise.all([
+export interface TimelineResult {
+  items: TimelineItem[]
+  // Real feedback, 2026-10-05: the timeline looked almost empty against "20
+  // records" shown elsewhere, with nothing explaining why -- most records
+  // (analytical findings, proposed redesigns) genuinely have no real-world
+  // date, so they never belonged on a chronological view. Surfacing the
+  // count turns that silence into an explained fact instead of a mystery.
+  undatedRecordCount: number
+}
+
+export async function listTimelineItems(supabase: Client, projectId: string): Promise<TimelineResult> {
+  const [{ data: records }, { data: documents }, { count: totalRecordCount }] = await Promise.all([
     supabase
       .from('curriculum_repository_records')
       .select('*')
@@ -135,6 +145,7 @@ export async function listTimelineItems(supabase: Client, projectId: string): Pr
       .select('*')
       .eq('project_id', projectId)
       .or('adopted_at.not.is.null,effective_from.not.is.null,effective_until.not.is.null'),
+    supabase.from('curriculum_repository_records').select('id', { count: 'exact', head: true }).eq('project_id', projectId),
   ])
 
   const items: TimelineItem[] = []
@@ -146,5 +157,7 @@ export async function listTimelineItems(supabase: Client, projectId: string): Pr
     const item = standardsDocumentToItem(d)
     if (item) items.push(item)
   }
-  return items
+  const datedRecordCount = (records ?? []).length
+  const undatedRecordCount = Math.max(0, (totalRecordCount ?? 0) - datedRecordCount)
+  return { items, undatedRecordCount }
 }
