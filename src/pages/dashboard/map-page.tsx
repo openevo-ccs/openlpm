@@ -5,6 +5,7 @@ import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 're
 import type { ProjectOutletContext } from './project-layout'
 import { listRecordsByPlace, type PlaceMapEntry, type PlaceRecordSummary } from '@/lib/supabase/geo-places'
 import { RECORD_TYPE_LABEL } from '@/lib/supabase/curriculum-repository'
+import { RecordKindIcon } from '@/lib/record-type-display'
 
 // Public-domain (Natural Earth, via world-atlas) country outlines, fetched
 // client-side by react-simple-maps at render time. This repo stores none of
@@ -125,6 +126,12 @@ export default function MapPage() {
                   // a zoomable projection).
                   const radius = (4 + 9 * Math.sqrt(count / maxCount)) / view.zoom
                   const isSelected = entry.place.place_code === selectedCode
+                  // Dots used to carry no label at all -- the single biggest
+                  // reason Dustin couldn't tell why there were two of them
+                  // (2026-10-05 feedback). A permanently-visible name fixes
+                  // that without needing a click; font size divides by zoom
+                  // the same way the circle's radius does, so it stays a
+                  // constant on-screen size as you zoom in/out.
                   return (
                     <Marker
                       key={entry.place.place_code}
@@ -143,6 +150,18 @@ export default function MapPage() {
                         stroke={isSelected ? 'var(--brand-navy)' : '#fff'}
                         strokeWidth={(isSelected ? 2.5 : 1) / view.zoom}
                       />
+                      <text
+                        x={radius + 4 / view.zoom}
+                        y={4 / view.zoom}
+                        fontSize={11 / view.zoom}
+                        fill="var(--text-primary)"
+                        stroke="var(--background, #fff)"
+                        strokeWidth={3 / view.zoom}
+                        paintOrder="stroke"
+                        style={{ fontWeight: isSelected ? 700 : 500 }}
+                      >
+                        {entry.place.display_name}
+                      </text>
                     </Marker>
                   )
                 })}
@@ -154,9 +173,27 @@ export default function MapPage() {
             {selected ? (
               <PlaceDetail entry={selected} allPlaces={places} onNavigateRecord={(id) => navigate(`/dashboard/${project.slug}/curriculum-repository/${id}`)} />
             ) : (
-              <p className="muted">
-                Click a place on the map. ({places.length} place{places.length === 1 ? '' : 's'} with content, {totalRecords} record{totalRecords === 1 ? '' : 's'} total)
-              </p>
+              <div>
+                <p className="muted" style={{ marginTop: 0 }}>
+                  Click a place on the map, or below. {totalRecords} record{totalRecords === 1 ? '' : 's'} total across {places.length} place{places.length === 1 ? '' : 's'}.
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  {places.map((p) => {
+                    const parentName = p.place.parent_place_code
+                      ? places.find((other) => other.place.place_code === p.place.parent_place_code)?.place.display_name
+                      : null
+                    return (
+                      <button key={p.place.place_code} type="button" className="btn-linklike" style={{ textAlign: 'left', padding: '4px 0' }} onClick={() => setSelectedCode(p.place.place_code)}>
+                        {p.place.display_name}
+                        <span className="muted" style={{ fontSize: 11, marginLeft: 6 }}>
+                          {p.rollupRecords.length} record{p.rollupRecords.length === 1 ? '' : 's'}
+                          {parentName ? ` · part of ${parentName} (its dot rolls this up too)` : ''}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             )}
 
             {data.unmapped.length > 0 && (
@@ -196,13 +233,16 @@ function PlaceDetail({
         {rollupRecords.map((r) => (
           <button
             key={r.id}
-            className="btn-linklike"
-            style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0' }}
+            className="btn-linklike row"
+            style={{ display: 'flex', width: '100%', textAlign: 'left', padding: '6px 0', gap: 6, alignItems: 'flex-start' }}
             onClick={() => onNavigateRecord(r.id)}
           >
-            {r.title}
-            <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>
-              {RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}
+            <span style={{ marginTop: 2 }}><RecordKindIcon type={r.record_type} /></span>
+            <span>
+              {r.title}
+              <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>
+                {RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}
+              </span>
             </span>
           </button>
         ))}

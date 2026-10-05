@@ -19,6 +19,7 @@ import {
   type RepositoryRecordRow,
   type SupersessionInfo,
 } from '@/lib/supabase/curriculum-repository'
+import { RECORD_TYPE_BLURB, RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
 
 // "Browse + connect" -- real sourced national/regional curriculum-policy
 // material (deutsche-lpm/nys-lpm today), invite-only. Any member can look at
@@ -134,12 +135,15 @@ export default function CurriculumRepositoryPage() {
             {records.map((r) => (
               <button
                 key={r.id}
-                className="btn-linklike"
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: r.id === recordId && !creating ? 600 : 400 }}
+                className="btn-linklike row"
+                style={{ display: 'flex', width: '100%', textAlign: 'left', padding: '6px 0', gap: 6, alignItems: 'flex-start', fontWeight: r.id === recordId && !creating ? 600 : 400 }}
                 onClick={() => { setCreating(false); navigate(`/dashboard/${project.slug}/curriculum-repository/${r.id}`) }}
               >
-                {r.title}
-                <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>{RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}</span>
+                <span style={{ marginTop: 2 }}><RecordKindIcon type={r.record_type} /></span>
+                <span>
+                  {r.title}
+                  <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>{RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}</span>
+                </span>
               </button>
             ))}
           </div>
@@ -155,7 +159,21 @@ export default function CurriculumRepositoryPage() {
             ) : recordId ? (
               <RecordDetail recordId={recordId} supabase={supabase} currentProject={project} repoProjectId={repoProjectId} canManage={canManage} onChanged={refresh} />
             ) : (
-              <p className="muted">Pick a record on the left. ({Array.from(countsByType.entries()).map(([t, n]) => `${RECORD_TYPE_LABEL[t as RepositoryRecordRow['record_type']]}: ${n}`).join(', ')})</p>
+              <div>
+                <p className="muted" style={{ marginTop: 0 }}>Pick a record on the left. Here&apos;s what kinds of things are in this repository:</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {Array.from(countsByType.entries()).map(([t, n]) => (
+                    <div key={t} className="row" style={{ gap: 8, alignItems: 'flex-start' }}>
+                      <span style={{ marginTop: 2 }}><RecordKindIcon type={t as RepositoryRecordRow['record_type']} size={15} /></span>
+                      <div>
+                        <strong style={{ fontSize: 13 }}>{RECORD_TYPE_LABEL[t as RepositoryRecordRow['record_type']]}</strong>
+                        <span className="muted" style={{ fontSize: 12 }}> ({n})</span>
+                        <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{RECORD_TYPE_BLURB[t as RepositoryRecordRow['record_type']]}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -184,6 +202,15 @@ function RecordDetail({
   const [supersession, setSupersession] = useState<SupersessionInfo>({ predecessor: null, successor: null })
   const [showConnect, setShowConnect] = useState(false)
   const [editing, setEditing] = useState(false)
+  // Real bug (this is what "clicking a record opens to nowhere" actually
+  // was, 2026-10-05 feedback): this hook used to sit below the `!record`
+  // early return, so the loading render called one fewer hook than every
+  // render after the record arrived -- a Rules-of-Hooks violation that
+  // throws and blanks the whole page the instant a record finishes
+  // loading, with no error boundary to catch it. Every hook has to run on
+  // every render regardless of what's returned, so it has to live above
+  // any conditional return.
+  const navigate = useNavigate()
 
   const reload = async () => {
     const rec = await getRepositoryRecord(supabase, recordId)
@@ -218,7 +245,6 @@ function RecordDetail({
 
   const { visible, gated } = splitContentFields(record)
   const sourceUrl = (record.content as Record<string, unknown> | null)?.sourceUrl ?? (record.content as Record<string, unknown> | null)?.url
-  const navigate = useNavigate()
   const goTo = (id: string) => navigate(`/dashboard/${currentProject.slug}/curriculum-repository/${id}`)
 
   return (
@@ -226,8 +252,8 @@ function RecordDetail({
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h3 style={{ marginTop: 0, marginBottom: 4 }}>{record.title}</h3>
+          <div style={{ marginBottom: 6 }}><RecordKindLine type={record.record_type} withBlurb /></div>
           <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
-            <span className="chip" style={{ fontSize: 10 }}>{RECORD_TYPE_LABEL[record.record_type]}</span>
             {record.jurisdiction && <span className="chip" style={{ fontSize: 10 }}>{record.jurisdiction}</span>}
             <span className="chip" style={{ fontSize: 10 }} title={record.license_or_rights_note ?? undefined}>{ACCESS_TIER_LABEL[record.access_tier]}</span>
             {record.event_date && <span className="chip" style={{ fontSize: 10 }}>{record.event_date}</span>}
