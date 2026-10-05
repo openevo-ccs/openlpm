@@ -62,7 +62,14 @@ export default function ProjectSwitcherPage() {
   // no toggle of its own at all. On by default, same convention as the two
   // curation checkboxes.
   const [showRepos, setShowRepos] = useState(true)
-  const [pendingRequests, setPendingRequests] = useState<PendingRequestForUser[]>([])
+  // null = not loaded yet, distinct from "loaded, zero pending" -- the
+  // single-membership auto-redirect below has to wait for a real answer
+  // here before it decides whether to fire, or an account with exactly one
+  // membership AND a pending invitation elsewhere would get redirected
+  // straight past the one page that invitation is ever shown on (real bug,
+  // caught live 2026-10-05: the standing QA account has exactly one
+  // membership, so it never saw its own test invitation).
+  const [pendingRequests, setPendingRequests] = useState<PendingRequestForUser[] | null>(null)
 
   const reloadPendingRequests = () => { listMyPendingRequests(supabase).then(setPendingRequests) }
 
@@ -102,13 +109,13 @@ export default function ProjectSwitcherPage() {
   // platform-wide view, even on a day it happens to have just one real
   // membership of its own.
   useEffect(() => {
-    if (!isAdmin && memberships?.length === 1) {
+    if (!isAdmin && memberships?.length === 1 && pendingRequests !== null && pendingRequests.length === 0) {
       navigate(`/dashboard/${memberships[0].project.slug}`, { replace: true })
     }
-  }, [isAdmin, memberships, navigate])
+  }, [isAdmin, memberships, pendingRequests, navigate])
 
-  const stillLoading = memberships === null || (isAdmin && allProjects === null)
-  const redirecting = !isAdmin && memberships?.length === 1
+  const stillLoading = memberships === null || pendingRequests === null || (isAdmin && allProjects === null)
+  const redirecting = !isAdmin && memberships?.length === 1 && pendingRequests?.length === 0
   if (stillLoading || redirecting) {
     return <p className="muted">Loading…</p>
   }
@@ -174,7 +181,7 @@ export default function ProjectSwitcherPage() {
           {pendingRequests.map((r) => (
             <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
               <span>
-                <strong>{r.project.name}</strong>
+                <strong>{r.project?.name ?? 'A project'}</strong>
                 <span className="muted" style={{ marginLeft: 6 }}>
                   as {r.role}{r.requester ? ` -- invited by ${r.requester.name}` : ''}
                 </span>
