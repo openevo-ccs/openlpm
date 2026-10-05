@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { CalendarRange, Info } from 'lucide-react'
+import { CalendarRange, Info, Minus, Plus } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { listTimelineItems, sortLanes, type TimelineItem } from '@/lib/supabase/timeline'
 import { RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
-import type { RepositoryRecordRow } from '@/lib/supabase/curriculum-repository'
+import { distinctLinkedProjects, listContentLinksForRecord, type RepositoryRecordRow } from '@/lib/supabase/curriculum-repository'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const LANE_HEIGHT = 40
@@ -14,6 +14,8 @@ const HEADER_HEIGHT = 28
 // grid, while a repository spanning decades of policy history stays
 // legible instead of crowding in a tick for every one of ~300 months.
 const MONTHLY_TICK_SPAN_DAYS = 450
+const MIN_ZOOM = 1
+const MAX_ZOOM = 40
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -26,10 +28,13 @@ function formatRange(item: TimelineItem): string {
   return `${fmtDate(item.start)} – ${item.end ? fmtDate(item.end) : fmtDate(item.start)}`
 }
 
-function buildTicks(min: Date, max: Date): { date: Date; label: string }[] {
-  const spanDays = (max.getTime() - min.getTime()) / DAY_MS
+// `tickSpanDays` decides monthly-vs-yearly ticks and can differ from the
+// real min/max span -- zooming in shows fewer effective days at once even
+// though the underlying date range hasn't changed, so it should get the
+// finer month grid a zoomed-out view of the same raw span wouldn't need.
+function buildTicks(min: Date, max: Date, tickSpanDays: number): { date: Date; label: string }[] {
   const ticks: { date: Date; label: string }[] = []
-  if (spanDays <= MONTHLY_TICK_SPAN_DAYS) {
+  if (tickSpanDays <= MONTHLY_TICK_SPAN_DAYS) {
     const cursor = new Date(min.getFullYear(), min.getMonth(), 1)
     while (cursor <= max) {
       if (cursor >= min) ticks.push({ date: new Date(cursor), label: cursor.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) })
@@ -60,6 +65,25 @@ export default function TimelinePage() {
   const [kind, setKind] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [selected, setSelected] = useState<TimelineItem | null>(null)
+  // Real feedback ea3a4c01 (2026-10-05): "zoomable with a default full
+  // zoom-out to show the full available timeline of data." The existing
+  // auto-fit-to-content width already WAS the full zoom-out view -- what was
+  // actually missing was any way to zoom in from there. zoom=1 is that
+  // baseline (the width this page always used to render at); zooming out
+  // further than that would just pad empty space around real content, so
+  // 1 is the floor, not a mid-point.
+  const [zoom, setZoom] = useState(1)
+  const zoomIn = () => setZoom((z) => Math.min(MAX_ZOOM, z * 1.6))
+  const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, z / 1.6))
+  const resetZoom = () => setZoom(1)
+  // Without this, zooming in just widens the content to the right of
+  // whatever scrollLeft already was -- caught live: the default view starts
+  // scrolled to day 0, so one click of zoom-in showed an empty stretch of
+  // calendar instead of the real content that was on screen a moment ago.
+  // Keeps the same calendar date centered in the viewport across a zoom
+  // change, the way any normal map/image zoom control behaves.
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const prevPxPerDayRef = useRef<number | null>(null)
 
   // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
@@ -90,6 +114,18 @@ export default function TimelinePage() {
   )
   const lanes = useMemo(() => sortLanes(filtered), [filtered])
 
+  // A filter change can shift which dates are even in view -- staying
+  // zoomed into wherever the OLD filter's range happened to be would land
+  // on an arbitrary, possibly now-empty slice of the new one.
+  useEffect(() => {
+    setZoom(1)
+    // A new filtered range means the old scroll position/center-anchor are
+    // both meaningless -- start fresh rather than let the zoom-centering
+    // effect below try to "center" on content that's no longer there.
+    prevPxPerDayRef.current = null
+    if (scrollRef.current) scrollRef.current.scrollLeft = 0
+  }, [kind, jurisdiction])
+
   const { minDate, maxDate } = useMemo(() => {
     const now = new Date()
     let min: Date | null = null
@@ -106,11 +142,22 @@ export default function TimelinePage() {
   }, [filtered])
 
   const totalDays = Math.max(1, Math.round((maxDate.getTime() - minDate.getTime()) / DAY_MS))
-  const pxPerDay = Math.min(24, Math.max(0.6, 1400 / totalDays))
+  const basePxPerDay = Math.min(24, Math.max(0.6, 1400 / totalDays))
+  const pxPerDay = basePxPerDay * zoom
   const width = Math.round(totalDays * pxPerDay)
   const x = (d: Date) => Math.round(((d.getTime() - minDate.getTime()) / DAY_MS) * pxPerDay)
 
-  const ticks = useMemo(() => buildTicks(minDate, maxDate), [minDate, maxDate])
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    const prev = prevPxPerDayRef.current
+    if (el && prev !== null && prev !== pxPerDay) {
+      const centerDays = (el.scrollLeft + el.clientWidth / 2) / prev
+      el.scrollLeft = centerDays * pxPerDay - el.clientWidth / 2
+    }
+    prevPxPerDayRef.current = pxPerDay
+  }, [pxPerDay])
+
+  const ticks = useMemo(() => buildTicks(minDate, maxDate, totalDays / zoom), [minDate, maxDate, totalDays, zoom])
   const today = new Date()
   const showToday = today >= minDate && today <= maxDate
 
@@ -185,7 +232,16 @@ export default function TimelinePage() {
         </div>
       ) : (
         <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
-          <div className="timeline-wrap" style={{ flex: '3 1 480px', minWidth: 0 }}>
+          <div style={{ flex: '3 1 480px', minWidth: 0 }}>
+            <div className="row" style={{ justifyContent: 'flex-end', gap: 6, marginBottom: 6 }}>
+              <span className="muted" style={{ fontSize: 12, marginRight: 'auto' }}>
+                {zoom === 1 ? 'Showing the full range' : `Zoomed in (${zoom.toFixed(1)}×)`}
+              </span>
+              <button type="button" className="btn btn-mini" aria-label="Zoom out" onClick={zoomOut} disabled={zoom <= MIN_ZOOM}><Minus size={13} /></button>
+              <button type="button" className="btn btn-mini" aria-label="Zoom in" onClick={zoomIn} disabled={zoom >= MAX_ZOOM}><Plus size={13} /></button>
+              <button type="button" className="btn btn-mini" onClick={resetZoom} disabled={zoom === 1}>Fit all</button>
+            </div>
+            <div className="timeline-wrap">
             <div className="timeline-labels">
               <div style={{ height: HEADER_HEIGHT }} />
               {lanes.map((l) => (
@@ -195,7 +251,7 @@ export default function TimelinePage() {
                 </div>
               ))}
             </div>
-            <div className="timeline-scroll">
+            <div className="timeline-scroll" ref={scrollRef}>
               <div style={{ width, position: 'relative' }}>
                 <div className="timeline-axis" style={{ height: HEADER_HEIGHT }}>
                   {ticks.map((t) => (
@@ -217,10 +273,11 @@ export default function TimelinePage() {
                 )}
               </div>
             </div>
+            </div>
           </div>
 
           <div className="card" style={{ flex: '1 1 280px', minHeight: 200 }}>
-            {selected ? <TimelineDetail item={selected} slug={slug} /> : <p className="muted">Click a marker or span to see its details.</p>}
+            {selected ? <TimelineDetail item={selected} slug={slug} supabase={supabase} /> : <p className="muted">Click a marker or span to see its details.</p>}
           </div>
         </div>
       )}
@@ -270,7 +327,20 @@ function TimelineMark({
   )
 }
 
-function TimelineDetail({ item, slug }: { item: TimelineItem; slug: string }) {
+function TimelineDetail({ item, slug, supabase }: { item: TimelineItem; slug: string; supabase: ProjectOutletContext['supabase'] }) {
+  // Real feedback ea3a4c01: "always enable ways to show which standards
+  // from which times are used in which OpenLPM projects" -- the data
+  // already existed (curriculum_repository_links, surfaced on the record
+  // page's own "Connected to your own work" section) but was a click-through
+  // away rather than visible right where you're looking at something's date.
+  const [usedBy, setUsedBy] = useState<{ id: string; name: string; slug: string }[] | null>(null)
+
+  useEffect(() => {
+    setUsedBy(null)
+    if (!item.recordId) return
+    listContentLinksForRecord(supabase, item.recordId).then((links) => setUsedBy(distinctLinkedProjects(links)))
+  }, [item.recordId, supabase])
+
   return (
     <div>
       <h3 style={{ marginTop: 0, marginBottom: 4 }}>{item.title}</h3>
@@ -288,6 +358,16 @@ function TimelineDetail({ item, slug }: { item: TimelineItem; slug: string }) {
           <span style={{ fontSize: 13 }}>{d.value}</span>
         </div>
       ))}
+      {item.recordId && usedBy !== null && (
+        <div style={{ margin: '8px 0' }}>
+          <strong style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Used in</strong>
+          {usedBy.length === 0 ? (
+            <span className="muted" style={{ fontSize: 13 }}>Not yet connected to any OpenLPM project.</span>
+          ) : (
+            <span style={{ fontSize: 13 }}>{usedBy.map((p) => p.name).join(', ')}</span>
+          )}
+        </div>
+      )}
       {item.recordId && (
         <p style={{ marginTop: 12 }}>
           <Link to={`/dashboard/${slug}/curriculum-repository/${item.recordId}`}>View full record →</Link>
