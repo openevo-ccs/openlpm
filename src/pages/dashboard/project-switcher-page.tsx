@@ -6,6 +6,7 @@ import { useSession } from '@/state/session'
 import { ADMIN_EMAIL } from '@/lib/admin'
 import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listAllProjects } from '@/lib/supabase/admin-users'
+import { listMyPendingRequests, respondToMemberRequest, type PendingRequestForUser } from '@/lib/supabase/members'
 
 // Admin-only: a project the admin can see exists (migration 049's directory
 // reach) but isn't personally a member of -- role is null rather than one
@@ -61,9 +62,14 @@ export default function ProjectSwitcherPage() {
   // no toggle of its own at all. On by default, same convention as the two
   // curation checkboxes.
   const [showRepos, setShowRepos] = useState(true)
+  const [pendingRequests, setPendingRequests] = useState<PendingRequestForUser[]>([])
+
+  const reloadPendingRequests = () => { listMyPendingRequests(supabase).then(setPendingRequests) }
 
   useEffect(() => {
     getUserProjects(supabase).then(setMemberships)
+    reloadPendingRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase])
 
   // Real need, stated directly (2026-10-01): "I need to always be able to
@@ -161,6 +167,30 @@ export default function ProjectSwitcherPage() {
           <Plus size={14} />Start new project
         </Link>
       </div>
+
+      {pendingRequests.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3>Invitations waiting for you</h3>
+          {pendingRequests.map((r) => (
+            <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{r.project.name}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>
+                  as {r.role}{r.requester ? ` -- invited by ${r.requester.name}` : ''}
+                </span>
+              </span>
+              <span className="row">
+                <button className="btn btn-mini btn-primary" onClick={() => respondToMemberRequest(supabase, r.id, 'accepted').then(() => { reloadPendingRequests(); getUserProjects(supabase).then(setMemberships) })}>
+                  Accept
+                </button>
+                <button className="btn btn-mini" onClick={() => respondToMemberRequest(supabase, r.id, 'declined').then(reloadPendingRequests)}>
+                  Decline
+                </button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="row" style={{ gap: 16, marginBottom: 20 }}>
         {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (

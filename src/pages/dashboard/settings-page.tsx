@@ -14,20 +14,26 @@ import {
 } from '@/lib/supabase/curriculum-repository'
 import {
   addJoinRule,
+  cancelMemberRequest,
+  createMemberRequest,
   inviteMembers,
   listJoinRules,
   listMembers,
   listPendingInvites,
+  listPendingRequestsSent,
   removeJoinRule,
   removeMember,
   revokeInvite,
+  searchUsersToInvite,
   updateMemberRole,
   type InviteResult,
   type InviteRow,
   type JoinRule,
   type JoinRuleType,
+  type MemberRequestRow,
   type MemberWithUser,
   type ProjectMemberRole,
+  type UserSearchResult,
 } from '@/lib/supabase/members'
 import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
 import { PROJECT_COLORS } from '@/lib/project-colors'
@@ -351,6 +357,7 @@ function MembersSection({
 }) {
   const [members, setMembers] = useState<MemberWithUser[] | null>(null)
   const [invites, setInvites] = useState<InviteRow[] | null>(null)
+  const [requests, setRequests] = useState<(MemberRequestRow & { user: UserSearchResult })[] | null>(null)
   const [federationLabels, setFederationLabels] = useState<Record<string, string>>({})
   const canManage = role === 'owner' || role === 'maintainer'
 
@@ -368,12 +375,16 @@ function MembersSection({
         })
       })
     })
-    if (canManage) listPendingInvites(supabase, project.id).then(setInvites)
+    if (canManage) {
+      listPendingInvites(supabase, project.id).then(setInvites)
+      listPendingRequestsSent(supabase, project.id).then(setRequests)
+    }
   }
 
   useEffect(() => {
     setMembers(null)
     setInvites(null)
+    setRequests(null)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id])
@@ -383,9 +394,29 @@ function MembersSection({
       <h2 className="row" style={{ marginTop: 8 }}><Users size={16} style={{ color: 'var(--text-muted)' }} />Members</h2>
       <p className="muted" style={{ marginBottom: 12 }}>Who can see and work on {project.name}.</p>
 
+      {canManage && <RequestToJoinForm projectId={project.id} supabase={supabase} onRequested={reload} />}
       {canManage && <InviteForm projectId={project.id} supabase={supabase} onInvited={reload} />}
       {canManage && <JoinRulesSection project={project} supabase={supabase} />}
       {canManage && <StudentViewSection project={project} supabase={supabase} />}
+
+      {requests !== null && requests.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3>Pending requests</h3>
+          <p className="muted">Waiting for them to accept or decline -- nothing happens until they respond.</p>
+          {requests.map((r) => (
+            <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{r.user.name}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>{r.user.email}</span>
+              </span>
+              <span className="row">
+                <span className="chip">{r.role}</span>
+                <button className="btn btn-mini" onClick={() => cancelMemberRequest(supabase, r.id).then(reload)}><Trash2 size={11} />Cancel</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {invites !== null && invites.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
@@ -518,6 +549,91 @@ function DangerZoneSection({
           {error && <p style={{ marginTop: 6, color: 'var(--critical)' }}>{error}</p>}
         </div>
       )}
+    </div>
+  )
+}
+
+// Real feedback 092405e2 (2026-10-04): "easier to add members who have
+// accounts on OpenLPM, type to search by name, then that sends their
+// account a request and they can accept to join or not" -- a separate path
+// from InviteForm below, which adds anyone who already has an account
+// immediately with no consent step (fine for a known class roster, not fine
+// for approaching one specific person). A debounced name/email search
+// against every real account, excluding anyone already a member or already
+// asked (searchUsersToInvite handles both exclusions).
+function RequestToJoinForm({ projectId, supabase, onRequested }: { projectId: string; supabase: ProjectOutletContext['supabase']; onRequested: () => void }) {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<UserSearchResult[]>([])
+  const [role, setRole] = useState<ProjectMemberRole>('viewer')
+  const [busy, setBusy] = useState<string | null>(null)
+  const [sent, setSent] = useState<string | null>(null)
+  const [sendError, setSendError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([])
+      return
+    }
+    const timer = setTimeout(() => {
+      searchUsersToInvite(supabase, projectId, query).then(setResults)
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [query, supabase, projectId])
+
+  const send = async (user: UserSearchResult) => {
+    setBusy(user.id)
+    setSendError(null)
+    const { error } = await createMemberRequest(supabase, projectId, user.id, role)
+    setBusy(null)
+    if (error) {
+      setSendError("Couldn't send that request right now -- try again in a moment.")
+    } else {
+      setSent(user.name)
+      setResults((prev) => prev.filter((u) => u.id !== user.id))
+      setQuery('')
+      onRequested()
+    }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><UserPlus size={16} />Request someone to join</h3>
+      <p className="muted">
+        Find someone who already has an OpenLPM account by name or email. They get a request and
+        choose whether to accept -- nothing happens until they do.
+      </p>
+      <div className="row" style={{ alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
+        <div className="field" style={{ flex: '1 1 220px', marginBottom: 0 }}>
+          <label>Name or email</label>
+          <input type="text" value={query} onChange={(e) => { setQuery(e.target.value); setSent(null) }} placeholder="Type at least 2 characters…" />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Role</label>
+          <select value={role} onChange={(e) => setRole(e.target.value as ProjectMemberRole)}>
+            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+      </div>
+      {results.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          {results.map((u) => (
+            <div key={u.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{u.name}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>{u.email}</span>
+              </span>
+              <button className="btn btn-mini" disabled={busy === u.id} onClick={() => send(u)}>
+                {busy === u.id ? 'Sending…' : 'Send request'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {query.trim().length >= 2 && results.length === 0 && (
+        <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>No matching account (or they&apos;re already a member or already asked).</p>
+      )}
+      {sent && <div className="notice notice-ok" style={{ marginTop: 10 }}>Request sent to {sent}.</div>}
+      {sendError && <div className="notice notice-bad" style={{ marginTop: 10 }}>{sendError}</div>}
     </div>
   )
 }
