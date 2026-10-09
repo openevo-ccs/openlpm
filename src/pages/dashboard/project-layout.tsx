@@ -4,11 +4,18 @@ import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBran
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
-import { groupsSettings } from '@/lib/supabase/groups'
+import { groupsSettings, listGroupsWithMyMembership } from '@/lib/supabase/groups'
+import {
+  listDashboardViewAssignments,
+  listDashboardViews,
+  resolveViewerViews,
+  type DashboardView,
+  type DashboardViewAssignment,
+} from '@/lib/supabase/dashboard-views'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
-import { ProjectNav } from '@/components/project-nav'
+import { ProjectNav, type ProjectNavItem } from '@/components/project-nav'
 import { LpmSearchBar } from '@/components/lpm-search-bar'
 import { StudentNav } from './student/student-nav'
 
@@ -23,25 +30,25 @@ export interface ProjectOutletContext {
   // shown, so a Project's Learning Goals/Analytics/Review tabs work the
   // moment you open the Project, with nothing extra to understand first.
   defaultBranchId: string
-  // True for a member who self-joined via a domain/email rule (migration
-  // 035/039) and holds a base role, OR an owner/maintainer explicitly
-  // previewing that experience (?view=student). Drives which sidebar/pages
-  // render -- see the branch below. Never true for an owner/maintainer's
-  // own real session, so an instructor can never be accidentally locked
-  // into the simplified view.
+  // True when the viewer's currently-active Dashboard View (see
+  // dashboard-views.ts) is a 'template' kind (today, only the Jena pilot's
+  // German pages) -- drives which sidebar/pages render, same meaning this
+  // flag has always had. Never true for an owner/maintainer's own real
+  // session unless they've deliberately chosen to preview one, so an
+  // instructor can never be accidentally locked into a simplified view.
   isStudentView: boolean
 }
 
-// Whether an owner/maintainer is currently previewing the student view for
-// this project -- kept in sessionStorage rather than the URL. The URL-based
-// version (?view=student) broke the moment anyone clicked a link inside
-// the preview: every nav link only points at its own plain path, so the
-// query param silently dropped and the very next navigation snapped back
-// to the researcher view after just one page -- confirmed live, exactly
-// the bug reported. sessionStorage survives navigation without every link
-// in the app needing to remember to carry a query param forward.
-function previewKey(slug: string) {
-  return `openlpm:preview_student:${slug}`
+// Dashboard Custom Views (migration 109): real feedback 63321a17 replaced
+// the single, all-or-nothing "Preview as student" toggle with named,
+// admin-managed views an owner assigns to a specific person, a Group, or a
+// role/join-method class (dashboard-views.ts's resolveViewerViews does the
+// actual matching). What's stored per-tab here is just the viewer's own
+// CHOICE among the views they're allowed to see -- 'full' (explicitly
+// opted out), a specific view id, or nothing yet (use whatever
+// resolveViewerViews computes as their default/forced view).
+function activeViewKey(slug: string) {
+  return `openlpm:active_view:${slug}`
 }
 
 // Real feedback bbf55cf2 (2026-10-01): "make all sidebar menus adjustable
@@ -66,7 +73,11 @@ export default function ProjectLayout() {
   const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null } | null>(null)
   const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
   const [defaultBranchId, setDefaultBranchId] = useState<string | null>(null)
-  const [previewing, setPreviewing] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [views, setViews] = useState<DashboardView[]>([])
+  const [assignments, setAssignments] = useState<DashboardViewAssignment[]>([])
+  const [myGroupIds, setMyGroupIds] = useState<string[]>([])
+  const [previewChoice, setPreviewChoice] = useState<string | null>(null)
   // Not one of the fixed 10 sidebar items below -- only shown for a project
   // that actually has curriculum-repository content of its own (e.g. the
   // Germany/New York repository spaces) or has declared grounding in one,
@@ -86,33 +97,34 @@ export default function ProjectLayout() {
     })
   }
 
-  // ?view=student (from a direct link) starts the preview session; from
-  // then on it's tracked in sessionStorage, independent of the URL.
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
+  }, [supabase])
+
+  // An old-style `?view=student` link (before Dashboard Custom Views
+  // existed) just gets its query param cleaned up now -- there was never
+  // more than one view to preview, so there's no single id left to resolve
+  // it to automatically; whoever shared that link can use the generalized
+  // "Preview as" control instead.
   useEffect(() => {
     if (!slug) return
     if (searchParams.get('view') === 'student') {
-      sessionStorage.setItem(previewKey(slug), '1')
       searchParams.delete('view')
       setSearchParams(searchParams, { replace: true })
     }
     try {
-      setPreviewing(sessionStorage.getItem(previewKey(slug)) === '1')
+      setPreviewChoice(sessionStorage.getItem(activeViewKey(slug)))
     } catch {
-      // Private-window/blocked-storage: preview toggle just won't persist
+      // Private-window/blocked-storage: the choice just won't persist
       // across navigation -- not worth failing the page load over.
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug])
 
-  const startPreview = () => {
+  const chooseView = (choice: string) => {
     if (!slug) return
-    try { sessionStorage.setItem(previewKey(slug), '1') } catch { /* see above */ }
-    setPreviewing(true)
-  }
-  const exitPreview = () => {
-    if (!slug) return
-    try { sessionStorage.removeItem(previewKey(slug)) } catch { /* see above */ }
-    setPreviewing(false)
+    try { sessionStorage.setItem(activeViewKey(slug), choice) } catch { /* see above */ }
+    setPreviewChoice(choice)
   }
 
   useEffect(() => {
@@ -157,6 +169,25 @@ export default function ProjectLayout() {
         ? (state.project as any).parent_project_id ?? state.project.id
         : state.project.id
     hasRepositoryContent(supabase, repoCheckId).then(setHasRepo)
+  }, [supabase, state?.project?.id])
+
+  useEffect(() => {
+    setViews([])
+    setAssignments([])
+    if (!state?.project?.id) return
+    listDashboardViews(supabase, state.project.id).then((vs) => {
+      setViews(vs)
+      if (vs.length > 0) listDashboardViewAssignments(supabase, vs.map((v) => v.id)).then(setAssignments)
+      else setAssignments([])
+    })
+  }, [supabase, state?.project?.id])
+
+  useEffect(() => {
+    setMyGroupIds([])
+    if (!state?.project?.id) return
+    listGroupsWithMyMembership(supabase, state.project.id).then((rows) => {
+      setMyGroupIds(rows.filter((r) => r.membership).map((r) => r.group.id))
+    })
   }, [supabase, state?.project?.id])
 
   if (!slug || state === null) {
@@ -208,6 +239,51 @@ export default function ProjectLayout() {
   const isRepository = (project as any).project_kind === 'curriculum-repository'
   const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
 
+  const canManage = role === 'owner' || role === 'maintainer'
+
+  // Dashboard Custom Views resolution (migration 109) -- see
+  // dashboard-views.ts's own comment for the full precedence rules. Only
+  // ever meaningful for a standard (non-repository) project: a Curriculum
+  // Repository space has its own, already-shorter nav and no UI to define
+  // views on it, so this resolves to nothing there regardless.
+  const resolution = userId
+    ? resolveViewerViews(views, assignments, { userId, role, joinedVia, groupIds: myGroupIds })
+    : { forcedView: null, defaultViewId: null, eligibleViews: [] as DashboardView[] }
+
+  const viewForced = !!resolution.forcedView
+  const effectiveChoice = resolution.forcedView ? resolution.forcedView.id : previewChoice ?? resolution.defaultViewId ?? 'full'
+  const activeView = effectiveChoice === 'full' ? null : views.find((v) => v.id === effectiveChoice) ?? null
+
+  const isStudentView = activeView?.kind === 'template'
+  const standardViewPageKeys = activeView?.kind === 'standard' ? new Set(activeView.page_keys) : null
+
+  // Whether this session gets a control to switch views at all: an
+  // owner/maintainer can always preview any defined view (even on a
+  // project with none assigned to them), and a regular member only gets
+  // one when they actually have an optional (non-forced) view available --
+  // most projects define no views at all, so most members never see this.
+  const previewOptions = canManage ? views : resolution.eligibleViews
+  const showViewSwitcher = !viewForced && previewOptions.length > 0
+
+  const viewSwitcher = showViewSwitcher && (
+    <div className="field" style={{ marginTop: 8, marginBottom: 0 }}>
+      <label style={{ fontSize: 11 }}>{canManage ? 'Preview as' : 'Viewing'}</label>
+      <select value={effectiveChoice} onChange={(e) => chooseView(e.target.value)}>
+        <option value="full">Full view{canManage ? ' (no preview)' : ''}</option>
+        {previewOptions.map((v) => (
+          <option key={v.id} value={v.id}>{v.name}</option>
+        ))}
+      </select>
+    </div>
+  )
+
+  // Only an owner/maintainer gets the sticky banner -- they're doing real
+  // admin work and need a constant reminder of which mode they're in. A
+  // regular member on an optional view just uses the switcher above
+  // directly; there's no separate "exit" action to confuse with a real
+  // admin control they don't have anyway.
+  const showPreviewBanner = canManage && !!activeView
+
   // Exactly these 10 items, in this order -- Dustin's explicit, final sidebar
   // spec for the 2026-09-13 restructure. Projects and Members are folded into
   // Dashboard; Schema is folded into Concepts; Explore is replaced by the
@@ -215,6 +291,26 @@ export default function ProjectLayout() {
   // function inside Learning Goals (and, later, Literature/Concepts/Theories)
   // rather than its own tab.
   //
+  // Each item's `key` matches dashboard-view-pages.ts's shared registry --
+  // a Dashboard Custom View ('standard' kind) narrows this list down to its
+  // own page_keys; Dashboard itself is never narrowed out, it's the view's
+  // own home page.
+  const standardNavItems: Array<ProjectNavItem & { key: string }> = [
+    { key: 'dashboard', href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
+    { key: 'learning-goals', href: `/dashboard/${slug}/learning-goals`, icon: <Layers size={14} />, label: 'Learning Goals', end: false },
+    { key: 'concepts', href: `/dashboard/${slug}/concepts`, icon: <Sparkles size={14} />, label: 'Concepts', end: false },
+    { key: 'theories', href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
+    { key: 'strands', href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
+    { key: 'literature', href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
+    { key: 'review', href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
+    { key: 'discussions', href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
+    { key: 'notebooks', href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
+    ...(groupsSettings(project).enabled ? [{ key: 'groups', href: `/dashboard/${slug}/groups`, icon: <Users size={14} />, label: 'Groups', end: false }] : []),
+    { key: 'analytics', href: `/dashboard/${slug}/analytics`, icon: <BarChart3 size={14} />, label: 'Analytics' },
+    ...(hasRepo ? [{ key: 'curriculum-repository', href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
+    { key: 'settings', href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
+  ]
+
   // A Curriculum Repository gets a deliberately different, much shorter
   // nav -- real feedback d9522fb3: "they won't have theories, literature,
   // review, etc. necessarily." It still gets Dashboard (which already
@@ -225,7 +321,9 @@ export default function ProjectLayout() {
   // curriculum-repository-custom-view (migration 095) gets the exact same
   // reduced nav -- it's a view of the same underlying content, just with
   // its own membership and never listed in the main switcher (see
-  // project-switcher-page.tsx).
+  // project-switcher-page.tsx). Dashboard Custom Views (migration 109)
+  // never apply here -- this nav isn't built from the shared page registry
+  // and there's no UI to define a view on a repository-kind project.
   // Real feedback 67375983 (2026-10-01): "settings page should be at the
   // bottom of the sidebar menu." Shown to every member, including
   // non-owners/maintainers -- same as today's Members list, the page itself
@@ -240,34 +338,9 @@ export default function ProjectLayout() {
         ...(hasRepo ? [{ href: `/dashboard/${slug}/map`, icon: <MapIcon size={14} />, label: 'Map', end: false }] : []),
         { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
       ]
-    : [
-        { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
-        { href: `/dashboard/${slug}/learning-goals`, icon: <Layers size={14} />, label: 'Learning Goals', end: false },
-        { href: `/dashboard/${slug}/concepts`, icon: <Sparkles size={14} />, label: 'Concepts', end: false },
-        { href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
-        { href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
-        { href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
-        { href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
-        { href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
-        { href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
-        ...(groupsSettings(project).enabled ? [{ href: `/dashboard/${slug}/groups`, icon: <Users size={14} />, label: 'Groups', end: false }] : []),
-        { href: `/dashboard/${slug}/analytics`, icon: <BarChart3 size={14} />, label: 'Analytics' },
-        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
-        { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
-      ]
-
-  const canManage = role === 'owner' || role === 'maintainer'
-  // student_view_template (migration 045) isn't in the generated types yet.
-  const studentViewTemplate = (project as any).student_view_template as string | null
-  // Real bug found live 2026-09-30: this used to be purely a viewer-role
-  // question (self-joined vs. owner), which meant "Preview as student"
-  // appeared on EVERY project any owner manages, and rendered the SAME
-  // German Jena-pilot UI regardless of which project it was. Whether a
-  // project HAS a student template at all is a property of the project
-  // itself, set explicitly by its own owner (dashboard-page.tsx's Student
-  // view settings card) -- without one, this is never true, no matter who's
-  // viewing or how they joined.
-  const isStudentView = !!studentViewTemplate && ((joinedVia === 'self_join_rule' && !canManage) || (canManage && previewing))
+    : standardViewPageKeys
+    ? standardNavItems.filter((item) => item.key === 'dashboard' || standardViewPageKeys.has(item.key))
+    : standardNavItems
 
   const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView }
   const isSpace = !project.parent_project_id
@@ -286,10 +359,11 @@ export default function ProjectLayout() {
             </button>
           </div>
           <h2 className="project-side-title" style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
+          {viewSwitcher}
           <StudentNav slug={slug} groupsEnabled={groupsSettings(project).enabled} />
         </aside>
         <div className="project-main">
-          {canManage && (
+          {showPreviewBanner && (
             // Real bug reported live 2026-09-30: the exit was a small text
             // link inside a thin gray notice bar -- easy to miss entirely
             // next to the student view's own bright colored cards/headers,
@@ -299,8 +373,8 @@ export default function ProjectLayout() {
             // repeated on every student page (this shell wraps all of
             // them) -- not something to have to scroll up and hunt for.
             <div className="preview-exit-bar">
-              <span>👁 You&apos;re previewing this as a student would see it.</span>
-              <button type="button" className="btn btn-primary btn-mini" onClick={exitPreview}>
+              <span>👁 You&apos;re previewing the &ldquo;{activeView?.name}&rdquo; view.</span>
+              <button type="button" className="btn btn-primary btn-mini" onClick={() => chooseView('full')}>
                 <ArrowLeft size={12} />
                 Exit preview — back to the full researcher view
               </button>
@@ -341,16 +415,21 @@ export default function ProjectLayout() {
             <MaturityBadge status={project.maturity} />
             <WorkingLanguagesTag languages={project.working_languages} />
           </div>
-          {canManage && studentViewTemplate && (
-            <button type="button" className="btn btn-mini" style={{ marginTop: 8 }} onClick={startPreview}>
-              Preview as student
-            </button>
-          )}
+          {viewSwitcher}
         </div>
         <ProjectNav items={nav} />
       </aside>
 
       <div className="project-main">
+        {showPreviewBanner && (
+          <div className="preview-exit-bar">
+            <span>👁 You&apos;re previewing the &ldquo;{activeView?.name}&rdquo; view.</span>
+            <button type="button" className="btn btn-primary btn-mini" onClick={() => chooseView('full')}>
+              <ArrowLeft size={12} />
+              Exit preview — back to the full researcher view
+            </button>
+          </div>
+        )}
         <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
           <LpmSearchBar project={project} slug={slug} supabase={supabase} />
         </div>
