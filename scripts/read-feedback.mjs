@@ -52,27 +52,34 @@ if (tag) query = query.eq('tag', tag)
 if (since) query = query.gte('created_at', since)
 
 const { data, error } = await query
+
+// From here on, never call process.exit() directly. createClient() above
+// leaves an async handle open (an auth/realtime timer, even with
+// persistSession: false and no channel ever opened) that races a forced
+// exit on Windows: reproduced live 2026-10-09, "Assertion failed:
+// !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94" --
+// right after the real output already printed. Confirmed by isolating it:
+// the same query with no explicit exit call completes cleanly every time;
+// only the process.exit() calls crashed. Set process.exitCode instead and
+// let the event loop drain on its own -- a few ms slower, never crashes.
 if (error) {
   console.error('Query failed:', error.message)
-  process.exit(1)
-}
-
-if (!data || data.length === 0) {
+  process.exitCode = 1
+} else if (!data || data.length === 0) {
   console.log('No feedback rows match.')
-  process.exit(0)
-}
-
-for (const row of data) {
-  console.log(`\n[${row.created_at}] ${row.tag}${row.project_id ? ` (project ${row.project_id})` : ''}`)
-  console.log(`  from: ${row.users?.name ?? 'unknown'} <${row.users?.email ?? '?'}>`)
-  console.log(`  page: ${row.context?.page ?? '?'} (${row.context?.path ?? '?'})`)
-  if (row.comment) console.log(`  comment: ${row.comment}`)
-  if (row.screenshot_path) {
-    // A signed URL, not the bucket's public URL -- the bucket is private
-    // (migration 025), so this is the only way to actually view the image.
-    const { data: signed } = await supabase.storage
-      .from('feedback-screenshots')
-      .createSignedUrl(row.screenshot_path, 3600)
-    if (signed?.signedUrl) console.log(`  screenshot: ${signed.signedUrl} (expires in 1h)`)
+} else {
+  for (const row of data) {
+    console.log(`\n[${row.created_at}] ${row.tag}${row.project_id ? ` (project ${row.project_id})` : ''}`)
+    console.log(`  from: ${row.users?.name ?? 'unknown'} <${row.users?.email ?? '?'}>`)
+    console.log(`  page: ${row.context?.page ?? '?'} (${row.context?.path ?? '?'})`)
+    if (row.comment) console.log(`  comment: ${row.comment}`)
+    if (row.screenshot_path) {
+      // A signed URL, not the bucket's public URL -- the bucket is private
+      // (migration 025), so this is the only way to actually view the image.
+      const { data: signed } = await supabase.storage
+        .from('feedback-screenshots')
+        .createSignedUrl(row.screenshot_path, 3600)
+      if (signed?.signedUrl) console.log(`  screenshot: ${signed.signedUrl} (expires in 1h)`)
+    }
   }
 }
