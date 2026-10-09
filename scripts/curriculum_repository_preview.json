@@ -8695,6 +8695,38 @@
     },
     {
       "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-ministry-of-tribal-affairs-india",
+      "title": "Ministry of Tribal Affairs, Government of India",
+      "content": {
+        "id": "INLP-ACTOR-ministry-of-tribal-affairs-india",
+        "slug": "ministry-of-tribal-affairs-india",
+        "label": "Ministry of Tribal Affairs, Government of India",
+        "actorType": "ministry",
+        "jurisdiction": "IN",
+        "role": "The central ministry that runs the Eklavya Model Residential School (EMRS) scheme -- added to this repo as part of its first Kerala- tribal-education research pass (2026-10-09) because EMRS operates two schools inside Kerala (EMRS Pookode, Wayanad, established 1997; EMRS Painavu, Idukki) run on the Jawahar Navodaya Vidyalaya model, funded under Article 275(1) of the Constitution, targeted at blocks with over 50% Scheduled Tribe population and at least 20,000 tribal persons. Nationally reported figures (as of mid-2024, via secondary sourcing rather than this repo's own read of the primary EMRS list): a target of 740 schools for 2025-26, with 708 sanctioned and 405 operational.\n",
+        "url": "https://tribal.nic.in/",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The Ministry's existence and the EMRS scheme's basic design (Article 275(1) funding, population-threshold targeting, Navodaya- style model) are well-corroborated across independent sources. The two specific Kerala school locations/establishment dates came from secondary school-directory pages. This session did not read the Ministry's official EMRS list PDF (https://tribal.nic.in/downloads/EMRS/ListofEMRSSchoolsinIndia31102025.pdf), which a search tool could not open directly this session -- worth a direct read of that PDF before treating the two-school count or establishment years as fully confirmed.\n",
+          "sourceProvenance": "https://en.wikipedia.org/wiki/Eklavya_Model_Residential_School"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
       "record_type": "policy-timeline-event",
       "jurisdiction": "IN",
       "source_repo": "india-lpm",
@@ -9006,6 +9038,184 @@
     },
     {
       "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-PRINCIPLE-offline-first-content-baseline-kerala",
+      "title": "Offline-first is a baseline requirement for Kerala's forest-area tribal students, never an optional enhancement",
+      "content": {
+        "id": "INLP-PRINCIPLE-offline-first-content-baseline-kerala",
+        "slug": "offline-first-content-baseline-kerala",
+        "label": "Offline-first is a baseline requirement for Kerala's forest-area tribal students, never an optional enhancement",
+        "domain": "computational-curriculum-studies",
+        "jurisdictionScope": "IN-KL",
+        "statement": "Any curriculum content built for Kerala's forest-dwelling Scheduled Tribe communities must be designed to be downloaded once (at a school, hostel, or known connectivity point) and used completely without a live connection afterward -- not \"mobile-friendly,\" not \"works offline as a fallback,\" but offline as the default assumption content has to survive. Kerala's existing flagship digital-education delivery (KITE/Samagra/First Bell) is a live-broadcast-plus-streaming model; documented forest hamlets in Wayanad and Attappady show gaps not only in connectivity but, in some specific cases, in electricity itself. A design that assumes \"has a phone, just needs better connectivity\" will not reach the students most in need of reaching.\n",
+        "rationale": "Directly grounded in a real, documented gap between Kerala's own digital-education design and the on-the-ground reality in specific named hamlets -- not a generic \"rural India has connectivity problems\" assumption.\n",
+        "groundedIn": [
+          "INLP-FINDING-kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap",
+          "INLP-ACTOR-kite-kerala"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "status": "proposed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "First-draft policy principle, not yet reviewed by the planned outside anthropological reviewer or anyone with direct knowledge of these communities.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-PRINCIPLE-local-global-knowledge-equal-epistemic-footing",
+      "title": "A community's own knowledge must stand on equal footing with state/global curriculum content, never serve merely to illustrate it",
+      "content": {
+        "id": "INLP-PRINCIPLE-local-global-knowledge-equal-epistemic-footing",
+        "slug": "local-global-knowledge-equal-epistemic-footing",
+        "label": "A community's own knowledge must stand on equal footing with state/global curriculum content, never serve merely to illustrate it",
+        "domain": "interdisciplinary-curriculum-design",
+        "jurisdictionScope": "IN-KL",
+        "statement": "Where a unit brings in a tribal community's own knowledge (forest ecology, medicinal-plant use, land management, oral history), that knowledge must be presented as genuinely valid on its own terms: a real way of knowing. It must never be treated as decorative material layered onto an unchanged state-curriculum core, and its validity must never depend on confirming a \"real\" scientific explanation. Science educators working on exactly this problem (Aikenhead's \"multi-science\" critique of tokenized Indigenous content in STEM curricula; Nakata's \"cultural interface\" as a space for dialogue rather than a one-way translation) describe this as the central, recurring failure mode of integration efforts that mean well. Even a celebrated bridging framework like \"Two-Eyed Seeing\" has a real, published critique (Broadhead & Howard, 2021) arguing it can still end up subordinating Indigenous knowledge to Western validation -- this principle names that risk explicitly rather than assuming a bridging metaphor alone solves it.\n",
+        "rationale": "This is the single most consequential design commitment for \"navigating the space between local and global knowledge\" as the founding brief for this work describes it -- and the research behind it deliberately includes documented failure modes alongside success stories, per Dustin's own framing of the task.\n",
+        "groundedIn": [
+          "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "status": "proposed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "First-draft policy principle, not yet reviewed by the planned outside anthropological reviewer or anyone with direct knowledge of these communities.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-PRINCIPLE-community-specific-not-pan-tribal-kerala",
+      "title": "Build for one specific, named community at a time -- never a generic 'tribal' category",
+      "content": {
+        "id": "INLP-PRINCIPLE-community-specific-not-pan-tribal-kerala",
+        "slug": "community-specific-not-pan-tribal-kerala",
+        "label": "Build for one specific, named community at a time -- never a generic 'tribal' category",
+        "domain": "interdisciplinary-curriculum-design",
+        "jurisdictionScope": "IN-KL",
+        "statement": "Kerala's own real precedents for bridging indigenous and formal schooling are all community-specific. None of them are pan-tribal: KIRTADS' Paniya-language primers are Paniya-specific; the \"Padippurasi\" bridge workshop was built specifically for Muthuvan children in Edamalakudy; the \"Gothrabandhu\" mentor-teacher model recruits mentors fluent in the specific local dialect of the school they serve. Paniya, Kattunaikkan, Irula, Muduga, Kurumba, Mannan, Malayarayan, Kurichiya, Cholanaikkan, and Muthuvan are documented as distinct communities with different languages, livelihoods, social structures (e.g. Kurichiya's matrilineal clan system), and circumstances (e.g. Cholanaikkan and Koraga are Particularly Vulnerable Tribal Groups with populations in the low hundreds; others number in the tens of thousands) -- a model LPM must not flatten this real diversity into one \"tribal module,\" even with good intentions.\n",
+        "rationale": "Grounded directly in this session's own research, which repeatedly found real, named, non-interchangeable communities rather than one undifferentiated population -- and in the documented critique (found in the same research pass) that generic applications of frameworks like \"funds of knowledge\" risk homogenizing exactly this kind of real diversity.\n",
+        "groundedIn": [],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "status": "proposed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "First-draft policy principle, not yet reviewed by the planned outside anthropological reviewer or anyone with direct knowledge of these communities.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-PRINCIPLE-consultation-before-content-not-extraction",
+      "title": "Real consultation with a community's own knowledge-holders has to come before building content about that community",
+      "content": {
+        "id": "INLP-PRINCIPLE-consultation-before-content-not-extraction",
+        "slug": "consultation-before-content-not-extraction",
+        "label": "Real consultation with a community's own knowledge-holders has to come before building content about that community",
+        "domain": "interdisciplinary-curriculum-design",
+        "jurisdictionScope": "IN-KL",
+        "statement": "Citing a published ethnographic or news description of a community is not the same as that community's own knowledge-holders having been consulted about how their knowledge is represented or used in schooling. Before any unit draws on a specific community's own knowledge beyond what is already publicly documented, this project requires real consultation with that community (ideally through people and institutions already connected to it, such as Oorukoottam hamlet-level councils, Gothrabandhu mentor-teachers, or researchers who already work directly with the community) -- in the spirit of UNESCO LINKS' Free, Prior and Informed Consent principle and Linda Tuhiwai Smith's critique of extractive research that studies indigenous communities without being accountable to them.\n",
+        "rationale": "This principle exists specifically to name the limits of this founding pass's own research, which was built entirely from published government, news, and academic sources -- real and carefully sourced, but not a substitute for consultation with the communities it describes. Nothing in this repository should be read as having already done that consultation.\n",
+        "groundedIn": [],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "status": "proposed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "First-draft policy principle, not yet reviewed by the planned outside anthropological reviewer or anyone with direct knowledge of these communities.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-PRINCIPLE-coagency-pathway-choice-mapped-to-kcf",
+      "title": "Give students and teachers real, jointly-made pathway choices, mapped onto KCF's own standards and governance -- not a parallel track",
+      "content": {
+        "id": "INLP-PRINCIPLE-coagency-pathway-choice-mapped-to-kcf",
+        "slug": "coagency-pathway-choice-mapped-to-kcf",
+        "label": "Give students and teachers real, jointly-made pathway choices, mapped onto KCF's own standards and governance -- not a parallel track",
+        "domain": "interdisciplinary-curriculum-design",
+        "jurisdictionScope": "IN-KL",
+        "statement": "Student agency and teacher-student co-agency need a concrete mechanism. Here is one: for a given KCF-mandated competency, a student and their teacher jointly choose which local/community knowledge strand to pursue in meeting it (e.g. a forest-ecology unit met through a Wayanad student's own community's land knowledge vs. a coastal student's own community's fishing knowledge), and jointly document that choice and its reasoning as part of the assessed work itself -- making the choice-making itself visible and valued alongside the final answer. This is deliberately designed to run through KCF's own existing machinery (its stated critical-pedagogy/social- constructivist foundation, and the Tribal Education Committee governance structure it already mandates) rather than as a competing framework schools would have to adopt instead of KCF.\n",
+        "rationale": "Answers the founding brief's explicit request for \"teacher-student co-agency in developing flexible, valued learning pathways\" with a specific mechanism, grounded in what KCF 2023 already commits to (critical pedagogy, social constructivism, a real governance structure for tribal education) rather than inventing a parallel structure that would compete with, rather than work inside, the state curriculum this project needs to stay compliant with.\n",
+        "groundedIn": [
+          "INLP-EVENT-kcf-2023-adopted",
+          "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "status": "proposed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "First-draft policy principle, not yet reviewed by the planned outside anthropological reviewer or anyone with direct knowledge of these communities.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
       "record_type": "coherence-finding-record",
       "jurisdiction": "IN, IN-KL",
       "source_repo": "india-lpm",
@@ -9062,6 +9272,109 @@
     },
     {
       "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics",
+      "title": "KCF 2023 names Scheduled Tribe children as needing equity support, but its English text names no specific tribal community, language, or place",
+      "content": {
+        "id": "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics",
+        "slug": "kcf2023-names-tribal-equity-but-omits-tribal-specifics",
+        "label": "KCF 2023 names Scheduled Tribe children as needing equity support, but its English text names no specific tribal community, language, or place",
+        "findingType": "uncrossreferenced-gap",
+        "themes": [
+          "tribal-adivasi-education",
+          "local-knowledge-integration",
+          "curriculum-equity-provisions"
+        ],
+        "objects": [
+          {
+            "jurisdiction": "IN-KL",
+            "subject": "Whole-framework (all subjects)",
+            "gradeLevel": "K-12 framework document",
+            "sourceDocument": "Kerala Curriculum Framework 2023 (School Education)",
+            "sourceUrl": "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/",
+            "accessTier": "summary-only",
+            "licenseOrRightsNote": "Described from a direct full-text read/search of the official English PDF; no extended verbatim passage reproduced.\n"
+          }
+        ],
+        "summary": "KCF 2023 explicitly names Scheduled Tribe children among groups needing \"special care and support\" (alongside Dalits, coastal communities, children of migrant/guest workers, and children with special needs) and mandates a \"Tribal Education Committee\" as a required sub-section of every local Panchayat Education Committee -- a real governance mechanism, going beyond a sentence of concern. The same document gives mother-tongue medium of instruction deep pedagogical grounding (citing Vygotsky, Chomsky, Gandhi, and Tagore) as essential to cognitive development, and states Kerala follows \"a tri-lingual curriculum\" with Tamil, Kannada, Arabic, Sanskrit, or Urdu available as a first language alongside Malayalam. However, a direct full-text search of the official English PDF found no mention anywhere of any specific tribal community (e.g. Paniya, Irula, Kattunaikkan, Adiya, Mannan, Cholanaikkan), any tribal language, the districts Wayanad or Attappady in a current tribal-policy context, residential/hostel schooling for tribal children, or a dedicated curricular unit on tribal/indigenous local knowledge. The document's mother-tongue discussion is framed entirely around Kerala's major language communities (the tri-lingual list above); it is never extended to a tribal language. Its one use of the phrase \"local knowledge\" is a general statement about strengthening the regional economy. It is not a tribal-education-specific goal. The gap, in other words, is not that KCF 2023 is silent on equity -- it names Scheduled Tribes directly and creates a real governance structure for them -- it is that the document's own well-developed pedagogical machinery for mother tongue and local knowledge never cross-references the specific population it separately commits to supporting.\n",
+        "policyRelevance": "This is exactly the \"space between local and global knowledge\" this project's own brief asks about, made concrete and checkable rather than asserted in the abstract: the state curriculum has the conceptual tools (mother-tongue pedagogy, local-knowledge framing, a named equity commitment and governance mechanism for tribal students) but has not yet connected them to each other for this specific population, at least not in the document this repo could read. A model LPM for Kerala's diverse communities has a real, specific opening here: connecting machinery the state has already built for other purposes, rather than inventing a parallel structure that competes with KCF.\n",
+        "testsMandateIds": [],
+        "exhaustivenessCaveat": "This is a careful absence-of-evidence finding from the English edition of KCF 2023 only. It does not rule out that the Malayalam edition, subject-specific syllabi, or individual textbooks (as opposed to the framework document itself) carry tribal-specific content -- that was explicitly out of scope for what this session could check. It also does not establish what KCF 2007 (the predecessor framework) said, since only KCF 2023 could be full-text-searched this session. This finding should be presented to an outside reviewer as \"the framework document's English text does not name these specifics.\" It should not be presented as \"Kerala's curriculum ignores tribal communities\" -- those are different claims, and only the first is actually supported here.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The \"special care\" language, the Tribal Education Committee mandate, the mother-tongue pedagogical grounding, and the tri-lingual-curriculum statement were all located via direct full-text search of the downloaded official PDF. This was not based on a secondary description. The negative finding (no named tribal specifics) is the result of the same full-text search returning no matches for a deliberately broad set of search terms (community names, district names, \"tribal language,\" \"indigenous,\" \"Adivasi\"). It is not an assumption.\n",
+          "sourceProvenance": "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kcf-2023-adopted"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Described from a direct full-text read/search of the official English PDF; no extended verbatim passage reproduced.\n",
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-FINDING-kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap",
+      "title": "Kerala's flagship digital-education delivery model (First Bell/Samagra) assumes electricity and connectivity that documented tribal forest hamlets do not reliably have",
+      "content": {
+        "id": "INLP-FINDING-kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap",
+        "slug": "kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap",
+        "label": "Kerala's flagship digital-education delivery model (First Bell/Samagra) assumes electricity and connectivity that documented tribal forest hamlets do not reliably have",
+        "findingType": "uncrossreferenced-gap",
+        "themes": [
+          "offline-access",
+          "digital-divide",
+          "tribal-adivasi-education"
+        ],
+        "objects": [
+          {
+            "jurisdiction": "IN-KL",
+            "subject": "Educational technology / digital-learning policy",
+            "sourceDocument": "KITE 'Functions and Duties' page; First Bell programme description",
+            "sourceUrl": "https://kite.kerala.gov.in/KITE/index.php/welcome/KITE",
+            "accessTier": "summary-only"
+          },
+          {
+            "jurisdiction": "IN-KL",
+            "subject": "On-the-ground reporting, Wayanad and Attappady tribal hamlets",
+            "gradeLevel": "Primary and secondary, several specific hamlets",
+            "sourceDocument": "Onmanorama (1 Sept 2021, Madamkunnu hamlet); The Morning Voice (27 Sept 2026, Attappady power outage); The Caravan (15 Oct 2020)",
+            "sourceUrl": "https://www.onmanorama.com/news/kerala/2021/09/01/adivasi-education-wayanad-tribal-colony.html",
+            "accessTier": "summary-only"
+          }
+        ],
+        "summary": "Kerala's own digital-learning infrastructure (KITE, the Samagra portal, and the First Bell programme built on top of them) is fundamentally a live-broadcast-plus-streaming model: content is watched on TV or streamed via app/YouTube. It is not distributed as a downloadable, store-and-forward package designed to work with no connection at all. Kerala's own documented response for students without a TV or internet during COVID-19 was organizational rather than technical: \"Neighbourhood Study Centres\" with subsidized shared TVs, and a public device-donation drive -- which helps a student without a device but does not help a student whose hamlet has no electricity or signal at all. Independent, directly-read local reporting shows this second case is real and recurring. It is not hypothetical: in September 2021, 31 students in Wayanad's Madamkunnu hamlet had no reliable electricity to charge any device, with some students walking 1.5km to a paid charging point; a September 2026 report (less independently corroborated, flagged separately in this repo's timeline/actor records) describes a 20-day power outage across four Attappady hamlets after storm damage to an underground cable; and a 2020 report on Nilambur/Attappady PVTG communities quotes education officials arguing that reopening residential hostels was the only realistic way to reach children from Kerala's five \"primitive\" (Particularly Vulnerable) tribal groups. Better streaming alone would not have reached them: they lacked electricity entirely and lived far from any community viewing point. This project's own framing -- students who often have a phone or laptop but no reliable internet -- undersells the severity found in some of these specific documented cases. In the most severe of them, electricity itself is the gap, and connectivity alone does not capture it.\n",
+        "policyRelevance": "Directly actionable for this project's own design work: an offline-first content model for Kerala's forest-area tribal students cannot assume First Bell/Samagra's existing delivery mechanism is a sufficient base to build on, since that mechanism itself assumes connectivity (and often electricity) the documented cases show is not universal. A genuinely offline-first design needs to plan for content that survives being downloaded once (at a school, hostel, or connectivity point) and used entirely without a connection afterward, and in the most severe documented cases, without reliable power either.\n",
+        "exhaustivenessCaveat": "This finding draws on a patchwork of separately-dated local news stories (2020, 2021, 2026) about different specific hamlets. It is not one comprehensive, current, state-wide connectivity survey -- no such single document was found this session. The 2026 Attappady power-outage report in particular comes from one outlet this repo is not familiar with and could not corroborate against a second source; it is included because it is the most current item found. Its inclusion does not mean it is as well-confirmed as the 2021 Onmanorama report. A separate, unresolved tension noted in this session's research (not fully reconciled here) is that a 2015 Government of India press release describes Idukki district as the first in India with complete rural broadband coverage via a national pilot, which sits oddly next to later (2021-2023) reports of tribal colonies within Idukki still lacking internet -- this repo could not find a source explaining that apparent gap and is not asserting either claim supersedes the other.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The Madamkunnu (Onmanorama) and Nilambur/Attappady PVTG (The Caravan, The News Minute) articles were fetched and read directly this session. The 2026 Attappady power-outage report was read directly but from a single, less-established outlet and is flagged as needing a second source. District-wide figures quoted inside some of these articles (e.g. \"23,000 of ~26,000 Wayanad tribal students lack tablets/laptops,\" \"30 hamlets with no internet\") are themselves stated by the articles without a cited government source, so are presented here only as reported. They are not this repo's own confirmed figures.\n",
+          "sourceProvenance": "https://www.onmanorama.com/news/kerala/2021/09/01/adivasi-education-wayanad-tribal-colony.html"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
       "record_type": "institutional-actor-record",
       "jurisdiction": "IN-KL",
       "source_repo": "india-lpm",
@@ -9085,6 +9398,136 @@
           "version": "1.0.0",
           "contributor_notes": "Confirmed by direct reads of scert.kerala.gov.in's own \"about\" pages (all describing SCERT as \"an autonomous body of the Department of General Education, Government of Kerala\") and the Class 10 Biology textbook's own copyright-imprint page (both volumes, 2019 edition, read directly from samagra.kite.kerala.gov.in). No government order or gazette notification establishing SCERT's precise legal instrument was found -- the \"department, not a society\" reading rests on consistent public self-description plus the textbook's own imprint, not a single definitive legal-instrument document.\n",
           "sourceProvenance": "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-stdd-kerala",
+      "title": "Scheduled Tribes Development Department, Government of Kerala",
+      "content": {
+        "id": "INLP-ACTOR-stdd-kerala",
+        "slug": "stdd-kerala",
+        "label": "Scheduled Tribes Development Department, Government of Kerala",
+        "actorType": "ministry",
+        "jurisdiction": "IN-KL",
+        "role": "Kerala's own line department for Scheduled Tribe welfare and education -- a separate department from the Department of General Education (INLP-ACTOR-dept-general-education-kerala). It is not a unit inside that department. It directly runs Kerala's Model Residential Schools, Ashram Schools, and a pre-metric/post-metric hostel network specifically for Scheduled Tribe students, through a set of Integrated Tribal Development Project (ITDP) and Tribal Development offices around the state (reported locations include Attappady/Agaly, Wayanad/Kalpetta, Idukki/Thodupuzha, and Nilambur). This is the department this founding pass could least directly verify: its own site (stdd.kerala.gov.in) refused every automated fetch attempt this session, so specific counts attributed to it below (how many schools, how many hostels, how many ITDP offices) come from a search tool's summary of that page rather than a character-by-character read, and the specific numbers differ somewhat between different secondary sources that cite it.\n",
+        "url": "https://www.stdd.kerala.gov.in/",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The department's existence, its ITDP/Tribal Development office structure, and its role running Model Residential/Ashram/Eklavya schools and hostels are corroborated across several independent academic sources (the IRTC/Kerala State Planning Board report on Model Residential Schools, which this repo's INLP-EVENT-emrs-pookode-established-1997 and coherence-finding records draw on directly) as well as its own separate ITDP- Attappady subdomain (itdpattappady.kerala.gov.in), which loaded independently even when the main stdd.kerala.gov.in domain did not. The *exact current* counts (one search summary said \"20 MRS/Ashram/Eklavya schools plus 3 hostels,\" another said \"111 hostels serving ~6,000 students\" with a different school count) are genuinely inconsistent across sources found this session and should be reconciled by someone who can load the live government page directly before being quoted as a precise figure to an outside reviewer.\n",
+          "sourceProvenance": "https://www.stdd.kerala.gov.in/index.php/institutions-managed-by-scheduled-tribe-development-department"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-kite-kerala",
+      "title": "Kerala Infrastructure and Technology for Education (KITE)",
+      "content": {
+        "id": "INLP-ACTOR-kite-kerala",
+        "slug": "kite-kerala",
+        "label": "Kerala Infrastructure and Technology for Education (KITE)",
+        "actorType": "other",
+        "jurisdiction": "IN-KL",
+        "parentActor": "INLP-ACTOR-dept-general-education-kerala",
+        "role": "The technology arm of Kerala's Department of General Education -- began life as the \"IT@School Project\" in 2001 and was converted into a government-owned company (KITE) in August 2017. Builds and runs the state's own digital-learning infrastructure directly relevant to this project's offline-access question: the Samagra e-Resource Portal (digital textbooks and teacher material for Classes 1-12, jointly run with SCERT), the KITE VICTERS educational TV channel, and the \"First Bell\" programme built on top of it. Reports serving over 16,000 schools and having deployed more than 4.5 lakh pieces of ICT equipment, with roughly 300 staff across a state office and 14 district offices -- figures are the department's own self-reported scale. This repo has not independently audited them.\n",
+        "legalForm": "a government-owned company, converted from the earlier IT@School Project in August 2017. It is not a government department itself.",
+        "url": "https://kite.kerala.gov.in/",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Organizational history, scale figures, and the Samagra/VICTERS/ First Bell product set were read directly from KITE's own \"Functions and Duties\" page. The Samagra portal's own site (samagra.kite.kerala.gov.in) returned almost no extractable text to this session's tools, so the specific claim that Samagra offers a genuine offline-download option (as opposed to being view-only online) rests on third-party aggregator sites repeating each other. This repo has not read Samagra's own site to confirm it directly -- flagged for that direct confirmation before being treated as a solved part of the offline-access question this project cares about most.\n",
+          "sourceProvenance": "https://kite.kerala.gov.in/KITE/index.php/welcome/KITE"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-kirtads",
+      "title": "Kerala Institute for Research, Training and Development Studies of Scheduled Castes and Scheduled Tribes (KIRTADS)",
+      "content": {
+        "id": "INLP-ACTOR-kirtads",
+        "slug": "kirtads",
+        "label": "Kerala Institute for Research, Training and Development Studies of Scheduled Castes and Scheduled Tribes (KIRTADS)",
+        "actorType": "research-institute",
+        "jurisdiction": "IN-KL",
+        "role": "A Government of Kerala research institute in Chevayur, near Kozhikode, founded in 1972 as the Tribal Research and Training Centre and renamed KIRTADS in 1979. Runs Training, Research, and Development Studies wings plus an Ethnological Museum (established 1973) documenting Scheduled Caste/Scheduled Tribe material culture. Directly relevant to this project because KIRTADS is the body credited with producing Kerala's bilingual Malayalam-Paniya bridge primers for early-grade tribal students (a Paniya Language Primer Part II for Standard I, 2018, and Part III for Standard II, completed April 2021, both authored by Dr. S. Bindu) -- one of the few concrete, named examples found this session of a Kerala government body producing tribal-language classroom material. Most of what else this session found is Malayalam-medium content alone.\n",
+        "url": "https://kirtads.kerala.gov.in/",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Institutional history read directly from KIRTADS' own site and cross-checked against independent Wikipedia coverage (including a named former director, P.R.G. Mathur), which agree. The Paniya primer bibliographic details (exact author, year, grade level) come from a Ministry of Tribal Affairs digital-repository listing this session could not open directly (404 error) -- KIRTADS' own existence and general role are solid; the specific primer titles and dates should be re-confirmed by opening https://repository.tribal.gov.in/handle/123456789/75212 directly.\n",
+          "sourceProvenance": "https://kirtads.kerala.gov.in/history/"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-ACTOR-samagra-shiksha-kerala",
+      "title": "Samagra Shiksha Kerala (SSK)",
+      "content": {
+        "id": "INLP-ACTOR-samagra-shiksha-kerala",
+        "slug": "samagra-shiksha-kerala",
+        "label": "Samagra Shiksha Kerala (SSK)",
+        "actorType": "school-authority",
+        "jurisdiction": "IN-KL",
+        "parentActor": "INLP-ACTOR-dept-general-education-kerala",
+        "role": "Kerala's implementing wing of the central Samagra Shiksha Abhiyan scheme -- described in sourcing found this session as \"the state's school-education mission.\" This is the body repeatedly named as the implementer behind Kerala's COVID-era mother-tongue bridge-content efforts for tribal students (reported under at least two different names in different outlets -- see INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020, which flags that naming inconsistency directly rather than picking one) and the Gothrabandhu tribal mentor-teacher programme (INLP-EVENT-gothrabandhu-mentor-teacher-program-launched-2017), and also the body that designed Edamalakudy's \"Padippurasi\" bridge workshop for Muthuvan children specifically (named staff: CA Shameer, a Government Tribal Lower Primary School teacher; Bindumol D, SSK's Idukki district project officer; TP Kaladharan, an SSK educational consultant).\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "SSK's role is consistently named across several independently fetched news articles (Careers360, The News Minute, Outlook India, The Caravan) describing different specific programmes, which gives reasonable confidence in its existence and general role, but no SSK-specific \"about us\" government page was read directly this session to confirm its exact administrative structure or current (2026) staffing/scope.\n",
+          "sourceProvenance": "https://news.careers360.com/kerala-samagra-shiksha-abhiyan-malayalam-st-muthuvan-western-ghats-scert-govt-schools-rte-act"
         }
       },
       "access_tier": "citation-only",
@@ -9165,6 +9608,248 @@
       "license_or_rights_note": "Paraphrased from news coverage (careers360.com reporting on Kerala CM/SCERT statements), not a verbatim reproduction of any curriculum text or official notification.\n",
       "event_date": null,
       "effective_from": "2023",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-kcf-2007-adopted",
+      "title": "Kerala Curriculum Framework (KCF) 2007 adopted",
+      "content": {
+        "id": "INLP-EVENT-kcf-2007-adopted",
+        "slug": "kcf-2007-adopted",
+        "label": "Kerala Curriculum Framework (KCF) 2007 adopted",
+        "jurisdiction": "IN-KL",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "2007",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "SCERT Kerala adopted its first Kerala Curriculum Framework (KCF) as a continuation of the National Curriculum Framework (NCF) 2005. KCF 2023's own foreword states the later framework \"builds upon the foundation laid by\" this 2007 version, and names the shared pedagogical commitment directly: \"critical pedagogy and social constructivism as formulated by Vygotsky... had received cardinal importance in the Kerala Curriculum Framework [2007],\" alongside issue-based learning. This repo has not located or read the original 2007 document itself (only KCF 2023's own description of it, plus an independent peer-reviewed case study corroborating the same characterization) -- see the coherence-finding and principle records this event grounds for what that pedagogical stance does and does not extend to.\n",
+        "involvedActors": [
+          "INLP-ACTOR-scert-kerala"
+        ],
+        "sourceUrl": "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Summarized from KCF 2023's own description of its predecessor and from an independent peer-reviewed secondary source. This is not from a direct read of the 2007 document itself.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The critical-pedagogy/social-constructivist/issue-based characterization is independently corroborated by Vishnu Prakash Kareepadath, \"Critical Pedagogy in Practice: A Case Study from Kerala, India,\" Journal of Pedagogy, 9(2), 33-54 (2018), a peer-reviewed source examining how Kerala teachers actually practiced this stance in classrooms. No exact adoption date (only \"2007\") was confirmed, and this repo has not read the original KCF 2007 PDF directly -- only KCF 2023's retrospective description of it.\n",
+          "sourceProvenance": "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Summarized from KCF 2023's own description of its predecessor and from an independent peer-reviewed secondary source. This is not from a direct read of the 2007 document itself.\n",
+      "event_date": null,
+      "effective_from": "2007",
+      "effective_until": "2023"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-kcf-2023-adopted",
+      "title": "Kerala Curriculum Framework (KCF) 2023 adopted, explicitly as a state-level alternative to NEP 2020",
+      "content": {
+        "id": "INLP-EVENT-kcf-2023-adopted",
+        "slug": "kcf-2023-adopted",
+        "label": "Kerala Curriculum Framework (KCF) 2023 adopted, explicitly as a state-level alternative to NEP 2020",
+        "jurisdiction": "IN-KL",
+        "eventType": "curriculum-revision-completes",
+        "dateStart": "2023",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "supersedes": "INLP-EVENT-kcf-2007-adopted",
+        "description": "SCERT Kerala published KCF 2023, produced by a Core Committee on Curriculum Reform (convened by SCERT's Director, chaired by the Principal Secretary for General Education) using 26 thematic focus groups and public consultations the document says involved over 30 lakh students. Read directly from the official 223-page English PDF: the document states plainly that \"the National Education Policy of 2020 does not put forward the same perspective that was presented in the first policy on school education... The federal system of the constitution has given space to all the states to take a position that caters to the specific needs of the state\" -- i.e. Kerala frames KCF 2023 as a deliberate state-level alternative to NEP 2020. It is not framed as an implementation of NEP 2020. News coverage adds that this includes rejecting NEP's 5+3+3+4 school-stage structure for Kerala's own (reported as 3+7+5), while keeping scientific temper, secularism and constitutional values -- 173 new KCF-aligned textbooks reportedly open with the Constitution's Preamble. KCF 2023 explicitly names Scheduled Tribe children as a group needing \"special care and support\" and mandates a \"Tribal Education Committee\" as a required sub-section of each local Panchayat Education Committee -- but a full-text search of the English PDF found no mention of any specific tribal community, tribal language, Wayanad or Attappady by name in a current tribal-policy context, residential/hostel schooling, or a dedicated curricular unit on tribal/indigenous local knowledge; its one use of \"local knowledge\" is a general statement about strengthening the regional economy. It is not a tribal-education-specific goal. See INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics for the full analysis.\n",
+        "involvedActors": [
+          "INLP-ACTOR-scert-kerala",
+          "INLP-ACTOR-dept-general-education-kerala"
+        ],
+        "sourceUrl": "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Summarized/paraphrased from the official KCF 2023 PDF and from news coverage of it -- the one directly quoted sentence above (on NEP 2020) is a short excerpt used for precise, checkable attribution. It is not a substitute for the document itself, and no attempt is made here to reproduce the document at length.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "This record is a genuine upgrade over this repo's earlier INLP-ACTOR-scert-kerala note (2026-10-02), which could not reach KCF 2023's own text directly and flagged the critical-pedagogy continuity claim as \"very likely, not verified\" -- this session downloaded and full-text-searched the actual 223-page English PDF linked from SCERT Kerala's own site. The \"3+7+5\" structure and the 173-textbook/Preamble detail rest on news coverage (The Federal, Careers360). They are not confirmed inside the PDF text itself. The negative finding (no named tribal community/language/district in the document) is a careful absence-of-evidence finding from the English edition only -- it does not rule out the Malayalam edition, subject-specific syllabi, or textbooks carrying such content, and should not be presented to an outside reviewer as proof the state curriculum ignores tribal communities. The only supported claim is that this particular framework document's English text does not name them.\n",
+          "sourceProvenance": "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Summarized/paraphrased from the official KCF 2023 PDF and from news coverage of it -- the one directly quoted sentence above (on NEP 2020) is a short excerpt used for precise, checkable attribution. It is not a substitute for the document itself, and no attempt is made here to reproduce the document at length.\n",
+      "event_date": null,
+      "effective_from": "2023",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-emrs-pookode-established-1997",
+      "title": "Eklavya Model Residential School (EMRS), Pookode, Wayanad established",
+      "content": {
+        "id": "INLP-EVENT-emrs-pookode-established-1997",
+        "slug": "emrs-pookode-established-1997",
+        "label": "Eklavya Model Residential School (EMRS), Pookode, Wayanad established",
+        "jurisdiction": "IN-KL",
+        "eventType": "implementation-begins",
+        "dateStart": "1997",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "One of Kerala's two Eklavya Model Residential Schools under the central Ministry of Tribal Affairs scheme (the other, EMRS Painavu, is in Idukki district) -- a residential (boarding) school specifically for Scheduled Tribe students, run on the Jawahar Navodaya Vidyalaya model. Nationally, EMRS serves from Class VI onward. This is one of the concrete institutional answers to this project's own framing question -- where forest-area tribal children who board away from their families actually attend school -- though this repo has not yet directly read the Ministry's own EMRS list PDF to confirm the exact establishment year or current status of either Kerala school.\n",
+        "involvedActors": [
+          "INLP-ACTOR-ministry-of-tribal-affairs-india"
+        ],
+        "sourceUrl": "https://tribal.nic.in/downloads/EMRS/ListofEMRSSchoolsinIndia31102025.pdf",
+        "accessTier": "citation-only",
+        "licenseOrRightsNote": "Named and dated from secondary school-directory pages describing the central government's own EMRS list. This is not from this repo's own read of that primary PDF.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "EMRS's existence as a scheme and its Class-VI-onward entry point are well-corroborated. The specific 1997 establishment year for EMRS Pookode and the precise current operating status of both Kerala schools were not confirmed against the Ministry's own PDF list this session (a direct fetch attempt did not return readable text) -- flagged for a future session to confirm directly before this date is treated as settled.\n",
+          "sourceProvenance": "https://en.wikipedia.org/wiki/Eklavya_Model_Residential_School"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": "Named and dated from secondary school-directory pages describing the central government's own EMRS list. This is not from this repo's own read of that primary PDF.\n",
+      "event_date": "1997",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-first-bell-launched-2020",
+      "title": "Kerala launches \"First Bell\" televised/virtual classes in response to COVID-19 school closures",
+      "content": {
+        "id": "INLP-EVENT-first-bell-launched-2020",
+        "slug": "first-bell-launched-2020",
+        "label": "Kerala launches \"First Bell\" televised/virtual classes in response to COVID-19 school closures",
+        "jurisdiction": "IN-KL",
+        "eventType": "implementation-begins",
+        "dateStart": "2020-06-01",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "KITE VICTERS (Kerala's educational TV channel) launched \"First Bell\" on 1 June 2020 for grades 1-12 plus a pre-primary strand (\"Kilikkonchal\") -- a live broadcast on the free VICTERS channel, re-uploaded same-day to YouTube, also reachable via the KITE VICTERS app/site and social media. A \"First Bell 2.0\" followed on 1 June 2021. Directly relevant to this project because First Bell is a live-broadcast-plus-streaming model. It is not a store-and-forward, offline-first one. For students with neither a TV nor internet, Kerala's documented response was organizational rather than technical: \"Neighbourhood Study Centres\" with subsidized TVs in public buildings, and a public device-donation drive. A 2020 government survey reportedly found about 261,000 students (roughly 6% of the government-school population) had no device to view First Bell at all; a two-week mobilization drive cut this to about 17,774 children still needing access by the time term began. Separately, reporting from the same period describes Kerala translating First Bell's Class 1 content into tribal dialects for an estimated 25,000 tribal Class 1 students, under a program named inconsistently across sources -- see INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020.\n",
+        "involvedActors": [
+          "INLP-ACTOR-kite-kerala"
+        ],
+        "sourceUrl": "https://en.wikipedia.org/wiki/First_Bell",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Summarized from Wikipedia and independent Indian news coverage (Onmanorama, Drishti IAS, EducationWorld, The Logical Indian). This is not from a single primary government order.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Core facts (launch date, TV+YouTube delivery, grade range, Neighbourhood Study Centres, the device-drive figures) are consistent across several independent, reputable Indian outlets, which is why the schema's \"well-established-literature\" research tier applied upstream -- recorded here as unverified-secondary-source per this repo's own, stricter verificationStatus discipline (no single primary government document was read directly). The 261,000/17,774 figures trace to a government survey this repo has not located as a standalone document.\n",
+          "sourceProvenance": "https://en.wikipedia.org/wiki/First_Bell"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Summarized from Wikipedia and independent Indian news coverage (Onmanorama, Drishti IAS, EducationWorld, The Logical Indian). This is not from a single primary government order.\n",
+      "event_date": "2020-06-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020",
+      "title": "Samagra Shiksha Kerala translates First Bell / produces mother-tongue video lessons for tribal students during COVID-19 closures",
+      "content": {
+        "id": "INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020",
+        "slug": "covid-era-tribal-mother-tongue-bridge-content-2020",
+        "label": "Samagra Shiksha Kerala translates First Bell / produces mother-tongue video lessons for tribal students during COVID-19 closures",
+        "jurisdiction": "IN-KL",
+        "eventType": "pilot-program",
+        "dateStart": "2020-06",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "During 2020 COVID-19 school closures, Samagra Shiksha Kerala (SSK) produced mother-tongue video lessons for tribal Class 1 students, distributed via a dedicated YouTube channel, WhatsApp parent groups, and community-centre televisions, with mother-tongue mentor teachers from the same communities preparing/recording lessons. This repo found the effort described under two different names in independent news coverage, with inconsistent scope details, and is deliberately recording that inconsistency rather than resolving it by guessing: one report (Outlook India, naming SSA Director Dr. A.P. Kuttikrishnan) calls it \"Namath Basai,\" piloted first in Attappady (Irula, Muduka, Kurumba languages) and extended to Wayanad and Idukki, covering six languages (Kattunayikka, Paniya, Adiya, Kurichiya, Oorali, Kuruma) with 241 teachers and 60 volunteers in Wayanad alone; another report (The News Minute) calls a July 2020 Wayanad-area effort \"Mazhavil Poovu,\" translating Class 1 First Bell lessons for about 25,000 students, with differing counts elsewhere of six vs. ten dialects/communities covered. These may be the same programme described inconsistently by different outlets, or two related but distinct efforts -- this repo could not resolve which from the sources read this session.\n",
+        "involvedActors": [
+          "INLP-ACTOR-samagra-shiksha-kerala"
+        ],
+        "sourceUrl": "https://www.outlookindia.com/national/india-news-kerala-to-reach-out-to-tribal-students-with-virtual-classes-in-local-dialects-news-355562",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Summarized from two independently-read news articles (Outlook India; The News Minute). This is not from an SSK or SCERT program document.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Both underlying articles were fetched and read directly. They were not summarized from a search snippet. The inconsistency sits between the two directly-read articles themselves; it does not come from a sourcing shortcut. Resolving whether \"Namath Basai\" and \"Mazhavil Poovu\" are the same programme is exactly the kind of concrete, checkable question worth putting to the outside reviewer or to SSK directly, rather than silently picking one name.\n",
+          "sourceProvenance": "https://www.thenewsminute.com/kerala/kerala-translates-class-1-virtual-lessons-students-10-tribal-dialects-128755"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Summarized from two independently-read news articles (Outlook India; The News Minute). This is not from an SSK or SCERT program document.\n",
+      "event_date": "2020-06",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "IN-KL",
+      "source_repo": "india-lpm",
+      "source_record_id": "INLP-EVENT-gothrabandhu-mentor-teacher-program-launched-2017",
+      "title": "\"Gothrabandhu\" tribal mentor-teacher programme launched",
+      "content": {
+        "id": "INLP-EVENT-gothrabandhu-mentor-teacher-program-launched-2017",
+        "slug": "gothrabandhu-mentor-teacher-program-launched-2017",
+        "label": "\"Gothrabandhu\" tribal mentor-teacher programme launched",
+        "jurisdiction": "IN-KL",
+        "eventType": "pilot-program",
+        "dateStart": "2017",
+        "dateGranularity": "school-year",
+        "temporalStatus": "current-in-progress",
+        "description": "Samagra Shiksha Kerala launched \"Gothrabandhu\" in the 2017-18 academic year: locally recruited, tribal-background mentor-teachers fluent in Malayalam and a local tribal dialect, placed into primary schools with tribal students specifically to reduce dropout and address the language barrier between home language and Malayalam- medium instruction. Reported active in Wayanad, Attappady block (Palakkad) and Nilambur, with around 267 mentor-teachers appointed at one point. A later (2025) report describes legal/administrative delays affecting continued appointments, which this repo could not independently verify (the source describing it returned an access error this session) -- recorded as current-in-progress on the strength of the 2020 reporting, with the 2025 delay noted as an open question about current (2026) status.\n",
+        "involvedActors": [
+          "INLP-ACTOR-samagra-shiksha-kerala"
+        ],
+        "sourceUrl": "https://caravanmagazine.in/education/wayanads-adivasi-students-protest-against-institutional-discrimination-in-education",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Summarized from The Caravan's reporting, a reputable long-form Indian investigative outlet, read directly this session.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin-eirdosh",
+          "date": "2026-10-09",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The Caravan article was fetched and read directly, including its direct quote of the mentor-teacher qualification requirement. The 267-teacher figure and the 2025 legal-delay detail come from a second source (a Plutus IAS current-affairs page) that returned an HTTP 403 error when this session tried to fetch it -- those two specific details should be re-confirmed before being presented to an outside reviewer as the programme's current state.\n",
+          "sourceProvenance": "https://caravanmagazine.in/education/wayanads-adivasi-students-protest-against-institutional-discrimination-in-education"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Summarized from The Caravan's reporting, a reputable long-form Indian investigative outlet, read directly this session.\n",
+      "event_date": null,
+      "effective_from": "2017",
       "effective_until": null
     },
     {

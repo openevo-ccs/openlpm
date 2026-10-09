@@ -53,3 +53,328 @@ events:
         state/kerala/local_policy/records/coherence-findings.yaml for how
         Kerala's own retained content compares in actual depth.
       sourceProvenance: "state/kerala/local_policy/records/coherence-findings.yaml#INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+
+  - id: "INLP-EVENT-kcf-2007-adopted"
+    slug: "kcf-2007-adopted"
+    label: "Kerala Curriculum Framework (KCF) 2007 adopted"
+    jurisdiction: "IN-KL"
+    eventType: "curriculum-revision-completes"
+    dateStart: "2007"
+    dateGranularity: "year"
+    temporalStatus: "past-completed"
+    description: >
+      SCERT Kerala adopted its first Kerala Curriculum Framework (KCF) as
+      a continuation of the National Curriculum Framework (NCF) 2005. KCF
+      2023's own foreword states the later framework "builds upon the
+      foundation laid by" this 2007 version, and names the shared
+      pedagogical commitment directly: "critical pedagogy and social
+      constructivism as formulated by Vygotsky... had received cardinal
+      importance in the Kerala Curriculum Framework [2007]," alongside
+      issue-based learning. This repo has not located or read the original
+      2007 document itself (only KCF 2023's own description of it, plus an
+      independent peer-reviewed case study corroborating the same
+      characterization) -- see the coherence-finding and principle records
+      this event grounds for what that pedagogical stance does and does
+      not extend to.
+    involvedActors: ["INLP-ACTOR-scert-kerala"]
+    sourceUrl: "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Summarized from KCF 2023's own description of its predecessor and
+      from an independent peer-reviewed secondary source. This is not
+      from a direct read of the 2007 document itself.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The critical-pedagogy/social-constructivist/issue-based
+        characterization is independently corroborated by Vishnu Prakash
+        Kareepadath, "Critical Pedagogy in Practice: A Case Study from
+        Kerala, India," Journal of Pedagogy, 9(2), 33-54 (2018), a
+        peer-reviewed source examining how Kerala teachers actually
+        practiced this stance in classrooms. No exact adoption date (only
+        "2007") was confirmed, and this repo has not read the original KCF
+        2007 PDF directly -- only KCF 2023's retrospective description of
+        it.
+      sourceProvenance: "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+
+  - id: "INLP-EVENT-kcf-2023-adopted"
+    slug: "kcf-2023-adopted"
+    label: "Kerala Curriculum Framework (KCF) 2023 adopted, explicitly as a state-level alternative to NEP 2020"
+    jurisdiction: "IN-KL"
+    eventType: "curriculum-revision-completes"
+    dateStart: "2023"
+    dateGranularity: "year"
+    temporalStatus: "past-completed"
+    supersedes: "INLP-EVENT-kcf-2007-adopted"
+    description: >
+      SCERT Kerala published KCF 2023, produced by a Core Committee on
+      Curriculum Reform (convened by SCERT's Director, chaired by the
+      Principal Secretary for General Education) using 26 thematic focus
+      groups and public consultations the document says involved over 30
+      lakh students. Read directly from the official 223-page English PDF:
+      the document states plainly that "the National Education Policy of
+      2020 does not put forward the same perspective that was presented in
+      the first policy on school education... The federal system of the
+      constitution has given space to all the states to take a position
+      that caters to the specific needs of the state" -- i.e. Kerala
+      frames KCF 2023 as a deliberate state-level alternative to NEP 2020.
+      It is not framed as an implementation of NEP 2020. News coverage adds that this includes
+      rejecting NEP's 5+3+3+4 school-stage structure for Kerala's own
+      (reported as 3+7+5), while keeping scientific temper, secularism and
+      constitutional values -- 173 new KCF-aligned textbooks reportedly
+      open with the Constitution's Preamble. KCF 2023 explicitly names
+      Scheduled Tribe children as a group needing "special care and
+      support" and mandates a "Tribal Education Committee" as a required
+      sub-section of each local Panchayat Education Committee -- but a
+      full-text search of the English PDF found no mention of any specific
+      tribal community, tribal language, Wayanad or Attappady by name in a
+      current tribal-policy context, residential/hostel schooling, or a
+      dedicated curricular unit on tribal/indigenous local knowledge; its
+      one use of "local knowledge" is a general statement about
+      strengthening the regional economy. It is not a
+      tribal-education-specific goal. See
+      INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics
+      for the full analysis.
+    involvedActors: ["INLP-ACTOR-scert-kerala", "INLP-ACTOR-dept-general-education-kerala"]
+    sourceUrl: "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Summarized/paraphrased from the official KCF 2023 PDF and from news
+      coverage of it -- the one directly quoted sentence above (on NEP
+      2020) is a short excerpt used for precise, checkable attribution.
+      It is not a substitute for the document itself, and no attempt is
+      made here to reproduce the document at length.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        This record is a genuine upgrade over this repo's earlier
+        INLP-ACTOR-scert-kerala note (2026-10-02), which could not reach
+        KCF 2023's own text directly and flagged the critical-pedagogy
+        continuity claim as "very likely, not verified" -- this session
+        downloaded and full-text-searched the actual 223-page English PDF
+        linked from SCERT Kerala's own site. The "3+7+5" structure and the
+        173-textbook/Preamble detail rest on news coverage (The Federal,
+        Careers360). They are not confirmed inside the PDF text itself. The negative
+        finding (no named tribal community/language/district in the
+        document) is a careful absence-of-evidence finding from the
+        English edition only -- it does not rule out the Malayalam
+        edition, subject-specific syllabi, or textbooks carrying such
+        content, and should not be presented to an outside reviewer as
+        proof the state curriculum ignores tribal communities. The only
+        supported claim is that this particular framework document's
+        English text does not name them.
+      sourceProvenance: "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+
+  - id: "INLP-EVENT-emrs-pookode-established-1997"
+    slug: "emrs-pookode-established-1997"
+    label: "Eklavya Model Residential School (EMRS), Pookode, Wayanad established"
+    jurisdiction: "IN-KL"
+    eventType: "implementation-begins"
+    dateStart: "1997"
+    dateGranularity: "year"
+    temporalStatus: "past-completed"
+    description: >
+      One of Kerala's two Eklavya Model Residential Schools under the
+      central Ministry of Tribal Affairs scheme (the other, EMRS Painavu,
+      is in Idukki district) -- a residential (boarding) school
+      specifically for Scheduled Tribe students, run on the Jawahar
+      Navodaya Vidyalaya model. Nationally, EMRS serves from Class VI
+      onward. This is one of the concrete institutional answers to this
+      project's own framing question -- where forest-area tribal children
+      who board away from their families actually attend school -- though
+      this repo has not yet directly read the Ministry's own EMRS list PDF
+      to confirm the exact establishment year or current status of either
+      Kerala school.
+    involvedActors: ["INLP-ACTOR-ministry-of-tribal-affairs-india"]
+    sourceUrl: "https://tribal.nic.in/downloads/EMRS/ListofEMRSSchoolsinIndia31102025.pdf"
+    accessTier: "citation-only"
+    licenseOrRightsNote: >
+      Named and dated from secondary school-directory pages describing the
+      central government's own EMRS list. This is not from this repo's
+      own read of that primary PDF.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        EMRS's existence as a scheme and its Class-VI-onward entry point
+        are well-corroborated. The specific 1997 establishment year for
+        EMRS Pookode and the precise current operating status of both
+        Kerala schools were not confirmed against the Ministry's own PDF
+        list this session (a direct fetch attempt did not return readable
+        text) -- flagged for a future session to confirm directly before
+        this date is treated as settled.
+      sourceProvenance: "https://en.wikipedia.org/wiki/Eklavya_Model_Residential_School"
+
+  - id: "INLP-EVENT-first-bell-launched-2020"
+    slug: "first-bell-launched-2020"
+    label: "Kerala launches \"First Bell\" televised/virtual classes in response to COVID-19 school closures"
+    jurisdiction: "IN-KL"
+    eventType: "implementation-begins"
+    dateStart: "2020-06-01"
+    dateGranularity: "day"
+    temporalStatus: "past-completed"
+    description: >
+      KITE VICTERS (Kerala's educational TV channel) launched "First Bell"
+      on 1 June 2020 for grades 1-12 plus a pre-primary strand
+      ("Kilikkonchal") -- a live broadcast on the free VICTERS channel,
+      re-uploaded same-day to YouTube, also reachable via the KITE VICTERS
+      app/site and social media. A "First Bell 2.0" followed on 1 June
+      2021. Directly relevant to this project because First Bell is a
+      live-broadcast-plus-streaming model. It is not a store-and-forward,
+      offline-first one. For students with neither a TV nor internet,
+      Kerala's documented response was organizational rather than
+      technical: "Neighbourhood Study Centres" with subsidized TVs in
+      public buildings, and a public device-donation drive. A 2020
+      government survey reportedly found about 261,000 students (roughly
+      6% of the government-school population) had no device to view First
+      Bell at all; a two-week mobilization drive cut this to about 17,774
+      children still needing access by the time term began. Separately,
+      reporting from the same period describes Kerala translating First
+      Bell's Class 1 content into tribal dialects for an estimated 25,000
+      tribal Class 1 students, under a program named inconsistently across
+      sources -- see
+      INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020.
+    involvedActors: ["INLP-ACTOR-kite-kerala"]
+    sourceUrl: "https://en.wikipedia.org/wiki/First_Bell"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Summarized from Wikipedia and independent Indian news coverage
+      (Onmanorama, Drishti IAS, EducationWorld, The Logical Indian). This
+      is not from a single primary government order.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Core facts (launch date, TV+YouTube delivery, grade range,
+        Neighbourhood Study Centres, the device-drive figures) are
+        consistent across several independent, reputable Indian outlets,
+        which is why the schema's "well-established-literature" research
+        tier applied upstream -- recorded here as
+        unverified-secondary-source per this repo's own, stricter
+        verificationStatus discipline (no single primary government
+        document was read directly). The 261,000/17,774 figures trace to a
+        government survey this repo has not located as a standalone
+        document.
+      sourceProvenance: "https://en.wikipedia.org/wiki/First_Bell"
+
+  - id: "INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020"
+    slug: "covid-era-tribal-mother-tongue-bridge-content-2020"
+    label: "Samagra Shiksha Kerala translates First Bell / produces mother-tongue video lessons for tribal students during COVID-19 closures"
+    jurisdiction: "IN-KL"
+    eventType: "pilot-program"
+    dateStart: "2020-06"
+    dateGranularity: "month"
+    temporalStatus: "past-completed"
+    description: >
+      During 2020 COVID-19 school closures, Samagra Shiksha Kerala (SSK)
+      produced mother-tongue video lessons for tribal Class 1 students,
+      distributed via a dedicated YouTube channel, WhatsApp parent groups,
+      and community-centre televisions, with mother-tongue mentor teachers
+      from the same communities preparing/recording lessons. This repo
+      found the effort described under two different names in independent
+      news coverage, with inconsistent scope details, and is deliberately
+      recording that inconsistency rather than resolving it by guessing:
+      one report (Outlook India, naming SSA Director Dr. A.P. Kuttikrishnan)
+      calls it "Namath Basai," piloted first in Attappady (Irula, Muduka,
+      Kurumba languages) and extended to Wayanad and Idukki, covering six
+      languages (Kattunayikka, Paniya, Adiya, Kurichiya, Oorali, Kuruma)
+      with 241 teachers and 60 volunteers in Wayanad alone; another report
+      (The News Minute) calls a July 2020 Wayanad-area effort "Mazhavil
+      Poovu," translating Class 1 First Bell lessons for about 25,000
+      students, with differing counts elsewhere of six vs. ten
+      dialects/communities covered. These may be the same programme
+      described inconsistently by different outlets, or two related but
+      distinct efforts -- this repo could not resolve which from the
+      sources read this session.
+    involvedActors: ["INLP-ACTOR-samagra-shiksha-kerala"]
+    sourceUrl: "https://www.outlookindia.com/national/india-news-kerala-to-reach-out-to-tribal-students-with-virtual-classes-in-local-dialects-news-355562"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Summarized from two independently-read news articles (Outlook India;
+      The News Minute). This is not from an SSK or SCERT program document.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Both underlying articles were fetched and read directly. They
+        were not summarized from a search snippet. The inconsistency sits
+        between the two directly-read articles themselves; it does not
+        come from a sourcing shortcut. Resolving whether "Namath Basai"
+        and "Mazhavil Poovu" are
+        the same programme is exactly the kind of concrete, checkable
+        question worth putting to the outside reviewer or to SSK directly,
+        rather than silently picking one name.
+      sourceProvenance: "https://www.thenewsminute.com/kerala/kerala-translates-class-1-virtual-lessons-students-10-tribal-dialects-128755"
+
+  - id: "INLP-EVENT-gothrabandhu-mentor-teacher-program-launched-2017"
+    slug: "gothrabandhu-mentor-teacher-program-launched-2017"
+    label: "\"Gothrabandhu\" tribal mentor-teacher programme launched"
+    jurisdiction: "IN-KL"
+    eventType: "pilot-program"
+    dateStart: "2017"
+    dateGranularity: "school-year"
+    temporalStatus: "current-in-progress"
+    description: >
+      Samagra Shiksha Kerala launched "Gothrabandhu" in the 2017-18
+      academic year: locally recruited, tribal-background mentor-teachers
+      fluent in Malayalam and a local tribal dialect, placed into primary
+      schools with tribal students specifically to reduce dropout and
+      address the language barrier between home language and Malayalam-
+      medium instruction. Reported active in Wayanad, Attappady block
+      (Palakkad) and Nilambur, with around 267 mentor-teachers appointed at
+      one point. A later (2025) report describes legal/administrative
+      delays affecting continued appointments, which this repo could not
+      independently verify (the source describing it returned an access
+      error this session) -- recorded as current-in-progress on the
+      strength of the 2020 reporting, with the 2025 delay noted as an open
+      question about current (2026) status.
+    involvedActors: ["INLP-ACTOR-samagra-shiksha-kerala"]
+    sourceUrl: "https://caravanmagazine.in/education/wayanads-adivasi-students-protest-against-institutional-discrimination-in-education"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Summarized from The Caravan's reporting, a reputable long-form
+      Indian investigative outlet, read directly this session.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The Caravan article was fetched and read directly, including its
+        direct quote of the mentor-teacher qualification requirement. The
+        267-teacher figure and the 2025 legal-delay detail come from a
+        second source (a Plutus IAS current-affairs page) that returned an
+        HTTP 403 error when this session tried to fetch it -- those two
+        specific details should be re-confirmed before being presented to
+        an outside reviewer as the programme's current state.
+      sourceProvenance: "https://caravanmagazine.in/education/wayanads-adivasi-students-protest-against-institutional-discrimination-in-education"

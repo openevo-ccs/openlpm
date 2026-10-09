@@ -51,6 +51,11 @@
       "pattern": "^INLP-EVENT-[a-z0-9-]+$",
       "description": "Id of a broader event/programme this is one milestone of, if any."
     },
+    "supersedes": {
+      "type": "string",
+      "pattern": "^INLP-EVENT-[a-z0-9-]+$",
+      "description": "Id of the prior curriculum-revision event this one directly replaces, if any -- lets a chain of a given jurisdiction/subject's curriculum editions (e.g. KCF 2007 -> KCF 2023) be walked in order without re-deriving it from prose each time. Distinct from partOf (a milestone WITHIN a broader programme): supersedes is specifically for one edition of the same curriculum replacing an earlier edition. Ported from deutsche_lp's/nys_lp's identical field (added there 2026-10-02 for Thuringia Biologie's multi-decade edition history) on 2026-10-09, for KCF 2007 -> KCF 2023 -- india_lp's schema predated that addition and had not needed it until now."
+    },
     "sourceUrl": { "type": "string", "format": "uri" },
     "accessTier": {
       "type": "string",
