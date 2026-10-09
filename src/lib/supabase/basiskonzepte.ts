@@ -251,3 +251,17 @@ export function ancestorAtDepth(id: string, targetDepth: number, byId: Map<strin
   }
   return depth === targetDepth ? cur : undefined
 }
+
+// Real Thuringia curriculum structure, named directly by Susan Hanisch
+// (feedback 2026-10-01): grades 5/6 and 7/8 are taught as one combined band,
+// not as separate single-grade steps -- Kl.9 and Kl.10 stay their own band.
+// A raw literal grade_band value of '5/6' (some MNT content, see migration
+// 104) already IS a band and falls through unchanged. Shared here so every
+// page that groups Lernziele by grade (Lernziele filter, Basiskonzepte
+// Dashboard) buckets the same way -- the Dashboard's own table used to group
+// on the raw value directly, which is what produced an all-dash "Kl. 5/6"
+// column next to separate "Kl. 5"/"Kl. 6" columns (feedback b0323f40).
+const GRADE_BAND_KEY: Record<string, string> = { '5': '5/6', '6': '5/6', '7': '7/8', '8': '7/8' }
+export function bandKeyForGrade(g: string): string {
+  return GRADE_BAND_KEY[g] ?? g
+}
