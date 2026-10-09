@@ -1,0 +1,39 @@
+# india_lp -- Maharashtra institutional actors.
+$schema: ../../../../schema/institutional-actor-record.schema.json
+
+actors:
+
+  - id: "INLP-ACTOR-balbharati-maharashtra"
+    slug: "balbharati-maharashtra"
+    label: "Maharashtra State Bureau of Textbook Production and Curriculum Research (Balbharati)"
+    actorType: "state-textbook-board"
+    jurisdiction: "IN-MH"
+    role: >
+      Maharashtra's state textbook-publishing and curriculum-research
+      bureau. Asserts copyright over its own textbooks and licenses
+      third-party reproduction for a fee: a 2020 policy revision raised
+      third-party publisher registration fees from Rs. 1,000 to Rs.
+      17,700, and drew public objection from the Association of Publishers
+      and Distributors, who argued Balbharati should not be able to
+      copyright material that is "just compiled facts." Sits at the
+      restrictive end of the state-to-state licensing spectrum this repo's
+      founding research found -- contrast with Karnataka's DSERT (see
+      state/karnataka/local_policy/records/institutional-actors.yaml,
+      INLP-ACTOR-dsert-karnataka), which licenses equivalent material
+      openly under CC BY-SA 4.0.
+    url: "https://services.ebalbharati.in/copyright/pdfs/Revised_Policy_26_Oct_2020.pdf"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The fee figures and the Revised Policy PDF were read directly. The
+        Association of Publishers and Distributors' "just compiled facts"
+        objection is corroborated by two independent secondary sources
+        (SpicyIP's 2021 analysis, The Bridge Chronicle's news coverage of
+        the dispute).
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"

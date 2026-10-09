@@ -1,0 +1,88 @@
+# india_lp -- Kerala institutional actors.
+$schema: ../../../../schema/institutional-actor-record.schema.json
+
+actors:
+
+  - id: "INLP-ACTOR-dept-general-education-kerala"
+    slug: "dept-general-education-kerala"
+    label: "Department of General Education, Government of Kerala"
+    actorType: "ministry"
+    jurisdiction: "IN-KL"
+    role: >
+      Kerala's state education department -- the literal Government of
+      Kerala department that SCERT Kerala (INLP-ACTOR-scert-kerala) operates
+      inside, and the entity actually named as copyright holder on Kerala's
+      own textbooks ("© Department of General Education, Government of
+      Kerala," read directly from the Class 10 Biology textbook's own
+      imprint page). This matters for the same reason NCERT/CBSE's legal
+      form matters nationally: a literal government department asserting
+      copyright is a more straightforward "government work" case under
+      Copyright Act 1957 Section 2(k) than a registered society's claim is
+      -- the opposite kind of legal question from NCERT's, not the same one
+      restated at state level.
+    legalForm: "a department of the Government of Kerala itself, not a separate registered society -- confirmed by SCERT Kerala's own self-description as 'an autonomous body of the Department,' not a body standing apart from it, and by the textbook imprint naming the Department, not SCERT, as copyright holder."
+    url: "https://education.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed by direct reads of scert.kerala.gov.in's own "about"
+        pages (all describing SCERT as "an autonomous body of the
+        Department of General Education, Government of Kerala") and the
+        Class 10 Biology textbook's own copyright-imprint page (both
+        volumes, 2019 edition, read directly from
+        samagra.kite.kerala.gov.in). No government order or gazette
+        notification establishing SCERT's precise legal instrument was
+        found -- the "department, not a society" reading rests on
+        consistent public self-description plus the textbook's own
+        imprint, not a single definitive legal-instrument document.
+      sourceProvenance: "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+
+  - id: "INLP-ACTOR-scert-kerala"
+    slug: "scert-kerala"
+    label: "State Council of Educational Research and Training (SCERT), Kerala"
+    actorType: "state-education-board"
+    jurisdiction: "IN-KL"
+    parentActor: "INLP-ACTOR-dept-general-education-kerala"
+    role: >
+      Kerala's state curriculum-research body -- publishes the Kerala
+      Curriculum Framework (most recently KCF 2023, succeeding a 2007
+      version built on stated critical-pedagogy/issue-based/social-
+      constructivist foundations, explicitly positioned by Kerala's
+      Education Department as a state-level alternative to NEP 2020 rather
+      than an implementation of it) and Kerala's own state textbooks.
+      Unlike Karnataka's DSERT, SCERT Kerala has no confirmed open license
+      on its own curriculum text or textbooks -- its Class 10 Biology
+      textbook's copyright page carries a bare copyright notice only, no
+      Creative Commons mark or stated reuse permission, and the same is
+      true of the KCF 2023 landing page itself. No KOER-equivalent open
+      platform was found in Kerala's own education-technology ecosystem
+      (IT@School/KITE's open-source commitment covers software/
+      infrastructure, not a license on curriculum text; the Samagra portal
+      is a plain PDF-distribution site with no license statement; School
+      Wiki's own license could not be confirmed, site unreachable this
+      session).
+    url: "https://scert.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        SCERT's own "about" self-description, the KCF 2023 landing page,
+        and the Samagra portal were all read directly, as was the Class 10
+        Biology textbook's own copyright-imprint page. The critical-
+        pedagogy/constructivist framing is well-corroborated for KCF
+        generally (multiple independent secondary sources) but was not
+        independently confirmed from the KCF 2023 document's own primary
+        text this session (its direct download link was not reachable) --
+        treat that specific continuity claim as very likely, not verified.
+      sourceProvenance: "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"

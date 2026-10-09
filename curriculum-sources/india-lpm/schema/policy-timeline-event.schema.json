@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/policy-timeline-event.schema.json",
+  "title": "india_lp Policy Timeline Event Record",
+  "description": "A single dated (or date-ranged) event in India's curriculum-policy or curriculum-licensing history -- past, current, or planned/future. Identical shape to deutsche_lp's/nys_lp's policy-timeline-event.schema.json, including the same accessTier/licenseOrRightsNote fields added 2026-09-30 (see the sibling repos' schema files, same date) -- India's founding session needed them from day one, since several of this repo's own founding events are directly about licensing/copyright status, not curriculum content itself.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "eventType", "temporalStatus", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-EVENT-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^IN(-[A-Z]{2})?$"
+    },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "commission-formed", "consultation-phase", "strategy-published",
+        "implementation-begins", "curriculum-revision-begins",
+        "curriculum-revision-completes", "pilot-program", "legislation",
+        "licensing-policy-change", "milestone-target", "other"
+      ],
+      "description": "Same core vocabulary as deutsche_lp's eventType, plus 'licensing-policy-change' -- added because this repo's founding content includes real, dated events that are specifically about a body's copyright/redistribution terms changing (e.g. a state textbook board revising its licensing-fee schedule), which is not itself a curriculum revision and shouldn't be filed as one."
+    },
+    "dateStart": { "type": "string", "format": "date" },
+    "dateEnd": { "type": "string", "format": "date" },
+    "dateGranularity": {
+      "type": "string",
+      "enum": ["day", "month", "school-year", "year"],
+      "description": "India's academic year generally runs April-March (unlike Germany's August-start or NY's September-start Schuljahr); record dateStart as the academic year's start where only a year is known, and note the granularity here."
+    },
+    "temporalStatus": {
+      "type": "string",
+      "enum": ["past-completed", "current-in-progress", "planned-future"],
+      "description": "Relative to this record's own provenance.date -- not auto-derived, since 'current' drifts."
+    },
+    "description": { "type": "string" },
+    "involvedActors": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^INLP-ACTOR-[a-z0-9-]+$" }
+    },
+    "partOf": {
+      "type": "string",
+      "pattern": "^INLP-EVENT-[a-z0-9-]+$",
+      "description": "Id of a broader event/programme this is one milestone of, if any."
+    },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "accessTier": {
+      "type": "string",
+      "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+      "description": "How much of the underlying source this record actually keeps, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Same four values as deutsche_lp's/nys_lp's identical field. Given this repo's founding session found India's redistribution-rights picture to be genuinely unresolved for NCERT/CBSE curriculum text (see docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md), every founding-session event in this repo is deliberately kept at 'citation-only' regardless of how much text was actually available in the source read -- not because a higher tier is known to be unsafe, but because it has not yet been confirmed safe. Raise a record's tier only after the real legal review this repo's docs/strategy/2026-09-30-india-legal-review-scope.md calls for, or after direct confirmation of an explicit open license (e.g. Karnataka KOER's CC BY-SA 4.0, which is a real, checkable, already-confirmed license -- see that state's own records)."
+    },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal basis for storing this source at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

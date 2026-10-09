@@ -1,0 +1,139 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/latent-connection-record.schema.json",
+  "title": "india_lp Latent Curriculum-Connection Record",
+  "description": "A PROPOSED reading of an existing, official Indian curriculum object as conceptually connected to evolutionary anthropology's 'what does it mean to be human?' question, even where the source text itself never uses that framing -- modeled directly on deutsche_lp's/nys_lp's latent-connection-record.schema.json. Deliberately a DIFFERENT and WEAKER claim than coherence-finding-record: this schema proposes an interpretive, human-justified reading, never a claim about what the official document asserts or requires. No records exist under this schema yet as of this repo's founding session (2026-09-30).",
+  "type": "object",
+  "required": [
+    "id", "slug", "label", "status", "curriculumObject",
+    "evolutionaryAnthropologyHub", "connectionNarrative",
+    "strengthAssessment", "evidenceMethod", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-LATENT-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "reviewed", "recommended", "rejected"]
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "curriculumObject": {
+      "type": "object",
+      "required": ["jurisdiction", "subject", "sourceDocument"],
+      "additionalProperties": false,
+      "properties": {
+        "jurisdiction": { "type": "string", "pattern": "^IN(-[A-Z]{2})?$" },
+        "subject": { "type": "string" },
+        "gradeLevel": { "type": "string" },
+        "excerptText": { "type": "string" },
+        "sourceDocument": { "type": "string" },
+        "sourcePage": { "type": "string" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "accessTier": {
+          "type": "string",
+          "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+          "description": "Same four values as deutsche_lp's/nys_lp's identical field. See the repo-wide default explained in policy-timeline-event.schema.json's accessTier description."
+        },
+        "licenseOrRightsNote": {
+          "type": "string",
+          "description": "The legal basis for storing excerptText at the accessTier chosen above."
+        }
+      }
+    },
+    "evolutionaryAnthropologyHub": { "type": "string" },
+    "connectionNarrative": { "type": "string" },
+    "strengthAssessment": {
+      "type": "object",
+      "required": ["openEvoDesignConcept", "didaktischeRekonstruktion"],
+      "additionalProperties": false,
+      "properties": {
+        "openEvoDesignConcept": {
+          "type": "object",
+          "required": ["rating", "justification"],
+          "additionalProperties": false,
+          "properties": {
+            "contentAnchors": { "type": "array", "items": { "type": "string" } },
+            "thinkingTools": { "type": "array", "items": { "type": "string" } },
+            "designPrinciples": { "type": "array", "items": { "type": "string" } },
+            "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+            "justification": { "type": "string" }
+          }
+        },
+        "didaktischeRekonstruktion": {
+          "type": "object",
+          "description": "Alignment with the Model of Educational Reconstruction (Kattmann, Duit, Gropengiesser & Komorek 1997), the same shared instrument deutsche_lp and nys_lp both use -- kept identical here for the same reason nys_lp gives: a connection's pedagogical soundness doesn't depend on which country's curriculum it targets.",
+          "required": ["fachlicheKlaerung", "schuelervorstellungen", "didaktischeStrukturierung", "overallRating"],
+          "additionalProperties": false,
+          "properties": {
+            "fachlicheKlaerung": {
+              "type": "object",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "schuelervorstellungen": {
+              "type": "object",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "didaktischeStrukturierung": {
+              "type": "object",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "overallRating": {
+              "type": "string",
+              "enum": ["none", "weak", "moderate", "strong"]
+            }
+          }
+        }
+      }
+    },
+    "evidenceMethod": { "type": "string" },
+    "bridgingActivity": { "type": "string" },
+    "gaps": { "type": "string" },
+    "relatedFindingIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^INLP-FINDING-[a-z0-9-]+$" }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

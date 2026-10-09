@@ -1,0 +1,55 @@
+# india_lp -- Kerala timeline events.
+$schema: ../../../../schema/policy-timeline-event.schema.json
+
+events:
+
+  - id: "INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+    slug: "kerala-rejects-ncert-evolution-deletion"
+    label: "Kerala directs schools to keep teaching evolution content NCERT deleted nationally"
+    jurisdiction: "IN-KL"
+    eventType: "curriculum-revision-completes"
+    dateStart: "2023"
+    dateGranularity: "year"
+    temporalStatus: "current-in-progress"
+    description: >
+      Following NCERT's 2023-2024 national "rationalisation" exercise,
+      which deleted entire chapters on Darwin's theory of evolution (along
+      with Mughal-history and caste-system content) from national
+      textbooks, Kerala's Chief Minister publicly criticized the deletions
+      and SCERT Kerala directed state schools to continue teaching the
+      removed content, releasing its own supplementary textbooks and
+      forming a review committee. This is a curriculum-content dispute, not
+      a copyright dispute -- Kerala is not asserting a licensing claim here,
+      it is rejecting a national content decision on substantive grounds.
+      Filed as its own event rather than folded into the licensing-history
+      events above because it is a different kind of fact, directly
+      relevant to this project's own evolution-education focus: a real
+      instance of a state-level body actively defending evolution content
+      against removal, not a hypothetical concern.
+    involvedActors: ["INLP-ACTOR-scert-kerala", "INLP-ACTOR-ncert"]
+    sourceUrl: "https://news.careers360.com/"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Paraphrased from news coverage (careers360.com reporting on Kerala
+      CM/SCERT statements), not a verbatim reproduction of any curriculum
+      text or official notification.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed via direct reads of two careers360.com news articles
+        ("Kerala CM releases supplementary textbooks; attacks NCERT over
+        removal of portions" and "Kerala schools likely to teach deleted
+        parts of NCERT history, social science textbooks: SCERT"). News
+        coverage, not a primary government order or SCERT notification --
+        treat the exact sequence/dates as approximate pending a primary
+        source. See INLP-EVENT-ncert-rationalisation-evolution-deletion
+        (national timeline) for the deletion this responds to, and
+        state/kerala/local_policy/records/coherence-findings.yaml for how
+        Kerala's own retained content compares in actual depth.
+      sourceProvenance: "state/kerala/local_policy/records/coherence-findings.yaml#INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"

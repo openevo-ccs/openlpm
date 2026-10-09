@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/institutional-mandate-record.schema.json",
+  "title": "india_lp Institutional Mandate Record",
+  "description": "A single named, dated commitment by a real education authority (Ministry of Education, NCERT under NEP 2020's mandate, a state education board) that calls for some form of curriculum coordination, competency-based reform, or cross-subject/holistic learning -- the computable unit for 'what does this authority actually require'. Modeled on deutsche_lp's/nys_lp's institutional-mandate-record.schema.json. Deliberately does NOT yet include a coordinationGrain-equivalent controlled vocabulary (Germany's fachuebergreifend/faecherverbindend/faecherintegrierend three-tier typology, or New York's interdisciplinaryExplicitness) -- this repo's founding session found real language in NEP 2020/NCF 2023 around 'holistic', 'multidisciplinary', and 'interdisciplinary' study, but has not done the equivalent close-reading research pass deutsche_lp did for Thueringen's own Leitgedanken or nys_lp did for NYSED's own materials to justify minting a controlled vocabulary yet. crossSubjectApproach is free text for now, not required -- revisit as a closed enum once real mandate records exist to derive one from, per this repo's own verification-first discipline (don't force a borrowed vocabulary that hasn't been checked against India's own texts). No mandate records exist in this repo yet as of its founding session (2026-09-30) -- statementText would require quoting actual government curriculum-policy text, which this repo's founding session deliberately deferred pending the real legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "issuingBody", "mandateType", "statementText", "status", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-MANDATE-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^IN(-[A-Z]{2})?$",
+      "description": "'IN' for a national NEP-2020/NCF-level mandate; 'IN-KA' / 'IN-MH' etc. for a single state's own curriculum-board document."
+    },
+    "issuingBody": {
+      "type": "string",
+      "description": "Free text, e.g. 'National Council of Educational Research and Training (NCERT)', 'Ministry of Education, Government of India', 'Maharashtra State Bureau of Textbook Production and Curriculum Research (Balbharati)'. Not a controlled vocabulary."
+    },
+    "mandateType": {
+      "type": "string",
+      "enum": [
+        "national-policy-framework", "national-curriculum-framework",
+        "state-curriculum-framework", "state-policy-announcement",
+        "licensing-policy"
+      ],
+      "description": "'national-policy-framework' = NEP 2020 itself or an equally broad national policy document. 'national-curriculum-framework' = NCF (e.g. NCF 2023) or a subject-specific national syllabus document. 'state-curriculum-framework' = a State Curriculum Framework or state syllabus document. 'state-policy-announcement' = a state-level policy direction not yet a formal curriculum document. 'licensing-policy' = a body's own stated copyright/redistribution terms (e.g. Balbharati's Revised Policy) -- included as its own type because, for this repo's purposes, a licensing policy is itself a mandate worth tracking precisely, distinct from curriculum content."
+    },
+    "crossSubjectApproach": {
+      "type": "string",
+      "description": "Free text describing how this mandate's own text frames cross-subject/interdisciplinary/holistic learning, if at all -- deliberately not yet a controlled vocabulary (see this schema's top-level description). Optional."
+    },
+    "statementText": {
+      "type": "string",
+      "description": "The mandate's own text, quoted exactly as read in the primary source. Do not paraphrase where a verbatim quote is available. Governed by accessTier below -- see that field before adding a long quotation here."
+    },
+    "adoptionDate": { "type": "string", "format": "date" },
+    "dateGranularity": {
+      "type": "string",
+      "enum": ["day", "month", "school-year", "year"]
+    },
+    "targetDate": {
+      "type": "string",
+      "format": "date",
+      "description": "If the mandate names a completion/target horizon distinct from its adoption date."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["adopted", "proposed", "superseded"]
+    },
+    "supersededBy": {
+      "type": "string",
+      "pattern": "^INLP-MANDATE-[a-z0-9-]+$"
+    },
+    "sourceDocument": { "type": "string" },
+    "sourcePage": { "type": "string" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "accessTier": {
+      "type": "string",
+      "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+      "description": "How much of the underlying mandate document this record actually keeps, chosen per-source based on what's legally safe to redistribute -- same four values and meaning as deutsche_lp's/nys_lp's identical field. See this schema's top-level description for why this repo's founding session default is 'citation-only' pending the real legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md."
+    },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal basis for storing this mandate's statementText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

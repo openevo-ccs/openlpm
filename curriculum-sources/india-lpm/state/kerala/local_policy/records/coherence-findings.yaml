@@ -1,0 +1,97 @@
+# india_lp -- Kerala coherence-analysis finding records.
+# Filed under state/kerala/local_policy/ rather than national_ccs_policy/,
+# same reasoning as Karnataka's own coherence-findings.yaml: this finding
+# is a genuine two-jurisdiction comparison (national vs. Kerala), but its
+# natural home is with the state whose own content is the actual subject.
+$schema: ../../../../schema/coherence-finding-record.schema.json
+
+findings:
+
+  - id: "INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+    slug: "kerala-retains-evolution-content-ncert-deleted"
+    label: "Kerala's Class 10 Biology retains full evolution/human-origins content NCERT deleted nationally"
+    findingType: "state-vs-national-divergence"
+    themes: ["human-origins-nature", "curriculum-content-deletion-and-retention"]
+    objects:
+      - jurisdiction: "IN"
+        subject: "Science (Biology)"
+        gradeLevel: "National (NCERT textbooks)"
+        sourceDocument: "NCERT 2023-2024 textbook 'rationalisation' exercise"
+        sourceUrl: "https://news.careers360.com/"
+        accessTier: "summary-only"
+        licenseOrRightsNote: >
+          Paraphrased from news coverage of NCERT's own rationalisation
+          exercise, not a reproduction of NCERT's curriculum text or
+          internal notification.
+      - jurisdiction: "IN-KL"
+        subject: "Biology"
+        gradeLevel: "Class 10 (Standard X), Part 2, 2019 edition"
+        sourceDocument: "SCERT Kerala Class 10 Biology textbook, Chapter 8, 'The Paths Traversed by Life' (pp. 123-137)"
+        sourceUrl: "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf"
+        accessTier: "summary-only"
+        licenseOrRightsNote: >
+          SCERT Kerala's textbooks carry a bare copyright notice ("©
+          Department of General Education, Government of Kerala") with no
+          stated reuse license anywhere checked (the textbook's own
+          imprint, the KCF 2023 landing page, the Samagra distribution
+          portal) -- unlike Karnataka's CC BY-SA-licensed KOER content,
+          this is described here only at the structural/paraphrase level,
+          not quoted verbatim, pending the same kind of legal review this
+          repo already applies to NCERT/CBSE content.
+    summary: >
+      Kerala's Class 10 Biology textbook devotes a full chapter (pp.
+      123-137) to evolution, covering chemical-origin-of-life theories
+      (Oparin-Haldane, Panspermia, the Urey-Miller experiment), a
+      geological timeline from life's origin through multicellularity,
+      Lamarckism and Darwinism (including the Galapagos finches and
+      Malthus's influence), Neo-Darwinism, and four independent lines of
+      evidence for evolution (fossil, comparative-morphology, biochemical,
+      and molecular -- including a beta-hemoglobin amino-acid-difference
+      comparison table showing chimpanzee at zero differences from humans,
+      gorilla at one, and rat at thirty-one). A dedicated section, "Evolution
+      of Human beings" (p.134), places humans within Anthropoidea and
+      Hominoidea and includes a named hominin-lineage diagram:
+      Ardipithecus ramidus, Australopithecus afarensis, Homo habilis, Homo
+      erectus, Homo neanderthalensis, Homo sapiens, each with a fossil-
+      discovery location. This is the exact category of content NCERT
+      removed from its own national textbooks in the 2023-2024
+      rationalisation exercise -- Kerala's own chapter was not itself
+      revised in response (it is the pre-existing 2019 edition), but
+      Kerala's state-level decision to keep teaching this content, formalized
+      as a public stance against the national deletion, makes this specific
+      chapter's continued existence a directly relevant data point, not
+      incidental.
+    policyRelevance: >
+      A concrete instance of state-level curriculum autonomy (India's
+      constitutional "Concurrent List" status for education, already noted
+      elsewhere in this repo re: Karnataka/Tamil Nadu) being exercised
+      specifically to preserve evolution-education content against a
+      national deletion -- directly relevant to this project's own mission,
+      independent of the separate licensing-rights question this repo
+      otherwise tracks state by state.
+    exhaustivenessCaveat: >
+      This repo has not independently read NCERT's own rationalisation
+      notification or its post-deletion textbook text directly this
+      session -- the national side of this comparison rests on news
+      coverage, not a primary NCERT document (see
+      INLP-EVENT-ncert-rationalisation-evolution-deletion's own caveat).
+      No verbatim text from Kerala's textbook is reproduced here, by
+      design -- see each object's own licenseOrRightsNote. The chapter
+      summary above describes real, page-cited structure and topic
+      coverage, not Kerala's own sentences.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Kerala's chapter content (title, page range, section structure,
+        topic list, the hemoglobin comparison figures, the named hominin
+        lineage) was read directly from the actual 2019-edition PDF on
+        Kerala's own Samagra portal, both volumes. The national side rests
+        on secondary news coverage, not a primary NCERT document -- see
+        exhaustivenessCaveat.
+      sourceProvenance: "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf"

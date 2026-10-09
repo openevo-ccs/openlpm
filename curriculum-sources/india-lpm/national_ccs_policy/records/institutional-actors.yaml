@@ -1,0 +1,109 @@
+# india_lp -- national-level institutional actors.
+# All facts below are grounded in the 2026-09-30 founding research session --
+# see docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md
+# for the full research trail and every source URL.
+$schema: ../../schema/institutional-actor-record.schema.json
+
+actors:
+
+  - id: "INLP-ACTOR-ministry-of-education-india"
+    slug: "ministry-of-education-india"
+    label: "Ministry of Education, Government of India"
+    actorType: "ministry"
+    jurisdiction: "IN"
+    role: >
+      The central government ministry that NCERT and CBSE both operate
+      under (as "autonomous" bodies, per NCERT's own description of its
+      relationship to the Ministry). Oversees national implementation of
+      the National Education Policy (NEP) 2020.
+    url: "https://dsel.education.gov.in/index.php/cbse"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Basic institutional-hierarchy fact (Ministry oversees NCERT/CBSE),
+        confirmed via dsel.education.gov.in (an official Ministry of
+        Education subdomain) and cross-checked against NCERT's and CBSE's
+        own "autonomous body" self-descriptions.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1"
+
+  - id: "INLP-ACTOR-ncert"
+    slug: "ncert"
+    label: "National Council of Educational Research and Training (NCERT)"
+    actorType: "autonomous-statutory-body"
+    jurisdiction: "IN"
+    legalForm: "registered society under the Societies Registration Act, 1860 (Act XXI) -- not a government department itself, though set up by the Government of India in 1961 and described as autonomous under the Ministry of Education"
+    role: >
+      Prepares the National Curriculum Framework (most recently NCF 2023,
+      under NEP 2020, covering ages 3-18) and publishes India's standard
+      national textbooks. Also actively asserts and enforces copyright over
+      its own textbook and curriculum-framework text: its own
+      state-adoption license agreement states "The NCERT is the sole owner
+      of copyright of the WORK" and that copyright "shall vest with the
+      NCERT in perpetuity," and NCERT has publicly warned that unauthorized
+      reproduction "will face legal action under the Copyright Act 1957."
+      This repo's own founding research found NCERT's legal-society status
+      (rather than being a literal government department) leaves it a
+      genuinely open question whether Copyright Act 1957 Section 2(k)'s
+      "government work" provision applies to its output by plain statutory
+      text -- see docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#2
+      for the unresolved-legal-question flag.
+    url: "https://ncert.nic.in"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The quoted license-agreement language ("sole owner... in
+        perpetuity") was read directly from NCERT's own state-adoption
+        license agreement PDF, not a secondary summary. The
+        legal-form/registered-society fact is corroborated by three
+        independent sources (Vajiram & Ravi, understandupsc.com,
+        Wikipedia) in the research session, none of which is itself a
+        primary NCERT document -- flagging that the legal-form claim rests
+        on secondary characterization even though the license-text quote
+        is primary.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1-2"
+
+  - id: "INLP-ACTOR-cbse"
+    slug: "cbse"
+    label: "Central Board of Secondary Education (CBSE)"
+    actorType: "autonomous-statutory-body"
+    jurisdiction: "IN"
+    legalForm: "autonomous body registered under the Societies Registration Act, 1860, under the Ministry of Education -- not a government department itself"
+    role: >
+      Sets curricula/syllabi for its affiliated schools nationwide and
+      administers board exams. Search-engine excerpts of CBSE's own
+      curriculum PDFs (cbseacademic.nic.in) suggest they carry a
+      reproduction-restriction notice similar in spirit to NCERT's, but
+      this repo's founding session could not independently confirm that
+      specific wording by reading a CBSE PDF directly -- treat the
+      reproduction-notice claim as likely-but-unverified until a future
+      session reads one directly.
+    url: "https://dsel.education.gov.in/index.php/cbse"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The basic institutional facts (autonomous society, sets national
+        curricula, under Ministry of Education) are confirmed via
+        dsel.education.gov.in (an official government page) and
+        corroborated by Wikipedia. The specific reproduction-notice wording
+        attributed to CBSE curriculum PDFs was found only via search-engine
+        excerpt, not a PDF read directly this session -- see role field's
+        own caveat.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#1-3"
