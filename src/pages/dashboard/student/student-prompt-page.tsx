@@ -314,11 +314,26 @@ export default function StudentPromptPage() {
                       </label>
                     ))}
                   </div>
-                  {deselectedInRange.size > 0 && (
-                    <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setDeselectedInRange(new Set())}>
-                      Alle wieder auswählen
+                  {/* Real feedback d398a23f (Susan): there should be an
+                      option here to select/deselect all. */}
+                  <div className="row" style={{ gap: 10, marginTop: 6 }}>
+                    <button
+                      className="btn-linklike"
+                      style={{ fontSize: 12 }}
+                      disabled={deselectedInRange.size === 0}
+                      onClick={() => setDeselectedInRange(new Set())}
+                    >
+                      Alle auswählen
                     </button>
-                  )}
+                    <button
+                      className="btn-linklike"
+                      style={{ fontSize: 12 }}
+                      disabled={deselectedInRange.size === rangeMatches.length}
+                      onClick={() => setDeselectedInRange(new Set(rangeMatches.map((t) => t.id)))}
+                    >
+                      Alle abwählen
+                    </button>
+                  </div>
                 </div>
               )}
             </>
@@ -356,11 +371,23 @@ export default function StudentPromptPage() {
                   ))
                 )}
               </div>
-              {manualSelection.size > 0 && (
-                <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setManualSelection(new Set())}>
-                  Auswahl zurücksetzen ({manualSelection.size})
+              {/* Real feedback d398a23f (Susan): select/deselect all, same
+                  as the "Nach Klassenstufe" scope above. */}
+              <div className="row" style={{ gap: 10, marginTop: 6 }}>
+                <button
+                  className="btn-linklike"
+                  style={{ fontSize: 12 }}
+                  disabled={auswahlResults.length === 0 || manualSelection.size === auswahlResults.length}
+                  onClick={() => setManualSelection(new Set(auswahlResults.map((t) => t.id)))}
+                >
+                  Alle auswählen
                 </button>
-              )}
+                {manualSelection.size > 0 && (
+                  <button className="btn-linklike" style={{ fontSize: 12 }} onClick={() => setManualSelection(new Set())}>
+                    Auswahl zurücksetzen ({manualSelection.size})
+                  </button>
+                )}
+              </div>
             </div>
           )}
           <p className="muted" style={{ fontSize: 12.5 }}>
