@@ -71,7 +71,13 @@ CREATE TABLE IF NOT EXISTS literaturebase_snapshot (
 );
 
 CREATE INDEX IF NOT EXISTS idx_literaturebase_snapshot_doi ON literaturebase_snapshot(doi);
-CREATE INDEX IF NOT EXISTS idx_literaturebase_snapshot_search ON literaturebase_snapshot USING gin (to_tsvector('english', title || ' ' || coalesce(array_to_string(domains, ' '), '')));
+-- title only, not title+domains -- array_to_string() isn't marked IMMUTABLE
+-- by Postgres, so it can't appear in an index expression at all (confirmed
+-- live: this migration's first real push attempt failed on exactly this
+-- line). theorybase_snapshot's own idx_theorybase_snapshot_label got away
+-- with concatenating two plain TEXT columns; domains is an array, which is
+-- the part that doesn't survive the same trick.
+CREATE INDEX IF NOT EXISTS idx_literaturebase_snapshot_search ON literaturebase_snapshot USING gin (to_tsvector('english', title));
 
 ALTER TABLE literaturebase_snapshot ENABLE ROW LEVEL SECURITY;
 
