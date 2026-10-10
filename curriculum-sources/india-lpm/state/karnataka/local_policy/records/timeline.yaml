@@ -49,7 +49,7 @@ events:
     jurisdiction: "IN-KA"
     eventType: "pilot-program"
     temporalStatus: "past-completed"
-    dateStart: "2013"
+    dateStart: "2013-01-01"
     dateGranularity: "year"
     description: >
       DSERT built Karnataka Open Educational Resources (KOER) with IT for
