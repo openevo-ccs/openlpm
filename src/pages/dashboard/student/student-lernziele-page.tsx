@@ -465,6 +465,16 @@ export default function StudentLernzielePage() {
             <div className="row"><Search size={14} style={{ color: 'var(--text-muted)' }} /><input type="search" placeholder="Suchen…" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
           </div>
 
+          {/* Real feedback 9a49a60f (Susan): this used to sit at the very
+              bottom of the sidebar, below 6 Basiskonzept checkboxes AND 15
+              method checkboxes -- easy to miss, and far from the rest of the
+              "which learning goals am I looking at" controls. Moved next to
+              the search box, the first real filter a visitor sees. */}
+          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
+            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
+            <Star size={13} />nur Favoriten
+          </label>
+
           <p className="muted student-filter-label">KLASSENSTUFE</p>
           <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
             <button className={`chip-btn${gradeFilter.size === 0 ? ' active' : ''}`} onClick={() => { setGradeFilter(new Set()); setThemaFilter(''); setUnterthemaFilter('') }}>Alle</button>
@@ -571,11 +581,6 @@ export default function StudentLernzielePage() {
               </label>
             ))}
           </div>
-
-          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
-            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
-            <Star size={13} />nur Favoriten
-          </label>
         </aside>
 
         <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>

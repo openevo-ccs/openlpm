@@ -4,6 +4,7 @@ import { ArrowLeft, Network, Star, Users } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
   canManageGroups,
+  canShareInGroup,
   getGroup,
   getGroupFavoritesSynthesis,
   getGroupNotebookSynthesis,
@@ -85,7 +86,7 @@ export default function GroupDetailPage() {
 
       {tab === 'mine' ? (
         isStudentView ? (
-          <MyFavoritesPane supabase={supabase} membership={myMembership} />
+          <MyFavoritesPane supabase={supabase} project={project} role={role} membership={myMembership} />
         ) : (
           <MyNotebooksPane supabase={supabase} slug={slug} project={project} groupId={groupId} userId={userId} />
         )
@@ -98,10 +99,25 @@ export default function GroupDetailPage() {
   )
 }
 
-function MyFavoritesPane({ supabase, membership }: { supabase: ProjectOutletContext['supabase']; membership: GroupMember | null }) {
+function MyFavoritesPane({
+  supabase,
+  project,
+  role,
+  membership,
+}: {
+  supabase: ProjectOutletContext['supabase']
+  project: ProjectOutletContext['project']
+  role: ProjectOutletContext['role']
+  membership: GroupMember | null
+}) {
   const [titles, setTitles] = useState<string[] | null>(null)
   const [sharing, setSharing] = useState(membership?.share_favorites ?? false)
   const [busy, setBusy] = useState(false)
+  // Real feedback 771f5fa2 (Dustin) / migration 117: a role the project has
+  // restricted from group-sharing can still see their own sharing state
+  // (so an owner un-sharing them doesn't look like a bug) but can't turn it
+  // ON -- turning it off always stays available, no permission needed.
+  const canShare = canShareInGroup(role, project)
 
   useEffect(() => {
     listFavoriteIds(supabase).then(async (ids) => {
@@ -113,6 +129,7 @@ function MyFavoritesPane({ supabase, membership }: { supabase: ProjectOutletCont
 
   const toggleSharing = async () => {
     if (!membership) return
+    if (sharing === false && !canShare) return
     const next = !sharing
     setSharing(next)
     setBusy(true)
@@ -124,9 +141,10 @@ function MyFavoritesPane({ supabase, membership }: { supabase: ProjectOutletCont
     <div className="card">
       <h3 className="row"><Star size={14} />Meine Favoriten</h3>
       {membership ? (
-        <label className="row" style={{ gap: 6, cursor: 'pointer', marginBottom: 10 }}>
-          <input type="checkbox" checked={sharing} disabled={busy} onChange={toggleSharing} />
+        <label className="row" style={{ gap: 6, cursor: canShare || sharing ? 'pointer' : 'default', marginBottom: 10, opacity: canShare || sharing ? 1 : 0.6 }}>
+          <input type="checkbox" checked={sharing} disabled={busy || (!canShare && !sharing)} onChange={toggleSharing} />
           Mit dieser Gruppe teilen
+          {!canShare && !sharing && <span className="muted" style={{ fontSize: 11, marginLeft: 4 }}>(für deine Rolle eingeschränkt)</span>}
         </label>
       ) : (
         <p className="muted">Trete der Gruppe bei, um deine Favoriten zu teilen.</p>
