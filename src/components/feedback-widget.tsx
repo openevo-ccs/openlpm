@@ -235,7 +235,19 @@ export function FeedbackWidget() {
       const shot = await html2canvas(document.body, {
         useCORS: true,
         logging: false,
-        backgroundColor: null,
+        // Real bug found 2026-10-10 (while investigating why a feedback
+        // screenshot was mostly unreadable, nearly black): `null` tells
+        // html2canvas to leave anywhere it doesn't explicitly paint a
+        // background as transparent -- fine for a PNG, but this capture
+        // gets flattened to JPEG for upload a few lines down
+        // (canvas.toDataURL('image/jpeg', ...)), and JPEG has no alpha
+        // channel, so every transparent pixel silently renders as BLACK on
+        // flatten, regardless of what the page's real background actually
+        // is. Resolving the real computed background color here (body's
+        // own `background: var(--page-plane)`, correct in both light and
+        // dark mode) instead of `null` means the flatten has a real color
+        // to fall back to, not black.
+        backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
         // The "Capturing…" indicator shown below replaces the panel for
         // the real multi-second duration of this call -- never let it end
         // up in its own screenshot.

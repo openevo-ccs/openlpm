@@ -7,7 +7,7 @@ import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type Pr
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
 import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
-import { listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listFavoriteGoalMethodsFor, listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { listMethodConceptLinks, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
 import { ExperimentCard } from '../portfolios/prompt-generator-page'
@@ -199,6 +199,20 @@ export default function StudentPromptPage() {
   }, [scopedIds])
 
   const items = useMemo(() => scopedIds.map((id) => fullById.get(id)).filter((o): o is DataObject => !!o), [scopedIds, fullById])
+
+  // Real feedback 3f22dcd5 (Susan): "in the KI Prompt-Generator, there needs
+  // to be an option to select favorite methods (if there are any relevant
+  // to the selected learning goals)" -- the per-goal favorites (migration
+  // 119) among whichever Lernziele are currently in scope, re-checked
+  // whenever the selection changes.
+  const [favoriteGoalMethodPairs, setFavoriteGoalMethodPairs] = useState<{ data_object_id: string; method_key: string }[]>([])
+  useEffect(() => {
+    listFavoriteGoalMethodsFor(supabase, scopedIds).then(setFavoriteGoalMethodPairs)
+  }, [supabase, scopedIds])
+  const relevantFavoriteMethods = useMemo(
+    () => Array.from(new Set(favoriteGoalMethodPairs.map((p) => p.method_key))),
+    [favoriteGoalMethodPairs]
+  )
 
   useEffect(() => {
     if (!cfg) return
@@ -472,6 +486,25 @@ export default function StudentPromptPage() {
 
         <div className="card student-prompt-card">
           <h3><span className="num">5</span>Didaktische Methoden</h3>
+          {relevantFavoriteMethods.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <p className="muted" style={{ fontSize: 12, margin: '0 0 4px' }}>
+                Favorisierte Methoden für die ausgewählten Lernziele:
+              </p>
+              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                {relevantFavoriteMethods.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`chip-btn${cfg.methoden.includes(m) ? ' active' : ''}`}
+                    onClick={() => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, m) })}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <CheckGroup
             options={options.methods}
             selected={cfg.methoden}
