@@ -22,6 +22,7 @@ export const DASHBOARD_PAGES: DashboardPageDescriptor[] = [
   { key: 'concepts', label: 'Concepts' },
   { key: 'theories', label: 'Theories' },
   { key: 'strands', label: 'Strands' },
+  { key: 'syllabus-planung', label: 'Wochenplan' },
   { key: 'literature', label: 'Literature' },
   { key: 'review', label: 'Review' },
   { key: 'discussions', label: 'Discussions' },

@@ -109,6 +109,26 @@ function matchesGrade(band: string | null, filter: string): boolean {
 }
 
 export default function LearningGoalsPage() {
+  const { project } = useOutletContext<ProjectOutletContext>()
+  // Real feedback 2026-10-10 (Dustin, Biologiedidaktik I): the two US-specific import
+  // panels (CASE Network's direct state API and its browse-by-state picker) are dead
+  // weight on a project that will only ever import German Lehrplan documents. Rather
+  // than removing them globally -- plenty of real projects (EvoMentor, the US/India
+  // curriculum repositories) genuinely need them -- a project whose working_languages
+  // is German-only has no legitimate use for a US-standards importer, so those two
+  // tabs are hidden for it specifically. Any project that also declares English (or
+  // any other language) keeps the full set unchanged.
+  const germanOnly = project.working_languages?.length === 1 && project.working_languages[0] === 'de'
+  const tabs = [
+    { label: 'Browse', content: <BrowseTab /> },
+    ...(germanOnly ? [] : [
+      { label: 'Import: Direct state API', content: <DirectCaseImportPanel /> },
+      { label: 'Import: Browse US states', content: <CaseImportPanel /> },
+    ]),
+    { label: 'Import: German Lehrplan', content: <FwuImportPanel /> },
+    { label: 'Import: Upload a file', content: <UploadImportPanel /> },
+    { label: 'Export', content: <ExportPanel /> },
+  ]
   return (
     <div>
       <h1>Learning goals</h1>
@@ -117,16 +137,7 @@ export default function LearningGoalsPage() {
         frameworks, mandated or optionally chosen within a given jurisdiction.
       </p>
 
-      <TabPanels
-        tabs={[
-          { label: 'Browse', content: <BrowseTab /> },
-          { label: 'Import: Direct state API', content: <DirectCaseImportPanel /> },
-          { label: 'Import: Browse US states', content: <CaseImportPanel /> },
-          { label: 'Import: German Lehrplan', content: <FwuImportPanel /> },
-          { label: 'Import: Upload a file', content: <UploadImportPanel /> },
-          { label: 'Export', content: <ExportPanel /> },
-        ]}
-      />
+      <TabPanels tabs={tabs} />
     </div>
   )
 }
