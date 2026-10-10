@@ -22,6 +22,16 @@ interface Ctx {
   // real "your account is blocked" message instead of silently bouncing to
   // the login screen like an ordinary signed-out visitor.
   blocked: boolean
+  // The real users.role column for the signed-in account (migration 001/049)
+  // -- null while loading or signed out. Added 2026-10-10 alongside isAdmin
+  // below, replacing a hardcoded single-email ADMIN_EMAIL constant that
+  // every admin-gated page used to compare against: that approach silently
+  // broke the moment a second real admin existed (granted via the users
+  // table directly), since nothing about it depended on the actual role
+  // column. Fetched in the same query as blocked_at below, not a separate
+  // round trip.
+  role: string | null
+  isAdmin: boolean
 }
 const C = createContext<Ctx>({
   session: null,
@@ -29,6 +39,8 @@ const C = createContext<Ctx>({
   passwordRecovery: false,
   consumePasswordRecovery: () => {},
   blocked: false,
+  role: null,
+  isAdmin: false,
 })
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -37,6 +49,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true)
   const [passwordRecovery, setPasswordRecovery] = useState(false)
   const [blocked, setBlocked] = useState(false)
+  const [role, setRole] = useState<string | null>(null)
 
   useEffect(() => {
     // Reversible admin-set account lock (migration 049, users.blocked_at) --
@@ -51,17 +64,19 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     // blocked) on any query error here, so an unmigrated database never
     // breaks sign-in for every real user.
     const resolveSession = async (s: Session | null): Promise<Session | null> => {
-      if (!s) return null
+      if (!s) { setRole(null); return null }
       const { data, error } = await (supabase as any)
         .from('users')
-        .select('blocked_at')
+        .select('blocked_at, role')
         .eq('id', s.user.id)
         .maybeSingle()
       if (!error && data?.blocked_at) {
         setBlocked(true)
+        setRole(null)
         await supabase.auth.signOut()
         return null
       }
+      setRole(!error ? data?.role ?? null : null)
       return s
     }
 
@@ -107,7 +122,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   const consumePasswordRecovery = () => setPasswordRecovery(false)
 
-  return <C.Provider value={{ session, loading, passwordRecovery, consumePasswordRecovery, blocked }}>{children}</C.Provider>
+  return <C.Provider value={{ session, loading, passwordRecovery, consumePasswordRecovery, blocked, role, isAdmin: role === 'admin' }}>{children}</C.Provider>
 }
 
 export function useSession() {
