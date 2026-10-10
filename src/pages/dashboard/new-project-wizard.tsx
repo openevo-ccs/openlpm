@@ -263,7 +263,11 @@ export default function NewProjectWizard() {
 
       navigate(`/dashboard/${project.slug}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong creating the project.')
+      // Supabase's PostgrestError (e.g. a slug CHECK constraint violation) carries a real
+      // .message but is a plain object, not `instanceof Error` -- that gate was silently
+      // discarding the actual reason and always showing the generic fallback instead.
+      const message = (err && typeof err === 'object' && 'message' in err) ? String((err as { message: unknown }).message) : null
+      setError(message || 'Something went wrong creating the project.')
     }
     setBusy(false)
   }
@@ -308,7 +312,13 @@ export default function NewProjectWizard() {
             )}
             <div className="field">
               <label>Short address</label>
-              <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="e.g. evomentor-france" required />
+              <input
+                value={slug}
+                onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                placeholder="e.g. evomentor-france"
+                required
+              />
+              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>Lowercase letters, numbers, and hyphens only — this becomes part of the project's URL.</p>
             </div>
             <div className="field">
               <label>Name</label>
