@@ -35,9 +35,24 @@ import {
   type ProjectMemberRole,
   type UserSearchResult,
 } from '@/lib/supabase/members'
-import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
+import { getStudentViewTemplate, STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
+import { ALWAYS_VISIBLE_PAGE_KEY, DASHBOARD_PAGES, defaultPageKeys } from '@/lib/dashboard-view-pages'
+import {
+  addDashboardViewAssignment,
+  createDashboardView,
+  deleteDashboardView,
+  listDashboardViewAssignments,
+  listDashboardViews,
+  removeDashboardViewAssignment,
+  setDashboardViewForced,
+  setDefaultDashboardView,
+  type DashboardView,
+  type DashboardViewAssignment,
+  type DashboardViewKind,
+  type ViewAssignmentTargetType,
+} from '@/lib/supabase/dashboard-views'
 import { PROJECT_COLORS } from '@/lib/project-colors'
-import { groupsSettings, setGroupCreatorRoles, setGroupsEnabled } from '@/lib/supabase/groups'
+import { groupsSettings, listGroups, setGroupCreatorRoles, setGroupsEnabled, type ProjectGroup } from '@/lib/supabase/groups'
 import {
   acceptFederation,
   federationCounterparty,
@@ -77,7 +92,7 @@ export default function SettingsPage() {
       <p className="muted" style={{ marginBottom: 20 }}>Manage {project.name} — color, members, who can join, and more.</p>
 
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
-      <MembersSection project={project} role={role} supabase={supabase} />
+      <MembersSection project={project} role={role} supabase={supabase} isRepository={isRepository} isCustomView={isCustomView} />
       {canManage && isRepository && <CustomViewsSection project={project} supabase={supabase} />}
       {!isRepository && !isCustomView && <CurriculumSourcesSection project={project} supabase={supabase} />}
       {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
@@ -350,10 +365,14 @@ function MembersSection({
   project,
   role,
   supabase,
+  isRepository,
+  isCustomView,
 }: {
   project: Database['public']['Tables']['projects']['Row']
   role: ProjectOutletContext['role']
   supabase: ProjectOutletContext['supabase']
+  isRepository: boolean
+  isCustomView: boolean
 }) {
   const [members, setMembers] = useState<MemberWithUser[] | null>(null)
   const [invites, setInvites] = useState<InviteRow[] | null>(null)
@@ -397,7 +416,7 @@ function MembersSection({
       {canManage && <RequestToJoinForm projectId={project.id} supabase={supabase} onRequested={reload} />}
       {canManage && <InviteForm projectId={project.id} supabase={supabase} onInvited={reload} />}
       {canManage && <JoinRulesSection project={project} supabase={supabase} />}
-      {canManage && <StudentViewSection project={project} supabase={supabase} />}
+      {canManage && !isRepository && !isCustomView && <DashboardViewsSection project={project} supabase={supabase} />}
 
       {requests !== null && requests.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
@@ -915,66 +934,330 @@ function ProjectColorSection({
 }
 
 // ============================================================================
-// Student view template (migration 045) -- a real, separate setting from
-// self-join above. Real bug found live 2026-09-30: "Preview as student"
-// used to appear on every project any owner manages and always rendered
-// the same German Jena-pilot UI, because the student view was gated purely
-// on the VIEWER's role, never on whether THIS project actually opted into
-// one. An owner now explicitly turns this on here and picks which
-// template -- "none" is the correct default for every project that isn't
-// the Jena pilot.
+// Dashboard views (migration 109) -- replaces the single, all-or-nothing
+// "Preview as student" toggle (migration 045) this section used to be.
+// Real feedback 63321a17: an owner builds any number of named views --
+// each either a checklist of the normal sidebar pages, or one of the
+// hand-built special templates below (today just the Jena pilot) -- and
+// assigns each one to a specific person, a Group (if Groups is on), a
+// project role, or how someone joined. One view can be the project's
+// default (whoever matches nothing more specific falls back to it); any
+// view can be forced (no switcher for whoever it applies to) or left
+// optional (switchable -- the same spirit the old preview toggle had, now
+// available to more than just an owner/maintainer previewing). Hidden for
+// Curriculum Repository projects (gated at the call site) -- their nav
+// isn't built from the shared page registry this reads, so a view created
+// here would have no visible effect there.
 // ============================================================================
 
-function StudentViewSection({
+function DashboardViewsSection({
   project,
   supabase,
 }: {
   project: Database['public']['Tables']['projects']['Row']
   supabase: ProjectOutletContext['supabase']
 }) {
-  // student_view_template (migration 045) isn't in the generated types yet.
-  const [value, setValue] = useState<string>((project as any).student_view_template ?? '')
-  const [busy, setBusy] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const [views, setViews] = useState<DashboardView[] | null>(null)
+  const [assignments, setAssignments] = useState<DashboardViewAssignment[]>([])
+  const [members, setMembers] = useState<MemberWithUser[]>([])
+  const [groups, setGroups] = useState<ProjectGroup[]>([])
+  const groupsEnabled = groupsSettings(project).enabled
 
-  const save = async (next: string) => {
-    setValue(next)
-    setBusy(true)
-    setSaved(false)
-    const { error } = await (supabase as any)
-      .from('projects')
-      .update({ student_view_template: next || null })
-      .eq('id', project.id)
-    setBusy(false)
-    if (!error) {
-      setSaved(true)
-      setTimeout(() => setSaved(false), 1500)
-    }
+  const reload = async () => {
+    const vs = await listDashboardViews(supabase, project.id)
+    setViews(vs)
+    setAssignments(vs.length > 0 ? await listDashboardViewAssignments(supabase, vs.map((v) => v.id)) : [])
+  }
+
+  useEffect(() => {
+    reload()
+    listMembers(supabase, project.id).then(setMembers)
+    if (groupsEnabled) listGroups(supabase, project.id).then(setGroups)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id, groupsEnabled])
+
+  const makeDefault = async (viewId: string) => {
+    await setDefaultDashboardView(supabase, project.id, viewId)
+    reload()
+  }
+  const clearDefault = async () => {
+    await setDefaultDashboardView(supabase, project.id, null)
+    reload()
+  }
+  const toggleForced = async (view: DashboardView) => {
+    await setDashboardViewForced(supabase, view.id, !view.is_forced)
+    reload()
+  }
+  const remove = async (viewId: string) => {
+    if (!window.confirm('Delete this view? Anyone assigned to it falls back to the project default, or the full view.')) return
+    await deleteDashboardView(supabase, viewId)
+    reload()
   }
 
   return (
     <div className="card" style={{ marginBottom: 16 }}>
-      <h3>Student view</h3>
+      <h3>Dashboard views</h3>
       <p className="muted">
-        A simplified, language-adapted view for people who join this specific project space themselves.
-        Off by default — turning it on doesn&apos;t change who can join, only what they see once they&apos;re in.
+        Build named views for different people, then decide who sees which one. Nobody sees anything
+        here until you assign it to them — a brand-new view is invisible to everyone until it has at
+        least one assignment, or is made the project default.
       </p>
-      <div className="field" style={{ marginBottom: 0 }}>
-        <label>Template</label>
-        <select value={value} disabled={busy} onChange={(e) => save(e.target.value)}>
-          <option value="">None — everyone sees the full researcher view</option>
-          {STUDENT_VIEW_TEMPLATES.map((t) => (
-            <option key={t.id} value={t.id}>{t.label}</option>
+
+      {views === null ? (
+        <p className="muted">Loading…</p>
+      ) : views.length === 0 ? (
+        <p className="muted" style={{ marginBottom: 12 }}>No views yet — everyone sees the full researcher view.</p>
+      ) : (
+        <div style={{ marginBottom: 12 }}>
+          {views.map((v) => (
+            <DashboardViewRow
+              key={v.id}
+              view={v}
+              assignments={assignments.filter((a) => a.view_id === v.id)}
+              members={members}
+              groups={groups}
+              groupsEnabled={groupsEnabled}
+              supabase={supabase}
+              onMakeDefault={() => makeDefault(v.id)}
+              onClearDefault={clearDefault}
+              onToggleForced={() => toggleForced(v)}
+              onDelete={() => remove(v.id)}
+              onChanged={reload}
+            />
           ))}
-        </select>
+        </div>
+      )}
+
+      <NewDashboardViewForm project={project} supabase={supabase} onCreated={reload} />
+    </div>
+  )
+}
+
+function DashboardViewRow({
+  view,
+  assignments,
+  members,
+  groups,
+  groupsEnabled,
+  supabase,
+  onMakeDefault,
+  onClearDefault,
+  onToggleForced,
+  onDelete,
+  onChanged,
+}: {
+  view: DashboardView
+  assignments: DashboardViewAssignment[]
+  members: MemberWithUser[]
+  groups: ProjectGroup[]
+  groupsEnabled: boolean
+  supabase: ProjectOutletContext['supabase']
+  onMakeDefault: () => void
+  onClearDefault: () => void
+  onToggleForced: () => void
+  onDelete: () => void
+  onChanged: () => void
+}) {
+  const [targetType, setTargetType] = useState<ViewAssignmentTargetType>('user')
+  const [targetValue, setTargetValue] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    setTargetValue('')
+  }, [targetType])
+
+  const describeAssignment = (a: DashboardViewAssignment) => {
+    if (a.target_type === 'user') return members.find((m) => m.user.id === a.target_value)?.user.name ?? 'Unknown person'
+    if (a.target_type === 'group') return groups.find((g) => g.id === a.target_value)?.name ?? 'Unknown group'
+    if (a.target_type === 'role') return `Role: ${a.target_value}`
+    return a.target_value === 'self_join_rule' ? 'Signed themselves up' : 'Added or invited directly'
+  }
+
+  const targetOptions: { value: string; label: string }[] =
+    targetType === 'user'
+      ? members.map((m) => ({ value: m.user.id, label: m.user.name }))
+      : targetType === 'group'
+      ? groups.map((g) => ({ value: g.id, label: g.name }))
+      : targetType === 'role'
+      ? ROLES.map((r) => ({ value: r, label: r }))
+      : [
+          { value: 'self_join_rule', label: 'Signed themselves up' },
+          { value: 'direct', label: 'Added or invited directly' },
+        ]
+
+  const addAssignment = async () => {
+    if (!targetValue) return
+    setBusy(true)
+    await addDashboardViewAssignment(supabase, view.id, targetType, targetValue)
+    setBusy(false)
+    setTargetValue('')
+    onChanged()
+  }
+
+  const removeAssignment = async (assignmentId: string) => {
+    await removeDashboardViewAssignment(supabase, assignmentId)
+    onChanged()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 10, background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <span className="row" style={{ flexWrap: 'wrap' }}>
+          <strong>{view.name}</strong>
+          <span className="chip">{view.kind === 'template' ? 'Template' : 'Standard pages'}</span>
+          {view.is_default && <span className="chip chip-progress">Default</span>}
+          <span className={`chip${view.is_forced ? ' chip-progress' : ''}`}>{view.is_forced ? 'Forced' : 'Optional'}</span>
+        </span>
+        <span className="row">
+          {view.is_default ? (
+            <button className="btn btn-mini" onClick={onClearDefault}>Unset default</button>
+          ) : (
+            <button className="btn btn-mini" onClick={onMakeDefault}>Make default</button>
+          )}
+          <button className="btn btn-mini" onClick={onToggleForced}>{view.is_forced ? 'Make optional' : 'Make forced'}</button>
+          <button className="btn btn-mini btn-danger" onClick={onDelete}><Trash2 size={11} />Delete</button>
+        </span>
       </div>
-      {value && (
-        <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-          {STUDENT_VIEW_TEMPLATES.find((t) => t.id === value)?.description}
+
+      {view.kind === 'standard' ? (
+        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+          Pages: {view.page_keys.length === 0
+            ? 'Dashboard only'
+            : view.page_keys.map((k) => DASHBOARD_PAGES.find((p) => p.key === k)?.label ?? k).join(', ')}
+        </p>
+      ) : (
+        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+          {getStudentViewTemplate(view.template_id)?.description ?? view.template_id}
         </p>
       )}
-      {saved && <p className="muted" style={{ fontSize: 12, marginTop: 4, color: 'var(--good)' }}>Saved.</p>}
+
+      <div style={{ marginTop: 8 }}>
+        {assignments.length === 0 ? (
+          <p className="muted" style={{ fontSize: 12 }}>Not assigned to anyone yet.</p>
+        ) : (
+          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+            {assignments.map((a) => (
+              <span key={a.id} className="chip row" style={{ gap: 4 }}>
+                {describeAssignment(a)}
+                <button type="button" className="btn-linklike" onClick={() => removeAssignment(a.id)} title="Remove" style={{ padding: 0 }}>
+                  <X size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
+          <select value={targetType} onChange={(e) => setTargetType(e.target.value as ViewAssignmentTargetType)}>
+            <option value="user">Specific person</option>
+            {groupsEnabled && <option value="group">Group</option>}
+            <option value="role">Project role</option>
+            <option value="join_method">How they joined</option>
+          </select>
+          <select value={targetValue} onChange={(e) => setTargetValue(e.target.value)}>
+            <option value="">Choose…</option>
+            {targetOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <button className="btn btn-mini" disabled={busy || !targetValue} onClick={addAssignment}>
+            <Plus size={11} />Assign
+          </button>
+        </div>
+      </div>
     </div>
+  )
+}
+
+function NewDashboardViewForm({
+  project,
+  supabase,
+  onCreated,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+  onCreated: () => void
+}) {
+  const [name, setName] = useState('')
+  const [kind, setKind] = useState<DashboardViewKind>('standard')
+  const [pageKeys, setPageKeys] = useState<string[]>(defaultPageKeys())
+  const [templateId, setTemplateId] = useState(STUDENT_VIEW_TEMPLATES[0]?.id ?? '')
+  const [busy, setBusy] = useState(false)
+
+  const togglePage = (key: string) => {
+    if (key === ALWAYS_VISIBLE_PAGE_KEY) return
+    setPageKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
+  }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim()) return
+    setBusy(true)
+    await createDashboardView(supabase, project.id, {
+      name: name.trim(),
+      kind,
+      pageKeys: kind === 'standard' ? pageKeys : undefined,
+      templateId: kind === 'template' ? templateId : undefined,
+    })
+    setBusy(false)
+    setName('')
+    setPageKeys(defaultPageKeys())
+    onCreated()
+  }
+
+  return (
+    <form onSubmit={submit} className="card" style={{ background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <h4 style={{ marginTop: 0 }}>New view</h4>
+      <div className="row" style={{ flexWrap: 'wrap' }}>
+        <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 160 }}>
+          <label>Name</label>
+          <input type="text" placeholder="e.g. Reviewer-only" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Built from</label>
+          <select value={kind} onChange={(e) => setKind(e.target.value as DashboardViewKind)}>
+            <option value="standard">A checklist of the normal pages</option>
+            <option value="template">A specially-built template</option>
+          </select>
+        </div>
+      </div>
+
+      {kind === 'standard' ? (
+        <div style={{ marginTop: 8 }}>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+            Which pages this view shows. Dashboard is always included. (Groups and Curriculum Repository
+            only actually appear if this project has those turned on.)
+          </p>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+            {DASHBOARD_PAGES.map((p) => (
+              <label key={p.key} className="row" style={{ gap: 4, fontSize: 13 }}>
+                <input
+                  type="checkbox"
+                  checked={p.key === ALWAYS_VISIBLE_PAGE_KEY || pageKeys.includes(p.key)}
+                  disabled={p.key === ALWAYS_VISIBLE_PAGE_KEY}
+                  onChange={() => togglePage(p.key)}
+                />
+                {p.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="field" style={{ marginTop: 8, marginBottom: 0 }}>
+          <label>Template</label>
+          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+            {STUDENT_VIEW_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
+          {templateId && (
+            <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              {STUDENT_VIEW_TEMPLATES.find((t) => t.id === templateId)?.description}
+            </p>
+          )}
+        </div>
+      )}
+
+      <button className="btn btn-primary" type="submit" disabled={busy || !name.trim()} style={{ marginTop: 10 }}>
+        {busy ? 'Creating…' : 'Create view'}
+      </button>
+    </form>
   )
 }
 
