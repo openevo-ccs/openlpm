@@ -301,6 +301,7 @@ export default function ProjectLayout() {
     { key: 'concepts', href: `/dashboard/${slug}/concepts`, icon: <Sparkles size={14} />, label: 'Concepts', end: false },
     { key: 'theories', href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
     { key: 'strands', href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
+    { key: 'syllabus-planung', href: `/dashboard/${slug}/syllabus-planung`, icon: <CalendarRange size={14} />, label: 'Wochenplan' },
     { key: 'literature', href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
     { key: 'review', href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
     { key: 'discussions', href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
