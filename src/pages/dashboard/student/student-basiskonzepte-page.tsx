@@ -4,7 +4,7 @@ import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { Anchor, Info, Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { ancestorAtDepth, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
@@ -80,7 +80,7 @@ export default function StudentBasiskonzeptePage() {
 
       {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
       {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} contentById={contentById} topics={topics} conceptElementsById={conceptElementsById} />}
-      {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} />}
+      {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} conceptElementsById={conceptElementsById} />}
     </div>
   )
 }
@@ -110,8 +110,14 @@ function DashboardTab({
   const stundenGesamt = stundenValues.reduce((a, b) => a + b, 0)
   const hasStunden = stundenValues.length > 0
 
+  // Real feedback b0323f40 (Susan): this used to group on each topic's raw
+  // grade_band value directly, which showed separate "Kl. 5"/"Kl. 6" columns
+  // next to an all-dash "Kl. 5/6" column (some MNT content genuinely carries
+  // the combined band as its literal value, migration 104) -- same real
+  // curriculum structure the Lernziele page's own filter already buckets
+  // correctly (bandKeyForGrade), just never applied here.
   const grades = useMemo(() => {
-    const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
+    const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean).map((g) => bandKeyForGrade(g as string)))
     const leadingNumber = (s: string) => parseInt(s, 10) || 0
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
@@ -130,7 +136,7 @@ function DashboardTab({
   const konzeptankerByRootAndGrade = (rootLabel: string, grade: string) => {
     let count = 0
     for (const t of topics ?? []) {
-      if (t.grade_band !== grade) continue
+      if (!t.grade_band || bandKeyForGrade(t.grade_band) !== grade) continue
       const tc = contentById.get(t.id) as any
       if (!tc?.ist_konzeptanker) continue
       if (bkEntries(tc).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, rootLabel))) count++
@@ -189,7 +195,7 @@ function DashboardTab({
                       // the top of it -- is visible per concept x grade cell.
                       const counts = [0, 0, 0]
                       for (const t of topics ?? []) {
-                        if (t.grade_band !== g) continue
+                        if (!t.grade_band || bandKeyForGrade(t.grade_band) !== g) continue
                         for (const e of bkEntries(contentById.get(t.id))) {
                           if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
                           if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) counts[e.relevanz_beurteilung - 1]++
@@ -1229,7 +1235,7 @@ function RelationPanel({
 // Detailinhalte") for a project that hasn't had this content imported.
 // ============================================================================
 
-function DetailTab({ rootConcepts }: { rootConcepts: SchemaElement[] }) {
+function DetailTab({ rootConcepts, conceptElementsById }: { rootConcepts: SchemaElement[]; conceptElementsById: Map<string, SchemaElement> }) {
   const [selectedId, setSelectedId] = useState<string | null>(rootConcepts[0]?.id ?? null)
   useEffect(() => {
     if (!selectedId && rootConcepts[0]) setSelectedId(rootConcepts[0].id)
@@ -1256,14 +1262,53 @@ function DetailTab({ rootConcepts }: { rootConcepts: SchemaElement[] }) {
         {!selected ? (
           <p className="muted">Kein Basiskonzept ausgewählt.</p>
         ) : (
-          <StudentBkDetail concept={selected} abbr={bkAbbreviation(selected.label)} />
+          <StudentBkDetail concept={selected} abbr={bkAbbreviation(selected.label)} conceptElementsById={conceptElementsById} />
         )}
       </div>
     </div>
   )
 }
 
-function StudentBkDetail({ concept }: { concept: SchemaElement; abbr: string }) {
+// Real feedback 87b2bb99 + 7fb73846 (Susan): add every Basiskonzept's real
+// Unterkonzepte here, each with the same short explanation already shown on
+// the Lernziele page's sub-concept chips (element.definition +
+// metadata.beispiel, migration 059) -- same data, not new content.
+function Subkonzepte({ rootId, conceptElementsById }: { rootId: string; conceptElementsById: Map<string, SchemaElement> }) {
+  const [openId, setOpenId] = useState<string | null>(null)
+  const children = Array.from(conceptElementsById.values())
+    .filter((el) => el.parent_id === rootId)
+    .sort((a, b) => a.label.localeCompare(b.label, 'de'))
+  if (children.length === 0) return null
+  return (
+    <section style={{ marginTop: 18 }}>
+      <h3>Unterkonzepte</h3>
+      {children.map((el) => {
+        const beispiel = (el.metadata as any)?.beispiel as string | undefined
+        const hasDetail = !!(el.definition || beispiel)
+        const isOpen = openId === el.id
+        return (
+          <div key={el.id} style={{ marginBottom: 8 }}>
+            <button
+              className="btn-linklike"
+              style={{ fontWeight: 600, cursor: hasDetail ? 'pointer' : 'default' }}
+              onClick={() => hasDetail && setOpenId(isOpen ? null : el.id)}
+            >
+              {el.label}
+            </button>
+            {isOpen && hasDetail && (
+              <div style={{ fontSize: 13, margin: '4px 0 0', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
+                {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
+                {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </section>
+  )
+}
+
+function StudentBkDetail({ concept, conceptElementsById }: { concept: SchemaElement; abbr: string; conceptElementsById: Map<string, SchemaElement> }) {
   const definition = (concept as any).didactic_definition as string | null
   const misconceptions = ((concept as any).common_misconceptions ?? []) as { falsch: string; richtig: string; hinweis?: string }[]
   const anchors = ((concept as any).everyday_anchors ?? []) as string[]
@@ -1305,6 +1350,7 @@ function StudentBkDetail({ concept }: { concept: SchemaElement; abbr: string }) 
           )}
         </>
       )}
+      <Subkonzepte rootId={concept.id} conceptElementsById={conceptElementsById} />
     </div>
   )
 }
