@@ -16,7 +16,7 @@ import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
-import { listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { goalMethodKey, listFavoriteGoalMethods, listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteGoalMethod, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 
 // The German, student-facing Lernziele explorer -- same real data as the
 // researcher Learning Goals page (same listTopics/getTopic/thread helpers),
@@ -201,6 +201,12 @@ export default function StudentLernzielePage() {
   // inline per-goal "Didaktische Strategien" list -- same data, just missing
   // from these two render sites.
   const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
+  // Real feedback 3f22dcd5 (Susan): the per-goal method SUGGESTION star
+  // (inside Didaktische Strategien) needed its own, learning-goal-scoped
+  // favorite instead of reusing favoriteMethods above (which stays exactly
+  // what it was -- the sidebar filter's general, not-tied-to-one-goal
+  // favorite). Composite `${objectId}::${method}` keys, see favorites.ts.
+  const [favoriteGoalMethods, setFavoriteGoalMethods] = useState<Set<string>>(new Set())
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
   // Every schema element (root Basiskonzepte AND their real sub-concepts),
   // keyed by id -- resolves relevante_unterkonzepte_taxonomie[].
@@ -224,6 +230,7 @@ export default function StudentLernzielePage() {
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
     listFavoriteIds(supabase).then(setFavorites)
     listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
+    listFavoriteGoalMethods(supabase).then(setFavoriteGoalMethods)
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
     getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
@@ -443,6 +450,18 @@ export default function StudentLernzielePage() {
     await toggleFavoriteMethod(supabase, methodKey, isFav)
   }
 
+  const onToggleFavoriteGoalMethod = async (dataObjectId: string, methodKey: string) => {
+    const key = goalMethodKey(dataObjectId, methodKey)
+    const isFav = favoriteGoalMethods.has(key)
+    setFavoriteGoalMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(key)
+      else next.add(key)
+      return next
+    })
+    await toggleFavoriteGoalMethod(supabase, dataObjectId, methodKey, isFav)
+  }
+
   const onToggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev)
@@ -642,6 +661,8 @@ export default function StudentLernzielePage() {
                   onToggleFavorite={onToggleFavorite}
                   favoriteMethods={favoriteMethods}
                   onToggleFavoriteMethod={onToggleFavoriteMethod}
+                  favoriteGoalMethods={favoriteGoalMethods}
+                  onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
                   isExpanded={expandedIds.has(t.id)}
                   onToggleExpand={onToggleExpand}
                   supabase={supabase}
@@ -668,6 +689,8 @@ function LernzielCard({
   onToggleFavorite,
   favoriteMethods,
   onToggleFavoriteMethod,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
   isExpanded,
   onToggleExpand,
   supabase,
@@ -684,6 +707,8 @@ function LernzielCard({
   onToggleFavorite: (id: string) => void
   favoriteMethods: Set<string>
   onToggleFavoriteMethod: (methodKey: string) => void
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
   isExpanded: boolean
   onToggleExpand: (id: string) => void
   supabase: ProjectOutletContext['supabase']
@@ -768,7 +793,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteMethods={favoriteMethods} onToggleFavoriteMethod={onToggleFavoriteMethod} />
+          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
         </div>
       )}
     </div>
@@ -784,8 +809,8 @@ function LernzielCardDetail({
   rootIdxById,
   rawIdToGroupKey,
   conceptElementsById,
-  favoriteMethods,
-  onToggleFavoriteMethod,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
 }: {
   objectId: string
   content: unknown
@@ -795,8 +820,8 @@ function LernzielCardDetail({
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
   conceptElementsById: Map<string, SchemaElement>
-  favoriteMethods: Set<string>
-  onToggleFavoriteMethod: (methodKey: string) => void
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
 }) {
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
 
@@ -811,7 +836,7 @@ function LernzielCardDetail({
     <div>
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
-      <DidaktischeStrategienSection content={content} favoriteMethods={favoriteMethods} onToggleFavoriteMethod={onToggleFavoriteMethod} />
+      <DidaktischeStrategienSection objectId={objectId} content={content} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
 
       {/* Real feedback 95972f01 (Susan): this showed up with no header and
           no explanation of what it is or how common it is. These are
@@ -845,13 +870,15 @@ function LernzielCardDetail({
 // has this field populated, same discipline as prompt-builder.tsx's own
 // comment about didaktische_strategien/originaltext.
 function DidaktischeStrategienSection({
+  objectId,
   content,
-  favoriteMethods,
-  onToggleFavoriteMethod,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
 }: {
+  objectId: string
   content: unknown
-  favoriteMethods: Set<string>
-  onToggleFavoriteMethod: (methodKey: string) => void
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const ds = (content as any)?.didaktische_strategien
@@ -890,15 +917,19 @@ function DidaktischeStrategienSection({
                     <span><strong>{m.methode}</strong>{m.beschreibung ? <> — {m.beschreibung}</> : null}</span>
                     {/* Real feedback 910b0c18 (Susan, repeat ask): favoriting
                         a method already existed in the Prompt Generator's own
-                        checklist -- just never shown here. Same toggle. */}
+                        checklist -- just never shown here. Real feedback
+                        3f22dcd5 (Susan, follow-up): this star favorites THIS
+                        suggestion on THIS learning goal, not the method in
+                        general -- goalMethodKey-scoped, a separate favorite
+                        from the sidebar filter's general method star. */}
                     <button
                       type="button"
                       className="btn-linklike"
-                      aria-label="Methode favorisieren"
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteMethod(m.methode) }}
+                      aria-label="Diese Methodenempfehlung favorisieren"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteGoalMethod(objectId, m.methode) }}
                       style={{ padding: 0, display: 'inline-flex', marginLeft: 2 }}
                     >
-                      <Star size={11} fill={favoriteMethods.has(m.methode) ? 'var(--series-a, gold)' : 'none'} />
+                      <Star size={11} fill={favoriteGoalMethods.has(goalMethodKey(objectId, m.methode)) ? 'var(--series-a, gold)' : 'none'} />
                     </button>
                   </li>
                 ))}
