@@ -5,7 +5,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { Chip } from '@/components/chip'
 import { getScreenshotUrl, listFeedback, setFeedbackStatus, type FeedbackItem } from '@/lib/supabase/feedback'
-import { ADMIN_EMAIL } from '@/lib/admin'
 
 // 2026-09-19: built the same night Dustin flagged that his feedback
 // submissions seemed to go nowhere -- correctly. The feedback table
@@ -15,12 +14,10 @@ import { ADMIN_EMAIL } from '@/lib/admin'
 // pages (the switcher, profile), so it lives as its own top-level route.
 
 export default function AdminFeedbackPage() {
-  const { session } = useSession()
+  const { isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
   const [items, setItems] = useState<FeedbackItem[] | null>(null)
   const [filter, setFilter] = useState<'open' | 'all'>('open')
-
-  const isAdmin = session?.user.email === ADMIN_EMAIL
 
   const reload = () => listFeedback(supabase).then(setItems)
 

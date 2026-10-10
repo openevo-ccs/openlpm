@@ -6,7 +6,6 @@ import { OpenLpmLogo } from '@/components/openlpm-logo'
 // import { MemoChatWidget } from '@/components/memo-chat-widget' -- see note below, not mounted yet
 import { FeedbackWidget } from '@/components/feedback-widget'
 import { HelpWidget } from '@/components/help-widget'
-import { ADMIN_EMAIL } from '@/lib/admin'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -14,7 +13,7 @@ import { ADMIN_EMAIL } from '@/lib/admin'
 // a project until they pick one from the switcher. Auth gating itself lives
 // one level up, in <RequireAuth> (App.tsx) -- RLS is the real boundary.
 export default function DashboardLayout() {
-  const { session } = useSession()
+  const { session, isAdmin } = useSession()
 
   const signOut = async () => {
     const supabase = createClient()
@@ -36,7 +35,7 @@ export default function DashboardLayout() {
               instead of its own topbar button. The full feedback list page
               itself (admin-feedback-page.tsx) is unchanged, just no longer
               linked from here directly. */}
-          {session?.user.email === ADMIN_EMAIL && (
+          {isAdmin && (
             <Link to="/dashboard/admin/users" className="btn btn-mini">
               <Users size={12} />
               Admin
