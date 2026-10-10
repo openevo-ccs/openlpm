@@ -49,7 +49,9 @@ const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel
 // present in the real data if no library resolves for this project (same
 // "never offer an option that matches nothing real" spirit as the original
 // hardcoded list's own comment).
-const METHOD_ICON: Record<string, string> = {
+// Exported for learning-goals-page.tsx's researcher-facing Methods tab, so
+// the two don't drift into separate icon sets for the same vocabulary.
+export const METHOD_ICON: Record<string, string> = {
   'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩',
   '(bioethische) Diskussion': '💬', 'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪',
   'Erfahrungs-/handlungsorientiertes Lernen': '🖐️', 'Digitale Medien': '💻', 'Recherche': '📚',
