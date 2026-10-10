@@ -52,7 +52,7 @@ import {
   type ViewAssignmentTargetType,
 } from '@/lib/supabase/dashboard-views'
 import { PROJECT_COLORS } from '@/lib/project-colors'
-import { groupsSettings, listGroups, setGroupCreatorRoles, setGroupsEnabled, type ProjectGroup } from '@/lib/supabase/groups'
+import { groupsSettings, listGroups, setGroupCreatorRoles, setGroupSharingRoles, setGroupsEnabled, type ProjectGroup } from '@/lib/supabase/groups'
 import {
   acceptFederation,
   federationCounterparty,
@@ -1282,6 +1282,9 @@ function GroupsSettingsSection({
   const initial = groupsSettings(project)
   const [enabled, setEnabled] = useState(initial.enabled)
   const [creatorRoles, setCreatorRoles] = useState<ProjectMemberRole[]>(initial.creatorRoles)
+  // null = unrestricted (every member may share -- today's real behavior);
+  // a real array = only these roles (plus owner/maintainer, always) may.
+  const [sharingRoles, setSharingRoles] = useState<ProjectMemberRole[] | null>(initial.sharingRoles)
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -1307,6 +1310,34 @@ function GroupsSettingsSection({
     const { error } = await setGroupCreatorRoles(supabase, project.id, next)
     setBusy(false)
     if (error) setCreatorRoles(creatorRoles)
+    else flashSaved()
+  }
+
+  // Real feedback 771f5fa2 (Dustin): "selected roles to determine the
+  // functions ... of users within groups" -- restricting who may actually
+  // share a Notebook or Favorites into a group, separate from who may
+  // create one (toggleRole above). Flipping the checkbox on starts at an
+  // empty role list (owner/maintainer only, the same restrictive floor
+  // canManageGroups already uses) rather than guessing a starting set.
+  const restrictSharing = sharingRoles !== null
+  const toggleRestrictSharing = async () => {
+    const next = restrictSharing ? null : []
+    const prev = sharingRoles
+    setSharingRoles(next)
+    setBusy(true)
+    const { error } = await setGroupSharingRoles(supabase, project.id, next)
+    setBusy(false)
+    if (error) setSharingRoles(prev)
+    else flashSaved()
+  }
+  const toggleSharingRole = async (r: ProjectMemberRole) => {
+    const current = sharingRoles ?? []
+    const next = current.includes(r) ? current.filter((x) => x !== r) : [...current, r]
+    setSharingRoles(next)
+    setBusy(true)
+    const { error } = await setGroupSharingRoles(supabase, project.id, next)
+    setBusy(false)
+    if (error) setSharingRoles(sharingRoles)
     else flashSaved()
   }
 
@@ -1338,6 +1369,28 @@ function GroupsSettingsSection({
             Any member, any role, can join a group once it exists — this only controls who may create or
             delete one.
           </p>
+
+          <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+            <label className="row" style={{ gap: 6, cursor: 'pointer' }}>
+              <input type="checkbox" checked={restrictSharing} disabled={busy} onChange={toggleRestrictSharing} />
+              Restrict who can share a Notebook or Favorites into a group
+            </label>
+            <p className="muted" style={{ fontSize: 12, marginTop: 4, marginBottom: restrictSharing ? 8 : 0 }}>
+              {restrictSharing
+                ? 'Owners and maintainers can always share. Who else may?'
+                : 'Off by default: any group member can share their own Notebook or Favorites with the group — this just restricts that.'}
+            </p>
+            {restrictSharing && (
+              <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+                {EXTRA_CREATOR_ROLES.map((r) => (
+                  <label key={r} className="row" style={{ gap: 4, fontSize: 12.5, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={(sharingRoles ?? []).includes(r)} disabled={busy} onChange={() => toggleSharingRole(r)} />
+                    <span className="capitalize">{r}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
       {saved && <p className="muted" style={{ fontSize: 12, marginTop: 6, color: 'var(--good)' }}>Saved.</p>}

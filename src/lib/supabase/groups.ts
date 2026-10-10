@@ -27,10 +27,15 @@ export interface GroupMember {
   user: { id: string; name: string; email: string }
 }
 
-export function groupsSettings(project: { groups_enabled?: boolean; group_creator_roles?: ProjectMemberRole[] } | Record<string, unknown>) {
+export function groupsSettings(project: { groups_enabled?: boolean; group_creator_roles?: ProjectMemberRole[]; group_sharing_roles?: ProjectMemberRole[] | null } | Record<string, unknown>) {
   return {
     enabled: Boolean((project as any).groups_enabled),
     creatorRoles: ((project as any).group_creator_roles ?? []) as ProjectMemberRole[],
+    // null (the default) = unrestricted, every member may share -- today's
+    // real behavior, preserved. A real (possibly empty) array means an
+    // owner has restricted sharing to just those roles (owner/maintainer
+    // can always share regardless, same as canManageGroups).
+    sharingRoles: ((project as any).group_sharing_roles ?? null) as ProjectMemberRole[] | null,
   }
 }
 
@@ -40,8 +45,19 @@ export function canManageGroups(role: ProjectMemberRole, project: Record<string,
   return groupsSettings(project).creatorRoles.includes(role)
 }
 
+/** Whether `role` may share a Notebook or Favorites into a group -- mirrors can_share_in_group() server-side (migration 117); owner/maintainer always can. */
+export function canShareInGroup(role: ProjectMemberRole, project: Record<string, unknown>): boolean {
+  if (role === 'owner' || role === 'maintainer') return true
+  const { sharingRoles } = groupsSettings(project)
+  return sharingRoles === null || sharingRoles.includes(role)
+}
+
 export async function setGroupsEnabled(supabase: Client, projectId: string, enabled: boolean) {
   return (supabase as any).from('projects').update({ groups_enabled: enabled }).eq('id', projectId)
+}
+
+export async function setGroupSharingRoles(supabase: Client, projectId: string, roles: ProjectMemberRole[] | null) {
+  return (supabase as any).from('projects').update({ group_sharing_roles: roles }).eq('id', projectId)
 }
 
 export async function setGroupCreatorRoles(supabase: Client, projectId: string, roles: ProjectMemberRole[]) {

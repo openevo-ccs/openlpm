@@ -166,12 +166,19 @@ function DashboardTab({
         <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
           Je Zelle: Relevanzverteilung (niedrig / mittel / hoch) der Lernziele dieser Klassenstufe, plus Konzeptanker darunter.
         </p>
+        {/* Real feedback bb8b075b/b9df99c1 (Susan): table-layout: fixed stops
+            the browser's own auto column sizing from leaving unnecessary gaps
+            around narrow grade columns and triggering a horizontal scrollbar
+            that wasn't actually needed -- columns now split the real
+            available width evenly, so each bar (width: 100% below) gets more
+            real room instead of sitting inside a fixed 76px box with blank
+            space around it. */}
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+          <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', fontSize: 12.5 }}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Basiskonzept</th>
-                {grades.map((g) => <th key={g} style={{ padding: '4px 8px' }}>Kl. {g}</th>)}
+                <th style={{ textAlign: 'left', padding: '4px 8px', width: '28%' }}>Basiskonzept</th>
+                {grades.map((g) => <th key={g} style={{ padding: '4px 4px' }}>Kl. {g}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -205,27 +212,31 @@ function DashboardTab({
                       const anchorCount = konzeptankerByRootAndGrade(c.label, g)
                       const color = `var(--map-${(i % 6) + 1})`
                       return (
-                        <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
+                        <td key={g} style={{ padding: '4px 4px', textAlign: 'center' }}>
                           {total === 0 ? (
                             '—'
                           ) : (
-                            <div style={{ display: 'inline-block', width: '100%', maxWidth: 76 }}>
+                            <div style={{ width: '100%' }}>
                               <div
                                 className="tip"
                                 data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
-                                style={{ display: 'flex', height: 15, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
+                                style={{ display: 'flex', height: 16, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
                               >
+                                {/* Real feedback bb8b075b (Susan): "the grey
+                                    numbers in the bars are hard to see, make
+                                    the font black" -- applying opacity to the
+                                    same div that held the number faded the
+                                    text along with the background tint. The
+                                    tint (which bar level = niedrig/mittel/
+                                    hoch) now lives on its own absolutely-
+                                    positioned layer behind the number, so the
+                                    number itself always renders at full
+                                    opacity, in the page's real text color. */}
                                 {([0, 1, 2] as const).map((lvl) =>
                                   counts[lvl] > 0 ? (
-                                    <div
-                                      key={lvl}
-                                      style={{
-                                        flex: counts[lvl], background: color, opacity: 0.35 + lvl * 0.3,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 9.5, color: lvl === 2 ? '#fff' : 'var(--text-primary)', lineHeight: 1,
-                                      }}
-                                    >
-                                      {counts[lvl]}
+                                    <div key={lvl} style={{ flex: counts[lvl], position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <div style={{ position: 'absolute', inset: 0, background: color, opacity: 0.35 + lvl * 0.3 }} />
+                                      <span style={{ position: 'relative', fontSize: 9.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>{counts[lvl]}</span>
                                     </div>
                                   ) : null
                                 )}
@@ -1273,6 +1284,26 @@ function DetailTab({ rootConcepts, conceptElementsById }: { rootConcepts: Schema
 // Unterkonzepte here, each with the same short explanation already shown on
 // the Lernziele page's sub-concept chips (element.definition +
 // metadata.beispiel, migration 059) -- same data, not new content.
+//
+// Real feedback (Susan, 2026-10-09/10, rows b4b1aade/0182976c/6a9b7103/
+// 29e5eb06): this used to render BELOW a second, separately-curated
+// "core_principles" chip row (migration 041/042 static content) that
+// listed near-identical sub-concept names with slightly different
+// wording -- e.g. "Biologisches System als offenes System" here vs.
+// "Offene Systeme" in core_principles for the same real concept. Two
+// never-reconciled data sources describing the same thing, shown twice,
+// inconsistently. Fixed by deleting that redundant static row entirely
+// (StudentBkDetail no longer reads core_principles) and keeping only this
+// one real, taxonomy-backed list -- restyled as inline tags near the top
+// of the page (Susan's own suggested pattern: "the subconcepts should
+// just show up once, ideally at the top as tags, and when one clicks on
+// the tabs, a window opens with the description... similar to how it is
+// implemented in the learning goals cards"). A tag with no real
+// definition or example yet (hasDetail = false) still renders -- it's
+// real taxonomy, not nothing -- but visibly muted and non-interactive,
+// instead of silently doing nothing on click (the "no explanation given"
+// complaint: previously a tag you could click with no visible sign it had
+// nothing to show).
 function Subkonzepte({ rootId, conceptElementsById }: { rootId: string; conceptElementsById: Map<string, SchemaElement> }) {
   const [openId, setOpenId] = useState<string | null>(null)
   const children = Array.from(conceptElementsById.values())
@@ -1280,31 +1311,37 @@ function Subkonzepte({ rootId, conceptElementsById }: { rootId: string; conceptE
     .sort((a, b) => a.label.localeCompare(b.label, 'de'))
   if (children.length === 0) return null
   return (
-    <section style={{ marginTop: 18 }}>
-      <h3>Unterkonzepte</h3>
-      {children.map((el) => {
-        const beispiel = (el.metadata as any)?.beispiel as string | undefined
-        const hasDetail = !!(el.definition || beispiel)
-        const isOpen = openId === el.id
-        return (
-          <div key={el.id} style={{ marginBottom: 8 }}>
+    <div style={{ marginTop: 10 }}>
+      <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+        {children.map((el) => {
+          const beispiel = (el.metadata as any)?.beispiel as string | undefined
+          const hasDetail = !!(el.definition || beispiel)
+          const isOpen = openId === el.id
+          return (
             <button
-              className="btn-linklike"
-              style={{ fontWeight: 600, cursor: hasDetail ? 'pointer' : 'default' }}
+              key={el.id}
+              className={`chip-btn${isOpen ? ' active' : ''}`}
+              style={{ cursor: hasDetail ? 'pointer' : 'default', opacity: hasDetail ? 1 : 0.5 }}
+              title={hasDetail ? undefined : 'Noch keine Beschreibung hinterlegt'}
               onClick={() => hasDetail && setOpenId(isOpen ? null : el.id)}
             >
               {el.label}
             </button>
-            {isOpen && hasDetail && (
-              <div style={{ fontSize: 13, margin: '4px 0 0', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
-                {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
-                {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
-              </div>
-            )}
+          )
+        })}
+      </div>
+      {openId && (() => {
+        const el = children.find((c) => c.id === openId)
+        if (!el) return null
+        const beispiel = (el.metadata as any)?.beispiel as string | undefined
+        return (
+          <div style={{ fontSize: 13, margin: '6px 0 0', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
+            {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
+            {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
           </div>
         )
-      })}
-    </section>
+      })()}
+    </div>
   )
 }
 
@@ -1312,7 +1349,6 @@ function StudentBkDetail({ concept, conceptElementsById }: { concept: SchemaElem
   const definition = (concept as any).didactic_definition as string | null
   const misconceptions = ((concept as any).common_misconceptions ?? []) as { falsch: string; richtig: string; hinweis?: string }[]
   const anchors = ((concept as any).everyday_anchors ?? []) as string[]
-  const principles = ((concept as any).core_principles ?? []) as string[]
 
   return (
     <div>
@@ -1320,15 +1356,13 @@ function StudentBkDetail({ concept, conceptElementsById }: { concept: SchemaElem
       {!definition ? (
         <p className="muted">Noch keine Detailinhalte für dieses Basiskonzept hinterlegt.</p>
       ) : (
+        <p>{definition}</p>
+      )}
+
+      <Subkonzepte rootId={concept.id} conceptElementsById={conceptElementsById} />
+
+      {definition && (
         <>
-          <p>{definition}</p>
-
-          {principles.length > 0 && (
-            <div className="row" style={{ flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-              {principles.map((p) => <span key={p} className="chip">{p}</span>)}
-            </div>
-          )}
-
           {misconceptions.length > 0 && (
             <section style={{ marginTop: 18 }}>
               <h3>Häufige Schülervorstellungen</h3>
@@ -1350,7 +1384,6 @@ function StudentBkDetail({ concept, conceptElementsById }: { concept: SchemaElem
           )}
         </>
       )}
-      <Subkonzepte rootId={concept.id} conceptElementsById={conceptElementsById} />
     </div>
   )
 }

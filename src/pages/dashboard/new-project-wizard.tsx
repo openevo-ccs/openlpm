@@ -299,7 +299,9 @@ export default function NewProjectWizard() {
                 <select value={parentProjectId} onChange={(e) => setParentProjectId(e.target.value)}>
                   <option value="">No — this is a new, top-level project space</option>
                   {parentOptions.map((m) => (
-                    <option key={m.project.id} value={m.project.id}>{m.project.name}</option>
+                    <option key={m.project.id} value={m.project.id}>
+                      {m.project.name}{(m.project as any).project_kind === 'curriculum-repository' ? ' (Curriculum Repository)' : ''}
+                    </option>
                   ))}
                 </select>
               </div>
