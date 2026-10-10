@@ -1,0 +1,262 @@
+# india_lp -- Kerala institutional actors.
+$schema: ../../../../schema/institutional-actor-record.schema.json
+
+actors:
+
+  - id: "INLP-ACTOR-dept-general-education-kerala"
+    slug: "dept-general-education-kerala"
+    label: "Department of General Education, Government of Kerala"
+    actorType: "ministry"
+    jurisdiction: "IN-KL"
+    role: >
+      Kerala's state education department -- the literal Government of
+      Kerala department that SCERT Kerala (INLP-ACTOR-scert-kerala) operates
+      inside, and the entity actually named as copyright holder on Kerala's
+      own textbooks ("© Department of General Education, Government of
+      Kerala," read directly from the Class 10 Biology textbook's own
+      imprint page). This matters for the same reason NCERT/CBSE's legal
+      form matters nationally: a literal government department asserting
+      copyright is a more straightforward "government work" case under
+      Copyright Act 1957 Section 2(k) than a registered society's claim is
+      -- the opposite kind of legal question from NCERT's, not the same one
+      restated at state level.
+    legalForm: "a department of the Government of Kerala itself, not a separate registered society -- confirmed by SCERT Kerala's own self-description as 'an autonomous body of the Department,' not a body standing apart from it, and by the textbook imprint naming the Department, not SCERT, as copyright holder."
+    url: "https://education.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed by direct reads of scert.kerala.gov.in's own "about"
+        pages (all describing SCERT as "an autonomous body of the
+        Department of General Education, Government of Kerala") and the
+        Class 10 Biology textbook's own copyright-imprint page (both
+        volumes, 2019 edition, read directly from
+        samagra.kite.kerala.gov.in). No government order or gazette
+        notification establishing SCERT's precise legal instrument was
+        found -- the "department, not a society" reading rests on
+        consistent public self-description plus the textbook's own
+        imprint, not a single definitive legal-instrument document.
+      sourceProvenance: "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"
+
+  - id: "INLP-ACTOR-stdd-kerala"
+    slug: "stdd-kerala"
+    label: "Scheduled Tribes Development Department, Government of Kerala"
+    actorType: "ministry"
+    jurisdiction: "IN-KL"
+    role: >
+      Kerala's own line department for Scheduled Tribe welfare and
+      education -- a separate department from the Department of General
+      Education (INLP-ACTOR-dept-general-education-kerala). It is not a
+      unit inside that department. It directly runs Kerala's Model
+      Residential Schools, Ashram
+      Schools, and a pre-metric/post-metric hostel network specifically for
+      Scheduled Tribe students, through a set of Integrated Tribal
+      Development Project (ITDP) and Tribal Development offices around the
+      state (reported locations include Attappady/Agaly, Wayanad/Kalpetta,
+      Idukki/Thodupuzha, and Nilambur). This is the department this founding
+      pass could least directly verify: its own site
+      (stdd.kerala.gov.in) refused every automated fetch attempt this
+      session, so specific counts attributed to it below (how many
+      schools, how many hostels, how many ITDP offices) come from a search
+      tool's summary of that page rather than a character-by-character
+      read, and the specific numbers differ somewhat between different
+      secondary sources that cite it.
+    url: "https://www.stdd.kerala.gov.in/"
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The department's existence, its ITDP/Tribal Development office
+        structure, and its role running Model Residential/Ashram/Eklavya
+        schools and hostels are corroborated across several independent
+        academic sources (the IRTC/Kerala State Planning Board report on
+        Model Residential Schools, which this repo's
+        INLP-EVENT-emrs-pookode-established-1997 and coherence-finding
+        records draw on directly) as well as its own separate ITDP-
+        Attappady subdomain (itdpattappady.kerala.gov.in), which loaded
+        independently even when the main stdd.kerala.gov.in domain did
+        not. The *exact current* counts (one search summary said "20
+        MRS/Ashram/Eklavya schools plus 3 hostels," another said "111
+        hostels serving ~6,000 students" with a different school count) are
+        genuinely inconsistent across sources found this session and
+        should be reconciled by someone who can load the live government
+        page directly before being quoted as a precise figure to an
+        outside reviewer.
+      sourceProvenance: "https://www.stdd.kerala.gov.in/index.php/institutions-managed-by-scheduled-tribe-development-department"
+
+  - id: "INLP-ACTOR-kite-kerala"
+    slug: "kite-kerala"
+    label: "Kerala Infrastructure and Technology for Education (KITE)"
+    actorType: "other"
+    jurisdiction: "IN-KL"
+    parentActor: "INLP-ACTOR-dept-general-education-kerala"
+    role: >
+      The technology arm of Kerala's Department of General Education --
+      began life as the "IT@School Project" in 2001 and was converted into
+      a government-owned company (KITE) in August 2017. Builds and runs
+      the state's own digital-learning infrastructure directly relevant to
+      this project's offline-access question: the Samagra e-Resource
+      Portal (digital textbooks and teacher material for Classes 1-12,
+      jointly run with SCERT), the KITE VICTERS educational TV channel, and
+      the "First Bell" programme built on top of it. Reports serving over
+      16,000 schools and having deployed more than 4.5 lakh pieces of ICT
+      equipment, with roughly 300 staff across a state office and 14
+      district offices -- figures are the department's own self-reported
+      scale. This repo has not independently audited them.
+    legalForm: "a government-owned company, converted from the earlier IT@School Project in August 2017. It is not a government department itself."
+    url: "https://kite.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Organizational history, scale figures, and the Samagra/VICTERS/
+        First Bell product set were read directly from KITE's own
+        "Functions and Duties" page. The Samagra portal's own site
+        (samagra.kite.kerala.gov.in) returned almost no extractable text to
+        this session's tools, so the specific claim that Samagra offers a
+        genuine offline-download option (as opposed to being view-only
+        online) rests on third-party aggregator sites repeating each
+        other. This repo has not read Samagra's own site to confirm it
+        directly -- flagged for that direct confirmation before being
+        treated as a solved part of the
+        offline-access question this project cares about most.
+      sourceProvenance: "https://kite.kerala.gov.in/KITE/index.php/welcome/KITE"
+
+  - id: "INLP-ACTOR-kirtads"
+    slug: "kirtads"
+    label: "Kerala Institute for Research, Training and Development Studies of Scheduled Castes and Scheduled Tribes (KIRTADS)"
+    actorType: "research-institute"
+    jurisdiction: "IN-KL"
+    role: >
+      A Government of Kerala research institute in Chevayur, near
+      Kozhikode, founded in 1972 as the Tribal Research and Training
+      Centre and renamed KIRTADS in 1979. Runs Training, Research, and
+      Development Studies wings plus an Ethnological Museum (established
+      1973) documenting Scheduled Caste/Scheduled Tribe material culture.
+      Directly relevant to this project because KIRTADS is the body
+      credited with producing Kerala's bilingual Malayalam-Paniya bridge
+      primers for early-grade tribal students (a Paniya Language Primer
+      Part II for Standard I, 2018, and Part III for Standard II,
+      completed April 2021, both authored by Dr. S. Bindu) -- one of the
+      few concrete, named examples found this session of a Kerala
+      government body producing tribal-language classroom material. Most
+      of what else this session found is Malayalam-medium content alone.
+    url: "https://kirtads.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Institutional history read directly from KIRTADS' own site and
+        cross-checked against independent Wikipedia coverage (including a
+        named former director, P.R.G. Mathur), which agree. The Paniya
+        primer bibliographic details (exact author, year, grade level) come
+        from a Ministry of Tribal Affairs digital-repository listing this
+        session could not open directly (404 error) -- KIRTADS' own
+        existence and general role are solid; the specific primer titles
+        and dates should be re-confirmed by opening
+        https://repository.tribal.gov.in/handle/123456789/75212 directly.
+      sourceProvenance: "https://kirtads.kerala.gov.in/history/"
+
+  - id: "INLP-ACTOR-samagra-shiksha-kerala"
+    slug: "samagra-shiksha-kerala"
+    label: "Samagra Shiksha Kerala (SSK)"
+    actorType: "school-authority"
+    jurisdiction: "IN-KL"
+    parentActor: "INLP-ACTOR-dept-general-education-kerala"
+    role: >
+      Kerala's implementing wing of the central Samagra Shiksha Abhiyan
+      scheme -- described in sourcing found this session as "the state's
+      school-education mission." This is the body repeatedly named as the
+      implementer behind Kerala's COVID-era mother-tongue bridge-content
+      efforts for tribal students (reported under at least two different
+      names in different outlets -- see
+      INLP-EVENT-covid-era-tribal-mother-tongue-bridge-content-2020, which
+      flags that naming inconsistency directly rather than picking one) and
+      the Gothrabandhu tribal mentor-teacher programme
+      (INLP-EVENT-gothrabandhu-mentor-teacher-program-launched-2017), and
+      also the body that designed Edamalakudy's "Padippurasi" bridge
+      workshop for Muthuvan children specifically (named staff: CA Shameer,
+      a Government Tribal Lower Primary School teacher; Bindumol D, SSK's
+      Idukki district project officer; TP Kaladharan, an SSK educational
+      consultant).
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        SSK's role is consistently named across several independently
+        fetched news articles (Careers360, The News Minute, Outlook India,
+        The Caravan) describing different specific programmes, which gives
+        reasonable confidence in its existence and general role, but no
+        SSK-specific "about us" government page was read directly this
+        session to confirm its exact administrative structure or current
+        (2026) staffing/scope.
+      sourceProvenance: "https://news.careers360.com/kerala-samagra-shiksha-abhiyan-malayalam-st-muthuvan-western-ghats-scert-govt-schools-rte-act"
+
+  - id: "INLP-ACTOR-scert-kerala"
+    slug: "scert-kerala"
+    label: "State Council of Educational Research and Training (SCERT), Kerala"
+    actorType: "state-education-board"
+    jurisdiction: "IN-KL"
+    parentActor: "INLP-ACTOR-dept-general-education-kerala"
+    role: >
+      Kerala's state curriculum-research body -- publishes the Kerala
+      Curriculum Framework (most recently KCF 2023, succeeding a 2007
+      version built on stated critical-pedagogy/issue-based/social-
+      constructivist foundations, explicitly positioned by Kerala's
+      Education Department as a state-level alternative to NEP 2020 rather
+      than an implementation of it) and Kerala's own state textbooks.
+      Unlike Karnataka's DSERT, SCERT Kerala has no confirmed open license
+      on its own curriculum text or textbooks -- its Class 10 Biology
+      textbook's copyright page carries a bare copyright notice only, no
+      Creative Commons mark or stated reuse permission, and the same is
+      true of the KCF 2023 landing page itself. No KOER-equivalent open
+      platform was found in Kerala's own education-technology ecosystem
+      (IT@School/KITE's open-source commitment covers software/
+      infrastructure, not a license on curriculum text; the Samagra portal
+      is a plain PDF-distribution site with no license statement; School
+      Wiki's own license could not be confirmed, site unreachable this
+      session).
+    url: "https://scert.kerala.gov.in/"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        SCERT's own "about" self-description, the KCF 2023 landing page,
+        and the Samagra portal were all read directly, as was the Class 10
+        Biology textbook's own copyright-imprint page. The critical-
+        pedagogy/constructivist framing is well-corroborated for KCF
+        generally (multiple independent secondary sources) but was not
+        independently confirmed from the KCF 2023 document's own primary
+        text this session (its direct download link was not reachable) --
+        treat that specific continuity claim as very likely, not verified.
+      sourceProvenance: "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kerala-rejects-ncert-evolution-deletion"

@@ -1,0 +1,138 @@
+# india_lp -- national-level timeline events, all about India's curriculum-
+# document licensing landscape specifically (this repo's founding-session
+# scope), not curriculum content itself.
+# See docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md
+# for the full research trail.
+$schema: ../../schema/policy-timeline-event.schema.json
+
+events:
+
+  - id: "INLP-EVENT-ncert-license-agreement-perpetual-copyright"
+    slug: "ncert-license-agreement-perpetual-copyright"
+    label: "NCERT's state-adoption license agreement asserts perpetual, sole copyright ownership"
+    jurisdiction: "IN"
+    eventType: "licensing-policy-change"
+    dateStart: "2019-01-01"
+    dateGranularity: "year"
+    temporalStatus: "past-completed"
+    description: >
+      NCERT's own template contract for licensing its textbooks to state
+      textbook boards for adaptation/republication states verbatim: "The
+      NCERT is the sole owner of copyright of the WORK," confines resale to
+      the licensed state only, requires a 5% royalty plus 12% GST, and
+      states "The Word 'Copyright' for the listed books... shall vest with
+      the NCERT in perpetuity." This is the single clearest primary-source
+      data point this repo's founding research found on NCERT's own
+      asserted rights position over its curriculum text.
+    involvedActors: ["INLP-ACTOR-ncert"]
+    sourceUrl: "https://ncert.nic.in/pdf/announcement/otherannouncements/teachersandresearchers/agreement-2019.pdf"
+    accessTier: "excerpt-only"
+    licenseOrRightsNote: >
+      The quoted phrases here are from NCERT's own license/rights notice,
+      quoted briefly to identify and describe that notice's terms -- not a
+      reproduction of NCERT's curriculum content itself. This is the
+      "quoting a rights notice to describe it" exception named in
+      CONTRIBUTING.md, not a claim that NCERT's curriculum text itself may
+      be excerpted at this tier.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Read directly from the actual PDF, not a summary. The exact
+        publication/effective date of this specific template agreement is
+        not stated on the document itself beyond the filename
+        ("agreement-2019.pdf"); dateStart is set to 2019-01-01 with
+        dateGranularity 'year' as an approximation from the filename, not a
+        confirmed effective date -- treat as approximate.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3"
+
+  - id: "INLP-EVENT-ncert-rationalisation-evolution-deletion"
+    slug: "ncert-rationalisation-evolution-deletion"
+    label: "NCERT's 2023-2024 'rationalisation' deletes evolution/Darwin content nationally"
+    jurisdiction: "IN"
+    eventType: "curriculum-revision-completes"
+    dateStart: "2023"
+    dateGranularity: "year"
+    temporalStatus: "past-completed"
+    description: >
+      As part of a broader national-textbook "rationalisation" exercise,
+      NCERT deleted entire chapters covering Darwin's theory of evolution
+      from its textbooks, alongside separate deletions of Mughal-history
+      and caste-system content. This is a curriculum-content decision, not
+      a new fact about NCERT's copyright/licensing posture (see
+      INLP-EVENT-ncert-license-agreement-perpetual-copyright for that),
+      but directly relevant to this project's evolution-education focus --
+      and the direct trigger for at least one state's own public pushback
+      (see state/kerala/local_policy/records/timeline.yaml,
+      INLP-EVENT-kerala-rejects-ncert-evolution-deletion).
+    involvedActors: ["INLP-ACTOR-ncert"]
+    sourceUrl: "https://news.careers360.com/"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Paraphrased from news coverage of the rationalisation exercise and
+      the state-level reaction to it, not a reproduction of NCERT's own
+      curriculum text or rationalisation notification.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed via the same careers360.com news coverage cited in
+        Kerala's own timeline event, which reports the deletion as context
+        for Kerala's reaction -- this repo has not yet independently read
+        NCERT's own rationalisation notification directly. Treat the exact
+        list of deleted content and precise dates as approximate pending a
+        primary-source check.
+      sourceProvenance: "state/kerala/local_policy/records/coherence-findings.yaml#INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+
+  - id: "INLP-EVENT-nroer-cc-by-sa-launch-2013"
+    slug: "nroer-cc-by-sa-launch-2013"
+    label: "NCERT/CIET launch NROER under CC BY-SA, later inactive"
+    jurisdiction: "IN"
+    eventType: "licensing-policy-change"
+    dateStart: "2013-08-14"
+    dateGranularity: "day"
+    temporalStatus: "past-completed"
+    description: >
+      NCERT/CIET launched the National Repository of Open Educational
+      Resources (NROER) in August 2013, defaulting its hosted resources to
+      a CC BY-SA license -- a real, if narrower, precedent for NCERT
+      publishing under an open license, in real tension with the
+      all-rights-reserved language in NCERT's own state-adoption agreement
+      (see INLP-EVENT-ncert-license-agreement-perpetual-copyright). The
+      repository appears now inactive; no precise retirement date was
+      found. A follow-up review of Karnataka's KOER (see
+      state/karnataka/local_policy/records/timeline.yaml) found that
+      NROER's own hosting was itself incomplete -- several chapters
+      missing -- even during its active period.
+    involvedActors: ["INLP-ACTOR-ncert"]
+    sourceUrl: "https://creativecommons.org/2013/08/14/india-launches-national-repository-of-open-educational-resources/"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Description is paraphrase of Creative Commons' own 2013 announcement
+      and Wikipedia's NROER page, not a verbatim quotation from NCERT
+      curriculum content.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        NROER's current "inactive" status and lack of a confirmed
+        retirement date both come from Wikipedia's own NROER page, not an
+        NCERT source -- flagged as secondary-source-derived for that
+        specific claim even though the 2013 launch date/license itself is
+        primary-source-confirmed via the Creative Commons announcement.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3"

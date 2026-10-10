@@ -1,0 +1,190 @@
+# india-lpm -- Kerala-adapted CCS/interdisciplinary policy principles.
+# First founding pass, 2026-10-09, for forest-dwelling Scheduled Tribe
+# communities whose children board away from family at residential
+# schools, building toward "a model LPM for diverse communities across
+# Kerala" -- see ../../../../../../lab_manager/docs/design-notes/ for the
+# fuller design write-up these principles distill.
+$schema: ../../../../schema/policy-principle-record.schema.json
+
+principles:
+
+  - id: "INLP-PRINCIPLE-offline-first-content-baseline-kerala"
+    slug: "offline-first-content-baseline-kerala"
+    label: "Offline-first is a baseline requirement for Kerala's forest-area tribal students, never an optional enhancement"
+    domain: "computational-curriculum-studies"
+    jurisdictionScope: "IN-KL"
+    statement: >
+      Any curriculum content built for Kerala's forest-dwelling Scheduled
+      Tribe communities must be designed to be downloaded once (at a
+      school, hostel, or known connectivity point) and used completely
+      without a live connection afterward -- not "mobile-friendly," not
+      "works offline as a fallback," but offline as the default assumption
+      content has to survive. Kerala's existing flagship digital-education
+      delivery (KITE/Samagra/First Bell) is a live-broadcast-plus-streaming
+      model; documented forest hamlets in Wayanad and Attappady show gaps
+      not only in connectivity but, in some specific cases, in electricity
+      itself. A design that assumes "has a phone, just needs better
+      connectivity" will not reach the students most in need of reaching.
+    rationale: >
+      Directly grounded in a real, documented gap between Kerala's own
+      digital-education design and the on-the-ground reality in specific
+      named hamlets -- not a generic "rural India has connectivity
+      problems" assumption.
+    groundedIn:
+      - "INLP-FINDING-kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap"
+      - "INLP-ACTOR-kite-kerala"
+    designPrinciples: []
+    contentAnchors: []
+    status: "proposed"
+
+    provenance: &prov_common
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        First-draft policy principle, not yet reviewed by the planned
+        outside anthropological reviewer or anyone with direct knowledge
+        of these communities.
+
+  - id: "INLP-PRINCIPLE-local-global-knowledge-equal-epistemic-footing"
+    slug: "local-global-knowledge-equal-epistemic-footing"
+    label: "A community's own knowledge must stand on equal footing with state/global curriculum content, never serve merely to illustrate it"
+    domain: "interdisciplinary-curriculum-design"
+    jurisdictionScope: "IN-KL"
+    statement: >
+      Where a unit brings in a tribal community's own knowledge (forest
+      ecology, medicinal-plant use, land management, oral history), that
+      knowledge must be presented as genuinely valid on its own terms: a
+      real way of knowing. It must never be treated as decorative material
+      layered onto an unchanged state-curriculum core, and its validity
+      must never depend on confirming a "real" scientific explanation.
+      Science
+      educators working on exactly this problem (Aikenhead's
+      "multi-science" critique of tokenized Indigenous content in STEM
+      curricula; Nakata's "cultural interface" as a space for dialogue
+      rather than a one-way translation) describe this as the central,
+      recurring failure mode of integration efforts that mean well. Even a
+      celebrated bridging framework like "Two-Eyed Seeing" has a real,
+      published critique (Broadhead & Howard, 2021) arguing it can still
+      end up subordinating Indigenous knowledge to Western validation --
+      this principle names that risk explicitly rather than assuming a
+      bridging metaphor alone solves it.
+    rationale: >
+      This is the single most consequential design commitment for
+      "navigating the space between local and global knowledge" as the
+      founding brief for this work describes it -- and the research behind
+      it deliberately includes documented failure modes alongside success
+      stories, per Dustin's own framing of the task.
+    groundedIn:
+      - "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+    designPrinciples: []
+    contentAnchors: []
+    status: "proposed"
+
+    provenance: *prov_common
+
+  - id: "INLP-PRINCIPLE-community-specific-not-pan-tribal-kerala"
+    slug: "community-specific-not-pan-tribal-kerala"
+    label: "Build for one specific, named community at a time -- never a generic 'tribal' category"
+    domain: "interdisciplinary-curriculum-design"
+    jurisdictionScope: "IN-KL"
+    statement: >
+      Kerala's own real precedents for bridging indigenous and formal
+      schooling are all community-specific. None of them are pan-tribal:
+      KIRTADS'
+      Paniya-language primers are Paniya-specific; the "Padippurasi"
+      bridge workshop was built specifically for Muthuvan children in
+      Edamalakudy; the "Gothrabandhu" mentor-teacher model recruits
+      mentors fluent in the specific local dialect of the school they
+      serve. Paniya, Kattunaikkan, Irula, Muduga, Kurumba, Mannan,
+      Malayarayan, Kurichiya, Cholanaikkan, and Muthuvan are documented as
+      distinct communities with different languages, livelihoods, social
+      structures (e.g. Kurichiya's matrilineal clan system), and
+      circumstances (e.g. Cholanaikkan and Koraga are Particularly
+      Vulnerable Tribal Groups with populations in the low hundreds; others
+      number in the tens of thousands) -- a model LPM must not flatten this
+      real diversity into one "tribal module," even with good intentions.
+    rationale: >
+      Grounded directly in this session's own research, which repeatedly
+      found real, named, non-interchangeable communities rather than one
+      undifferentiated population -- and in the documented critique (found
+      in the same research pass) that generic applications of frameworks
+      like "funds of knowledge" risk homogenizing exactly this kind of real
+      diversity.
+    groundedIn: []
+    designPrinciples: []
+    contentAnchors: []
+    status: "proposed"
+
+    provenance: *prov_common
+
+  - id: "INLP-PRINCIPLE-consultation-before-content-not-extraction"
+    slug: "consultation-before-content-not-extraction"
+    label: "Real consultation with a community's own knowledge-holders has to come before building content about that community"
+    domain: "interdisciplinary-curriculum-design"
+    jurisdictionScope: "IN-KL"
+    statement: >
+      Citing a published ethnographic or news description of a community
+      is not the same as that community's own knowledge-holders having
+      been consulted about how their knowledge is represented or used in
+      schooling. Before any unit draws on a specific community's own
+      knowledge beyond what is already publicly documented, this project
+      requires real consultation with that community (ideally through
+      people and institutions already connected to it, such as
+      Oorukoottam hamlet-level councils, Gothrabandhu mentor-teachers, or
+      researchers who already work directly with the community) -- in the
+      spirit of UNESCO LINKS' Free, Prior and Informed Consent principle
+      and Linda Tuhiwai Smith's critique of extractive research that
+      studies indigenous communities without being accountable to them.
+    rationale: >
+      This principle exists specifically to name the limits of this
+      founding pass's own research, which was built entirely from
+      published government, news, and academic sources -- real and
+      carefully sourced, but not a substitute for consultation with the
+      communities it describes. Nothing in this repository should be read
+      as having already done that consultation.
+    groundedIn: []
+    designPrinciples: []
+    contentAnchors: []
+    status: "proposed"
+
+    provenance: *prov_common
+
+  - id: "INLP-PRINCIPLE-coagency-pathway-choice-mapped-to-kcf"
+    slug: "coagency-pathway-choice-mapped-to-kcf"
+    label: "Give students and teachers real, jointly-made pathway choices, mapped onto KCF's own standards and governance -- not a parallel track"
+    domain: "interdisciplinary-curriculum-design"
+    jurisdictionScope: "IN-KL"
+    statement: >
+      Student agency and teacher-student co-agency need a concrete
+      mechanism. Here is one: for a given KCF-mandated competency,
+      a student and their teacher jointly choose which local/community
+      knowledge strand to pursue in meeting it (e.g. a forest-ecology unit
+      met through a Wayanad student's own community's land knowledge vs.
+      a coastal student's own community's fishing knowledge), and jointly
+      document that choice and its reasoning as part of the assessed work
+      itself -- making the choice-making itself visible and valued
+      alongside the final answer. This is deliberately designed to run
+      through KCF's own
+      existing machinery (its stated critical-pedagogy/social-
+      constructivist foundation, and the Tribal Education Committee
+      governance structure it already mandates) rather than as a
+      competing framework schools would have to adopt instead of KCF.
+    rationale: >
+      Answers the founding brief's explicit request for "teacher-student
+      co-agency in developing flexible, valued learning pathways" with a
+      specific mechanism, grounded in what KCF 2023 already commits to
+      (critical pedagogy, social constructivism, a real governance
+      structure for tribal education) rather than inventing a parallel
+      structure that would compete with, rather than work inside, the
+      state curriculum this project needs to stay compliant with.
+    groundedIn:
+      - "INLP-EVENT-kcf-2023-adopted"
+      - "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+    designPrinciples: []
+    contentAnchors: []
+    status: "proposed"
+
+    provenance: *prov_common

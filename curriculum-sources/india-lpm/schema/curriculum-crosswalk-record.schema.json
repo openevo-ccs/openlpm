@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/curriculum-crosswalk-record.schema.json",
+  "title": "india_lp Curriculum Crosswalk Record",
+  "description": "A pointer from an official Indian curriculum/standards document (NCF, a state syllabus) to machine-readable curriculum-graph data that already exists elsewhere in this ecosystem -- ConceptBase/CompetencyBase records, bio-core-k12/interdisciplinary-k12 LPM strands. This is deliberately NOT a document archive: state/<state>/lp/ and national_ccs_policy/lp/ hold metadata ABOUT how far a crosswalk has progressed, not the standards content itself. Modeled on deutsche_lp's/nys_lp's curriculum-crosswalk-record.schema.json; sourceSystem is adapted since no India-specific live queryable standards endpoint has been found as of this repo's founding session -- see nys_lp's own equivalent finding for the same reason (no FWU-MEM-SPARQL-style service confirmed to exist for India either).",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "sourceSystem", "coverageStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-CROSSWALK-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^IN(-[A-Z]{2})?$"
+    },
+    "standardOrFramework": {
+      "type": "string",
+      "description": "What this crosswalk covers, e.g. 'NCF 2023 Science, Secondary Stage', 'Karnataka State Curriculum Framework, Biology'. A crosswalk record is scoped to one standard/framework document."
+    },
+    "gradeRange": { "type": "string" },
+    "sourceSystem": {
+      "type": "string",
+      "enum": ["openevo-conceptbase-competencybase-informal-refs", "published-standards-doc-no-live-api", "not-yet-available"],
+      "description": "'openevo-conceptbase-competencybase-informal-refs' = this ecosystem's own ConceptBase/CompetencyBase records, loosely referenced. 'published-standards-doc-no-live-api' = the official published document itself (PDF/web page), not a live queryable API. 'not-yet-available' = no machine-readable crosswalk exists yet."
+    },
+    "sourceRepoPath": {
+      "type": "string",
+      "description": "Relative path to the actual data file in a sibling repo. This repo references that file; it does not copy its contents in."
+    },
+    "coverageStatus": {
+      "type": "string",
+      "enum": [
+        "document-registry-only", "fine-grained-content-staged-untagged",
+        "canonical-items-concept-tagged", "not-yet-attempted"
+      ],
+      "description": "How far the referenced data has progressed, mirroring deutsche_lp's/nys_lp's own three-tier progression convention."
+    },
+    "notes": { "type": "string" },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal/rights status of the referenced external dataset itself (not this record, which stores no source text). Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency. accessTier does not apply to this schema since it deliberately stores no excerpt/full text."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

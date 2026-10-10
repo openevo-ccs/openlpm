@@ -1,0 +1,283 @@
+# india_lp -- Kerala coherence-analysis finding records.
+# Filed under state/kerala/local_policy/ rather than national_ccs_policy/,
+# same reasoning as Karnataka's own coherence-findings.yaml: this finding
+# is a genuine two-jurisdiction comparison (national vs. Kerala), but its
+# natural home is with the state whose own content is the actual subject.
+$schema: ../../../../schema/coherence-finding-record.schema.json
+
+findings:
+
+  - id: "INLP-FINDING-kerala-retains-evolution-content-ncert-deleted"
+    slug: "kerala-retains-evolution-content-ncert-deleted"
+    label: "Kerala's Class 10 Biology retains full evolution/human-origins content NCERT deleted nationally"
+    findingType: "state-vs-national-divergence"
+    themes: ["human-origins-nature", "curriculum-content-deletion-and-retention"]
+    objects:
+      - jurisdiction: "IN"
+        subject: "Science (Biology)"
+        gradeLevel: "National (NCERT textbooks)"
+        sourceDocument: "NCERT 2023-2024 textbook 'rationalisation' exercise"
+        sourceUrl: "https://news.careers360.com/"
+        accessTier: "summary-only"
+        licenseOrRightsNote: >
+          Paraphrased from news coverage of NCERT's own rationalisation
+          exercise, not a reproduction of NCERT's curriculum text or
+          internal notification.
+      - jurisdiction: "IN-KL"
+        subject: "Biology"
+        gradeLevel: "Class 10 (Standard X), Part 2, 2019 edition"
+        sourceDocument: "SCERT Kerala Class 10 Biology textbook, Chapter 8, 'The Paths Traversed by Life' (pp. 123-137)"
+        sourceUrl: "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf"
+        accessTier: "summary-only"
+        licenseOrRightsNote: >
+          SCERT Kerala's textbooks carry a bare copyright notice ("©
+          Department of General Education, Government of Kerala") with no
+          stated reuse license anywhere checked (the textbook's own
+          imprint, the KCF 2023 landing page, the Samagra distribution
+          portal) -- unlike Karnataka's CC BY-SA-licensed KOER content,
+          this is described here only at the structural/paraphrase level,
+          not quoted verbatim, pending the same kind of legal review this
+          repo already applies to NCERT/CBSE content.
+    summary: >
+      Kerala's Class 10 Biology textbook devotes a full chapter (pp.
+      123-137) to evolution, covering chemical-origin-of-life theories
+      (Oparin-Haldane, Panspermia, the Urey-Miller experiment), a
+      geological timeline from life's origin through multicellularity,
+      Lamarckism and Darwinism (including the Galapagos finches and
+      Malthus's influence), Neo-Darwinism, and four independent lines of
+      evidence for evolution (fossil, comparative-morphology, biochemical,
+      and molecular -- including a beta-hemoglobin amino-acid-difference
+      comparison table showing chimpanzee at zero differences from humans,
+      gorilla at one, and rat at thirty-one). A dedicated section, "Evolution
+      of Human beings" (p.134), places humans within Anthropoidea and
+      Hominoidea and includes a named hominin-lineage diagram:
+      Ardipithecus ramidus, Australopithecus afarensis, Homo habilis, Homo
+      erectus, Homo neanderthalensis, Homo sapiens, each with a fossil-
+      discovery location. This is the exact category of content NCERT
+      removed from its own national textbooks in the 2023-2024
+      rationalisation exercise -- Kerala's own chapter was not itself
+      revised in response (it is the pre-existing 2019 edition), but
+      Kerala's state-level decision to keep teaching this content, formalized
+      as a public stance against the national deletion, makes this specific
+      chapter's continued existence a directly relevant data point, not
+      incidental.
+    policyRelevance: >
+      A concrete instance of state-level curriculum autonomy (India's
+      constitutional "Concurrent List" status for education, already noted
+      elsewhere in this repo re: Karnataka/Tamil Nadu) being exercised
+      specifically to preserve evolution-education content against a
+      national deletion -- directly relevant to this project's own mission,
+      independent of the separate licensing-rights question this repo
+      otherwise tracks state by state.
+    exhaustivenessCaveat: >
+      This repo has not independently read NCERT's own rationalisation
+      notification or its post-deletion textbook text directly this
+      session -- the national side of this comparison rests on news
+      coverage, not a primary NCERT document (see
+      INLP-EVENT-ncert-rationalisation-evolution-deletion's own caveat).
+      No verbatim text from Kerala's textbook is reproduced here, by
+      design -- see each object's own licenseOrRightsNote. The chapter
+      summary above describes real, page-cited structure and topic
+      coverage, not Kerala's own sentences.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Kerala's chapter content (title, page range, section structure,
+        topic list, the hemoglobin comparison figures, the named hominin
+        lineage) was read directly from the actual 2019-edition PDF on
+        Kerala's own Samagra portal, both volumes. The national side rests
+        on secondary news coverage, not a primary NCERT document -- see
+        exhaustivenessCaveat.
+      sourceProvenance: "https://samagra.kite.kerala.gov.in/files/samagra-resource/uploads/tbookscmq/VOL_2_10/Biology_English_2/Biology_English_2.pdf"
+
+  - id: "INLP-FINDING-kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+    slug: "kcf2023-names-tribal-equity-but-omits-tribal-specifics"
+    label: "KCF 2023 names Scheduled Tribe children as needing equity support, but its English text names no specific tribal community, language, or place"
+    findingType: "uncrossreferenced-gap"
+    themes: ["tribal-adivasi-education", "local-knowledge-integration", "curriculum-equity-provisions"]
+    objects:
+      - jurisdiction: "IN-KL"
+        subject: "Whole-framework (all subjects)"
+        gradeLevel: "K-12 framework document"
+        sourceDocument: "Kerala Curriculum Framework 2023 (School Education)"
+        sourceUrl: "https://scert.kerala.gov.in/kerala-curriculum-framework-2023/"
+        accessTier: "summary-only"
+        licenseOrRightsNote: >
+          Described from a direct full-text read/search of the official
+          English PDF; no extended verbatim passage reproduced.
+    summary: >
+      KCF 2023 explicitly names Scheduled Tribe children among groups
+      needing "special care and support" (alongside Dalits, coastal
+      communities, children of migrant/guest workers, and children with
+      special needs) and mandates a "Tribal Education Committee" as a
+      required sub-section of every local Panchayat Education Committee --
+      a real governance mechanism, going beyond a sentence of concern. The same
+      document gives mother-tongue medium of instruction deep pedagogical
+      grounding (citing Vygotsky, Chomsky, Gandhi, and Tagore) as essential
+      to cognitive development, and states Kerala follows "a tri-lingual
+      curriculum" with Tamil, Kannada, Arabic, Sanskrit, or Urdu available
+      as a first language alongside Malayalam. However, a direct full-text
+      search of the official English PDF found no mention anywhere of any
+      specific tribal community (e.g. Paniya, Irula, Kattunaikkan, Adiya,
+      Mannan, Cholanaikkan), any tribal language, the districts Wayanad or
+      Attappady in a current tribal-policy context, residential/hostel
+      schooling for tribal children, or a dedicated curricular unit on
+      tribal/indigenous local knowledge. The document's mother-tongue
+      discussion is framed entirely around Kerala's major language
+      communities (the tri-lingual list above); it is never extended to a
+      tribal language. Its one use of the phrase "local knowledge" is a
+      general statement about strengthening the regional economy. It is
+      not a tribal-education-specific goal. The gap, in other words, is not that
+      KCF 2023 is silent on equity -- it names Scheduled Tribes directly
+      and creates a real governance structure for them -- it is that the
+      document's own well-developed pedagogical machinery for mother
+      tongue and local knowledge never cross-references the specific
+      population it separately commits to supporting.
+    policyRelevance: >
+      This is exactly the "space between local and global knowledge" this
+      project's own brief asks about, made concrete and checkable rather
+      than asserted in the abstract: the state curriculum has the
+      conceptual tools (mother-tongue pedagogy, local-knowledge framing,
+      a named equity commitment and governance mechanism for tribal
+      students) but has not yet connected them to each other for this
+      specific population, at least not in the document this repo could
+      read. A model LPM for Kerala's diverse communities has a real,
+      specific opening here: connecting machinery the state has already
+      built for other purposes, rather than inventing a parallel structure
+      that competes with KCF.
+    testsMandateIds: []
+    exhaustivenessCaveat: >
+      This is a careful absence-of-evidence finding from the English
+      edition of KCF 2023 only. It does not rule out that the Malayalam
+      edition, subject-specific syllabi, or individual textbooks (as
+      opposed to the framework document itself) carry tribal-specific
+      content -- that was explicitly out of scope for what this session
+      could check. It also does not establish what KCF 2007 (the
+      predecessor framework) said, since only KCF 2023 could be
+      full-text-searched this session. This finding should be presented to
+      an outside reviewer as "the framework document's English text does
+      not name these specifics." It should not be presented as "Kerala's
+      curriculum ignores tribal communities" -- those are different
+      claims, and only the first is actually supported here.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The "special care" language, the Tribal Education Committee
+        mandate, the mother-tongue pedagogical grounding, and the
+        tri-lingual-curriculum statement were all located via direct
+        full-text search of the downloaded official PDF. This was not
+        based on a secondary description. The negative finding (no named
+        tribal specifics) is the result of the same full-text search
+        returning no matches for a deliberately broad set of search terms
+        (community names, district names, "tribal language," "indigenous,"
+        "Adivasi"). It is not an assumption.
+      sourceProvenance: "state/kerala/local_policy/records/timeline.yaml#INLP-EVENT-kcf-2023-adopted"
+
+  - id: "INLP-FINDING-kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap"
+    slug: "kerala-digital-education-design-assumes-connectivity-tribal-reality-shows-gap"
+    label: "Kerala's flagship digital-education delivery model (First Bell/Samagra) assumes electricity and connectivity that documented tribal forest hamlets do not reliably have"
+    findingType: "uncrossreferenced-gap"
+    themes: ["offline-access", "digital-divide", "tribal-adivasi-education"]
+    objects:
+      - jurisdiction: "IN-KL"
+        subject: "Educational technology / digital-learning policy"
+        sourceDocument: "KITE 'Functions and Duties' page; First Bell programme description"
+        sourceUrl: "https://kite.kerala.gov.in/KITE/index.php/welcome/KITE"
+        accessTier: "summary-only"
+      - jurisdiction: "IN-KL"
+        subject: "On-the-ground reporting, Wayanad and Attappady tribal hamlets"
+        gradeLevel: "Primary and secondary, several specific hamlets"
+        sourceDocument: "Onmanorama (1 Sept 2021, Madamkunnu hamlet); The Morning Voice (27 Sept 2026, Attappady power outage); The Caravan (15 Oct 2020)"
+        sourceUrl: "https://www.onmanorama.com/news/kerala/2021/09/01/adivasi-education-wayanad-tribal-colony.html"
+        accessTier: "summary-only"
+    summary: >
+      Kerala's own digital-learning infrastructure (KITE, the Samagra
+      portal, and the First Bell programme built on top of them) is
+      fundamentally a live-broadcast-plus-streaming model: content is
+      watched on TV or streamed via app/YouTube. It is not distributed as
+      a downloadable, store-and-forward package designed to work with no
+      connection at all. Kerala's own documented response for students
+      without a TV or internet during COVID-19 was organizational rather
+      than technical: "Neighbourhood Study Centres" with subsidized shared
+      TVs, and a public device-donation drive -- which helps a student
+      without a device but does not help a student whose hamlet has no
+      electricity or signal at all. Independent, directly-read local
+      reporting shows this second case is real and recurring. It is not
+      hypothetical: in September 2021, 31 students in Wayanad's Madamkunnu
+      hamlet had no reliable electricity to charge any device, with some
+      students walking 1.5km to a paid charging point; a September 2026
+      report (less independently corroborated, flagged separately in this
+      repo's timeline/actor records) describes a 20-day power outage
+      across four Attappady hamlets after storm damage to an underground
+      cable; and a 2020 report on Nilambur/Attappady PVTG communities
+      quotes education officials arguing that reopening residential
+      hostels was the only realistic way to reach children from Kerala's
+      five "primitive" (Particularly Vulnerable) tribal groups. Better
+      streaming alone would not have reached them: they lacked electricity
+      entirely and lived far from any community viewing point. This
+      project's own framing -- students who often have a phone or laptop
+      but no reliable internet -- undersells the severity found in some of
+      these specific documented cases. In the most severe of them,
+      electricity itself is the gap, and connectivity alone does not
+      capture it.
+    policyRelevance: >
+      Directly actionable for this project's own design work: an
+      offline-first content model for Kerala's forest-area tribal students
+      cannot assume First Bell/Samagra's existing delivery mechanism is a
+      sufficient base to build on, since that mechanism itself assumes
+      connectivity (and often electricity) the documented cases show is
+      not universal. A genuinely offline-first design needs to plan for
+      content that survives being downloaded once (at a school, hostel, or
+      connectivity point) and used entirely without a connection
+      afterward, and in the most severe documented cases, without reliable
+      power either.
+    exhaustivenessCaveat: >
+      This finding draws on a patchwork of separately-dated local news
+      stories (2020, 2021, 2026) about different specific hamlets. It is
+      not one comprehensive, current, state-wide connectivity survey --
+      no such single document was found this session. The 2026 Attappady
+      power-outage report in particular comes from one outlet this repo
+      is not familiar with and could not corroborate against a second
+      source; it is included because it is the most current item found.
+      Its inclusion does not mean it is as well-confirmed as the 2021
+      Onmanorama report.
+      A separate, unresolved tension noted in this session's research
+      (not fully reconciled here) is that a 2015 Government of India press
+      release describes Idukki district as the first in India with
+      complete rural broadband coverage via a national pilot, which sits
+      oddly next to later (2021-2023) reports of tribal colonies within
+      Idukki still lacking internet -- this repo could not find a source
+      explaining that apparent gap and is not asserting either claim
+      supersedes the other.
+    verificationStatus: "unverified-secondary-source"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-09"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The Madamkunnu (Onmanorama) and Nilambur/Attappady PVTG (The
+        Caravan, The News Minute) articles were fetched and read directly
+        this session. The 2026 Attappady power-outage report was read
+        directly but from a single, less-established outlet and is
+        flagged as needing a second source. District-wide figures quoted
+        inside some of these articles (e.g. "23,000 of ~26,000 Wayanad
+        tribal students lack tablets/laptops," "30 hamlets with no
+        internet") are themselves stated by the articles without a cited
+        government source, so are presented here only as reported. They
+        are not this repo's own confirmed figures.
+      sourceProvenance: "https://www.onmanorama.com/news/kerala/2021/09/01/adivasi-education-wayanad-tribal-colony.html"
