@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/policy-principle-record.schema.json",
+  "title": "india_lp Policy Principle Record",
+  "description": "A modular, OpenEvo-authored policy principle -- the compilable unit that policy briefs and other outreach materials are built from. Distinct from local_policy records: those describe external institutional facts (verificationStatus); this describes OUR authored position, grounded in those facts via groundedIn, using the ordinary ecosystem review_status lifecycle instead of a verification status. Identical shape to deutsche_lp's/nys_lp's policy-principle-record.schema.json. No records exist under this schema yet as of this repo's founding session (2026-09-30) -- founding-session work was institutional/licensing groundwork, not yet an authored outreach position.",
+  "type": "object",
+  "required": ["id", "slug", "label", "domain", "jurisdictionScope", "statement", "status", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-PRINCIPLE-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "domain": {
+      "type": "string",
+      "enum": ["computational-curriculum-studies", "interdisciplinary-curriculum-design"]
+    },
+    "jurisdictionScope": {
+      "type": "string",
+      "pattern": "^IN(-[A-Z]{2})?$",
+      "description": "'IN' for a national-level principle (lives in national_ccs_policy/), a specific state code for a state-adapted version (lives in state/<state>/ccs_policy/)."
+    },
+    "adaptedFrom": {
+      "type": "string",
+      "pattern": "^INLP-PRINCIPLE-[a-z0-9-]+$"
+    },
+    "statement": { "type": "string" },
+    "rationale": { "type": "string" },
+    "groundedIn": {
+      "type": "array",
+      "description": "Ids of local_policy records (institutional actors, timeline events, curriculum crosswalks, mandates, coherence findings) this principle is grounded in or responds to.",
+      "items": { "type": "string", "pattern": "^INLP-(ACTOR|EVENT|CROSSWALK|MANDATE|FINDING)-[a-z0-9-]+$" }
+    },
+    "designPrinciples": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "contentAnchors": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "conceptRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "adopted", "retired"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

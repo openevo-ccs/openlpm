@@ -80,7 +80,7 @@ REPOS = {
         "default_jurisdiction": "US-NY",
     },
     "india-lpm": {
-        "path": LAB_ROOT / "india_lp",
+        "path": ROOT / "curriculum-sources" / "india-lpm",  # moved inside openlpm 2026-10-09, no longer a LAB_ROOT sibling
         "project_slug": "india-curriculum-repository",
         "project_name": "India Curriculum Repository",
         "region_tags": ["IN"],

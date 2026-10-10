@@ -1,0 +1,44 @@
+# india_lp -- Maharashtra timeline events.
+$schema: ../../../../schema/policy-timeline-event.schema.json
+
+events:
+
+  - id: "INLP-EVENT-balbharati-2020-fee-revision"
+    slug: "balbharati-2020-fee-revision"
+    label: "Balbharati revises third-party licensing fees, drawing public objection"
+    jurisdiction: "IN-MH"
+    eventType: "licensing-policy-change"
+    dateStart: "2020-10-26"
+    dateGranularity: "day"
+    temporalStatus: "past-completed"
+    description: >
+      Maharashtra's Balbharati revised its copyright/licensing policy,
+      raising third-party publisher registration fees from Rs. 1,000 to
+      Rs. 17,700 -- a roughly seventeen-fold increase. The Association of
+      Publishers and Distributors publicly objected, arguing Balbharati
+      should not be able to copyright material that is "just compiled
+      facts," and separately objected to a reported Rs. 63,000
+      per-subject-per-standard-per-medium fee.
+    involvedActors: ["INLP-ACTOR-balbharati-maharashtra"]
+    sourceUrl: "https://services.ebalbharati.in/copyright/pdfs/Revised_Policy_26_Oct_2020.pdf"
+    accessTier: "excerpt-only"
+    licenseOrRightsNote: >
+      The one quoted phrase ("just compiled facts") is a third party's
+      (APD's) public objection, quoted briefly for identification --
+      ordinary journalistic/commentary quotation, not a reproduction of
+      Balbharati's own curriculum content. The fee figures themselves are
+      factual/numeric, not copyrightable expression.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Date taken from the Revised Policy PDF's own filename
+        ("Revised_Policy_26_Oct_2020.pdf"), read directly. The APD
+        objection and the Rs. 63,000 figure are corroborated across two
+        independent secondary sources (SpicyIP, The Bridge Chronicle).
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"

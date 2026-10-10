@@ -1,0 +1,94 @@
+# india_lp -- Karnataka timeline events.
+$schema: ../../../../schema/policy-timeline-event.schema.json
+
+events:
+
+  - id: "INLP-EVENT-karnataka-koer-cc-by-sa-license"
+    slug: "karnataka-koer-cc-by-sa-license"
+    label: "Karnataka's DSERT licenses KOER curriculum materials under CC BY-SA 4.0"
+    jurisdiction: "IN-KA"
+    eventType: "licensing-policy-change"
+    temporalStatus: "current-in-progress"
+    description: >
+      Karnataka's Department of State Educational Research and Training
+      runs Karnataka Open Educational Resources (KOER), hosting the
+      state's own textbooks and curriculum materials in full under an
+      explicit Creative Commons CC BY-SA 4.0 license. A 2021
+      legal-scholarship review (SpicyIP, Dhonchak) found this more
+      permissive than NCERT's own National Repository of Open Educational
+      Resources, which hosted several chapters incomplete even during its
+      active period.
+    involvedActors: ["INLP-ACTOR-dsert-karnataka"]
+    sourceUrl: "https://karnatakaeducation.org.in/KOER/en/index.php/Text_Books"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      Description is this repo's own paraphrase of KOER's publicly-stated
+      licensing terms, not a verbatim reproduction of KOER's actual
+      curriculum text -- the underlying materials are themselves CC BY-SA
+      4.0, so a future record could reproduce them at a higher tier with
+      that license cited directly as grounds, without needing the broader
+      legal review named in docs/strategy/2026-09-30-india-legal-review-scope.md.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Corroborated across the KOER portal itself and a SpicyIP
+        legal-scholarship piece (Dhonchak, 2021); no exact license-adoption
+        date was found in either source, so dateStart is left unset rather
+        than guessed.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+
+  - id: "INLP-EVENT-koer-rmsa-pilot-launch"
+    slug: "koer-rmsa-pilot-launch"
+    label: "KOER launches as a Class-IX-only pilot under RMSA Karnataka, then grows"
+    jurisdiction: "IN-KA"
+    eventType: "pilot-program"
+    temporalStatus: "past-completed"
+    dateStart: "2013"
+    dateGranularity: "year"
+    description: >
+      DSERT built Karnataka Open Educational Resources (KOER) with IT for
+      Change as resource/implementation partner, under the national RMSA
+      (Rashtriya Madhyamik Shiksha Abhiyan) secondary-education scheme.
+      Deliberately scoped at launch to Class IX topics only, in Mathematics,
+      Science, and Social Science, in English and Kannada -- built via a
+      cascading teacher-training model (roughly 30 "core" teachers per
+      subject across 19 districts, each training roughly 30 more, who in
+      turn trained teachers at roughly 1,000 high schools), with an
+      explicit stated goal to expand to all classes, subjects, and media of
+      instruction over time. As of 2026-10-02, KOER's own textbook
+      directory shows populated content for Class 8, 9, and 10 -- grown
+      past the original Class-IX-only scope, but still short of the
+      original full-K-12 ambition.
+    involvedActors: ["INLP-ACTOR-dsert-karnataka", "INLP-ACTOR-it-for-change"]
+    sourceUrl: "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER"
+    accessTier: "summary-only"
+    licenseOrRightsNote: >
+      This description is this repo's own paraphrase of KOER's "Brief note
+      on KOER" page, itself CC BY-SA 4.0-licensed content, so a fuller
+      excerpt would be safe to add later if useful -- paraphrased here only
+      because a historical-summary record doesn't need verbatim text to be
+      useful.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed by a direct fetch of koer-en.karnatakaeducation.org.in's
+        "Brief note on KOER" page (the karnatakaeducation.org.in/KOER/...
+        URLs this repo originally cited now redirect, HTTP 301, to the
+        koer-en. subdomain -- both still resolve). The "populated through
+        Class 8-10 as of today" claim comes from directly checking KOER's
+        own Science_Textbooks page and Social_Science:_Topics index the
+        same session, not from the Brief Note page itself, which only
+        states the original 2013-14 scope and ambition.
+      sourceProvenance: "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER"
