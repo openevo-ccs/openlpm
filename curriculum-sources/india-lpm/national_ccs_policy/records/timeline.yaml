@@ -56,7 +56,7 @@ events:
     label: "NCERT's 2023-2024 'rationalisation' deletes evolution/Darwin content nationally"
     jurisdiction: "IN"
     eventType: "curriculum-revision-completes"
-    dateStart: "2023"
+    dateStart: "2023-01-01"
     dateGranularity: "year"
     temporalStatus: "past-completed"
     description: >
