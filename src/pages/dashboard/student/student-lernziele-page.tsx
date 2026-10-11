@@ -17,6 +17,7 @@ import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 import { goalMethodKey, listFavoriteGoalMethods, listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteGoalMethod, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listMethodLernzielLinks, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
 
 // The German, student-facing Lernziele explorer -- same real data as the
 // researcher Learning Goals page (same listTopics/getTopic/thread helpers),
@@ -226,6 +227,15 @@ export default function StudentLernzielePage() {
   // Empty until the project's prompt library resolves; the filter falls
   // back to whatever methods are actually tagged in the real data below.
   const [libraryMethods, setLibraryMethods] = useState<string[]>([])
+  // Real feedback ee644d5d (Susan): the researcher-facing Methods tab
+  // (learning-goals-page.tsx) could confirm a MethodsBase-backed method as
+  // applying to a Lernziel, but that confirmation never reached this page's
+  // own method filter or per-goal "Didaktische Strategien" list -- those
+  // still only ever read the original, static top3_methoden[] import.
+  // Fetched project-wide once, same convention as the other favorite/
+  // vocabulary lookups above; only 'confirmed' links are ever shown to a
+  // student, same rule the Methods tab itself follows.
+  const [methodLernzielLinks, setMethodLernzielLinks] = useState<MethodLernzielLink[]>([])
 
   useEffect(() => {
     setTopics(null)
@@ -236,7 +246,19 @@ export default function StudentLernzielePage() {
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
     getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
+    listMethodLernzielLinks(supabase, project.id).then(setMethodLernzielLinks)
   }, [supabase, project.id, defaultBranchId])
+
+  const confirmedMethodsByLernziel = useMemo(() => {
+    const m = new Map<string, MethodLernzielLink[]>()
+    for (const l of methodLernzielLinks) {
+      if (l.status !== 'confirmed') continue
+      const arr = m.get(l.lernziel_id) ?? []
+      arr.push(l)
+      m.set(l.lernziel_id, arr)
+    }
+    return m
+  }, [methodLernzielLinks])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
   // per-concept relevance dots need it -- one bulk query for every topic's
@@ -368,12 +390,16 @@ export default function StudentLernzielePage() {
       }
       if (methodFilter.size > 0) {
         const methoden: string[] = ((contentById.get(t.id) as any)?.didaktische_strategien?.top3_methoden ?? []).map((m: any) => m?.methode)
-        if (!methoden.some((m) => methodFilter.has(m))) return false
+        // Real feedback ee644d5d (Susan): a method confirmed via the
+        // researcher Methods tab (not originally part of top3_methoden)
+        // still needs to match this filter, not just the static import.
+        const confirmedKeys = (confirmedMethodsByLernziel.get(t.id) ?? []).map((l) => l.method_key)
+        if (!methoden.some((m) => methodFilter.has(m)) && !confirmedKeys.some((m) => methodFilter.has(m))) return false
       }
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, methodFilter, contentById, rawIdToGroupKey])
+  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
 
   // A deep link (Davor/Danach, or a Netz-tab tap) can point at a Lernziel
   // the current filters would otherwise hide (different grade, excluded
@@ -680,6 +706,7 @@ export default function StudentLernzielePage() {
                   onToggleFavoriteMethod={onToggleFavoriteMethod}
                   favoriteGoalMethods={favoriteGoalMethods}
                   onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
+                  confirmedMethods={confirmedMethodsByLernziel.get(t.id) ?? []}
                   isExpanded={expandedIds.has(t.id)}
                   onToggleExpand={onToggleExpand}
                   supabase={supabase}
@@ -708,6 +735,7 @@ function LernzielCard({
   onToggleFavoriteMethod,
   favoriteGoalMethods,
   onToggleFavoriteGoalMethod,
+  confirmedMethods,
   isExpanded,
   onToggleExpand,
   supabase,
@@ -726,6 +754,7 @@ function LernzielCard({
   onToggleFavoriteMethod: (methodKey: string) => void
   favoriteGoalMethods: Set<string>
   onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
   isExpanded: boolean
   onToggleExpand: (id: string) => void
   supabase: ProjectOutletContext['supabase']
@@ -810,7 +839,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
+          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} confirmedMethods={confirmedMethods} />
         </div>
       )}
     </div>
@@ -828,6 +857,7 @@ function LernzielCardDetail({
   conceptElementsById,
   favoriteGoalMethods,
   onToggleFavoriteGoalMethod,
+  confirmedMethods,
 }: {
   objectId: string
   content: unknown
@@ -839,6 +869,7 @@ function LernzielCardDetail({
   conceptElementsById: Map<string, SchemaElement>
   favoriteGoalMethods: Set<string>
   onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
 }) {
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
 
@@ -853,22 +884,19 @@ function LernzielCardDetail({
     <div>
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
-      <DidaktischeStrategienSection objectId={objectId} content={content} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
-
-      {/* Real feedback 95972f01 (Susan): this showed up with no header and
-          no explanation of what it is or how common it is. These are
-          hand-curated cross-topic connections ("Threads"), authored live by
-          researchers on the Learning Goals page -- most Lernziele don't have
-          one yet, so its absence here is expected, not a gap in this card. */}
-      {stations && stations.length > 0 && (
-        <section style={{ marginBottom: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
-          <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>Vernetztes Lernen</p>
-          <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>
-            Hand ausgewählte Verbindungen zu anderen Themen, die über dieselbe Grundidee zusammenhängen. Nicht jedes Lernziel hat eine.
-          </p>
-          {stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
-        </section>
-      )}
+      {/* Real feedback 75fd5be9 (Susan): "Vernetztes Lernen" used to always
+          show below here, even when this section was collapsed -- she
+          wanted it folded in as a subsection instead, so collapsing
+          Didaktische Strategien hides it too. */}
+      <DidaktischeStrategienSection
+        objectId={objectId}
+        content={content}
+        favoriteGoalMethods={favoriteGoalMethods}
+        onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
+        confirmedMethods={confirmedMethods}
+        stations={stations}
+        supabase={supabase}
+      />
 
       {stations?.length === 0 && entries.length === 0 && (
         <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>
@@ -891,15 +919,22 @@ function DidaktischeStrategienSection({
   content,
   favoriteGoalMethods,
   onToggleFavoriteGoalMethod,
+  confirmedMethods,
+  stations,
+  supabase,
 }: {
   objectId: string
   content: unknown
   favoriteGoalMethods: Set<string>
   onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
+  stations: ThreadStationWithThread[] | null
+  supabase: ProjectOutletContext['supabase']
 }) {
   const [open, setOpen] = useState(false)
   const ds = (content as any)?.didaktische_strategien
-  if (!ds) return null
+  const hasStations = !!stations && stations.length > 0
+  if (!ds && confirmedMethods.length === 0 && !hasStations) return null
   // Real feedback 2026-10-01 (Susan), 2nd pass: "you should expand on each
   // method... each method should be highlighted on a different line,
   // possibly with an icon" -- this was previously dropping the real
@@ -909,7 +944,19 @@ function DidaktischeStrategienSection({
   // data this view was throwing away). Matches v1.2's own real layout:
   // icon + bold method name + em dash + its topic-specific description,
   // one per line.
-  const methoden = (ds.top3_methoden ?? []).filter((m: any) => m?.methode)
+  const staticMethoden: { methode: string; beschreibung: string | null }[] =
+    (ds?.top3_methoden ?? []).filter((m: any) => m?.methode)
+  // Real feedback fbd27cda (Susan): "consider if [methods] could be
+  // expanded for any learning goal... up to 6 per learning goal" -- adds
+  // whatever the researcher Methods tab has confirmed for this Lernziel
+  // (method_lernziel_links, migration 123) beyond the original static
+  // three, deduped by method name, capped at 6 total so this doesn't turn
+  // into information overload (her own stated concern).
+  const staticNames = new Set(staticMethoden.map((m) => m.methode))
+  const extraMethoden = confirmedMethods
+    .filter((l) => !staticNames.has(l.method_key))
+    .map((l) => ({ methode: l.method_key, beschreibung: l.rationale }))
+  const methoden = [...staticMethoden, ...extraMethoden].slice(0, 6)
   return (
     // Real feedback 70d0770a (Susan): this section and BkRelevanceSection
     // above it needed clearer visual separation -- a line like the one
@@ -921,14 +968,14 @@ function DidaktischeStrategienSection({
       </button>
       {open && (
         <div style={{ marginTop: 10 }}>
-          {ds.evolutionsdidaktischer_impuls && (
+          {ds?.evolutionsdidaktischer_impuls && (
             <p style={{ margin: '0 0 8px' }}><strong>Leitfrage:</strong> {ds.evolutionsdidaktischer_impuls}</p>
           )}
           {methoden.length > 0 && (
             <div style={{ margin: '0 0 8px' }}>
               <strong>Methoden:</strong>
               <ul style={{ margin: '4px 0 0', paddingLeft: 0, listStyle: 'none' }}>
-                {methoden.map((m: any, i: number) => (
+                {methoden.map((m, i: number) => (
                   <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
                     <span aria-hidden="true">{METHOD_ICON[m.methode] ?? '•'}</span>
                     <span><strong>{m.methode}</strong>{m.beschreibung ? <> — {m.beschreibung}</> : null}</span>
@@ -953,8 +1000,25 @@ function DidaktischeStrategienSection({
               </ul>
             </div>
           )}
-          {ds.moegliche_fehlvorstellungen && (
+          {ds?.moegliche_fehlvorstellungen && (
             <p style={{ margin: 0 }}><strong>Mögliche Fehlvorstellungen:</strong> {ds.moegliche_fehlvorstellungen}</p>
+          )}
+          {/* Real feedback 75fd5be9 (Susan): this used to render always-
+              visible, below Didaktische Strategien regardless of whether
+              that section was collapsed -- now it's a subsection here, so
+              it folds away with everything else. Real feedback 95972f01
+              (Susan): still needs its own header and explanation of what it
+              is and how common it is -- these are hand-curated cross-topic
+              connections ("Threads"), authored live by researchers; most
+              Lernziele don't have one yet, so its absence is expected. */}
+          {hasStations && (
+            <div style={{ marginTop: ds || methoden.length > 0 ? 14 : 0, paddingTop: ds || methoden.length > 0 ? 12 : 0, borderTop: ds || methoden.length > 0 ? '1px solid var(--border)' : 'none' }}>
+              <p style={{ fontSize: 12.5, fontWeight: 600, margin: '0 0 4px' }}>Vernetztes Lernen</p>
+              <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>
+                Hand ausgewählte Verbindungen zu anderen Themen, die über dieselbe Grundidee zusammenhängen. Nicht jedes Lernziel hat eine.
+              </p>
+              {stations!.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+            </div>
           )}
         </div>
       )}
