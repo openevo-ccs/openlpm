@@ -18,7 +18,8 @@ import LiteraturePage from '@/pages/dashboard/literature-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
-import SyllabusPlanungPage from '@/pages/dashboard/syllabus-planung-page'
+import CalendarPage from '@/pages/dashboard/calendar-page'
+import MethodsPage from '@/pages/dashboard/methods-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
 import TimelinePage from '@/pages/dashboard/timeline-page'
 import ContextItemsPage from '@/pages/dashboard/context-items-page'
@@ -119,13 +120,14 @@ export default function App() {
             <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
+            <Route path="methods" element={<MethodsPage />} />
             <Route path="concepts" element={<ConceptsPage />} />
             <Route path="concepts/:conceptId" element={<ConceptsPage />} />
             <Route path="theories" element={<TheoriesPage />} />
             <Route path="theories/:theoryId" element={<TheoriesPage />} />
             <Route path="strands" element={<StrandsPage />} />
             <Route path="strands/:strandId" element={<StrandsPage />} />
-            <Route path="syllabus-planung" element={<SyllabusPlanungPage />} />
+            <Route path="calendar" element={<CalendarPage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
             <Route path="timeline" element={<TimelinePage />} />

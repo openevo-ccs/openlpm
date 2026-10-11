@@ -19,10 +19,16 @@ export interface DashboardPageDescriptor {
 export const DASHBOARD_PAGES: DashboardPageDescriptor[] = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'learning-goals', label: 'Learning Goals' },
+  { key: 'methods', label: 'Methods' },
   { key: 'concepts', label: 'Concepts' },
   { key: 'theories', label: 'Theories' },
   { key: 'strands', label: 'Strands' },
-  { key: 'syllabus-planung', label: 'Wochenplan' },
+  // Rendered as "Wochenplan" instead when the project is German-only -- see
+  // project-layout.tsx's own comment. This registry only feeds the
+  // settings-page checklist (which page keys a view includes), not the
+  // actual rendered label, so one static English name here is correct even
+  // though the real sidebar sometimes shows German.
+  { key: 'calendar', label: 'Calendar' },
   { key: 'literature', label: 'Literature' },
   { key: 'review', label: 'Review' },
   { key: 'discussions', label: 'Discussions' },
