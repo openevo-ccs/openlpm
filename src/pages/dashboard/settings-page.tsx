@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, ExternalLink, Globe, Layers, Library, Link2, Mail, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
+import { AlertTriangle, Check, Copy, ExternalLink, GraduationCap, Globe, Layers, Library, Link2, Mail, MapPin, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
@@ -52,6 +52,8 @@ import {
   type ViewAssignmentTargetType,
 } from '@/lib/supabase/dashboard-views'
 import { PROJECT_COLORS } from '@/lib/project-colors'
+import { listAvailableFrameworks, listFrameworkTags, type FrameworkRow, type FrameworkTagRow } from '@/lib/supabase/frameworks'
+import { ACCESS_TIER_OPTIONS, type AccessTier } from './new-project-wizard'
 import { groupsSettings, listGroups, setGroupCreatorRoles, setGroupSharingRoles, setGroupsEnabled, type ProjectGroup } from '@/lib/supabase/groups'
 import {
   acceptFederation,
@@ -92,6 +94,7 @@ export default function SettingsPage() {
       <p className="muted" style={{ marginBottom: 20 }}>Manage {project.name} — color, members, who can join, and more.</p>
 
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
+      {canManage && !isRepository && !isCustomView && <ProjectDetailsSection project={project} supabase={supabase} />}
       <MembersSection project={project} role={role} supabase={supabase} isRepository={isRepository} isCustomView={isCustomView} />
       {canManage && isRepository && <CustomViewsSection project={project} supabase={supabase} />}
       {!isRepository && !isCustomView && <CurriculumSourcesSection project={project} supabase={supabase} />}
@@ -931,6 +934,387 @@ function ProjectColorSection({
       </div>
     </div>
   )
+}
+
+// ============================================================================
+// Project Details: geography, working languages, subject area(s), grade-band
+// framework, and sources & rights -- real feedback 55779d95 (Dustin,
+// 2026-10-10): "generally lets make starting a project much easier - give
+// it a name and then let's just enable the settings and dashboard within
+// the project space be where the user can add / update all the other
+// project meta-data." Before this, these five fields could ONLY ever be set
+// during the creation wizard (new-project-wizard.tsx) -- once a project
+// existed, there was no way to add or change any of them. Same field
+// layouts as that wizard's old steps 1-5, now editing the real row/table
+// directly instead of building up local draft state before one final
+// insert. Each sub-section saves independently (no shared "save all"
+// button) -- a change to Geography shouldn't be held hostage by an
+// in-progress edit to Sources.
+// ============================================================================
+
+const PROJECT_DETAILS_LANGUAGES: { code: string; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'German' },
+  { code: 'fr', label: 'French' },
+  { code: 'es', label: 'Spanish' },
+  { code: 'pt', label: 'Portuguese' },
+  { code: 'zh', label: 'Chinese' },
+  { code: 'ja', label: 'Japanese' },
+  { code: 'ar', label: 'Arabic' },
+]
+
+type JurisdictionRow = Database['public']['Tables']['project_jurisdictions']['Row']
+type SourceDeclarationRow = Database['public']['Tables']['project_source_declarations']['Row']
+
+function ProjectDetailsSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Globe size={16} />Project details</h3>
+      <p className="muted" style={{ marginBottom: 16 }}>
+        Geography, languages, subject area, grade-band framework, and sources — set once at
+        creation, editable here any time.
+      </p>
+      <LanguagesSubsection project={project} supabase={supabase} />
+      <GeographySubsection project={project} supabase={supabase} />
+      <SubjectAreaSubsection project={project} supabase={supabase} />
+      <GradeBandSubsection project={project} supabase={supabase} />
+      <SourceDeclarationsSubsection project={project} supabase={supabase} />
+    </div>
+  )
+}
+
+function LanguagesSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [languages, setLanguages] = useState<Set<string>>(new Set(project.working_languages ?? []))
+  const [customLanguage, setCustomLanguage] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const save = async (next: Set<string>) => {
+    setLanguages(next)
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ working_languages: Array.from(next) }).eq('id', project.id)
+    setBusy(false)
+    if (error) setLanguages(new Set(project.working_languages ?? []))
+  }
+
+  const toggle = (code: string) => {
+    const next = new Set(languages)
+    if (next.has(code)) next.delete(code)
+    else next.add(code)
+    save(next)
+  }
+
+  const extras = Array.from(languages).filter((c) => !PROJECT_DETAILS_LANGUAGES.some((l) => l.code === c))
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 style={{ marginBottom: 6 }}>Working language(s)</h4>
+      <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+        {PROJECT_DETAILS_LANGUAGES.map((l) => (
+          <label key={l.code} className="row" style={{ gap: 4 }}>
+            <input type="checkbox" checked={languages.has(l.code)} disabled={busy} onChange={() => toggle(l.code)} />
+            {l.label}
+          </label>
+        ))}
+      </div>
+      <div className="row" style={{ marginTop: 10, gap: 8 }}>
+        <input value={customLanguage} onChange={(e) => setCustomLanguage(e.target.value)} placeholder="Other language code, e.g. sw, hi" style={{ width: 200 }} />
+        <button
+          className="btn btn-mini"
+          disabled={busy || !customLanguage.trim()}
+          onClick={() => { const c = customLanguage.trim(); setCustomLanguage(''); save(new Set([...languages, c])) }}
+        >
+          <Plus size={12} />Add
+        </button>
+      </div>
+      {extras.length > 0 && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 8 }}>
+          Also added: {extras.map((code) => (
+            <span key={code} style={{ marginRight: 8 }}>
+              {code} <button className="btn-linklike" style={{ fontSize: 11 }} onClick={() => toggle(code)}>remove</button>
+            </span>
+          ))}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function GeographySubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [jurisdictions, setJurisdictions] = useState<JurisdictionRow[] | null>(null)
+  const [countryCode, setCountryCode] = useState('')
+  const [regionCode, setRegionCode] = useState('')
+  const [label, setLabel] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const reload = () => {
+    supabase.from('project_jurisdictions').select('*').eq('project_id', project.id).order('created_at').then(({ data }) => setJurisdictions(data ?? []))
+  }
+  useEffect(reload, [supabase, project.id])
+
+  const add = async () => {
+    if (!countryCode.trim() || !label.trim()) return
+    setBusy(true)
+    await supabase.from('project_jurisdictions').insert({
+      project_id: project.id,
+      country_code: countryCode.trim().toUpperCase(),
+      region_code: regionCode.trim() || null,
+      label: label.trim(),
+    })
+    setCountryCode(''); setRegionCode(''); setLabel('')
+    reload()
+    setBusy(false)
+  }
+
+  const remove = async (id: string) => {
+    setBusy(true)
+    await supabase.from('project_jurisdictions').delete().eq('id', id)
+    reload()
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><MapPin size={14} />Geography</h4>
+      <p className="muted" style={{ fontSize: 12.5, marginTop: 0 }}>One or more states/regions within one or more countries — leave empty for a project with no fixed geographic scope.</p>
+      {jurisdictions === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        jurisdictions.map((j) => (
+          <div key={j.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+            <span>{j.label} <span className="muted" style={{ fontSize: 12 }}>({j.country_code}{j.region_code ? `, ${j.region_code}` : ''})</span></span>
+            <button className="btn btn-mini" disabled={busy} onClick={() => remove(j.id)}><Trash2 size={12} /></button>
+          </div>
+        ))
+      )}
+      <div className="row" style={{ gap: 8, marginTop: 10, alignItems: 'flex-end' }}>
+        <div className="field" style={{ marginBottom: 0, width: 70 }}>
+          <label>Country</label>
+          <input value={countryCode} onChange={(e) => setCountryCode(e.target.value)} placeholder="DE" maxLength={2} />
+        </div>
+        <div className="field" style={{ marginBottom: 0, width: 90 }}>
+          <label>Region (optional)</label>
+          <input value={regionCode} onChange={(e) => setRegionCode(e.target.value)} placeholder="DE-BY" />
+        </div>
+        <div className="field" style={{ marginBottom: 0, flex: 1 }}>
+          <label>Plain-language name</label>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Bavaria, Germany" />
+        </div>
+        <button className="btn btn-mini" disabled={busy || !countryCode.trim() || !label.trim()} onClick={add}><Plus size={12} />Add</button>
+      </div>
+    </div>
+  )
+}
+
+function SubjectAreaSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [framework, setFramework] = useState<FrameworkRow | null>(null)
+  const [tags, setTags] = useState<FrameworkTagRow[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    listAvailableFrameworks(supabase, 'subject-area').then(async (fws) => {
+      const shared = fws.find((f) => f.project_id === null) ?? fws[0] ?? null
+      setFramework(shared)
+      if (shared) setTags(await listFrameworkTags(supabase, shared.id))
+    })
+    supabase.from('project_subject_area_tags').select('framework_tag_id').eq('project_id', project.id)
+      .then(({ data }) => setSelectedIds(new Set((data ?? []).map((r) => r.framework_tag_id))))
+  }, [supabase, project.id])
+
+  const toggle = async (tagId: string) => {
+    const has = selectedIds.has(tagId)
+    const next = new Set(selectedIds)
+    if (has) next.delete(tagId); else next.add(tagId)
+    setSelectedIds(next)
+    setBusy(true)
+    if (has) await supabase.from('project_subject_area_tags').delete().eq('project_id', project.id).eq('framework_tag_id', tagId)
+    else await supabase.from('project_subject_area_tags').insert({ project_id: project.id, framework_tag_id: tagId })
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Layers size={14} />Subject area(s)</h4>
+      {tags.length === 0 ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        tags.map((t) => (
+          <label key={t.id} className="row" style={{ marginLeft: t.parent_tag_id ? 16 : 0, padding: '2px 0' }}>
+            <input type="checkbox" checked={selectedIds.has(t.id)} disabled={busy} onChange={() => toggle(t.id)} />
+            {t.label}
+          </label>
+        ))
+      )}
+      <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+        Only {framework?.label ?? 'the starter taxonomy'}'s current entries are selectable here. Propose a new
+        subject area or a crosswalk to another project's terms from the Concepts page.
+      </p>
+    </div>
+  )
+}
+
+function GradeBandSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [frameworks, setFrameworks] = useState<FrameworkRow[] | null>(null)
+  const [choice, setChoice] = useState<string>(project.grade_framework_id ?? '')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => { listAvailableFrameworks(supabase, 'grade-band').then(setFrameworks) }, [supabase])
+
+  const save = async (next: string) => {
+    setChoice(next)
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ grade_framework_id: next || null }).eq('id', project.id)
+    setBusy(false)
+    if (error) setChoice(project.grade_framework_id ?? '')
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><GraduationCap size={14} />Grade-band framework</h4>
+      {frameworks === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        <div className="field">
+          <select value={choice} disabled={busy} onChange={(e) => save(e.target.value)}>
+            <option value="">None set — define a custom grade-band scheme later</option>
+            {frameworks.map((f) => (
+              <option key={f.id} value={f.id}>{f.label}{f.project_id === null ? ' (ecosystem reference)' : ''}</option>
+            ))}
+          </select>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SourceDeclarationsSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [sources, setSources] = useState<SourceDeclarationRow[] | null>(null)
+  const [draft, setDraft] = useState({ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' as AccessTier | '' })
+  const [busy, setBusy] = useState(false)
+
+  const reload = () => {
+    supabase.from('project_source_declarations').select('*').eq('project_id', project.id).order('created_at').then(({ data }) => setSources(data ?? []))
+  }
+  useEffect(reload, [supabase, project.id])
+
+  const add = async () => {
+    if (!draft.sourceName.trim()) return
+    setBusy(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('project_source_declarations').insert({
+      project_id: project.id,
+      source_name: draft.sourceName.trim(),
+      format: draft.format.trim() || null,
+      license_or_rights_note: draft.licenseNote.trim() || null,
+      url: draft.url.trim() || null,
+      access_tier: draft.accessTier || null,
+      created_by: user?.id ?? null,
+    })
+    setDraft({ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' })
+    reload()
+    setBusy(false)
+  }
+
+  const remove = async (id: string) => {
+    setBusy(true)
+    await supabase.from('project_source_declarations').delete().eq('id', id)
+    reload()
+    setBusy(false)
+  }
+
+  return (
+    <div>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Library size={14} />Sources & rights</h4>
+      <p className="muted" style={{ fontSize: 12.5, marginTop: 0 }}>What curriculum policies or competency frameworks this project brings in, and the rights to use them.</p>
+      {sources === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        sources.map((s) => {
+          const tier = ACCESS_TIER_OPTIONS.find((opt) => opt.value === s.access_tier)
+          return (
+            <div key={s.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+              <span>
+                {s.source_name}
+                {s.format && <span className="muted" style={{ fontSize: 12 }}> · {s.format}</span>}
+                {tier?.value && <span className="muted" style={{ fontSize: 12 }}> · {ACCESS_TIER_LABEL_SHORT[tier.value]}</span>}
+              </span>
+              <button className="btn btn-mini" disabled={busy} onClick={() => remove(s.id)}><Trash2 size={12} /></button>
+            </div>
+          )
+        })
+      )}
+      <div style={{ marginTop: 10 }}>
+        <div className="grid grid-2">
+          <div className="field">
+            <label>Source name</label>
+            <input value={draft.sourceName} onChange={(e) => setDraft({ ...draft, sourceName: e.target.value })} placeholder="e.g. Bavaria Biologie Lehrplan" />
+          </div>
+          <div className="field">
+            <label>Format</label>
+            <input value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value })} placeholder="e.g. PDF, CASE, SPARQL" />
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>Rights / license note</label>
+            <input value={draft.licenseNote} onChange={(e) => setDraft({ ...draft, licenseNote: e.target.value })} placeholder="e.g. Public domain government document" />
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>How much of this source can we actually keep?</label>
+            <select value={draft.accessTier} onChange={(e) => setDraft({ ...draft, accessTier: e.target.value as AccessTier | '' })}>
+              {ACCESS_TIER_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>URL (optional)</label>
+            <input value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value })} placeholder="https://…" />
+          </div>
+        </div>
+        <button className="btn btn-mini" disabled={busy || !draft.sourceName.trim()} onClick={add}><Plus size={12} />Add source</button>
+      </div>
+    </div>
+  )
+}
+
+const ACCESS_TIER_LABEL_SHORT: Record<AccessTier, string> = {
+  'full-text-stored': 'full text',
+  'excerpt-only': 'excerpts only',
+  'summary-only': 'summary only',
+  'citation-only': 'citation only',
 }
 
 // ============================================================================
