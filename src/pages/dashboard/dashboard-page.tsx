@@ -177,8 +177,13 @@ function ProjectsSection({
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 8 }}>
         <div>
           <h2 className="row"><FolderKanban size={16} style={{ color: 'var(--text-muted)' }} />Projects in this Space</h2>
+          {/* Real feedback f316c6a2 (Susan): "/style-check all text on this
+              page, specifically get rid of any mention of 'echt'" -- this
+              opened with "Real efforts," a reflexive self-vouching "real"
+              Dustin's own writing-style rule already bans. State the fact,
+              skip the qualifier. */}
           <p className="muted" style={{ marginBottom: 12 }}>
-            Real efforts inside {project.name} — some fully proven, some still early drafts.
+            Efforts inside {project.name} — some fully proven, some still early drafts.
           </p>
         </div>
         {canManage && (
