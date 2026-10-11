@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { ChevronDown, ChevronRight, LayoutList, Layers, Loader2, Maximize2, Network, Shapes, X } from 'lucide-react'
+import dagre from 'cytoscape-dagre'
+import { ChevronDown, ChevronRight, Download, LayoutList, Layers, Loader2, Maximize2, Network, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { layoutTier } from '@/lib/graph-layout'
+
+cytoscape.use(dagre)
 
 function cssVar(name: string, fallback: string) {
   if (typeof window === 'undefined') return fallback
@@ -14,6 +16,24 @@ function cssVar(name: string, fallback: string) {
 }
 
 const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--map-6']
+
+// Real feedback 2427b091 (Dustin): "zooming the full map to fit perfectly
+// within the window on loading" -- a plain cy.fit() does exactly that, but
+// for a real tree this size (EvoMentor Thuringia: ~130 nodes once laid out
+// with real, non-overlapping spacing) that means zooming out far enough
+// that every node and label becomes illegible, which defeats the point of
+// fitting in the first place. Fits, then refuses to go below a zoom level
+// where a label would still be readable -- the whole tree may no longer
+// fit in that case, but what's on screen is actually usable, and panning
+// reaches the rest.
+const MIN_READABLE_ZOOM = 0.45
+function fitWithReadableFloor(cy: Core) {
+  cy.fit(undefined, 24)
+  if (cy.zoom() < MIN_READABLE_ZOOM) {
+    cy.zoom(MIN_READABLE_ZOOM)
+    cy.center()
+  }
+}
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 type ProjectRow = Database['public']['Tables']['projects']['Row']
@@ -478,43 +498,6 @@ function ConceptGraph({
 
   useEffect(() => {
     if (!containerRef.current) return
-    const width = containerRef.current.clientWidth || 700
-
-    // Real bug found live 2026-10-01 (Dustin: "makes little to no sense"):
-    // Cytoscape's 'breadthfirst'+circle layout treats this real tree (a
-    // handful of root concepts, each with a real and sometimes-large
-    // number of its own sub-concepts, no edges between siblings) as a
-    // tangle -- the same category of problem the student Netz tab's own
-    // 'cose' layout had, rejected there 2026-09-30 for the identical
-    // reason. Same fix: a deterministic tiered layout, one row per real
-    // depth level, reusing the exact layoutTier helper Netz already
-    // proved out rather than inventing a second algorithm. Depth isn't
-    // hardcoded to 2 -- this walks however many real levels the taxonomy
-    // actually has, same generality the original code already had.
-    const maxDepth = taxonomy.reduce((m, n) => Math.max(m, depthOf.get(n.id) ?? 0), 0)
-    const positions = new Map<string, { x: number; y: number }>()
-    const ROW_GAP = 64
-    const CHILD_SPACING = 74
-    roots.forEach((r, i) => positions.set(r.id, { x: (i + 0.5) * (width / Math.max(1, roots.length)), y: 36 }))
-    let currentLevel = roots.map((r) => r.id)
-    let y = 36
-    for (let depth = 1; depth <= maxDepth; depth++) {
-      let maxRowsThisLevel = 0
-      const nextLevel: string[] = []
-      for (const parentId of currentLevel) {
-        const kids = taxonomy.filter((n) => n.parent_id === parentId)
-        if (kids.length === 0) continue
-        const parentPos = positions.get(parentId)
-        if (!parentPos) continue
-        const maxWidth = Math.max(CHILD_SPACING, CHILD_SPACING * Math.ceil(Math.sqrt(kids.length)))
-        const { positions: kidPositions, rows } = layoutTier(kids.map((k) => ({ id: k.id })), parentPos.x, y + ROW_GAP, maxWidth, ROW_GAP * 0.65, CHILD_SPACING)
-        for (const [id, pos] of kidPositions) positions.set(id, pos)
-        maxRowsThisLevel = Math.max(maxRowsThisLevel, rows)
-        nextLevel.push(...kids.map((k) => k.id))
-      }
-      y += ROW_GAP + maxRowsThisLevel * (ROW_GAP * 0.65)
-      currentLevel = nextLevel
-    }
 
     const elements: ElementDefinition[] = [
       ...taxonomy.map((n) => {
@@ -522,10 +505,7 @@ function ConceptGraph({
         const depth = depthOf.get(n.id) ?? 0
         const colorVar = MAP_PALETTE[(rootIndexOf.get(n.id) ?? 0) % MAP_PALETTE.length]
         const size = Math.max(10, 36 - depth * 8) + Math.min(count, 10) * 1.3
-        return {
-          data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size, depth },
-          position: positions.get(n.id) ?? { x: width / 2, y: y + 60 },
-        }
+        return { data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size, depth } }
       }),
       ...taxonomy
         .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
@@ -536,8 +516,29 @@ function ConceptGraph({
       container: containerRef.current,
       elements,
       boxSelectionEnabled: false,
-      layout: { name: 'preset' },
-      minZoom: 0.3,
+      // Real feedback 2427b091 (Dustin): the hand-rolled tiered layout this
+      // replaced (itself a 2026-10-01 fix for breadthfirst/cose both
+      // tangling this same tree -- see Netz's own identical history) still
+      // overlapped nodes and labels once a root had many real children: it
+      // split the canvas evenly across root concepts regardless of how
+      // many descendants each one actually has, so a root with a large
+      // subtree (Evolutive Entwicklung, EvoMentor Thuringia's biggest)
+      // spilled into its neighbors' lanes. dagre (cytoscape-dagre) is a
+      // real hierarchical-graph layout algorithm built specifically to
+      // avoid exactly this for a tree -- every subtree gets the width it
+      // actually needs instead of a hand-estimated square, and
+      // nodeDimensionsIncludeLabels makes it account for each node's real
+      // rendered size (not just the circle) when spacing siblings.
+      layout: {
+        name: 'dagre',
+        rankDir: 'TB',
+        nodeSep: 26,
+        rankSep: 64,
+        nodeDimensionsIncludeLabels: true,
+        fit: false,
+        animate: false,
+      } as any,
+      minZoom: 0.1,
       maxZoom: 3,
       style: [
         {
@@ -586,7 +587,7 @@ function ConceptGraph({
     // height from the viewport, not page scroll), so a real multi-row
     // tiered tree needs an explicit fit rather than a JS-set pixel height
     // (which `inset:0` would just override anyway).
-    cy.fit(undefined, 24)
+    fitWithReadableFloor(cy)
     cyRef.current = cy
     return () => { cy.destroy() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -605,17 +606,47 @@ function ConceptGraph({
     }
   }, [selectedId])
 
+  // Real feedback 2427b091 (Dustin): "let users download the map image as
+  // PNG." Cytoscape's own built-in export -- `full: true` captures the
+  // whole graph, not just the current viewport, so the downloaded image
+  // matches what "Fit to screen" shows, not whatever happened to be
+  // scrolled into view; `bg` set explicitly since a transparent PNG
+  // dropped onto a slide or doc would otherwise pick up whatever's behind
+  // it, not this page's own background.
+  const downloadPng = () => {
+    const cy = cyRef.current
+    if (!cy) return
+    const uri = cy.png({ full: true, scale: 2, bg: cssVar('--surface-0', '#ffffff') })
+    const a = document.createElement('a')
+    a.href = uri
+    a.download = 'concept-map.png'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
+
   return (
-    <div className="graph-host">
+    // Real feedback 2427b091 (Dustin): the default 400px floor (shared with
+    // Notebooks/Learning Goals' own smaller graphs) left too little room
+    // once overlap-free spacing made this particular tree genuinely wide --
+    // fitting ~130 real nodes into 400px of height forced the zoom down to
+    // illegible. Taller here specifically (not changed globally, since the
+    // other two consumers' graphs are usually much smaller).
+    <div className="graph-host" style={{ minHeight: 640 }}>
       <div ref={containerRef} className="graph-canvas" />
-      <button
-        className="btn btn-mini"
-        style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
-        aria-label="Fit to screen"
-        onClick={() => cyRef.current?.fit(undefined, 24)}
-      >
-        <Maximize2 size={12} />
-      </button>
+      <div className="row" style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, gap: 6 }}>
+        <button className="btn btn-mini" aria-label="Download as PNG" title="Download as PNG" onClick={downloadPng}>
+          <Download size={12} />
+        </button>
+        <button
+          className="btn btn-mini"
+          aria-label="Fit to screen"
+          title="Fit to screen"
+          onClick={() => { if (cyRef.current) fitWithReadableFloor(cyRef.current) }}
+        >
+          <Maximize2 size={12} />
+        </button>
+      </div>
       {taxonomy.length === 0 && (
         <div className="empty" style={{ position: 'absolute', inset: 0 }}>
           <Network size={32} />
