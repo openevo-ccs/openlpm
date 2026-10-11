@@ -11,12 +11,12 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
-import { bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
-import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
+import { goalMethodKey, listFavoriteGoalMethods, listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteGoalMethod, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 
 // The German, student-facing Lernziele explorer -- same real data as the
 // researcher Learning Goals page (same listTopics/getTopic/thread helpers),
@@ -28,16 +28,6 @@ import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
 
 function gradeChipLabel(g: string): string {
   return `Kl. ${g}`
-}
-
-// Real Thuringia curriculum structure, named directly by Susan Hanisch
-// (feedback 2026-10-01): grades 5/6 and 7/8 are taught as one combined band,
-// not as six separate single-grade steps -- Kl.9 and Kl.10 stay their own
-// band. Grouping happens purely in this filter UI; `grade_band` itself still
-// stores a single real grade per Lernziel, so no data migration is needed.
-const GRADE_BAND_KEY: Record<string, string> = { '5': '5/6', '6': '5/6', '7': '7/8', '8': '7/8' }
-function bandKeyForGrade(g: string): string {
-  return GRADE_BAND_KEY[g] ?? g
 }
 
 const RELEVANCE_LEVELS = [1, 2, 3] as const
@@ -59,7 +49,9 @@ const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel
 // present in the real data if no library resolves for this project (same
 // "never offer an option that matches nothing real" spirit as the original
 // hardcoded list's own comment).
-const METHOD_ICON: Record<string, string> = {
+// Exported for learning-goals-page.tsx's researcher-facing Methods tab, so
+// the two don't drift into separate icon sets for the same vocabulary.
+export const METHOD_ICON: Record<string, string> = {
   'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩',
   '(bioethische) Diskussion': '💬', 'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪',
   'Erfahrungs-/handlungsorientiertes Lernen': '🖐️', 'Digitale Medien': '💻', 'Recherche': '📚',
@@ -205,6 +197,18 @@ export default function StudentLernzielePage() {
   const [methodFilter, setMethodFilter] = useState<Set<string>>(new Set())
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  // Real feedback 910b0c18 (Susan, repeat ask): favoriting a method already
+  // existed for the AI Prompt Generator's own checklist (user_favorite_methods,
+  // migration 077) but was never wired into this page's method filter or the
+  // inline per-goal "Didaktische Strategien" list -- same data, just missing
+  // from these two render sites.
+  const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
+  // Real feedback 3f22dcd5 (Susan): the per-goal method SUGGESTION star
+  // (inside Didaktische Strategien) needed its own, learning-goal-scoped
+  // favorite instead of reusing favoriteMethods above (which stays exactly
+  // what it was -- the sidebar filter's general, not-tied-to-one-goal
+  // favorite). Composite `${objectId}::${method}` keys, see favorites.ts.
+  const [favoriteGoalMethods, setFavoriteGoalMethods] = useState<Set<string>>(new Set())
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
   // Every schema element (root Basiskonzepte AND their real sub-concepts),
   // keyed by id -- resolves relevante_unterkonzepte_taxonomie[].
@@ -227,6 +231,8 @@ export default function StudentLernzielePage() {
     setTopics(null)
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
     listFavoriteIds(supabase).then(setFavorites)
+    listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
+    listFavoriteGoalMethods(supabase).then(setFavoriteGoalMethods)
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
     getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
@@ -435,6 +441,29 @@ export default function StudentLernzielePage() {
     await toggleFavorite(supabase, id, isFav)
   }
 
+  const onToggleFavoriteMethod = async (methodKey: string) => {
+    const isFav = favoriteMethods.has(methodKey)
+    setFavoriteMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(methodKey)
+      else next.add(methodKey)
+      return next
+    })
+    await toggleFavoriteMethod(supabase, methodKey, isFav)
+  }
+
+  const onToggleFavoriteGoalMethod = async (dataObjectId: string, methodKey: string) => {
+    const key = goalMethodKey(dataObjectId, methodKey)
+    const isFav = favoriteGoalMethods.has(key)
+    setFavoriteGoalMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(key)
+      else next.add(key)
+      return next
+    })
+    await toggleFavoriteGoalMethod(supabase, dataObjectId, methodKey, isFav)
+  }
+
   const onToggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev)
@@ -456,6 +485,16 @@ export default function StudentLernzielePage() {
           <div className="field">
             <div className="row"><Search size={14} style={{ color: 'var(--text-muted)' }} /><input type="search" placeholder="Suchen…" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
           </div>
+
+          {/* Real feedback 9a49a60f (Susan): this used to sit at the very
+              bottom of the sidebar, below 6 Basiskonzept checkboxes AND 15
+              method checkboxes -- easy to miss, and far from the rest of the
+              "which learning goals am I looking at" controls. Moved next to
+              the search box, the first real filter a visitor sees. */}
+          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
+            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
+            <Star size={13} />nur Favoriten
+          </label>
 
           <p className="muted student-filter-label">KLASSENSTUFE</p>
           <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
@@ -523,15 +562,18 @@ export default function StudentLernzielePage() {
                   {activeLevels && (
                     <div className="row" style={{ gap: 5, marginLeft: 21, marginTop: 3, alignItems: 'center' }}>
                       <span className="muted" style={{ fontSize: 10 }}>Relevanz:</span>
+                      {/* Real feedback 769c5b85 (Susan): these should just
+                          show dots in the Basiskonzept's own color, without
+                          the chip-btn.active turquoise pill background. */}
                       {RELEVANCE_LEVELS.map((lvl) => (
                         <button
                           key={lvl}
-                          className={`chip-btn${activeLevels.has(lvl) ? ' active' : ''}`}
-                          style={{ padding: '1px 7px', fontSize: 10.5 }}
+                          className="chip-btn"
+                          style={{ padding: '1px 7px', fontSize: 10.5, background: 'none', border: activeLevels.has(lvl) ? '1px solid var(--border)' : '1px solid transparent' }}
                           title={RELEVANCE_LEVEL_LABEL[lvl]}
                           onClick={() => toggleConceptLevel(g.rootId, lvl)}
                         >
-                          <RelevanceDots level={lvl} />
+                          <RelevanceDots level={lvl} color={rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : undefined} />
                         </button>
                       ))}
                     </div>
@@ -548,14 +590,18 @@ export default function StudentLernzielePage() {
                 <input type="checkbox" checked={methodFilter.has(m)} onChange={() => toggleMethod(m)} />
                 <span aria-hidden="true">{METHOD_ICON[m] ?? DEFAULT_METHOD_ICON}</span>
                 <span>{m}</span>
+                <button
+                  type="button"
+                  className="btn-linklike"
+                  aria-label="Methode favorisieren"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteMethod(m) }}
+                  style={{ padding: 0, display: 'inline-flex' }}
+                >
+                  <Star size={11} fill={favoriteMethods.has(m) ? 'var(--series-a, gold)' : 'none'} />
+                </button>
               </label>
             ))}
           </div>
-
-          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
-            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
-            <Star size={13} />nur Favoriten
-          </label>
         </aside>
 
         <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>
@@ -615,6 +661,10 @@ export default function StudentLernzielePage() {
                   conceptElementsById={conceptElementsById}
                   isFavorite={favorites.has(t.id)}
                   onToggleFavorite={onToggleFavorite}
+                  favoriteMethods={favoriteMethods}
+                  onToggleFavoriteMethod={onToggleFavoriteMethod}
+                  favoriteGoalMethods={favoriteGoalMethods}
+                  onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
                   isExpanded={expandedIds.has(t.id)}
                   onToggleExpand={onToggleExpand}
                   supabase={supabase}
@@ -639,6 +689,10 @@ function LernzielCard({
   conceptElementsById,
   isFavorite,
   onToggleFavorite,
+  favoriteMethods,
+  onToggleFavoriteMethod,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
   isExpanded,
   onToggleExpand,
   supabase,
@@ -653,6 +707,10 @@ function LernzielCard({
   conceptElementsById: Map<string, SchemaElement>
   isFavorite: boolean
   onToggleFavorite: (id: string) => void
+  favoriteMethods: Set<string>
+  onToggleFavoriteMethod: (methodKey: string) => void
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
   isExpanded: boolean
   onToggleExpand: (id: string) => void
   supabase: ProjectOutletContext['supabase']
@@ -737,7 +795,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
+          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
         </div>
       )}
     </div>
@@ -753,6 +811,8 @@ function LernzielCardDetail({
   rootIdxById,
   rawIdToGroupKey,
   conceptElementsById,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
 }: {
   objectId: string
   content: unknown
@@ -762,6 +822,8 @@ function LernzielCardDetail({
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
   conceptElementsById: Map<string, SchemaElement>
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
 }) {
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
 
@@ -776,9 +838,22 @@ function LernzielCardDetail({
     <div>
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
-      <DidaktischeStrategienSection content={content} />
+      <DidaktischeStrategienSection objectId={objectId} content={content} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} />
 
-      {stations && stations.length > 0 && stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+      {/* Real feedback 95972f01 (Susan): this showed up with no header and
+          no explanation of what it is or how common it is. These are
+          hand-curated cross-topic connections ("Threads"), authored live by
+          researchers on the Learning Goals page -- most Lernziele don't have
+          one yet, so its absence here is expected, not a gap in this card. */}
+      {stations && stations.length > 0 && (
+        <section style={{ marginBottom: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>Vernetztes Lernen</p>
+          <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>
+            Hand ausgewählte Verbindungen zu anderen Themen, die über dieselbe Grundidee zusammenhängen. Nicht jedes Lernziel hat eine.
+          </p>
+          {stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+        </section>
+      )}
 
       {stations?.length === 0 && entries.length === 0 && (
         <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>
@@ -796,7 +871,17 @@ function LernzielCardDetail({
 // same real content here. Read defensively: not every imported Lernziel
 // has this field populated, same discipline as prompt-builder.tsx's own
 // comment about didaktische_strategien/originaltext.
-function DidaktischeStrategienSection({ content }: { content: unknown }) {
+function DidaktischeStrategienSection({
+  objectId,
+  content,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
+}: {
+  objectId: string
+  content: unknown
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+}) {
   const [open, setOpen] = useState(false)
   const ds = (content as any)?.didaktische_strategien
   if (!ds) return null
@@ -811,9 +896,12 @@ function DidaktischeStrategienSection({ content }: { content: unknown }) {
   // one per line.
   const methoden = (ds.top3_methoden ?? []).filter((m: any) => m?.methode)
   return (
-    <section style={{ marginBottom: 18 }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
-        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+    // Real feedback 70d0770a (Susan): this section and BkRelevanceSection
+    // above it needed clearer visual separation -- a line like the one
+    // above the whole expanded block, and bigger section headers.
+    <section style={{ marginBottom: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Didaktische Strategien ausblenden' : 'Didaktische Strategien anzeigen'}
       </button>
       {open && (
@@ -829,6 +917,22 @@ function DidaktischeStrategienSection({ content }: { content: unknown }) {
                   <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
                     <span aria-hidden="true">{METHOD_ICON[m.methode] ?? '•'}</span>
                     <span><strong>{m.methode}</strong>{m.beschreibung ? <> — {m.beschreibung}</> : null}</span>
+                    {/* Real feedback 910b0c18 (Susan, repeat ask): favoriting
+                        a method already existed in the Prompt Generator's own
+                        checklist -- just never shown here. Real feedback
+                        3f22dcd5 (Susan, follow-up): this star favorites THIS
+                        suggestion on THIS learning goal, not the method in
+                        general -- goalMethodKey-scoped, a separate favorite
+                        from the sidebar filter's general method star. */}
+                    <button
+                      type="button"
+                      className="btn-linklike"
+                      aria-label="Diese Methodenempfehlung favorisieren"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteGoalMethod(objectId, m.methode) }}
+                      style={{ padding: 0, display: 'inline-flex', marginLeft: 2 }}
+                    >
+                      <Star size={11} fill={favoriteGoalMethods.has(goalMethodKey(objectId, m.methode)) ? 'var(--series-a, gold)' : 'none'} />
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -866,8 +970,8 @@ function BkRelevanceSection({
   if (entries.length === 0) return null
   return (
     <section style={{ marginBottom: 18 }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
-        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Basiskonzept-Bezüge ausblenden' : 'Basiskonzept-Bezüge anzeigen'}
       </button>
       {open && (

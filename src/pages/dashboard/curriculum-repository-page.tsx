@@ -19,7 +19,7 @@ import {
   type RepositoryRecordRow,
   type SupersessionInfo,
 } from '@/lib/supabase/curriculum-repository'
-import { RECORD_TYPE_BLURB, RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import { RECORD_TYPE_BLURB, RECORD_TYPE_COLOR, RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
 
 // "Browse + connect" -- real sourced national/regional curriculum-policy
 // material (deutsche-lpm/nys-lpm today), invite-only. Any member can look at
@@ -82,10 +82,11 @@ export default function CurriculumRepositoryPage() {
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 className="row"><Library size={18} style={{ color: 'var(--text-muted)' }} />Curriculum Repository</h1>
-          <p className="muted" style={{ marginBottom: 12, maxWidth: 640 }}>
-            Real, sourced curriculum-policy material for this jurisdiction. Each item is shown only as
-            much as its own source allows — some are full excerpts, most today are citation only (a
-            pointer to the source rather than the text itself) until someone reviews them for more.
+          <p className="muted row" style={{ marginBottom: 12, maxWidth: 640, gap: 5, alignItems: 'flex-start' }}>
+            Sourced curriculum-policy material for this jurisdiction.
+            <span title="Each record is shown as fully as its own source allows. Most today are citation-only -- a pointer to the source rather than the full text -- until someone reviews them for more." style={{ cursor: 'help' }}>
+              <Info size={13} style={{ verticalAlign: 'text-bottom' }} />
+            </span>
           </p>
         </div>
         {canManage && (
@@ -135,15 +136,20 @@ export default function CurriculumRepositoryPage() {
             {records.map((r) => (
               <button
                 key={r.id}
-                className="btn-linklike row"
-                style={{ display: 'flex', width: '100%', textAlign: 'left', padding: '6px 0', gap: 6, alignItems: 'flex-start', fontWeight: r.id === recordId && !creating ? 600 : 400 }}
+                className="btn-linklike"
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', marginBottom: 6,
+                  borderLeft: `3px solid ${RECORD_TYPE_COLOR[r.record_type]}`, borderRadius: 4, textDecoration: 'none',
+                  background: r.id === recordId && !creating ? 'var(--surface-2)' : 'var(--surface-1)',
+                }}
                 onClick={() => { setCreating(false); navigate(`/dashboard/${project.slug}/curriculum-repository/${r.id}`) }}
               >
-                <span style={{ marginTop: 2 }}><RecordKindIcon type={r.record_type} /></span>
-                <span>
-                  {r.title}
-                  <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>{RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}</span>
+                <span className="row" style={{ gap: 5, alignItems: 'center', marginBottom: 2 }}>
+                  <RecordKindIcon type={r.record_type} size={12} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: RECORD_TYPE_COLOR[r.record_type] }}>{RECORD_TYPE_LABEL[r.record_type]}</span>
+                  {r.jurisdiction && <span className="muted" style={{ fontSize: 11 }}>· {r.jurisdiction}</span>}
                 </span>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block' }}>{r.title}</span>
               </button>
             ))}
           </div>

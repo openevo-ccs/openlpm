@@ -1,6 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
-import { ADMIN_EMAIL } from '@/lib/admin'
 
 type Client = SupabaseClient<Database>
 
@@ -93,7 +92,14 @@ export async function getProjectBySlug(
   // 'owner' gives the same UI capability (canManage, Danger zone, etc.) a
   // real owner gets -- joinedVia stays null, so this never gets mistaken
   // for a self-joined student view.
-  if (user.email === ADMIN_EMAIL) {
+  //
+  // Checks the real users.role column (2026-10-10, fixing a real gap: this
+  // used to compare user.email against a single hardcoded ADMIN_EMAIL
+  // constant, which meant a second real admin -- e.g. a platform admin
+  // granted via the users table directly -- would still silently hit the
+  // "you don't have access" screen on any project they don't belong to).
+  const { data: self } = await (supabase as any).from('users').select('role').eq('id', user.id).maybeSingle()
+  if (self?.role === 'admin') {
     return { project, role: 'owner', joinedVia: null }
   }
 

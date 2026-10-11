@@ -95,6 +95,114 @@ export type Database = {
         }
         Relationships: []
       }
+      literaturebase_snapshot: {
+        Row: {
+          id: string
+          slug: string
+          title: string
+          authors: string[]
+          year: number | null
+          venue: string | null
+          doi: string | null
+          type: string | null
+          license: string | null
+          domains: string[]
+          status: string | null
+          review_status: string | null
+          data: Json
+          synced_at: string
+        }
+        Insert: {
+          id: string
+          slug: string
+          title: string
+          authors?: string[]
+          year?: number | null
+          venue?: string | null
+          doi?: string | null
+          type?: string | null
+          license?: string | null
+          domains?: string[]
+          status?: string | null
+          review_status?: string | null
+          data: Json
+          synced_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          title?: string
+          authors?: string[]
+          year?: number | null
+          venue?: string | null
+          doi?: string | null
+          type?: string | null
+          license?: string | null
+          domains?: string[]
+          status?: string | null
+          review_status?: string | null
+          data?: Json
+          synced_at?: string
+        }
+        Relationships: []
+      }
+      literature_contributions: {
+        Row: {
+          id: string
+          literature_reference_id: string
+          project_id: string
+          status: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml: string
+          target_branch: string | null
+          target_record_id: string | null
+          note: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          literature_reference_id: string
+          project_id: string
+          status?: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml: string
+          target_branch?: string | null
+          target_record_id?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          literature_reference_id?: string
+          project_id?: string
+          status?: 'drafted' | 'branch_committed' | 'pr_opened' | 'merged' | 'rejected'
+          draft_yaml?: string
+          target_branch?: string | null
+          target_record_id?: string | null
+          note?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "literature_contributions_literature_reference_id_fkey",
+            columns: ["literature_reference_id"],
+            isOneToOne: false,
+            referencedRelation: "literature_references",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "literature_contributions_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       lpm_schema_elements: {
         Row: {
           id: string

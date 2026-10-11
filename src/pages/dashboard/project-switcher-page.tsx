@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FolderKanban, Library, Plus, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
-import { ADMIN_EMAIL } from '@/lib/admin'
 import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listAllProjects } from '@/lib/supabase/admin-users'
 import { listMyPendingRequests, respondToMemberRequest, type PendingRequestForUser } from '@/lib/supabase/members'
@@ -46,8 +45,7 @@ const CURATION_GLOSS: Record<Curation, string> = {
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
   const navigate = useNavigate()
-  const { session } = useSession()
-  const isAdmin = session?.user.email === ADMIN_EMAIL
+  const { isAdmin } = useSession()
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
   const [allProjects, setAllProjects] = useState<ProjectWithRole['project'][] | null>(null)
   // Both on by default -- this only narrows the view, never hides a project

@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Library, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Library, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, ShieldCheck, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
-import { ADMIN_EMAIL } from '@/lib/admin'
 import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
@@ -17,6 +16,7 @@ import {
   listAllUsers,
   removeAdminJoinRule,
   setUserBlocked,
+  setUserPlatformAdmin,
   type AdminJoinRule,
   type AdminMembershipRow,
   type AdminProjectRow,
@@ -28,8 +28,9 @@ import {
 // for the real decision record (feedback 908d1311). Everything here centralizes
 // actions that already existed per-project (dashboard-page.tsx's Members card)
 // plus one genuinely new capability: a reversible sign-in lock. Gated the same
-// way admin-feedback-page.tsx is -- client-side ADMIN_EMAIL check for what
-// renders, migration 049's RLS is the real boundary underneath.
+// way admin-feedback-page.tsx is -- the real users.role column (via
+// useSession's isAdmin) decides what renders, migration 049's RLS is the
+// real boundary underneath.
 
 const ROLES: ProjectMemberRole[] = ['owner', 'maintainer', 'editor', 'reviewer', 'contributor', 'viewer']
 
@@ -69,15 +70,13 @@ const EPISTEMIC_STATUS_OPTIONS: { value: AdminProjectRow['epistemic_status']; la
 ]
 
 export default function AdminUsersPage() {
-  const { session } = useSession()
+  const { session, isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
   const [users, setUsers] = useState<AdminUserRow[] | null>(null)
   const [memberships, setMemberships] = useState<AdminMembershipRow[] | null>(null)
   const [projects, setProjects] = useState<AdminProjectRow[] | null>(null)
   const [joinRules, setJoinRules] = useState<AdminJoinRule[] | null>(null)
   const [feedback, setFeedback] = useState<FeedbackItem[] | null>(null)
-
-  const isAdmin = session?.user.email === ADMIN_EMAIL
 
   const reload = () => {
     listAllUsers(supabase).then(setUsers)
@@ -140,7 +139,7 @@ export default function AdminUsersPage() {
                 memberships={membershipsByUser.get(u.id) ?? []}
                 projects={projects ?? []}
                 supabase={supabase}
-                isSelf={u.email === ADMIN_EMAIL}
+                isSelf={u.email === session?.user.email}
                 onChanged={reload}
               />
             ))}
@@ -191,6 +190,7 @@ function TestAccountsSection({
   supabase: ReturnType<typeof createClient>
   onChanged: () => void
 }) {
+  const { session } = useSession()
   const [open, setOpen] = useState(false)
   if (users.length === 0) return null
   return (
@@ -212,7 +212,7 @@ function TestAccountsSection({
               memberships={membershipsByUser.get(u.id) ?? []}
               projects={projects}
               supabase={supabase}
-              isSelf={u.email === ADMIN_EMAIL}
+              isSelf={u.email === session?.user.email}
               onChanged={onChanged}
             />
           ))}
@@ -300,10 +300,21 @@ function UserRow({
   const [busy, setBusy] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const blocked = !!user.blocked_at
+  const isAdmin = user.role === 'admin'
 
   const toggleBlocked = async () => {
     setBusy(true)
     await setUserBlocked(supabase, user.id, !blocked)
+    setBusy(false)
+    onChanged()
+  }
+
+  const toggleAdmin = async () => {
+    if (!window.confirm(isAdmin
+      ? `Remove admin from ${user.email}? They'll keep their own project memberships, but lose visibility into every project and account platform-wide.`
+      : `Make ${user.email} an admin? They'll see and manage every project, repository, and account on OpenLPM -- not just the ones they're a member of.`)) return
+    setBusy(true)
+    await setUserPlatformAdmin(supabase, user.id, !isAdmin)
     setBusy(false)
     onChanged()
   }
@@ -321,6 +332,7 @@ function UserRow({
           {expanded ? <ChevronDown size={13} style={{ flexShrink: 0 }} /> : <ChevronRight size={13} style={{ flexShrink: 0 }} />}
           <strong>{user.name}</strong>
           <span className="muted">{user.email}</span>
+          {isAdmin && <span className="chip chip-progress">Admin</span>}
           {blocked && <span className="chip chip-critical">Blocked</span>}
           {!expanded && (
             <span className="muted" style={{ fontSize: 12 }}>
@@ -331,16 +343,26 @@ function UserRow({
         {isSelf ? (
           <span className="muted" style={{ fontSize: 12, flexShrink: 0 }}>This is you</span>
         ) : (
-          <button
-            className={`btn btn-mini${blocked ? '' : ' btn-danger'}`}
-            disabled={busy}
-            onClick={toggleBlocked}
-            title={blocked ? 'Let them sign in again' : "Block this account from signing in -- reversible, nothing is deleted"}
-            style={{ flexShrink: 0 }}
-          >
-            {blocked ? <UserCheck size={11} /> : <UserX size={11} />}
-            {blocked ? 'Unblock' : 'Block'}
-          </button>
+          <div className="row" style={{ gap: 6, flexShrink: 0 }}>
+            <button
+              className="btn btn-mini"
+              disabled={busy}
+              onClick={toggleAdmin}
+              title={isAdmin ? 'Remove platform-wide admin access' : 'Grant platform-wide admin access -- every project and account, not just their own'}
+            >
+              <ShieldCheck size={11} />
+              {isAdmin ? 'Remove admin' : 'Make admin'}
+            </button>
+            <button
+              className={`btn btn-mini${blocked ? '' : ' btn-danger'}`}
+              disabled={busy}
+              onClick={toggleBlocked}
+              title={blocked ? 'Let them sign in again' : "Block this account from signing in -- reversible, nothing is deleted"}
+            >
+              {blocked ? <UserCheck size={11} /> : <UserX size={11} />}
+              {blocked ? 'Unblock' : 'Block'}
+            </button>
+          </div>
         )}
       </div>
 

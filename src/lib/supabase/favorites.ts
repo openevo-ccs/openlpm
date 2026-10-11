@@ -71,3 +71,64 @@ export async function toggleFavoriteMethod(supabase: Client, methodKey: string, 
     .from('user_favorite_methods')
     .insert({ user_id: user.id, method_key: methodKey })
 }
+
+// user_favorite_goal_methods (migration 119) -- real feedback 3f22dcd5
+// (Susan Hanisch, 2026-10-09): favoriting the specific method SUGGESTION
+// shown on one Lernziel, not the method category in general (that's what
+// user_favorite_methods above is still for -- the Lernziele sidebar's
+// filter checkboxes and the Prompt Generator's general methods checklist
+// are both unaffected by this). Keys are composite
+// `${data_object_id}::${method_key}` strings so the UI can check
+// membership with one Set lookup, same ergonomic as listFavoriteIds.
+
+function goalMethodKey(dataObjectId: string, methodKey: string) {
+  return `${dataObjectId}::${methodKey}`
+}
+
+export async function listFavoriteGoalMethods(supabase: Client): Promise<Set<string>> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return new Set()
+  const { data } = await (supabase as any)
+    .from('user_favorite_goal_methods')
+    .select('data_object_id, method_key')
+    .eq('user_id', user.id)
+  return new Set((data ?? []).map((r: { data_object_id: string; method_key: string }) => goalMethodKey(r.data_object_id, r.method_key)))
+}
+
+export async function toggleFavoriteGoalMethod(supabase: Client, dataObjectId: string, methodKey: string, isFavorite: boolean) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: new Error('Sign in required') }
+
+  if (isFavorite) {
+    return (supabase as any)
+      .from('user_favorite_goal_methods')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('data_object_id', dataObjectId)
+      .eq('method_key', methodKey)
+  }
+  return (supabase as any)
+    .from('user_favorite_goal_methods')
+    .insert({ user_id: user.id, data_object_id: dataObjectId, method_key: methodKey })
+}
+
+/** Every (learning goal, method) favorite the user has among a given set of learning goal ids -- the Prompt Generator's "favorites relevant to your selection" lookup (feedback 3f22dcd5). */
+export async function listFavoriteGoalMethodsFor(supabase: Client, dataObjectIds: string[]): Promise<{ data_object_id: string; method_key: string }[]> {
+  if (dataObjectIds.length === 0) return []
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return []
+  const { data } = await (supabase as any)
+    .from('user_favorite_goal_methods')
+    .select('data_object_id, method_key')
+    .eq('user_id', user.id)
+    .in('data_object_id', dataObjectIds)
+  return data ?? []
+}
+
+export { goalMethodKey }

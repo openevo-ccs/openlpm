@@ -113,3 +113,20 @@ export async function setUserBlocked(supabase: Client, userId: string, blocked: 
     .update({ blocked_at: blocked ? new Date().toISOString() : null })
     .eq('id', userId)
 }
+
+/**
+ * Platform-wide admin (users.role = 'admin', migration 001/049/is_admin()) -- real
+ * feedback b4b7c28c (Dustin, 2026-10-10): "Admin panel needs to allow me to enable
+ * others as Admin." Migration 049's "Admins can update any user" policy already
+ * let an admin do this via a raw API call; this is the actual UI control for it.
+ * Demoting resets to 'contributor' (the universal signup default) -- platform role
+ * has no notion of "the role before admin," and contributor is the correct
+ * baseline for someone no longer meant to see every project/account on the
+ * platform. Never affects a user's per-project membership roles.
+ */
+export async function setUserPlatformAdmin(supabase: Client, userId: string, admin: boolean) {
+  return (supabase as any)
+    .from('users')
+    .update({ role: admin ? 'admin' : 'contributor' })
+    .eq('id', userId)
+}
