@@ -1,65 +1,55 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Check } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
-import { listAvailableFrameworks, listFrameworkTags, type FrameworkRow, type FrameworkTagRow } from '@/lib/supabase/frameworks'
 import { PROJECT_COLORS } from '@/lib/project-colors'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 
-// The "Start new project" flow Dustin asked for: a proper multi-step setup
-// covering geography, language, subject area, grade-band framework, and
-// source/rights declarations -- replacing the bare slug/name/description
-// form that used to be the only way to create a project (and only ever as a
-// child of whatever Space happened to be open). Reachable two ways: from
-// the top-level project switcher (no fixed parent -- creates a new Project
-// Space) via /dashboard/new-project, and from inside an open project (fixed
-// parent -- creates a sub-project) via /dashboard/:project/new-project.
+// Real feedback 55779d95 (Dustin, 2026-10-10): "Not sure what happened
+// here! generally lets make starting a project much easier - give it a
+// name and then let's just enable the settings and dashboard within the
+// project space be where the user can add / update all the other project
+// meta-data." This used to be a 7-step wizard (Basics, Geography, Language,
+// Subject area, Grade bands, Sources & rights, Review) -- the same session
+// that reported this feedback also hit a real bug in it (a capital letter
+// in the slug field triggered a swallowed error, fixed separately in
+// commit 0bcab07). Collapsed down to just this one screen: a name, a short
+// address, and the handful of choices (parent, curation, privacy) that
+// only make sense to ask once, at creation. Geography, working language(s),
+// subject area, grade-band framework, and sources & rights all moved to
+// settings-page.tsx's ProjectDetailsSection, editable any time afterward --
+// not just a one-shot decision a researcher has to get right up front.
 //
-// Known, deliberate scope limits for this first pass (noted inline in the
-// UI, not hidden): a brand-new subject area or grade-band scheme can't be
-// authored *during* wizard creation, since the framework tables' own access
-// rules require a real project to attach new rows to, and this project
-// doesn't exist yet until the final step submits. Both are one-click-away
-// afterward from the Concepts page (subject areas) or a future framework
-// builder (custom grade-bands) -- this wizard picks from what already
-// exists rather than half-building an authoring UI it can't actually use yet.
+// Reachable two ways: from the top-level project switcher (no fixed
+// parent -- creates a new Project Space) via /dashboard/new-project, and
+// from inside an open project (fixed parent -- creates a sub-project) via
+// /dashboard/:project/new-project.
 
 type Project = Database['public']['Tables']['projects']['Row']
 type EpistemicStatus = Project['epistemic_status']
 
-const COMMON_LANGUAGES: { code: string; label: string }[] = [
-  { code: 'en', label: 'English' },
-  { code: 'de', label: 'German' },
-  { code: 'fr', label: 'French' },
-  { code: 'es', label: 'Spanish' },
-  { code: 'pt', label: 'Portuguese' },
-  { code: 'zh', label: 'Chinese' },
-  { code: 'ja', label: 'Japanese' },
-  { code: 'ar', label: 'Arabic' },
-]
-
-type AccessTier = 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
-
-interface JurisdictionDraft { countryCode: string; regionCode: string; label: string }
-interface SourceDraft { sourceName: string; format: string; licenseNote: string; url: string; accessTier: AccessTier | '' }
+export type AccessTier = 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
 
 // Plain-language options for project_source_declarations.access_tier /
 // standards_documents.access_tier (migration 044) -- same underlying values
 // as deutsche_lp/nys_lp's accessTier schema field, added the same day, so a
 // source declared here means the same thing as one recorded in either
 // regional repo. Labels are written for a researcher filling out this form,
-// not for someone who already knows the column name.
-const ACCESS_TIER_OPTIONS: { value: AccessTier | ''; label: string }[] = [
+// not for someone who already knows the column name. Exported: used by
+// settings-page.tsx's SourceDeclarationsSection, which is now the only
+// place a source gets declared (see this file's own top comment). Kept as
+// its own copy from curriculum-repository.ts's own ACCESS_TIER_OPTIONS --
+// see that file's comment -- since this one's value can be '' ("not sure
+// yet"), which that table's NOT NULL access_tier never allows.
+export const ACCESS_TIER_OPTIONS: { value: AccessTier | ''; label: string }[] = [
   { value: '', label: "Not sure yet — decide before importing" },
   { value: 'full-text-stored', label: 'The full document — we have clear rights to keep all of it' },
   { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, never the whole document' },
   { value: 'summary-only', label: "A summary only — described in our own words, no direct quotes" },
   { value: 'citation-only', label: "Just a citation — we'll link to the original without storing any of its text" },
 ]
-
-const STEPS = ['Basics', 'Geography', 'Language', 'Subject area', 'Grade bands', 'Sources & rights', 'Review']
 
 export default function NewProjectWizard() {
   // Two mount points: inside an open project (sub-project, parent fixed) or
@@ -69,11 +59,9 @@ export default function NewProjectWizard() {
   const supabase = useMemo(() => fixedParent ? outlet!.supabase : createClient(), [fixedParent, outlet])
   const navigate = useNavigate()
 
-  const [step, setStep] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Basics
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
   const [parentProjectId, setParentProjectId] = useState<string>('')
   const [slug, setSlug] = useState('')
@@ -82,48 +70,16 @@ export default function NewProjectWizard() {
   const [curation, setCuration] = useState<EpistemicStatus>('in-development')
   // Only meaningful for a new top-level project space (a sub-project always
   // inherits visibility from its parent, same rule as epistemic_status just
-  // above) -- migration 025. Default false: most projects should stay in
+  // below) -- migration 025. Default false: most projects should stay in
   // the browsable directory; private is an opt-in for something like
   // eva-lpm that genuinely shouldn't be visible to other OpenLPM users yet.
   const [isPrivate, setIsPrivate] = useState(false)
-
-  // Geography
-  const [jurisdictions, setJurisdictions] = useState<JurisdictionDraft[]>([{ countryCode: '', regionCode: '', label: '' }])
-
-  // Language
-  const [languages, setLanguages] = useState<Set<string>>(new Set(['en']))
-  const [customLanguage, setCustomLanguage] = useState('')
-
-  // Subject area
-  const [subjectFramework, setSubjectFramework] = useState<FrameworkRow | null>(null)
-  const [subjectTags, setSubjectTags] = useState<FrameworkTagRow[]>([])
-  const [selectedSubjectTagIds, setSelectedSubjectTagIds] = useState<Set<string>>(new Set())
-
-  // Grade bands
-  const [gradeFrameworks, setGradeFrameworks] = useState<FrameworkRow[] | null>(null)
-  const [gradeChoice, setGradeChoice] = useState<string>('') // framework id, or 'custom-later'
-
-  // Sources & rights
-  const [sources, setSources] = useState<SourceDraft[]>([{ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' }])
 
   useEffect(() => {
     if (!fixedParent) {
       getUserProjects(supabase).then(setMemberships)
     }
   }, [fixedParent, supabase])
-
-  useEffect(() => {
-    listAvailableFrameworks(supabase, 'subject-area').then(async (fws) => {
-      const shared = fws.find((f) => f.project_id === null) ?? fws[0] ?? null
-      setSubjectFramework(shared)
-      if (shared) setSubjectTags(await listFrameworkTags(supabase, shared.id))
-    })
-    listAvailableFrameworks(supabase, 'grade-band').then((fws) => {
-      setGradeFrameworks(fws)
-      const shared = fws.find((f) => f.project_id === null)
-      if (shared) setGradeChoice(shared.id)
-    })
-  }, [supabase])
 
   const canManageParent = (id: string) => {
     if (fixedParent) return true
@@ -133,35 +89,7 @@ export default function NewProjectWizard() {
 
   const parentOptions = (memberships ?? []).filter((m) => m.role === 'owner' || m.role === 'maintainer')
 
-  const toggleLanguage = (code: string) => {
-    setLanguages((prev) => {
-      const next = new Set(prev)
-      if (next.has(code)) next.delete(code)
-      else next.add(code)
-      return next
-    })
-  }
-
-  const toggleSubjectTag = (id: string) => {
-    setSelectedSubjectTagIds((prev) => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
-
-  const updateJurisdiction = (i: number, patch: Partial<JurisdictionDraft>) => {
-    setJurisdictions((prev) => prev.map((j, idx) => (idx === i ? { ...j, ...patch } : j)))
-  }
-  const updateSource = (i: number, patch: Partial<SourceDraft>) => {
-    setSources((prev) => prev.map((s, idx) => (idx === i ? { ...s, ...patch } : s)))
-  }
-
-  const canProceed = () => {
-    if (step === 0) return slug.trim().length > 0 && name.trim().length > 0 && (fixedParent || parentProjectId === '' || canManageParent(parentProjectId))
-    return true
-  }
+  const canSubmit = slug.trim().length > 0 && name.trim().length > 0 && (fixedParent || parentProjectId === '' || canManageParent(parentProjectId))
 
   const submit = async () => {
     setBusy(true)
@@ -189,17 +117,15 @@ export default function NewProjectWizard() {
           ? (memberships?.find((m) => m.project.id === parentId)?.project.is_private ?? isPrivate)
           : isPrivate
 
-      const gradeFrameworkId = gradeChoice && gradeChoice !== 'custom-later' ? gradeChoice : null
-
       // Real feedback 2026-10-01 (Dustin): "lets automatically assign some
       // color to each project space... and allow users to edit that choice
-      // anytime" -- the edit-anytime half already existed (dashboard
-      // page's own Project color card); this is the missing auto-assign
-      // half. Picks the first palette color none of this project's own
-      // siblings (same parent, among projects this user can already see)
-      // is using yet, so adjacent entries in the switcher/sidebar don't
-      // collide -- falls back to a round-robin pick once the palette is
-      // exhausted, rather than leaving later siblings uncolored.
+      // anytime" -- the edit-anytime half already exists (Settings' own
+      // Project color card); this is the missing auto-assign half. Picks
+      // the first palette color none of this project's own siblings (same
+      // parent, among projects this user can already see) is using yet, so
+      // adjacent entries in the switcher/sidebar don't collide -- falls
+      // back to a round-robin pick once the palette is exhausted, rather
+      // than leaving later siblings uncolored.
       const siblingProjects = (memberships ?? [])
         .map((m) => m.project as any)
         .filter((p) => (parentId ? p.parent_project_id === parentId : !p.parent_project_id))
@@ -207,18 +133,22 @@ export default function NewProjectWizard() {
       const autoColor = PROJECT_COLORS.find((c) => !usedColors.has(c.key))?.key
         ?? PROJECT_COLORS[siblingProjects.length % PROJECT_COLORS.length].key
 
+      // Geography, working language(s), subject area, grade-band framework,
+      // and sources & rights are deliberately NOT asked here -- see this
+      // file's own top comment. working_languages defaults to English so
+      // the app has something sane to show before a researcher visits
+      // Settings; everything else starts empty/unset.
       const { data: project, error: insertError } = await supabase
         .from('projects')
         .insert({
           slug: slug.trim(),
           name: name.trim(),
           description: description.trim() || null,
-          focus_type: jurisdictions.some((j) => j.countryCode.trim()) ? 'regional' : 'general',
+          focus_type: 'general',
           maturity: 'draft',
           epistemic_status: epistemicStatus,
           parent_project_id: parentId,
-          working_languages: Array.from(languages),
-          grade_framework_id: gradeFrameworkId,
+          working_languages: ['en'],
           is_private: projectIsPrivate,
           created_by: user?.id ?? null,
           color: autoColor,
@@ -227,39 +157,6 @@ export default function NewProjectWizard() {
         .single()
 
       if (insertError || !project) throw insertError ?? new Error('Could not create the project.')
-
-      const realJurisdictions = jurisdictions.filter((j) => j.countryCode.trim() && j.label.trim())
-      if (realJurisdictions.length > 0) {
-        await supabase.from('project_jurisdictions').insert(
-          realJurisdictions.map((j) => ({
-            project_id: project.id,
-            country_code: j.countryCode.trim().toUpperCase(),
-            region_code: j.regionCode.trim() || null,
-            label: j.label.trim(),
-          }))
-        )
-      }
-
-      if (selectedSubjectTagIds.size > 0) {
-        await supabase.from('project_subject_area_tags').insert(
-          Array.from(selectedSubjectTagIds).map((tagId) => ({ project_id: project.id, framework_tag_id: tagId }))
-        )
-      }
-
-      const realSources = sources.filter((s) => s.sourceName.trim())
-      if (realSources.length > 0) {
-        await supabase.from('project_source_declarations').insert(
-          realSources.map((s) => ({
-            project_id: project.id,
-            source_name: s.sourceName.trim(),
-            format: s.format.trim() || null,
-            license_or_rights_note: s.licenseNote.trim() || null,
-            url: s.url.trim() || null,
-            access_tier: s.accessTier || null,
-            created_by: user?.id ?? null,
-          }))
-        )
-      }
 
       navigate(`/dashboard/${project.slug}`)
     } catch (err) {
@@ -275,7 +172,7 @@ export default function NewProjectWizard() {
   const backHref = fixedParent ? `/dashboard/${fixedParent.slug}` : '/dashboard'
 
   return (
-    <div className="page-narrow" style={{ maxWidth: 640 }}>
+    <div className="page-narrow" style={{ maxWidth: 560 }}>
       <button className="row muted btn-linklike" style={{ marginBottom: 12 }} onClick={() => navigate(backHref)}>
         <ArrowLeft size={14} />
         {fixedParent ? `Back to ${fixedParent.name}` : 'Back to your project spaces'}
@@ -283,257 +180,73 @@ export default function NewProjectWizard() {
 
       <h1>{fixedParent ? `New project in ${fixedParent.name}` : 'Start a new project space'}</h1>
 
-      <div className="row" style={{ gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
-        {STEPS.map((label, i) => (
-          <span key={label} className={`chip${i === step ? ' chip-good' : ''}`} style={{ fontSize: 11 }}>
-            {i + 1}. {label}
-          </span>
-        ))}
-      </div>
-
       {error && <div className="notice notice-bad">{error}</div>}
 
       <div className="card">
-        {step === 0 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Basics</h3>
-            {!fixedParent && (
-              <div className="field">
-                <label>Nest this inside an existing project? (optional)</label>
-                <select value={parentProjectId} onChange={(e) => setParentProjectId(e.target.value)}>
-                  <option value="">No — this is a new, top-level project space</option>
-                  {parentOptions.map((m) => (
-                    <option key={m.project.id} value={m.project.id}>
-                      {m.project.name}{(m.project as any).project_kind === 'curriculum-repository' ? ' (Curriculum Repository)' : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-            <div className="field">
-              <label>Short address</label>
-              <input
-                value={slug}
-                onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                placeholder="e.g. evomentor-france"
-                required
-              />
-              <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>Lowercase letters, numbers, and hyphens only — this becomes part of the project's URL.</p>
-            </div>
-            <div className="field">
-              <label>Name</label>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. EvoMentor France" required />
-            </div>
-            <div className="field">
-              <label>Description</label>
-              <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What is this for?" />
-            </div>
-            {!fixedParent && !parentProjectId && (
-              <div className="field">
-                <label>Is this real, human-curated curriculum content, or a synthetic/theoretical construct?</label>
-                <select value={curation} onChange={(e) => setCuration(e.target.value as EpistemicStatus)}>
-                  <option value="in-development">Human-curated — real content, still being built</option>
-                  <option value="field-validated-curriculum">Human-curated — already in real classroom use</option>
-                  <option value="designed-thought-experiment">Synthetic-theoretical — a designed comparison or research construct</option>
-                </select>
-              </div>
-            )}
-            {!fixedParent && !parentProjectId && (
-              <div className="field">
-                <label className="row" style={{ gap: 6, alignItems: 'center' }}>
-                  <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
-                  Make this project private
-                </label>
-                <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  A private project is invisible to anyone outside it, both in the project directory
-                  and by name. Only people you add as members can see that it exists at all. Leave
-                  unchecked for a normal, browsable project space.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {step === 1 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Geography</h3>
-            <p className="muted">One or more states/regions within one or more countries — leave empty for a project with no fixed geographic scope.</p>
-            {jurisdictions.map((j, i) => (
-              <div key={i} className="row" style={{ gap: 8, marginBottom: 8, alignItems: 'flex-end' }}>
-                <div className="field" style={{ marginBottom: 0, width: 80 }}>
-                  <label>Country code</label>
-                  <input value={j.countryCode} onChange={(e) => updateJurisdiction(i, { countryCode: e.target.value })} placeholder="DE" maxLength={2} />
-                </div>
-                <div className="field" style={{ marginBottom: 0, width: 100 }}>
-                  <label>Region code (optional)</label>
-                  <input value={j.regionCode} onChange={(e) => updateJurisdiction(i, { regionCode: e.target.value })} placeholder="DE-BY" />
-                </div>
-                <div className="field" style={{ marginBottom: 0, flex: 1 }}>
-                  <label>Plain-language name</label>
-                  <input value={j.label} onChange={(e) => updateJurisdiction(i, { label: e.target.value })} placeholder="e.g. Bavaria, Germany" />
-                </div>
-                <button className="btn btn-mini" onClick={() => setJurisdictions((prev) => prev.filter((_, idx) => idx !== i))}><Trash2 size={12} /></button>
-              </div>
-            ))}
-            <button className="btn btn-mini" onClick={() => setJurisdictions((prev) => [...prev, { countryCode: '', regionCode: '', label: '' }])}>
-              <Plus size={12} />Add another region
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Working language(s)</h3>
-            <p className="muted">All languages are supported for the curriculum content itself — the OpenLPM app interface stays English for now, with an English/German toggle planned.</p>
-            <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
-              {COMMON_LANGUAGES.map((l) => (
-                <label key={l.code} className="row" style={{ gap: 4 }}>
-                  <input type="checkbox" checked={languages.has(l.code)} onChange={() => toggleLanguage(l.code)} />
-                  {l.label}
-                </label>
+        {!fixedParent && (
+          <div className="field">
+            <label>Nest this inside an existing project? (optional)</label>
+            <select value={parentProjectId} onChange={(e) => setParentProjectId(e.target.value)}>
+              <option value="">No — this is a new, top-level project space</option>
+              {parentOptions.map((m) => (
+                <option key={m.project.id} value={m.project.id}>
+                  {m.project.name}{(m.project as any).project_kind === 'curriculum-repository' ? ' (Curriculum Repository)' : ''}
+                </option>
               ))}
-            </div>
-            <div className="row" style={{ marginTop: 12, gap: 8 }}>
-              <input value={customLanguage} onChange={(e) => setCustomLanguage(e.target.value)} placeholder="Other language code, e.g. sw, hi" style={{ width: 200 }} />
-              <button
-                className="btn btn-mini"
-                onClick={() => { if (customLanguage.trim()) { toggleLanguage(customLanguage.trim()); setCustomLanguage('') } }}
-              >
-                <Plus size={12} />Add
-              </button>
-            </div>
-            {Array.from(languages).filter((c) => !COMMON_LANGUAGES.some((l) => l.code === c)).length > 0 && (
-              <p className="muted" style={{ fontSize: 12 }}>
-                Also added: {Array.from(languages).filter((c) => !COMMON_LANGUAGES.some((l) => l.code === c)).join(', ')}
-              </p>
-            )}
+            </select>
           </div>
         )}
-
-        {step === 3 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Subject area(s)</h3>
-            {subjectTags.length === 0 ? (
-              <p className="muted">Loading…</p>
-            ) : (
-              <div>
-                {subjectTags.map((t) => (
-                  <label key={t.id} className="row" style={{ marginLeft: t.parent_tag_id ? 16 : 0, padding: '2px 0' }}>
-                    <input type="checkbox" checked={selectedSubjectTagIds.has(t.id)} onChange={() => toggleSubjectTag(t.id)} />
-                    {t.label}
-                  </label>
-                ))}
-              </div>
-            )}
-            <p className="muted" style={{ fontSize: 12, marginTop: 12 }}>
-              Only {subjectFramework?.label ?? 'the starter taxonomy'}'s current entries are selectable here. Once
-              your project exists, you can propose a new subject area or a crosswalk to another project's terms from
-              the Concepts page.
+        <div className="field">
+          <label>Short address</label>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+            placeholder="e.g. evomentor-france"
+            required
+          />
+          <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>Lowercase letters, numbers, and hyphens only — this becomes part of the project's URL.</p>
+        </div>
+        <div className="field">
+          <label>Name</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. EvoMentor France" required />
+        </div>
+        <div className="field">
+          <label>Description</label>
+          <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What is this for?" />
+        </div>
+        {!fixedParent && !parentProjectId && (
+          <div className="field">
+            <label>Is this real, human-curated curriculum content, or a synthetic/theoretical construct?</label>
+            <select value={curation} onChange={(e) => setCuration(e.target.value as EpistemicStatus)}>
+              <option value="in-development">Human-curated — real content, still being built</option>
+              <option value="field-validated-curriculum">Human-curated — already in real classroom use</option>
+              <option value="designed-thought-experiment">Synthetic-theoretical — a designed comparison or research construct</option>
+            </select>
+          </div>
+        )}
+        {!fixedParent && !parentProjectId && (
+          <div className="field">
+            <label className="row" style={{ gap: 6, alignItems: 'center' }}>
+              <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
+              Make this project private
+            </label>
+            <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              A private project is invisible to anyone outside it, both in the project directory
+              and by name. Only people you add as members can see that it exists at all. Leave
+              unchecked for a normal, browsable project space.
             </p>
           </div>
         )}
 
-        {step === 4 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Grade bands / educational stage</h3>
-            <p className="muted">
-              Pick a pre-existing framework to compare against, or note that you'll define a custom one later.
-              Grade counts differ even for the same ages (e.g. an 8-year vs. 9-year Gymnasium track) — the reference
-              scale below is age-anchored for exactly that reason.
-            </p>
-            {gradeFrameworks === null ? (
-              <p className="muted">Loading…</p>
-            ) : (
-              <div className="field">
-                <select value={gradeChoice} onChange={(e) => setGradeChoice(e.target.value)}>
-                  {gradeFrameworks.map((f) => (
-                    <option key={f.id} value={f.id}>{f.label}{f.project_id === null ? ' (ecosystem reference)' : ''}</option>
-                  ))}
-                  <option value="custom-later">I'll define a custom grade-band scheme after creating this project</option>
-                </select>
-              </div>
-            )}
-          </div>
-        )}
+        <p className="muted" style={{ fontSize: 12.5, marginTop: 4 }}>
+          Geography, working language(s), subject area, grade-band framework, and sources & rights
+          aren't asked here — add or change any of them from this project's own Settings page
+          (under "Project details") once it exists.
+        </p>
 
-        {step === 5 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Source(s), format(s), and rights</h3>
-            <p className="muted">What curriculum policies or competency frameworks are you planning to bring in, and do you have the rights to use them?</p>
-            {sources.map((s, i) => (
-              <div key={i} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
-                <div className="grid grid-2">
-                  <div className="field">
-                    <label>Source name</label>
-                    <input value={s.sourceName} onChange={(e) => updateSource(i, { sourceName: e.target.value })} placeholder="e.g. Bavaria Biologie Lehrplan" />
-                  </div>
-                  <div className="field">
-                    <label>Format</label>
-                    <input value={s.format} onChange={(e) => updateSource(i, { format: e.target.value })} placeholder="e.g. PDF, CASE, SPARQL" />
-                  </div>
-                  <div className="field" style={{ gridColumn: '1 / -1' }}>
-                    <label>Rights / license note</label>
-                    <input value={s.licenseNote} onChange={(e) => updateSource(i, { licenseNote: e.target.value })} placeholder="e.g. Public domain government document" />
-                  </div>
-                  <div className="field" style={{ gridColumn: '1 / -1' }}>
-                    <label>How much of this source can we actually keep?</label>
-                    <select value={s.accessTier} onChange={(e) => updateSource(i, { accessTier: e.target.value as AccessTier | '' })}>
-                      {ACCESS_TIER_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                    <p className="muted" style={{ marginTop: 4, marginBottom: 0, fontSize: '0.85em' }}>
-                      This can differ source by source — some documents we have clear rights to store in full, others only as a short quote or a citation. If you're not sure, leave this as "Not sure yet" and check before importing full text.
-                    </p>
-                  </div>
-                  <div className="field" style={{ gridColumn: '1 / -1' }}>
-                    <label>URL (optional)</label>
-                    <input value={s.url} onChange={(e) => updateSource(i, { url: e.target.value })} placeholder="https://…" />
-                  </div>
-                </div>
-                <button className="btn btn-mini" onClick={() => setSources((prev) => prev.filter((_, idx) => idx !== i))}><Trash2 size={12} />Remove</button>
-              </div>
-            ))}
-            <button className="btn btn-mini" onClick={() => setSources((prev) => [...prev, { sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' }])}>
-              <Plus size={12} />Add another source
-            </button>
-          </div>
-        )}
-
-        {step === 6 && (
-          <div>
-            <h3 style={{ marginTop: 0 }}>Review</h3>
-            <p><strong>{name || '(no name yet)'}</strong> ({slug || 'no-slug-yet'})</p>
-            <p className="muted">{description || 'No description.'}</p>
-            <p className="muted">Parent: {fixedParent?.name ?? parentOptions.find((m) => m.project.id === parentProjectId)?.project.name ?? 'None — a new top-level project space'}</p>
-            <p className="muted">Visibility: {(fixedParent?.is_private ?? (parentProjectId ? parentOptions.find((m) => m.project.id === parentProjectId)?.project.is_private : isPrivate)) ? 'Private — members only' : 'Public — anyone signed in can find it'}</p>
-            <p className="muted">Languages: {Array.from(languages).join(', ') || 'none selected'}</p>
-            <p className="muted">Regions: {jurisdictions.filter((j) => j.label.trim()).map((j) => j.label).join(', ') || 'none specified'}</p>
-            <p className="muted">Subject areas: {subjectTags.filter((t) => selectedSubjectTagIds.has(t.id)).map((t) => t.label).join(', ') || 'none selected'}</p>
-            <p className="muted">Grade-band framework: {gradeChoice === 'custom-later' ? 'custom, to be defined later' : gradeFrameworks?.find((f) => f.id === gradeChoice)?.label ?? 'none'}</p>
-            <p className="muted">
-              Sources: {sources.filter((s) => s.sourceName.trim()).map((s) => {
-                const tier = ACCESS_TIER_OPTIONS.find((opt) => opt.value === s.accessTier)
-                return tier && tier.value ? `${s.sourceName} (${tier.label})` : s.sourceName
-              }).join(', ') || 'none specified'}
-            </p>
-          </div>
-        )}
-      </div>
-
-      <div className="row" style={{ justifyContent: 'space-between', marginTop: 16 }}>
-        <button className="btn btn-mini" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
-          <ArrowLeft size={12} />Back
+        <button className="btn btn-primary" disabled={!canSubmit || busy} onClick={submit} style={{ marginTop: 8 }}>
+          <Check size={12} />{busy ? 'Creating…' : 'Create project'}
         </button>
-        {step < STEPS.length - 1 ? (
-          <button className="btn btn-primary" disabled={!canProceed()} onClick={() => setStep((s) => s + 1)}>
-            Next<ArrowRight size={12} />
-          </button>
-        ) : (
-          <button className="btn btn-primary" disabled={busy} onClick={submit}>
-            <Check size={12} />{busy ? 'Creating…' : 'Create project'}
-          </button>
-        )}
       </div>
     </div>
   )
