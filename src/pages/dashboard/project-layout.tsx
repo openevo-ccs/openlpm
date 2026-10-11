@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
@@ -284,24 +284,44 @@ export default function ProjectLayout() {
   // admin control they don't have anyway.
   const showPreviewBanner = canManage && !!activeView
 
-  // Exactly these 10 items, in this order -- Dustin's explicit, final sidebar
-  // spec for the 2026-09-13 restructure. Projects and Members are folded into
-  // Dashboard; Schema is folded into Concepts; Explore is replaced by the
-  // project-scoped search bar below (not a nav item); Import/export is now a
-  // function inside Learning Goals (and, later, Literature/Concepts/Theories)
-  // rather than its own tab.
+  // Was "exactly these 10 items, in this order" (Dustin's explicit sidebar
+  // spec for the 2026-09-13 restructure) -- relaxed 2026-10-11 (Dustin's own
+  // call): Dashboard Custom Views ('standard' kind, below) can narrow a
+  // project's sidebar down to only what it needs, so a longer base list no
+  // longer means every project sees everything. Projects and Members are
+  // still folded into Dashboard; Schema is still folded into Concepts;
+  // Explore is still the project-scoped search bar below (not a nav item);
+  // Import/export is still a function inside Learning Goals rather than its
+  // own tab -- those consolidations stand, this just stops treating the
+  // total COUNT as fixed.
+  //
+  // Calendar's label is the one item here that varies by project language:
+  // it shipped 2026-10-10 as "Wochenplan" (German), hardcoded, for every
+  // project regardless of language -- a Biologiedidaktik/EvoMentor
+  // Thuringia-specific page that leaked into the global default nav. Fixed
+  // 2026-10-11: English "Calendar" by default, German "Wochenplan" only for
+  // a German-only project, same convention learning-goals-page.tsx already
+  // uses (isGermanOnly) to decide whether to show the US-specific import
+  // panels. The actual German Biologiedidaktik context (the
+  // jena-biologiedidaktik-de template view) renders through a completely
+  // separate nav (student-nav.tsx) untouched by this list -- see that
+  // file's own "Wochenplan" entry, added the same day, for why this page
+  // needed to reach it from a second place, not just stop reaching everyone
+  // else by mistake.
   //
   // Each item's `key` matches dashboard-view-pages.ts's shared registry --
   // a Dashboard Custom View ('standard' kind) narrows this list down to its
   // own page_keys; Dashboard itself is never narrowed out, it's the view's
   // own home page.
+  const isGermanOnly = project.working_languages?.length === 1 && project.working_languages[0] === 'de'
   const standardNavItems: Array<ProjectNavItem & { key: string }> = [
     { key: 'dashboard', href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
     { key: 'learning-goals', href: `/dashboard/${slug}/learning-goals`, icon: <Layers size={14} />, label: 'Learning Goals', end: false },
+    { key: 'methods', href: `/dashboard/${slug}/methods`, icon: <GraduationCap size={14} />, label: 'Methods' },
     { key: 'concepts', href: `/dashboard/${slug}/concepts`, icon: <Sparkles size={14} />, label: 'Concepts', end: false },
     { key: 'theories', href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
     { key: 'strands', href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
-    { key: 'syllabus-planung', href: `/dashboard/${slug}/syllabus-planung`, icon: <CalendarRange size={14} />, label: 'Wochenplan' },
+    { key: 'calendar', href: `/dashboard/${slug}/calendar`, icon: <CalendarRange size={14} />, label: isGermanOnly ? 'Wochenplan' : 'Calendar' },
     { key: 'literature', href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
     { key: 'review', href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
     { key: 'discussions', href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
