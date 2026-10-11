@@ -146,27 +146,38 @@ export default function TheoriesPage() {
         </div>
       </div>
 
+      {/* Real feedback 2d2b1f58 (Dustin): the notice text and its action
+          button(s) were crammed into one inline flow (just a marginLeft gap)
+          -- cluttered, especially once a second button (Unlink) joined the
+          first. Icon+text now stays on its own line; buttons get their own
+          row underneath with real spacing, same pattern on both states. */}
       {baseLink === undefined ? null : !linked ? (
-        <div className="notice">
-          <Info size={14} />
-          This project isn't linked to TheoryBase yet — findability, a cached browse view, and
-          proposing theories back to the shared library all need that link first.
+        <div className="notice" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}>
+          <span className="row" style={{ gap: 8 }}>
+            <Info size={14} />
+            This project isn't linked to TheoryBase yet — findability, a cached browse view, and
+            proposing theories back to the shared library all need that link first.
+          </span>
           {canManageBaseLink && (
-            <button className="btn btn-mini" style={{ marginLeft: 10 }} onClick={toggleLink}>Link this project to TheoryBase</button>
+            <button className="btn btn-mini" onClick={toggleLink}>Link this project to TheoryBase</button>
           )}
         </div>
       ) : (
-        <div className="notice">
-          <Info size={14} />
-          Linked to TheoryBase. Browsing below reads a periodically-refreshed snapshot, not a live
-          connection — TheoryBase is still a private repo, so there's no live browser fetch the way
-          ConceptBase's import works.
-          <button className="btn btn-mini" style={{ marginLeft: 10 }} onClick={() => setShowBrowse((v) => !v)}>
-            <Search size={12} />{showBrowse ? 'Hide' : 'Browse'} TheoryBase
-          </button>
-          {canManageBaseLink && (
-            <button className="btn-linklike" style={{ marginLeft: 10, fontSize: 12 }} onClick={toggleLink}>Unlink</button>
-          )}
+        <div className="notice" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}>
+          <span className="row" style={{ gap: 8 }}>
+            <Info size={14} />
+            Linked to TheoryBase. Browsing below reads a periodically-refreshed snapshot, not a live
+            connection — TheoryBase is still a private repo, so there's no live browser fetch the way
+            ConceptBase's import works.
+          </span>
+          <span className="row" style={{ gap: 10 }}>
+            <button className="btn btn-mini" onClick={() => setShowBrowse((v) => !v)}>
+              <Search size={12} />{showBrowse ? 'Hide' : 'Browse'} TheoryBase
+            </button>
+            {canManageBaseLink && (
+              <button className="btn-linklike" style={{ fontSize: 12 }} onClick={toggleLink}>Unlink</button>
+            )}
+          </span>
         </div>
       )}
 

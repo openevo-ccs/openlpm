@@ -180,12 +180,16 @@ export default function ProfilePage() {
       )}
 
       <div className="card">
-        <h3 className="row"><LogIn size={16} />Join a group</h3>
+        {/* Real feedback be47dea7 (Dustin): "group" here was ambiguous with
+            the real, separate within-project Gruppen feature (project
+            members forming their own working groups) -- this section is
+            about joining a PROJECT SPACE itself, so it's named that. */}
+        <h3 className="row"><LogIn size={16} />Join a project space</h3>
 
         {availableToJoin.length > 0 && (
           <div style={{ marginBottom: 14 }}>
             <p className="muted" style={{ marginBottom: 6 }}>
-              Your account&apos;s email is eligible to join {availableToJoin.length === 1 ? 'this group' : 'these groups'} right
+              Your account&apos;s email is eligible to join {availableToJoin.length === 1 ? 'this project space' : 'these project spaces'} right
               away:
             </p>
             {availableToJoin.map((jp) => (
@@ -215,7 +219,7 @@ export default function ProfilePage() {
         <p className="muted">
           {availableToJoin.length > 0
             ? 'Have a join link or code for something else? Paste it here.'
-            : "Got a join link from an instructor or research lead? Paste it here — or just type the group's short name if that's all you were given."}
+            : "Got a join link from an instructor or research lead? Paste it here — or just type the project space's short name if that's all you were given."}
         </p>
         <form
           className="row"

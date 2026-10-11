@@ -565,17 +565,32 @@ export default function StudentLernzielePage() {
                       {/* Real feedback 769c5b85 (Susan): these should just
                           show dots in the Basiskonzept's own color, without
                           the chip-btn.active turquoise pill background. */}
-                      {RELEVANCE_LEVELS.map((lvl) => (
-                        <button
-                          key={lvl}
-                          className="chip-btn"
-                          style={{ padding: '1px 7px', fontSize: 10.5, background: 'none', border: activeLevels.has(lvl) ? '1px solid var(--border)' : '1px solid transparent' }}
-                          title={RELEVANCE_LEVEL_LABEL[lvl]}
-                          onClick={() => toggleConceptLevel(g.rootId, lvl)}
-                        >
-                          <RelevanceDots level={lvl} color={rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : undefined} />
-                        </button>
-                      ))}
+                      {RELEVANCE_LEVELS.map((lvl) => {
+                        const levelColor = rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : 'var(--text-secondary)'
+                        const isSelected = activeLevels.has(lvl)
+                        return (
+                          <button
+                            key={lvl}
+                            className="chip-btn"
+                            style={{
+                              padding: '1px 7px',
+                              fontSize: 10.5,
+                              background: isSelected ? 'color-mix(in srgb, ' + levelColor + ' 16%, transparent)' : 'none',
+                              // Real feedback 4050304d (Susan): a selected relevance
+                              // level was barely distinguishable from an unselected
+                              // one -- 1px either way, same near-invisible border
+                              // color. Selected now gets a thicker, concept-colored
+                              // outline plus a faint fill, instead of relying on a
+                              // 1px color-vs-transparent difference alone.
+                              border: isSelected ? `2px solid ${levelColor}` : '1px solid var(--border)',
+                            }}
+                            title={RELEVANCE_LEVEL_LABEL[lvl]}
+                            onClick={() => toggleConceptLevel(g.rootId, lvl)}
+                          >
+                            <RelevanceDots level={lvl} color={rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : undefined} />
+                          </button>
+                        )
+                      })}
                     </div>
                   )}
                 </div>

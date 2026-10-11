@@ -197,17 +197,19 @@ export default function ProjectSwitcherPage() {
         </div>
       )}
 
+      {/* Real feedback 6df024a9 (Dustin): wanted these in a specific order --
+          Curriculum Repositories, Human-Curated, Synthetic-Theoretical. */}
       <div className="row" style={{ gap: 16, marginBottom: 20 }}>
+        <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Reference curriculum documents for a country or region.">
+          <input type="checkbox" checked={showRepos} onChange={() => setShowRepos((v) => !v)} />
+          Curriculum Repositories
+        </label>
         {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (
           <label key={c} className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title={CURATION_GLOSS[c]}>
             <input type="checkbox" checked={visibleCurations.has(c)} onChange={() => toggleCuration(c)} />
             {CURATION_LABEL[c]}
           </label>
         ))}
-        <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Reference curriculum documents for a country or region.">
-          <input type="checkbox" checked={showRepos} onChange={() => setShowRepos((v) => !v)} />
-          Curriculum Repositories
-        </label>
       </div>
 
       {entries.length === 0 ? (
