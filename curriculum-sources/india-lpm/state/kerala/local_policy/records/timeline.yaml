@@ -8,7 +8,7 @@ events:
     label: "Kerala directs schools to keep teaching evolution content NCERT deleted nationally"
     jurisdiction: "IN-KL"
     eventType: "curriculum-revision-completes"
-    dateStart: "2023"
+    dateStart: "2023-01-01"
     dateGranularity: "year"
     temporalStatus: "current-in-progress"
     description: >
@@ -59,7 +59,7 @@ events:
     label: "Kerala Curriculum Framework (KCF) 2007 adopted"
     jurisdiction: "IN-KL"
     eventType: "curriculum-revision-completes"
-    dateStart: "2007"
+    dateStart: "2007-01-01"
     dateGranularity: "year"
     temporalStatus: "past-completed"
     description: >
@@ -108,7 +108,7 @@ events:
     label: "Kerala Curriculum Framework (KCF) 2023 adopted, explicitly as a state-level alternative to NEP 2020"
     jurisdiction: "IN-KL"
     eventType: "curriculum-revision-completes"
-    dateStart: "2023"
+    dateStart: "2023-01-01"
     dateGranularity: "year"
     temporalStatus: "past-completed"
     supersedes: "INLP-EVENT-kcf-2007-adopted"
@@ -182,7 +182,7 @@ events:
     label: "Eklavya Model Residential School (EMRS), Pookode, Wayanad established"
     jurisdiction: "IN-KL"
     eventType: "implementation-begins"
-    dateStart: "1997"
+    dateStart: "1997-01-01"
     dateGranularity: "year"
     temporalStatus: "past-completed"
     description: >
@@ -284,7 +284,7 @@ events:
     label: "Samagra Shiksha Kerala translates First Bell / produces mother-tongue video lessons for tribal students during COVID-19 closures"
     jurisdiction: "IN-KL"
     eventType: "pilot-program"
-    dateStart: "2020-06"
+    dateStart: "2020-06-01"
     dateGranularity: "month"
     temporalStatus: "past-completed"
     description: >
@@ -338,7 +338,7 @@ events:
     label: "\"Gothrabandhu\" tribal mentor-teacher programme launched"
     jurisdiction: "IN-KL"
     eventType: "pilot-program"
-    dateStart: "2017"
+    dateStart: "2017-04-01"
     dateGranularity: "school-year"
     temporalStatus: "current-in-progress"
     description: >
