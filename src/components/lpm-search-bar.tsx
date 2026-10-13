@@ -29,7 +29,7 @@ export function LpmSearchBar({ project, slug, supabase }: Pick<ProjectOutletCont
     const timer = setTimeout(async () => {
       const like = `%${q}%`
       const [goals, concepts, literature] = await Promise.all([
-        supabase.from('lpm_data_objects').select('id, title, grade_band').eq('project_id', project.id).ilike('title', like).limit(5),
+        supabase.from('lpm_data_objects').select('id, title, grade_band').eq('project_id', project.id).eq('status', 'accepted').ilike('title', like).limit(5),
         supabase.from('lpm_schema_elements').select('id, label, element_type').eq('project_id', project.id).ilike('label', like).limit(5),
         supabase.from('literature_references').select('id, title, year').eq('project_id', project.id).ilike('title', like).limit(5),
       ])
