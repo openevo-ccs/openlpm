@@ -558,7 +558,7 @@ function ConnectForm({
   useEffect(() => {
     if (query.trim().length < 2) { setResults([]); return }
     const timer = setTimeout(async () => {
-      const { data } = await supabase.from('lpm_data_objects').select('id, title').eq('project_id', currentProjectId).ilike('title', `%${query.trim()}%`).limit(8)
+      const { data } = await supabase.from('lpm_data_objects').select('id, title').eq('project_id', currentProjectId).eq('status', 'accepted').ilike('title', `%${query.trim()}%`).limit(8)
       setResults(data ?? [])
     }, 250)
     return () => clearTimeout(timer)
