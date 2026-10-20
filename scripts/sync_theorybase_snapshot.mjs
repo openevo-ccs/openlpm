@@ -55,10 +55,20 @@ const FILES = [
   { file: 'cross-domain-constructs.yaml', key: 'crossDomainConstructs', fallbackType: 'cross_domain_construct' },
   { file: 'design-principles.yaml', key: 'designPrinciples', fallbackType: 'design_principle' },
   { file: 'curriculum-decisions.yaml', key: 'curriculumDecisions', fallbackType: 'curriculum_decision' },
+  // Added 2026-10-20 for the bio-core/interdisciplinary comparative-analysis
+  // build: divergences.yaml (RFC-0009) is the one real, structured registry
+  // of named disagreements between two theories -- exactly what a
+  // cross-LPM comparison needs to cite rather than restate in its own
+  // words. label/summary come from the synthesis field (recordType has no
+  // fallback need here, divergences.yaml entries carry no recordType of
+  // their own, same shape as propositions/assumptions).
+  { file: 'divergences.yaml', key: 'divergences', fallbackType: 'divergence' },
 ]
 
 function summarize(entry) {
-  const raw = entry.description ?? entry.statement ?? entry.scope ?? ''
+  // synthesis is divergences.yaml's own summary field -- each entry states
+  // two opposing positions, not one description/statement/scope.
+  const raw = entry.description ?? entry.statement ?? entry.scope ?? entry.synthesis ?? ''
   const collapsed = String(raw).replace(/\s+/g, ' ').trim()
   return collapsed.length > 600 ? `${collapsed.slice(0, 600)}…` : (collapsed || null)
 }
