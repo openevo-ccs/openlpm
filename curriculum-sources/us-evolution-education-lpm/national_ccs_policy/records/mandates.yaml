@@ -1,0 +1,107 @@
+$schema: ../../schema/institutional-mandate-record.schema.json
+$description: >
+  The two US Supreme Court rulings that bind all fifty states on evolution-
+  education policy, modeled as institutional-mandate-records with the new
+  mandateType value federal-supreme-court-precedent. See
+  docs/source-notes/2026-10-20-national-level-case-law-and-actor-research.md.
+
+mandates:
+  - id: USLP-MANDATE-epperson-v-arkansas
+    slug: epperson-v-arkansas
+    label: "Epperson v. Arkansas, 393 U.S. 97 (1968): states may not ban teaching evolution"
+    jurisdiction: US
+    issuingBody: Supreme Court of the United States
+    mandateType: federal-supreme-court-precedent
+    statementText: >
+      "[T]he law must be stricken because of its conflict with the
+      constitutional prohibition of state laws respecting an establishment
+      of religion or prohibiting the free exercise thereof. The overriding
+      fact is that Arkansas' law selects from the body of knowledge a
+      particular segment which it proscribes for the sole reason that it is
+      deemed to conflict with a particular religious doctrine; that is, with
+      a particular interpretation of the Book of Genesis by a particular
+      religious group." "Government in our democracy, state and national,
+      must be neutral in matters of religious theory, doctrine, and
+      practice... The First Amendment mandates governmental neutrality
+      between religion and religion, and between religion and nonreligion."
+    adoptionDate: "1968-11-12"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Epperson v. Arkansas, 393 U.S. 97 (1968)"
+    sourceUrl: https://tile.loc.gov/storage-services/service/ll/usrep/usrep393/usrep393097/usrep393097.pdf
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      A US Supreme Court opinion is a public judicial record, not subject to
+      copyright.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Unanimous in result (9-0, Justice Abe Fortas writing for the Court)
+        but not in reasoning -- Black, Harlan, and Stewart each wrote
+        separate concurrences; Black doubted the case was even "genuinely
+        justiciable" since Arkansas had never once enforced the law in 40
+        years. The Court's own opinion states directly that the Arkansas
+        statute "was an adaptation of the famous Tennessee 'monkey law'
+        which that State adopted in 1925" -- the direct doctrinal lineage
+        from tennessee-lpm's own Butler Act. Footnote 8 confirms Mississippi
+        had an identical law still on the books in 1968 (struck down
+        separately, Smith v. State, 242 So. 2d 692 (Miss. 1970)) and that
+        Tennessee's own law had already been repealed by 1967.
+      sourceProvenance: >
+        Library of Congress's own digitized US Reports volume, fetched and
+        read directly -- the actual opinion text, not a summary.
+
+  - id: USLP-MANDATE-edwards-v-aguillard
+    slug: edwards-v-aguillard
+    label: "Edwards v. Aguillard, 482 U.S. 578 (1987): states may not mandate \"creation science\" alongside evolution"
+    jurisdiction: US
+    issuingBody: Supreme Court of the United States
+    mandateType: federal-supreme-court-precedent
+    statementText: >
+      "While the Court is normally deferential to a State's articulation of
+      a secular purpose, it is required that the statement of such purpose
+      be sincere and not a sham." "The preeminent purpose of the Louisiana
+      Legislature was clearly to advance the religious viewpoint that a
+      supernatural being created humankind." The Act "does not grant
+      teachers a flexibility that they did not already possess" and was
+      "designed either to promote the theory of creation science which
+      embodies a particular religious tenet or to prohibit the teaching of a
+      scientific theory disfavored by certain religious sects."
+    adoptionDate: "1987-06-19"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Edwards v. Aguillard, 482 U.S. 578 (1987)"
+    sourceUrl: https://www.law.cornell.edu/supremecourt/text/482/578
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      A US Supreme Court opinion is a public judicial record, not subject to
+      copyright.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        7-2, Justice William Brennan writing for the Court; Justice Scalia
+        dissented, joined by Chief Justice Rehnquist, arguing the majority
+        too readily inferred unconstitutional religious motive from a law
+        stating a facially secular ("academic freedom") purpose. Reached the
+        Supreme Court via summary judgment on the pleadings and legislative
+        history alone -- no trial record, unlike pennsylvania-lpm's
+        Kitzmiller, which was a full six-week trial. This ruling's own
+        reasoning (a law survives only if its secular purpose is sincere,
+        not a sham) is the direct doctrinal target the later "academic
+        freedom act" template (Louisiana 2008, tennessee-lpm's own 2012 law)
+        was designed around -- see this repo's own
+        national_ccs_policy/records/coherence-findings.yaml.
+      sourceProvenance: >
+        Cornell Legal Information Institute's and FindLaw's hosted opinion
+        text, cross-checked against each other -- both verbatim
+        reproductions, fetched and read directly.

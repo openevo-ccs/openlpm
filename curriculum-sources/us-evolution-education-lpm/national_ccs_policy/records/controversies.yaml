@@ -1,0 +1,135 @@
+$schema: ../../schema/policy-controversy-record.schema.json
+$description: >
+  The single national-level synthesis record this repo exists to hold, using
+  the new controversyType value cross-jurisdiction-pattern. See
+  GOVERNANCE.md and
+  ../../cross-repo-notes/national-actors-across-state-repos-2026-10-20.md
+  for the full reasoning.
+
+controversies:
+  - id: USLP-CONTROVERSY-american-evolution-education-culture-war
+    slug: american-evolution-education-culture-war
+    label: The American evolution-education culture war, 1925-present
+    jurisdiction: US
+    controversyType: cross-jurisdiction-pattern
+    topicArea: >
+      Whether American public schools may, or must, teach evolution as
+      settled science, unqualified, contested, or legally discouraged --
+      a single recurring national question fought separately in at least
+      three states' own legislatures, school boards, and courts across a
+      full century.
+    summary: >
+      Beginning with Tennessee's 1925 Butler Act and the Scopes Trial, the
+      same underlying question -- should a biblical or religiously-adjacent
+      account of human origins get special legal protection against
+      evolution in the science classroom -- has recurred in different US
+      states, different decades, and different legal mechanisms: Arkansas
+      and Mississippi's own Butler-Act-style bans (struck down by the US
+      Supreme Court and the Mississippi Supreme Court, 1968 and 1970), a
+      1973 Tennessee "equal time" law (struck down 1975), Louisiana's 1981
+      "balanced treatment" law (struck down by the US Supreme Court, 1987),
+      a single Pennsylvania school district's 2004 intelligent-design
+      disclaimer (struck down by a federal court, 2005), a wave of
+      "academic freedom act" laws modeled on Discovery Institute's template
+      and designed to survive the 1987 ruling (Louisiana 2008, Tennessee
+      2012, the latter still in force), and Florida's own recurring
+      state-standards fights (2008, and an active 2026 rewrite). This record
+      does not replace or duplicate florida-lpm's, pennsylvania-lpm's, or
+      tennessee-lpm's own controversy records -- it names the pattern they
+      are each a real, independently-adjudicated instance of.
+    dateStart: "1925-01-21"
+    status: recurring
+    outcomeSummary: >
+      No single outcome -- by design, since this is not one dispute but a
+      named pattern across several. Of the specific episodes this record
+      synthesizes: two US Supreme Court rulings (Epperson 1968, Edwards
+      1987) permanently foreclosed outright bans and explicit
+      "creation-science" mandates nationwide; Pennsylvania's Dover case
+      (2005) and Tennessee's own 1973 law (1975) were struck down at the
+      district/circuit level; Tennessee's 2012 law remains in force,
+      untested; and Florida's 2026 fight is still actively unresolved as of
+      this record's own date.
+    outcomeDate: "2026-10-20"
+    recurrenceOf: []
+    crossRepoRefs:
+      - "florida-lpm:FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight"
+      - "florida-lpm:FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission"
+      - "pennsylvania-lpm:PALP-CONTROVERSY-pa-2002-standards-wording-fight"
+      - "pennsylvania-lpm:PALP-CONTROVERSY-dover-intelligent-design-disclaimer"
+      - "tennessee-lpm:TNLP-CONTROVERSY-butler-act-and-scopes-trial"
+      - "tennessee-lpm:TNLP-CONTROVERSY-tn-1973-equal-time-law"
+      - "tennessee-lpm:TNLP-CONTROVERSY-tn-2012-teacher-protection-act"
+    contestedObjects:
+      - description: >
+          Whether a state or district may legally discourage, qualify, or
+          omit the teaching of evolution, or mandate a religiously-adjacent
+          alternative be taught alongside it -- the single question
+          underlying every episode this record synthesizes.
+        relatedMandateIds:
+          - USLP-MANDATE-epperson-v-arkansas
+          - USLP-MANDATE-edwards-v-aguillard
+        relatedEventIds:
+          - USLP-EVENT-epperson-v-arkansas-ruling
+          - USLP-EVENT-edwards-v-aguillard-ruling
+          - USLP-EVENT-smith-v-state-mississippi-ruling
+        relatedFindingIds:
+          - USLP-FINDING-three-states-three-current-postures
+          - USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law
+    positions:
+      - actorId: USLP-ACTOR-ncse
+        actorLabel: National Center for Science Education
+        stance: opposes-change
+        stanceSummary: >
+          The single most consistent institutional opponent of every
+          restrictive episode this record synthesizes, across its entire
+          multi-decade existence (founded 1981/1983, directly in response to
+          this same wave of state legislative activity).
+        sourceUrl: https://ncse.ngo
+        sourceDate: "2026-10-20"
+        accessTier: summary-only
+      - actorId: USLP-ACTOR-discovery-institute
+        actorLabel: Discovery Institute
+        stance: supports-change
+        stanceSummary: >
+          Authored the "Academic Freedom Act" legislative template directly
+          responsible for the post-Edwards wave (Louisiana 2008, Tennessee
+          2012), its own 1998 "Wedge Document" strategy memo stating the
+          actual long-term goal was to "replace materialistic explanations
+          with the theistic understanding that nature and human beings are
+          created by God."
+        sourceUrl: https://ncse.ngo/wedge-document
+        sourceDate: "1998-01-01"
+        accessTier: excerpt-only
+      - actorId: USLP-ACTOR-aclu
+        actorLabel: American Civil Liberties Union
+        stance: opposes-change
+        stanceSummary: >
+          A direct participant in multiple episodes across the full
+          century: recruited John Scopes in 1925, filed an amicus brief in
+          Epperson (1968), represented Gary Scott in Tennessee (1967), and
+          was co-counsel for the Kitzmiller plaintiffs in Pennsylvania
+          (2005).
+        sourceUrl: https://www.aclu.org/about/aclu-history
+        sourceDate: "2026-10-20"
+        accessTier: summary-only
+    mediaCoverage: []
+    themes: ["evolution", "creationism", "intelligent-design", "establishment-clause", "recurring-fault-line", "cross-state-comparison"]
+    exhaustivenessCaveat: >
+      Synthesizes only the episodes documented in florida-lpm/pennsylvania-lpm/
+      tennessee-lpm plus the two national Supreme Court rulings this repo's
+      own research covered directly -- NOT a claim this is the complete
+      universe of US evolution-education controversies (other states --
+      e.g. Kansas, Texas, Ohio -- have their own real, undocumented-in-this-ecosystem
+      episodes; this record is honest about covering what this ecosystem has
+      actually built so far, not the full national history).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Synthesized from this repo's own national-level research (the two
+        Supreme Court opinions, read directly) plus florida-lpm's/
+        pennsylvania-lpm's/tennessee-lpm's own founding-session records.

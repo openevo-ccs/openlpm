@@ -37,6 +37,8 @@ controversies:
       prevailed in the final rulemaking.
     outcomeDate: "2002-01-05"
     recurrenceOf: []
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether Standard 3.3.10.D should ask students to analyze evidence
@@ -127,6 +129,8 @@ controversies:
       for, not by a subsequent compromise.
     outcomeDate: "2006-01-03"
     recurrenceOf: []
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether Dover's biology curriculum could require students be told

@@ -21,6 +21,10 @@ actors:
       content in both 2009 and 2017 reviews; an "F" for climate-change
       content in its 2020 "Making the Grade?" report).
     url: https://ncse.ngo
+    crossRepoRefs:
+      - "florida-lpm:FLLP-ACTOR-ncse"
+      - "tennessee-lpm:TNLP-ACTOR-ncse"
+      - "us-evolution-education-lpm:USLP-ACTOR-ncse"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -52,6 +56,9 @@ actors:
       dispute -- this is the same real-world institution, referenced here for
       its distinct role in Pennsylvania's litigation history.
     url: https://www.discovery.org
+    crossRepoRefs:
+      - "florida-lpm:FLLP-ACTOR-discovery-institute"
+      - "us-evolution-education-lpm:USLP-ACTOR-discovery-institute"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -97,6 +104,9 @@ actors:
       co-counsel for the Kitzmiller plaintiffs alongside Pepper Hamilton LLP
       and Americans United.
     url: https://www.aclu.org
+    crossRepoRefs:
+      - "tennessee-lpm:TNLP-ACTOR-aclu"
+      - "us-evolution-education-lpm:USLP-ACTOR-aclu"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

@@ -38,7 +38,7 @@ a ruling the new board did not appeal. See `docs/source-notes/` for the full
 sourced research this repo's founding session produced, and `README.md` for
 what's populated as of founding vs. left for a later pass.
 
-## Why this case is a genuinely different shape than Florida's, not just a second example
+## Why this case is a genuinely different shape than Florida's
 
 `florida-lpm` documents a **state-level** story: one authority (the State
 Board of Education) repeatedly re-adopting and re-wording the same standard

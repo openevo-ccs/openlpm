@@ -20,7 +20,7 @@ rewrite, evolution was never actually the point of controversy.
 Lives inside `openlpm/curriculum-sources/`, following `india-lpm`'s and
 `florida-lpm`'s precedent.
 
-## Why this repo is a genuinely different case, not just a second Florida
+## Why this repo is a genuinely different case
 
 Florida's case (`florida-lpm`) is a **state-level**, **recurring**,
 **politically-resolved** story: one authority repeatedly re-adopting and

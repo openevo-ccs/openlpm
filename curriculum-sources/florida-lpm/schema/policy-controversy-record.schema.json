@@ -70,6 +70,14 @@
       "description": "Ids of later policy-controversy-records that continue this episode's fault line. Usually left for the LATER record's own recurrenceOf to populate instead (avoiding the same link stated twice in two places) -- populate here only if this record is edited after a later episode already exists and the later record's own file is not being touched in the same change.",
       "items": { "type": "string", "pattern": "^FLLP-CONTROVERSY-[a-z0-9-]+$" }
     },
+    "crossRepoRefs": {
+      "type": "array",
+      "description": "Added 2026-10-20 alongside institutional-actor-record's identical field: ids of a controversy in a SIBLING repo that is part of the same broader national or cross-jurisdiction pattern as this one, without being the same recurring fault line in the stricter recurrenceOf sense (recurrenceOf is reserved for the same jurisdiction's own fault line resurfacing; crossRepoRefs is for a different jurisdiction's own, separately-adjudicated episode that nonetheless belongs to the same larger story -- e.g. a national-level 'American evolution-education culture war' controversy record pointing at each state repo's own controversy records). Deliberately free-text, not a validated cross-repo link -- same informal-reference discipline this ecosystem already uses for ConceptBase/CompetencyBase ids. Format: '<repo>:<that repo's own controversy id>', e.g. 'tennessee-lpm:TNLP-CONTROVERSY-butler-act-and-scopes-trial'.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+-lpm:[A-Z]+-CONTROVERSY-[a-z0-9-]+$"
+      }
+    },
     "contestedObjects": {
       "type": "array",
       "minItems": 1,

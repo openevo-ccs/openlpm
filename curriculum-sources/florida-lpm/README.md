@@ -13,7 +13,7 @@ Lives inside `openlpm/curriculum-sources/`, following the precedent
 `india-lpm` set 2026-10-09, rather than as a standalone sibling repo like
 `nys_lp`/`deutsche_lp`.
 
-## Why this repo exists, and why it's not just "another state"
+## Why this repo exists
 
 Florida is the second US state in this ecosystem after New York. But where
 New York's case (`nys_lp`) is a single, calm, currently-in-progress reform

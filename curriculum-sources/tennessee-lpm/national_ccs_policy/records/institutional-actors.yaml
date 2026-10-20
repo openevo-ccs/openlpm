@@ -25,6 +25,9 @@ actors:
       whose 1967 firing triggered the Butler Act's repeal -- a genuinely
       different kind of case (a real firing, not a staged test).
     url: https://www.aclu.org
+    crossRepoRefs:
+      - "pennsylvania-lpm:PALP-ACTOR-aclu"
+      - "us-evolution-education-lpm:USLP-ACTOR-aclu"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -53,6 +56,10 @@ actors:
       current 2022 standards, which NCSE has not separately evaluated as of
       this repo's founding research.
     url: https://ncse.ngo
+    crossRepoRefs:
+      - "florida-lpm:FLLP-ACTOR-ncse"
+      - "pennsylvania-lpm:PALP-ACTOR-ncse"
+      - "us-evolution-education-lpm:USLP-ACTOR-ncse"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

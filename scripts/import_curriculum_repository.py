@@ -60,12 +60,12 @@ REPOS = {
         # subjects checked in each, already directly compared against each
         # other) get their own real sub-project, matching how New York
         # already works -- a record whose inferred jurisdiction is EXACTLY
-        # one of these keys (a clean single-state tag, not a multi-state
-        # comparison) is routed there instead of staying on the flat
+        # one of these keys (a clean single-state tag with no other state
+        # mixed in) is routed there instead of staying on the flat
         # national project. The other 13 states stay jurisdiction-tagged
         # inside the national project for now (background depth only,
-        # per deutsche_lp/README.md) -- splitting them out is real future
-        # work, not attempted here.
+        # per deutsche_lp/README.md). Splitting them out is real future
+        # work that hasn't been attempted here yet.
         "state_projects": {
             "DE-SN": {"slug": "saxony-curriculum-repository", "name": "Saxony Curriculum Repository", "region_tags": ["DE-SN"]},
             "DE-TH": {"slug": "thuringia-curriculum-repository", "name": "Thuringia Curriculum Repository", "region_tags": ["DE-TH"]},
@@ -92,7 +92,7 @@ REPOS = {
         # to structural/citation-level detail, no quoted textbook text)
         # all get real sub-projects, per Dustin's 2026-10-02 calls -- the
         # access-tier model doing its job across three real, different
-        # cases, not a gap to fix later.
+        # cases.
         "state_projects": {
             "IN-KA": {"slug": "karnataka-curriculum-repository", "name": "Karnataka Curriculum Repository", "region_tags": ["IN-KA"]},
             "IN-MH": {"slug": "maharashtra-curriculum-repository", "name": "Maharashtra Curriculum Repository", "region_tags": ["IN-MH"]},
@@ -140,6 +140,20 @@ REPOS = {
         # policy-controversy-record.recurrenceOf chain in this ecosystem
         # (three links).
     },
+    "us-evolution-education-lpm": {
+        "path": ROOT / "curriculum-sources" / "us-evolution-education-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/pennsylvania-lpm/tennessee-lpm
+        "project_slug": "us-evolution-education-curriculum-repository",
+        "project_name": "US Evolution Education Curriculum Repository",
+        "region_tags": ["US"],
+        "default_jurisdiction": "US",
+        # National apex repo, founded 2026-10-20 right after florida-lpm/
+        # pennsylvania-lpm/tennessee-lpm, to hold the two US Supreme Court
+        # rulings (Epperson v. Arkansas, Edwards v. Aguillard) that bind
+        # every state at once and the national actors/pattern the three
+        # state repos' own histories sit underneath. No state_projects
+        # sub-split: this repo has no state/ folder at all, by design (see
+        # its own GOVERNANCE.md).
+    },
 }
 
 GERMAN_STATE_ISO = {
@@ -173,7 +187,7 @@ def load_service_role_key():
 
 def infer_jurisdiction(record, file_path, default_jurisdiction):
     # Collect every jurisdiction/jurisdictionScope tag found ANYWHERE in the
-    # record, not just a top-level field. This matters a lot in practice:
+    # record, at any nesting depth. This matters a lot in practice:
     # coherence-finding/latent-connection/synthetic-curriculum-redesign
     # records (deutsche_lp's richest, most distinctive content) carry no
     # top-level jurisdiction field at all -- only per-grounding-object tags
@@ -182,8 +196,8 @@ def infer_jurisdiction(record, file_path, default_jurisdiction):
     # ("DE") for every one of them, regardless of which state they were
     # actually about. Reuses find_recursive, the same helper already used
     # for accessTier/licenseOrRightsNote, for the same reason: a record is
-    # only correctly describable by what's really inside it, not by whether
-    # a tag happens to sit at the top level or several layers down.
+    # only correctly describable by what's really inside it, regardless of
+    # whether a tag happens to sit at the top level or several layers down.
     found = set()
     for key in ("jurisdiction", "jurisdictionScope"):
         for value in find_recursive(record, key):
@@ -231,8 +245,8 @@ def effective_state_key(jurisdiction, default_jurisdiction):
     state_projects routing key, where that's actually what the record is
     about. A record tagged only the bare national default alongside one
     real state (e.g. "IN, IN-KL" -- a national-vs-one-state comparison) is
-    routed to that one state: the national side is context/baseline, not a
-    second peer being compared, the same way this repo's own Karnataka
+    routed to that one state: the national side is context/baseline rather
+    than a second peer being compared, the same way this repo's own Karnataka
     coherence-finding keeps NCERT in prose rather than as a competing
     jurisdiction. A genuine multi-STATE comparison (e.g. "DE-SN, DE-ST,
     DE-TH", no bare national code involved) has no single reduction and
@@ -273,9 +287,9 @@ def record_type_from_schema_ref(schema_ref):
 # targetDate/status/supersededBy), and -- new as of florida-lpm's founding,
 # 2026-10-20 -- policy-controversy-record (dateStart/dateEnd/status), which
 # has no supersession chain of its own (a controversy doesn't get
-# "superseded" the way a standards document does; see its recurrenceOf field
-# instead, not handled by this function). Every other type returns all-null
-# here and simply won't appear on the Timeline view, same as today.
+# "superseded" the way a standards document does; its recurrenceOf field
+# handles that instead, outside this function). Every other type returns
+# all-null here and simply won't appear on the Timeline view, same as today.
 #
 # This function handles the STANDALONE case only (a record with no sibling
 # edition before or after it). A record that's part of a real edition chain
@@ -297,8 +311,9 @@ def compute_standalone_dates(record_type, content):
         # A completed, dateless-end event (a milestone, a revision that's
         # already finished and not part of any tracked chain) is a single
         # point. An ongoing or future-starting one, with no end yet, is an
-        # open-ended bar (drawn to "today" by the Timeline view) -- still
-        # genuinely in force/in progress, not a one-off moment.
+        # open-ended bar (drawn to "today" by the Timeline view), since it's
+        # still genuinely in force or in progress rather than a one-off
+        # moment.
         if event_type == "milestone-target" or temporal_status == "past-completed":
             return (date_start, None, None)
         return (None, date_start, None)
@@ -388,11 +403,11 @@ def parse_file(file_path, source_repo, default_jurisdiction, warnings, edges):
 # "still in force" -- unless ITS OWN successor edge sets it in a later
 # iteration of this same loop). Both ends' event_date is cleared when
 # converted to a range, since a record that's part of a chain is a standing
-# edition, not a one-off point. Mutates `records_by_key` in place; returns
-# the count of edges actually resolved (an edge whose other end didn't parse
-# -- e.g. a typo'd id -- is silently skipped, surfaced only via the summary
-# count, not a hard failure, since one bad link shouldn't block every other
-# record from importing).
+# edition rather than a one-off point. Mutates `records_by_key` in place;
+# returns the count of edges actually resolved (an edge whose other end
+# didn't parse -- e.g. a typo'd id -- is silently skipped, surfaced only via
+# the summary count rather than a hard failure, since one bad link shouldn't
+# block every other record from importing).
 def resolve_supersession_chains(by_repo, edges):
     by_key = {}
     for source_repo, records in by_repo.items():
@@ -536,8 +551,8 @@ def resolve_supersedes_fk(key, by_repo, edges):
     # before upload (resolve_supersession_chains), but supersedes_record_id
     # (migration 100) is a real foreign key to another row's UUID -- which
     # only exists once that row has actually been written. This is the one
-    # part of the whole import that genuinely needs a round-trip after the
-    # main upsert, not just in-memory bookkeeping.
+    # part of the whole import that genuinely needs a round-trip to the
+    # database after the main upsert, beyond in-memory bookkeeping alone.
     if not edges:
         return
     id_map = {}
@@ -569,7 +584,7 @@ def apply_import(by_repo, owner_email, edges):
 
     # 2026-10-02: no more shared "Curriculum Repositories" hub project --
     # migration 081 already retired that (feedback 283570ae: nations are
-    # real top-level entries, states nest under their own nation, not under
+    # real top-level entries; states nest under their own nation instead of
     # a generic hub). Each repo's main project is created top-level
     # (parent_project_id left unset/null) to match; get_or_create_project
     # only INSERTs when a slug is genuinely new, so this is a no-op for

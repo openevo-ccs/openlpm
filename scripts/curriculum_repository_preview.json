@@ -9946,6 +9946,11 @@
           "asOf": "2026-10-20"
         },
         "url": "https://ncse.ngo",
+        "crossRepoRefs": [
+          "pennsylvania-lpm:PALP-ACTOR-ncse",
+          "tennessee-lpm:TNLP-ACTOR-ncse",
+          "us-evolution-education-lpm:USLP-ACTOR-ncse"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -9978,6 +9983,10 @@
         "role": "National intelligent-design-promoting think tank. Authored the model \"Academic Freedom Act\" statute (posted at academicfreedompetition.com) that Florida's 2008 SB 2692/HB 1483 followed closely, and the same template later enacted in Louisiana (2008) and Tennessee (2012). A Discovery Institute representative appeared at a closed March 2008 press event hosted by Rep. Alan Hays for Florida legislators. Already modeled as group:discovery-institute in openevo-graph's own dispute graph (og:dispute:openevo-vs-discovery-institute) for a separate, scientific-content dispute (the bacterial-flagellum/Kitzmiller case) -- this record is the same real-world institution, referenced here for its distinct role in Florida's *legislative* history specifically, not a duplicate or conflicting characterization.\n",
         "url": "https://www.discovery.org",
         "relatedActors": [],
+        "crossRepoRefs": [
+          "pennsylvania-lpm:PALP-ACTOR-discovery-institute",
+          "us-evolution-education-lpm:USLP-ACTOR-discovery-institute"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -10412,6 +10421,9 @@
         "outcomeSummary": "The State Board adopted the standards with \"the scientific theory of\" qualifier inserted before \"evolution\" (and before several other scientific theories/laws) -- the first explicit naming of evolution in Florida's standards, but in a hedged form that satisfied neither side fully: opponents wanted evolution presented as contestable, while board member Roberto Martinez and the original writing committee considered the qualifier an unnecessary, \"watered down\" concession.\n",
         "outcomeDate": "2008-02-19",
         "recurrenceOf": [],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
         "contestedObjects": [
           {
             "description": "Whether SC.912.L.15 and related benchmarks should name \"evolution\" explicitly, and whether that name should be qualified by \"the scientific theory of.\"\n",
@@ -10721,6 +10733,9 @@
         "status": "active",
         "recurrenceOf": [
           "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight"
+        ],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
         ],
         "contestedObjects": [
           {
@@ -12156,6 +12171,11 @@
         "jurisdiction": "US",
         "role": "National nonprofit defending evolution/climate-science education. The single most consistent institutional source on the Kitzmiller v. Dover case -- hosts the full trial-transcript index and the ruling itself, and produced the only national evaluative grading of Pennsylvania's state science standards found this session (an \"A\" for evolution content in both 2009 and 2017 reviews; an \"F\" for climate-change content in its 2020 \"Making the Grade?\" report).\n",
         "url": "https://ncse.ngo",
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-ACTOR-ncse",
+          "tennessee-lpm:TNLP-ACTOR-ncse",
+          "us-evolution-education-lpm:USLP-ACTOR-ncse"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -12187,6 +12207,10 @@
         "jurisdiction": "US",
         "role": "National intelligent-design-promoting think tank. Unlike its role in Florida's 2008 legislative fight (authoring the model statute Florida's bill followed), its role in Pennsylvania was to distance itself from Dover's specific disclaimer policy -- its own site states it repeatedly advised the board and its defense counsel the policy \"was problematic and should be replaced,\" and three of its affiliated fellows (William Dembski, Stephen Meyer, John Angus Campbell) who had agreed to serve as defense expert witnesses withdrew before depositions. Already modeled as group:discovery-institute in openevo-graph's own dispute graph (og:dispute:openevo-vs-discovery-institute), which cites this same trial's bacterial-flagellum testimony for a separate scientific-content dispute -- this is the same real-world institution, referenced here for its distinct role in Pennsylvania's litigation history.\n",
         "url": "https://www.discovery.org",
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-ACTOR-discovery-institute",
+          "us-evolution-education-lpm:USLP-ACTOR-discovery-institute"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -12249,6 +12273,10 @@
         "jurisdiction": "US",
         "role": "National civil-liberties organization. Its Pennsylvania affiliate (ACLU of Pennsylvania; attorneys Vic Walczak and Paula Knudsen) was co-counsel for the Kitzmiller plaintiffs alongside Pepper Hamilton LLP and Americans United.\n",
         "url": "https://www.aclu.org",
+        "crossRepoRefs": [
+          "tennessee-lpm:TNLP-ACTOR-aclu",
+          "us-evolution-education-lpm:USLP-ACTOR-aclu"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -12643,6 +12671,9 @@
         "outcomeSummary": "The State Board adopted the revised, more neutral wording (\"relevant to the theory of evolution\") rather than the originally proposed language -- the side objecting to the \"support or do not support\" framing prevailed in the final rulemaking.\n",
         "outcomeDate": "2002-01-05",
         "recurrenceOf": [],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
         "contestedObjects": [
           {
             "description": "Whether Standard 3.3.10.D should ask students to analyze evidence that \"supports or does not support\" evolution, versus evidence \"relevant to\" it.\n",
@@ -12730,6 +12761,9 @@
         "outcomeSummary": "The intelligent-design disclaimer policy was both ruled unconstitutional by a federal court (Dec 20, 2005) and formally, unanimously rescinded by the newly elected board (Jan 3, 2006) -- resolved decisively against the change the original 2004 board fought for, not by a subsequent compromise.\n",
         "outcomeDate": "2006-01-03",
         "recurrenceOf": [],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
         "contestedObjects": [
           {
             "description": "Whether Dover's biology curriculum could require students be told of \"gaps/problems\" in evolution and be directed toward \"intelligent design\" and the book \"Of Pandas and People\" as an alternative explanation.\n",
@@ -13960,6 +13994,10 @@
         "jurisdiction": "US",
         "role": "National civil-liberties organization. Placed the 1925 newspaper advertisement (reported May 4, 1925) offering to defend any Tennessee teacher willing to test the Butler Act -- the advertisement George Rappleyea and Dayton's civic boosters answered by recruiting John Scopes, making the ACLU the direct originator of the Scopes Trial as a deliberately engineered test case. Its attorney Arthur Garfield Hays joined Scopes's defense team. Forty-two years later, the ACLU (via attorney William Kunstler) also represented Gary Scott, the teacher whose 1967 firing triggered the Butler Act's repeal -- a genuinely different kind of case (a real firing, not a staged test).\n",
         "url": "https://www.aclu.org",
+        "crossRepoRefs": [
+          "pennsylvania-lpm:PALP-ACTOR-aclu",
+          "us-evolution-education-lpm:USLP-ACTOR-aclu"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -13991,6 +14029,11 @@
         "jurisdiction": "US",
         "role": "National nonprofit defending evolution/climate-science education. The single most consistent institutional source on Tennessee's 2012 Teacher Protection Act specifically (its own \"Background on Tennessee's 21st Century Monkey Law\" page is a primary tracking document for that episode), and the source of the 2009 Mead & Mates study that graded Tennessee's then-current standards poorly for evolution content -- a grade that does NOT carry forward to the current 2022 standards, which NCSE has not separately evaluated as of this repo's founding research.\n",
         "url": "https://ncse.ngo",
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-ACTOR-ncse",
+          "pennsylvania-lpm:PALP-ACTOR-ncse",
+          "us-evolution-education-lpm:USLP-ACTOR-ncse"
+        ],
         "verificationStatus": "primary-source-confirmed",
         "provenance": {
           "extracted_by": "llm",
@@ -14333,6 +14376,9 @@
         "outcomeSummary": "Neither side got a clean, lasting win: the ACLU failed to get the Butler Act declared unconstitutional (the Tennessee Supreme Court upheld it), while the state lost its only conviction under the law and the Court itself signaled the prosecution should not continue. The law remained on the books, unenforced in any further prosecution, until its 1967 repeal.\n",
         "outcomeDate": "1927-01-15",
         "recurrenceOf": [],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
         "contestedObjects": [
           {
             "description": "Whether the Butler Act's criminal prohibition on teaching evolution is constitutional, and whether John Scopes's specific conviction under it should stand.\n",
@@ -14442,6 +14488,9 @@
         "recurrenceOf": [
           "TNLP-CONTROVERSY-butler-act-and-scopes-trial"
         ],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
         "contestedObjects": [
           {
             "description": "Whether Tennessee law may require Genesis be taught alongside evolution with \"equal emphasis\" and require evolution (but not the Bible) carry a disclaimer that it is \"not... scientific fact.\"\n",
@@ -14533,6 +14582,9 @@
         "outcomeDate": "2012-04-10",
         "recurrenceOf": [
           "TNLP-CONTROVERSY-tn-1973-equal-time-law"
+        ],
+        "crossRepoRefs": [
+          "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
         ],
         "contestedObjects": [
           {
@@ -15821,6 +15873,623 @@
       "access_tier": "citation-only",
       "license_or_rights_note": null,
       "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    }
+  ],
+  "us-evolution-education-lpm": [
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "US-FL, US-PA, US-TN",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-FINDING-three-states-three-current-postures",
+      "title": "Florida, Pennsylvania, and Tennessee have three genuinely different current postures on evolution-education policy",
+      "content": {
+        "id": "USLP-FINDING-three-states-three-current-postures",
+        "slug": "three-states-three-current-postures",
+        "label": "Florida, Pennsylvania, and Tennessee have three genuinely different current postures on evolution-education policy",
+        "findingType": "cross-state-standards-divergence",
+        "objects": [
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "2026 proposed Florida science standards",
+            "documentDate": "2026-09-25",
+            "excerptText": "",
+            "sourceDocument": "Draft 2026 Florida K-12 Science Standards",
+            "accessTier": "citation-only"
+          },
+          {
+            "jurisdiction": "US-PA",
+            "policyArea": "2022 STEELS Pennsylvania science standards",
+            "documentDate": "2022-01-01",
+            "excerptText": "",
+            "sourceDocument": "Science, Technology & Engineering and Environmental Literacy & Sustainability Standards (STEELS)",
+            "accessTier": "citation-only"
+          },
+          {
+            "jurisdiction": "US-TN",
+            "policyArea": "2022 Tennessee Academic Standards for Science",
+            "documentDate": "2022-10-28",
+            "excerptText": "",
+            "sourceDocument": "Tennessee Academic Standards for Science",
+            "accessTier": "citation-only"
+          }
+        ],
+        "summary": "As of this research (2026-10-20): Florida's CURRENT standards-revision process is actively removing explicit naming of evolution and climate change -- the single most acute live controversy of the three. Pennsylvania's current standards were never themselves a site of evolution controversy (the fight there was Dover's 2004 DISTRICT policy, resolved by litigation in 2005, with the state's own standards never substantively challenged). Tennessee's current 2022 standards are robust on evolution (NCSE graded the prior generation \"A\" for evolution content specifically) -- but Tennessee is also the only one of the three with an unresolved, currently-active STATUTE (the 2012 Teacher Protection Act) sitting alongside those otherwise strong standards, never challenged in court.\n",
+        "policyRelevance": "This is the comparison none of the three state repos' own self-contained files can make about themselves -- each is accurate and complete about its own jurisdiction, but only reading all three side by side shows that \"a US state's current posture on evolution education\" is not one thing: a state can be actively regressing (FL), quiet because its one real fight happened at a different governmental level (PA), or quiet on standards while still carrying a live, untested statute that could resurface (TN).\n",
+        "testsMandateIds": [
+          "USLP-MANDATE-epperson-v-arkansas",
+          "USLP-MANDATE-edwards-v-aguillard"
+        ],
+        "relatedControversyIds": [
+          "USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
+        "themes": [
+          "evolution",
+          "climate-change",
+          "cross-state-comparison",
+          "standards-divergence"
+        ],
+        "exhaustivenessCaveat": "Built from this session's own three state-repo founding research passes, not a fourth, independent cross-state research effort -- accurate as of each repo's own founding date (2026-10-20) and subject to the same caveats as each repo's own records (e.g. no NCSE evaluation of Pennsylvania's or Tennessee's CURRENT standards was found; only older-generation grades exist for comparison).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Synthesized directly from florida-lpm's, pennsylvania-lpm's, and tennessee-lpm's own founding-session records, all built the same day from primary sources -- see each repo's own docs/source-notes/.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "US, US-TN",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law",
+      "title": "Tennessee's 2012 law's secular language is legible as a direct response to Edwards v. Aguillard's own reasoning",
+      "content": {
+        "id": "USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law",
+        "slug": "edwards-reasoning-vs-2012-tennessee-law",
+        "label": "Tennessee's 2012 law's secular language is legible as a direct response to Edwards v. Aguillard's own reasoning",
+        "findingType": "litigation-finding-vs-standard-text",
+        "objects": [
+          {
+            "jurisdiction": "US",
+            "policyArea": "Edwards v. Aguillard (1987) holding",
+            "documentDate": "1987-06-19",
+            "excerptText": "it is required that the statement of such purpose be sincere and not a sham",
+            "sourceDocument": "Edwards v. Aguillard, 482 U.S. 578 (1987)",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "jurisdiction": "US-TN",
+            "policyArea": "2012 Teacher Protection Act, T.C.A. S49-6-1030",
+            "documentDate": "2012-04-10",
+            "excerptText": "scientific strengths and scientific weaknesses of existing scientific theories",
+            "sourceDocument": "Tennessee Code Annotated S49-6-1030",
+            "accessTier": "excerpt-only"
+          }
+        ],
+        "summary": "Edwards struck down Louisiana's 1981 law specifically because its stated \"academic freedom\" purpose was found insincere -- a pretext for a religious goal, given the law explicitly named \"creation science\" and the Genesis account. Tennessee's own 1973 law (named explicitly in tennessee-lpm) was struck down on parallel reasoning in 1975 for the same explicit naming. Tennessee's 2012 law never names religion, creationism, or intelligent design at all -- using only \"scientific strengths and weaknesses,\" a framing that, if genuinely secular, would satisfy Edwards' own sincerity requirement.\n",
+        "policyRelevance": "This finding does not claim to know the 2012 Tennessee legislature's actual subjective intent (no named 2012 legislator was found making this connection explicitly, per tennessee-lpm's own research) -- it states only that the law's text is legally well-designed to survive exactly the test Edwards established, whatever the drafters' own motives actually were.\n",
+        "testsMandateIds": [
+          "USLP-MANDATE-edwards-v-aguillard"
+        ],
+        "relatedControversyIds": [
+          "USLP-CONTROVERSY-american-evolution-education-culture-war"
+        ],
+        "themes": [
+          "evolution",
+          "academic-freedom-legislation",
+          "litigation-strategy"
+        ],
+        "exhaustivenessCaveat": "An inference grounded in the two statutes' and the ruling's own text, not a sourced quotation from a 2012 legislator stating this connection outright -- tennessee-lpm's own equivalent finding (TNLP-FINDING-1973-law-vs-2012-law-framing-shift) makes the identical caveat for the same reason.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Edwards v. Aguillard opinion (Cornell LII/FindLaw) and Tennessee Code Annotated S49-6-1030 (Justia) -- both fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-controversy-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-CONTROVERSY-american-evolution-education-culture-war",
+      "title": "The American evolution-education culture war, 1925-present",
+      "content": {
+        "id": "USLP-CONTROVERSY-american-evolution-education-culture-war",
+        "slug": "american-evolution-education-culture-war",
+        "label": "The American evolution-education culture war, 1925-present",
+        "jurisdiction": "US",
+        "controversyType": "cross-jurisdiction-pattern",
+        "topicArea": "Whether American public schools may, or must, teach evolution as settled science, unqualified, contested, or legally discouraged -- a single recurring national question fought separately in at least three states' own legislatures, school boards, and courts across a full century.\n",
+        "summary": "Beginning with Tennessee's 1925 Butler Act and the Scopes Trial, the same underlying question -- should a biblical or religiously-adjacent account of human origins get special legal protection against evolution in the science classroom -- has recurred in different US states, different decades, and different legal mechanisms: Arkansas and Mississippi's own Butler-Act-style bans (struck down by the US Supreme Court and the Mississippi Supreme Court, 1968 and 1970), a 1973 Tennessee \"equal time\" law (struck down 1975), Louisiana's 1981 \"balanced treatment\" law (struck down by the US Supreme Court, 1987), a single Pennsylvania school district's 2004 intelligent-design disclaimer (struck down by a federal court, 2005), a wave of \"academic freedom act\" laws modeled on Discovery Institute's template and designed to survive the 1987 ruling (Louisiana 2008, Tennessee 2012, the latter still in force), and Florida's own recurring state-standards fights (2008, and an active 2026 rewrite). This record does not replace or duplicate florida-lpm's, pennsylvania-lpm's, or tennessee-lpm's own controversy records -- it names the pattern they are each a real, independently-adjudicated instance of.\n",
+        "dateStart": "1925-01-21",
+        "status": "recurring",
+        "outcomeSummary": "No single outcome -- by design, since this is not one dispute but a named pattern across several. Of the specific episodes this record synthesizes: two US Supreme Court rulings (Epperson 1968, Edwards 1987) permanently foreclosed outright bans and explicit \"creation-science\" mandates nationwide; Pennsylvania's Dover case (2005) and Tennessee's own 1973 law (1975) were struck down at the district/circuit level; Tennessee's 2012 law remains in force, untested; and Florida's 2026 fight is still actively unresolved as of this record's own date.\n",
+        "outcomeDate": "2026-10-20",
+        "recurrenceOf": [],
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight",
+          "florida-lpm:FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission",
+          "pennsylvania-lpm:PALP-CONTROVERSY-pa-2002-standards-wording-fight",
+          "pennsylvania-lpm:PALP-CONTROVERSY-dover-intelligent-design-disclaimer",
+          "tennessee-lpm:TNLP-CONTROVERSY-butler-act-and-scopes-trial",
+          "tennessee-lpm:TNLP-CONTROVERSY-tn-1973-equal-time-law",
+          "tennessee-lpm:TNLP-CONTROVERSY-tn-2012-teacher-protection-act"
+        ],
+        "contestedObjects": [
+          {
+            "description": "Whether a state or district may legally discourage, qualify, or omit the teaching of evolution, or mandate a religiously-adjacent alternative be taught alongside it -- the single question underlying every episode this record synthesizes.\n",
+            "relatedMandateIds": [
+              "USLP-MANDATE-epperson-v-arkansas",
+              "USLP-MANDATE-edwards-v-aguillard"
+            ],
+            "relatedEventIds": [
+              "USLP-EVENT-epperson-v-arkansas-ruling",
+              "USLP-EVENT-edwards-v-aguillard-ruling",
+              "USLP-EVENT-smith-v-state-mississippi-ruling"
+            ],
+            "relatedFindingIds": [
+              "USLP-FINDING-three-states-three-current-postures",
+              "USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law"
+            ]
+          }
+        ],
+        "positions": [
+          {
+            "actorId": "USLP-ACTOR-ncse",
+            "actorLabel": "National Center for Science Education",
+            "stance": "opposes-change",
+            "stanceSummary": "The single most consistent institutional opponent of every restrictive episode this record synthesizes, across its entire multi-decade existence (founded 1981/1983, directly in response to this same wave of state legislative activity).\n",
+            "sourceUrl": "https://ncse.ngo",
+            "sourceDate": "2026-10-20",
+            "accessTier": "summary-only"
+          },
+          {
+            "actorId": "USLP-ACTOR-discovery-institute",
+            "actorLabel": "Discovery Institute",
+            "stance": "supports-change",
+            "stanceSummary": "Authored the \"Academic Freedom Act\" legislative template directly responsible for the post-Edwards wave (Louisiana 2008, Tennessee 2012), its own 1998 \"Wedge Document\" strategy memo stating the actual long-term goal was to \"replace materialistic explanations with the theistic understanding that nature and human beings are created by God.\"\n",
+            "sourceUrl": "https://ncse.ngo/wedge-document",
+            "sourceDate": "1998-01-01",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "USLP-ACTOR-aclu",
+            "actorLabel": "American Civil Liberties Union",
+            "stance": "opposes-change",
+            "stanceSummary": "A direct participant in multiple episodes across the full century: recruited John Scopes in 1925, filed an amicus brief in Epperson (1968), represented Gary Scott in Tennessee (1967), and was co-counsel for the Kitzmiller plaintiffs in Pennsylvania (2005).\n",
+            "sourceUrl": "https://www.aclu.org/about/aclu-history",
+            "sourceDate": "2026-10-20",
+            "accessTier": "summary-only"
+          }
+        ],
+        "mediaCoverage": [],
+        "themes": [
+          "evolution",
+          "creationism",
+          "intelligent-design",
+          "establishment-clause",
+          "recurring-fault-line",
+          "cross-state-comparison"
+        ],
+        "exhaustivenessCaveat": "Synthesizes only the episodes documented in florida-lpm/pennsylvania-lpm/ tennessee-lpm plus the two national Supreme Court rulings this repo's own research covered directly -- NOT a claim this is the complete universe of US evolution-education controversies (other states -- e.g. Kansas, Texas, Ohio -- have their own real, undocumented-in-this-ecosystem episodes; this record is honest about covering what this ecosystem has actually built so far, not the full national history).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Synthesized from this repo's own national-level research (the two Supreme Court opinions, read directly) plus florida-lpm's/ pennsylvania-lpm's/tennessee-lpm's own founding-session records.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "1925-01-21",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-ACTOR-ncse",
+      "title": "National Center for Science Education (NCSE)",
+      "content": {
+        "id": "USLP-ACTOR-ncse",
+        "slug": "ncse",
+        "label": "National Center for Science Education (NCSE)",
+        "actorType": "nonprofit-curriculum-organization",
+        "jurisdiction": "US",
+        "role": "Founded by Stanley L. Weinberg, a retired Iowa high school biology teacher, who began organizing state-level \"Committees of Correspondence\" to track and counter creationist legislative efforts starting in 1980, linked by a Creation/Evolution Newsletter; formally incorporated as NCSE in 1983 (1981 is also commonly cited as the founding/organizing year). The single most consistent institutional voice defending evolution/climate-science education in US public schools for over four decades, with a confirmed, independent role in all three state repos this ecosystem has built so far.\n",
+        "currentHolder": {
+          "name": "Glenn Branch",
+          "title": "Deputy Director",
+          "asOf": "2026-10-20"
+        },
+        "url": "https://ncse.ngo",
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-ACTOR-ncse",
+          "pennsylvania-lpm:PALP-ACTOR-ncse",
+          "tennessee-lpm:TNLP-ACTOR-ncse"
+        ],
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "1981 vs. 1983 founding-year discrepancy reflects organizing-effort vs. legal-incorporation dates, both found in reputable sources.\n",
+          "sourceProvenance": "NCSE's own site and Wikipedia's NCSE entry, cross-checked -- fetched and read directly this session.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-ACTOR-aclu",
+      "title": "American Civil Liberties Union (ACLU)",
+      "content": {
+        "id": "USLP-ACTOR-aclu",
+        "slug": "aclu",
+        "label": "American Civil Liberties Union (ACLU)",
+        "actorType": "advocacy-body",
+        "jurisdiction": "US",
+        "role": "Founded 1920 in New York (Roger Baldwin among the founders), emerging from the National Civil Liberties Bureau in response to the WWI-era Palmer Raids -- unrelated to evolution at founding. The Scopes Trial (1925) was one of its earliest and most famous cases: it recruited John Scopes to challenge Tennessee's Butler Act and partnered with Clarence Darrow for his defense. Filed an amicus brief (not direct counsel) supporting Susan Epperson in Epperson v. Arkansas (1968, Leo Pfeffer, Melvin L. Wulf, Joseph B. Robison). Its Pennsylvania affiliate was co-counsel for the Kitzmiller plaintiffs (2005); it also represented Gary Scott in Tennessee (1967).\n",
+        "url": "https://www.aclu.org",
+        "crossRepoRefs": [
+          "pennsylvania-lpm:PALP-ACTOR-aclu",
+          "tennessee-lpm:TNLP-ACTOR-aclu"
+        ],
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "The Epperson v. Arkansas opinion itself (Library of Congress digitized US Reports volume), read directly; ACLU's own history page (aclu.org/about/aclu-history), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-ACTOR-discovery-institute",
+      "title": "Discovery Institute (Center for Science and Culture)",
+      "content": {
+        "id": "USLP-ACTOR-discovery-institute",
+        "slug": "discovery-institute",
+        "label": "Discovery Institute (Center for Science and Culture)",
+        "actorType": "think-tank",
+        "jurisdiction": "US",
+        "role": "Founded 1991 (not 1990, an earlier assumption corrected this session) by Bruce Chapman (a former Reagan-era official) and George Gilder, in Seattle, as a spinoff of the Hudson Institute. Its Center for Science and Culture (originally \"Center for the Renewal of Science and Culture,\" the intelligent-design-focused unit) was established in 1996. Its internal 1998 strategy memo, the \"Wedge Document\" (leaked 1999-02-05), states its actual long-term goal in its own words: \"To defeat scientific materialism and its destructive moral, cultural and political legacies\" and \"To replace materialistic explanations with the theistic understanding that nature and human beings are created by God.\" Authored the model \"Academic Freedom Act\" legislative template (used in Louisiana 2008 and Tennessee 2012) -- language deliberately designed, per NCSE's own analysis, to avoid the specific religious-purpose reasoning Edwards v. Aguillard (1987) used to strike down Louisiana's earlier, more explicit law.\n",
+        "url": "https://www.discovery.org",
+        "crossRepoRefs": [
+          "florida-lpm:FLLP-ACTOR-discovery-institute",
+          "pennsylvania-lpm:PALP-ACTOR-discovery-institute"
+        ],
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "No actor record for Discovery Institute exists in tennessee-lpm -- that repo's own research found no direct institutional tie between the Institute and Tennessee's 2012 law specifically, so no crossRepoRef to tennessee-lpm is added here either (an informal cross-reference should not assert a connection a sibling repo's own research did not confirm).\n",
+          "sourceProvenance": "Discovery Institute's own history page (discovery.org/f/4441/); the Wedge Document itself, hosted in full by NCSE (ncse.ngo/wedge-document) -- both fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-MANDATE-epperson-v-arkansas",
+      "title": "Epperson v. Arkansas, 393 U.S. 97 (1968): states may not ban teaching evolution",
+      "content": {
+        "id": "USLP-MANDATE-epperson-v-arkansas",
+        "slug": "epperson-v-arkansas",
+        "label": "Epperson v. Arkansas, 393 U.S. 97 (1968): states may not ban teaching evolution",
+        "jurisdiction": "US",
+        "issuingBody": "Supreme Court of the United States",
+        "mandateType": "federal-supreme-court-precedent",
+        "statementText": "\"[T]he law must be stricken because of its conflict with the constitutional prohibition of state laws respecting an establishment of religion or prohibiting the free exercise thereof. The overriding fact is that Arkansas' law selects from the body of knowledge a particular segment which it proscribes for the sole reason that it is deemed to conflict with a particular religious doctrine; that is, with a particular interpretation of the Book of Genesis by a particular religious group.\" \"Government in our democracy, state and national, must be neutral in matters of religious theory, doctrine, and practice... The First Amendment mandates governmental neutrality between religion and religion, and between religion and nonreligion.\"\n",
+        "adoptionDate": "1968-11-12",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Epperson v. Arkansas, 393 U.S. 97 (1968)",
+        "sourceUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep393/usrep393097/usrep393097.pdf",
+        "accessTier": "full-text-stored",
+        "licenseOrRightsNote": "A US Supreme Court opinion is a public judicial record, not subject to copyright.\n",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Unanimous in result (9-0, Justice Abe Fortas writing for the Court) but not in reasoning -- Black, Harlan, and Stewart each wrote separate concurrences; Black doubted the case was even \"genuinely justiciable\" since Arkansas had never once enforced the law in 40 years. The Court's own opinion states directly that the Arkansas statute \"was an adaptation of the famous Tennessee 'monkey law' which that State adopted in 1925\" -- the direct doctrinal lineage from tennessee-lpm's own Butler Act. Footnote 8 confirms Mississippi had an identical law still on the books in 1968 (struck down separately, Smith v. State, 242 So. 2d 692 (Miss. 1970)) and that Tennessee's own law had already been repealed by 1967.\n",
+          "sourceProvenance": "Library of Congress's own digitized US Reports volume, fetched and read directly -- the actual opinion text, not a summary.\n"
+        }
+      },
+      "access_tier": "full-text-stored",
+      "license_or_rights_note": "A US Supreme Court opinion is a public judicial record, not subject to copyright.\n",
+      "event_date": null,
+      "effective_from": "1968-11-12",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-MANDATE-edwards-v-aguillard",
+      "title": "Edwards v. Aguillard, 482 U.S. 578 (1987): states may not mandate \"creation science\" alongside evolution",
+      "content": {
+        "id": "USLP-MANDATE-edwards-v-aguillard",
+        "slug": "edwards-v-aguillard",
+        "label": "Edwards v. Aguillard, 482 U.S. 578 (1987): states may not mandate \"creation science\" alongside evolution",
+        "jurisdiction": "US",
+        "issuingBody": "Supreme Court of the United States",
+        "mandateType": "federal-supreme-court-precedent",
+        "statementText": "\"While the Court is normally deferential to a State's articulation of a secular purpose, it is required that the statement of such purpose be sincere and not a sham.\" \"The preeminent purpose of the Louisiana Legislature was clearly to advance the religious viewpoint that a supernatural being created humankind.\" The Act \"does not grant teachers a flexibility that they did not already possess\" and was \"designed either to promote the theory of creation science which embodies a particular religious tenet or to prohibit the teaching of a scientific theory disfavored by certain religious sects.\"\n",
+        "adoptionDate": "1987-06-19",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Edwards v. Aguillard, 482 U.S. 578 (1987)",
+        "sourceUrl": "https://www.law.cornell.edu/supremecourt/text/482/578",
+        "accessTier": "full-text-stored",
+        "licenseOrRightsNote": "A US Supreme Court opinion is a public judicial record, not subject to copyright.\n",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "7-2, Justice William Brennan writing for the Court; Justice Scalia dissented, joined by Chief Justice Rehnquist, arguing the majority too readily inferred unconstitutional religious motive from a law stating a facially secular (\"academic freedom\") purpose. Reached the Supreme Court via summary judgment on the pleadings and legislative history alone -- no trial record, unlike pennsylvania-lpm's Kitzmiller, which was a full six-week trial. This ruling's own reasoning (a law survives only if its secular purpose is sincere, not a sham) is the direct doctrinal target the later \"academic freedom act\" template (Louisiana 2008, tennessee-lpm's own 2012 law) was designed around -- see this repo's own national_ccs_policy/records/coherence-findings.yaml.\n",
+          "sourceProvenance": "Cornell Legal Information Institute's and FindLaw's hosted opinion text, cross-checked against each other -- both verbatim reproductions, fetched and read directly.\n"
+        }
+      },
+      "access_tier": "full-text-stored",
+      "license_or_rights_note": "A US Supreme Court opinion is a public judicial record, not subject to copyright.\n",
+      "event_date": null,
+      "effective_from": "1987-06-19",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-PRINCIPLE-a-national-pattern-is-not-a-national-rule",
+      "title": "A real, documented national pattern is not the same thing as a single national rule, and a curriculum archive should keep the two distinct",
+      "content": {
+        "id": "USLP-PRINCIPLE-a-national-pattern-is-not-a-national-rule",
+        "slug": "a-national-pattern-is-not-a-national-rule",
+        "label": "A real, documented national pattern is not the same thing as a single national rule, and a curriculum archive should keep the two distinct",
+        "domain": "computational-curriculum-studies",
+        "jurisdictionScope": "US",
+        "statement": "Two US Supreme Court rulings genuinely bind every state at once on this question. Everything else this ecosystem has documented -- Florida's recurring state fights, Pennsylvania's district-level litigation, Tennessee's century of statutes -- is a separate, independently-adjudicated dispute in its own jurisdiction, connected to the others only by a real, documented, continuous underlying question, not by a shared legal proceeding or a single governing body. `policy-controversy-record.controversyType: cross-jurisdiction-pattern` exists specifically so a curriculum-policy archive can name that kind of connection honestly, without either ignoring it (treating each state as if it had no relationship to the others) or overstating it (writing as if \"the United States\" itself were one single disputing party with one single legal outcome, the way a single state's own controversy record legitimately can be written).\n",
+        "rationale": "This is the single structural lesson of this repo's own founding: the three state repos, each internally accurate and complete, were genuinely missing a layer that is distinct from any one of them -- and building that layer required one new schema value (`cross-jurisdiction-pattern`) and one new field (`crossRepoRefs`), not a restructuring of anything already built.\n",
+        "groundedIn": [
+          "USLP-CONTROVERSY-american-evolution-education-culture-war",
+          "USLP-MANDATE-epperson-v-arkansas",
+          "USLP-MANDATE-edwards-v-aguillard"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "conceptRefs": [],
+        "status": "draft",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-PRINCIPLE-landmark-rulings-get-redesigned-around-not-defeated",
+      "title": "A landmark ruling changes what the next legislative attempt looks like; it rarely ends the underlying attempt",
+      "content": {
+        "id": "USLP-PRINCIPLE-landmark-rulings-get-redesigned-around-not-defeated",
+        "slug": "landmark-rulings-get-redesigned-around-not-defeated",
+        "label": "A landmark ruling changes what the next legislative attempt looks like; it rarely ends the underlying attempt",
+        "domain": "computational-curriculum-studies",
+        "jurisdictionScope": "US",
+        "statement": "Epperson (1968) ended outright teaching bans. Edwards (1987) ended explicit \"creation science\" mandates. Neither ruling ended the underlying legislative effort to protect a religiously-motivated alternative to evolution in public education -- each one instead produced a next-generation template, engineered specifically to avoid the exact legal defect the ruling identified, with Tennessee's 2012 law (still standing, untested) as the clearest documented example in this ecosystem so far.\n",
+        "rationale": "Grounded directly in USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law and tennessee-lpm's own parallel finding -- this is a pattern this ecosystem's own research actually traced across two real rulings and three real statutes, not a general claim about litigation's limits stated in the abstract.\n",
+        "groundedIn": [
+          "USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law",
+          "USLP-MANDATE-edwards-v-aguillard"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [
+          "Our Mind"
+        ],
+        "conceptRefs": [],
+        "status": "draft",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-EVENT-epperson-v-arkansas-ruling",
+      "title": "Supreme Court strikes down Arkansas's outright evolution-teaching ban",
+      "content": {
+        "id": "USLP-EVENT-epperson-v-arkansas-ruling",
+        "slug": "epperson-v-arkansas-ruling",
+        "label": "Supreme Court strikes down Arkansas's outright evolution-teaching ban",
+        "jurisdiction": "US",
+        "eventType": "court-ruling",
+        "dateStart": "1968-11-12",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Epperson v. Arkansas, 393 U.S. 97 (1968). Unanimous (9-0), Justice Abe Fortas writing. Struck down Arkansas's Initiated Act No. 1 (1928) -- itself, per the Court's own opinion, \"an adaptation of the famous Tennessee 'monkey law' which that State adopted in 1925\" -- as an unconstitutional establishment of religion. Tennessee had already repealed its own law roughly 18 months earlier (see tennessee-lpm); Mississippi's identical law was struck down separately two years later (Smith v. State, 1970).\n",
+        "involvedActors": [
+          "USLP-ACTOR-aclu"
+        ],
+        "sourceUrl": "https://tile.loc.gov/storage-services/service/ll/usrep/usrep393/usrep393097/usrep393097.pdf",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "A US Supreme Court opinion is a public judicial record.",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Library of Congress's own digitized US Reports volume, fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "A US Supreme Court opinion is a public judicial record.",
+      "event_date": "1968-11-12",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-EVENT-edwards-v-aguillard-ruling",
+      "title": "Supreme Court strikes down Louisiana's \"balanced treatment\" creationism law",
+      "content": {
+        "id": "USLP-EVENT-edwards-v-aguillard-ruling",
+        "slug": "edwards-v-aguillard-ruling",
+        "label": "Supreme Court strikes down Louisiana's \"balanced treatment\" creationism law",
+        "jurisdiction": "US",
+        "eventType": "court-ruling",
+        "dateStart": "1987-06-19",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Edwards v. Aguillard, 482 U.S. 578 (1987). 7-2, Justice William Brennan writing; Scalia dissented, joined by Rehnquist. Struck down Louisiana's \"Balanced Treatment for Creation-Science and Evolution-Science Act\" (1981), finding its stated \"academic freedom\" purpose a sham for a religious one. Reached the Court via summary judgment, not a trial. This ruling's own reasoning is the specific legal target the later \"academic freedom act\" template (Louisiana 2008, Tennessee 2012 -- see tennessee-lpm) was designed around, avoiding explicit religious language to survive it.\n",
+        "involvedActors": [],
+        "sourceUrl": "https://www.law.cornell.edu/supremecourt/text/482/578",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "A US Supreme Court opinion is a public judicial record.",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Scalia's dissent is quoted in docs/source-notes/ via a non-official reproduction -- substance confirmed, exact pincites flagged as needing one more cross-check.\n",
+          "sourceProvenance": "Cornell Legal Information Institute and FindLaw's hosted opinion text, cross-checked against each other, fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "A US Supreme Court opinion is a public judicial record.",
+      "event_date": "1987-06-19",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US",
+      "source_repo": "us-evolution-education-lpm",
+      "source_record_id": "USLP-EVENT-smith-v-state-mississippi-ruling",
+      "title": "Mississippi Supreme Court strikes down its own identical anti-evolution law",
+      "content": {
+        "id": "USLP-EVENT-smith-v-state-mississippi-ruling",
+        "slug": "smith-v-state-mississippi-ruling",
+        "label": "Mississippi Supreme Court strikes down its own identical anti-evolution law",
+        "jurisdiction": "US",
+        "eventType": "court-ruling",
+        "dateStart": "1970-12-21",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Smith v. State, 242 So. 2d 692 (Miss. 1970). The Mississippi Supreme Court held Epperson v. Arkansas had \"for all practical purposes already held that our anti-evolution statutes are unconstitutional\" -- Mississippi and Arkansas were, per Epperson's own footnote 8, the only two states that still had Butler-Act-style teaching bans on the books as of 1968.\n",
+        "involvedActors": [],
+        "partOf": "USLP-EVENT-epperson-v-arkansas-ruling",
+        "sourceUrl": "https://law.justia.com/cases/mississippi/supreme-court/1970/46058-0.html",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "A state supreme court's own published opinion is a public judicial record.",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Justia's reproduction of the opinion, fetched and read directly."
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "A state supreme court's own published opinion is a public judicial record.",
+      "event_date": "1970-12-21",
       "effective_from": null,
       "effective_until": null
     }

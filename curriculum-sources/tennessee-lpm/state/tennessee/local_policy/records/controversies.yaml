@@ -38,6 +38,8 @@ controversies:
       until its 1967 repeal.
     outcomeDate: "1927-01-15"
     recurrenceOf: []
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether the Butler Act's criminal prohibition on teaching
@@ -145,6 +147,8 @@ controversies:
       based non-resolution.
     outcomeDate: "1975-04-10"
     recurrenceOf: [TNLP-CONTROVERSY-butler-act-and-scopes-trial]
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether Tennessee law may require Genesis be taught alongside
@@ -235,6 +239,8 @@ controversies:
       been actually invoked by any teacher or district.
     outcomeDate: "2012-04-10"
     recurrenceOf: [TNLP-CONTROVERSY-tn-1973-equal-time-law]
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether Tennessee teachers should be explicitly shielded from

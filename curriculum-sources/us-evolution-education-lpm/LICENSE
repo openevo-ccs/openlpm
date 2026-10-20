@@ -1,0 +1,54 @@
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)
+
+Copyright (c) 2026 OpenEvo - CCS Lab
+
+This work — the policy-principle records, institutional-intelligence
+records, curriculum crosswalk references, schemas, and documentation in this
+repository (all content except the build/validation tooling, which is
+licensed separately under MIT, see LICENSE-CODE) — is licensed under the
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+License.
+
+To view a copy of this license, visit
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+Summary (not a substitute for the full license text linked above):
+
+You are free to:
+  - Share — copy and redistribute the material in any medium or format
+  - Adapt — remix, transform, and build upon the material
+
+Under the following terms:
+  - Attribution — You must give appropriate credit, provide a link to
+    this license, and indicate if changes were made. You may do so in
+    any reasonable manner, but not in any way that suggests the licensor
+    endorses you or your use.
+  - NonCommercial — You may not use the material for commercial purposes.
+  - ShareAlike — If you remix, transform, or build upon the material, you
+    must distribute your contributions under the same license as the
+    original.
+  - No additional restrictions — You may not apply legal terms or
+    technological measures that legally restrict others from doing
+    anything the license permits.
+
+The full legal text of CC BY-NC-SA 4.0 governs in the event of any conflict
+with this summary.
+
+Note: this is a private repository. This license governs the terms under
+which content may be used *if and when* it is shared outside the
+organization; it does not itself make the repository or its contents public.
+
+A note specific to this repo, because it matters more here than in most of
+this ecosystem's other repos: this license covers OpenEvo's own authored and
+compiled content only -- our institutional-actor descriptions, our own
+policy-principle statements, our schemas, our documentation. It says nothing
+about, and grants no rights to, the underlying Indian government
+curriculum/policy documents this repo describes or occasionally quotes from
+(NCERT/CBSE textbooks and syllabi, NCF text, state curriculum frameworks,
+etc.). Those documents remain under whatever copyright status their own
+publishers hold, which this repo's own founding research found to be a
+genuinely unresolved legal question for NCERT/CBSE specifically (see
+docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md)
+-- see each record's own accessTier/licenseOrRightsNote fields, not this
+file, for what's actually known or assumed about a specific quoted source.

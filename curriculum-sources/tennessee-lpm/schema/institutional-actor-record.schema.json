@@ -27,7 +27,7 @@
     },
     "jurisdiction": {
       "type": "string",
-      "description": "ISO-3166-2 style state code (e.g. US-TN) or 'US' for federal/multi-state.",
+      "description": "ISO-3166-2 style state code (e.g. US-FL) or 'US' for federal/multi-state.",
       "pattern": "^US(-[A-Z]{2})?$"
     },
     "parentActor": {
@@ -52,6 +52,14 @@
     "relatedActors": {
       "type": "array",
       "items": { "type": "string", "pattern": "^TNLP-ACTOR-[a-z0-9-]+$" }
+    },
+    "crossRepoRefs": {
+      "type": "array",
+      "description": "Added 2026-10-20 across tennessee-lpm/pennsylvania-lpm/tennessee-lpm: ids of the SAME real-world institution's own actor record in a sibling state-curriculum repo (e.g. NCSE, Discovery Institute, and the ACLU each appear independently in 2-3 of these repos, since each repo was founded in its own session before any of them existed to cross-reference). Deliberately free-text, not a validated cross-repo link -- same informal-reference discipline this ecosystem already uses for ConceptBase/CompetencyBase/bio-core-k12 ids (see CONTRIBUTING.md), just applied to actor identity across sibling LPM repos instead of to a different base repo. Format: '<repo>:<that repo's own actor id>', e.g. 'pennsylvania-lpm:PALP-ACTOR-ncse'. See curriculum-sources/README.md and curriculum-sources/cross-repo-notes/ for the synthesized, connected narrative these cross-references point at.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+-lpm:[A-Z]+-ACTOR-[a-z0-9-]+$"
+      }
     },
     "verificationStatus": {
       "type": "string",

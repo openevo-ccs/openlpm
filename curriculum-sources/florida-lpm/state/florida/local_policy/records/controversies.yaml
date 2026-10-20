@@ -42,6 +42,8 @@ controversies:
       the qualifier an unnecessary, "watered down" concession.
     outcomeDate: "2008-02-19"
     recurrenceOf: []
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether SC.912.L.15 and related benchmarks should name "evolution"
@@ -342,6 +344,8 @@ controversies:
     dateStart: "2026-09-25"
     status: active
     recurrenceOf: [FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight]
+    crossRepoRefs:
+      - "us-evolution-education-lpm:USLP-CONTROVERSY-american-evolution-education-culture-war"
     contestedObjects:
       - description: >
           Whether the 2026 draft's omission of the word "evolution" from

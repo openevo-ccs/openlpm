@@ -28,6 +28,10 @@ actors:
       title: Deputy Director
       asOf: "2026-10-20"
     url: https://ncse.ngo
+    crossRepoRefs:
+      - "pennsylvania-lpm:PALP-ACTOR-ncse"
+      - "tennessee-lpm:TNLP-ACTOR-ncse"
+      - "us-evolution-education-lpm:USLP-ACTOR-ncse"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -60,6 +64,9 @@ actors:
       a duplicate or conflicting characterization.
     url: https://www.discovery.org
     relatedActors: []
+    crossRepoRefs:
+      - "pennsylvania-lpm:PALP-ACTOR-discovery-institute"
+      - "us-evolution-education-lpm:USLP-ACTOR-discovery-institute"
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

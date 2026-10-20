@@ -1,0 +1,81 @@
+$schema: ../../schema/policy-principle-record.schema.json
+$description: >
+  OpenEvo-authored positions that only make sense read across all three
+  state repos (and the two national rulings) at once.
+
+principles:
+  - id: USLP-PRINCIPLE-a-national-pattern-is-not-a-national-rule
+    slug: a-national-pattern-is-not-a-national-rule
+    label: A real, documented national pattern is not the same thing as a single national rule, and a curriculum archive should keep the two distinct
+    domain: computational-curriculum-studies
+    jurisdictionScope: US
+    statement: >
+      Two US Supreme Court rulings genuinely bind every state at once on
+      this question. Everything else this ecosystem has documented --
+      Florida's recurring state fights, Pennsylvania's district-level
+      litigation, Tennessee's century of statutes -- is a separate,
+      independently-adjudicated dispute in its own jurisdiction, connected
+      to the others only by a real, documented, continuous underlying
+      question, not by a shared legal proceeding or a single governing
+      body. `policy-controversy-record.controversyType: cross-jurisdiction-pattern`
+      exists specifically so a curriculum-policy archive can name that kind
+      of connection honestly, without either ignoring it (treating each
+      state as if it had no relationship to the others) or overstating it
+      (writing as if "the United States" itself were one single disputing
+      party with one single legal outcome, the way a single state's own
+      controversy record legitimately can be written).
+    rationale: >
+      This is the single structural lesson of this repo's own founding: the
+      three state repos, each internally accurate and complete, were
+      genuinely missing a layer that is distinct from any one of them --
+      and building that layer required one new schema value
+      (`cross-jurisdiction-pattern`) and one new field (`crossRepoRefs`),
+      not a restructuring of anything already built.
+    groundedIn:
+      - USLP-CONTROVERSY-american-evolution-education-culture-war
+      - USLP-MANDATE-epperson-v-arkansas
+      - USLP-MANDATE-edwards-v-aguillard
+    designPrinciples: []
+    contentAnchors: []
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: USLP-PRINCIPLE-landmark-rulings-get-redesigned-around-not-defeated
+    slug: landmark-rulings-get-redesigned-around-not-defeated
+    label: A landmark ruling changes what the next legislative attempt looks like; it rarely ends the underlying attempt
+    domain: computational-curriculum-studies
+    jurisdictionScope: US
+    statement: >
+      Epperson (1968) ended outright teaching bans. Edwards (1987) ended
+      explicit "creation science" mandates. Neither ruling ended the
+      underlying legislative effort to protect a religiously-motivated
+      alternative to evolution in public education -- each one instead
+      produced a next-generation template, engineered specifically to avoid
+      the exact legal defect the ruling identified, with Tennessee's 2012
+      law (still standing, untested) as the clearest documented example in
+      this ecosystem so far.
+    rationale: >
+      Grounded directly in USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law
+      and tennessee-lpm's own parallel finding -- this is a pattern this
+      ecosystem's own research actually traced across two real rulings and
+      three real statutes, not a general claim about litigation's limits
+      stated in the abstract.
+    groundedIn:
+      - USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law
+      - USLP-MANDATE-edwards-v-aguillard
+    designPrinciples: []
+    contentAnchors: ["Our Mind"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0

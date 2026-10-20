@@ -56,6 +56,20 @@ repos' own schema copies in this founding session (that's a mechanical,
 low-risk follow-up, not attempted here to keep this session's scope to
 Florida's own content).
 
+## Cross-repo actor connections — `crossRepoRefs` (added 2026-10-20)
+
+Three national organizations modeled in this repo's own `national_ccs_policy/`
+— NCSE, the Discovery Institute — turned out to also be real, independently
+confirmed actors in `pennsylvania-lpm`'s and/or `tennessee-lpm`'s own
+histories (each repo was founded before the others existed to
+cross-reference). `institutional-actor-record.crossRepoRefs` is a new,
+deliberately informal field (plain strings, not a validated link, same
+discipline as this ecosystem's ConceptBase/CompetencyBase references) that
+points from a record here to the matching record in a sibling repo. See
+[`../cross-repo-notes/national-actors-across-state-repos-2026-10-20.md`](../cross-repo-notes/national-actors-across-state-repos-2026-10-20.md)
+for the synthesized, connected account these cross-references point at, and
+`../README.md` for the full curriculum-sources index.
+
 ## A machine-readable standards layer the other three repos don't have yet — `case/`
 
 Florida's founding-session research (`docs/source-notes/`) found that CPALMS

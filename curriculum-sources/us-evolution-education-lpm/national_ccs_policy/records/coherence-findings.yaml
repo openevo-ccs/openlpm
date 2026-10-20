@@ -1,0 +1,131 @@
+$schema: ../../schema/coherence-finding-record.schema.json
+$description: >
+  Findings that only make sense read across two or more of
+  florida-lpm/pennsylvania-lpm/tennessee-lpm at once, or comparing a US
+  Supreme Court ruling's own holding against a specific state's later
+  statute text.
+
+findings:
+  - id: USLP-FINDING-three-states-three-current-postures
+    slug: three-states-three-current-postures
+    label: Florida, Pennsylvania, and Tennessee have three genuinely different current postures on evolution-education policy
+    findingType: cross-state-standards-divergence
+    objects:
+      - jurisdiction: US-FL
+        policyArea: 2026 proposed Florida science standards
+        documentDate: "2026-09-25"
+        excerptText: ""
+        sourceDocument: Draft 2026 Florida K-12 Science Standards
+        accessTier: citation-only
+      - jurisdiction: US-PA
+        policyArea: 2022 STEELS Pennsylvania science standards
+        documentDate: "2022-01-01"
+        excerptText: ""
+        sourceDocument: Science, Technology & Engineering and Environmental Literacy & Sustainability Standards (STEELS)
+        accessTier: citation-only
+      - jurisdiction: US-TN
+        policyArea: 2022 Tennessee Academic Standards for Science
+        documentDate: "2022-10-28"
+        excerptText: ""
+        sourceDocument: Tennessee Academic Standards for Science
+        accessTier: citation-only
+    summary: >
+      As of this research (2026-10-20): Florida's CURRENT standards-revision
+      process is actively removing explicit naming of evolution and climate
+      change -- the single most acute live controversy of the three.
+      Pennsylvania's current standards were never themselves a site of
+      evolution controversy (the fight there was Dover's 2004 DISTRICT
+      policy, resolved by litigation in 2005, with the state's own
+      standards never substantively challenged). Tennessee's current 2022
+      standards are robust on evolution (NCSE graded the prior generation
+      "A" for evolution content specifically) -- but Tennessee is also the
+      only one of the three with an unresolved, currently-active STATUTE
+      (the 2012 Teacher Protection Act) sitting alongside those otherwise
+      strong standards, never challenged in court.
+    policyRelevance: >
+      This is the comparison none of the three state repos' own
+      self-contained files can make about themselves -- each is accurate
+      and complete about its own jurisdiction, but only reading all three
+      side by side shows that "a US state's current posture on evolution
+      education" is not one thing: a state can be actively regressing (FL),
+      quiet because its one real fight happened at a different governmental
+      level (PA), or quiet on standards while still carrying a live,
+      untested statute that could resurface (TN).
+    testsMandateIds:
+      - USLP-MANDATE-epperson-v-arkansas
+      - USLP-MANDATE-edwards-v-aguillard
+    relatedControversyIds: [USLP-CONTROVERSY-american-evolution-education-culture-war]
+    themes: ["evolution", "climate-change", "cross-state-comparison", "standards-divergence"]
+    exhaustivenessCaveat: >
+      Built from this session's own three state-repo founding research
+      passes, not a fourth, independent cross-state research effort --
+      accurate as of each repo's own founding date (2026-10-20) and subject
+      to the same caveats as each repo's own records (e.g. no NCSE
+      evaluation of Pennsylvania's or Tennessee's CURRENT standards was
+      found; only older-generation grades exist for comparison).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Synthesized directly from florida-lpm's, pennsylvania-lpm's, and
+        tennessee-lpm's own founding-session records, all built the same
+        day from primary sources -- see each repo's own docs/source-notes/.
+
+  - id: USLP-FINDING-edwards-reasoning-vs-2012-tennessee-law
+    slug: edwards-reasoning-vs-2012-tennessee-law
+    label: Tennessee's 2012 law's secular language is legible as a direct response to Edwards v. Aguillard's own reasoning
+    findingType: litigation-finding-vs-standard-text
+    objects:
+      - jurisdiction: US
+        policyArea: "Edwards v. Aguillard (1987) holding"
+        documentDate: "1987-06-19"
+        excerptText: "it is required that the statement of such purpose be sincere and not a sham"
+        sourceDocument: "Edwards v. Aguillard, 482 U.S. 578 (1987)"
+        accessTier: excerpt-only
+      - jurisdiction: US-TN
+        policyArea: "2012 Teacher Protection Act, T.C.A. S49-6-1030"
+        documentDate: "2012-04-10"
+        excerptText: "scientific strengths and scientific weaknesses of existing scientific theories"
+        sourceDocument: "Tennessee Code Annotated S49-6-1030"
+        accessTier: excerpt-only
+    summary: >
+      Edwards struck down Louisiana's 1981 law specifically because its
+      stated "academic freedom" purpose was found insincere -- a pretext for
+      a religious goal, given the law explicitly named "creation science"
+      and the Genesis account. Tennessee's own 1973 law (named explicitly in
+      tennessee-lpm) was struck down on parallel reasoning in 1975 for the
+      same explicit naming. Tennessee's 2012 law never names religion,
+      creationism, or intelligent design at all -- using only "scientific
+      strengths and weaknesses," a framing that, if genuinely secular, would
+      satisfy Edwards' own sincerity requirement.
+    policyRelevance: >
+      This finding does not claim to know the 2012 Tennessee legislature's
+      actual subjective intent (no named 2012 legislator was found making
+      this connection explicitly, per tennessee-lpm's own research) -- it
+      states only that the law's text is legally well-designed to survive
+      exactly the test Edwards established, whatever the drafters' own
+      motives actually were.
+    testsMandateIds: [USLP-MANDATE-edwards-v-aguillard]
+    relatedControversyIds: [USLP-CONTROVERSY-american-evolution-education-culture-war]
+    themes: ["evolution", "academic-freedom-legislation", "litigation-strategy"]
+    exhaustivenessCaveat: >
+      An inference grounded in the two statutes' and the ruling's own text,
+      not a sourced quotation from a 2012 legislator stating this
+      connection outright -- tennessee-lpm's own equivalent finding
+      (TNLP-FINDING-1973-law-vs-2012-law-framing-shift) makes the identical
+      caveat for the same reason.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Edwards v. Aguillard opinion (Cornell LII/FindLaw) and Tennessee
+        Code Annotated S49-6-1030 (Justia) -- both fetched and read
+        directly.

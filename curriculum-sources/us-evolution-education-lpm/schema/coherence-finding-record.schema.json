@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/us-evolution-education-lpm/schema/coherence-finding-record.schema.json",
+  "title": "us-evolution-education-lpm Coherence-Analysis Finding Record",
+  "description": "One empirical finding from directly comparing official documents ACROSS two or more of florida-lpm/pennsylvania-lpm/tennessee-lpm -- this repo's own central use for coherence-finding-record, distinct from any single state repo's own within-state comparisons. The computable unit underneath prose in docs/source-notes/ -- lets a query ask 'how does Florida's current posture on evolution content compare to Pennsylvania's and Tennessee's' or 'does a US Supreme Court ruling's own holding get reflected in a specific state's later statute text'. Modeled on deutsche_lp's/nys_lp's/india-lpm's/florida-lpm's/pennsylvania-lpm's/tennessee-lpm's coherence-finding-record.schema.json; findingType's 'cross-state-standards-divergence' value existed in the shared schema from florida-lpm's own founding but had never actually been used in a real record until this repo -- the whole point of a national-level repo is to be the natural home for that comparison, rather than it living awkwardly inside any one state's own file.",
+  "type": "object",
+  "required": ["id", "slug", "label", "findingType", "objects", "summary", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^USLP-FINDING-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "findingType": {
+      "type": "string",
+      "enum": [
+        "uncrossreferenced-gap", "working-crossreference",
+        "standard-wording-change-across-editions", "standard-naming-explicitness-gap",
+        "district-vs-state-standard-divergence", "litigation-finding-vs-standard-text",
+        "convergent-coverage-pattern", "cross-state-standards-divergence"
+      ],
+      "description": "'uncrossreferenced-gap' = no link found between related content in two policy objects that would benefit from one. 'working-crossreference' = a real cross-reference was found and confirmed. 'standard-wording-change-across-editions' = inherited, not expected to be used here (this repo has no single state's own standard re-adopted across editions -- see florida-lpm/tennessee-lpm for that use). 'standard-naming-explicitness-gap' = whether a given statute/standard names a contested concept explicitly at all -- usable here comparing how explicitly a Supreme Court ruling's own language names 'evolution'/'creationism' versus a later state statute's softer language. 'district-vs-state-standard-divergence' = inherited from pennsylvania-lpm, not expected to be used here. 'litigation-finding-vs-standard-text' = this repo's second central use: whether a specific holding from Epperson v. Arkansas or Edwards v. Aguillard is reflected, contradicted, or simply untested against a specific state's own later statute (e.g. whether Tennessee's 2012 law's careful avoidance of religious language is a legible response to Edwards' own reasoning). 'convergent-coverage-pattern' = 2+ independent sources converge on the same content emphasis. 'cross-state-standards-divergence' = this repo's FIRST central use -- a direct, real comparison of Florida's, Pennsylvania's, and Tennessee's own current postures on evolution-education policy, side by side, the comparison none of those three repos' own self-contained files can make about themselves."
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The policy object(s) this finding is about. One object alone is valid for a single-source placement fact that a later finding might compare against; most findings compare 2+ (e.g. the same benchmark across two editions).",
+      "items": {
+        "type": "object",
+        "required": ["jurisdiction", "sourceDocument"],
+        "additionalProperties": false,
+        "properties": {
+          "jurisdiction": { "type": "string", "pattern": "^US-[A-Z]{2}$|^US$" },
+          "policyArea": { "type": "string", "description": "e.g. 'Epperson v. Arkansas (1968) holding on teaching-ban statutes', 'Florida's 2026 proposed standards, evolution-naming posture', 'Tennessee's 2012 Teacher Protection Act wording'." },
+          "documentDate": { "type": "string", "format": "date" },
+          "excerptText": { "type": "string", "description": "A short verbatim excerpt grounding the object, where one exists in the source doc." },
+          "sourceDocument": { "type": "string" },
+          "sourcePage": { "type": "string" },
+          "sourceUrl": { "type": "string", "format": "uri" },
+          "accessTier": {
+            "type": "string",
+            "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+            "description": "How much of this object's source document this record actually keeps in excerptText, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Identical field to deutsche_lp's/nys_lp's/india-lpm's coherence-finding-record.schema.json."
+          },
+          "licenseOrRightsNote": {
+            "type": "string",
+            "description": "The legal basis for storing excerptText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences stating the finding in plain language -- what was found, not why it matters (see policyRelevance for that)."
+    },
+    "policyRelevance": {
+      "type": "string",
+      "description": "Optional: why this finding matters for curriculum policy or for OpenEvo's own strategy, if not already obvious from summary."
+    },
+    "testsMandateIds": {
+      "type": "array",
+      "description": "Institutional-mandate-record ids this finding provides evidence for, against, or relevant to.",
+      "items": { "type": "string", "pattern": "^USLP-MANDATE-[a-z0-9-]+$" }
+    },
+    "relatedControversyIds": {
+      "type": "array",
+      "description": "policy-controversy-record ids this finding provides direct textual evidence for -- e.g. a wording-change finding that documents exactly what a controversy's contestedObjects fight was actually about.",
+      "items": { "type": "string", "pattern": "^USLP-CONTROVERSY-[a-z0-9-]+$" }
+    },
+    "themes": {
+      "type": "array",
+      "description": "Which content theme(s) this finding is evidentially about -- kept as an open, non-enum string list since this repo's theme taxonomy has not yet stabilized.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "exhaustivenessCaveat": {
+      "type": "string",
+      "description": "Explicit statement of how exhaustive the underlying search was, e.g. 'based on the specific editions and benchmark codes fetched this session, not a systematic benchmark-by-benchmark diff of every life-science standard across all four editions' -- required honesty; omit only when a search genuinely was exhaustive (rare)."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

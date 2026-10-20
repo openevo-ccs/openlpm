@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/us-evolution-education-lpm/schema/latent-connection-record.schema.json",
+  "title": "us-evolution-education-lpm Latent Curriculum-Connection Record",
+  "description": "A PROPOSED reading of an existing, official the national standard or benchmark as conceptually connected to evolutionary anthropology's 'what does it mean to be human?' question, even where the relevant federal body's own text never uses that framing -- modeled directly on deutsche_lp's/nys_lp's latent-connection-record.schema.json, itself modeled on EvoMentor_DE's Basiskonzept-Kohaerenzfaeden pattern. Deliberately a DIFFERENT and WEAKER claim than coherence-finding-record: that schema asserts checkable facts about what a document says or doesn't say; this schema proposes an interpretive, human-justified reading of what an existing, unchanged standard COULD mean when read through an explicit theoretical lens. The two must never be conflated -- a latent-connection-record is a recommendation for how a teacher or curriculum designer could teach toward an existing, already-adopted benchmark, never a claim about what the relevant federal body's own text asserts or requires. Expected to be used sparingly in this repo relative to its siblings: the United States' evolution-related benchmarks are typically OVERT biology content already, not content needing a latent/reinterpretive reading -- this schema is more likely to apply to a non-science the national standard (e.g. a civics or social-studies benchmark) that could be read through an evolutionary-cooperation or human-behavior lens.",
+  "type": "object",
+  "required": [
+    "id", "slug", "label", "status", "curriculumObject",
+    "evolutionaryAnthropologyHub", "connectionNarrative",
+    "strengthAssessment", "evidenceMethod", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^USLP-LATENT-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "reviewed", "recommended", "rejected"],
+      "description": "'candidate' = surfaced by the evidenceMethod, not yet reviewed. 'reviewed' = a human has read and assessed it. 'recommended' = judged strong enough to cite in a brief or proposal. 'rejected' = considered and judged too weak/forced -- kept in the record, not deleted, so the search space itself stays visible."
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Open string list, same rationale as coherence-finding-record.themes."
+    },
+    "curriculumObject": {
+      "type": "object",
+      "description": "The single, real, unchanged the national standard or benchmark this connection attaches to.",
+      "required": ["jurisdiction", "policyArea", "sourceDocument"],
+      "additionalProperties": false,
+      "properties": {
+        "jurisdiction": { "type": "string", "pattern": "^US-[A-Z]{2}$" },
+        "policyArea": { "type": "string", "description": "e.g. 'Global Citizen attribute', 'Capstone Learning Experience pathway'." },
+        "excerptText": { "type": "string" },
+        "sourceDocument": { "type": "string" },
+        "sourcePage": { "type": "string" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "accessTier": {
+          "type": "string",
+          "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+          "description": "How much of this object's source document this record actually keeps in excerptText, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Same four values and meaning as coherence-finding-record.schema.json's identical field. Optional; a curriculumObject without this field predates 2026-09-30 and should be treated as 'excerpt-only' at most until reviewed."
+        },
+        "licenseOrRightsNote": {
+          "type": "string",
+          "description": "The legal basis for storing excerptText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+        }
+      }
+    },
+    "evolutionaryAnthropologyHub": {
+      "type": "string",
+      "description": "The specific evolutionary-anthropological mechanism or idea that is the actual connecting principle -- e.g. 'evolved third-party punishment and norm psychology as a lens for civic/legal reasoning', 'multilevel selection and the evolution of large-scale cooperation'. Must name a specific mechanism, not a vague topic label."
+    },
+    "connectionNarrative": {
+      "type": "string",
+      "description": "The mandatory, human-authored explanation of why the curriculumObject and the evolutionaryAnthropologyHub actually connect -- not automatable."
+    },
+    "strengthAssessment": {
+      "type": "object",
+      "description": "Two independently-scored theoretical lenses -- a connection can be strong on one, the other, both, or neither; the two scores are never averaged into a single number.",
+      "required": ["openEvoDesignConcept", "didaktischeRekonstruktion"],
+      "additionalProperties": false,
+      "properties": {
+        "openEvoDesignConcept": {
+          "type": "object",
+          "description": "Alignment with OpenEvo's Educational Design Concept (3 design principles, 9 content anchors, 6 thinking tools). Fields are informal string references, per interdisciplinary_design/README.md's 'loose references now, formal linking later' convention.",
+          "required": ["rating", "justification"],
+          "additionalProperties": false,
+          "properties": {
+            "contentAnchors": { "type": "array", "items": { "type": "string" } },
+            "thinkingTools": { "type": "array", "items": { "type": "string" } },
+            "designPrinciples": { "type": "array", "items": { "type": "string" } },
+            "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+            "justification": { "type": "string" }
+          }
+        },
+        "didaktischeRekonstruktion": {
+          "type": "object",
+          "description": "Alignment with the Model of Educational Reconstruction (Kattmann, Duit, Gropengiesser & Komorek 1997), same three-component scoring deutsche_lp uses -- kept as the shared theoretical instrument across both repos deliberately, since a connection's pedagogical soundness doesn't depend on which country's curriculum it targets.",
+          "required": ["fachlicheKlaerung", "schuelervorstellungen", "didaktischeStrukturierung", "overallRating"],
+          "additionalProperties": false,
+          "properties": {
+            "fachlicheKlaerung": {
+              "type": "object",
+              "description": "Is the evolutionary-anthropological framing itself scientifically sound and accurately stated for this content.",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "schuelervorstellungen": {
+              "type": "object",
+              "description": "Does this connection engage a real, documented learner preconception or naive-theory gap.",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "didaktischeStrukturierung": {
+              "type": "object",
+              "description": "Is there a concrete, plausible way to actually teach this connection within a realistic classroom/capstone time budget.",
+              "required": ["rating", "justification"],
+              "additionalProperties": false,
+              "properties": {
+                "rating": { "type": "string", "enum": ["none", "weak", "moderate", "strong"] },
+                "justification": { "type": "string" }
+              }
+            },
+            "overallRating": {
+              "type": "string",
+              "enum": ["none", "weak", "moderate", "strong"],
+              "description": "A human judgment call across the three components above, not a formula."
+            }
+          }
+        }
+      }
+    },
+    "evidenceMethod": {
+      "type": "string",
+      "description": "How this candidate was found -- reproducibility requirement."
+    },
+    "bridgingActivity": {
+      "type": "string",
+      "description": "Optional: a concrete classroom, capstone, or CTE-project activity a teacher could use to make the connection explicit to students."
+    },
+    "gaps": {
+      "type": "string",
+      "description": "Optional: known weaknesses of this specific proposed connection. Required in practice whenever any strengthAssessment rating is 'weak' or below strong."
+    },
+    "relatedFindingIds": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^USLP-FINDING-[a-z0-9-]+$" }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}
