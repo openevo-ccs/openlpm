@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
-import { CalendarRange, ClipboardList, Dna, Sparkles, Users } from 'lucide-react'
+import { CalendarRange, ClipboardList, Dna, Link2, Sparkles, Users } from 'lucide-react'
+import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 
 // Two groups, four items -- EvoMentor DE v1.2's own real sidebar shape
 // (ERKUNDEN: Lernziele, Basiskonzepte / PLANEN: KI-Prompt-Generator,
@@ -20,7 +21,35 @@ import { CalendarRange, ClipboardList, Dna, Sparkles, Users } from 'lucide-react
 // copy in German automatically for a German-only project (which this
 // template is always used by), so no extra plumbing is needed beyond
 // linking to it.
-export function StudentNav({ slug, groupsEnabled }: { slug: string; groupsEnabled: boolean }) {
+// The 4 2026-10-20 German/US custom views (bio-core/interdisciplinary x
+// Sachsen-Thüringen/New York-California) share one simple nav -- Learning
+// Goals plus Curriculum Connections, in the view's own language -- rather
+// than extending the Jena pilot's bespoke ERKUNDEN/PLANEN structure, which
+// is specifically modeled on EvoMentor DE and doesn't fit a generic
+// two-tab researcher workspace.
+function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 'de' | 'en' }) {
+  const base = `/dashboard/${slug}`
+  const labels = language === 'de'
+    ? { goals: 'Lernziele', connections: 'Lehrplan-Verbindungen' }
+    : { goals: 'Learning Goals', connections: 'Curriculum Connections' }
+  return (
+    <nav className="student-nav">
+      <NavLink to={base} end title={labels.goals} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <ClipboardList size={14} /><span className="nav-label">{labels.goals}</span>
+      </NavLink>
+      <NavLink to={`${base}/curriculum-connections`} title={labels.connections} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <Link2 size={14} /><span className="nav-label">{labels.connections}</span>
+      </NavLink>
+    </nav>
+  )
+}
+
+export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; groupsEnabled: boolean; templateId?: string | null }) {
+  const curriculumConnectionsConfig = getCurriculumConnectionsViewConfig(templateId ?? null)
+  if (curriculumConnectionsConfig) {
+    return <CurriculumConnectionsNav slug={slug} language={curriculumConnectionsConfig.language} />
+  }
+
   const base = `/dashboard/${slug}`
   return (
     <nav className="student-nav">

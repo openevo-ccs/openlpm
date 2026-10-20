@@ -40,6 +40,7 @@ import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
 import StudentPromptPage from '@/pages/dashboard/student/student-prompt-page'
+import CurriculumConnectionsPage from '@/pages/dashboard/student/curriculum-connections-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -117,6 +118,7 @@ export default function App() {
             <Route path="basiskonzepte" element={<StudentBasiskonzeptePage />} />
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
+            <Route path="curriculum-connections" element={<CurriculumConnectionsPage />} />
             <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
