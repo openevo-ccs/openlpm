@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, Download, LayoutList, Layers, Loader2, Maxim
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
+import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 
 cytoscape.use(dagre)
 
@@ -138,6 +139,7 @@ function ConceptMapTab() {
   const { conceptId } = useParams<{ conceptId?: string }>()
   const navigate = useNavigate()
   const [taxonomy, setTaxonomy] = useState<SchemaElement[] | null>(null)
+  const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [children, setChildren] = useState<ProjectRow[]>([])
   const [hitsByTaxId, setHitsByTaxId] = useState<Map<string, Hit[]>>(new Map())
   const [hitsByBk, setHitsByBk] = useState<Map<string, Map<string, { sum: number; count: number }>>>(new Map())
@@ -280,6 +282,18 @@ function ConceptMapTab() {
       setHitsByTaxId(byTaxId)
       setHitsByBk(byBk)
       setHubName(hubProject.name)
+
+      // Real feedback 553dc7cd (Dustin, 2026-10-20): "Why is this concept
+      // map without links?" -- the graph below only ever drew parent_id
+      // tree edges; lpm_concept_relations (migration 087) is a real,
+      // separate many-to-many concept network that existed in the schema
+      // but was never fetched here (only the Jena Basiskonzepte Netz tab
+      // used it). Fetched for every taxonomy project, not just the hub --
+      // same reasoning as taxonomyProjectIds above.
+      const allRelations = (
+        await Promise.all(taxonomyProjectIds.map((pid) => listConceptRelations(supabase, pid)))
+      ).flat()
+      if (!cancelled) setRelations(allRelations)
     }
     load()
     return () => { cancelled = true }
@@ -394,7 +408,7 @@ function ConceptMapTab() {
 
       {view === 'map' ? (
         <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <ConceptGraph taxonomy={taxonomy} hitsByTaxId={hitsByTaxId} roots={roots} selectedId={selectedNode?.id ?? null} onSelect={selectNode} />
+          <ConceptGraph taxonomy={taxonomy} hitsByTaxId={hitsByTaxId} roots={roots} relations={relations} selectedId={selectedNode?.id ?? null} onSelect={selectNode} />
           <div className="drawer-shell wide">
             <div className="drawer">
               {!selectedNode ? (
@@ -455,12 +469,14 @@ function ConceptGraph({
   taxonomy,
   hitsByTaxId,
   roots,
+  relations,
   selectedId,
   onSelect,
 }: {
   taxonomy: SchemaElement[]
   hitsByTaxId: Map<string, Hit[]>
   roots: SchemaElement[]
+  relations: ConceptRelation[]
   selectedId: string | null
   onSelect: (n: SchemaElement) => void
 }) {
@@ -499,6 +515,7 @@ function ConceptGraph({
   useEffect(() => {
     if (!containerRef.current) return
 
+    const taxIds = new Set(taxonomy.map((n) => n.id))
     const elements: ElementDefinition[] = [
       ...taxonomy.map((n) => {
         const count = hitsByTaxId.get(n.id)?.length ?? 0
@@ -510,6 +527,18 @@ function ConceptGraph({
       ...taxonomy
         .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
         .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id } })),
+      // lpm_concept_relations -- a real, separate many-to-many concept
+      // network (migration 087), distinct from the parent_id tree above.
+      // Only rendered when both ends are actually in this taxonomy (a
+      // relation can point at a concept outside the currently-loaded
+      // project set) -- silently dropped rather than crashing Cytoscape,
+      // same defensive shape as the tree-edge dedup fix above.
+      ...relations
+        .filter((r) => taxIds.has(r.from_element_id) && taxIds.has(r.to_element_id))
+        .map((r) => ({
+          data: { id: `rel-${r.id}`, source: r.from_element_id, target: r.to_element_id, relationType: r.relation_type },
+          classes: 'relation',
+        })),
     ]
 
     const cy = cytoscape({
@@ -571,6 +600,24 @@ function ConceptGraph({
           selector: 'edge',
           style: { width: 1, 'line-color': cssVar('--baseline', '#c3c2b7'), 'curve-style': 'bezier', 'target-arrow-shape': 'none' },
         },
+        {
+          // Real, separate concept-to-concept relations (lpm_concept_relations)
+          // vs. the parent/child tree edges above -- a different line style
+          // (dashed, accent color, unbundled curve so it doesn't try to
+          // follow dagre's rank-based routing meant for tree edges) keeps
+          // the two kinds of connection visually distinct rather than
+          // implying a false hierarchy.
+          selector: 'edge.relation',
+          style: {
+            width: 1.5,
+            'line-color': cssVar('--series-a', '#006c66'),
+            'line-style': 'dashed',
+            'curve-style': 'unbundled-bezier',
+            'control-point-distances': 20,
+            'control-point-weights': 0.5,
+            opacity: 0.8,
+          } as any,
+        },
       ],
     })
 
@@ -591,7 +638,7 @@ function ConceptGraph({
     cyRef.current = cy
     return () => { cy.destroy() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [taxonomy, hitsByTaxId, rootIndexOf, depthOf])
+  }, [taxonomy, hitsByTaxId, relations, rootIndexOf, depthOf])
 
   // Keep the graph's own selection in sync with the URL-driven selectedId
   // (a search-bar link, a shared link, or a plain refresh) without
