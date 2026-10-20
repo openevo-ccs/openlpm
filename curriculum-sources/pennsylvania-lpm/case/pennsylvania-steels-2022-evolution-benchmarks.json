@@ -1,0 +1,673 @@
+{
+  "$schema": "https://opensalt.net/api/v1/case/CFDocument",
+  "$generator": "OpenEvo pennsylvania-lpm founding research session, 2026-10-20",
+  "$generated": "2026-10-20T00:00:00Z",
+  "$fileDescription": "CASE-format (openevo-graph/schema/case_schema.json) representation of Pennsylvania's 2022 STEELS standards, Discipline 3.1 Life Science, the five strands covering evolution/heredity (Inheritance of Traits, Variation of Traits, Evidence of Common Ancestry and Diversity, Natural Selection, Adaptation), at both the 9-12 and 6-8 grade bands. Transformed from real, directly-fetched data: the Common Standards Project API (api.commonstandardsproject.com/api/v1/standard_sets/5A99211C6D874994A2CFEE2AE40023DD_D21358967_...), confirmed live 2026-10-20, document id D21358967, cross-validated against a second independent CSP cataloging (document D21302564) which uses a different code scheme but identical wording. NOTE: unlike florida-lpm's equivalent file, this dataset carries NO confirmed open license (Common Standards Project's license title/URL fields are blank for this document) -- see case/README.md and state/pennsylvania/local_policy/records/mandates.yaml's licenseOrRightsNote for the full discussion.",
+  "CFDocument": {
+    "identifier": "pa-steels-2022-science",
+    "uri": "oe://case/framework/pa-steels-2022-science",
+    "title": "Pennsylvania Science, Technology & Engineering and Environmental Literacy & Sustainability Standards (STEELS)",
+    "creator": "Pennsylvania State Board of Education",
+    "publisher": "Pennsylvania Department of Education",
+    "description": "Pennsylvania's K-12 science standards, adopted by the State Board of Education in January 2022 (final-form regulation published in the Pennsylvania Bulletin 2022-07-16), with full mandatory implementation beginning the 2025-2026 school year. This file covers only Discipline 3.1 Life Science's five evolution/heredity-related strands at grades 9-12 and 6-8 -- not the full ~177-benchmark grade 9-12 Science standard set (physical science, earth/space science, technology/engineering, and the rest of life science are out of scope for this repo).",
+    "subject": [
+      "Science"
+    ],
+    "language": "en",
+    "version": "2022",
+    "adoptionStatus": "Active",
+    "statusStart": "2022-01-01",
+    "lastChangeDateTime": "2026-10-20T00:00:00Z",
+    "gradeLevels": [
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "gradeBand": "9-12",
+    "openEvoAnchors": [],
+    "notes": "Supersedes the 2002 'Academic Standards for Science and Technology' (22 Pa. Code, Ch. 4, App. B), which remained in force until its 2025-06-30 sunset -- see state/pennsylvania/local_policy/records/mandates.yaml (PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution) for that superseded standard's own quoted text (no separate CASE file built for it, since its full benchmark set was not independently re-fetched this session beyond the single 3.3.10.D benchmark). See mandates.yaml's licenseOrRightsNote for the PA public-records/copyright discussion specific to this document."
+  },
+  "CFItems": [
+    {
+      "identifier": "steels-2022-life-science",
+      "uri": "oe://case/item/steels-2022-life-science",
+      "fullStatement": "Life Science",
+      "humanCodingScheme": "3.1",
+      "listEnumeration": "3.1",
+      "CFItemType": "Domain",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": [],
+      "note": "Common Standards Project 'Discipline' level, mapped to CASE's 'Domain' CFItemType (CASE has no native 'Discipline' type)."
+    },
+    {
+      "identifier": "steels-2022-strand-inheritance-of-traits",
+      "uri": "oe://case/item/steels-2022-strand-inheritance-of-traits",
+      "fullStatement": "Inheritance of Traits",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-p",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-p",
+      "fullStatement": "Ask questions to clarify relationships about the role of DNA and chromosomes in coding the instructions for characteristic traits passed from parents to offspring.",
+      "humanCodingScheme": "3.1.9-12.P",
+      "listEnumeration": "3.1.9-12.P",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-strand-variation-of-traits",
+      "uri": "oe://case/item/steels-2022-strand-variation-of-traits",
+      "fullStatement": "Variation of Traits",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-q",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-q",
+      "fullStatement": "Make and defend a claim based on evidence that inheritable genetic variations may result from (1) new genetic combinations through meiosis, (2) viable errors occurring during replication, and/or (3) mutations caused by environmental factors.",
+      "humanCodingScheme": "3.1.9-12.Q",
+      "listEnumeration": "3.1.9-12.Q",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-r",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-r",
+      "fullStatement": "Apply concepts of statistics and probability to explain the variation and distribution of expressed traits in a population.",
+      "humanCodingScheme": "3.1.9-12.R",
+      "listEnumeration": "3.1.9-12.R",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "uri": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "fullStatement": "Evidence of Common Ancestry and Diversity",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-s",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-s",
+      "fullStatement": "Communicate scientific information that common ancestry and biological evolution are supported by multiple lines of empirical evidence.",
+      "humanCodingScheme": "3.1.9-12.S",
+      "listEnumeration": "3.1.9-12.S",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-strand-natural-selection",
+      "uri": "oe://case/item/steels-2022-strand-natural-selection",
+      "fullStatement": "Natural Selection",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-t",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-t",
+      "fullStatement": "Construct an explanation based on evidence that the process of evolution primarily results from four factors: (1) the potential for a species to increase in number, (2) the heritable genetic variation of individuals in a species due to mutation and sexual reproduction, (3) competition for limited resources, and (4) the proliferation of those organisms that are better able to survive and reproduce in the environment.",
+      "humanCodingScheme": "3.1.9-12.T",
+      "listEnumeration": "3.1.9-12.T",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-u",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-u",
+      "fullStatement": "Apply concepts of statistics and probability to support explanations that organisms with an advantageous heritable trait tend to increase in proportion to organisms lacking this trait.",
+      "humanCodingScheme": "3.1.9-12.U",
+      "listEnumeration": "3.1.9-12.U",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-strand-adaptation",
+      "uri": "oe://case/item/steels-2022-strand-adaptation",
+      "fullStatement": "Adaptation",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-v",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-v",
+      "fullStatement": "Create or revise a simulation to test a solution to mitigate the adverse impacts of human activity on biodiversity.",
+      "humanCodingScheme": "3.1.9-12.V",
+      "listEnumeration": "3.1.9-12.V",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-w",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-w",
+      "fullStatement": "Construct an explanation based on evidence for how natural selection leads to adaptation of populations.",
+      "humanCodingScheme": "3.1.9-12.W",
+      "listEnumeration": "3.1.9-12.W",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-x",
+      "uri": "oe://case/item/steels-2022-3-1-9-12-x",
+      "fullStatement": "Evaluate the evidence supporting claims that changes in environmental conditions may result in (1)increases in the number of individuals of some species, (2) the emergence of new species over time, and (3) the extinction of other species.",
+      "humanCodingScheme": "3.1.9-12.X",
+      "listEnumeration": "3.1.9-12.X",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-m",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-m",
+      "fullStatement": "Develop and use a model to describe why structural changes to genes (mutations) located on chromosomes may affect proteins and may result in harmful, beneficial, or neutral effects to the structure and function of the organism.",
+      "humanCodingScheme": "3.1.6-8.M",
+      "listEnumeration": "3.1.6-8.M",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-n",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-n",
+      "fullStatement": "Develop and use a model to describe why asexual reproduction results in offspring with identical genetic information and sexual reproduction results in offspring with genetic variation.",
+      "humanCodingScheme": "3.1.6-8.N",
+      "listEnumeration": "3.1.6-8.N",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-o",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-o",
+      "fullStatement": "Analyze and interpret data for patterns in the fossil record that document the existence, diversity, extinction, and change of life forms throughout the history of life on Earth under the assumption that natural laws operate today as in the past.",
+      "humanCodingScheme": "3.1.6-8.O",
+      "listEnumeration": "3.1.6-8.O",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-p",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-p",
+      "fullStatement": "Apply scientific ideas to construct an explanation for anatomical similarities and differences among modern organisms and between modern and fossil organisms to infer evolutionary relationships.",
+      "humanCodingScheme": "3.1.6-8.P",
+      "listEnumeration": "3.1.6-8.P",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-q",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-q",
+      "fullStatement": "Analyze displays of pictorial data to compare patterns of similarities in anatomical structures across multiple species to identify relationships not evident in the fully formed anatomy.",
+      "humanCodingScheme": "3.1.6-8.Q",
+      "listEnumeration": "3.1.6-8.Q",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-r",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-r",
+      "fullStatement": "Gather and synthesize information about the technologies that have changed the way humans influence the inheritance of desired traits in organisms.",
+      "humanCodingScheme": "3.1.6-8.R",
+      "listEnumeration": "3.1.6-8.R",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-s",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-s",
+      "fullStatement": "Construct an explanation based on evidence that describes how genetic variations of traits in a population increase some individuals' probability of surviving and reproducing in a specific environment.",
+      "humanCodingScheme": "3.1.6-8.S",
+      "listEnumeration": "3.1.6-8.S",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-t",
+      "uri": "oe://case/item/steels-2022-3-1-6-8-t",
+      "fullStatement": "Use mathematical representations to support explanations of how natural selection may lead to increases and decreases of specific traits in populations over time.",
+      "humanCodingScheme": "3.1.6-8.T",
+      "listEnumeration": "3.1.6-8.T",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-01-01",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "6",
+        "7",
+        "8"
+      ],
+      "openEvoLinks": []
+    }
+  ],
+  "CFAssociations": [
+    {
+      "identifier": "steels-2022-strand-inheritance-of-traits-ischildof-life-science",
+      "originNodeURI": "oe://case/item/steels-2022-strand-inheritance-of-traits",
+      "originNodeId": "steels-2022-strand-inheritance-of-traits",
+      "destinationNodeURI": "oe://case/item/steels-2022-life-science",
+      "destinationNodeId": "steels-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-p-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-p",
+      "originNodeId": "steels-2022-3-1-9-12-p",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-inheritance-of-traits",
+      "destinationNodeId": "steels-2022-strand-inheritance-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-strand-variation-of-traits-ischildof-life-science",
+      "originNodeURI": "oe://case/item/steels-2022-strand-variation-of-traits",
+      "originNodeId": "steels-2022-strand-variation-of-traits",
+      "destinationNodeURI": "oe://case/item/steels-2022-life-science",
+      "destinationNodeId": "steels-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-q-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-q",
+      "originNodeId": "steels-2022-3-1-9-12-q",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-variation-of-traits",
+      "destinationNodeId": "steels-2022-strand-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-r-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-r",
+      "originNodeId": "steels-2022-3-1-9-12-r",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-variation-of-traits",
+      "destinationNodeId": "steels-2022-strand-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-strand-evidence-of-common-ancestry-and-diversity-ischildof-life-science",
+      "originNodeURI": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "originNodeId": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "destinationNodeURI": "oe://case/item/steels-2022-life-science",
+      "destinationNodeId": "steels-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-s-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-s",
+      "originNodeId": "steels-2022-3-1-9-12-s",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "destinationNodeId": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-strand-natural-selection-ischildof-life-science",
+      "originNodeURI": "oe://case/item/steels-2022-strand-natural-selection",
+      "originNodeId": "steels-2022-strand-natural-selection",
+      "destinationNodeURI": "oe://case/item/steels-2022-life-science",
+      "destinationNodeId": "steels-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-t-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-t",
+      "originNodeId": "steels-2022-3-1-9-12-t",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-natural-selection",
+      "destinationNodeId": "steels-2022-strand-natural-selection",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-u-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-u",
+      "originNodeId": "steels-2022-3-1-9-12-u",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-natural-selection",
+      "destinationNodeId": "steels-2022-strand-natural-selection",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-strand-adaptation-ischildof-life-science",
+      "originNodeURI": "oe://case/item/steels-2022-strand-adaptation",
+      "originNodeId": "steels-2022-strand-adaptation",
+      "destinationNodeURI": "oe://case/item/steels-2022-life-science",
+      "destinationNodeId": "steels-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-v-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-v",
+      "originNodeId": "steels-2022-3-1-9-12-v",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-adaptation",
+      "destinationNodeId": "steels-2022-strand-adaptation",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-w-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-w",
+      "originNodeId": "steels-2022-3-1-9-12-w",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-adaptation",
+      "destinationNodeId": "steels-2022-strand-adaptation",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-9-12-x-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-9-12-x",
+      "originNodeId": "steels-2022-3-1-9-12-x",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-adaptation",
+      "destinationNodeId": "steels-2022-strand-adaptation",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-m-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-m",
+      "originNodeId": "steels-2022-3-1-6-8-m",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-inheritance-of-traits",
+      "destinationNodeId": "steels-2022-strand-inheritance-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-n-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-n",
+      "originNodeId": "steels-2022-3-1-6-8-n",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-variation-of-traits",
+      "destinationNodeId": "steels-2022-strand-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-o-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-o",
+      "originNodeId": "steels-2022-3-1-6-8-o",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "destinationNodeId": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-p-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-p",
+      "originNodeId": "steels-2022-3-1-6-8-p",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "destinationNodeId": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-q-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-q",
+      "originNodeId": "steels-2022-3-1-6-8-q",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "destinationNodeId": "steels-2022-strand-evidence-of-common-ancestry-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-r-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-r",
+      "originNodeId": "steels-2022-3-1-6-8-r",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-natural-selection",
+      "destinationNodeId": "steels-2022-strand-natural-selection",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-s-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-s",
+      "originNodeId": "steels-2022-3-1-6-8-s",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-natural-selection",
+      "destinationNodeId": "steels-2022-strand-natural-selection",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "steels-2022-3-1-6-8-t-ischildof-strand",
+      "originNodeURI": "oe://case/item/steels-2022-3-1-6-8-t",
+      "originNodeId": "steels-2022-3-1-6-8-t",
+      "destinationNodeURI": "oe://case/item/steels-2022-strand-adaptation",
+      "destinationNodeId": "steels-2022-strand-adaptation",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/pa-steels-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    }
+  ]
+}

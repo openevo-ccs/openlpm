@@ -111,6 +111,20 @@ REPOS = {
         # repo to use the new policy-controversy-record schema (see its own
         # GOVERNANCE.md).
     },
+    "pennsylvania-lpm": {
+        "path": ROOT / "curriculum-sources" / "pennsylvania-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/india-lpm
+        "project_slug": "pennsylvania-curriculum-repository",
+        "project_name": "Pennsylvania Curriculum Repository",
+        "region_tags": ["US-PA"],
+        "default_jurisdiction": "US-PA",
+        # Single-state repo (like nys_lp/florida-lpm) -- no state_projects
+        # sub-split needed. Founded 2026-10-20, same session as florida-lpm,
+        # to document the Kitzmiller v. Dover case and Pennsylvania's own
+        # state-level standards history -- the first repo to actually
+        # populate a policy-controversy-record with controversyType
+        # "litigation" (the value existed from florida-lpm's founding, with
+        # no case yet to use it on).
+    },
 }
 
 GERMAN_STATE_ISO = {

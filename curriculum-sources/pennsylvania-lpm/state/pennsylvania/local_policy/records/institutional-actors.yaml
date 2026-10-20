@@ -1,0 +1,110 @@
+$schema: ../../../../schema/institutional-actor-record.schema.json
+$description: >
+  Pennsylvania-specific institutional actors: the state-level authorities
+  that actually set science standards (a three-body regulatory process, not
+  a single vote), and Dover Area School District, whose own board -- not any
+  state authority -- issued the mandate this repo's central case is about.
+
+actors:
+  - id: PALP-ACTOR-pde
+    slug: pde
+    label: Pennsylvania Department of Education (PDE)
+    actorType: state-education-department
+    jurisdiction: US-PA
+    role: >
+      Administers K-12 standards implementation for Pennsylvania public
+      schools, under the State Board of Education's regulatory authority.
+      Its pdesas.org "Standards Aligned System" hub distributes standards
+      documents (PDF/Word/PowerPoint only -- no API, confirmed this session)
+      including the 2022 STEELS revision.
+    url: https://www.pdesas.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        pdesas.org's own STEELS resource hub page, fetched and read directly.
+
+  - id: PALP-ACTOR-pa-state-board-of-education
+    slug: pa-state-board-of-education
+    label: Pennsylvania State Board of Education
+    actorType: governing-board
+    jurisdiction: US-PA
+    role: >
+      Sets Pennsylvania's academic standards by formal regulation under the
+      Commonwealth's Regulatory Review Act -- a materially different,
+      multi-body process than a single public vote: proposed rulemaking goes
+      to the Independent Regulatory Review Commission (IRRC) and the chairs
+      of the House and Senate Education Committees before taking legal effect
+      via publication in the Pennsylvania Bulletin. Adopted the 2002
+      "Academic Standards for Science and Technology" (22 Pa. Code, Chapter
+      4, Appendix B) -- after changing proposed evolution-standard wording in
+      response to 120+ public comments and IRRC concern -- and the 2022
+      STEELS standards.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9
+        (pacodeandbulletin.gov), fetched and read directly.
+
+  - id: PALP-ACTOR-irrc
+    slug: independent-regulatory-review-commission
+    label: Independent Regulatory Review Commission (IRRC)
+    actorType: governing-board
+    jurisdiction: US-PA
+    role: >
+      Independent Pennsylvania state body that reviews and can object to
+      proposed regulations, including State Board of Education rulemaking on
+      academic standards -- one of the three institutional-review layers
+      (State Board, IRRC, legislative education committees) Pennsylvania's
+      standards-adoption process runs through. Raised concern during the
+      2000-2002 rulemaking over the proposed evolution-standard wording that
+      the State Board subsequently changed.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9, fetched
+        and read directly.
+
+  - id: PALP-ACTOR-dover-area-school-district
+    slug: dover-area-school-district
+    label: Dover Area School District
+    actorType: school-district
+    jurisdiction: US-PA
+    role: >
+      The real, binding curriculum-policy actor at the center of this repo's
+      founding case -- a single school district's own board, not a state
+      authority. Voted 6-3 on 2004-10-18 to require a disclaimer statement
+      about "intelligent design" be read to ninth-grade biology students
+      before the evolution unit; the policy was struck down by a federal
+      court (Kitzmiller v. Dover, Dec. 2005) and unanimously rescinded by a
+      newly elected board on 2006-01-03.
+    currentHolder:
+      name: "various, by meeting -- see state/pennsylvania/local_policy/records/timeline.yaml and controversies.yaml for named board members at each vote"
+      title: School Board
+      asOf: "2004-10-18"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Kitzmiller v. Dover Timeline" and "Design on Trial in Dover,
+        Pennsylvania" (both ncse.ngo), fetched and read directly, summarizing
+        the trial record (Plaintiffs' Findings of Fact,
+        talkorigins.org/faqs/dover/pf.html).

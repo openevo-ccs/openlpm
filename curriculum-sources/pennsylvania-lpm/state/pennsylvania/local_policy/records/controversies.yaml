@@ -1,0 +1,299 @@
+$schema: ../../../../schema/policy-controversy-record.schema.json
+$description: >
+  Bounded, named public controversies in Pennsylvania's evolution-curriculum
+  politics, using the policy-controversy-record schema adopted unchanged from
+  florida-lpm. See GOVERNANCE.md for why Pennsylvania's case stress-tests a
+  genuinely different shape (district-level mandate, resolved by litigation)
+  than Florida's (state-level, resolved by a vote). See
+  docs/source-notes/2026-10-20-pennsylvania-evolution-curriculum-policy-history-research.md
+  for full sourcing.
+
+controversies:
+  - id: PALP-CONTROVERSY-pa-2002-standards-wording-fight
+    slug: pa-2002-standards-wording-fight
+    label: The pre-Dover 2000-2002 fight over how PA's first evolution-naming standard should be worded
+    jurisdiction: US-PA
+    controversyType: standards-adoption-fight
+    topicArea: >
+      Whether Pennsylvania's first science standard to explicitly mention
+      evolution should ask students to analyze evidence that "supports or
+      does not support" evolution, or more neutrally, evidence "relevant to"
+      it.
+    summary: >
+      During rulemaking for Pennsylvania's 2002 science standards, the
+      proposed wording for the evolution standard was challenged by more
+      than 120 public commenters and the Independent Regulatory Review
+      Commission as effectively inviting creationism/intelligent-design
+      framing into the classroom. The State Board revised the final wording
+      in response, explicitly disclaiming any intent to encourage teaching
+      creationism or intelligent design.
+    dateStart: "2000-01-01"
+    dateEnd: "2002-01-05"
+    status: resolved-outcome-adopted
+    outcomeSummary: >
+      The State Board adopted the revised, more neutral wording ("relevant to
+      the theory of evolution") rather than the originally proposed language
+      -- the side objecting to the "support or do not support" framing
+      prevailed in the final rulemaking.
+    outcomeDate: "2002-01-05"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          Whether Standard 3.3.10.D should ask students to analyze evidence
+          that "supports or does not support" evolution, versus evidence
+          "relevant to" it.
+        relatedMandateIds: [PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution]
+        relatedEventIds:
+          - PALP-EVENT-pa-2000-2002-standards-wording-fight
+          - PALP-EVENT-pa-2002-standards-adopted
+        relatedFindingIds: [PALP-FINDING-pa-2002-proposed-vs-final-wording-change]
+    positions:
+      - actorId: PALP-ACTOR-irrc
+        actorLabel: Independent Regulatory Review Commission
+        stance: opposes-change
+        stanceSummary: >
+          Raised concern during the rulemaking review that the proposed
+          "support or do not support" wording could invite creationism or
+          intelligent-design framing.
+        sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+        sourceDate: "2001-06-01"
+        accessTier: summary-only
+      - actorLabel: 120+ individual and organizational public commenters (not individually named in sources reviewed)
+        stance: opposes-change
+        stanceSummary: >
+          Objected that the proposed wording "inappropriately singled out"
+          evolution and could "permit or even encourage schools to teach
+          creationism or intelligent design."
+        sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+        sourceDate: "2001-06-01"
+        accessTier: excerpt-only
+      - actorId: PALP-ACTOR-pa-state-board-of-education
+        actorLabel: Pennsylvania State Board of Education
+        stance: seeks-compromise
+        stanceSummary: >
+          Revised the final wording and stated it "did not intend to
+          encourage the teaching of creationism or intelligent design,"
+          framing the standard as "written to encourage critical thinking."
+        sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+        sourceDate: "2002-01-05"
+        accessTier: excerpt-only
+    mediaCoverage: []
+    themes: ["evolution", "standards-wording", "regulatory-process"]
+    exhaustivenessCaveat: >
+      Built entirely from the Pennsylvania Bulletin's own rulemaking
+      preamble -- no contemporaneous news coverage of this specific 2000-2002
+      episode was located this session (unlike the much more widely covered
+      Dover case below); the 120+ commenters are not individually named in
+      the Bulletin notice itself.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9, fetched
+        and read directly.
+
+  - id: PALP-CONTROVERSY-dover-intelligent-design-disclaimer
+    slug: dover-intelligent-design-disclaimer
+    label: Kitzmiller v. Dover -- the fight over teaching intelligent design alongside evolution
+    jurisdiction: US-PA
+    controversyType: litigation
+    topicArea: >
+      Whether a public school district may require a disclaimer statement
+      presenting "intelligent design" as a scientific alternative to
+      evolution be read to students before the evolution unit.
+    summary: >
+      The Dover Area School Board voted 6-3 in October 2004 to require
+      students be told of "gaps/problems" in evolution and of "other
+      theories... including, but not limited to, intelligent design." All
+      eight Dover biology teachers refused to read the resulting disclaimer
+      themselves; eleven parents sued; a six-week federal trial followed;
+      voters ousted every pro-policy board member before the ruling came
+      down; and Judge John E. Jones III ruled the policy unconstitutional,
+      finding intelligent design is not science and is a form of creationism.
+      The new board did not appeal and formally rescinded the policy weeks
+      later.
+    dateStart: "2004-10-18"
+    dateEnd: "2006-01-03"
+    status: resolved-outcome-rejected
+    outcomeSummary: >
+      The intelligent-design disclaimer policy was both ruled
+      unconstitutional by a federal court (Dec 20, 2005) and formally,
+      unanimously rescinded by the newly elected board (Jan 3, 2006) --
+      resolved decisively against the change the original 2004 board fought
+      for, not by a subsequent compromise.
+    outcomeDate: "2006-01-03"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          Whether Dover's biology curriculum could require students be told
+          of "gaps/problems" in evolution and be directed toward "intelligent
+          design" and the book "Of Pandas and People" as an alternative
+          explanation.
+        relatedMandateIds:
+          - PALP-MANDATE-dover-2004-id-disclaimer-policy
+          - PALP-MANDATE-dover-2006-policy-rescission
+        relatedEventIds:
+          - PALP-EVENT-dover-curriculum-committee-pushes-balance
+          - PALP-EVENT-dover-2004-08-textbook-vote
+          - PALP-EVENT-dover-2004-10-18-board-vote
+          - PALP-EVENT-dover-teachers-refuse-and-disclaimer-first-read
+          - PALP-EVENT-kitzmiller-lawsuit-filed
+          - PALP-EVENT-kitzmiller-trial
+          - PALP-EVENT-dover-2005-election
+          - PALP-EVENT-kitzmiller-ruling
+          - PALP-EVENT-dover-2006-01-policy-rescinded
+          - PALP-EVENT-dover-2006-02-legal-fees-settlement
+        relatedFindingIds: [PALP-FINDING-dover-policy-exceeded-state-standard]
+    positions:
+      - actorLabel: William Buckingham (Dover board curriculum-committee chair)
+        stance: supports-change
+        stanceSummary: >
+          Led the push to balance evolution with creationism/intelligent
+          design, objecting that the proposed biology textbook was "laced
+          with Darwinism."
+        sourceUrl: https://ncse.ngo/design-trial-dover-pennsylvania
+        sourceDate: "2004-06-01"
+        accessTier: excerpt-only
+      - actorLabel: "Jeffrey and Carol \"Casey\" Brown (Dover board members, resigned in protest)"
+        stance: opposes-change
+        stanceSummary: >
+          Voted against the policy and resigned immediately afterward. Casey
+          Brown: "it has become increasingly evident that in the direction
+          the board has now chosen to go, holding a certain religious belief
+          is of paramount importance... I can no longer effectively function
+          as a member of this board."
+        sourceUrl: https://ncse.ngo/kitzmiller-v-dover-timeline
+        sourceDate: "2004-10-18"
+        accessTier: excerpt-only
+      - actorLabel: Dover High School's 8 biology teachers
+        stance: opposes-change
+        stanceSummary: >
+          Formally refused to read the disclaimer, stating intelligent
+          design "is not science" and "not an accepted scientific theory,"
+          and that reading it would "violate the ethics code of [their]
+          profession."
+        sourceUrl: https://ncse.com/news/2005/01/dover-teachers-refuse-to-read-antievolution-disclaimer-00664
+        sourceDate: "2005-01-06"
+        accessTier: excerpt-only
+      - actorId: PALP-ACTOR-pepper-hamilton
+        actorLabel: Tammy Kitzmiller and the 10 other plaintiff parents (represented by Pepper Hamilton LLP, Americans United, ACLU of Pennsylvania)
+        stance: opposes-change
+        stanceSummary: >
+          Sued to block the policy as an unconstitutional establishment of
+          religion.
+        sourceUrl: https://www.courtlistener.com/docket/4528445/kitzmiller-v-dover-area-school-district/
+        sourceDate: "2004-12-14"
+        accessTier: summary-only
+      - actorId: PALP-ACTOR-thomas-more-law-center
+        actorLabel: Thomas More Law Center (defense counsel for the school board)
+        stance: supports-change
+        stanceSummary: >
+          Defended the board's policy at trial as permissible under the
+          Establishment Clause.
+        sourceUrl: https://ncse.ngo/kitzmiller-trial-transcripts
+        sourceDate: "2005-09-26"
+        accessTier: summary-only
+      - actorId: PALP-ACTOR-discovery-institute
+        actorLabel: Discovery Institute
+        stance: other
+        stanceSummary: >
+          Publicly distanced itself from Dover's SPECIFIC policy even while
+          promoting intelligent design generally: its own site states it
+          "repeatedly advised the Dover School Board and [Thomas More Law
+          Center] that the board's intelligent design policy... was
+          problematic and should be replaced," and three of its affiliated
+          fellows who had agreed to serve as defense experts withdrew before
+          depositions.
+        sourceUrl: https://www.discovery.org/a/3003/
+        sourceDate: "2005-09-01"
+        accessTier: excerpt-only
+      - actorLabel: Kenneth R. Miller (plaintiffs' lead science expert witness, Brown University)
+        stance: opposes-change
+        stanceSummary: >
+          Testified that intelligent design, including the bacterial-
+          flagellum "irreducible complexity" argument, is not testable
+          science, citing peer-reviewed research on flagellum evolutionary
+          precursors.
+        sourceUrl: https://talkorigins.org/faqs/dover/day1am.html
+        sourceDate: "2005-09-26"
+        accessTier: excerpt-only
+      - actorLabel: Michael Behe (defense expert witness, Lehigh University)
+        stance: supports-change
+        stanceSummary: >
+          Testified the bacterial flagellum exhibits "irreducible
+          complexity" that could not have evolved stepwise; under
+          cross-examination conceded there are "no peer reviewed articles by
+          anyone... providing detailed, rigorous accounts of how intelligent
+          design of any biological system occurred," and that his own
+          definition of "theory" was broad enough to include astrology.
+        sourceUrl: https://talkorigins.org/faqs/dover/day11pm.html
+        sourceDate: "2005-10-01"
+        accessTier: excerpt-only
+      - actorLabel: Judge John E. Jones III (US District Court, Middle District of Pennsylvania)
+        stance: neutral-fact-finding
+        stanceSummary: >
+          Ruled the policy unconstitutional: intelligent design is not
+          science and is a form of creationism; the board acted with
+          religious intent, violating the Establishment Clause. Wrote that
+          "the breathtaking inanity of the Board's decision is evident when
+          considered against the factual backdrop which has now been fully
+          revealed through this trial," and found board members Buckingham
+          and Bonsell gave false testimony about the policy's religious
+          origins.
+        sourceUrl: https://ncse.ngo/files/pub/legal/kitzmiller/highlights/2005-12-20_Kitzmiller_decision.pdf
+        sourceDate: "2005-12-20"
+        accessTier: full-text-stored
+        licenseOrRightsNote: A federal court's own published opinion is a public judicial record.
+    mediaCoverage:
+      - outlet: NPR
+        headline: "Pa. Case Weighs Intelligent Design in Schools"
+        url: https://www.npr.org/2005/09/26/4864027/pa-case-weighs-intelligent-design-in-schools
+        publicationDate: "2005-09-26"
+        accessTier: citation-only
+      - outlet: TIME
+        headline: "'Breathtaking Inanity': How Intelligent Design Flunked Its Test Case"
+        url: https://time.com/archive/6931851/breathtaking-inanity-how-intelligent-design-flunked-its-test-case/
+        publicationDate: "2005-12-20"
+        accessTier: citation-only
+      - outlet: NBC News
+        headline: "Dover voters oust intelligent design supporters"
+        url: https://www.nbcnews.com/id/wbna9973228
+        publicationDate: "2005-11-09"
+        accessTier: citation-only
+      - outlet: NBC News
+        headline: "Intelligent-design policy rescinded"
+        url: https://www.nbcnews.com/id/wbna10698535
+        publicationDate: "2006-01-03"
+        accessTier: citation-only
+      - outlet: National Center for Science Education (NCSE)
+        headline: "Design on Trial in Dover, Pennsylvania"
+        url: https://ncse.ngo/design-trial-dover-pennsylvania
+        publicationDate: "2005-01-01"
+        framingNote: >
+          Advocacy-organization framing, sympathetic to the plaintiffs; also
+          the source hosting the verbatim disclaimer text used in this
+          repo's mandate records.
+        accessTier: citation-only
+    themes: ["evolution", "intelligent-design", "litigation", "establishment-clause", "school-board-election"]
+    exhaustivenessCaveat: >
+      Built from NCSE's contemporaneous and retrospective coverage, the
+      opinion itself, TalkOrigins' trial-transcript archive, and
+      Discovery Institute's own statement -- not a complete read of the full
+      139-page opinion or the entire six-week trial transcript.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's Kitzmiller coverage (multiple articles), the opinion itself
+        (NCSE-hosted PDF and Justia), TalkOrigins trial transcripts,
+        Discovery Institute's own statement, CourtListener, ACLU materials --
+        all fetched and read directly. See docs/source-notes/ for the full
+        list.

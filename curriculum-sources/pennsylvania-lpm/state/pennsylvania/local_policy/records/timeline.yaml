@@ -1,0 +1,565 @@
+$schema: ../../../../schema/policy-timeline-event.schema.json
+$description: >
+  Dated events in Pennsylvania's K-12 evolution-education policy history,
+  spanning the state's own 2002 standards-wording fight and the Kitzmiller v.
+  Dover Area School District case (2004-2006). See
+  docs/source-notes/2026-10-20-pennsylvania-evolution-curriculum-policy-history-research.md
+  for the full research this was built from.
+
+events:
+  - id: PALP-EVENT-pa-2000-2002-standards-wording-fight
+    slug: pa-2000-2002-standards-wording-fight
+    label: Pre-Dover PA state standards rulemaking fight over evolution-wording, resolved by final-form change
+    jurisdiction: US-PA
+    eventType: public-hearing
+    dateStart: "2000-01-01"
+    dateEnd: "2002-01-05"
+    dateGranularity: year
+    temporalStatus: past-completed
+    description: >
+      During rulemaking for Pennsylvania's first science standards to
+      explicitly mention evolution, the proposed Standard 3.3.10.D required
+      students to analyze records/studies "that support or do not support
+      the theory of evolution." Over 120 individuals and organizations
+      submitted public comments objecting the wording "inappropriately
+      singled out" evolution and could "permit or even encourage schools to
+      teach creationism or intelligent design"; the Independent Regulatory
+      Review Commission also raised concern. The State Board changed the
+      final-form language to "relevant to the theory of evolution" and
+      stated it "did not intend to encourage the teaching of creationism or
+      intelligent design."
+    involvedActors:
+      - PALP-ACTOR-pa-state-board-of-education
+      - PALP-ACTOR-irrc
+    sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+    accessTier: excerpt-only
+    licenseOrRightsNote: >
+      The Pennsylvania Bulletin is the Commonwealth's own official
+      legal-notice publication, a public record.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9, fetched
+        and read directly.
+
+  - id: PALP-EVENT-pa-2002-standards-adopted
+    slug: pa-2002-standards-adopted
+    label: Pennsylvania adopts "Academic Standards for Science and Technology" (22 Pa. Code, Ch. 4, App. B)
+    jurisdiction: US-PA
+    eventType: framework-adopted
+    dateStart: "2002-01-05"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Final-form adoption of Pennsylvania's first science standards document
+      to explicitly mention evolution at all, organized under heading 3.3
+      Biological Sciences, subsection D. Evolution (grade-12 benchmark
+      3.3.10.D: "analyze the theory of evolution"). This was the standards
+      document in effect during the 2004-2005 Dover controversy -- Dover's
+      own disclaimer explicitly invoked "the state standards" as the reason
+      evolution had to be taught.
+    involvedActors: [PALP-ACTOR-pa-state-board-of-education]
+    sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Title page of the official PDF (22 Pa. Code, Ch. 4, App. B), fetched
+        directly, read for its adoption date; full verbatim 3.3.10.D text not
+        independently re-confirmed this session beyond the characterization
+        above.
+
+  - id: PALP-EVENT-dover-curriculum-committee-pushes-balance
+    slug: dover-curriculum-committee-pushes-balance
+    label: Dover curriculum committee pushes to "balance" evolution with creationism in textbook discussions
+    jurisdiction: US-PA
+    eventType: school-board-action
+    dateStart: "2004-06-01"
+    dateGranularity: month
+    temporalStatus: past-completed
+    description: >
+      Dover Area School Board curriculum committee, chaired by William
+      Buckingham, began pushing to balance evolution teaching with
+      "creationism" during discussions of adopting Kenneth Miller & Joseph
+      Levine's textbook "Biology." Buckingham objected the book was "laced
+      with Darwinism."
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.ngo/design-trial-dover-pennsylvania
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: NCSE, "Design on Trial in Dover, Pennsylvania," fetched and read directly.
+
+  - id: PALP-EVENT-dover-2004-08-textbook-vote
+    slug: dover-2004-08-textbook-vote
+    label: Dover board votes 5-3 to purchase Miller & Levine's Biology textbook, withholds ordering it
+    jurisdiction: US-PA
+    eventType: school-board-action
+    dateStart: "2004-08-02"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      The board voted 5-3 to purchase the textbook but, per trial testimony,
+      initially withheld actually ordering it over the ongoing evolution
+      dispute.
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.ngo/design-trial-dover-pennsylvania
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: NCSE, "Design on Trial in Dover, Pennsylvania," fetched and read directly.
+
+  - id: PALP-EVENT-dover-2004-10-18-board-vote
+    slug: dover-2004-10-18-board-vote
+    label: Dover board votes 6-3 to adopt the intelligent-design curriculum policy; two members resign in protest
+    jurisdiction: US-PA
+    eventType: school-board-action
+    dateStart: "2004-10-18"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      The Dover Area School Board voted 6-3 to amend the biology curriculum:
+      "Students will be made aware of gaps/problems in Darwin's theory and of
+      other theories of evolution including, but not limited to, intelligent
+      design." FOR: Alan Bonsell, William Buckingham, Jane Cleaver, Heather
+      Geesey, Sheila Harkins, Angie Ziegler-Yingling. AGAINST: Jeffrey Brown,
+      Carol "Casey" Brown, Noel Wenrich. Jeff and Casey Brown (a married
+      couple, board members 5 and 10 years respectively) resigned in protest
+      at the end of the same meeting; Casey Brown's statement: "it has become
+      increasingly evident that in the direction the board has now chosen to
+      go, holding a certain religious belief is of paramount importance... I
+      can no longer effectively function as a member of this board."
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.ngo/kitzmiller-v-dover-timeline
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Kitzmiller v. Dover Timeline" and "Design on Trial in Dover,
+        Pennsylvania," both fetched and read directly, summarizing the trial
+        record (Plaintiffs' Findings of Fact, talkorigins.org/faqs/dover/pf.html).
+
+  - id: PALP-EVENT-dover-teachers-refuse-and-disclaimer-first-read
+    slug: dover-teachers-refuse-and-disclaimer-first-read
+    label: All 8 Dover biology teachers refuse to read the disclaimer; it is read by administrators instead
+    jurisdiction: US-PA
+    eventType: implementation-begins
+    dateStart: "2005-01-06"
+    dateEnd: "2005-01-18"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      All eight Dover High School science teachers sent the superintendent a
+      letter stating intelligent design "is not science" and "not an
+      accepted scientific theory," asking to be excused from reading the
+      disclaimer since doing so would make them "violate the ethics code of
+      [their] profession." They formally refused on Jan 6, 2005; the
+      administration agreed (Jan 7) administrators would read it instead. The
+      disclaimer was first read on Jan 18, 2005, by the assistant
+      superintendent, in each 9th-grade biology classroom; roughly 15
+      students walked out during the reading.
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.com/news/2005/01/dover-teachers-refuse-to-read-antievolution-disclaimer-00664
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Dover teachers refuse to read antievolution disclaimer" and
+        "Design on Trial in Dover, Pennsylvania," both fetched and read
+        directly.
+
+  - id: PALP-EVENT-kitzmiller-lawsuit-filed
+    slug: kitzmiller-lawsuit-filed
+    label: Eleven Dover parents file suit in federal court
+    jurisdiction: US
+    eventType: other
+    dateStart: "2004-12-14"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Eleven Dover parents, led by Tammy Kitzmiller, filed suit in the US
+      District Court for the Middle District of Pennsylvania: Kitzmiller et
+      al. v. Dover Area School District et al., No. 4:04-cv-02688. Named
+      plaintiffs: Tammy J. Kitzmiller, Aralene D. Callahan, Frederick B.
+      Callahan, Bryan Rehm, Christy Rehm, Deborah F. Fenimore, Joel A. Leib,
+      Steven Stough, Beth A. Eveland, Cynthia Sneath, Julie Smith.
+      Represented by Pepper Hamilton LLP, Americans United for Separation of
+      Church and State, and the ACLU of Pennsylvania; the school board was
+      defended by the Thomas More Law Center.
+    involvedActors:
+      - PALP-ACTOR-dover-area-school-district
+      - PALP-ACTOR-pepper-hamilton
+      - PALP-ACTOR-americans-united
+      - PALP-ACTOR-aclu
+      - PALP-ACTOR-thomas-more-law-center
+    sourceUrl: https://www.courtlistener.com/docket/4528445/kitzmiller-v-dover-area-school-district/
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        CourtListener docket and the published opinion's own caption (Justia,
+        law.justia.com/cases/federal/district-courts/FSupp2/400/707/2414073/),
+        both fetched and read directly.
+
+  - id: PALP-EVENT-kitzmiller-trial
+    slug: kitzmiller-trial
+    label: Kitzmiller v. Dover trial held before Judge John E. Jones III
+    jurisdiction: US
+    eventType: other
+    dateStart: "2005-09-26"
+    dateEnd: "2005-11-04"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Six weeks of testimony in Harrisburg, PA, before Judge John E. Jones
+      III (US District Court, Middle District of Pennsylvania; a George W.
+      Bush appointee). Plaintiffs' expert witnesses included Kenneth R.
+      Miller (Brown University), Barbara Forrest (SE Louisiana University --
+      testified on the "cdesign proponentsists" find-and-replace artifact in
+      draft manuscripts of "Of Pandas and People"), Kevin Padian, Robert
+      Pennock, John Haught, Brian Alters. Defense expert witnesses Michael
+      Behe (Lehigh University) and Scott Minnich (University of Idaho)
+      testified on "irreducible complexity" (the bacterial flagellum
+      argument); three other Discovery-Institute-affiliated experts (William
+      Dembski, Stephen Meyer, John Angus Campbell) had withdrawn before
+      depositions.
+    involvedActors:
+      - PALP-ACTOR-dover-area-school-district
+      - PALP-ACTOR-discovery-institute
+    sourceUrl: https://ncse.ngo/kitzmiller-trial-transcripts
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NPR, "Pa. Case Weighs Intelligent Design in Schools" (Sept 26 2005);
+        NCSE's trial transcript index; TalkOrigins trial-transcript archive
+        (Day 1 AM, Day 11 PM) -- all fetched and read directly.
+
+  - id: PALP-EVENT-dover-2005-election
+    slug: dover-2005-election
+    label: All 8 pro-intelligent-design Dover board members defeated at the polls
+    jurisdiction: US-PA
+    eventType: election
+    dateStart: "2005-11-08"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      All eight Republican incumbents who had supported the intelligent-design
+      policy were defeated by the "Dover CARES" slate: Bernadette Reinking,
+      Terry Emig, Bryan Rehm (also a named plaintiff in the lawsuit), Herbert
+      "Rob" McIlvaine, Judy McIlvaine, Larry Gurreri, Patricia Dapp, Phil
+      Herman. Ousted incumbents included board president Sheila Harkins and
+      former board president Alan Bonsell. The new board's stated position
+      was that it would drop the policy regardless of the pending court
+      ruling.
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.ngo/dover-voters-choose-good-science-polls
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Dover voters choose good science at polls"; NBC News, "Dover
+        voters oust intelligent design supporters" (Nov 9 2005) -- both
+        fetched and read directly.
+
+  - id: PALP-EVENT-kitzmiller-ruling
+    slug: kitzmiller-ruling
+    label: Judge Jones rules the intelligent-design policy unconstitutional
+    jurisdiction: US
+    eventType: court-ruling
+    dateStart: "2005-12-20"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Judge John E. Jones III issued a 139-page opinion, Kitzmiller v. Dover
+      Area School District, 400 F. Supp. 2d 707 (M.D. Pa. 2005). Found
+      intelligent design is not science (it invokes a supernatural designer,
+      "a hallmark of a religious, rather than scientific, position") and is a
+      form of creationism relabeled (citing the "cdesign proponentsists"
+      evidence); applied both the Lemon v. Kurtzman test and the endorsement
+      test to find the board acted with religious intent, violating the
+      Establishment Clause. Wrote: "The breathtaking inanity of the Board's
+      decision is evident when considered against the factual backdrop which
+      has now been fully revealed through this trial." Found board members
+      Buckingham and Bonsell gave false testimony denying the policy's
+      religious origins. Not appealed.
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    sourceUrl: https://ncse.ngo/files/pub/legal/kitzmiller/highlights/2005-12-20_Kitzmiller_decision.pdf
+    accessTier: excerpt-only
+    licenseOrRightsNote: >
+      A federal court's own published opinion is a public judicial record.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        The opinion itself (NCSE-hosted PDF and Justia); TIME, "'Breathtaking
+        Inanity': How Intelligent Design Flunked Its Test Case" (2005) --
+        both fetched and read directly.
+
+  - id: PALP-EVENT-dover-2006-01-policy-rescinded
+    slug: dover-2006-01-policy-rescinded
+    label: Newly elected Dover board unanimously rescinds the intelligent-design policy
+    jurisdiction: US-PA
+    eventType: school-board-action
+    dateStart: "2006-01-03"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      The newly elected "Dover CARES" board voted unanimously (voice vote, no
+      discussion) to formally rescind the intelligent-design policy. New
+      board president Bernadette Reinking: "This is it."
+    involvedActors: [PALP-ACTOR-dover-area-school-district]
+    partOf: PALP-EVENT-kitzmiller-ruling
+    sourceUrl: https://www.nbcnews.com/id/wbna10698535
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NBC News, "Intelligent-design policy rescinded"; Boston Globe/AP,
+        "Pa. board rescinds school policy" (Jan 4 2006) -- both fetched and
+        read directly.
+
+  - id: PALP-EVENT-dover-2006-02-legal-fees-settlement
+    slug: dover-2006-02-legal-fees-settlement
+    label: Dover board votes to pay $1,000,011 in plaintiffs' legal fees and costs
+    jurisdiction: US-PA
+    eventType: other
+    dateStart: "2006-02-21"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      The $11 reflects a $1 nominal-damages award to each of the 11
+      plaintiffs, plus $1,000,000 toward fees/costs. Plaintiffs' actual
+      documented fees/expenses totaled $2,067,226; Pepper Hamilton (which
+      handled the case pro bono) billed only its roughly $267,000 in hard
+      costs, not attorney time, with the remainder split between Americans
+      United and the ACLU of Pennsylvania as their own cost reimbursement.
+    involvedActors:
+      - PALP-ACTOR-dover-area-school-district
+      - PALP-ACTOR-pepper-hamilton
+    sourceUrl: https://ncse.ngo/intelligent-design-costs-dover-over-1000000
+    accessTier: excerpt-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "'Intelligent design' costs Dover over $1,000,000," fetched and
+        read directly.
+
+  - id: PALP-EVENT-pa-hb1007-2005
+    slug: pa-hb1007-2005
+    label: Pennsylvania HB 1007 (2005) would have authorized intelligent-design teaching statewide; dies in committee
+    jurisdiction: US-PA
+    eventType: legislation
+    dateStart: "2005-01-01"
+    dateEnd: "2005-06-30"
+    dateGranularity: month
+    temporalStatus: past-completed
+    description: >
+      House Bill 1007 would have let local school boards add "intelligent
+      design" to any curriculum that included evolution and let teachers
+      introduce "supporting evidence" for ID. Got a hearing in the House
+      Subcommittee on Basic Education in June 2005, while the Dover trial was
+      underway, but never advanced further -- died in committee. No PA state
+      "academic freedom act" targeting K-12 evolution instruction has ever
+      passed, before or after Dover.
+    involvedActors: []
+    sourceUrl: https://ncse.ngo/evolution-pennsylvania
+    accessTier: summary-only
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The bill's prime sponsor could not be independently confirmed via
+        primary PA legislative records this session (palegis.us has no
+        accessible 2005-session archive entry for HB 1007); existence/content
+        corroborated via NCSE's "Evolution in Pennsylvania" page and
+        Wikipedia's "Anti-evolution legislation" article.
+      sourceProvenance: NCSE, "Evolution in Pennsylvania," fetched and read directly.
+
+  - id: PALP-EVENT-pa-2019-steels-review-begins
+    slug: pa-2019-steels-review-begins
+    label: Pennsylvania begins its first science-standards revision in 17 years
+    jurisdiction: US-PA
+    eventType: consultation-phase
+    dateStart: "2019-01-01"
+    dateGranularity: year
+    temporalStatus: past-completed
+    description: >
+      Formal review launched 2019, developed with input from "over 900
+      stakeholders," producing the new STEELS standards (Science, Technology
+      & Engineering, Environmental Literacy & Sustainability) -- a title
+      signaling environmental/sustainability content was the main addition,
+      not evolution content. Pennsylvania's standards had gone 17 years
+      without revision at that point (2002-2019), eventually 20 by adoption
+      (2002-2022) -- the oldest in the country by replacement time.
+    involvedActors:
+      - PALP-ACTOR-pa-state-board-of-education
+      - PALP-ACTOR-pde
+    sourceUrl: https://whyy.org/articles/pa-hasnt-updated-science-education-standards-since-2002-new-plan-would-be-first-to-acknowledge-climate-change/
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: WHYY, fetched and read directly.
+
+  - id: PALP-EVENT-mann-critiques-draft-climate-content
+    slug: mann-critiques-draft-climate-content
+    label: Climate scientist Michael Mann publicly critiques the draft standards' climate-change treatment
+    jurisdiction: US-PA
+    eventType: advocacy-campaign
+    dateStart: "2021-06-01"
+    dateGranularity: month
+    temporalStatus: past-completed
+    description: >
+      During the STEELS public-comment process, climate scientist Michael
+      Mann publicly criticized a draft version's climate-change treatment.
+      This -- not evolution content -- was the actual point of public debate
+      during the 2019-2022 revision: PA's old 2002 standards had been graded
+      "F" for climate change by NCSE's 2020 "Making the Grade?" report, while
+      the same report's companion reviews (Mead & Mates 2009; Vazquez 2017,
+      both in Evolution: Education and Outreach) had graded the same old
+      standards "A" for both high-school and middle-school evolution content.
+    involvedActors: [PALP-ACTOR-ncse]
+    sourceUrl: https://ncse.ngo/concern-about-climate-change-pennsylvanias-proposed-science-standards
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Concern about climate change in Pennsylvania's proposed
+        science standards," fetched and read directly (checked specifically
+        for an evolution angle; none found).
+
+  - id: PALP-EVENT-pa-2022-steels-adopted
+    slug: pa-2022-steels-adopted
+    label: Pennsylvania adopts the STEELS science standards
+    jurisdiction: US-PA
+    eventType: framework-adopted
+    dateStart: "2022-01-01"
+    dateGranularity: month
+    temporalStatus: past-completed
+    description: >
+      State Board approval occurred January 2022; final-form regulation
+      amending 22 Pa. Code Chapter 4 was published in the Pennsylvania
+      Bulletin on 2022-07-16 (IRRC approval reportedly around 2022-05-19, per
+      a secondary source not independently confirmed this session, sitting
+      between those two dates as the normal sequence would predict). Full
+      classroom implementation became mandatory starting the 2025-2026 school
+      year; the prior 2002 standards sunset 2025-06-30. No public controversy
+      specifically about evolution content was found during this revision --
+      see PALP-EVENT-mann-critiques-draft-climate-content.
+    involvedActors:
+      - PALP-ACTOR-pa-state-board-of-education
+      - PALP-ACTOR-irrc
+    sourceUrl: https://www.pdesas.org/Page/Viewer/ViewPage/58/?SectionPageItemId=12998
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        IRRC's exact 2022-05-19 approval date is secondary-sourced, not
+        independently confirmed against an IRRC primary document this
+        session.
+      sourceProvenance: >
+        WHYY reporting; pdesas.org's own STEELS hub page; Common Standards
+        Project API record for document D21358967 (publicationStatus
+        "Published", valid "2022") -- fetched and read/queried directly.
+
+  - id: PALP-EVENT-pa-2025-steels-full-implementation
+    slug: pa-2025-steels-full-implementation
+    label: STEELS standards become fully mandatory; 2002 standards formally sunset
+    jurisdiction: US-PA
+    eventType: milestone-target
+    dateStart: "2025-06-30"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      The three-year transition window from the January 2022 adoption ended
+      with the 2002 standards' formal sunset and full mandatory
+      implementation of STEELS beginning the 2025-2026 school year.
+    involvedActors: [PALP-ACTOR-pa-state-board-of-education]
+    sourceUrl: https://whyy.org/articles/pa-hasnt-updated-science-education-standards-since-2002-new-plan-would-be-first-to-acknowledge-climate-change/
+    accessTier: summary-only
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: WHYY, fetched and read directly.

@@ -1,0 +1,160 @@
+$schema: ../../../../schema/coherence-finding-record.schema.json
+$description: >
+  Empirical findings from comparing Pennsylvania's state-level standards text
+  against Dover's district-level policy, and against the Kitzmiller ruling's
+  own findings. See
+  docs/source-notes/2026-10-20-pennsylvania-evolution-curriculum-policy-history-research.md.
+
+findings:
+  - id: PALP-FINDING-pa-2002-proposed-vs-final-wording-change
+    slug: pa-2002-proposed-vs-final-wording-change
+    label: PA's 2002 standard changed from "support or do not support" to "relevant to" the theory of evolution after public pressure
+    findingType: standard-wording-change-across-editions
+    objects:
+      - jurisdiction: US-PA
+        policyArea: Proposed Standard 3.3.10.D (pre-final-form)
+        documentDate: "2001-01-01"
+        excerptText: "analyze records/studies that support or do not support the theory of evolution"
+        sourceDocument: Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9 (rulemaking preamble)
+        sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+        accessTier: excerpt-only
+      - jurisdiction: US-PA
+        policyArea: Final-form Standard 3.3.10.D (2002-01-05)
+        documentDate: "2002-01-05"
+        excerptText: "analyze records/studies relevant to the theory of evolution"
+        sourceDocument: 22 Pa. Code, Chapter 4, Appendix B
+        sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+        accessTier: excerpt-only
+    summary: >
+      Pennsylvania's own 2002 standards-rulemaking process changed the
+      proposed evolution-standard wording after more than 120 public comments
+      and Independent Regulatory Review Commission concern that the original
+      phrasing ("support or do not support") singled out evolution in a way
+      that could encourage teaching creationism or intelligent design.
+    policyRelevance: >
+      Establishes that Pennsylvania had a real, document-level fight over
+      evolution-standard wording nearly five years before the Dover case
+      reached federal court -- the state-level and district-level episodes
+      are related but distinct, not the same event retold.
+    testsMandateIds: [PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution]
+    relatedControversyIds: [PALP-CONTROVERSY-pa-2002-standards-wording-fight]
+    themes: ["evolution", "standards-wording", "regulatory-process"]
+    exhaustivenessCaveat: >
+      Based on the Pennsylvania Bulletin's own rulemaking preamble, read
+      directly; the complete final 3.3.10.D descriptor text was not
+      independently re-confirmed beyond this wording comparison.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9, fetched
+        and read directly.
+
+  - id: PALP-FINDING-dover-policy-exceeded-state-standard
+    slug: dover-policy-exceeded-state-standard
+    label: Dover's district policy went well beyond what Pennsylvania's own state standard required or permitted
+    findingType: district-vs-state-standard-divergence
+    objects:
+      - jurisdiction: US-PA
+        policyArea: PA state standard 3.3.10.D (2002, in force during the Dover dispute)
+        documentDate: "2002-01-05"
+        excerptText: "analyze the theory of evolution"
+        sourceDocument: 22 Pa. Code, Chapter 4, Appendix B
+        accessTier: excerpt-only
+      - jurisdiction: US-PA
+        policyArea: Dover Area School District's 2004 curriculum policy
+        documentDate: "2004-10-18"
+        excerptText: "Students will be made aware of gaps/problems in Darwin's theory and of other theories of evolution including, but not limited to, intelligent design."
+        sourceDocument: Dover Area School Board meeting minutes / Kitzmiller trial exhibit
+        accessTier: excerpt-only
+    summary: >
+      Pennsylvania's own state standard required analyzing the theory of
+      evolution and said nothing about "gaps/problems" or alternative
+      "theories" including intelligent design -- language the State Board had
+      specifically revised away from in its own 2002 rulemaking (see
+      PALP-FINDING-pa-2002-proposed-vs-final-wording-change). Dover's district
+      policy introduced exactly the kind of framing the state had already
+      rejected, at the district level, two years later, citing "the state
+      standards" as its own justification even though the state standard did
+      not call for or permit this content.
+    policyRelevance: >
+      This is the direct textual basis for understanding Kitzmiller v. Dover
+      as a story about a district exceeding an already-adequate state
+      standard, not about a weak or ambiguous state standard needing
+      correction -- NCSE's own later grading of PA's evolution standards as
+      "A" (2009, 2017) is consistent with this finding, not in tension with
+      it.
+    testsMandateIds:
+      - PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution
+      - PALP-MANDATE-dover-2004-id-disclaimer-policy
+    relatedControversyIds: [PALP-CONTROVERSY-dover-intelligent-design-disclaimer]
+    themes: ["evolution", "district-vs-state-divergence", "intelligent-design"]
+    exhaustivenessCaveat: >
+      Based on the characterizations of both documents available this
+      session; the complete verbatim 3.3.10.D descriptor beyond "analyze the
+      theory of evolution" was not independently re-confirmed.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Pennsylvania Bulletin Vol. 32 Issue 1; NCSE's Kitzmiller coverage --
+        both fetched and read directly.
+
+  - id: PALP-FINDING-evolution-was-never-steels-controversy
+    slug: evolution-was-never-steels-controversy
+    label: Unlike Florida's 2026 rewrite, evolution content was not the point of controversy in PA's 2019-2022 standards revision
+    findingType: convergent-coverage-pattern
+    objects:
+      - jurisdiction: US-PA
+        policyArea: 2002 standards, evolution content (NCSE grading)
+        documentDate: "2009-01-01"
+        excerptText: ""
+        sourceDocument: Mead & Mates (2009), Evolution:Education and Outreach
+        accessTier: citation-only
+      - jurisdiction: US-PA
+        policyArea: 2002 standards, climate-change content (NCSE grading)
+        documentDate: "2020-10-08"
+        excerptText: ""
+        sourceDocument: "NCSE, \"Making the Grade?\" (2020)"
+        sourceUrl: https://ncse.ngo/files/MakingTheGrade_Final_10.8.2020.pdf
+        accessTier: citation-only
+    summary: >
+      NCSE-commissioned reviews graded Pennsylvania's 2002 standards "A" for
+      both high-school (2009) and middle-school (2017) evolution content, but
+      "F" for climate-change content (2020) -- and it was specifically the
+      climate-change grade that drove public comment and debate during the
+      2019-2022 STEELS revision (e.g. climate scientist Michael Mann's public
+      critique of a draft version, June 2021), not evolution.
+    policyRelevance: >
+      A direct contrast with florida-lpm's 2026 case, where evolution WAS the
+      center of public controversy over a contemporaneous standards rewrite.
+      Pennsylvania's evolution-education story is centered entirely on the
+      2004-2006 Dover district-level episode; its state-level standards have
+      not been a site of evolution-specific controversy before or since.
+    themes: ["evolution", "climate-change", "cross-state-comparison", "standards-revision-cycle"]
+    exhaustivenessCaveat: >
+      Based on NCSE's own published grading reports and its June 2021
+      article on the STEELS draft, checked specifically for an evolution
+      angle (none found) -- not a systematic review of every public comment
+      submitted during the 2019-2022 process.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Concern about climate change in Pennsylvania's proposed
+        science standards" (ncse.ngo/concern-about-climate-change-pennsylvanias-proposed-science-standards),
+        fetched and read directly; Mead & Mates (2009) and NCSE's 2020
+        "Making the Grade?" report referenced via search, not independently
+        fetched in full this session.

@@ -1,0 +1,157 @@
+$schema: ../../schema/institutional-actor-record.schema.json
+$description: >
+  Federal/multi-state actors in the Kitzmiller v. Dover case and Pennsylvania's
+  own standards history. Several overlap with florida-lpm's own national
+  actors (NCSE, Discovery Institute) -- modeled independently here with this
+  repo's own id prefix, per this ecosystem's current convention of informal,
+  not cross-repo-validated, references (see CONTRIBUTING.md).
+
+actors:
+  - id: PALP-ACTOR-ncse
+    slug: ncse
+    label: National Center for Science Education (NCSE)
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      National nonprofit defending evolution/climate-science education. The
+      single most consistent institutional source on the Kitzmiller v. Dover
+      case -- hosts the full trial-transcript index and the ruling itself,
+      and produced the only national evaluative grading of Pennsylvania's
+      state science standards found this session (an "A" for evolution
+      content in both 2009 and 2017 reviews; an "F" for climate-change
+      content in its 2020 "Making the Grade?" report).
+    url: https://ncse.ngo
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's own site (ncse.ngo), multiple articles fetched and read
+        directly this session. See docs/source-notes/2026-10-20-pennsylvania-evolution-curriculum-policy-history-research.md.
+
+  - id: PALP-ACTOR-discovery-institute
+    slug: discovery-institute
+    label: Discovery Institute (Center for Science and Culture)
+    actorType: think-tank
+    jurisdiction: US
+    role: >
+      National intelligent-design-promoting think tank. Unlike its role in
+      Florida's 2008 legislative fight (authoring the model statute Florida's
+      bill followed), its role in Pennsylvania was to distance itself from
+      Dover's specific disclaimer policy -- its own site states it repeatedly
+      advised the board and its defense counsel the policy "was problematic
+      and should be replaced," and three of its affiliated fellows (William
+      Dembski, Stephen Meyer, John Angus Campbell) who had agreed to serve as
+      defense expert witnesses withdrew before depositions. Already modeled
+      as group:discovery-institute in openevo-graph's own dispute graph
+      (og:dispute:openevo-vs-discovery-institute), which cites this same
+      trial's bacterial-flagellum testimony for a separate scientific-content
+      dispute -- this is the same real-world institution, referenced here for
+      its distinct role in Pennsylvania's litigation history.
+    url: https://www.discovery.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Discovery Institute's own site, "Setting the Record Straight about
+        Discovery Institute's Role in the Dover School District Case"
+        (discovery.org/a/3003/), fetched and read directly.
+
+  - id: PALP-ACTOR-americans-united
+    slug: americans-united-separation-church-state
+    label: Americans United for Separation of Church and State
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      National church-state-separation advocacy organization. Co-counsel for
+      the Kitzmiller plaintiffs (attorneys Richard Katskee and Alex
+      Luchenitser), alongside Pepper Hamilton LLP and the ACLU of
+      Pennsylvania.
+    url: https://www.au.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        ACLU, "The Trial of Kitzmiller v. Dover" (aclu.org/documents/trial-kitzmiller-v-dover),
+        fetched and read directly.
+
+  - id: PALP-ACTOR-aclu
+    slug: aclu
+    label: American Civil Liberties Union (ACLU), via its Pennsylvania affiliate
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      National civil-liberties organization. Its Pennsylvania affiliate
+      (ACLU of Pennsylvania; attorneys Vic Walczak and Paula Knudsen) was
+      co-counsel for the Kitzmiller plaintiffs alongside Pepper Hamilton LLP
+      and Americans United.
+    url: https://www.aclu.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        ACLU, "The Trial of Kitzmiller v. Dover"; ACLU of Pennsylvania's own
+        case page (aclupa.org/cases/kitzmiller-v-dover/); both fetched and
+        read directly.
+
+  - id: PALP-ACTOR-thomas-more-law-center
+    slug: thomas-more-law-center
+    label: Thomas More Law Center
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      National Christian-conservative public-interest law firm (based in
+      Michigan). Defended the Dover Area School Board (attorneys Richard
+      Thompson, Patrick Gillen, Robert Muise). The full attorney roster/"lead"
+      framing is secondary-sourced; the names recur consistently across
+      sources.
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        No Thomas More Law Center primary-source page confirming its full
+        attorney roster on this case was found this session.
+      sourceProvenance: >
+        Cross-checked across Wikipedia's case summary and multiple
+        contemporaneous news accounts, not a single primary document.
+
+  - id: PALP-ACTOR-pepper-hamilton
+    slug: pepper-hamilton
+    label: Pepper Hamilton LLP
+    actorType: professional-association
+    jurisdiction: US
+    role: >
+      National law firm. Lead pro bono trial counsel for the Kitzmiller
+      plaintiffs (attorneys Eric Rothschild, Stephen Harvey, Thomas Schmidt,
+      Alfred Wilcox), billing only its own hard costs (~$267,000) rather than
+      attorney time in the eventual $1,000,011 fee settlement.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "'Intelligent design' costs Dover over $1,000,000"
+        (ncse.ngo/intelligent-design-costs-dover-over-1000000), fetched and
+        read directly.

@@ -1,0 +1,106 @@
+$schema: ../../../../schema/curriculum-crosswalk-record.schema.json
+$description: >
+  Pointers from Pennsylvania's own evolution-related standards to
+  machine-readable curriculum-graph data elsewhere in this ecosystem. See
+  case/README.md.
+
+crosswalks:
+  - id: PALP-CROSSWALK-steels-common-standards-project-api
+    slug: steels-common-standards-project-api
+    label: "STEELS Discipline 3.1 Life Science (evolution strands) -- live source: Common Standards Project API"
+    jurisdiction: US-PA
+    standardOrAttribute: "STEELS (2022) Discipline 3.1 Life Science -- Inheritance of Traits, Variation of Traits, Evidence of Common Ancestry and Diversity, Natural Selection, Adaptation strands, grades 6-8 and 9-12"
+    gradeRange: "6-12"
+    sourceSystem: common-standards-project-api
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      CONFIRMED LIVE 2026-10-20 (same session as florida-lpm's identical
+      confirmation): GET
+      https://api.commonstandardsproject.com/api/v1/jurisdictions/5A99211C6D874994A2CFEE2AE40023DD
+      lists Pennsylvania's standard sets; GET
+      https://api.commonstandardsproject.com/api/v1/standard_sets/5A99211C6D874994A2CFEE2AE40023DD_D21358967_grades-09-10-11-12
+      (and the equivalent grades-6-8 endpoint) return the complete STEELS
+      standard set (document D21358967, "Science, Technology & Engineering
+      and Environmental Literacy & Sustainability Standards (STEEL)",
+      publicationStatus "Published", 177 real standards at grades 9-12
+      alone). Cross-validated against a second, independent CSP cataloging of
+      the same content (document D21302564) which uses a different internal
+      code scheme but identical benchmark wording at grades 6-8 -- the
+      parallel grades-9-12 entry for THAT document came back empty, a real
+      data-quality gap in that one cataloging, not in STEEL itself.
+      UNLIKE florida-lpm's identical crosswalk, this document's license
+      title/URL fields are both blank in the API response (rightsHolder
+      "D2L Corporation," likely the data submitter, not a rights claim) --
+      do not cite an open license for this specific dataset; see mandates.yaml's
+      licenseOrRightsNote for the actual legal basis relied on instead.
+    licenseOrRightsNote: >
+      Pennsylvania law (71 Pa. Stat. Ann. S636) permits the Commonwealth to
+      claim copyright on its own publications (discretionary, not
+      automatic); direct inspection of PA's own published standards PDFs
+      found no copyright notice asserted. The Common Standards Project's own
+      compiled dataset carries no explicit license statement either way for
+      this specific document.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        api.commonstandardsproject.com, fetched directly and read in full
+        2026-10-20.
+
+  - id: PALP-CROSSWALK-steels-case-2022-evolution
+    slug: steels-case-2022-evolution
+    label: "STEELS Discipline 3.1 Life Science (evolution strands) -- CASE format"
+    jurisdiction: US-PA
+    standardOrAttribute: "STEELS (2022) Discipline 3.1 Life Science, evolution-related strands"
+    gradeRange: "6-12"
+    sourceSystem: openevo-graph-case-format-local-file
+    sourceRepoPath: ../../../case/pennsylvania-steels-2022-evolution-benchmarks.json
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      CASE-format (conforming to openevo-graph/schema/case_schema.json) file
+      transformed from the confirmed-live Common Standards Project data
+      above -- covers both grade bands (6-8 and 9-12), 17 benchmarks across
+      5 strands, plus the shared Domain/Strand hierarchy nodes. Not a
+      complete re-publication of the full ~177-item grades-9-12 Science
+      standard set.
+    licenseOrRightsNote: >
+      Same basis as PALP-CROSSWALK-steels-common-standards-project-api above.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Transformed from api.commonstandardsproject.com data, fetched
+        directly 2026-10-20 -- see case/README.md.
+
+  - id: PALP-CROSSWALK-bio-core-k12-natural-selection
+    slug: bio-core-k12-natural-selection
+    label: "STEELS Natural Selection/Adaptation strands -- crosswalk to bio-core-k12's LPM strand"
+    jurisdiction: US-PA
+    standardOrAttribute: "STEELS Discipline 3.1 Life Science, Natural Selection and Adaptation strands"
+    gradeRange: "6-12"
+    sourceSystem: openevo-conceptbase-competencybase-informal-refs
+    sourceRepoPath: ../../../../bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      Informal reference only (plain path, not a validated cross-repo link),
+      same convention as florida-lpm's identical crosswalk -- this
+      ecosystem already has mature curriculum content directly applicable to
+      Pennsylvania's own natural-selection/adaptation benchmarks.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Confirmed bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+        exists in this ecosystem via direct file listing.
