@@ -3,6 +3,18 @@ import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
 
+// Real as of 2026-10-20 for exactly one real pair (Bio-Core LPM /
+// Interdisciplinary LPM, the deliberate DCR-vs-ICR comparison pair) --
+// shared between coherence-page.tsx's "Across curricula" tab and the
+// German/US custom views' own "Vergleich"/"Comparison" tab, so both read
+// the same one source of truth rather than two copies drifting apart.
+// Not yet a general "pick any project to compare against" picker -- widen
+// this map when a second real comparison pair exists.
+export const KNOWN_COMPARISON_PAIRS: Record<string, string> = {
+  'bio-core-lpm-synth': 'interdisciplinary-lpm-synth',
+  'interdisciplinary-lpm-synth': 'bio-core-lpm-synth',
+}
+
 // None of this (lpm_comparative_links, lpm_divergence_reviews, and the two
 // views built on top of them, migration 143/144) is in the generated types
 // yet -- cast at the query boundary, same convention as dashboard-views.ts.
