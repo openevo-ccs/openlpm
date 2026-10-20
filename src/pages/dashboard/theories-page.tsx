@@ -17,6 +17,9 @@ import {
   resolveRelationLabels,
   searchTheorybaseSnapshot,
   setTheorybaseLink,
+  theoryRecordTypeFromRef,
+  listOtherProjectsUsingTheory,
+  type OtherProjectUsingTheory,
   type ProjectBaseLinkRow,
   type TheoryContributionRow,
   type TheoryLiteratureLinkWithReference,
@@ -155,8 +158,9 @@ export default function TheoriesPage() {
         <div className="notice" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 10 }}>
           <span className="row" style={{ gap: 8 }}>
             <Info size={14} />
-            This project isn't linked to TheoryBase yet — findability, a cached browse view, and
-            proposing theories back to the shared library all need that link first.
+            {theories && theories.length > 0
+              ? "This project isn't linked to TheoryBase's search yet — the theories below were added directly. Link it to search for more and propose new ones back to the shared library."
+              : "This project isn't linked to TheoryBase yet — findability, a cached browse view, and proposing theories back to the shared library all need that link first."}
           </span>
           {canManageBaseLink && (
             <button className="btn btn-mini" onClick={toggleLink}>Link this project to TheoryBase</button>
@@ -218,22 +222,28 @@ export default function TheoriesPage() {
       ) : (
         <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
           <div className="card">
-            {theories.map((t) => (
-              <button
-                key={t.id}
-                className="btn-linklike"
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: t.id === theoryId ? 600 : 400 }}
-                onClick={() => navigate(`/dashboard/${project.slug}/theories/${t.id}`)}
-              >
-                {t.label}
-                {t.evidentiary_maturity && (
-                  <span className="muted" style={{ fontSize: 11, marginLeft: 8 }} title={MATURITY_GLOSS[t.evidentiary_maturity]}>{MATURITY_LABEL[t.evidentiary_maturity]}</span>
-                )}
-                {t.base_repo === 'theorybase' && t.base_repo_ref && (
-                  <span className="chip" style={{ fontSize: 10, marginLeft: 8 }} title={`Corresponds to ${t.base_repo_ref} in TheoryBase`}>{t.base_repo_ref}</span>
-                )}
-              </button>
-            ))}
+            {theories.map((t) => {
+              const recordType = theoryRecordTypeFromRef(t.base_repo_ref)
+              return (
+                <button
+                  key={t.id}
+                  className="btn-linklike"
+                  style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: t.id === theoryId ? 600 : 400 }}
+                  onClick={() => navigate(`/dashboard/${project.slug}/theories/${t.id}`)}
+                >
+                  {recordType && recordType.label !== 'Theory' && (
+                    <span className="chip" style={{ fontSize: 10, marginRight: 6, background: 'var(--surface-2, #eee)' }} title={recordType.gloss}>{recordType.label}</span>
+                  )}
+                  {t.label}
+                  {t.evidentiary_maturity && (
+                    <span className="muted" style={{ fontSize: 11, marginLeft: 8 }} title={MATURITY_GLOSS[t.evidentiary_maturity]}>{MATURITY_LABEL[t.evidentiary_maturity]}</span>
+                  )}
+                  {t.base_repo === 'theorybase' && t.base_repo_ref && (
+                    <span className="chip" style={{ fontSize: 10, marginLeft: 8 }} title={`Corresponds to ${t.base_repo_ref} in TheoryBase`}>{t.base_repo_ref}</span>
+                  )}
+                </button>
+              )
+            })}
           </div>
           <div className="card" style={{ minHeight: 200 }}>
             {theoryId ? (
@@ -502,6 +512,7 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase, linked }: { th
   const [relationLabels, setRelationLabels] = useState<Map<string, string>>(new Map())
   const [propositions, setPropositions] = useState<TheoryPropositionRow[]>([])
   const [contributions, setContributions] = useState<TheoryContributionRow[]>([])
+  const [otherProjects, setOtherProjects] = useState<OtherProjectUsingTheory[]>([])
 
   const reload = async () => {
     const [{ data: t }, l, r, p, c] = await Promise.all([
@@ -517,6 +528,11 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase, linked }: { th
     setRelationLabels(await resolveRelationLabels(supabase, r))
     setPropositions(p)
     setContributions(c)
+    setOtherProjects(
+      t?.base_repo === 'theorybase' && t.base_repo_ref
+        ? await listOtherProjectsUsingTheory(supabase, t.base_repo_ref, projectId)
+        : []
+    )
   }
 
   useEffect(() => {
@@ -526,9 +542,16 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase, linked }: { th
 
   if (!theory) return <p className="muted">Loading…</p>
 
+  const recordType = theoryRecordTypeFromRef(theory.base_repo_ref)
+
   return (
     <div>
-      <h3 style={{ marginTop: 0 }}>{theory.label}</h3>
+      <h3 className="row" style={{ marginTop: 0, gap: 8 }}>
+        {theory.label}
+        {recordType && recordType.label !== 'Theory' && (
+          <span className="chip" style={{ fontSize: 11, background: 'var(--surface-2, #eee)' }} title={recordType.gloss}>{recordType.label}</span>
+        )}
+      </h3>
       {theory.evidentiary_maturity && (
         <p className="muted" style={{ fontSize: 12 }} title={MATURITY_GLOSS[theory.evidentiary_maturity]}>
           {MATURITY_LABEL[theory.evidentiary_maturity]}{theory.evidentiary_maturity_note ? ` — ${theory.evidentiary_maturity_note}` : ''}
@@ -537,6 +560,14 @@ function TheoryDetail({ theoryId, projectId, canManage, supabase, linked }: { th
       {theory.base_repo === 'theorybase' && theory.base_repo_ref && (
         <p className="muted" style={{ fontSize: 12 }} title="A label, not a live link -- TheoryBase is still a private repo.">
           Corresponds to <strong>{theory.base_repo_ref}</strong> in TheoryBase
+          {otherProjects.length > 0 && (
+            <> — also used by {otherProjects.map((p, i) => (
+              <span key={p.projectId}>
+                {i > 0 ? ', ' : ' '}
+                <a href={`/#/dashboard/${p.projectSlug}/theories/${p.theoryId}`}>{p.projectName}</a>
+              </span>
+            ))}</>
+          )}
         </p>
       )}
       <p>{theory.description}</p>
