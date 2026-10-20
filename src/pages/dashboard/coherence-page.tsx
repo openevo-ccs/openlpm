@@ -1,8 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, CheckCircle2, Clock, Grid3x3, Layers, X } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Clock, GitCompare, Grid3x3, Layers, Plus, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { TabPanels } from '@/components/tab-panels'
+import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import {
+  createComparativeLink,
+  getProjectComparisonProfile,
+  listComparativeLinksBetweenProjects,
+  listDivergenceCoverage,
+  type ComparativeLinkWithTitles,
+  type ProjectComparisonProfile,
+} from '@/lib/supabase/comparative-analysis'
 import {
   createConnection,
   getCoOccurringConcepts,
@@ -533,19 +542,253 @@ function StrandPairPanel({
 // than faked, since comparing across PROJECTS (not just within one) needs
 // its own access-control thinking first (a viewer here may not be a
 // member of the other project being compared against).
+// Real as of 2026-10-20 for exactly one real pair (Bio-Core LPM / Interdisciplinary
+// LPM, the deliberate DCR-vs-ICR comparison pair) -- the access-control question the
+// old stub's comment raised is answered by lpm_comparative_links' own RLS
+// ("either side's members can view/edit", migration 143), not by anything in this
+// component. Not yet a general "pick any project to compare against" picker --
+// that's real added complexity with only one real use case to build it against so
+// far; widen this map when a second real comparison pair exists.
+const KNOWN_COMPARISON_PAIRS: Record<string, string> = {
+  'bio-core-lpm-synth': 'interdisciplinary-lpm-synth',
+  'interdisciplinary-lpm-synth': 'bio-core-lpm-synth',
+}
+
+function ProfileCard({ profile, label }: { profile: ProjectComparisonProfile; label: string }) {
+  return (
+    <div className="card">
+      <strong>{label}</strong>
+      <p className="muted" style={{ fontSize: 11, marginTop: 2, marginBottom: 8 }}>
+        Depth and breadth are kept separate on purpose — neither axis implies the other model is &quot;more finished.&quot;
+      </p>
+      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
+        <span>Breadth of scope</span>
+      </div>
+      <p style={{ fontSize: 12, margin: '2px 0 8px' }}>
+        {profile.strand_count} strands · {profile.subject_domain_count} subject domain{profile.subject_domain_count === 1 ? '' : 's'} · {profile.grade_bands_covered} grade bands
+      </p>
+      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
+        <span>Depth within that scope</span>
+      </div>
+      <p style={{ fontSize: 12, margin: '2px 0 8px' }}>
+        avg. {profile.avg_performance_indicators ?? 0} performance indicators/item · avg. {profile.avg_real_world_links ?? 0} real-world links/item
+      </p>
+      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
+        <span>Ecosystem grounding</span>
+      </div>
+      <p style={{ fontSize: 12, margin: '2px 0 0' }}>
+        {profile.theory_count} theories · {profile.literature_count} literature refs · {profile.curriculum_repository_link_count} real-world curriculum links
+      </p>
+    </div>
+  )
+}
+
 function CrossCurriculumStub() {
+  const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const canEdit = role !== 'viewer' && role !== 'reviewer'
+  const compareSlug = KNOWN_COMPARISON_PAIRS[project.slug]
+
+  const [compareProjectId, setCompareProjectId] = useState<string | null>(null)
+  const [compareName, setCompareName] = useState<string>('')
+  const [ownProfile, setOwnProfile] = useState<ProjectComparisonProfile | null>(null)
+  const [compareProfile, setCompareProfile] = useState<ProjectComparisonProfile | null>(null)
+  const [links, setLinks] = useState<ComparativeLinkWithTitles[] | null>(null)
+  const [coverage, setCoverage] = useState<{ reviewed: number; stale: number } | null>(null)
+  const [showAdd, setShowAdd] = useState(false)
+  const [refreshToken, setRefreshToken] = useState(0)
+
+  useEffect(() => {
+    if (!compareSlug) return
+    supabase.from('projects').select('id,name').eq('slug', compareSlug).maybeSingle().then(({ data }) => {
+      if (data) { setCompareProjectId(data.id); setCompareName(data.name) }
+    })
+  }, [supabase, compareSlug])
+
+  useEffect(() => {
+    getProjectComparisonProfile(supabase, project.id).then(setOwnProfile)
+    listDivergenceCoverage(supabase, project.id).then((rows) =>
+      setCoverage({ reviewed: rows.length, stale: rows.filter((r) => r.is_stale).length })
+    )
+  }, [supabase, project.id, refreshToken])
+
+  useEffect(() => {
+    if (!compareProjectId) return
+    getProjectComparisonProfile(supabase, compareProjectId).then(setCompareProfile)
+    listComparativeLinksBetweenProjects(supabase, project.id, compareProjectId).then(setLinks)
+  }, [supabase, project.id, compareProjectId, refreshToken])
+
+  if (!compareSlug) {
+    return (
+      <div style={{ marginTop: 10 }}>
+        <div className="card empty">
+          <Layers size={28} />
+          <p>No comparison pair is configured for this project yet.</p>
+          <p className="muted" style={{ maxWidth: 440, margin: '4px auto 0' }}>
+            This view is built out for Bio-Core LPM (Synthetic) and Interdisciplinary LPM (Synthetic)
+            specifically, the one real deliberate comparison pair in OpenLPM today. Widening it to any
+            two projects is a real next step, not done here.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div style={{ marginTop: 10 }}>
-      <div className="card empty">
-        <Layers size={28} />
-        <p>Comparing coherence across different curricula isn&apos;t built yet.</p>
-        <p className="muted" style={{ maxWidth: 440, margin: '4px auto 0' }}>
-          The idea: e.g. how coherent is grade 7 across every German state&apos;s own curriculum
-          repository, across projects rather than within just one. That needs real thinking about
-          access first — comparing against a project you&apos;re not a member of isn&apos;t a small
-          addition to the matrix above. Planned as a real next step; nothing built on it this session.
+      <p className="muted row" style={{ gap: 5, marginBottom: 10 }}>
+        <GitCompare size={13} /> Comparing against <strong>{compareName || compareSlug}</strong>
+      </p>
+
+      {ownProfile && compareProfile && (
+        <div className="grid grid-2" style={{ marginBottom: 14 }}>
+          <ProfileCard profile={ownProfile} label={project.name} />
+          <ProfileCard profile={compareProfile} label={compareName} />
+        </div>
+      )}
+
+      {coverage && (
+        <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+          {coverage.reviewed} real TheoryBase divergence{coverage.reviewed === 1 ? '' : 's'} reviewed for this project
+          {coverage.stale > 0 ? `, ${coverage.stale} now out of date since TheoryBase was last revised` : ', none out of date'}.
         </p>
+      )}
+
+      <div className="card">
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <strong style={{ fontSize: 13 }}>Comparative notes</strong>
+          {canEdit && !showAdd && (
+            <button className="btn btn-mini" onClick={() => setShowAdd(true)}><Plus size={12} />Add a note</button>
+          )}
+        </div>
+        {links === null ? (
+          <p className="muted">…</p>
+        ) : links.length === 0 ? (
+          <p className="muted" style={{ fontSize: 13 }}>No comparative notes yet between these two projects.</p>
+        ) : (
+          links.map((l) => (
+            <div key={l.id} className="card" style={{ marginTop: 8, padding: 8 }}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 12, fontWeight: 600 }}>
+                  {l.from_title} <span className="muted">↔</span> {l.to_title}
+                </span>
+                <span className="muted" style={{ fontSize: 11 }}>{l.relation_type.replace(/_/g, ' ')}</span>
+              </div>
+              {l.divergence_label && (
+                <p className="muted" style={{ fontSize: 11, margin: '2px 0' }}>Illustrates: {l.divergence_label}</p>
+              )}
+              <p style={{ fontSize: 12, margin: '4px 0 0' }}>{l.commentary}</p>
+            </div>
+          ))
+        )}
+        {canEdit && showAdd && compareProjectId && (
+          <AddComparativeNoteForm
+            supabase={supabase}
+            ownProjectId={project.id}
+            ownProjectName={project.name}
+            compareProjectId={compareProjectId}
+            compareProjectName={compareName}
+            defaultBranchId={defaultBranchId}
+            onDone={() => { setShowAdd(false); setRefreshToken((x) => x + 1) }}
+            onCancel={() => setShowAdd(false)}
+          />
+        )}
       </div>
+    </div>
+  )
+}
+
+function AddComparativeNoteForm({
+  supabase,
+  ownProjectId,
+  ownProjectName,
+  compareProjectId,
+  compareProjectName,
+  defaultBranchId,
+  onDone,
+  onCancel,
+}: {
+  supabase: ProjectOutletContext['supabase']
+  ownProjectId: string
+  ownProjectName: string
+  compareProjectId: string
+  compareProjectName: string
+  defaultBranchId: string
+  onDone: () => void
+  onCancel: () => void
+}) {
+  const [ownTopics, setOwnTopics] = useState<TopicListItem[]>([])
+  const [compareTopics, setCompareTopics] = useState<TopicListItem[]>([])
+  const [ownPicked, setOwnPicked] = useState('')
+  const [comparePicked, setComparePicked] = useState('')
+  const [relationType, setRelationType] = useState('contrasting_treatment')
+  const [divergenceRef, setDivergenceRef] = useState('')
+  const [commentary, setCommentary] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    listTopics(supabase, ownProjectId, defaultBranchId).then(setOwnTopics)
+    // compareProject's own default branch -- the trunk branch id differs per
+    // project, but listTopics only filters by it, and every real project's
+    // trunk is its one real branch (no branching UI exists), so looking it
+    // up fresh here rather than threading a second defaultBranchId through
+    // props is the simpler real option.
+    supabase.from('branches').select('id').eq('project_id', compareProjectId).eq('is_trunk', true).maybeSingle().then(({ data }) => {
+      if (data) listTopics(supabase, compareProjectId, data.id).then(setCompareTopics)
+    })
+  }, [supabase, ownProjectId, compareProjectId, defaultBranchId])
+
+  const submit = async () => {
+    if (!ownPicked || !comparePicked || !commentary.trim()) return
+    setBusy(true); setError(null)
+    const { error: err } = await createComparativeLink(supabase, {
+      fromDataObjectId: ownPicked,
+      toDataObjectId: comparePicked,
+      relationType: relationType.trim() || 'relates_to',
+      divergenceRef: divergenceRef.trim() || null,
+      commentary: commentary.trim(),
+    })
+    setBusy(false)
+    if (err) { setError(err); return }
+    onDone()
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 8 }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <strong style={{ fontSize: 13 }}>Add a comparative note</strong>
+        <button className="btn-linklike" onClick={onCancel}><X size={12} /></button>
+      </div>
+      {error && <div className="notice notice-bad">{error}</div>}
+      <div className="field">
+        <label>{ownProjectName}&apos;s item</label>
+        <select value={ownPicked} onChange={(e) => setOwnPicked(e.target.value)}>
+          <option value="">Choose…</option>
+          {ownTopics.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+        </select>
+      </div>
+      <div className="field">
+        <label>{compareProjectName}&apos;s item</label>
+        <select value={comparePicked} onChange={(e) => setComparePicked(e.target.value)}>
+          <option value="">Choose…</option>
+          {compareTopics.map((t) => <option key={t.id} value={t.id}>{t.title}</option>)}
+        </select>
+      </div>
+      <div className="field">
+        <label>How are these related?</label>
+        <input value={relationType} onChange={(e) => setRelationType(e.target.value)} placeholder="e.g. contrasting_treatment, parallel_treatment" />
+      </div>
+      <div className="field">
+        <label>Real TheoryBase divergence id this illustrates (optional)</label>
+        <input value={divergenceRef} onChange={(e) => setDivergenceRef(e.target.value)} placeholder="e.g. OE-DIVERGENCE-role-of-organism-agency" />
+      </div>
+      <div className="field">
+        <label>Commentary</label>
+        <textarea value={commentary} onChange={(e) => setCommentary(e.target.value)} rows={3} />
+      </div>
+      <button className="btn btn-primary" disabled={!ownPicked || !comparePicked || !commentary.trim() || busy} onClick={submit}>
+        {busy ? 'Saving…' : 'Save note'}
+      </button>
     </div>
   )
 }
