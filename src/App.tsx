@@ -42,6 +42,7 @@ import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskon
 import StudentPromptPage from '@/pages/dashboard/student/student-prompt-page'
 import CurriculumConnectionsPage from '@/pages/dashboard/student/curriculum-connections-page'
 import CurriculumNetworkPage from '@/pages/dashboard/student/curriculum-network-page'
+import CurriculumRegionsPage from '@/pages/dashboard/student/curriculum-regions-page'
 import CurriculumComparisonPage from '@/pages/dashboard/student/curriculum-comparison-page'
 import CurriculumReportPage from '@/pages/dashboard/student/curriculum-report-page'
 
@@ -123,6 +124,7 @@ export default function App() {
             <Route path="planen" element={<StudentPromptPage />} />
             <Route path="curriculum-connections" element={<CurriculumConnectionsPage />} />
             <Route path="curriculum-network" element={<CurriculumNetworkPage />} />
+            <Route path="curriculum-regions" element={<CurriculumRegionsPage />} />
             <Route path="curriculum-comparison" element={<CurriculumComparisonPage />} />
             <Route path="curriculum-report" element={<CurriculumReportPage />} />
             <Route path="new-project" element={<NewProjectWizard />} />
