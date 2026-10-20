@@ -191,7 +191,7 @@ BEGIN
   -- Saxony -> Interdisciplinary
   INSERT INTO curriculum_repository_links (project_id, data_object_id, repository_record_id, relation_type, rationale)
   VALUES
-  (v_inter_project, '8a5e0393-d378-584d-add1-a3c9c4022bb6', '13cf764f-e571-451a-8f79-721c54fb5302', 'built_from',
+  (v_inter_project, '9d59fa89-cdc8-5147-a71e-95175b25fcee', '13cf764f-e571-451a-8f79-721c54fb5302', 'built_from',
     'Sachsen''s own 2026-2030 Lehrplan revision makes faecherverbindendes Lernen (cross-subject teaching) equally binding to single-subject Fachunterricht by 2030 -- real-world institutional backing for exactly the cross-subject design this strand represents.'),
   (v_inter_project, '9d59fa89-cdc8-5147-a71e-95175b25fcee', '5074bf81-5e69-43b6-ba0e-618a5a00b45c', 'relates_to',
     'G/R/W''s own foundational categories (Macht, Institutionen, Recht) are a real curriculum anchor for this strand''s own claim that institutions stabilize large-scale non-kin cooperation.'),
@@ -208,27 +208,27 @@ BEGIN
     'Thüringen leaves sequencing within a combined Klassen-/Doppelklassenstufe entirely to the teacher -- a real, flexible counterpart to this strand''s own fixed synthetic grade-band sequence.'),
   (v_bio_project, 'd8df353a-aa76-5d37-b5b4-a0cd3f1d4860', '3c5562de-ab2c-4085-a283-5b247848eeb9', 'relates_to',
     'Thüringen''s real curriculum teaches population-thinking earlier than any other state checked -- a concrete real-world data point for how early this strand''s own K-2/3-5 population concepts can genuinely be introduced.'),
-  (v_bio_project, '698860a1-3a2f-5a18-bdc6-959b49c8cb58', '7bbc2bd8-8465-414f-aed1-8266510c7b86', 'relates_to',
+  (v_bio_project, 'd1b088f7-a940-5d5e-a5bc-45c0a049d351', '7bbc2bd8-8465-414f-aed1-8266510c7b86', 'relates_to',
     'This is itself a real, named "DCR-Consonant" curriculum redesign proposal for Thüringen -- the same Dichotomized Causal Reasoning framing this strand structurally instantiates, applied to a real curriculum document rather than a synthetic one.')
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
 
   -- Thuringia -> Interdisciplinary
   INSERT INTO curriculum_repository_links (project_id, data_object_id, repository_record_id, relation_type, rationale)
   VALUES
-  (v_inter_project, '8a5e0393-d378-584d-add1-a3c9c4022bb6', '8aef6424-d486-45f5-a437-b688ebeb81b7', 'relates_to',
+  (v_inter_project, '9d59fa89-cdc8-5147-a71e-95175b25fcee', '8aef6424-d486-45f5-a437-b688ebeb81b7', 'relates_to',
     'A real, named Biologie/Informatik bridge proposal for Thüringen (modeling the hormone system as an information-processing system) -- a concrete real-world instance of the cross-subject bridging this strand represents.'),
-  (v_inter_project, '43533bcf-fd95-5e80-83b7-5a9be1b466fd', 'e85b56a9-74ee-4333-83a4-5c2152458eb3', 'relates_to',
+  (v_inter_project, '408a667a-93d5-58a1-bb50-f8e6606b9745', 'e85b56a9-74ee-4333-83a4-5c2152458eb3', 'relates_to',
     'Thüringen''s real Sozialkunde and Ethik curricula both ask overlapping nature-vs-nurture questions at the same grade, currently unlinked -- a direct real-world case this strand''s own agency/development framing speaks to.'),
-  (v_inter_project, '932bdcf8-39b4-54ec-b0ff-3039fbacfaa0', '158a515a-b020-4dc6-a3b8-51e68ffc96ef', 'relates_to',
+  (v_inter_project, '5e4cdc6e-5c25-5f21-a833-4c0859a609da', '158a515a-b020-4dc6-a3b8-51e68ffc96ef', 'relates_to',
     'Thüringen''s own fachuebergreifend/faecherverbindend/faecherintegrierend typology is a real institutional vocabulary for exactly the kind of cross-domain organizing device this foundational strand uses.')
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
 
   -- New York -> Bio-Core
   INSERT INTO curriculum_repository_links (project_id, data_object_id, repository_record_id, relation_type, rationale)
   VALUES
-  (v_bio_project, '698860a1-3a2f-5a18-bdc6-959b49c8cb58', 'c484aecf-4836-42e3-b5b8-1da564fc33b4', 'relates_to',
+  (v_bio_project, 'd1b088f7-a940-5d5e-a5bc-45c0a049d351', 'c484aecf-4836-42e3-b5b8-1da564fc33b4', 'relates_to',
     'NYSSLS HS-LS4 is New York''s real biological-evolution standard; the real repository record itself honestly marks its crosswalk to this kind of LPM content as "not yet attempted" -- linked here as an honest, open gap, not a completed comparison.'),
-  (v_bio_project, '255b48be-ede2-551e-a9ab-027b11d82c94', 'c484aecf-4836-42e3-b5b8-1da564fc33b4', 'relates_to',
+  (v_bio_project, 'd561e9fc-f767-5d25-94dc-6a4715f8ecd4', 'c484aecf-4836-42e3-b5b8-1da564fc33b4', 'relates_to',
     'NYSSLS HS-LS4 also covers speciation/common ancestry; same honest "crosswalk not yet attempted" caveat applies.')
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
 
@@ -237,24 +237,24 @@ BEGIN
   VALUES
   (v_inter_project, '9d59fa89-cdc8-5147-a71e-95175b25fcee', '92fc5a61-e765-4928-8cdf-1894662fbb8f', 'relates_to',
     'The NYS Portrait of a Graduate''s "Global Citizen" attribute is a real state-adopted framework naming evolved cooperation and institutional trust as a graduation-relevant competency -- a direct real-world anchor for this strand.'),
-  (v_inter_project, '932bdcf8-39b4-54ec-b0ff-3039fbacfaa0', '07b35e58-113d-4266-9503-99324e9bd878', 'relates_to',
+  (v_inter_project, '5e4cdc6e-5c25-5f21-a833-4c0859a609da', '07b35e58-113d-4266-9503-99324e9bd878', 'relates_to',
     '"What does it mean to be human?" is explicitly named in New York''s own policy material as a jurisdiction-independent integrating question -- the same cross-domain organizing move this foundational strand makes.')
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
 
   -- California (starter-depth) -> Bio-Core
   INSERT INTO curriculum_repository_links (project_id, data_object_id, repository_record_id, relation_type, rationale)
-  SELECT v_bio_project, '698860a1-3a2f-5a18-bdc6-959b49c8cb58', r.id, 'relates_to',
+  SELECT v_bio_project, 'd1b088f7-a940-5d5e-a5bc-45c0a049d351'::uuid, r.id, 'relates_to',
     'California''s 2013 NGSS adoption is the real standards mandate under which evolution/natural selection is taught statewide; starter-depth record, see california-curriculum-repository''s own description.'
   FROM curriculum_repository_records r WHERE r.source_record_id = 'CA-MANDATE-ngss-adoption-2013'
   UNION ALL
-  SELECT v_bio_project, '698860a1-3a2f-5a18-bdc6-959b49c8cb58', r.id, 'relates_to',
+  SELECT v_bio_project, 'd1b088f7-a940-5d5e-a5bc-45c0a049d351'::uuid, r.id, 'relates_to',
     'California''s own anti-dogmatism policy is the explicit real governing principle protecting evolution instruction in this exact strand''s subject matter; starter-depth record.'
   FROM curriculum_repository_records r WHERE r.source_record_id = 'CA-PRINCIPLE-nothing-taught-dogmatically'
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
 
   -- California (starter-depth) -> Interdisciplinary
   INSERT INTO curriculum_repository_links (project_id, data_object_id, repository_record_id, relation_type, rationale)
-  SELECT v_inter_project, '932bdcf8-39b4-54ec-b0ff-3039fbacfaa0', r.id, 'relates_to',
+  SELECT v_inter_project, '5e4cdc6e-5c25-5f21-a833-4c0859a609da'::uuid, r.id, 'relates_to',
     'NGSS''s own cross-cutting-concepts design (patterns, systems, structure/function) is a real standards-level precedent for this strand''s cross-domain organizing device; starter-depth record.'
   FROM curriculum_repository_records r WHERE r.source_record_id = 'CA-MANDATE-ngss-adoption-2013'
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
