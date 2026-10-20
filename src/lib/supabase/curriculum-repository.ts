@@ -306,3 +306,49 @@ export async function createContentLink(
   })
   return { error: error?.message ?? null }
 }
+
+/** The one editable note per connection (2026-10-20 design decision: a single text field, not a comment thread) -- needs migration 142's own UPDATE policy on curriculum_repository_links, which only grants this to is_project_editor(). */
+export async function updateContentLinkRationale(supabase: Client, linkId: string, rationale: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('curriculum_repository_links').update({ rationale: rationale.trim() || null }).eq('id', linkId)
+  return { error: error?.message ?? null }
+}
+
+export async function deleteContentLink(supabase: Client, linkId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('curriculum_repository_links').delete().eq('id', linkId)
+  return { error: error?.message ?? null }
+}
+
+export interface DataObjectLinkWithRecord extends RepositoryContentLinkRow {
+  record: RepositoryRecordRow
+}
+
+/** The reverse of listContentLinksForRecord -- for a given set of this project's own content ids, every real-world connection already made, keyed by data_object_id. Used by the Curriculum Connections workspace (the 4 2026-10-20 custom views) so each strand/substrand can show its own existing connections without a separate query per row. */
+export async function listContentLinksForDataObjects(supabase: Client, dataObjectIds: string[]): Promise<Record<string, DataObjectLinkWithRecord[]>> {
+  if (dataObjectIds.length === 0) return {}
+  const { data } = await supabase
+    .from('curriculum_repository_links')
+    .select('*, record:curriculum_repository_records(*)')
+    .in('data_object_id', dataObjectIds)
+  const rows = (data ?? []) as unknown as DataObjectLinkWithRecord[]
+  const byObject: Record<string, DataObjectLinkWithRecord[]> = {}
+  for (const row of rows) {
+    if (!row.record) continue
+    ;(byObject[row.data_object_id] ??= []).push(row)
+  }
+  return byObject
+}
+
+/** Every real-world record available to link against, across a set of Curriculum Repository projects (e.g. Germany + Saxony + Thuringia for a German-context view) -- resolved from real project slugs, not ids, since callers only know the slug. */
+export async function listRepositoryRecordsForRegionSlugs(supabase: Client, regionSlugs: string[]): Promise<RepositoryRecordRow[]> {
+  if (regionSlugs.length === 0) return []
+  const { data: regionProjects } = await supabase.from('projects').select('id').in('slug', regionSlugs)
+  const regionIds = (regionProjects ?? []).map((p) => p.id)
+  if (regionIds.length === 0) return []
+  const { data } = await supabase
+    .from('curriculum_repository_records')
+    .select('*')
+    .in('project_id', regionIds)
+    .order('record_type', { ascending: true })
+    .order('title', { ascending: true })
+  return data ?? []
+}

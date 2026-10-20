@@ -18,6 +18,7 @@ import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav, type ProjectNavItem } from '@/components/project-nav'
 import { LpmSearchBar } from '@/components/lpm-search-bar'
 import { StudentNav } from './student/student-nav'
+import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 
 export interface ProjectOutletContext {
   project: ProjectRow
@@ -37,6 +38,13 @@ export interface ProjectOutletContext {
   // session unless they've deliberately chosen to preview one, so an
   // instructor can never be accidentally locked into a simplified view.
   isStudentView: boolean
+  // The active Dashboard View's own template_id when isStudentView is true,
+  // else null -- lets a shared template page (e.g.
+  // curriculum-connections-page.tsx) know which of several templates it's
+  // rendering for, and lets StudentNav/this shell pick the right language's
+  // chrome strings instead of always assuming German (the Jena pilot's own
+  // language, hardcoded here before any other template existed).
+  templateId: string | null
 }
 
 // Dashboard Custom Views (migration 109): real feedback 63321a17 replaced
@@ -255,6 +263,13 @@ export default function ProjectLayout() {
   const activeView = effectiveChoice === 'full' ? null : views.find((v) => v.id === effectiveChoice) ?? null
 
   const isStudentView = activeView?.kind === 'template'
+  const templateId = isStudentView ? activeView?.template_id ?? null : null
+  // Every template except the original Jena pilot is German/English via
+  // CURRICULUM_CONNECTIONS_VIEWS's own language field -- defaulting to German
+  // for the Jena id specifically (rather than reading a config that doesn't
+  // cover it) keeps its existing chrome unchanged.
+  const templateLanguage: 'de' | 'en' =
+    templateId === 'jena-biologiedidaktik-de' ? 'de' : getCurriculumConnectionsViewConfig(templateId)?.language ?? 'de'
   const standardViewPageKeys = activeView?.kind === 'standard' ? new Set(activeView.page_keys) : null
 
   // Whether this session gets a control to switch views at all: an
@@ -363,7 +378,7 @@ export default function ProjectLayout() {
     ? standardNavItems.filter((item) => item.key === 'dashboard' || standardViewPageKeys.has(item.key))
     : standardNavItems
 
-  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView }
+  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView, templateId }
   const isSpace = !project.parent_project_id
 
   if (isStudentView) {
@@ -371,17 +386,26 @@ export default function ProjectLayout() {
       <div className="project-shell student-shell">
         <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`}>
           <div className="project-side-top">
-            <Link to="/dashboard" className="row muted" title="Alle Bereiche">
+            <Link to="/dashboard" className="row muted" title={templateLanguage === 'de' ? 'Alle Bereiche' : 'All project spaces'}>
               <ArrowLeft size={14} />
-              <span className="nav-label">Alle Bereiche</span>
+              <span className="nav-label">{templateLanguage === 'de' ? 'Alle Bereiche' : 'All spaces'}</span>
             </Link>
-            <button type="button" className="sidebar-toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'}>
+            <button
+              type="button"
+              className="sidebar-toggle"
+              onClick={toggleSidebar}
+              title={
+                templateLanguage === 'de'
+                  ? sidebarCollapsed ? 'Seitenleiste ausklappen' : 'Seitenleiste einklappen'
+                  : sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
+              }
+            >
               {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
             </button>
           </div>
           <h2 className="project-side-title" style={{ marginTop: 10, marginBottom: 2 }}>{project.name}</h2>
           {viewSwitcher}
-          <StudentNav slug={slug} groupsEnabled={groupsSettings(project).enabled} />
+          <StudentNav slug={slug} groupsEnabled={groupsSettings(project).enabled} templateId={templateId} />
         </aside>
         <div className="project-main">
           {showPreviewBanner && (
