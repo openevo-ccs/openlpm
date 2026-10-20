@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { CalendarRange, ClipboardList, Dna, FileText, GitCompare, Network, Sparkles, Users } from 'lucide-react'
+import { CalendarRange, ClipboardList, Dna, FileText, GitCompare, MapPin, Network, Sparkles, Users } from 'lucide-react'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 import { STRINGS } from './curriculum-connections-strings'
 
@@ -45,6 +45,9 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
         <Network size={14} /><span className="nav-label">{t.navNetwork}</span>
       </NavLink>
       <p className="muted student-nav-group">{t.groupAnalyze}</p>
+      <NavLink to={`${base}/curriculum-regions`} title={t.navRegions} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <MapPin size={14} /><span className="nav-label">{t.navRegions}</span>
+      </NavLink>
       <NavLink to={`${base}/curriculum-comparison`} title={t.navComparison} className={({ isActive }) => (isActive ? 'active' : '')}>
         <GitCompare size={14} /><span className="nav-label">{t.navComparison}</span>
       </NavLink>

@@ -8,10 +8,18 @@
 export interface ConnectionsStrings {
   navOverview: string
   navNetwork: string
+  navRegions: string
   navComparison: string
   navReport: string
   groupExplore: string
   groupAnalyze: string
+
+  regionsTitle: string
+  regionsHelp: string
+  regionsCoverage: (covered: number, total: number) => string
+  regionsNoLinks: string
+  regionsStrandLabel: string
+  regionsNoStrandLinks: string
 
   overviewTitle: string
   overviewIntro: (region: string) => string
@@ -80,10 +88,18 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
   de: {
     navOverview: 'Übersicht',
     navNetwork: 'Netzwerk',
+    navRegions: 'Nach Bundesland',
     navComparison: 'Vergleich',
     navReport: 'Bericht',
     groupExplore: 'ERKUNDEN',
     groupAnalyze: 'ANALYSIEREN',
+
+    regionsTitle: 'Nach Bundesland',
+    regionsHelp: 'Wie sich die Stränge dieses LPM auf jedes einzelne Bundesland stützen, statt nur gepoolt gezeigt zu werden. Wähle ein Bundesland, um seine eigenen realen Verknüpfungen zu sehen.',
+    regionsCoverage: (covered: number, total: number) => `${covered} von ${total} Strängen haben eine Verknüpfung aus diesem Bundesland`,
+    regionsNoLinks: 'Für dieses Bundesland liegt noch keine Verknüpfung vor.',
+    regionsStrandLabel: 'Strang',
+    regionsNoStrandLinks: 'Kein Bezug aus diesem Bundesland.',
 
     overviewTitle: 'Verbindungen zum Lehrplan',
     overviewIntro: (region: string) =>
@@ -151,10 +167,18 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
   en: {
     navOverview: 'Overview',
     navNetwork: 'Network',
+    navRegions: 'By State',
     navComparison: 'Comparison',
     navReport: 'Report',
     groupExplore: 'EXPLORE',
     groupAnalyze: 'ANALYZE',
+
+    regionsTitle: 'By State',
+    regionsHelp: 'How this LPM\'s strands are grounded in each individual state, rather than pooled together. Pick a state to see its own real connections.',
+    regionsCoverage: (covered: number, total: number) => `${covered} of ${total} strands have a connection from this state`,
+    regionsNoLinks: 'No connections from this state yet.',
+    regionsStrandLabel: 'Strand',
+    regionsNoStrandLinks: 'No grounding from this state.',
 
     overviewTitle: 'Curriculum Connections',
     overviewIntro: (region: string) =>
