@@ -3,7 +3,7 @@ import { useOutletContext, useSearchParams } from 'react-router-dom'
 import { BookOpen, CheckCircle2, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
 import { searchOpenAlex, type SearchResult as OpenAlexResult } from '@/lib/api/openalex'
 import { searchSemanticScholar, type SearchResult as SemanticScholarResult } from '@/lib/api/semantic-scholar'
-import { searchCrossRef, type CrossRefSearchResult } from '@/lib/api/crossref'
+import { searchCrossRef, verifyDOI, type CrossRefSearchResult } from '@/lib/api/crossref'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
@@ -182,6 +182,13 @@ export default function LiteraturePage() {
     setSavingId(r.key)
     const litbaseId = literaturebaseIdFor(r)
     const tags = tagsText.split(',').map((t) => t.trim()).filter(Boolean)
+    // verifyDOI() has existed in src/lib/api/crossref.ts since this page's
+    // Crossref search was added, but nothing ever called it -- confirm the
+    // DOI against Crossref itself at save time, regardless of which search
+    // engine actually found this result. A result with no DOI (an
+    // OpenEvo LiteratureBase hit without one, etc.) just stays unverified,
+    // same as before this call existed.
+    const crossrefVerified = r.doi ? (await verifyDOI(r.doi)).verified : false
     const { data, error } = await (supabase as any)
       .from('literature_references')
       .insert({
@@ -198,6 +205,7 @@ export default function LiteraturePage() {
         tags,
         notes: note || null,
         status: 'draft',
+        crossref_verified: crossrefVerified,
       })
       .select('id')
       .single()
