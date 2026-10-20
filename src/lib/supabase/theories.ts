@@ -145,6 +145,86 @@ export async function setTheorybaseLink(supabase: Client, projectId: string, ena
   }
 }
 
+// ============================================================================
+// Theory record type -- TheoryBase itself distinguishes a real Theory from
+// a documented Misconception, a live Divergence (research dispute), a
+// Proposition, etc. (see theorybase's own record types), but the `theories`
+// table here has no separate column for it. Derived from the base_repo_ref
+// id's own prefix (e.g. "OE-MISCONCEPTION-agency-binary") rather than adding
+// a column, since the id is already the real source of truth -- a
+// duplicated column would just be one more place for the two to drift.
+// Added 2026-10-20: without this, an author had no way to show a reader
+// "this is a documented misconception, not a theory" except by typing it
+// into the label text itself (e.g. "Agency as Binary... (documented
+// misconception, not a theory)"), which only a few records happened to do.
+// ============================================================================
+
+export interface TheoryRecordType {
+  label: string
+  gloss: string
+}
+
+const RECORD_TYPE_BY_PREFIX: Record<string, TheoryRecordType> = {
+  THEORY: { label: 'Theory', gloss: 'A proposed explanation for how learning or reasoning works.' },
+  THEORYBUNDLE: { label: 'Theory bundle', gloss: 'A named group of related theories, discussed as a set.' },
+  PROPOSITION: { label: 'Proposition', gloss: 'A specific, checkable claim that is part of a larger theory.' },
+  ASSUMPTION: { label: 'Assumption', gloss: 'Something this line of research takes as a starting point, not itself tested.' },
+  MISCONCEPTION: { label: 'Misconception', gloss: 'A documented wrong belief learners tend to hold — not a theory OpenLPM endorses.' },
+  DIVERGENCE: { label: 'Disputed claim', gloss: 'A live disagreement between real researchers or frameworks, not a settled position.' },
+  CROSSDOMAINCONSTRUCT: { label: 'Cross-domain idea', gloss: 'A concept that shows up the same way across more than one subject area.' },
+  MECHANISM: { label: 'Mechanism', gloss: 'A specific proposed cause-and-effect process.' },
+  HYPOTHESIS: { label: 'Hypothesis', gloss: 'A specific prediction that could be tested.' },
+  DESIGNPRINCIPLE: { label: 'Design principle', gloss: 'A rule of thumb for designing curriculum, drawn from theory.' },
+  CURRICULUMDECISION: { label: 'Curriculum decision', gloss: 'A real, documented choice a curriculum made, and why.' },
+  LEARNINGDEPENDENCY: { label: 'Learning dependency', gloss: 'A claim that one kind of understanding needs to come before another.' },
+}
+
+/** Null for a locally-authored theory (no base_repo_ref to read a type from) or an id shape this doesn't recognize -- callers should render no badge in that case, not a guess. */
+export function theoryRecordTypeFromRef(baseRepoRef: string | null): TheoryRecordType | null {
+  if (!baseRepoRef) return null
+  const match = baseRepoRef.match(/^OE-([A-Z]+)-/)
+  if (!match) return null
+  return RECORD_TYPE_BY_PREFIX[match[1]] ?? null
+}
+
+// ============================================================================
+// "Also used by" -- which OTHER OpenLPM projects have imported the same
+// real TheoryBase record (feedback 35924e8a follow-up, 2026-10-20: seeing
+// real cross-project reuse is itself a quality-improvement signal). Needs
+// migration 150's cross-project read policy on `theories` -- without it,
+// this silently returns nothing for a theory belonging to a project this
+// viewer isn't also a member of, same shape the region-filter fix earlier
+// today had to account for. Only ever meaningful for a theory with a real
+// base_repo_ref; a locally-authored theory has no TheoryBase identity to
+// look up other users of.
+// ============================================================================
+
+export interface OtherProjectUsingTheory {
+  projectId: string
+  projectName: string
+  projectSlug: string
+  theoryId: string
+}
+
+export async function listOtherProjectsUsingTheory(
+  supabase: Client,
+  baseRepoRef: string,
+  excludeProjectId: string
+): Promise<OtherProjectUsingTheory[]> {
+  const { data } = await supabase
+    .from('theories')
+    .select('id, project_id, project:projects(id, name, slug)')
+    .eq('base_repo_ref', baseRepoRef)
+    .neq('project_id', excludeProjectId)
+  const rows = (data ?? []) as unknown as { id: string; project_id: string; project: { id: string; name: string; slug: string } | null }[]
+  const seen = new Map<string, OtherProjectUsingTheory>()
+  for (const r of rows) {
+    if (!r.project || seen.has(r.project.id)) continue
+    seen.set(r.project.id, { projectId: r.project.id, projectName: r.project.name, projectSlug: r.project.slug, theoryId: r.id })
+  }
+  return Array.from(seen.values()).sort((a, b) => a.projectName.localeCompare(b.projectName))
+}
+
 export interface TheoryLiteratureLinkWithReference extends TheoryLiteratureLinkRow {
   reference: LiteratureRow
 }
