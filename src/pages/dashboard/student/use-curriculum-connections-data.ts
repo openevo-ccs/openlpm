@@ -59,6 +59,25 @@ export function useCurriculumConnectionsData() {
     listContentLinksForDataObjects(supabase, topics.map((tp) => tp.id)).then(setLinksByObject)
   }, [supabase, topics, refreshToken])
 
+  // Real feedback 1512aaa9 (Dustin, 2026-10-20): a Thüringen-sourced
+  // connection showed up while previewing the "New York / California (US)"
+  // view. listContentLinksForDataObjects pulls every curriculum_repository_links
+  // row for this project's topics with no region filter at all -- a
+  // project's own content can carry links from more than one of these 4
+  // custom views at once (bio-core/interdisciplinary's topics link to both
+  // German and US records), so every consumer of linksByObject needs the
+  // same region scoping listRepositoryRecordsForRegionSlugs already applies
+  // to regionRecords. Scoped once here rather than in each consuming page.
+  const regionRecordIds = useMemo(() => new Set(regionRecords.map((r) => r.id)), [regionRecords])
+  const scopedLinksByObject = useMemo(() => {
+    if (regionRecords.length === 0) return linksByObject
+    const scoped: Record<string, DataObjectLinkWithRecord[]> = {}
+    for (const [objectId, links] of Object.entries(linksByObject)) {
+      scoped[objectId] = links.filter((l) => regionRecordIds.has(l.record.id))
+    }
+    return scoped
+  }, [linksByObject, regionRecordIds, regionRecords.length])
+
   useEffect(() => {
     getProjectComparisonProfile(supabase, project.id).then(setProfile)
     listDivergenceCoverage(supabase, project.id).then(setCoverage)
@@ -79,13 +98,13 @@ export function useCurriculumConnectionsData() {
   }, [supabase, project.id, compareProjectId, refreshToken])
 
   const connectedTopicCount = useMemo(
-    () => (topics ?? []).filter((tp) => (linksByObject[tp.id]?.length ?? 0) > 0).length,
-    [topics, linksByObject]
+    () => (topics ?? []).filter((tp) => (scopedLinksByObject[tp.id]?.length ?? 0) > 0).length,
+    [topics, scopedLinksByObject]
   )
 
   return {
     project, role, supabase, templateId, config, canEdit,
-    topics, linksByObject, regionRecords, connectedTopicCount,
+    topics, linksByObject: scopedLinksByObject, regionRecords, connectedTopicCount,
     profile, compareProfile, compareName, compareProjectId, comparativeLinks, coverage,
     refresh,
   }

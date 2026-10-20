@@ -880,8 +880,24 @@ function LernzielCardDetail({
     getThreadStationsForTopic(supabase, objectId).then(setStations)
   }, [supabase, objectId])
 
+  // Real feedback 24ffeed7 and others (Susan, repeated across 2026-10-14/15):
+  // flagged this item's wording as not matching the curriculum document.
+  // Checked directly against the primary source each time -- content.originaltext
+  // already carries the exact, verbatim curriculum wording (the short `title`
+  // above is deliberately a paraphrase, same as every other Lernziel), but
+  // originaltext was never actually shown anywhere in this page, only used
+  // internally by the AI Prompt Generator's text export. Shown here now so a
+  // wording review can be done directly against what's in the app.
+  const originaltext = (content as any)?.originaltext as string | undefined
+
   return (
     <div>
+      {originaltext && (
+        <div style={{ marginBottom: 12, padding: '8px 10px', background: 'var(--surface-1)', borderRadius: 'var(--radius)' }}>
+          <strong style={{ fontSize: 11, display: 'block', marginBottom: 2 }}>Originalwortlaut (Lehrplan)</strong>
+          <p style={{ fontSize: 12.5, margin: 0, whiteSpace: 'pre-wrap' }}>{originaltext}</p>
+        </div>
+      )}
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
       {/* Real feedback 75fd5be9 (Susan): "Vernetztes Lernen" used to always

@@ -176,10 +176,10 @@ export function ConnectionRow({
 
   return (
     <div className="card" style={{ marginBottom: 6, padding: 8 }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="row" style={{ gap: 5 }}>
+      <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
+        <span className="row" style={{ gap: 5, minWidth: 0 }}>
           <RecordKindIcon type={link.record.record_type} size={13} />
-          <strong style={{ fontSize: 13 }}>{link.record.title}</strong>
+          <strong style={{ fontSize: 13, overflowWrap: 'break-word', wordBreak: 'break-word' }}>{link.record.title}</strong>
         </span>
         <span className="muted" style={{ fontSize: 11 }}>{RECORD_TYPE_LABEL[link.record.record_type]}</span>
       </div>
@@ -193,7 +193,7 @@ export function ConnectionRow({
         </div>
       ) : (
         <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 4 }}>
-          <p className="muted" style={{ fontSize: 12, margin: 0 }}>{link.rationale || '—'}</p>
+          <p className="muted" style={{ fontSize: 12, margin: 0, overflowWrap: 'break-word', wordBreak: 'break-word', minWidth: 0 }}>{link.rationale || '—'}</p>
           {canEdit && (
             <button className="btn-linklike" onClick={() => setEditing(true)}><Pencil size={11} /></button>
           )}
