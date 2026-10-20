@@ -1,0 +1,100 @@
+$schema: ../../../../schema/curriculum-crosswalk-record.schema.json
+$description: >
+  Pointers from Tennessee's own evolution-related standards to
+  machine-readable curriculum-graph data elsewhere in this ecosystem. See
+  case/README.md.
+
+crosswalks:
+  - id: TNLP-CROSSWALK-tn2022-common-standards-project-api
+    slug: tn2022-common-standards-project-api
+    label: "Tennessee Academic Standards for Science (2022), Biology I/Grade 8 evolution strands -- live source: Common Standards Project API"
+    jurisdiction: US-TN
+    standardOrAttribute: "Tennessee Academic Standards for Science (2022) -- BIO1.LS3 (Heredity), BIO1.LS4 (Biological Change: Unity and Diversity), 8.LS4 (Biological Change: Unity and Diversity)"
+    gradeRange: "8-12"
+    sourceSystem: common-standards-project-api
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      CONFIRMED LIVE 2026-10-20, independently twice (a delegated research
+      agent and the main session's own direct curl calls). GET
+      https://api.commonstandardsproject.com/api/v1/jurisdictions/180878796A3C448D808F38BCCCFD26CF
+      lists Tennessee's standard sets (480 total, three generations of
+      science standards: 2009-2016 deprecated, 2016 superseded-in-practice,
+      2022 current); GET
+      https://api.commonstandardsproject.com/api/v1/standard_sets/E068CD122CE146DFBCED7A17EE6E130A
+      (Biology I) and .../D19049B7586D4FD2B5E1CE17D2694B94 (grade 8) return
+      the real, current evolution/heredity benchmark clusters. A THIRD
+      distinct licensing case among this ecosystem's three state repos so
+      far: CC BY 4.0 US, rightsHolder "Common Curriculum, Inc." -- different
+      from both Florida's CC BY 3.0 US and Pennsylvania's no-license-stated
+      data.
+    licenseOrRightsNote: >
+      Independently and openly licensed by the Common Standards Project's
+      compiler: CC BY 4.0 US (http://creativecommons.org/licenses/by/4.0/us/),
+      rightsHolder "Common Curriculum, Inc." Tennessee's own government text
+      is additionally a public record; see
+      state/tennessee/local_policy/records/mandates.yaml for the specific
+      statutory-text legal basis used for this repo's older (1925/1973/2012)
+      mandate records.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        api.commonstandardsproject.com, fetched directly and read in full
+        2026-10-20 (both by a delegated research agent and independently by
+        the main session).
+
+  - id: TNLP-CROSSWALK-tn2022-case-evolution
+    slug: tn2022-case-evolution
+    label: "Tennessee Academic Standards for Science (2022) evolution strands -- CASE format"
+    jurisdiction: US-TN
+    standardOrAttribute: "Tennessee Academic Standards for Science (2022), evolution/heredity strands"
+    gradeRange: "8-12"
+    sourceSystem: openevo-graph-case-format-local-file
+    sourceRepoPath: ../../../case/tennessee-2022-evolution-benchmarks.json
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      CASE-format file transformed from the confirmed-live Common Standards
+      Project data above -- 17 benchmarks across 3 strands (BIO1.LS3,
+      BIO1.LS4, 8.LS4) plus the shared Domain/Strand hierarchy. Not a
+      complete re-publication of the full K-12 standard set; Biology II's
+      own much larger 28-benchmark evolution/phylogenetics strand was found
+      but not built out here (see case/README.md).
+    licenseOrRightsNote: >
+      Same basis as TNLP-CROSSWALK-tn2022-common-standards-project-api above.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Transformed from api.commonstandardsproject.com data, fetched
+        directly 2026-10-20 -- see case/README.md.
+
+  - id: TNLP-CROSSWALK-bio-core-k12-natural-selection
+    slug: bio-core-k12-natural-selection
+    label: "Tennessee BIO1.LS4/8.LS4 Biological Change strands -- crosswalk to bio-core-k12's LPM strand"
+    jurisdiction: US-TN
+    standardOrAttribute: "Tennessee Academic Standards for Science (2022), Natural Selection/Adaptation content within BIO1.LS4 and 8.LS4"
+    gradeRange: "8-12"
+    sourceSystem: openevo-conceptbase-competencybase-informal-refs
+    sourceRepoPath: ../../../../bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      Informal reference only, same convention as florida-lpm's and
+      pennsylvania-lpm's identical crosswalks.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Confirmed bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+        exists in this ecosystem via direct file listing.

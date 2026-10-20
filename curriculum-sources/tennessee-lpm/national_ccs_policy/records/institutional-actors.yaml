@@ -1,0 +1,120 @@
+$schema: ../../schema/institutional-actor-record.schema.json
+$description: >
+  Federal/multi-state actors across a full century of Tennessee's
+  evolution-curriculum history. Several overlap in real-world identity with
+  actors already modeled independently in florida-lpm's/pennsylvania-lpm's
+  own national_ccs_policy/ -- modeled here with this repo's own id prefix,
+  per this ecosystem's current informal (not cross-repo-validated)
+  reference convention.
+
+actors:
+  - id: TNLP-ACTOR-aclu
+    slug: aclu
+    label: American Civil Liberties Union (ACLU)
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      National civil-liberties organization. Placed the 1925 newspaper
+      advertisement (reported May 4, 1925) offering to defend any Tennessee
+      teacher willing to test the Butler Act -- the advertisement George
+      Rappleyea and Dayton's civic boosters answered by recruiting John
+      Scopes, making the ACLU the direct originator of the Scopes Trial as a
+      deliberately engineered test case. Its attorney Arthur Garfield Hays
+      joined Scopes's defense team. Forty-two years later, the ACLU (via
+      attorney William Kunstler) also represented Gary Scott, the teacher
+      whose 1967 firing triggered the Butler Act's repeal -- a genuinely
+      different kind of case (a real firing, not a staged test).
+    url: https://www.aclu.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Science History Institute, "The Scopes Monkey Trial Publicity Stunt";
+        Knox TN Today, "His name was Gary Scott, and he is a hero" -- both
+        fetched and read directly. See docs/source-notes/2026-10-20-tennessee-evolution-curriculum-policy-history-research.md.
+
+  - id: TNLP-ACTOR-ncse
+    slug: ncse
+    label: National Center for Science Education (NCSE)
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      National nonprofit defending evolution/climate-science education. The
+      single most consistent institutional source on Tennessee's 2012
+      Teacher Protection Act specifically (its own "Background on
+      Tennessee's 21st Century Monkey Law" page is a primary tracking
+      document for that episode), and the source of the 2009 Mead & Mates
+      study that graded Tennessee's then-current standards poorly for
+      evolution content -- a grade that does NOT carry forward to the
+      current 2022 standards, which NCSE has not separately evaluated as of
+      this repo's founding research.
+    url: https://ncse.ngo
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's own site (ncse.ngo), multiple articles fetched and read
+        directly this session.
+
+  - id: TNLP-ACTOR-national-association-of-biology-teachers
+    slug: national-association-of-biology-teachers
+    label: National Association of Biology Teachers (NABT)
+    actorType: professional-association
+    jurisdiction: US
+    role: >
+      National professional association for biology educators. Co-plaintiff
+      (with Tennessee biology teachers and parents) in Daniel v. Waters
+      (1975), the case that struck down Tennessee's 1973 "equal time" law.
+      Also named among the organizations publicly opposing the 2012 Teacher
+      Protection Act.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Daniel v. Waters case summaries (Wikipedia, TalkOrigins) and NCSE's
+        2012 reporting -- fetched and read directly.
+
+  - id: TNLP-ACTOR-public-resource-org
+    slug: public-resource-org
+    label: Public.Resource.Org
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      National nonprofit (founded by Carl Malamud) advocating for free public
+      access to government legal text. Not directly about evolution curriculum,
+      but directly relevant to this repo's own public-records/licensing
+      discipline: its 2021-2022 effort (with Nashville law professor David
+      Hudson) to establish that the Tennessee Code Annotated is public
+      domain, and its subsequent lawsuit against LexisNexis, is the real
+      basis for this repo's more cautious licenseOrRightsNote posture on
+      Tennessee statutory text compared to florida-lpm's simpler
+      public-domain claim.
+    url: https://law.resource.org
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The organization's own 2021 letter to Tennessee's Revisor of
+        Statutes was located but could not be read in full this session (PDF
+        text extraction failed) -- its existence and general content are
+        corroborated via the resulting lawsuit's own court record instead.
+      sourceProvenance: >
+        Nashville Post, "LexisNexis sued over access to Tennessee Code
+        Annotated"; Tennessee Court of Appeals opinion (Justia,
+        M2022-01260-COA-R3-CV) -- both fetched and read directly.

@@ -1,0 +1,320 @@
+$schema: ../../../../schema/policy-controversy-record.schema.json
+$description: >
+  Three state-level controversies spanning a century, chained via
+  recurrenceOf into the deepest such chain in this ecosystem so far. See
+  GOVERNANCE.md for why this is a genuinely different shape than
+  florida-lpm's or pennsylvania-lpm's own controversy records, and
+  docs/source-notes/2026-10-20-tennessee-evolution-curriculum-policy-history-research.md
+  for full sourcing.
+
+controversies:
+  - id: TNLP-CONTROVERSY-butler-act-and-scopes-trial
+    slug: butler-act-and-scopes-trial
+    label: The Butler Act and the Scopes "Monkey Trial" (1925-1927)
+    jurisdiction: US-TN
+    controversyType: litigation
+    topicArea: >
+      Whether Tennessee may criminally prohibit public-school teachers from
+      teaching evolution in favor of the biblical account of human origins.
+    summary: >
+      Tennessee's 1925 Butler Act made teaching evolution a crime. The ACLU
+      deliberately engineered a test prosecution in Dayton, recruiting
+      teacher John Scopes; the resulting trial pitted Clarence Darrow
+      against William Jennings Bryan in a national media spectacle. Scopes
+      was convicted and fined, but the Tennessee Supreme Court reversed the
+      conviction on a sentencing technicality in 1927 while explicitly
+      upholding the law's constitutionality and urging the state not to
+      pursue the matter further -- ending enforcement without the law ever
+      being struck down.
+    dateStart: "1925-01-21"
+    dateEnd: "1927-01-15"
+    status: resolved-compromise
+    outcomeSummary: >
+      Neither side got a clean, lasting win: the ACLU failed to get the
+      Butler Act declared unconstitutional (the Tennessee Supreme Court
+      upheld it), while the state lost its only conviction under the law
+      and the Court itself signaled the prosecution should not continue. The
+      law remained on the books, unenforced in any further prosecution,
+      until its 1967 repeal.
+    outcomeDate: "1927-01-15"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          Whether the Butler Act's criminal prohibition on teaching
+          evolution is constitutional, and whether John Scopes's specific
+          conviction under it should stand.
+        relatedMandateIds: [TNLP-MANDATE-butler-act-1925]
+        relatedEventIds:
+          - TNLP-EVENT-butler-act-introduced
+          - TNLP-EVENT-butler-act-signed
+          - TNLP-EVENT-aclu-ad-and-scopes-recruitment
+          - TNLP-EVENT-scopes-trial
+          - TNLP-EVENT-bryan-death
+          - TNLP-EVENT-scopes-appeal-ruling
+    positions:
+      - actorId: TNLP-ACTOR-aclu
+        actorLabel: American Civil Liberties Union
+        stance: opposes-change
+        stanceSummary: >
+          Engineered the test case specifically to challenge the Butler
+          Act's constitutionality, providing Scopes's defense team.
+        sourceUrl: https://en.wikipedia.org/wiki/George_Rappleyea
+        sourceDate: "1925-05-04"
+        accessTier: summary-only
+      - actorLabel: William Jennings Bryan (prosecution)
+        stance: supports-change
+        stanceSummary: >
+          Joined the prosecution to defend the Butler Act and biblical
+          literalism; his own testimony under Darrow's cross-examination
+          ("I'll leave the agnostics to hunt for her" wife of Cain) was
+          widely seen as damaging to his position.
+        sourceUrl: https://en.wikipedia.org/wiki/William_Jennings_Bryan
+        sourceDate: "1925-07-20"
+        accessTier: excerpt-only
+      - actorLabel: Clarence Darrow (defense)
+        stance: opposes-change
+        stanceSummary: >
+          Lead defense attorney; called Bryan himself as a witness to
+          directly challenge biblical literalism in open court.
+        sourceUrl: https://en.wikipedia.org/wiki/Scopes_trial
+        sourceDate: "1925-07-20"
+        accessTier: summary-only
+      - actorLabel: Tennessee Supreme Court (Chief Justice Grafton Green)
+        stance: neutral-fact-finding
+        stanceSummary: >
+          Upheld the Butler Act's constitutionality but reversed Scopes's
+          conviction on a sentencing technicality, writing "nothing is to be
+          gained by prolonging the life of this bizarre case" and
+          recommending the state not retry Scopes.
+        sourceUrl: https://time.com/archive/6777617/education-bizarre/
+        sourceDate: "1927-01-15"
+        accessTier: excerpt-only
+        licenseOrRightsNote: A state appellate court's own published opinion is a public judicial record.
+    mediaCoverage:
+      - outlet: Baltimore Sun / Baltimore Evening Sun (H.L. Mencken)
+        headline: "Coverage of the Scopes Trial; Bryan obituary"
+        url: https://ncse.ngo/stop-press-menckens-obituary-bryan
+        publicationDate: "1925-07-27"
+        framingNote: >
+          Openly mocking of both prosecution and the town; coined "Monkey
+          Trial"; Bryan's obituary was explicitly hostile.
+        accessTier: citation-only
+    themes: ["evolution", "creationism", "litigation", "establishment-clause", "media-spectacle"]
+    exhaustivenessCaveat: >
+      Built from Wikipedia's well-corroborated case summary, NCSE's own
+      archival pages, and TIME's contemporaneous archive -- not a complete
+      read of the full trial transcript or the Tennessee Supreme Court's
+      full opinion text.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        See docs/source-notes/2026-10-20-tennessee-evolution-curriculum-policy-history-research.md
+        for the full source list.
+
+  - id: TNLP-CONTROVERSY-tn-1973-equal-time-law
+    slug: tn-1973-equal-time-law
+    label: The 1973 "equal time" / "Genesis Bill" and its 1975 invalidation
+    jurisdiction: US-TN
+    controversyType: litigation
+    topicArea: >
+      Whether Tennessee may require biology textbooks give the Genesis
+      account "equal emphasis" with evolution and label evolution "not...
+      scientific fact."
+    summary: >
+      Six years after repealing the Butler Act, Tennessee passed a new law
+      -- championed explicitly as continuing the earlier fight by a
+      legislator representing Dayton's own county -- requiring textbooks
+      teach the Genesis account alongside evolution with equal weight.
+      Tennessee biology teachers, parents, and the National Association of
+      Biology Teachers sued; the Sixth Circuit struck the law down as
+      patently unconstitutional in 1975, less than two years after it
+      passed.
+    dateStart: "1971-01-01"
+    dateEnd: "1975-04-10"
+    status: resolved-outcome-rejected
+    outcomeSummary: >
+      The law was struck down in full by the Sixth Circuit Court of Appeals,
+      which called it "patently unconstitutional" on two independent
+      grounds. Not appealed further -- a clean, substantive defeat for the
+      side that wanted the change, unlike the 1925 episode's technicality-
+      based non-resolution.
+    outcomeDate: "1975-04-10"
+    recurrenceOf: [TNLP-CONTROVERSY-butler-act-and-scopes-trial]
+    contestedObjects:
+      - description: >
+          Whether Tennessee law may require Genesis be taught alongside
+          evolution with "equal emphasis" and require evolution (but not the
+          Bible) carry a disclaimer that it is "not... scientific fact."
+        relatedMandateIds: [TNLP-MANDATE-tn-1973-equal-time-law]
+        relatedEventIds:
+          - TNLP-EVENT-russell-artist-advocacy
+          - TNLP-EVENT-tn-1973-equal-time-law-passed
+          - TNLP-EVENT-daniel-v-waters
+        relatedFindingIds: [TNLP-FINDING-butler-act-vs-1973-law-strategy-shift]
+    positions:
+      - actorLabel: Rep. Bill Carter (Rhea County)
+        stance: supports-change
+        stanceSummary: >
+          Championed the bill explicitly as continuing the earlier Scopes-era
+          fight: "Since I unsuccessfully opposed the repeal of the
+          'Evolution Law'... I have been duty bound to do all I can to see
+          that this bill is passed."
+        sourceUrl: https://jsreligion.org/issues/vol16/edwards.html
+        sourceDate: "1973-04-01"
+        accessTier: excerpt-only
+      - actorId: TNLP-ACTOR-national-association-of-biology-teachers
+        actorLabel: National Association of Biology Teachers, joined by Tennessee biology teachers and parents
+        stance: opposes-change
+        stanceSummary: >
+          Sued the state textbook board, arguing the law unconstitutionally
+          preferred the biblical account of creation.
+        sourceUrl: https://en.wikipedia.org/wiki/Daniel_v._Waters
+        sourceDate: "1973-01-01"
+        accessTier: summary-only
+      - actorLabel: Judge George Edwards (Sixth Circuit Court of Appeals)
+        stance: neutral-fact-finding
+        stanceSummary: >
+          Wrote the majority opinion calling the law "patently
+          unconstitutional" for its special treatment of "occult or
+          satanical beliefs" and of the Genesis account specifically.
+        sourceUrl: https://en.wikipedia.org/wiki/Daniel_v._Waters
+        sourceDate: "1975-04-10"
+        accessTier: excerpt-only
+        licenseOrRightsNote: A federal appellate court's own published opinion is a public judicial record.
+    mediaCoverage: []
+    themes: ["evolution", "creationism", "litigation", "establishment-clause", "recurring-fault-line"]
+    exhaustivenessCaveat: >
+      Built primarily from the Journal of Southern Religion's detailed
+      historical account and Wikipedia's case summary of Daniel v. Waters --
+      no contemporaneous 1973-75 news coverage was independently located and
+      read this session, unlike the much more heavily documented 1925 and
+      2012 episodes.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Journal of Southern Religion, "'Equal Space With Adam and Eve':
+        Tennessee's 'Genesis Bill' of 1973"; Wikipedia, "Daniel v. Waters" --
+        both fetched and read directly.
+
+  - id: TNLP-CONTROVERSY-tn-2012-teacher-protection-act
+    slug: tn-2012-teacher-protection-act
+    label: The 2012 Tennessee Teacher Protection Act ("monkey law")
+    jurisdiction: US-TN
+    controversyType: legislative-mandate-fight
+    topicArea: >
+      Whether Tennessee teachers should be explicitly protected from
+      discipline for presenting "scientific weaknesses" of evolution,
+      climate change, and other named theories.
+    summary: >
+      Nearly 40 years after Daniel v. Waters struck down Tennessee's
+      religiously-framed 1973 law, the legislature passed a new law using
+      entirely secular language -- "scientific strengths and weaknesses,"
+      never naming religion, creationism, or intelligent design directly.
+      Governor Haslam let it become law without his signature, calling it
+      unclear rather than objectionable. It passed over organized opposition
+      from national and Tennessee-specific science-education bodies, and
+      remains in force today, apparently never challenged in court.
+    dateStart: "2011-04-07"
+    dateEnd: "2012-04-10"
+    status: resolved-outcome-adopted
+    outcomeSummary: >
+      The law took effect and remains in force as of this repo's founding
+      session (2026), the only one of Tennessee's three central statutes
+      never invalidated, repealed, or amended -- though also, per this
+      session's research, apparently never tested in court or shown to have
+      been actually invoked by any teacher or district.
+    outcomeDate: "2012-04-10"
+    recurrenceOf: [TNLP-CONTROVERSY-tn-1973-equal-time-law]
+    contestedObjects:
+      - description: >
+          Whether Tennessee teachers should be explicitly shielded from
+          discipline for presenting "scientific strengths and weaknesses" of
+          evolution and other named theories.
+        relatedMandateIds: [TNLP-MANDATE-tn-2012-teacher-protection-act]
+        relatedEventIds:
+          - TNLP-EVENT-tn-2011-2012-teacher-protection-act-legislative-process
+          - TNLP-EVENT-haslam-lets-teacher-protection-act-become-law
+        relatedFindingIds: [TNLP-FINDING-1973-law-vs-2012-law-framing-shift]
+    positions:
+      - actorLabel: Sen. Bo Watson and Rep. Bill Dunn (sponsors)
+        stance: supports-change
+        stanceSummary: >
+          Framed the bill as promoting critical thinking and objective
+          scientific inquiry, not an attack on evolution specifically.
+        sourceUrl: https://www.timesfreepress.com/news/news/story/2012/mar/20/tn-senate-passes-watsons-bill-on-evolution-debate/73438/
+        sourceDate: "2012-03-20"
+        accessTier: summary-only
+      - actorLabel: Governor Bill Haslam
+        stance: other
+        stanceSummary: >
+          Let the bill become law without his signature rather than veto or
+          sign it: "good legislation should bring clarity and not confusion.
+          My concern is that this bill has not met this objective" -- a
+          deliberately ambivalent position, neither endorsing nor blocking
+          it.
+        sourceUrl: https://www.huffingtonpost.com/2012/04/10/tennessee-evolution-bill-haslam_n_1416015.html
+        sourceDate: "2012-04-10"
+        accessTier: excerpt-only
+      - actorId: TNLP-ACTOR-ncse
+        actorLabel: National Center for Science Education (Eugenie C. Scott)
+        stance: opposes-change
+        stanceSummary: >
+          "Telling students that evolution and climate change are
+          scientifically controversial is miseducating them."
+        sourceUrl: https://ncse.ngo/background-tennessees-21st-century-monkey-law
+        sourceDate: "2012-04-01"
+        accessTier: excerpt-only
+      - actorId: TNLP-ACTOR-tennessee-science-teachers-association
+        actorLabel: Tennessee Science Teachers Association (Becky Ashe)
+        stance: opposes-change
+        stanceSummary: >
+          Called the bill "unnecessary, anti-scientific, and very likely
+          unconstitutional," warning it would let teachers "teach a Sunday
+          school class" in science class.
+        sourceUrl: https://ncse.ngo/background-tennessees-21st-century-monkey-law
+        sourceDate: "2012-03-01"
+        accessTier: excerpt-only
+    mediaCoverage:
+      - outlet: Times Free Press
+        headline: "Tennessee Senate passes Bo Watson's bill on evolution debate"
+        url: https://www.timesfreepress.com/news/news/story/2012/mar/20/tn-senate-passes-watsons-bill-on-evolution-debate/73438/
+        publicationDate: "2012-03-20"
+        accessTier: citation-only
+      - outlet: HuffPost
+        headline: "Tennessee Evolution Bill Becomes Law After Governor Bill Haslam Declines To Act"
+        url: https://www.huffingtonpost.com/2012/04/10/tennessee-evolution-bill-haslam_n_1416015.html
+        publicationDate: "2012-04-10"
+        accessTier: citation-only
+      - outlet: National Center for Science Education (NCSE)
+        headline: "Background on Tennessee's 21st Century Monkey Law"
+        url: https://ncse.ngo/background-tennessees-21st-century-monkey-law
+        publicationDate: "2012-03-01"
+        framingNote: Advocacy-organization framing, critical of the bill.
+        accessTier: citation-only
+    themes: ["evolution", "academic-freedom-legislation", "climate-change", "recurring-fault-line"]
+    exhaustivenessCaveat: >
+      This repo's research found no evidence the 2012 law has ever been
+      challenged in court or invoked in a documented real case -- an
+      absence-of-evidence finding from a non-exhaustive search, not a
+      confirmed claim that no such case exists.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's contemporaneous coverage, Times Free Press, HuffPost,
+        Local3News -- all fetched and read directly. See
+        docs/source-notes/ for the full list.

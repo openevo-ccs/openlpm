@@ -1,0 +1,126 @@
+$schema: ../../../../schema/policy-principle-record.schema.json
+$description: >
+  OpenEvo-authored positions grounded in the institutional facts, mandates,
+  and controversies documented in state/tennessee/local_policy/.
+
+principles:
+  - id: TNLP-PRINCIPLE-softened-language-is-a-tactic-not-a-change-of-goal
+    slug: softened-language-is-a-tactic-not-a-change-of-goal
+    label: When a recurring legislative fight loses in court, the next round tends to arrive in secularized language, not a changed goal
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-TN
+    statement: >
+      Tennessee's own hundred-year record shows the same underlying question
+      -- should a biblical account of human origins get special legal
+      protection in the science classroom -- pursued through three
+      legislatively distinct mechanisms, each one measurably more
+      secular-sounding than the last: an outright criminal prohibition
+      (1925), a mandate to teach Genesis with "equal emphasis" (1973,
+      struck down specifically for naming the Bible), and a law protecting
+      "scientific strengths and weaknesses" that never names religion at
+      all (2012, still standing). A curriculum-policy archive that only
+      reads each era's law on its own terms, without comparing it to what
+      came before, would miss that the softening itself is the pattern --
+      and would risk taking 2012's secular framing at face value rather
+      than reading it as a direct, legible response to why 1973 lost in
+      court.
+    rationale: >
+      This is an inference this repo's own research drew from comparing
+      three real statutes' text side by side (see
+      TNLP-FINDING-1973-law-vs-2012-law-framing-shift) -- not a claim any
+      named 2012 legislator stated outright the way Rep. Bill Carter
+      explicitly did for the 1973 bill. The principle is offered as a
+      documented pattern worth watching for in any other jurisdiction's own
+      recurring legislative fight, not as a settled fact about anyone's
+      stated intent in 2012.
+    groundedIn:
+      - TNLP-FINDING-butler-act-vs-1973-law-strategy-shift
+      - TNLP-FINDING-1973-law-vs-2012-law-framing-shift
+      - TNLP-CONTROVERSY-tn-2012-teacher-protection-act
+    designPrinciples: []
+    contentAnchors: ["Our Mind"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: TNLP-PRINCIPLE-an-unenforced-or-untested-law-is-still-a-real-mandate
+    slug: an-unenforced-or-untested-law-is-still-a-real-mandate
+    label: A law nobody has prosecuted under, or ever invoked, is still a real curriculum mandate worth documenting precisely
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-TN
+    statement: >
+      The Butler Act itself was enforced exactly once (Scopes) in its
+      42-year life, by its own governor's admission expected never to be
+      used at all. The 2012 Teacher Protection Act, per this repo's own
+      research, has apparently never been invoked in a documented case
+      either. Neither fact makes either law less real as a legal
+      requirement teachers and districts must account for -- a curriculum-
+      policy archive's job is to document what a jurisdiction's law actually
+      says and requires, independent of how often, or whether, it has ever
+      been tested in practice.
+    rationale: >
+      Worth stating explicitly because it would be easy to under-document a
+      law that "doesn't seem to matter" in daily practice. Tennessee's own
+      history argues the opposite: an unenforced law can still produce a
+      landmark national trial decades after its passage (nobody enforcing
+      the Butler Act in 1925 predicted Scopes), and a currently-untested law
+      can still be cited by this exact kind of archive as live, binding, and
+      worth tracking for exactly that reason.
+    groundedIn:
+      - TNLP-MANDATE-butler-act-1925
+      - TNLP-MANDATE-tn-2012-teacher-protection-act
+      - TNLP-CONTROVERSY-tn-2012-teacher-protection-act
+    designPrinciples: []
+    contentAnchors: []
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: TNLP-PRINCIPLE-the-scopes-trial-is-itself-teachable-history-of-science-content
+    slug: the-scopes-trial-is-itself-teachable-history-of-science-content
+    label: The Scopes Trial is a real, concrete case study in how scientific consensus and public institutions actually interact under pressure
+    domain: interdisciplinary-curriculum-design
+    jurisdictionScope: US-TN
+    statement: >
+      A hundred years on, Tennessee's own Scopes Trial -- an engineered test
+      case, a media circus, a courtroom cross-examination of a public
+      figure's own literalist beliefs, and a conviction reversed on a
+      technicality rather than a verdict on the science -- is exactly the
+      kind of worked example OpenEvo's Nature of Science and civic-reasoning
+      goals can draw on directly: how a legal system, a press corps, and a
+      scientific community actually responded to a real controversy, not a
+      hypothetical one. The repeated recurrence of the same underlying
+      question in 1973 and 2012 extends the lesson: this is not a closed,
+      one-time historical event but a documented, recurring pattern a
+      student can trace across a full century using this repo's own
+      recurrenceOf chain.
+    rationale: >
+      Same underlying payoff florida-lpm's own equivalent principle names:
+      once a controversy is modeled as a structured record rather than left
+      as prose, it becomes something a curriculum designer can build a
+      lesson or unit from directly. Tennessee's century-long chain is the
+      single richest version of this payoff in this ecosystem so far.
+    groundedIn:
+      - TNLP-CONTROVERSY-butler-act-and-scopes-trial
+      - TNLP-CONTROVERSY-tn-1973-equal-time-law
+      - TNLP-CONTROVERSY-tn-2012-teacher-protection-act
+    designPrinciples: []
+    contentAnchors: ["Our Mind", "Cultural Diversity"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0

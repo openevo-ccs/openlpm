@@ -125,6 +125,21 @@ REPOS = {
         # "litigation" (the value existed from florida-lpm's founding, with
         # no case yet to use it on).
     },
+    "tennessee-lpm": {
+        "path": ROOT / "curriculum-sources" / "tennessee-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/pennsylvania-lpm
+        "project_slug": "tennessee-curriculum-repository",
+        "project_name": "Tennessee Curriculum Repository",
+        "region_tags": ["US-TN"],
+        "default_jurisdiction": "US-TN",
+        # Single-state repo (like nys_lp/florida-lpm/pennsylvania-lpm) -- no
+        # state_projects sub-split needed. Founded 2026-10-20, same session
+        # as florida-lpm/pennsylvania-lpm, documenting a full century
+        # (1925-2026) of Tennessee evolution-education law: the Butler Act
+        # and Scopes Trial, the 1973 "equal time" law struck down in 1975,
+        # and the 2012 Teacher Protection Act still in force -- the deepest
+        # policy-controversy-record.recurrenceOf chain in this ecosystem
+        # (three links).
+    },
 }
 
 GERMAN_STATE_ISO = {

@@ -1,0 +1,125 @@
+$schema: ../../../../schema/coherence-finding-record.schema.json
+$description: >
+  Empirical findings comparing how Tennessee's legislative approach to
+  evolution instruction changed across a century of recurring statutes. See
+  docs/source-notes/2026-10-20-tennessee-evolution-curriculum-policy-history-research.md.
+
+findings:
+  - id: TNLP-FINDING-butler-act-vs-1973-law-strategy-shift
+    slug: butler-act-vs-1973-law-strategy-shift
+    label: From outright prohibition (1925) to mandated alternative-teaching (1973) -- a real shift in legislative strategy
+    findingType: standard-wording-change-across-editions
+    objects:
+      - jurisdiction: US-TN
+        policyArea: Butler Act (1925)
+        documentDate: "1925-03-21"
+        excerptText: "unlawful for any teacher... to teach any theory that denies the story of the Divine Creation of man as taught in the Bible, and to teach instead that man has descended from a lower order of animals"
+        sourceDocument: Tennessee House Bill No. 185 (1925)
+        accessTier: excerpt-only
+      - jurisdiction: US-TN
+        policyArea: 1973 "equal time" law
+        documentDate: "1973-04-30"
+        excerptText: "commensurate attention to, and an equal amount of emphasis on... the Genesis account in the Bible"
+        sourceDocument: Chapter 377 of the 1973 Public Acts of Tennessee
+        accessTier: excerpt-only
+    summary: >
+      The 1925 Butler Act banned teaching evolution outright. The 1973 law
+      took a structurally different approach: it did not ban evolution, but
+      required Genesis be taught alongside it with "equal emphasis," and
+      required evolution carry a disclaimer that the Bible did not.
+      Forty-eight years apart, the same underlying goal (protect a biblical
+      account of human origins from being taught as settled over evolution)
+      was pursued through a legislatively different mechanism -- a
+      prohibition replaced by a mandated-alternative-plus-disclaimer
+      approach.
+    policyRelevance: >
+      This is the first link in a pattern that continues into the 2012 law
+      (see TNLP-FINDING-1973-law-vs-2012-law-framing-shift) -- directly
+      supports the recurrenceOf chain in controversies.yaml.
+    testsMandateIds:
+      - TNLP-MANDATE-butler-act-1925
+      - TNLP-MANDATE-tn-1973-equal-time-law
+    relatedControversyIds:
+      - TNLP-CONTROVERSY-butler-act-and-scopes-trial
+      - TNLP-CONTROVERSY-tn-1973-equal-time-law
+    themes: ["evolution", "legislative-strategy-shift", "creationism"]
+    exhaustivenessCaveat: >
+      Based on the two statutes' own text as sourced in this repo's
+      founding research; not an exhaustive review of every intervening bill
+      introduced between 1925 and 1973 (the research found none that passed,
+      but did not claim to have found every one introduced).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Full Butler Act text (todayinsci.com) and Journal of Southern
+        Religion's account of the 1973 law, both fetched and read directly.
+
+  - id: TNLP-FINDING-1973-law-vs-2012-law-framing-shift
+    slug: 1973-law-vs-2012-law-framing-shift
+    label: From explicit religious framing (1973) to secular "critical thinking" framing (2012) -- language softened, underlying goal arguably continuous
+    findingType: standard-wording-change-across-editions
+    objects:
+      - jurisdiction: US-TN
+        policyArea: 1973 "equal time" law
+        documentDate: "1973-04-30"
+        excerptText: "the Genesis account in the Bible"
+        sourceDocument: Chapter 377 of the 1973 Public Acts of Tennessee
+        accessTier: excerpt-only
+      - jurisdiction: US-TN
+        policyArea: 2012 Teacher Protection Act
+        documentDate: "2012-04-10"
+        excerptText: "scientific strengths and scientific weaknesses of existing scientific theories"
+        sourceDocument: Tennessee Code Annotated S49-6-1030
+        accessTier: excerpt-only
+    summary: >
+      Where the 1973 law named the Bible and Genesis explicitly, the 2012
+      law uses entirely secular-sounding language ("scientific strengths and
+      weaknesses," "critical thinking") and never mentions religion,
+      creationism, or intelligent design by name. Rep. Bill Carter's own
+      1973 framing ("duty bound... since I unsuccessfully opposed the
+      repeal") shows explicit continuity of intent between the 1925 and 1973
+      episodes; no comparably explicit statement of continuity between 1973
+      and 2012 was found in this repo's research, but Tennessee's 2012 law
+      is textually and functionally the same template Louisiana enacted in
+      2008 (the "second state" framing, per NCSE) -- a template designed,
+      nationally, after Kitzmiller v. Dover (2005, see pennsylvania-lpm)
+      specifically to avoid the religious language a court could rule
+      unconstitutional.
+    policyRelevance: >
+      Evidence for why TNLP-CONTROVERSY-tn-2012-teacher-protection-act has
+      never been challenged in court the way the 1973 law was: its careful
+      avoidance of explicit religious language is plausibly a direct,
+      strategic response to Daniel v. Waters' own reasoning (the 1973 law
+      was struck down specifically for its special treatment of "the
+      Genesis account"), not an indication the underlying political goal
+      changed.
+    testsMandateIds:
+      - TNLP-MANDATE-tn-1973-equal-time-law
+      - TNLP-MANDATE-tn-2012-teacher-protection-act
+    relatedControversyIds:
+      - TNLP-CONTROVERSY-tn-1973-equal-time-law
+      - TNLP-CONTROVERSY-tn-2012-teacher-protection-act
+    themes: ["evolution", "legislative-strategy-shift", "academic-freedom-legislation"]
+    exhaustivenessCaveat: >
+      The claim that 2012's secular framing is a deliberate response to
+      Daniel v. Waters' specific legal reasoning is this repo's own
+      interpretive inference, grounded in the two rulings/statutes' own
+      text, not a sourced quotation from a 2012 legislator making that
+      connection explicitly -- flagged as inference, not direct testimony,
+      unlike Rep. Carter's own explicit 1973 continuity statement.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Journal of Southern Religion's account of the 1973 law; Justia's
+        hosting of T.C.A. S49-6-1030; NCSE's coverage of the 2012 law's
+        "second state" status -- all fetched and read directly.
