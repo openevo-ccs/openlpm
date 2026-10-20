@@ -1,0 +1,197 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/florida-lpm/schema/policy-controversy-record.schema.json",
+  "title": "florida-lpm Policy Controversy Record",
+  "description": "A new record type, first authored in this repo (2026-10-20) and intended as a shared ecosystem-wide addition alongside deutsche_lp/nys_lp/india-lpm's existing nine schemas -- a bounded, named public dispute over curriculum policy, with multiple named actors taking opposing or differing positions, real media coverage, and a tracked resolution (or lack of one). None of the existing nine record types model this directly: policy-timeline-event records a single dated fact, institutional-mandate-record records a single authority's requirement, and coherence-finding-record records a textual comparison -- but a real controversy (the 2008 Florida evolution-wording fight, the 2026 proposed-standards fight) is made of many of those, held together by contested stakes, named sides, and press coverage, which is exactly the 'politics' dimension this repo was built to capture. A policy-controversy-record does not duplicate the text of its own timeline events or mandates -- it POINTS at them (via contestedObjects' relatedEventIds/relatedMandateIds) and adds the layer those schemas don't carry: who took which side, what the press said, and whether a recurring fault line connects this episode to an earlier or later one.",
+  "type": "object",
+  "required": [
+    "id", "slug", "label", "jurisdiction", "controversyType", "topicArea",
+    "summary", "dateStart", "status", "contestedObjects", "positions",
+    "verificationStatus", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^FLLP-CONTROVERSY-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md. A sibling repo adopting this schema uses its own prefix (e.g. NYLP-CONTROVERSY-, INLP-CONTROVERSY-, DELP-CONTROVERSY-)."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^US(-[A-Z]{2})?$"
+    },
+    "controversyType": {
+      "type": "string",
+      "enum": [
+        "standards-adoption-fight", "curriculum-content-dispute",
+        "textbook-or-materials-challenge", "legislative-mandate-fight",
+        "personnel-or-appointment-fight", "litigation", "other"
+      ],
+      "description": "'standards-adoption-fight' = a dispute over a governing board's vote to adopt/readopt a standards document (e.g. the 2008 NGSSS 4-3 vote, a 2026 State Board vote). 'curriculum-content-dispute' = a dispute over what specific content should say, short of a formal adoption vote (e.g. public comment on a draft). 'textbook-or-materials-challenge' = a dispute over a specific instructional material, often under a named objection process (e.g. Florida's 2017 instructional-materials-objection statute). 'legislative-mandate-fight' = a dispute over a bill before it becomes a mandate (track the bill itself via a policy-timeline-event with eventType 'legislation'; this record is for the surrounding public fight). 'personnel-or-appointment-fight' = a dispute centered on who holds a decision-making role (e.g. a contested State Board appointment). 'litigation' = a dispute that became or stemmed from a lawsuit."
+    },
+    "topicArea": {
+      "type": "string",
+      "description": "The specific curricular content at stake, in plain language, e.g. 'explicit naming of evolution and natural selection in high-school biology standards'. Not the same as controversyType, which is about the dispute's institutional shape."
+    },
+    "summary": {
+      "type": "string",
+      "description": "Two or three sentences stating what the controversy was actually about and why -- plain language, no jargon, written so it stands on its own without reading the linked records."
+    },
+    "dateStart": { "type": "string", "format": "date" },
+    "dateEnd": {
+      "type": "string",
+      "format": "date",
+      "description": "Omit if unresolved/ongoing as of this record's provenance.date."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "emerging", "active", "resolved-outcome-adopted",
+        "resolved-outcome-rejected", "resolved-compromise",
+        "dormant-unresolved", "recurring"
+      ],
+      "description": "'emerging' = surfacing, not yet a full public fight. 'active' = genuinely in progress as of provenance.date. 'resolved-outcome-adopted' = the change the controversy was fought over went into effect. 'resolved-outcome-rejected' = the change did not happen / the status quo held. 'resolved-compromise' = neither side's full position prevailed (e.g. the 2008 'scientific theory of evolution' wording, which satisfied neither side completely). 'dormant-unresolved' = no longer active but never formally resolved either way. 'recurring' = this specific episode resolved, but recurrenceOf/recurrenceContinuedBy below chain it to a pattern that resurfaces across years -- use alongside one of the resolved-* values, not instead of one, once this episode itself has concluded."
+    },
+    "outcomeSummary": {
+      "type": "string",
+      "description": "What actually happened, in plain language. Required once status is any resolved-* or dormant-unresolved value; may be omitted while status is emerging/active."
+    },
+    "outcomeDate": { "type": "string", "format": "date" },
+    "recurrenceOf": {
+      "type": "array",
+      "description": "Ids of earlier policy-controversy-records this episode is a recurrence/continuation of -- the same underlying fault line resurfacing (e.g. a 2026 standards fight that revisits the exact same wording question the 2008 fight already fought over). This is the field that turns several disconnected episodes into one documented, decades-long pattern -- the core of 'historically' documenting a region's curriculum politics, not just cataloguing isolated incidents.",
+      "items": { "type": "string", "pattern": "^FLLP-CONTROVERSY-[a-z0-9-]+$" }
+    },
+    "recurrenceContinuedBy": {
+      "type": "array",
+      "description": "Ids of later policy-controversy-records that continue this episode's fault line. Usually left for the LATER record's own recurrenceOf to populate instead (avoiding the same link stated twice in two places) -- populate here only if this record is edited after a later episode already exists and the later record's own file is not being touched in the same change.",
+      "items": { "type": "string", "pattern": "^FLLP-CONTROVERSY-[a-z0-9-]+$" }
+    },
+    "contestedObjects": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The actual policy/standard content at stake, pointing at existing records rather than re-quoting their text.",
+      "items": {
+        "type": "object",
+        "required": ["description"],
+        "additionalProperties": false,
+        "properties": {
+          "description": { "type": "string" },
+          "relatedMandateIds": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^FLLP-MANDATE-[a-z0-9-]+$" }
+          },
+          "relatedEventIds": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^FLLP-EVENT-[a-z0-9-]+$" }
+          },
+          "relatedFindingIds": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^FLLP-FINDING-[a-z0-9-]+$" }
+          }
+        }
+      }
+    },
+    "positions": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Who took which side, and what they actually said -- the heart of documenting the politics, not just the policy outcome.",
+      "items": {
+        "type": "object",
+        "required": ["actorLabel", "stance", "stanceSummary"],
+        "additionalProperties": false,
+        "properties": {
+          "actorId": {
+            "type": "string",
+            "pattern": "^FLLP-ACTOR-[a-z0-9-]+$",
+            "description": "Optional link to an institutional-actor-record, where the actor is already modeled there."
+          },
+          "actorLabel": {
+            "type": "string",
+            "description": "Free-text name, always required even when actorId is also given -- a position entry must be readable on its own without resolving a cross-reference. Use this alone for a named individual (a legislator, a board member) not modeled as their own institutional-actor-record."
+          },
+          "stance": {
+            "type": "string",
+            "enum": [
+              "supports-change", "opposes-change", "supports-status-quo",
+              "seeks-compromise", "neutral-fact-finding", "other"
+            ]
+          },
+          "stanceSummary": {
+            "type": "string",
+            "description": "What this actor actually said or did, in plain language -- a real position, not a label. Prefer a short, bounded, attributed quotation where one exists in the source (see sourceUrl/accessTier)."
+          },
+          "sourceUrl": { "type": "string", "format": "uri" },
+          "sourceDate": { "type": "string", "format": "date" },
+          "accessTier": {
+            "type": "string",
+            "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+            "description": "Governs stanceSummary where it contains a direct quotation. Same four values and meaning as this repo's other schemas' identical field."
+          },
+          "licenseOrRightsNote": { "type": "string" }
+        }
+      }
+    },
+    "mediaCoverage": {
+      "type": "array",
+      "description": "Real, named press/media coverage of this controversy -- optional but strongly expected for any well-documented US public controversy, since press coverage is often the only record of how a dispute was actually framed to the public.",
+      "items": {
+        "type": "object",
+        "required": ["outlet", "headline", "url"],
+        "additionalProperties": false,
+        "properties": {
+          "outlet": { "type": "string" },
+          "headline": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "publicationDate": { "type": "string", "format": "date" },
+          "framingNote": {
+            "type": "string",
+            "description": "Optional: how this outlet characterized the controversy, if notable (e.g. a local outlet framing it as a parents'-rights issue vs. a science-education outlet framing it as a standards-rigor issue). A factual observation about framing, not this repo's own editorializing."
+          },
+          "quotedExcerpt": {
+            "type": "string",
+            "description": "A short, bounded direct quotation from the article, if used. Governed by accessTier below -- news reporting is copyrighted; keep this short and clearly attributed."
+          },
+          "accessTier": {
+            "type": "string",
+            "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+            "description": "Governs quotedExcerpt. 'citation-only' (headline + url, no quotedExcerpt) is the safe default for third-party journalism; raise to 'excerpt-only' only for a short, clearly-bounded, attributed quotation."
+          }
+        }
+      }
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Open string list for cross-controversy querying, e.g. ['evolution', 'academic-freedom-legislation', 'standards-adoption']."
+    },
+    "exhaustivenessCaveat": {
+      "type": "string",
+      "description": "Explicit statement of how exhaustive the underlying search was -- required honesty, same convention as coherence-finding-record."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

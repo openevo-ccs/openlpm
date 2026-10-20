@@ -8778,7 +8778,7 @@
         "label": "NCERT's 2023-2024 'rationalisation' deletes evolution/Darwin content nationally",
         "jurisdiction": "IN",
         "eventType": "curriculum-revision-completes",
-        "dateStart": "2023",
+        "dateStart": "2023-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
         "description": "As part of a broader national-textbook \"rationalisation\" exercise, NCERT deleted entire chapters covering Darwin's theory of evolution from its textbooks, alongside separate deletions of Mughal-history and caste-system content. This is a curriculum-content decision, not a new fact about NCERT's copyright/licensing posture (see INLP-EVENT-ncert-license-agreement-perpetual-copyright for that), but directly relevant to this project's evolution-education focus -- and the direct trigger for at least one state's own public pushback (see state/kerala/local_policy/records/timeline.yaml, INLP-EVENT-kerala-rejects-ncert-evolution-deletion).\n",
@@ -8801,7 +8801,7 @@
       },
       "access_tier": "summary-only",
       "license_or_rights_note": "Paraphrased from news coverage of the rationalisation exercise and the state-level reaction to it, not a reproduction of NCERT's own curriculum text or rationalisation notification.\n",
-      "event_date": "2023",
+      "event_date": "2023-01-01",
       "effective_from": null,
       "effective_until": null
     },
@@ -9009,7 +9009,7 @@
         "jurisdiction": "IN-KA",
         "eventType": "pilot-program",
         "temporalStatus": "past-completed",
-        "dateStart": "2013",
+        "dateStart": "2013-01-01",
         "dateGranularity": "year",
         "description": "DSERT built Karnataka Open Educational Resources (KOER) with IT for Change as resource/implementation partner, under the national RMSA (Rashtriya Madhyamik Shiksha Abhiyan) secondary-education scheme. Deliberately scoped at launch to Class IX topics only, in Mathematics, Science, and Social Science, in English and Kannada -- built via a cascading teacher-training model (roughly 30 \"core\" teachers per subject across 19 districts, each training roughly 30 more, who in turn trained teachers at roughly 1,000 high schools), with an explicit stated goal to expand to all classes, subjects, and media of instruction over time. As of 2026-10-02, KOER's own textbook directory shows populated content for Class 8, 9, and 10 -- grown past the original Class-IX-only scope, but still short of the original full-K-12 ambition.\n",
         "involvedActors": [
@@ -9032,7 +9032,7 @@
       },
       "access_tier": "summary-only",
       "license_or_rights_note": "This description is this repo's own paraphrase of KOER's \"Brief note on KOER\" page, itself CC BY-SA 4.0-licensed content, so a fuller excerpt would be safe to add later if useful -- paraphrased here only because a historical-summary record doesn't need verbatim text to be useful.\n",
-      "event_date": "2013",
+      "event_date": "2013-01-01",
       "effective_from": null,
       "effective_until": null
     },
@@ -9582,7 +9582,7 @@
         "label": "Kerala directs schools to keep teaching evolution content NCERT deleted nationally",
         "jurisdiction": "IN-KL",
         "eventType": "curriculum-revision-completes",
-        "dateStart": "2023",
+        "dateStart": "2023-01-01",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
         "description": "Following NCERT's 2023-2024 national \"rationalisation\" exercise, which deleted entire chapters on Darwin's theory of evolution (along with Mughal-history and caste-system content) from national textbooks, Kerala's Chief Minister publicly criticized the deletions and SCERT Kerala directed state schools to continue teaching the removed content, releasing its own supplementary textbooks and forming a review committee. This is a curriculum-content dispute, not a copyright dispute -- Kerala is not asserting a licensing claim here, it is rejecting a national content decision on substantive grounds. Filed as its own event rather than folded into the licensing-history events above because it is a different kind of fact, directly relevant to this project's own evolution-education focus: a real instance of a state-level body actively defending evolution content against removal, not a hypothetical concern.\n",
@@ -9607,7 +9607,7 @@
       "access_tier": "summary-only",
       "license_or_rights_note": "Paraphrased from news coverage (careers360.com reporting on Kerala CM/SCERT statements), not a verbatim reproduction of any curriculum text or official notification.\n",
       "event_date": null,
-      "effective_from": "2023",
+      "effective_from": "2023-01-01",
       "effective_until": null
     },
     {
@@ -9623,7 +9623,7 @@
         "label": "Kerala Curriculum Framework (KCF) 2007 adopted",
         "jurisdiction": "IN-KL",
         "eventType": "curriculum-revision-completes",
-        "dateStart": "2007",
+        "dateStart": "2007-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
         "description": "SCERT Kerala adopted its first Kerala Curriculum Framework (KCF) as a continuation of the National Curriculum Framework (NCF) 2005. KCF 2023's own foreword states the later framework \"builds upon the foundation laid by\" this 2007 version, and names the shared pedagogical commitment directly: \"critical pedagogy and social constructivism as formulated by Vygotsky... had received cardinal importance in the Kerala Curriculum Framework [2007],\" alongside issue-based learning. This repo has not located or read the original 2007 document itself (only KCF 2023's own description of it, plus an independent peer-reviewed case study corroborating the same characterization) -- see the coherence-finding and principle records this event grounds for what that pedagogical stance does and does not extend to.\n",
@@ -9647,8 +9647,8 @@
       "access_tier": "summary-only",
       "license_or_rights_note": "Summarized from KCF 2023's own description of its predecessor and from an independent peer-reviewed secondary source. This is not from a direct read of the 2007 document itself.\n",
       "event_date": null,
-      "effective_from": "2007",
-      "effective_until": "2023"
+      "effective_from": "2007-01-01",
+      "effective_until": "2023-01-01"
     },
     {
       "project_id": null,
@@ -9663,7 +9663,7 @@
         "label": "Kerala Curriculum Framework (KCF) 2023 adopted, explicitly as a state-level alternative to NEP 2020",
         "jurisdiction": "IN-KL",
         "eventType": "curriculum-revision-completes",
-        "dateStart": "2023",
+        "dateStart": "2023-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
         "supersedes": "INLP-EVENT-kcf-2007-adopted",
@@ -9689,7 +9689,7 @@
       "access_tier": "summary-only",
       "license_or_rights_note": "Summarized/paraphrased from the official KCF 2023 PDF and from news coverage of it -- the one directly quoted sentence above (on NEP 2020) is a short excerpt used for precise, checkable attribution. It is not a substitute for the document itself, and no attempt is made here to reproduce the document at length.\n",
       "event_date": null,
-      "effective_from": "2023",
+      "effective_from": "2023-01-01",
       "effective_until": null
     },
     {
@@ -9705,7 +9705,7 @@
         "label": "Eklavya Model Residential School (EMRS), Pookode, Wayanad established",
         "jurisdiction": "IN-KL",
         "eventType": "implementation-begins",
-        "dateStart": "1997",
+        "dateStart": "1997-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
         "description": "One of Kerala's two Eklavya Model Residential Schools under the central Ministry of Tribal Affairs scheme (the other, EMRS Painavu, is in Idukki district) -- a residential (boarding) school specifically for Scheduled Tribe students, run on the Jawahar Navodaya Vidyalaya model. Nationally, EMRS serves from Class VI onward. This is one of the concrete institutional answers to this project's own framing question -- where forest-area tribal children who board away from their families actually attend school -- though this repo has not yet directly read the Ministry's own EMRS list PDF to confirm the exact establishment year or current status of either Kerala school.\n",
@@ -9728,7 +9728,7 @@
       },
       "access_tier": "citation-only",
       "license_or_rights_note": "Named and dated from secondary school-directory pages describing the central government's own EMRS list. This is not from this repo's own read of that primary PDF.\n",
-      "event_date": "1997",
+      "event_date": "1997-01-01",
       "effective_from": null,
       "effective_until": null
     },
@@ -9785,7 +9785,7 @@
         "label": "Samagra Shiksha Kerala translates First Bell / produces mother-tongue video lessons for tribal students during COVID-19 closures",
         "jurisdiction": "IN-KL",
         "eventType": "pilot-program",
-        "dateStart": "2020-06",
+        "dateStart": "2020-06-01",
         "dateGranularity": "month",
         "temporalStatus": "past-completed",
         "description": "During 2020 COVID-19 school closures, Samagra Shiksha Kerala (SSK) produced mother-tongue video lessons for tribal Class 1 students, distributed via a dedicated YouTube channel, WhatsApp parent groups, and community-centre televisions, with mother-tongue mentor teachers from the same communities preparing/recording lessons. This repo found the effort described under two different names in independent news coverage, with inconsistent scope details, and is deliberately recording that inconsistency rather than resolving it by guessing: one report (Outlook India, naming SSA Director Dr. A.P. Kuttikrishnan) calls it \"Namath Basai,\" piloted first in Attappady (Irula, Muduka, Kurumba languages) and extended to Wayanad and Idukki, covering six languages (Kattunayikka, Paniya, Adiya, Kurichiya, Oorali, Kuruma) with 241 teachers and 60 volunteers in Wayanad alone; another report (The News Minute) calls a July 2020 Wayanad-area effort \"Mazhavil Poovu,\" translating Class 1 First Bell lessons for about 25,000 students, with differing counts elsewhere of six vs. ten dialects/communities covered. These may be the same programme described inconsistently by different outlets, or two related but distinct efforts -- this repo could not resolve which from the sources read this session.\n",
@@ -9808,7 +9808,7 @@
       },
       "access_tier": "summary-only",
       "license_or_rights_note": "Summarized from two independently-read news articles (Outlook India; The News Minute). This is not from an SSK or SCERT program document.\n",
-      "event_date": "2020-06",
+      "event_date": "2020-06-01",
       "effective_from": null,
       "effective_until": null
     },
@@ -9825,7 +9825,7 @@
         "label": "\"Gothrabandhu\" tribal mentor-teacher programme launched",
         "jurisdiction": "IN-KL",
         "eventType": "pilot-program",
-        "dateStart": "2017",
+        "dateStart": "2017-04-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
         "description": "Samagra Shiksha Kerala launched \"Gothrabandhu\" in the 2017-18 academic year: locally recruited, tribal-background mentor-teachers fluent in Malayalam and a local tribal dialect, placed into primary schools with tribal students specifically to reduce dropout and address the language barrier between home language and Malayalam- medium instruction. Reported active in Wayanad, Attappady block (Palakkad) and Nilambur, with around 267 mentor-teachers appointed at one point. A later (2025) report describes legal/administrative delays affecting continued appointments, which this repo could not independently verify (the source describing it returned an access error this session) -- recorded as current-in-progress on the strength of the 2020 reporting, with the 2025 delay noted as an open question about current (2026) status.\n",
@@ -9849,7 +9849,7 @@
       "access_tier": "summary-only",
       "license_or_rights_note": "Summarized from The Caravan's reporting, a reputable long-form Indian investigative outlet, read directly this session.\n",
       "event_date": null,
-      "effective_from": "2017",
+      "effective_from": "2017-04-01",
       "effective_until": null
     },
     {
@@ -9921,6 +9921,2221 @@
       "access_tier": "excerpt-only",
       "license_or_rights_note": "The one quoted phrase (\"just compiled facts\") is a third party's (APD's) public objection, quoted briefly for identification -- ordinary journalistic/commentary quotation, not a reproduction of Balbharati's own curriculum content. The fee figures themselves are factual/numeric, not copyrightable expression.\n",
       "event_date": "2020-10-26",
+      "effective_from": null,
+      "effective_until": null
+    }
+  ],
+  "florida-lpm": [
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-ncse",
+      "title": "National Center for Science Education (NCSE)",
+      "content": {
+        "id": "FLLP-ACTOR-ncse",
+        "slug": "ncse",
+        "label": "National Center for Science Education (NCSE)",
+        "actorType": "nonprofit-curriculum-organization",
+        "jurisdiction": "US",
+        "role": "National nonprofit defending the teaching of evolution and climate science in US public schools. The single most consistent, longest-running named institutional voice on Florida's evolution-curriculum fights, from the 2007-08 NGSSS episode (contemporaneous reporting) through the 2026 proposed-standards fight (three 2026 posts by Deputy Director Glenn Branch, including the article that prompted this repo's founding). NCSE's Board Chair, Kenneth R. Miller, is also a co-author of a Florida-adopted biology textbook directly affected by the 2024 textbook-review climate-content removal.\n",
+        "currentHolder": {
+          "name": "Glenn Branch",
+          "title": "Deputy Director",
+          "asOf": "2026-10-20"
+        },
+        "url": "https://ncse.ngo",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE's own site (ncse.ngo) and its 2026 articles, fetched and read directly by this repo's founding research session. See docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-discovery-institute",
+      "title": "Discovery Institute (Center for Science and Culture)",
+      "content": {
+        "id": "FLLP-ACTOR-discovery-institute",
+        "slug": "discovery-institute",
+        "label": "Discovery Institute (Center for Science and Culture)",
+        "actorType": "think-tank",
+        "jurisdiction": "US",
+        "role": "National intelligent-design-promoting think tank. Authored the model \"Academic Freedom Act\" statute (posted at academicfreedompetition.com) that Florida's 2008 SB 2692/HB 1483 followed closely, and the same template later enacted in Louisiana (2008) and Tennessee (2012). A Discovery Institute representative appeared at a closed March 2008 press event hosted by Rep. Alan Hays for Florida legislators. Already modeled as group:discovery-institute in openevo-graph's own dispute graph (og:dispute:openevo-vs-discovery-institute) for a separate, scientific-content dispute (the bacterial-flagellum/Kitzmiller case) -- this record is the same real-world institution, referenced here for its distinct role in Florida's *legislative* history specifically, not a duplicate or conflicting characterization.\n",
+        "url": "https://www.discovery.org",
+        "relatedActors": [],
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Discovery Institute's own site (discovery.org/a/4510/) and Evolution News (evolutionnews.org/2008/03/prepared_remarks_for_florida_a/), both cited directly in this repo's founding research. See docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-fordham-institute",
+      "title": "Thomas B. Fordham Institute (formerly Foundation)",
+      "content": {
+        "id": "FLLP-ACTOR-fordham-institute",
+        "slug": "thomas-b-fordham-institute",
+        "label": "Thomas B. Fordham Institute (formerly Foundation)",
+        "actorType": "think-tank",
+        "jurisdiction": "US",
+        "role": "National education-policy think tank that periodically grades every US state's K-12 science standards. Gave Florida's pre-2008 standards an \"F\" in its 2005 report (The State of State Science Standards 2005, lead author Paul R. Gross) for avoiding \"the E-word,\" and reviewed the post-2019 B.E.S.T. Standards in 2020 (ELA/Math only -- science was not rewritten that cycle, so Fordham's 2020 review has no science content). A 2012 50-state regrade reportedly also covered Florida's NGSSS, though the exact before/after grade (an unconfirmed \"D-then-revised-to-C\") was not independently verified this session.\n",
+        "url": "https://fordhaminstitute.org",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Fordham's own 2005/2012 PDFs were not independently fetched this session -- the organization's existence/role is well-confirmed, but the exact Florida-specific grades/wording should be checked against edexcellence.net directly before being quoted verbatim anywhere.\n",
+          "sourceProvenance": "Referenced via NCSE's own articles (ncse.ngo/evolution-comes-floridas-science-standards, ncse.ngo/evolution-florida-state-science-standards) and Education Week (edweek.org/teaching-learning/many-states-receive-d-or-f-in-review-of-science-standards/2012/02), not fetched from Fordham's own site directly this session.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-national-academy-of-sciences",
+      "title": "National Academy of Sciences (NAS)",
+      "content": {
+        "id": "FLLP-ACTOR-national-academy-of-sciences",
+        "slug": "national-academy-of-sciences",
+        "label": "National Academy of Sciences (NAS)",
+        "actorType": "professional-association",
+        "jurisdiction": "US",
+        "role": "Sent a letter endorsing the original (pre-\"scientific theory of\" compromise) draft of Florida's 2008 NGSSS, cited directly by Florida State Board member Roberto Martinez during the Feb 19, 2008 vote.\n",
+        "url": "https://www.nasonline.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" (ncse.ngo/evolution-comes-floridas-science-standards), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-answers-in-genesis",
+      "title": "Answers in Genesis (AiG)",
+      "content": {
+        "id": "FLLP-ACTOR-answers-in-genesis",
+        "slug": "answers-in-genesis",
+        "label": "Answers in Genesis (AiG)",
+        "actorType": "advocacy-body",
+        "jurisdiction": "US",
+        "role": "National young-earth-creationist ministry. Published reactive commentary on Florida's Feb 2008 NGSSS vote (quoting NCSE's Eugenie Scott) but this repo's research found NO evidence of direct involvement in shaping Florida's standards or legislation -- its role in Florida's history specifically was commentary-only, distinct from Discovery Institute's direct legislative-template role. Recorded here precisely to document that absence of involvement, not to overstate its role.\n",
+        "url": "https://answersingenesis.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Answers in Genesis's own site, \"Florida Now Supports Teaching Evolution\" (Feb 23, 2008), answersingenesis.org/public-school/science-standards/florida-now-supports-teaching-evolution/, fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-PRINCIPLE-explicit-naming-outlasts-euphemism",
+      "title": "Standards that name a contested concept explicitly are more durable than standards that gesture at it euphemistically",
+      "content": {
+        "id": "FLLP-PRINCIPLE-explicit-naming-outlasts-euphemism",
+        "slug": "explicit-naming-outlasts-euphemism",
+        "label": "Standards that name a contested concept explicitly are more durable than standards that gesture at it euphemistically",
+        "domain": "computational-curriculum-studies",
+        "jurisdictionScope": "US-FL",
+        "statement": "When a curriculum standard avoids naming a scientifically settled but politically contested concept directly -- using a vaguer substitute phrase instead of the term itself -- that avoidance does not resolve the underlying political pressure; it just defers the fight to the next revision cycle, at a cost paid by whichever cohort of students sits between editions. Florida's own record is the clearest evidence for this available anywhere in this ecosystem: standards that avoided \"evolution\" (pre-2008) were graded academically unsound by name; the standards that then explicitly named it, even in hedged form, held for eighteen years; and the current proposal to drop explicit naming again is being criticized in the same terms the 2005 Fordham review used against the pre-2008 standards. A standards body gains nothing durable by euphemism -- only a shorter interval before the same argument recurs.\n",
+        "rationale": "This is not a claim that explicit naming settles the underlying political disagreement -- it doesn't, and Florida's 2008 compromise (\"the scientific theory of evolution\") shows a state can name a concept explicitly while still hedging around it. The claim is narrower and empirical: avoidance is not even a stable truce. It is simply the shortest-lived of the three postures a standards document can take (avoid, hedge, name plainly), based on the one case this ecosystem has tracked across four decades.\n",
+        "groundedIn": [
+          "FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift",
+          "FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming",
+          "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight",
+          "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission",
+          "FLLP-MANDATE-ngsss-2008-sc912l15-standard"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [
+          "Our Mind"
+        ],
+        "conceptRefs": [],
+        "status": "draft",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-PRINCIPLE-standards-committees-need-proportionate-disciplinary-expertise",
+      "title": "A standards-writing committee needs disciplinary experts proportionate to what it is writing standards for",
+      "content": {
+        "id": "FLLP-PRINCIPLE-standards-committees-need-proportionate-disciplinary-expertise",
+        "slug": "standards-committees-need-proportionate-disciplinary-expertise",
+        "label": "A standards-writing committee needs disciplinary experts proportionate to what it is writing standards for",
+        "domain": "computational-curriculum-studies",
+        "jurisdictionScope": "US-FL",
+        "statement": "A committee asked to write K-12 science standards should include enough working scientists and science educators that the document's scientific framing is actually load-bearing in the room, not a single voice outnumbered seventeen to one. Florida's 2026 draft was written by an 18-person committee with exactly one science-education professional on it -- the rest school-district employees -- at the same time FLDOE reportedly has no K-12 science specialists on its own staff. This is a staffing-composition fact, independent of what the resulting standards actually say, and it is a predictable risk factor for exactly the kind of gap (a 1,000-benchmark document a national science-education organization calls \"a mile wide and an inch deep\") that followed.\n",
+        "rationale": "This principle deliberately stops short of asserting the committee composition CAUSED the specific omissions reported in the 2026 draft -- that causal claim isn't something this repo's research established, and asserting it would overstate what's actually known. What IS established is the staffing fact itself, confirmed by FLDOE's own named officials (Patricia Duncan, Alicia Foy). A review process this thin on subject-matter expertise is a structural risk condition worth naming on its own terms.\n",
+        "groundedIn": [
+          "FLLP-EVENT-2026-standards-review-process-begins",
+          "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [],
+        "conceptRefs": [],
+        "status": "draft",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-principle-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-PRINCIPLE-documented-controversy-is-teachable-nature-of-science-content",
+      "title": "A well-documented, decades-long curriculum controversy is itself legitimate classroom content, not just background politics to route around",
+      "content": {
+        "id": "FLLP-PRINCIPLE-documented-controversy-is-teachable-nature-of-science-content",
+        "slug": "documented-controversy-is-teachable-nature-of-science-content",
+        "label": "A well-documented, decades-long curriculum controversy is itself legitimate classroom content, not just background politics to route around",
+        "domain": "interdisciplinary-curriculum-design",
+        "jurisdictionScope": "US-FL",
+        "statement": "Florida's own evolution-standards history -- a real, four-decade, multiply-recurring public fight over what a state is willing to name in its own science standards -- is a concrete, well-sourced case study in how scientific consensus, institutional governance, and organized public pressure actually interact. Rather than treating this history as noise to be kept out of the classroom, a curriculum designed around OpenEvo's Nature of Science and civic-reasoning goals can use Florida's own documented record (who took which position, what changed, what didn't) as a worked example of how a real governing body resolves -- or fails to resolve -- a contested empirical question under public pressure, distinct from and in addition to teaching the underlying biology itself.\n",
+        "rationale": "This is the practical payoff of building policy-controversy-record in the first place: once a controversy is modeled as a structured record (named positions, real press coverage, a tracked outcome) rather than left as prose, it becomes something a curriculum designer can actually build a lesson or discussion unit from, not just background context a teacher has to research independently.\n",
+        "groundedIn": [
+          "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight",
+          "FLLP-CONTROVERSY-2017-hb989-textbook-challenges",
+          "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission"
+        ],
+        "designPrinciples": [],
+        "contentAnchors": [
+          "Our Mind",
+          "Cultural Diversity"
+        ],
+        "conceptRefs": [],
+        "status": "draft",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift",
+      "title": "Florida's standards shifted from avoiding the word \"evolution\" (pre-2008) to explicitly naming it (2008)",
+      "content": {
+        "id": "FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift",
+        "slug": "evolution-naming-1996-to-2008-explicitness-shift",
+        "label": "Florida's standards shifted from avoiding the word \"evolution\" (pre-2008) to explicitly naming it (2008)",
+        "findingType": "standard-naming-explicitness-gap",
+        "objects": [
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "1996/1999 Sunshine State Standards, science",
+            "documentDate": "1996-05-01",
+            "excerptText": "biological change over time (reported characterization, not a confirmed verbatim quotation -- see verificationStatus)",
+            "sourceDocument": "Sunshine State Standards (original), Science",
+            "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+            "accessTier": "summary-only"
+          },
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "2008 NGSSS, SC.912.L.15",
+            "documentDate": "2008-02-19",
+            "excerptText": "the scientific theory of evolution... the fundamental concept underlying all of biology",
+            "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science",
+            "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+            "accessTier": "excerpt-only"
+          }
+        ],
+        "summary": "Florida's original (1996/1999) science standards reportedly never used the word \"evolution,\" using only \"biological change over time\" instead; the 2008 NGSSS was the first Florida standards document to use \"evolution\" explicitly, and the Fordham Foundation's 2005 review (which prompted much of the pressure for the 2008 rewrite) specifically graded the pre-2008 standards an \"F\" for this avoidance.\n",
+        "policyRelevance": "Establishes the baseline the 2026 draft is now being compared against -- critics of the 2026 draft (see FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission) are explicitly framing the omission as \"moving backward\" to a pre-2008 pattern, not merely a new development.\n",
+        "testsMandateIds": [
+          "FLLP-MANDATE-ngsss-2008-sc912l15-standard"
+        ],
+        "relatedControversyIds": [
+          "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight"
+        ],
+        "themes": [
+          "evolution",
+          "standards-wording",
+          "naming-explicitness"
+        ],
+        "exhaustivenessCaveat": "The 1996/1999 side of this comparison rests on secondary-source characterization (the Winn quote, Fordham's 2005 review as cited by NCSE), not a primary document read directly this session -- see source-notes confidence flags 1-2. Treat the 1996/1999 object above as provisional until the original text is located.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" and \"Evolution in the Florida state science standards,\" both fetched and read directly; 1996/1999 side via AI-synthesized secondary-source summary.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-FINDING-best-standards-2020-science-untouched",
+      "title": "The 2019-2020 B.E.S.T. Standards rewrite did not touch science -- SC.912.L.15 remained 2008-era text until 2026",
+      "content": {
+        "id": "FLLP-FINDING-best-standards-2020-science-untouched",
+        "slug": "best-standards-2020-science-untouched",
+        "label": "The 2019-2020 B.E.S.T. Standards rewrite did not touch science -- SC.912.L.15 remained 2008-era text until 2026",
+        "findingType": "benchmark-removed-or-added-across-editions",
+        "objects": [
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "B.E.S.T. Standards (2020)",
+            "documentDate": "2020-02-12",
+            "excerptText": "",
+            "sourceDocument": "FLDOE B.E.S.T. Standards Overview (July 20, 2020)",
+            "sourceUrl": "https://www.fldoe.org/file/7576/BESTStandardsOverview.pdf",
+            "accessTier": "citation-only"
+          },
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "NGSSS SC.912.L.15 (2008, still in force through 2020)",
+            "documentDate": "2008-02-19",
+            "excerptText": "",
+            "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science",
+            "accessTier": "citation-only"
+          }
+        ],
+        "summary": "Florida's 2019-2020 \"B.E.S.T. Standards\" rewrite (prompted by Gov. DeSantis's Executive Order 19-32 eliminating Common Core) covered English Language Arts and Mathematics only. Science standards, including the 2008 evolution benchmarks, were not touched by that process and remained in force unchanged until the 2026 rewrite -- confirming an 18-year gap (2008-2026) in Florida science-standards revision, not the shorter gap a casual reading of \"B.E.S.T. Standards\" news coverage from 2020 might suggest.\n",
+        "policyRelevance": "Corrects a plausible misreading: Florida's evolution-standards content did not change in 2019-2020. The 2026 rewrite is genuinely the first science-specific revision since the 2008 NGSSS vote, which is why its outcome carries the weight it does.\n",
+        "testsMandateIds": [
+          "FLLP-MANDATE-ngsss-2008-sc912l15-1",
+          "FLLP-MANDATE-ngsss-2008-sc912l15-standard"
+        ],
+        "themes": [
+          "standards-revision-cycle",
+          "scope-of-rewrite"
+        ],
+        "exhaustivenessCaveat": "Based on FLDOE's own Overview document and the Fordham Institute's 2020 review (confirmed to exist and to cover ELA/Math only via search, not independently re-fetched in full this session) -- not a line-by-line diff of the full 2020 B.E.S.T. rulemaking record.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "FLDOE B.E.S.T. Standards Overview (fldoe.org/file/7576/BESTStandardsOverview.pdf); Fordham Institute, \"The State of the Sunshine State Standards: Florida's B.E.S.T. Edition\" (June 2020, ERIC ED606003).\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "coherence-finding-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming",
+      "title": "The 2026 draft standards omit explicit naming of both \"evolution\" and \"climate change,\" reversing 2008's explicit-naming approach",
+      "content": {
+        "id": "FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming",
+        "slug": "2026-draft-omits-evolution-and-climate-explicit-naming",
+        "label": "The 2026 draft standards omit explicit naming of both \"evolution\" and \"climate change,\" reversing 2008's explicit-naming approach",
+        "findingType": "standard-wording-change-across-editions",
+        "objects": [
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "2008 NGSSS, SC.912.L.15",
+            "documentDate": "2008-02-19",
+            "excerptText": "the scientific theory of evolution... the fundamental concept underlying all of biology",
+            "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "jurisdiction": "US-FL",
+            "policyArea": "2026 draft high-school life-science standards",
+            "documentDate": "2026-09-25",
+            "excerptText": "",
+            "sourceDocument": "Draft 2026 Florida K-12 Science Standards",
+            "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "accessTier": "citation-only"
+          }
+        ],
+        "summary": "Where the 2008 NGSSS explicitly named \"evolution\" as \"the fundamental concept underlying all of biology,\" the 2026 draft does not use the word \"evolution\" anywhere in its high-school life-science standards, and does not use \"climate change\"/\"global warming\" anywhere in the entire document -- a reversal of the 2008 standards' explicit-naming approach for both concepts, per multiple named teacher/science-specialist reviewers at public-comment sessions.\n",
+        "policyRelevance": "This is the specific textual claim underlying FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission. Note this finding currently rests on reporting ABOUT the draft, not a direct read of the draft text itself (see exhaustivenessCaveat) -- upgrading this finding to primary-source-confirmed is the single highest-value follow-up action for this repo.\n",
+        "testsMandateIds": [
+          "FLLP-MANDATE-ngsss-2008-sc912l15-standard",
+          "FLLP-MANDATE-2026-draft-science-standards-evolution-omission"
+        ],
+        "relatedControversyIds": [
+          "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission"
+        ],
+        "themes": [
+          "evolution",
+          "climate-change",
+          "standards-wording",
+          "naming-explicitness"
+        ],
+        "exhaustivenessCaveat": "Based on named reviewers' public-comment-session characterizations as reported by WUSF, Florida Phoenix, and NCSE -- not a direct line-by-line read of the draft standards document itself, which could not be fetched this session (fldoe.org/standardsreview/ returned HTTP 403).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "WUSF (Nancy Guan, Sept 30 2026), Florida Phoenix (Jay Waagmeester, Oct 14 2026), NCSE (Glenn Branch, Oct 2 and Oct 9 2026) -- all fetched and read directly; all are reporting about the draft rather than the draft text itself.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-controversy-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight",
+      "title": "The 2008 fight over explicitly naming evolution in the Next Generation Sunshine State Standards",
+      "content": {
+        "id": "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight",
+        "slug": "2008-ngsss-evolution-wording-fight",
+        "label": "The 2008 fight over explicitly naming evolution in the Next Generation Sunshine State Standards",
+        "jurisdiction": "US-FL",
+        "controversyType": "standards-adoption-fight",
+        "topicArea": "Whether Florida's science standards should explicitly name \"evolution\" at all, and if so, whether the word must be qualified by \"the scientific theory of.\"\n",
+        "summary": "FLDOE's October 2007 draft standards were the first in Florida's history to explicitly use the word \"evolution.\" Organized religious-right opposition (Focus on the Family, the Florida Baptist Witness, the Florida Family Policy Council, at least 12 county school boards) pushed back through late 2007, while Florida Citizens for Science led a public counter-campaign defending the draft, backed by the National Academy of Sciences and other scientific bodies. Days before the Feb 19, 2008 vote, under pressure, the State Board had the draft redrafted to insert \"the scientific theory of\" before \"evolution\" as a last-minute compromise, which the Board then adopted 4-3.\n",
+        "dateStart": "2007-10-19",
+        "dateEnd": "2008-02-19",
+        "status": "resolved-compromise",
+        "outcomeSummary": "The State Board adopted the standards with \"the scientific theory of\" qualifier inserted before \"evolution\" (and before several other scientific theories/laws) -- the first explicit naming of evolution in Florida's standards, but in a hedged form that satisfied neither side fully: opponents wanted evolution presented as contestable, while board member Roberto Martinez and the original writing committee considered the qualifier an unnecessary, \"watered down\" concession.\n",
+        "outcomeDate": "2008-02-19",
+        "recurrenceOf": [],
+        "contestedObjects": [
+          {
+            "description": "Whether SC.912.L.15 and related benchmarks should name \"evolution\" explicitly, and whether that name should be qualified by \"the scientific theory of.\"\n",
+            "relatedMandateIds": [
+              "FLLP-MANDATE-ngsss-2008-sc912l15-1",
+              "FLLP-MANDATE-ngsss-2008-sc912l15-standard"
+            ],
+            "relatedEventIds": [
+              "FLLP-EVENT-fldoe-2007-draft-standards-released",
+              "FLLP-EVENT-county-school-board-resolutions-2007",
+              "FLLP-EVENT-ngsss-2008-state-board-vote"
+            ],
+            "relatedFindingIds": [
+              "FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift"
+            ]
+          }
+        ],
+        "positions": [
+          {
+            "actorId": "FLLP-ACTOR-florida-citizens-for-science",
+            "actorLabel": "Florida Citizens for Science (Brandon Haught, co-founder)",
+            "stance": "supports-change",
+            "stanceSummary": "Defended the original draft's unqualified use of \"evolution,\" organized a 1,700+-signature petition, and called the adopted compromise \"a huge step forward for our Florida schools\" despite the hedged wording.\n",
+            "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+            "sourceDate": "2008-02-19",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-florida-family-policy-council",
+            "actorLabel": "Florida Family Policy Council (John Stemberger)",
+            "stance": "opposes-change",
+            "stanceSummary": "Organized opposition to the draft's explicit naming of evolution, part of the same push that led to the 2008 \"Academic Freedom Act\" legislative fight.\n",
+            "sourceUrl": "https://www.discovery.org/a/4510/",
+            "sourceDate": "2008-01-01",
+            "accessTier": "summary-only"
+          },
+          {
+            "actorLabel": "Roberto Martinez (Florida State Board of Education member)",
+            "stance": "other",
+            "stanceSummary": "Voted NO on the adopted compromise -- not because he opposed naming evolution, but because he considered the late \"scientific theory of\" qualifier an unnecessary watering-down of the original, scientifically stronger draft the National Academy of Sciences had endorsed: \"What we have here is an effort by people to water down our standards.\"\n",
+            "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+            "sourceDate": "2008-02-19",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorLabel": "Donna Callaway (Florida State Board of Education member)",
+            "stance": "opposes-change",
+            "stanceSummary": "Voted NO on the adopted compromise from the opposite direction, having pushed for a further \"critical analysis\" amendment to the evolution standard that did not pass.\n",
+            "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+            "sourceDate": "2008-02-19",
+            "accessTier": "summary-only"
+          }
+        ],
+        "mediaCoverage": [
+          {
+            "outlet": "Education Week",
+            "headline": "Fla. Panel's Evolution Vote Hailed",
+            "url": "https://www.edweek.org/teaching-learning/fla-panels-evolution-vote-hailed/2008/02",
+            "publicationDate": "2008-02-19",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "Science",
+            "headline": "Florida Standards Support Evolution\u2014With a Twist",
+            "url": "https://www.science.org/doi/10.1126/science.319.5867.1168",
+            "publicationDate": "2008-02-29",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "NBC News",
+            "headline": "Florida adopts 'scientific theory of evolution'",
+            "url": "https://www.nbcnews.com/news/amp/wbna23238493",
+            "publicationDate": "2008-02-19",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "Answers in Genesis",
+            "headline": "Florida Now Supports Teaching Evolution",
+            "url": "https://answersingenesis.org/public-school/science-standards/florida-now-supports-teaching-evolution/",
+            "publicationDate": "2008-02-23",
+            "framingNote": "Reactive commentary, not involvement in the Florida fight itself -- expressed hope that \"teachers will still end up treading quite carefully\" despite the standards' adoption.\n",
+            "accessTier": "citation-only"
+          }
+        ],
+        "themes": [
+          "evolution",
+          "standards-adoption",
+          "scientific-theory-wording"
+        ],
+        "exhaustivenessCaveat": "Built from NCSE's contemporaneous articles and the news sources they cite; the full set of 12+ county school-board resolutions was not individually verified (modeled as one combined timeline event).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" and \"The e-word arrives in Florida,\" both fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2007-10-19",
+      "effective_until": "2008-02-19"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-controversy-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CONTROVERSY-2008-academic-freedom-act-legislative-fight",
+      "title": "The 2008 \"Academic Freedom Act\" (SB 2692/HB 1483) legislative fight",
+      "content": {
+        "id": "FLLP-CONTROVERSY-2008-academic-freedom-act-legislative-fight",
+        "slug": "2008-academic-freedom-act-legislative-fight",
+        "label": "The 2008 \"Academic Freedom Act\" (SB 2692/HB 1483) legislative fight",
+        "jurisdiction": "US-FL",
+        "controversyType": "legislative-mandate-fight",
+        "topicArea": "Whether Florida law should require \"critical analysis\" of evolution be taught alongside it, via a Discovery-Institute-template \"Academic Freedom Act.\"\n",
+        "summary": "Running concurrently with the NGSSS standards fight, Sen. Ronda Storms and Rep. Alan Hays introduced companion bills modeled on Discovery Institute's template \"Academic Freedom Act\" legislation (the same template Louisiana enacted in June 2008 and Tennessee enacted in 2012). The House passed a substituted version 71-43, but the Senate rejected the substitution and the bill died in a standoff at the end of the 2008 session.\n",
+        "dateStart": "2008-01-01",
+        "dateEnd": "2008-05-02",
+        "status": "resolved-outcome-rejected",
+        "outcomeSummary": "The bill died without becoming law -- the House and Senate could not agree on which chamber's version to send to the Governor, and the session ended with no further action. Unlike the near-simultaneous NGSSS standards fight (which produced an adopted compromise), this legislative push produced no change to Florida law.\n",
+        "outcomeDate": "2008-05-02",
+        "recurrenceOf": [],
+        "contestedObjects": [
+          {
+            "description": "SB 2692 / HB 1483's proposed statutory language requiring \"thorough presentation and critical analysis of the scientific theory of evolution\" in Florida public schools.\n",
+            "relatedEventIds": [
+              "FLLP-EVENT-sb2692-hb1483-2008-academic-freedom-act",
+              "FLLP-EVENT-hb837-2005-academic-freedom-bill-of-rights"
+            ]
+          }
+        ],
+        "positions": [
+          {
+            "actorId": "FLLP-ACTOR-discovery-institute",
+            "actorLabel": "Discovery Institute",
+            "stance": "supports-change",
+            "stanceSummary": "Authored the model statute the Florida bills followed; a Discovery Institute representative appeared at a closed March 2008 press event for legislators hosted by Rep. Alan Hays.\n",
+            "sourceUrl": "https://www.discovery.org/a/4510/",
+            "sourceDate": "2008-03-01",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-florida-family-policy-council",
+            "actorLabel": "Florida Family Policy Council (John Stemberger)",
+            "stance": "supports-change",
+            "stanceSummary": "Lead public advocate for the bill, citing anecdotal/unnamed claims of teachers facing reprisal for questioning evolution.\n",
+            "sourceUrl": "https://www.discovery.org/a/4510/",
+            "sourceDate": "2008-03-01",
+            "accessTier": "summary-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-florida-citizens-for-science",
+            "actorLabel": "Florida Citizens for Science",
+            "stance": "opposes-change",
+            "stanceSummary": "Publicized and opposed the bill through its own news releases, part of the same organizing effort defending the NGSSS draft.\n",
+            "sourceUrl": "https://www.flascience.org/wp/?p=529",
+            "sourceDate": "2008-03-01",
+            "accessTier": "summary-only"
+          }
+        ],
+        "mediaCoverage": [
+          {
+            "outlet": "Discovery Institute (Evolution News)",
+            "headline": "Prepared Remarks for Florida Academic Freedom Bill Press Conference",
+            "url": "https://evolutionnews.org/2008/03/prepared_remarks_for_florida_a/",
+            "publicationDate": "2008-03-01",
+            "framingNote": "Advocacy-organization framing, supportive of the bill.",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "Panda's Thumb",
+            "headline": "Explore the str[ategy]...",
+            "url": "https://pandasthumb.org/archives/2008/03/explore-the-str.html",
+            "publicationDate": "2008-03-01",
+            "framingNote": "NCSE-adjacent blog, critical framing.",
+            "accessTier": "citation-only"
+          }
+        ],
+        "themes": [
+          "evolution",
+          "academic-freedom-legislation",
+          "legislative-fight"
+        ],
+        "exhaustivenessCaveat": "The exact House/Senate procedural standoff in late April 2008 (Tampa Tribune, April 29 2008) was not independently fetched this session -- see source-notes confidence flag 5.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Discovery Institute's own site, Evolution News, Florida Citizens for Science's news releases, and the Florida Senate's own bill-amendment record -- all fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2008-01-01",
+      "effective_until": "2008-05-02"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-controversy-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CONTROVERSY-2017-hb989-textbook-challenges",
+      "title": "2017-2018 textbook challenges against evolution/climate content under HB 989",
+      "content": {
+        "id": "FLLP-CONTROVERSY-2017-hb989-textbook-challenges",
+        "slug": "2017-hb989-textbook-challenges",
+        "label": "2017-2018 textbook challenges against evolution/climate content under HB 989",
+        "jurisdiction": "US-FL",
+        "controversyType": "textbook-or-materials-challenge",
+        "topicArea": "Whether specific adopted science textbooks' treatment of evolution and/or human-caused climate change should be removed, stickered, or otherwise altered, using HB 989's any-resident-may-object mechanism.\n",
+        "summary": "Within months of HB 989 taking effect, residents in at least three Florida counties (Nassau, Collier, Martin) filed formal objections specifically targeting evolution and/or climate-change content in adopted science textbooks. Nassau County's objection (the first statewide) sought disclaimer stickers; it and the Collier/Martin County objections were all rejected at the school-board level, but the mechanism itself remained in place for future use.\n",
+        "dateStart": "2017-11-01",
+        "dateEnd": "2018-12-31",
+        "status": "resolved-outcome-rejected",
+        "outcomeSummary": "All three known 2017-18 evolution/climate-specific challenges failed at the school-board vote stage (Nassau's sticker proposal voted down; Collier and Martin both failed 3-2) -- the original textbooks were retained unaltered in every case. Florida Citizens for Science reports at least 7 total instructional-materials complaints statewide in HB 989's first 5 months, of which at least 2 specifically targeted evolution/climate content.\n",
+        "outcomeDate": "2018-12-31",
+        "recurrenceOf": [],
+        "contestedObjects": [
+          {
+            "description": "Whether specific adopted biology/science textbooks' evolution and climate-change content should carry disclaimers or be removed from adoption, under HB 989's instructional-materials-objection process.\n",
+            "relatedMandateIds": [
+              "FLLP-MANDATE-hb989-2017-instructional-materials"
+            ],
+            "relatedEventIds": [
+              "FLLP-EVENT-hb989-2017-signed-into-law",
+              "FLLP-EVENT-nassau-county-textbook-challenge-2017",
+              "FLLP-EVENT-collier-martin-county-textbook-challenges-2018"
+            ]
+          }
+        ],
+        "positions": [
+          {
+            "actorLabel": "Nassau County resident objector (name not captured in sources reviewed)",
+            "stance": "opposes-change",
+            "stanceSummary": "Objected to evolution's \"prominent place\" in three textbooks, stating a goal \"to stop the teaching of Darwinian evolution as fact,\" and requested disclaimer stickers.\n",
+            "sourceUrl": "https://www.flascience.org/?p=2997",
+            "sourceDate": "2017-11-01",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-florida-citizens-for-science",
+            "actorLabel": "Florida Citizens for Science",
+            "stance": "supports-status-quo",
+            "stanceSummary": "Tracked and publicized each challenge, supporting the textbooks as adopted and opposing the stickering/removal requests.\n",
+            "sourceUrl": "https://www.flascience.org/?p=3506",
+            "sourceDate": "2018-01-01",
+            "accessTier": "summary-only"
+          }
+        ],
+        "mediaCoverage": [
+          {
+            "outlet": "The World (PRX)",
+            "headline": "Florida allows any resident to challenge textbooks \u2014 and it has some science supporters concerned",
+            "url": "https://theworld.org/stories/2017/09/10/florida-allows-any-resident-challenge-textbooks-and-it-has-some-science",
+            "publicationDate": "2017-09-10",
+            "accessTier": "citation-only"
+          }
+        ],
+        "themes": [
+          "evolution",
+          "climate-change",
+          "textbook-challenge",
+          "instructional-materials-law"
+        ],
+        "exhaustivenessCaveat": "Covers the specific episodes named in sources reviewed (Nassau, Collier, Martin counties); FCS's own count of 7+ total statewide complaints in the first 5 months suggests other, non-evolution-specific challenges this record does not individually enumerate.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Citizens for Science's own reporting (flascience.org/?p=2997, /?p=3506) and The World/PRX (Sept 10 2017) -- all fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2017-11-01",
+      "effective_until": "2018-12-31"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-controversy-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission",
+      "title": "The 2026 fight over omitting \"evolution\" and \"climate change\" from Florida's first science-standards rewrite since 2008",
+      "content": {
+        "id": "FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission",
+        "slug": "2026-proposed-standards-evolution-climate-omission",
+        "label": "The 2026 fight over omitting \"evolution\" and \"climate change\" from Florida's first science-standards rewrite since 2008",
+        "jurisdiction": "US-FL",
+        "controversyType": "standards-adoption-fight",
+        "topicArea": "Whether Florida's proposed 2026 K-12 science standards -- which do not use the word \"evolution\" in high-school life-science content, and do not use \"climate change\"/\"global warming\" anywhere -- should be revised before adoption, and what the omissions mean about the state's intent.\n",
+        "summary": "FLDOE's draft rewrite (the first full science-standards revision since 2008) removes explicit naming of both evolution and climate change, drawing fierce, wide-ranging criticism from teachers, a science specialist, the state teachers' union, and the National Center for Science Education, while FLDOE's own leadership defends the draft as still substantively covering the underlying science. As of this record's provenance date, the dispute is active: a public-comment listening tour is underway and a State Board vote is expected December 2026.\n",
+        "dateStart": "2026-09-25",
+        "status": "active",
+        "recurrenceOf": [
+          "FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight"
+        ],
+        "contestedObjects": [
+          {
+            "description": "Whether the 2026 draft's omission of the word \"evolution\" from high-school life-science standards, and of \"climate change\"/\"global warming\" from the entire document, should be corrected before the State Board's expected December 2026 vote.\n",
+            "relatedMandateIds": [
+              "FLLP-MANDATE-2026-draft-science-standards-evolution-omission",
+              "FLLP-MANDATE-ngsss-2008-sc912l15-standard"
+            ],
+            "relatedEventIds": [
+              "FLLP-EVENT-2026-standards-review-process-begins",
+              "FLLP-EVENT-2026-draft-standards-released-for-comment",
+              "FLLP-EVENT-2026-listening-tour-armwood-hs",
+              "FLLP-EVENT-2026-virtual-statewide-listening-session",
+              "FLLP-EVENT-2026-orange-county-listening-session",
+              "FLLP-EVENT-2026-state-board-vote-expected",
+              "FLLP-EVENT-2024-textbook-climate-content-removal"
+            ],
+            "relatedFindingIds": [
+              "FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming"
+            ]
+          }
+        ],
+        "positions": [
+          {
+            "actorId": "FLLP-ACTOR-fldoe",
+            "actorLabel": "Henry Mack (Florida Education Commissioner)",
+            "stance": "supports-status-quo",
+            "stanceSummary": "Defended the draft as substantively covering evolution and climate science despite the wording concerns: \"We want evolutionary biology in the standards, they are in the standards... My kids are reading Charles Darwin\"; \"We are teaching climate science... Sea level rise is in the standards.\" Separately described the draft's philosophy in explicitly classical/teleological terms: \"Science begins in wonder, not in ideology... Florida's new standards will form students who observe carefully, reason rigorously, and treat the natural world as something given to be known, not invented.\"\n",
+            "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "sourceDate": "2026-09-30",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorLabel": "Patricia Duncan (FLDOE Senior Education Manager)",
+            "stance": "neutral-fact-finding",
+            "stanceSummary": "Told a public listening session the omissions were \"not intentional,\" and that the listening tour was \"the first of many steps.\"\n",
+            "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+            "sourceDate": "2026-09-30",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-ncse",
+            "actorLabel": "Glenn Branch (NCSE Deputy Director)",
+            "stance": "opposes-change",
+            "stanceSummary": "\"I would like to say something nice about the new standards, but I can't.\" Criticized the draft's ~1,000 high-school benchmarks as \"a mile wide and an inch deep,\" much of it \"fun-fact-style trivia\" rather than a teaching framework.\n",
+            "sourceUrl": "https://ncse.ngo/proposed-new-florida-science-standards-attract-fierce-criticism",
+            "sourceDate": "2026-10-02",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-teacher-institute-for-evolutionary-science",
+            "actorLabel": "Bertha Vazquez (Director, Teacher Institute for Evolutionary Science)",
+            "stance": "opposes-change",
+            "stanceSummary": "\"Moving backward... If it's not broken, why the hell are we fixing it? We had smash bang good standards.\"\n",
+            "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "sourceDate": "2026-09-30",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorLabel": "Robin Williams (retired biology/environmental-science teacher)",
+            "stance": "opposes-change",
+            "stanceSummary": "\"Evolution is a fundamental underlying process unifying all of biology. To leave it out is ideology posing as biology.\"\n",
+            "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "sourceDate": "2026-09-30",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorLabel": "Lindsey Craven (Science Specialist, grades 9-12, Pinellas County Schools)",
+            "stance": "opposes-change",
+            "stanceSummary": "Noted the standards \"reference... evolution without actually... stating evolution.\"\n",
+            "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "sourceDate": "2026-09-30",
+            "accessTier": "excerpt-only"
+          },
+          {
+            "actorId": "FLLP-ACTOR-florida-education-association",
+            "actorLabel": "Florida Education Association",
+            "stance": "opposes-change",
+            "stanceSummary": "Warned that teaching outside mainstream science leaves Florida students \"at a disadvantage,\" and formally requested extended review periods and additional virtual town halls.\n",
+            "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+            "sourceDate": "2026-10-14",
+            "accessTier": "excerpt-only"
+          }
+        ],
+        "mediaCoverage": [
+          {
+            "outlet": "WUSF Public Media",
+            "headline": "Evolution and climate change are missing from Florida's new K-12 science standards",
+            "url": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+            "publicationDate": "2026-09-30",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "Florida Phoenix",
+            "headline": "New K-12 science curriculum scrutinized; December vote by Board of Ed expected",
+            "url": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+            "publicationDate": "2026-10-14",
+            "framingNote": "Also mirrored at Florida Trend and Yahoo News per this repo's research.",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "National Center for Science Education (NCSE)",
+            "headline": "Proposed new Florida science standards attract fierce criticism",
+            "url": "https://ncse.ngo/proposed-new-florida-science-standards-attract-fierce-criticism",
+            "publicationDate": "2026-10-02",
+            "framingNote": "Advocacy-organization framing, critical of the draft.",
+            "accessTier": "citation-only"
+          },
+          {
+            "outlet": "National Center for Science Education (NCSE)",
+            "headline": "Florida Opens Pandora's Box of Educational Horrors with Proposed New Science Standards",
+            "url": "https://ncse.ngo/florida-opens-pandoras-box-educational-horrors-proposed-new-science-standards",
+            "publicationDate": "2026-10-09",
+            "framingNote": "The article that prompted this repo's founding; itself mostly links out to NCSE's own prior reporting and to Pat Beall's Fort Lauderdale Sun Sentinel column (Oct 9 2026, not independently fetched -- likely paywalled).\n",
+            "accessTier": "citation-only"
+          }
+        ],
+        "themes": [
+          "evolution",
+          "climate-change",
+          "standards-adoption",
+          "naming-explicitness",
+          "recurring-fault-line"
+        ],
+        "exhaustivenessCaveat": "This record reflects news coverage of the draft and of public-comment sessions, not a direct read of the draft standards document itself (fldoe.org/standardsreview/ returned HTTP 403 on automated fetch this session). Florida Citizens for Science's own 2026 position could not be found despite being the historically central Florida-specific voice on this issue -- a real gap, not an indication the organization has no position. This controversy is ACTIVE and unresolved as of this record's provenance date; update status/outcomeSummary/outcomeDate once the State Board actually votes.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "WUSF (Nancy Guan, Sept 30 2026), Florida Phoenix (Jay Waagmeester, Oct 14 2026), NCSE (Glenn Branch, Oct 2 and Oct 9 2026) -- all fetched and read directly, the three sources listed in docs/source-notes/ as independently verified rather than search-snippeted.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2026-09-25",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-fldoe",
+      "title": "Florida Department of Education (FLDOE)",
+      "content": {
+        "id": "FLLP-ACTOR-fldoe",
+        "slug": "fldoe",
+        "label": "Florida Department of Education (FLDOE)",
+        "actorType": "state-education-department",
+        "jurisdiction": "US-FL",
+        "role": "Administers K-12 standards development, review, and textbook/instructional- materials adoption for Florida public schools. Ran the 2007-08 NGSSS standards-review process, the 2019-20 B.E.S.T. Standards rewrite (ELA/Math only), the 2024 textbook-review process in which publishers were asked to reduce/remove climate-change content, and the 2024-2026 science-standards rewrite (first since 2008) now in public comment.\n",
+        "currentHolder": {
+          "name": "Henry Mack",
+          "title": "Florida Education Commissioner",
+          "asOf": "2026-10-20"
+        },
+        "url": "https://www.fldoe.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix, \"New K-12 science curriculum scrutinized; December vote by Board of Ed expected\" (Oct 14, 2026), fetched and read directly; FLDOE's own site (fldoe.org).\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-florida-state-board-of-education",
+      "title": "Florida State Board of Education",
+      "content": {
+        "id": "FLLP-ACTOR-florida-state-board-of-education",
+        "slug": "florida-state-board-of-education",
+        "label": "Florida State Board of Education",
+        "actorType": "governing-board",
+        "jurisdiction": "US-FL",
+        "role": "The seven-member body with final rule-making authority to adopt Florida's K-12 academic standards. Voted 4-3 on Feb 19, 2008 to adopt the NGSSS with the \"scientific theory of evolution\" compromise wording (see FLLP-EVENT-ngsss-2008-state-board-vote); adopted the B.E.S.T. Standards in Feb 2020 (ELA/Math only); expected to vote on the current proposed science-standards rewrite in December 2026.\n",
+        "currentHolder": {
+          "name": "unknown -- not researched this session",
+          "title": "Chair",
+          "asOf": "2026-10-20"
+        },
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "2008 vote composition (Fair, Taylor, Shanahan, Raulerson voting yes; Martinez, Desai, Callaway voting no) is well-documented for that date specifically -- see FLLP-EVENT-ngsss-2008-state-board-vote. The BOARD'S CURRENT (2026) membership was not researched this session; currentHolder above is a placeholder, not a verified claim.\n",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" and \"The e-word arrives in Florida\" (both ncse.ngo), fetched and read directly; contemporaneous AP/Orlando Sentinel/Education Week coverage cited therein.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-florida-legislature",
+      "title": "Florida Legislature",
+      "content": {
+        "id": "FLLP-ACTOR-florida-legislature",
+        "slug": "florida-legislature",
+        "label": "Florida Legislature",
+        "actorType": "governing-board",
+        "jurisdiction": "US-FL",
+        "role": "Bicameral state legislature (House + Senate). Considered but did not pass the 2008 \"Academic Freedom Act\" (SB 2692/HB 1483); passed and Gov. Scott signed the 2017 instructional-materials-objection law (HB 989); considered but did not pass Sen. Dennis Baxley's 2018/2019 \"controversial theories\" bills.\n",
+        "url": "https://www.flsenate.gov",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Senate's own bill pages (flsenate.gov/Session/Bill/2008/2692, flsenate.gov/Session/Bill/2017/00989), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-cpalms-usf",
+      "title": "CPALMS (University of South Florida)",
+      "content": {
+        "id": "FLLP-ACTOR-cpalms-usf",
+        "slug": "cpalms",
+        "label": "CPALMS (University of South Florida)",
+        "actorType": "university-research-center",
+        "jurisdiction": "US-FL",
+        "role": "FLDOE's designated official online standards repository, run by the University of South Florida (hosted the 2007 public-comment review tool at tools.fcit.usf.edu/ScienceReview/). Per a 1EdTech Consortium announcement, CPALMS is \"the authorized publisher of Florida academic standards in digital format\" and joined 1EdTech as a Contributing Member to publish Florida's standards via the CASE (Competencies & Academic Standards Exchange) format through the free public CASE Network -- though this repo's own research could not confirm the Florida CASE data is actually live/browsable today (JS-rendering blocked automated verification of both casenetwork.1edtech.org/ rosetta.commongoodlt.com and CPALMS's own Standards API page). See docs/source-notes/2026-10-20-florida-machine-readable-standards-landscape-research.md and case/README.md.\n",
+        "url": "https://www.cpalms.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "1EdTech's own certification directory (site.imsglobal.org/certifications/cpalms) separately states \"CPALMS is not a member of 1EdTech\" with no active product certifications -- read as a different thing (formal product certification) than the \"Contributing Member\" tier the workshop announcement describes, not a contradiction, but flagged since both statements come from 1EdTech's own domain.\n",
+          "sourceProvenance": "1EdTech, \"Florida CASE Network Workshop (Invitation Only)\" event page (imsglobal.org/event/florida-case-network-workshop-invitation-only) and site.imsglobal.org/certifications/cpalms, both fetched directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-florida-citizens-for-science",
+      "title": "Florida Citizens for Science (FCS)",
+      "content": {
+        "id": "FLLP-ACTOR-florida-citizens-for-science",
+        "slug": "florida-citizens-for-science",
+        "label": "Florida Citizens for Science (FCS)",
+        "actorType": "advocacy-body",
+        "jurisdiction": "US-FL",
+        "role": "Statewide grassroots 501(c)(3) founded 2006 specifically to defend evolution education in Florida's public schools. Members directly participated in writing/framing the 2007-08 NGSSS draft; ran a public petition (1,700+ signatures) defending it; has tracked and publicized textbook challenges under the 2017 HB 989 process (Nassau, Collier, Martin counties). No direct, dated 2026 public statement on the current proposed-standards rewrite was found as of this repo's founding session -- a real, notable gap given the organization's historical centrality to this exact issue; flagged for a direct (not search-indexed) check of flascience.org in a follow-up.\n",
+        "currentHolder": {
+          "name": "Brandon Haught",
+          "title": "Co-founder, Communications Director (as of the 2008 episode; current role not re-verified this session)",
+          "asOf": "2008-02-19"
+        },
+        "url": "https://www.flascience.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE's 2007-08 articles (ncse.ngo/e-word-arrives-florida, ncse.ngo/evolution-comes-floridas-science-standards) and flascience.org's own site/timeline page (flascience.org/?p=3506), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-florida-family-policy-council",
+      "title": "Florida Family Policy Council",
+      "content": {
+        "id": "FLLP-ACTOR-florida-family-policy-council",
+        "slug": "florida-family-policy-council",
+        "label": "Florida Family Policy Council",
+        "actorType": "advocacy-body",
+        "jurisdiction": "US-FL",
+        "role": "Religious-right advocacy organization. Led by John Stemberger, who was the lead public advocate for the 2008 \"Academic Freedom Act\" (SB 2692/HB 1483), citing anecdotal/unnamed claims of teachers facing reprisal for questioning evolution.\n",
+        "currentHolder": {
+          "name": "John Stemberger",
+          "title": "President (as of the 2008 episode)",
+          "asOf": "2008-01-01"
+        },
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Discovery Institute, \"Anti-Freedom Activists Try to Censor Science Education in Florida\" (discovery.org/a/4510/), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-florida-education-association",
+      "title": "Florida Education Association (FEA)",
+      "content": {
+        "id": "FLLP-ACTOR-florida-education-association",
+        "slug": "florida-education-association",
+        "label": "Florida Education Association (FEA)",
+        "actorType": "professional-association",
+        "jurisdiction": "US-FL",
+        "role": "Florida's statewide teachers' union. Publicly warned during the 2026 standards-review process that teaching outside mainstream science leaves Florida students \"at a disadvantage,\" and formally requested extended review periods and additional virtual town halls.\n",
+        "url": "https://feaweb.org",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix, \"New K-12 science curriculum scrutinized; December vote by Board of Ed expected\" (Oct 14, 2026), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-actor-record",
+      "jurisdiction": "US",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-ACTOR-teacher-institute-for-evolutionary-science",
+      "title": "Teacher Institute for Evolutionary Science (TIES)",
+      "content": {
+        "id": "FLLP-ACTOR-teacher-institute-for-evolutionary-science",
+        "slug": "teacher-institute-for-evolutionary-science",
+        "label": "Teacher Institute for Evolutionary Science (TIES)",
+        "actorType": "nonprofit-curriculum-organization",
+        "jurisdiction": "US",
+        "role": "Nonprofit providing evolution-education professional development to teachers nationally. Its Director, Bertha Vazquez (a former Miami-Dade middle-school science teacher and an NCSE \"Friend of Darwin\" award recipient), is a named, vocal critic of Florida's 2026 proposed standards.\n",
+        "currentHolder": {
+          "name": "Bertha Vazquez",
+          "title": "Director",
+          "asOf": "2026-10-20"
+        },
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "WUSF (Nancy Guan), \"Evolution and climate change are missing from Florida's new K-12 science standards\" (Sept 30, 2026), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-MANDATE-ngsss-2008-sc912l15-1",
+      "title": "NGSSS benchmark SC.912.L.15.1 (2008): evolution supported by multiple lines of evidence",
+      "content": {
+        "id": "FLLP-MANDATE-ngsss-2008-sc912l15-1",
+        "slug": "ngsss-2008-sc912l15-1",
+        "label": "NGSSS benchmark SC.912.L.15.1 (2008): evolution supported by multiple lines of evidence",
+        "jurisdiction": "US-FL",
+        "issuingBody": "Florida State Board of Education",
+        "mandateType": "state-board-adopted-standard",
+        "statementText": "Explain how the scientific theory of evolution is supported by the fossil record, comparative anatomy, comparative embryology, biogeography, molecular biology, and observed evolutionary change.\n",
+        "adoptionDate": "2008-02-19",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science, benchmark SC.912.L.15.1 (document D1000338)",
+        "sourceUrl": "https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12",
+        "accessTier": "full-text-stored",
+        "licenseOrRightsNote": "Florida State Board of Education-adopted benchmark text is a public record under Fla. Stat. ch. 119 / Fla. Const. Art. I, S24(a) and not subject to copyright (Microdecisions, Inc. v. Skinner, 889 So.2d 871 (Fla. 2d DCA 2004)). Independently, the structured dataset this exact text was fetched from is separately licensed CC BY 3.0 US by its compiler (rightsHolder: Desire2Learn Incorporated, Common Standards Project, http://creativecommons.org/licenses/by/3.0/us/) -- attribute both when reusing this text elsewhere.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Upgraded 2026-10-20 (same session) from excerpt-only/unverified-secondary-source to full-text-stored/primary-source-confirmed after directly fetching the Common Standards Project API (a real, live REST endpoint, not blocked by the JS-rendering wall that stopped the CASE Network/CPALMS checks -- see docs/source-notes/2026-10-20-florida-machine-readable-standards-landscape-research.md). This exact wording matches what secondary teacher-resource mirrors had already reported, so no correction was needed here (contrast FLLP-MANDATE-ngsss-2008-sc912l15-standard below, which WAS corrected).\n",
+          "sourceProvenance": "api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12, fetched directly 2026-10-20; cross-confirmed against NCSE's contemporaneous reporting (ncse.ngo/evolution-comes-floridas-science-standards).\n"
+        }
+      },
+      "access_tier": "full-text-stored",
+      "license_or_rights_note": "Florida State Board of Education-adopted benchmark text is a public record under Fla. Stat. ch. 119 / Fla. Const. Art. I, S24(a) and not subject to copyright (Microdecisions, Inc. v. Skinner, 889 So.2d 871 (Fla. 2d DCA 2004)). Independently, the structured dataset this exact text was fetched from is separately licensed CC BY 3.0 US by its compiler (rightsHolder: Desire2Learn Incorporated, Common Standards Project, http://creativecommons.org/licenses/by/3.0/us/) -- attribute both when reusing this text elsewhere.\n",
+      "event_date": null,
+      "effective_from": "2008-02-19",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-MANDATE-ngsss-2008-sc912l15-standard",
+      "title": "NGSSS standard SC.912.L.15 (2008): \"Diversity and Evolution of Living Organisms\"",
+      "content": {
+        "id": "FLLP-MANDATE-ngsss-2008-sc912l15-standard",
+        "slug": "ngsss-2008-sc912l15-standard",
+        "label": "NGSSS standard SC.912.L.15 (2008): \"Diversity and Evolution of Living Organisms\"",
+        "jurisdiction": "US-FL",
+        "issuingBody": "Florida State Board of Education",
+        "mandateType": "state-board-adopted-standard",
+        "statementText": "Diversity and Evolution of Living Organisms\n",
+        "adoptionDate": "2008-02-19",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science, standard SC.912.L.15 (document D1000338)",
+        "sourceUrl": "https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12",
+        "accessTier": "full-text-stored",
+        "licenseOrRightsNote": "Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1 (Florida public-record status + Common Standards Project's own CC BY 3.0 US license on the compiled dataset).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "CORRECTED 2026-10-20 (same session): this record originally quoted \"[Evolution is] the fundamental concept underlying all of biology... supported by multiple forms of scientific evidence\" as the standard's statementText, sourced only via a secondary characterization. Directly fetching the real Common Standards Project data found the standard's actual, exact statement at this structural level is simply \"Diversity and Evolution of Living Organisms\" (Common Standards Project asnIdentifier S1130831) -- no \"fundamental concept\"/\"multiple forms of evidence\" language exists at the standard-title level. That phrasing may exist elsewhere in FLDOE's own framework preamble/rationale text (not yet located) as a characterization of the standard's intent, not as SC.912.L.15's own statement -- flagged for a future session to track down if the distinction matters for a specific use. Left uncorrected, this would have been a fabricated-sounding quote attributed to a real standard code -- exactly the kind of error this repo's verification discipline exists to catch.\n",
+          "sourceProvenance": "api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12, fetched directly 2026-10-20.\n"
+        }
+      },
+      "access_tier": "full-text-stored",
+      "license_or_rights_note": "Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1 (Florida public-record status + Common Standards Project's own CC BY 3.0 US license on the compiled dataset).\n",
+      "event_date": null,
+      "effective_from": "2008-02-19",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-MANDATE-ngsss-2008-sc912l15-10-11-human-evolution",
+      "title": "NGSSS benchmarks SC.912.L.15.10-11 (2008): hominid evolution and fossil evidence",
+      "content": {
+        "id": "FLLP-MANDATE-ngsss-2008-sc912l15-10-11-human-evolution",
+        "slug": "ngsss-2008-sc912l15-10-11-human-evolution",
+        "label": "NGSSS benchmarks SC.912.L.15.10-11 (2008): hominid evolution and fossil evidence",
+        "jurisdiction": "US-FL",
+        "issuingBody": "Florida State Board of Education",
+        "mandateType": "state-board-adopted-standard",
+        "statementText": "SC.912.L.15.10: Identify basic trends in hominid evolution from early ancestors six million years ago to modern humans, including brain size, jaw size, language, and manufacture of tools. SC.912.L.15.11: Discuss specific fossil hominids and what they show about human evolution.\n",
+        "adoptionDate": "2008-02-19",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Next Generation Sunshine State Standards (NGSSS), Science, benchmarks SC.912.L.15.10 and SC.912.L.15.11 (document D1000338)",
+        "sourceUrl": "https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12",
+        "accessTier": "full-text-stored",
+        "licenseOrRightsNote": "Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Added 2026-10-20 after directly fetching the full benchmark set -- these two benchmarks are the specific, named human-origins content Pat Beall's Sun Sentinel column (cited via NCSE) characterized the 2026 draft as \"all but erasing.\" Modeled as one combined record (two adjacent, closely related benchmarks) rather than split in two, since both support the same FLLP-FINDING/FLLP-CONTROVERSY references.\n",
+          "sourceProvenance": "api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12, fetched directly 2026-10-20.\n"
+        }
+      },
+      "access_tier": "full-text-stored",
+      "license_or_rights_note": "Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1.\n",
+      "event_date": null,
+      "effective_from": "2008-02-19",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-MANDATE-hb989-2017-instructional-materials",
+      "title": "HB 989 (2017) -- any Florida resident may formally challenge instructional materials",
+      "content": {
+        "id": "FLLP-MANDATE-hb989-2017-instructional-materials",
+        "slug": "hb989-2017-instructional-materials",
+        "label": "HB 989 (2017) -- any Florida resident may formally challenge instructional materials",
+        "jurisdiction": "US-FL",
+        "issuingBody": "Florida Legislature / Gov. Rick Scott",
+        "mandateType": "state-statute",
+        "statementText": "[Summary, not a verbatim statutory quotation -- see accessTier.] CS/CS/HB 989 overhauls Florida school districts' textbook/instructional-materials review and adoption process and extends standing to formally object to any Florida resident, not only a parent of an enrolled student, triggering a hearing before an independent review officer.\n",
+        "adoptionDate": "2017-06-26",
+        "targetDate": "2017-07-01",
+        "dateGranularity": "day",
+        "status": "adopted",
+        "sourceDocument": "Chapter law 2017-177 (CS/CS/HB 989, \"Instructional Materials\")",
+        "sourceUrl": "https://www.flsenate.gov/Session/Bill/2017/00989",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Florida statutory text is a public record and not subject to copyright; summary-only here reflects that the exact codified statutory language was not quoted verbatim this session (the Senate bill page was read for its legislative-history metadata, not transcribed in full) -- raise to excerpt-only/full-text-stored once the enacted statute's exact text is pulled and quoted directly.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Senate's own bill page (flsenate.gov/Session/Bill/2017/00989), fetched and read directly."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Florida statutory text is a public record and not subject to copyright; summary-only here reflects that the exact codified statutory language was not quoted verbatim this session (the Senate bill page was read for its legislative-history metadata, not transcribed in full) -- raise to excerpt-only/full-text-stored once the enacted statute's exact text is pulled and quoted directly.\n",
+      "event_date": null,
+      "effective_from": "2017-06-26",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "institutional-mandate-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-MANDATE-2026-draft-science-standards-evolution-omission",
+      "title": "2026 draft K-12 science standards omit the word \"evolution\" from high-school life-science content",
+      "content": {
+        "id": "FLLP-MANDATE-2026-draft-science-standards-evolution-omission",
+        "slug": "2026-draft-science-standards-evolution-omission",
+        "label": "2026 draft K-12 science standards omit the word \"evolution\" from high-school life-science content",
+        "jurisdiction": "US-FL",
+        "issuingBody": "Florida Department of Education (FLDOE)",
+        "mandateType": "state-policy-announcement",
+        "statementText": "[Not a verbatim quotation of the draft standards themselves -- a reporting-level characterization, see accessTier/verificationStatus.] Per named reviewers at public-comment sessions, the word \"evolution\" does not appear anywhere in the proposed high-school life-science standards; specifically named missing vocabulary includes gene flow, genetic drift, origins of life, evidence of evolution, DNA transcription, and genetics. Middle-school standards reference natural selection without an explicit evolution framing. The terms \"climate change\" and \"global warming\" do not appear anywhere in the draft (which retains \"weather and climate,\" \"climate systems,\" and \"climate impacts on biodiversity\").\n",
+        "adoptionDate": "2026-09-25",
+        "dateGranularity": "day",
+        "status": "proposed",
+        "sourceDocument": "Draft 2026 Florida K-12 Science Standards (FLDOE standards-review process)",
+        "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "This record characterizes the draft's content via news reporting, not a verbatim quotation of the draft document itself (fldoe.org/standardsreview/ returned HTTP 403 on automated fetch this session) -- summary-only is the honest tier here, not a rights restriction. Raise to excerpt-only/ full-text-stored once the draft PDF itself is fetched and specific benchmark text can be quoted directly.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "This is the single most important mandate record to upgrade in a follow-up session -- fetch fldoe.org/standardsreview/ or the draft PDF directly (a human browser session may be needed; automated fetch was blocked this session) and replace this reporting-level characterization with actual quoted benchmark text.\n",
+          "sourceProvenance": "WUSF (Nancy Guan), \"Evolution and climate change are missing from Florida's new K-12 science standards\" (Sept 30, 2026); Florida Phoenix (Jay Waagmeester), Oct 14, 2026; NCSE (Glenn Branch), Oct 2 and Oct 9, 2026 -- all fetched and read directly, but all are reporting ABOUT the draft, not the draft text itself.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "This record characterizes the draft's content via news reporting, not a verbatim quotation of the draft document itself (fldoe.org/standardsreview/ returned HTTP 403 on automated fetch this session) -- summary-only is the honest tier here, not a rights restriction. Raise to excerpt-only/ full-text-stored once the draft PDF itself is fetched and specific benchmark text can be quoted directly.\n",
+      "event_date": null,
+      "effective_from": "2026-09-25",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-sunshine-state-standards-1996-adoption",
+      "title": "Florida Board of Education gives initial adoption to the first Sunshine State Standards",
+      "content": {
+        "id": "FLLP-EVENT-sunshine-state-standards-1996-adoption",
+        "slug": "sunshine-state-standards-1996-adoption",
+        "label": "Florida Board of Education gives initial adoption to the first Sunshine State Standards",
+        "jurisdiction": "US-FL",
+        "eventType": "framework-adopted",
+        "dateStart": "1996-05-01",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "Florida's first Sunshine State Standards, covering eight subjects including science, received initial adoption from the Florida Board of Education in May 1996 (development had begun in 1993). Secondary sources describe the original science standards as not using the term \"evolution\" at all, instead referring only to \"biological change over time\" -- a characterization attributed to then-Education Commissioner John Winn in a 2005 statement, though the Grades 9-12 standards did cover evolution-adjacent concepts (natural selection, mutation) without naming the theory itself.\n",
+        "involvedActors": [],
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sunshine_State_Standards",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Florida state government standards text is a public record under Fla. Stat. ch. 119 and not subject to copyright (Microdecisions, Inc. v. Skinner, 889 So.2d 871 (Fla. 2d DCA 2004)) -- but the original 1996 standards text itself was not located/fetched this session, so no verbatim excerpt is stored here; summary-only reflects that gap, not a rights restriction.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The \"biological change over time\" wording and the Winn quote came via AI-synthesized search summaries, not a document read directly; whether \"1996\" and \"1999\" (the year Fordham's 2005 report describes reviewing) refer to the same document or a revision is unresolved. See source-notes confidence flags 1-2.\n",
+          "sourceProvenance": "Wikipedia, \"Sunshine State Standards\" (bare adoption-date fact only)."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Florida state government standards text is a public record under Fla. Stat. ch. 119 and not subject to copyright (Microdecisions, Inc. v. Skinner, 889 So.2d 871 (Fla. 2d DCA 2004)) -- but the original 1996 standards text itself was not located/fetched this session, so no verbatim excerpt is stored here; summary-only reflects that gap, not a rights restriction.\n",
+      "event_date": "1996-05-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-fordham-2005-f-grade",
+      "title": "Fordham Foundation gives Florida's science standards an \"F\" for evolution treatment",
+      "content": {
+        "id": "FLLP-EVENT-fordham-2005-f-grade",
+        "slug": "fordham-2005-f-grade",
+        "label": "Fordham Foundation gives Florida's science standards an \"F\" for evolution treatment",
+        "jurisdiction": "US-FL",
+        "eventType": "other",
+        "dateStart": "2005-01-01",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "The Thomas B. Fordham Foundation's national report \"The State of State Science Standards 2005\" (lead author Paul R. Gross) gave Florida's then-current science standards a failing grade, stating \"The E-word is sedulously avoided\" and \"the superficiality of the treatment of evolutionary biology alone justifies the grade 'F.'\" Evolution scored 0; Florida was not singling out evolution for vague treatment -- plate tectonics, cell theory, atomic theory, electromagnetism, and the Big Bang received similarly superficial treatment.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fordham-institute"
+        ],
+        "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "Short quotations from Fordham's report, as reproduced in NCSE's own articles (third-party commentary quoting a think-tank report) -- fair use / citation basis, not a government-text public-record claim.\n",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Fordham's own 2005 PDF was not independently fetched this session -- quotes came via NCSE's citation of it. Pull directly from edexcellence.net before treating as fully primary-confirmed.\n",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" and \"Evolution in the Florida state science standards\" (Oct 23, 2007), both fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "Short quotations from Fordham's report, as reproduced in NCSE's own articles (third-party commentary quoting a think-tank report) -- fair use / citation basis, not a government-text public-record claim.\n",
+      "event_date": "2005-01-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-fldoe-2007-draft-standards-released",
+      "title": "FLDOE releases draft revised science standards for public comment, first explicit use of \"evolution\"",
+      "content": {
+        "id": "FLLP-EVENT-fldoe-2007-draft-standards-released",
+        "slug": "fldoe-2007-draft-standards-released",
+        "label": "FLDOE releases draft revised science standards for public comment, first explicit use of \"evolution\"",
+        "jurisdiction": "US-FL",
+        "eventType": "consultation-phase",
+        "dateStart": "2007-10-19",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "FLDOE opened a 60-day public-comment window (hosted at tools.fcit.usf.edu/ScienceReview/) on a draft of new science standards -- the first time Florida's standards would explicitly use the word \"evolution.\" Adoption by the State Board was expected January 2008, later slipping to February.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "sourceUrl": "https://ncse.ngo/evolution-florida-state-science-standards",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE, \"Evolution in the Florida state science standards\" (Oct 23, 2007), fetched and read directly (itself citing Orlando Sentinel Oct 20 2007 and Florida Today/Tallahassee Democrat/South Florida Sun-Sentinel editorials Oct 23-24 2007).\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2007-10-19",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-county-school-board-resolutions-2007",
+      "title": "At least 12 Florida county school boards pass resolutions opposing the draft standards' treatment of evolution",
+      "content": {
+        "id": "FLLP-EVENT-county-school-board-resolutions-2007",
+        "slug": "county-school-board-resolutions-2007",
+        "label": "At least 12 Florida county school boards pass resolutions opposing the draft standards' treatment of evolution",
+        "jurisdiction": "US-FL",
+        "eventType": "school-board-action",
+        "dateStart": "2007-11-01",
+        "dateEnd": "2007-12-31",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "Through November-December 2007, at least 12 Florida county school boards passed resolutions urging the State Board to revise the draft standards so evolution would not be \"presented as fact.\" Named counties: Baker County (passed 5-0), Polk County, and Taylor County (Superintendent Oscar Howard named; Polk board member Kay Fields named in opposition). Organized opposition in this period also included Focus on the Family (joined November 2007), the Florida Baptist Witness (ran pieces against the draft, Nov 30 2007), and the Florida Family Policy Council.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-family-policy-council"
+        ],
+        "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "Modeled as one combined event for the cluster of county-level resolutions rather than 12 separate records -- a future pass could split this if each county's exact resolution text/date becomes important to track individually.\n",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" (ncse.ngo/evolution-comes-floridas-science-standards), fetched and read directly (citing Lakeland Ledger Nov 13 & 20 2007, St. Petersburg Times Dec 6 2007, Florida Baptist Witness Nov 30 2007).\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2007-11-01",
+      "effective_until": "2007-12-31"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-ngsss-2008-state-board-vote",
+      "title": "Florida State Board of Education votes 4-3 to adopt the Next Generation Sunshine State Standards",
+      "content": {
+        "id": "FLLP-EVENT-ngsss-2008-state-board-vote",
+        "slug": "ngsss-2008-state-board-vote",
+        "label": "Florida State Board of Education votes 4-3 to adopt the Next Generation Sunshine State Standards",
+        "jurisdiction": "US-FL",
+        "eventType": "framework-adopted",
+        "dateStart": "2008-02-19",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Days before the vote, under public and legislative pressure, Education Commissioner Eric Smith redrafted the standards to insert \"the scientific theory of\" before \"evolution\" (and before plate tectonics, cell theory, atomic theory, electromagnetism, and \"scientific law of\" before gravity) -- a late compromise (\"Option B\"). A further amendment proposed by board member Donna Callaway calling for \"critical analysis\" of evolution did NOT pass. The Board voted 4-3 to adopt the compromise version: YES -- T. Willard Fair (Chairman), Linda Taylor, Kathleen Shanahan, Phoebe Raulerson. NO -- Roberto Martinez (opposing because the compromise watered down the original, scientifically stronger draft, which the National Academy of Sciences had endorsed), Akshay Desai, Donna Callaway (opposing from the other direction, wanting weaker language than even the compromise). This was Florida's first standards document to explicitly name \"evolution.\"\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-state-board-of-education",
+          "FLLP-ACTOR-fldoe",
+          "FLLP-ACTOR-florida-citizens-for-science",
+          "FLLP-ACTOR-national-academy-of-sciences"
+        ],
+        "sourceUrl": "https://ncse.ngo/evolution-comes-floridas-science-standards",
+        "accessTier": "excerpt-only",
+        "licenseOrRightsNote": "Quoted official vote/standards-text details are Florida government action/public record; named-actor quotes are short, attributed excerpts from contemporaneous news reporting (fair use / citation basis).\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "NCSE, \"Evolution Comes to Florida's Science Standards\" and \"The e-word arrives in Florida\" (both ncse.ngo), fetched and read directly (citing Orlando Sentinel, Miami Herald, AP, Education Week, St. Petersburg Times, Lakeland Ledger, Ft. Myers News-Press, Tallahassee Democrat, Florida Baptist Witness, all dated Feb 2008); independently corroborated by Education Week (edweek.org/teaching-learning/fla-panels-evolution-vote-hailed/2008/02), Science magazine (science.org/doi/10.1126/science.319.5867.1168), and NBC News.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": "Quoted official vote/standards-text details are Florida government action/public record; named-actor quotes are short, attributed excerpts from contemporaneous news reporting (fair use / citation basis).\n",
+      "event_date": "2008-02-19",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-hb837-2005-academic-freedom-bill-of-rights",
+      "title": "HB 837 \"Academic Freedom Bill of Rights\" introduced and dies",
+      "content": {
+        "id": "FLLP-EVENT-hb837-2005-academic-freedom-bill-of-rights",
+        "slug": "hb837-2005-academic-freedom-bill-of-rights",
+        "label": "HB 837 \"Academic Freedom Bill of Rights\" introduced and dies",
+        "jurisdiction": "US-FL",
+        "eventType": "legislation",
+        "dateStart": "2005-03-01",
+        "dateEnd": "2005-05-31",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "Rep. Dennis Baxley (R-Ocala) introduced HB 837, modeled on David Horowitz's \"Academic Bill of Rights\" -- NOT the later Discovery Institute evolution-specific template, and not itself about evolution directly. Targeted university-level viewpoint diversity and would have let students sue professors. Died on the calendar in May 2005; not reintroduced in 2006. Recorded here as relevant background to Florida's \"academic freedom\" legislative pattern, distinct from the 2008 bill below.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-legislature"
+        ],
+        "sourceUrl": "https://en.wikipedia.org/wiki/Florida_House_Bill_H-837",
+        "accessTier": "summary-only",
+        "verificationStatus": "unverified-secondary-source",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Wikipedia, \"Florida House Bill H-837\" (citing Nature April 2005, the Florida Senate's own bill records, Inside Higher Ed, St. Petersburg Times, Democracy Now!) -- not independently cross-checked against the Florida Legislature's own bill-history page this session.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2005-03-01",
+      "effective_until": "2005-05-31"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-sb2692-hb1483-2008-academic-freedom-act",
+      "title": "SB 2692 / HB 1483 \"Academic Freedom Act\" introduced, passes House, dies in Senate standoff",
+      "content": {
+        "id": "FLLP-EVENT-sb2692-hb1483-2008-academic-freedom-act",
+        "slug": "sb2692-hb1483-2008-academic-freedom-act",
+        "label": "SB 2692 / HB 1483 \"Academic Freedom Act\" introduced, passes House, dies in Senate standoff",
+        "jurisdiction": "US-FL",
+        "eventType": "legislation",
+        "dateStart": "2008-01-01",
+        "dateEnd": "2008-05-02",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Sen. Ronda Storms (R-Valrico) introduced SB 2692 following Discovery Institute's model \"Academic Freedom Act\" statute; Rep. Alan Hays introduced the House companion HB 1483, narrowed to call for \"thorough presentation and critical analysis of the scientific theory of evolution.\" John Stemberger (Florida Family Policy Council) was lead public advocate. Hays hosted a closed March 2008 press event with a Discovery Institute representative, for legislators only. The House passed its substituted version (HB 1483 text swapped into SB 2692) 71-43 on April 28, 2008; the Senate rejected the substitution and restored its own text, sending it back to the House, which left it untouched -- the bill died at session's end without becoming law. This is the same Discovery Institute template later enacted in Louisiana (June 2008) and Tennessee (2012), but Florida's version did not pass.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-legislature",
+          "FLLP-ACTOR-discovery-institute",
+          "FLLP-ACTOR-florida-family-policy-council"
+        ],
+        "sourceUrl": "https://www.discovery.org/a/4510/",
+        "accessTier": "excerpt-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "The exact House/Senate procedural standoff in late April 2008 is described per a Tampa Tribune (April 29, 2008) account that was not independently fetched this session -- came via search synthesis. The vote count and the Discovery Institute/Stemberger/Hays roles ARE independently corroborated across Discovery Institute's own site, Florida Citizens for Science's news releases, and the Florida Senate's own bill-amendment record.\n",
+          "sourceProvenance": "Discovery Institute, \"Anti-Freedom Activists Try to Censor Science Education in Florida\" (discovery.org/a/4510/); Evolution News, \"Prepared Remarks for Florida Academic Freedom Bill Press Conference\" (evolutionnews.org/2008/03/prepared_remarks_for_florida_a/); Florida Senate's own bill-amendment record (flsenate.gov/Session/Bill/2008/2692/Amendment/307351/PDF); Florida Citizens for Science news releases (flascience.org/wp/?p=529, /?p=534, /?p=547) -- all fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2008-01-01",
+      "effective_until": "2008-05-02"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-hb989-2017-signed-into-law",
+      "title": "Gov. Rick Scott signs HB 989, the instructional-materials-objection law",
+      "content": {
+        "id": "FLLP-EVENT-hb989-2017-signed-into-law",
+        "slug": "hb989-2017-signed-into-law",
+        "label": "Gov. Rick Scott signs HB 989, the instructional-materials-objection law",
+        "jurisdiction": "US-FL",
+        "eventType": "legislation",
+        "dateStart": "2017-06-26",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "CS/CS/HB 989, \"Instructional Materials\" (Rep. Byron Donalds, 20 co-introducers), overhauled how Florida school districts review/adopt textbooks and let any Florida resident -- not just parents of enrolled students -- formally challenge a district's instructional materials, triggering a hearing before an independent review officer. Introduced March 7, 2017; passed House 94-25 (April 20, 2017); passed Senate 19-17 (May 5, 2017; companion SB 1210 tabled); signed by Gov. Rick Scott June 26, 2017; effective July 1, 2017 (Chapter law 2017-177). Not itself about evolution, but became the mechanism for the 2017-18 textbook challenges below.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-legislature"
+        ],
+        "sourceUrl": "https://www.flsenate.gov/Session/Bill/2017/00989",
+        "accessTier": "summary-only",
+        "licenseOrRightsNote": "Florida statutory text and the Legislature's own bill-history page are public records, not subject to copyright.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Senate's own bill page (flsenate.gov/Session/Bill/2017/00989), fetched and read directly."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": "Florida statutory text and the Legislature's own bill-history page are public records, not subject to copyright.\n",
+      "event_date": "2017-06-26",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-nassau-county-textbook-challenge-2017",
+      "title": "Nassau County becomes the first district challenged under HB 989 over evolution content",
+      "content": {
+        "id": "FLLP-EVENT-nassau-county-textbook-challenge-2017",
+        "slug": "nassau-county-textbook-challenge-2017",
+        "label": "Nassau County becomes the first district challenged under HB 989 over evolution content",
+        "jurisdiction": "US-FL",
+        "eventType": "school-board-action",
+        "dateStart": "2017-11-01",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "A resident filed a complaint targeting evolution's \"prominent place\" in three textbooks, stating a goal \"to stop the teaching of Darwinian evolution as fact,\" and requested disclaimer stickers. An independent hearing officer reviewed the complaint; the Nassau County school board ultimately voted down the sticker proposal, reportedly largely over concern about an unwinnable First Amendment challenge.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-citizens-for-science"
+        ],
+        "sourceUrl": "https://www.flascience.org/?p=2997",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Citizens for Science, \"Nassau County textbook challenge: 'Bacteria to man evolution is not supported by science'\" (flascience.org/?p=2997); The World/PRX (Sept 10, 2017); both fetched and read directly.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2017-11-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-collier-martin-county-textbook-challenges-2018",
+      "title": "Collier and Martin County evolution/climate-change textbook complaints both fail 3-2",
+      "content": {
+        "id": "FLLP-EVENT-collier-martin-county-textbook-challenges-2018",
+        "slug": "collier-martin-county-textbook-challenges-2018",
+        "label": "Collier and Martin County evolution/climate-change textbook complaints both fail 3-2",
+        "jurisdiction": "US-FL",
+        "eventType": "school-board-action",
+        "dateStart": "2018-01-01",
+        "dateEnd": "2018-12-31",
+        "dateGranularity": "year",
+        "temporalStatus": "past-completed",
+        "description": "Separate evolution/climate-change textbook complaints in Collier County and Martin County, filed under the HB 989 process, each failed 3-2 at the school-board level; the original textbooks were adopted as written. At least 7 complaints were filed statewide in the first 5 months after HB 989 took effect, including at least 2 specifically targeting evolution and human-driven climate-change content.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-citizens-for-science"
+        ],
+        "sourceUrl": "https://www.flascience.org/?p=3506",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Citizens for Science's own running timeline (flascience.org/?p=3506) and The World/PRX (Sept 10, 2017), fetched and read directly. FCS is a first-party advocacy source with an explicit pro-evolution-education viewpoint -- generally reliable on bare dates/vote outcomes.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2018-01-01",
+      "effective_until": "2018-12-31"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-best-standards-2020-adoption-ela-math-only",
+      "title": "State Board adopts B.E.S.T. Standards -- English Language Arts and Mathematics only, science untouched",
+      "content": {
+        "id": "FLLP-EVENT-best-standards-2020-adoption-ela-math-only",
+        "slug": "best-standards-2020-adoption-ela-math-only",
+        "label": "State Board adopts B.E.S.T. Standards -- English Language Arts and Mathematics only, science untouched",
+        "jurisdiction": "US-FL",
+        "eventType": "framework-adopted",
+        "dateStart": "2020-02-12",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "Following Gov. DeSantis's Executive Order 19-32 (Jan 31, 2019) eliminating Common Core, the State Board formally adopted the new B.E.S.T. (Benchmarks for Excellent Student Thinking) Standards. B.E.S.T. Standards cover English Language Arts and Mathematics ONLY -- science (and social studies) were explicitly not rewritten in this process and continued under the existing 2008 NGSSS the entire time, confirmed by FLDOE's own B.E.S.T. Standards Overview document and by the Fordham Institute's 2020 review (which graded only ELA/Math, \"weak\" on both, with no science content because there was none to review). This is a correction to a plausible assumption that Florida's evolution standards changed in 2019-2020 -- they did not; SC.912.L.15 remained the governing 2008-era standard until the 2026 rewrite.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-state-board-of-education",
+          "FLLP-ACTOR-fldoe"
+        ],
+        "sourceUrl": "https://www.flgov.com/eog/news/press/2020/governor-ron-desantis-announces-floridas-new-best-k-12-standards",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "One secondary source gives the State Board vote date as \"January 12, 2020\" rather than February 12, 2020 -- a one-month discrepancy not resolved this session. The SCIENCE-UNTOUCHED finding itself is solidly corroborated (FLDOE's own July 20, 2020 Overview document, fldoe.org/file/7576/BESTStandardsOverview.pdf, and Fordham's own 2020 review, ERIC ED606003, eric.ed.gov/?id=ED606003).\n",
+          "sourceProvenance": "Gov. DeSantis's own announcement (flgov.com); FLDOE's B.E.S.T. Standards Overview; Fordham Institute, \"The State of the Sunshine State Standards: Florida's B.E.S.T. Edition\" (June 2020, ERIC ED606003) -- all cited directly, though the FLDOE Overview PDF and ERIC record were not independently re-fetched this session beyond confirming their existence via search.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2020-02-12",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2024-textbook-climate-content-removal",
+      "title": "FLDOE asks science-textbook publishers to reduce/remove climate-change content",
+      "content": {
+        "id": "FLLP-EVENT-2024-textbook-climate-content-removal",
+        "slug": "2024-textbook-climate-content-removal",
+        "label": "FLDOE asks science-textbook publishers to reduce/remove climate-change content",
+        "jurisdiction": "US-FL",
+        "eventType": "other",
+        "dateStart": "2024-06-01",
+        "dateEnd": "2024-08-31",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "In summer 2024, FLDOE asked publishers submitting science textbooks for state adoption to reduce or remove climate-change content; publishers complied. Teachers described a resulting \"culture of caution\" discouraging classroom discussion of climate topics, with some citing fear of professional retaliation. This operated through the ordinary textbook-adoption review process (the same process HB 989 opened to resident challenges in 2017) -- not a formal standards rewrite, and reported publicly only in 2026 via a joint investigation.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe",
+          "FLLP-ACTOR-ncse"
+        ],
+        "sourceUrl": "https://ncse.ngo/how-florida-quietly-removed-climate-change-content-textbooks",
+        "accessTier": "excerpt-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "WUSF Public Media / The Hechinger Report joint investigation, republished by NCSE, \"How Florida quietly removed climate change content from textbooks\" (Aug 20/21, 2026), fetched and read directly. Named sources in that piece: Glenn Branch (NCSE), Kenneth R. Miller (textbook co-author; Chair, NCSE Board of Directors).\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2024-06-01",
+      "effective_until": "2024-08-31"
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-standards-review-process-begins",
+      "title": "FLDOE begins the first full K-12 science-standards review process since 2008",
+      "content": {
+        "id": "FLLP-EVENT-2026-standards-review-process-begins",
+        "slug": "2026-standards-review-process-begins",
+        "label": "FLDOE begins the first full K-12 science-standards review process since 2008",
+        "jurisdiction": "US-FL",
+        "eventType": "consultation-phase",
+        "dateStart": "2024-11-01",
+        "dateGranularity": "month",
+        "temporalStatus": "past-completed",
+        "description": "FLDOE began reviewing Florida's K-12 science standards -- the first full rewrite process since 2008. The writing/development committee had 18 people, of whom only 1 was a science-education professor (the rest were school-district employees); FLDOE reportedly has no designated K-12 science specialists on staff currently, per former specialists Patricia Duncan and Alicia Foy, and Duncan's own current on-record comments.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix (Jay Waagmeester), \"New K-12 science curriculum scrutinized; December vote by Board of Ed expected\" (Oct 14, 2026), fetched and read directly.\n"
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2024-11-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-draft-standards-released-for-comment",
+      "title": "Draft 2026 K-12 science standards released for public comment",
+      "content": {
+        "id": "FLLP-EVENT-2026-draft-standards-released-for-comment",
+        "slug": "2026-draft-standards-released-for-comment",
+        "label": "Draft 2026 K-12 science standards released for public comment",
+        "jurisdiction": "US-FL",
+        "eventType": "consultation-phase",
+        "dateStart": "2026-09-25",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "FLDOE released its draft K-12 science standards rewrite for public comment. Reporting found the word \"evolution\" absent from the proposed high-school life-science standards entirely, and \"climate change\"/ \"global warming\" absent from the draft anywhere (which retains \"weather and climate,\" \"climate systems,\" \"climate impacts on biodiversity\"). The draft contains roughly 1,000 high-school science benchmarks and is not built on the National Research Council's 2012 Framework for K-12 Science Education (the NGSS-aligned framework most other states now use). Public comment accepted via fldoe.org/standardsreview/.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "sourceUrl": "https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards",
+        "accessTier": "excerpt-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "contributor_notes": "One outlet gives the release date as Sept 27, 2026 rather than Sept 25 -- Sept 25 2026 was a Friday, consistent with a Friday release reported on the following Monday/Tuesday, so Sept 25 is treated as correct here, but not independently confirmed against FLDOE's own posting (fldoe.org/standardsreview/ returned HTTP 403 on automated fetch this session).\n",
+          "sourceProvenance": "WUSF (Nancy Guan), \"Evolution and climate change are missing from Florida's new K-12 science standards\" (Sept 30, 2026); NCSE (Glenn Branch) posts dated Oct 2 and Oct 9, 2026 -- all fetched and read directly.\n"
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": null,
+      "event_date": "2026-09-25",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-listening-tour-armwood-hs",
+      "title": "First in-person public listening session on the 2026 draft standards, Armwood High School",
+      "content": {
+        "id": "FLLP-EVENT-2026-listening-tour-armwood-hs",
+        "slug": "2026-listening-tour-armwood-hs",
+        "label": "First in-person public listening session on the 2026 draft standards, Armwood High School",
+        "jurisdiction": "US-FL",
+        "eventType": "public-hearing",
+        "dateStart": "2026-09-30",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "First in-person public listening session on the draft 2026 science standards, held at Armwood High School, Seffner (Hillsborough County). Parents and teachers present were described by Florida Phoenix as \"gobsmacked.\" FLDOE Senior Education Manager Patricia Duncan told attendees the omissions were \"not intentional\" and that the listening tour was \"the first of many steps.\"\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "partOf": "FLLP-EVENT-2026-draft-standards-released-for-comment",
+        "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+        "accessTier": "excerpt-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix (Oct 14, 2026), fetched and read directly."
+        }
+      },
+      "access_tier": "excerpt-only",
+      "license_or_rights_note": null,
+      "event_date": "2026-09-30",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-virtual-statewide-listening-session",
+      "title": "Virtual statewide public-comment listening session on the 2026 draft standards",
+      "content": {
+        "id": "FLLP-EVENT-2026-virtual-statewide-listening-session",
+        "slug": "2026-virtual-statewide-listening-session",
+        "label": "Virtual statewide public-comment listening session on the 2026 draft standards",
+        "jurisdiction": "US-FL",
+        "eventType": "public-hearing",
+        "dateStart": "2026-10-08",
+        "dateGranularity": "day",
+        "temporalStatus": "past-completed",
+        "description": "A virtual, statewide listening session on the draft 2026 science standards drew approximately 300 participants.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "partOf": "FLLP-EVENT-2026-draft-standards-released-for-comment",
+        "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix (Oct 14, 2026), fetched and read directly."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2026-10-08",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-orange-county-listening-session",
+      "title": "Orange County public listening session on the 2026 draft standards",
+      "content": {
+        "id": "FLLP-EVENT-2026-orange-county-listening-session",
+        "slug": "2026-orange-county-listening-session",
+        "label": "Orange County public listening session on the 2026 draft standards",
+        "jurisdiction": "US-FL",
+        "eventType": "public-hearing",
+        "dateStart": "2026-10-27",
+        "dateGranularity": "day",
+        "temporalStatus": "planned-future",
+        "description": "A scheduled public listening session on the draft 2026 science standards, at Lake Buena Vista High School, Orange County, 5:30-7:30pm.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-fldoe"
+        ],
+        "partOf": "FLLP-EVENT-2026-draft-standards-released-for-comment",
+        "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix (Oct 14, 2026), fetched and read directly."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": null,
+      "effective_from": "2026-10-27",
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "policy-timeline-event",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-EVENT-2026-state-board-vote-expected",
+      "title": "Florida State Board of Education vote on the 2026 draft standards expected",
+      "content": {
+        "id": "FLLP-EVENT-2026-state-board-vote-expected",
+        "slug": "2026-state-board-vote-expected",
+        "label": "Florida State Board of Education vote on the 2026 draft standards expected",
+        "jurisdiction": "US-FL",
+        "eventType": "milestone-target",
+        "dateStart": "2026-12-01",
+        "dateGranularity": "month",
+        "temporalStatus": "planned-future",
+        "description": "The Florida State Board of Education is expected to vote on the proposed 2026 science standards in December 2026. If adopted, phased implementation would begin school year 2028-29 (grades K-2) and 2029-30 (older grades), with teacher training beginning Spring 2027.\n",
+        "involvedActors": [
+          "FLLP-ACTOR-florida-state-board-of-education"
+        ],
+        "sourceUrl": "https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected",
+        "accessTier": "summary-only",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Florida Phoenix (Oct 14, 2026), fetched and read directly."
+        }
+      },
+      "access_tier": "summary-only",
+      "license_or_rights_note": null,
+      "event_date": "2026-12-01",
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "curriculum-crosswalk-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CROSSWALK-sc912l15-common-standards-project-api",
+      "title": "SC.912.L.15 (2008 NGSSS) -- live source: Common Standards Project API",
+      "content": {
+        "id": "FLLP-CROSSWALK-sc912l15-common-standards-project-api",
+        "slug": "sc912l15-common-standards-project-api",
+        "label": "SC.912.L.15 (2008 NGSSS) -- live source: Common Standards Project API",
+        "jurisdiction": "US-FL",
+        "standardOrAttribute": "NGSSS (2008) SC.912.L.15 (Diversity and Evolution of Living Organisms), full 15-benchmark set plus Access Points",
+        "gradeRange": "9-12",
+        "sourceSystem": "common-standards-project-api",
+        "coverageStatus": "canonical-items-concept-tagged",
+        "notes": "CONFIRMED LIVE 2026-10-20 (this session, via direct curl/REST calls, not browser automation -- the JS-rendering wall that blocked CPALMS's own Standards API page and the 1EdTech CASE Network registry did NOT block this endpoint). Real, free, public, no-authentication-required REST API: GET https://api.commonstandardsproject.com/api/v1/jurisdictions (find Florida's jurisdiction id, \"80B94A122D3D4B95884660FF09CC357E\") then GET https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12 returns the complete Grades 9-12 Science (2008-) standard set (document D1000338, \"Science Next Generation Sunshine State Standards\", publicationStatus \"Published\", 546 standards total) as structured JSON in the Achievement Standards Network (ASN) data model -- a predecessor/cousin schema to CASE, not CASE itself. The dataset is independently licensed CC BY 3.0 US by its compiler (rightsHolder: Desire2Learn Incorporated). This is the record the hand-built case/ file (below) was transformed from, once this source was confirmed reachable where CPALMS's own CASE Network feed was not.\n",
+        "licenseOrRightsNote": "Florida State Board of Education-adopted benchmark text is a public record under Fla. Stat. ch. 119, not subject to copyright. The Common Standards Project's own compiled dataset is additionally and independently licensed CC BY 3.0 US (http://creativecommons.org/licenses/by/3.0/us/, rightsHolder Desire2Learn Incorporated) -- attribute both when reusing this data elsewhere.\n",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "api.commonstandardsproject.com, fetched directly and read in full 2026-10-20 (not a search snippet or secondary mirror).\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": "Florida State Board of Education-adopted benchmark text is a public record under Fla. Stat. ch. 119, not subject to copyright. The Common Standards Project's own compiled dataset is additionally and independently licensed CC BY 3.0 US (http://creativecommons.org/licenses/by/3.0/us/, rightsHolder Desire2Learn Incorporated) -- attribute both when reusing this data elsewhere.\n",
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "curriculum-crosswalk-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CROSSWALK-sc912l15-case-2008-ngsss",
+      "title": "SC.912.L.15 (2008 NGSSS, Diversity and Evolution of Living Organisms) -- CASE format",
+      "content": {
+        "id": "FLLP-CROSSWALK-sc912l15-case-2008-ngsss",
+        "slug": "sc912l15-case-2008-ngsss",
+        "label": "SC.912.L.15 (2008 NGSSS, Diversity and Evolution of Living Organisms) -- CASE format",
+        "jurisdiction": "US-FL",
+        "standardOrAttribute": "NGSSS (2008) SC.912.L.15 (Diversity and Evolution of Living Organisms)",
+        "gradeRange": "9-12",
+        "sourceSystem": "openevo-graph-case-format-local-file",
+        "sourceRepoPath": "../../../case/florida-ngsss-2008-evolution-benchmarks.json",
+        "coverageStatus": "canonical-items-concept-tagged",
+        "notes": "Hand-built CFDocument/CFItem JSON (conforming to openevo-graph/schema/case_schema.json), transformed from the confirmed-live Common Standards Project data (see FLLP-CROSSWALK-sc912l15-common-standards-project-api above) into CASE's own shape -- now covers the full SC.912.L.15 standard (all 15 core benchmarks plus 2 representative Access Points), not just the 2 items this repo started with. Still NOT a complete re-publication of the full ~500-item Grades 9-12 Science standard set (physical science, earth/space science, and the rest of life science are out of scope for this repo). CPALMS/FLDOE's OWN native CASE Network feed (as opposed to the Common Standards Project's separate ASN-format data, now confirmed) was still not confirmed reachable this session (JS-rendering blocked automated verification of casenetwork.1edtech.org/rosetta.commongoodlt.com). If a human confirms that feed separately, compare it against this file for any discrepancy before treating either as sole source of truth.\n",
+        "licenseOrRightsNote": "Same dual basis as FLLP-CROSSWALK-sc912l15-common-standards-project-api above (Florida public-record status + Common Standards Project's CC BY 3.0 US license on the compiled dataset this file was transformed from).\n",
+        "verificationStatus": "verified",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Transformed from api.commonstandardsproject.com data, fetched directly 2026-10-20 -- see case/README.md.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": "Same dual basis as FLLP-CROSSWALK-sc912l15-common-standards-project-api above (Florida public-record status + Common Standards Project's CC BY 3.0 US license on the compiled dataset this file was transformed from).\n",
+      "event_date": null,
+      "effective_from": null,
+      "effective_until": null
+    },
+    {
+      "project_id": null,
+      "record_type": "curriculum-crosswalk-record",
+      "jurisdiction": "US-FL",
+      "source_repo": "florida-lpm",
+      "source_record_id": "FLLP-CROSSWALK-sc912l15-bio-core-k12-natural-selection",
+      "title": "SC.912.L.15 -- crosswalk to bio-core-k12's natural-selection/adaptation LPM strand",
+      "content": {
+        "id": "FLLP-CROSSWALK-sc912l15-bio-core-k12-natural-selection",
+        "slug": "sc912l15-bio-core-k12-natural-selection",
+        "label": "SC.912.L.15 -- crosswalk to bio-core-k12's natural-selection/adaptation LPM strand",
+        "jurisdiction": "US-FL",
+        "standardOrAttribute": "NGSSS/B.E.S.T. (pending 2026 readoption) SC.912.L.15 (Diversity and Evolution of Living Organisms)",
+        "gradeRange": "9-12",
+        "sourceSystem": "openevo-conceptbase-competencybase-informal-refs",
+        "sourceRepoPath": "../../../../bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml",
+        "coverageStatus": "canonical-items-concept-tagged",
+        "notes": "Informal reference only (plain path, not a validated cross-repo link, per this repo's own CONTRIBUTING.md convention) -- the real value here is flagging that OpenEvo already has a mature, concept-tagged LPM strand for exactly the content Florida's 2026 draft is reportedly sidelining, which the design-concept-coach/curriculum-architect agents (or a future policy-brief-manifest record) could draw on directly when responding to Florida's public-comment process.\n",
+        "verificationStatus": "primary-source-confirmed",
+        "provenance": {
+          "extracted_by": "llm",
+          "added_by": "dustin.eirdosh@eva.mpg.de",
+          "date": "2026-10-20",
+          "review_status": "author-draft",
+          "version": "1.0.0",
+          "sourceProvenance": "Confirmed bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml exists in this ecosystem via direct file listing.\n"
+        }
+      },
+      "access_tier": "citation-only",
+      "license_or_rights_note": null,
+      "event_date": null,
       "effective_from": null,
       "effective_until": null
     }

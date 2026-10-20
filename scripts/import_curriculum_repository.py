@@ -99,6 +99,18 @@ REPOS = {
             "IN-KL": {"slug": "kerala-curriculum-repository", "name": "Kerala Curriculum Repository", "region_tags": ["IN-KL"]},
         },
     },
+    "florida-lpm": {
+        "path": ROOT / "curriculum-sources" / "florida-lpm",  # lives inside openlpm from founding, same precedent as india-lpm (2026-10-09)
+        "project_slug": "florida-curriculum-repository",
+        "project_name": "Florida Curriculum Repository",
+        "region_tags": ["US-FL"],
+        "default_jurisdiction": "US-FL",
+        # Single-state repo (like nys_lp) -- no state_projects sub-split
+        # needed, since every record is already US-FL. Founded 2026-10-20 to
+        # document Florida's evolution-curriculum politics, and the first
+        # repo to use the new policy-controversy-record schema (see its own
+        # GOVERNANCE.md).
+    },
 }
 
 GERMAN_STATE_ISO = {
@@ -226,11 +238,15 @@ def record_type_from_schema_ref(schema_ref):
 
 # Real-world dates, mapped onto curriculum_repository_records' event_date/
 # effective_from/effective_until (migration 094) and supersedes_record_id
-# (migration 100). Only two of the nine deutsche-lpm/nys-lpm record schemas
-# carry real-world dates at all: policy-timeline-event (dateStart/dateEnd/
-# eventType/temporalStatus/supersedes) and institutional-mandate-record
-# (adoptionDate/targetDate/status/supersededBy) -- every other type returns
-# all-null here and simply won't appear on the Timeline view, same as today.
+# (migration 100). Three of the ten florida-lpm-era record schemas carry
+# real-world dates: policy-timeline-event (dateStart/dateEnd/eventType/
+# temporalStatus/supersedes), institutional-mandate-record (adoptionDate/
+# targetDate/status/supersededBy), and -- new as of florida-lpm's founding,
+# 2026-10-20 -- policy-controversy-record (dateStart/dateEnd/status), which
+# has no supersession chain of its own (a controversy doesn't get
+# "superseded" the way a standards document does; see its recurrenceOf field
+# instead, not handled by this function). Every other type returns all-null
+# here and simply won't appear on the Timeline view, same as today.
 #
 # This function handles the STANDALONE case only (a record with no sibling
 # edition before or after it). A record that's part of a real edition chain
@@ -266,6 +282,17 @@ def compute_standalone_dates(record_type, content):
         if target and status == "proposed":
             return (None, adoption, target)
         return (None, adoption, None)
+    if record_type == "policy-controversy-record":
+        date_start = content.get("dateStart")
+        if not date_start:
+            return (None, None, None)
+        date_end = content.get("dateEnd")
+        if date_end:
+            return (None, date_start, date_end)
+        # No dateEnd -- active/emerging/dormant-unresolved controversies are
+        # open-ended bars (drawn to "today" by the Timeline view), same
+        # treatment as an in-progress policy-timeline-event.
+        return (None, date_start, None)
     return (None, None, None)
 
 

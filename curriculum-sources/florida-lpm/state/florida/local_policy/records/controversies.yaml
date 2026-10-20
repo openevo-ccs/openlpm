@@ -1,0 +1,487 @@
+$schema: ../../../../schema/policy-controversy-record.schema.json
+$description: >
+  Bounded, named public controversies in Florida's evolution-curriculum
+  politics -- the core deliverable of this repo's founding, using the new
+  policy-controversy-record schema (see GOVERNANCE.md and
+  schema/policy-controversy-record.schema.json's own description for why
+  this is a new, tenth record type rather than a reuse of an existing one).
+  See docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md
+  for full sourcing.
+
+controversies:
+  - id: FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight
+    slug: 2008-ngsss-evolution-wording-fight
+    label: The 2008 fight over explicitly naming evolution in the Next Generation Sunshine State Standards
+    jurisdiction: US-FL
+    controversyType: standards-adoption-fight
+    topicArea: >
+      Whether Florida's science standards should explicitly name "evolution"
+      at all, and if so, whether the word must be qualified by "the
+      scientific theory of."
+    summary: >
+      FLDOE's October 2007 draft standards were the first in Florida's history
+      to explicitly use the word "evolution." Organized religious-right
+      opposition (Focus on the Family, the Florida Baptist Witness, the
+      Florida Family Policy Council, at least 12 county school boards)
+      pushed back through late 2007, while Florida Citizens for Science led a
+      public counter-campaign defending the draft, backed by the National
+      Academy of Sciences and other scientific bodies. Days before the Feb
+      19, 2008 vote, under pressure, the State Board had the draft redrafted
+      to insert "the scientific theory of" before "evolution" as a last-minute
+      compromise, which the Board then adopted 4-3.
+    dateStart: "2007-10-19"
+    dateEnd: "2008-02-19"
+    status: resolved-compromise
+    outcomeSummary: >
+      The State Board adopted the standards with "the scientific theory of"
+      qualifier inserted before "evolution" (and before several other
+      scientific theories/laws) -- the first explicit naming of evolution in
+      Florida's standards, but in a hedged form that satisfied neither side
+      fully: opponents wanted evolution presented as contestable, while board
+      member Roberto Martinez and the original writing committee considered
+      the qualifier an unnecessary, "watered down" concession.
+    outcomeDate: "2008-02-19"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          Whether SC.912.L.15 and related benchmarks should name "evolution"
+          explicitly, and whether that name should be qualified by "the
+          scientific theory of."
+        relatedMandateIds:
+          - FLLP-MANDATE-ngsss-2008-sc912l15-1
+          - FLLP-MANDATE-ngsss-2008-sc912l15-standard
+        relatedEventIds:
+          - FLLP-EVENT-fldoe-2007-draft-standards-released
+          - FLLP-EVENT-county-school-board-resolutions-2007
+          - FLLP-EVENT-ngsss-2008-state-board-vote
+        relatedFindingIds:
+          - FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift
+    positions:
+      - actorId: FLLP-ACTOR-florida-citizens-for-science
+        actorLabel: Florida Citizens for Science (Brandon Haught, co-founder)
+        stance: supports-change
+        stanceSummary: >
+          Defended the original draft's unqualified use of "evolution,"
+          organized a 1,700+-signature petition, and called the adopted
+          compromise "a huge step forward for our Florida schools" despite
+          the hedged wording.
+        sourceUrl: https://ncse.ngo/evolution-comes-floridas-science-standards
+        sourceDate: "2008-02-19"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-florida-family-policy-council
+        actorLabel: Florida Family Policy Council (John Stemberger)
+        stance: opposes-change
+        stanceSummary: >
+          Organized opposition to the draft's explicit naming of evolution,
+          part of the same push that led to the 2008 "Academic Freedom Act"
+          legislative fight.
+        sourceUrl: https://www.discovery.org/a/4510/
+        sourceDate: "2008-01-01"
+        accessTier: summary-only
+      - actorLabel: Roberto Martinez (Florida State Board of Education member)
+        stance: other
+        stanceSummary: >
+          Voted NO on the adopted compromise -- not because he opposed
+          naming evolution, but because he considered the late "scientific
+          theory of" qualifier an unnecessary watering-down of the original,
+          scientifically stronger draft the National Academy of Sciences had
+          endorsed: "What we have here is an effort by people to water down
+          our standards."
+        sourceUrl: https://ncse.ngo/evolution-comes-floridas-science-standards
+        sourceDate: "2008-02-19"
+        accessTier: excerpt-only
+      - actorLabel: Donna Callaway (Florida State Board of Education member)
+        stance: opposes-change
+        stanceSummary: >
+          Voted NO on the adopted compromise from the opposite direction,
+          having pushed for a further "critical analysis" amendment to the
+          evolution standard that did not pass.
+        sourceUrl: https://ncse.ngo/evolution-comes-floridas-science-standards
+        sourceDate: "2008-02-19"
+        accessTier: summary-only
+    mediaCoverage:
+      - outlet: Education Week
+        headline: "Fla. Panel's Evolution Vote Hailed"
+        url: https://www.edweek.org/teaching-learning/fla-panels-evolution-vote-hailed/2008/02
+        publicationDate: "2008-02-19"
+        accessTier: citation-only
+      - outlet: Science
+        headline: "Florida Standards Support Evolution—With a Twist"
+        url: https://www.science.org/doi/10.1126/science.319.5867.1168
+        publicationDate: "2008-02-29"
+        accessTier: citation-only
+      - outlet: NBC News
+        headline: "Florida adopts 'scientific theory of evolution'"
+        url: https://www.nbcnews.com/news/amp/wbna23238493
+        publicationDate: "2008-02-19"
+        accessTier: citation-only
+      - outlet: Answers in Genesis
+        headline: "Florida Now Supports Teaching Evolution"
+        url: https://answersingenesis.org/public-school/science-standards/florida-now-supports-teaching-evolution/
+        publicationDate: "2008-02-23"
+        framingNote: >
+          Reactive commentary, not involvement in the Florida fight itself --
+          expressed hope that "teachers will still end up treading quite
+          carefully" despite the standards' adoption.
+        accessTier: citation-only
+    themes: ["evolution", "standards-adoption", "scientific-theory-wording"]
+    exhaustivenessCaveat: >
+      Built from NCSE's contemporaneous articles and the news sources they
+      cite; the full set of 12+ county school-board resolutions was not
+      individually verified (modeled as one combined timeline event).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Evolution Comes to Florida's Science Standards" and "The
+        e-word arrives in Florida," both fetched and read directly.
+
+  - id: FLLP-CONTROVERSY-2008-academic-freedom-act-legislative-fight
+    slug: 2008-academic-freedom-act-legislative-fight
+    label: The 2008 "Academic Freedom Act" (SB 2692/HB 1483) legislative fight
+    jurisdiction: US-FL
+    controversyType: legislative-mandate-fight
+    topicArea: >
+      Whether Florida law should require "critical analysis" of evolution be
+      taught alongside it, via a Discovery-Institute-template "Academic
+      Freedom Act."
+    summary: >
+      Running concurrently with the NGSSS standards fight, Sen. Ronda Storms
+      and Rep. Alan Hays introduced companion bills modeled on Discovery
+      Institute's template "Academic Freedom Act" legislation (the same
+      template Louisiana enacted in June 2008 and Tennessee enacted in 2012).
+      The House passed a substituted version 71-43, but the Senate rejected
+      the substitution and the bill died in a standoff at the end of the
+      2008 session.
+    dateStart: "2008-01-01"
+    dateEnd: "2008-05-02"
+    status: resolved-outcome-rejected
+    outcomeSummary: >
+      The bill died without becoming law -- the House and Senate could not
+      agree on which chamber's version to send to the Governor, and the
+      session ended with no further action. Unlike the near-simultaneous
+      NGSSS standards fight (which produced an adopted compromise), this
+      legislative push produced no change to Florida law.
+    outcomeDate: "2008-05-02"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          SB 2692 / HB 1483's proposed statutory language requiring "thorough
+          presentation and critical analysis of the scientific theory of
+          evolution" in Florida public schools.
+        relatedEventIds:
+          - FLLP-EVENT-sb2692-hb1483-2008-academic-freedom-act
+          - FLLP-EVENT-hb837-2005-academic-freedom-bill-of-rights
+    positions:
+      - actorId: FLLP-ACTOR-discovery-institute
+        actorLabel: Discovery Institute
+        stance: supports-change
+        stanceSummary: >
+          Authored the model statute the Florida bills followed; a Discovery
+          Institute representative appeared at a closed March 2008 press
+          event for legislators hosted by Rep. Alan Hays.
+        sourceUrl: https://www.discovery.org/a/4510/
+        sourceDate: "2008-03-01"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-florida-family-policy-council
+        actorLabel: Florida Family Policy Council (John Stemberger)
+        stance: supports-change
+        stanceSummary: >
+          Lead public advocate for the bill, citing anecdotal/unnamed claims
+          of teachers facing reprisal for questioning evolution.
+        sourceUrl: https://www.discovery.org/a/4510/
+        sourceDate: "2008-03-01"
+        accessTier: summary-only
+      - actorId: FLLP-ACTOR-florida-citizens-for-science
+        actorLabel: Florida Citizens for Science
+        stance: opposes-change
+        stanceSummary: >
+          Publicized and opposed the bill through its own news releases,
+          part of the same organizing effort defending the NGSSS draft.
+        sourceUrl: https://www.flascience.org/wp/?p=529
+        sourceDate: "2008-03-01"
+        accessTier: summary-only
+    mediaCoverage:
+      - outlet: Discovery Institute (Evolution News)
+        headline: "Prepared Remarks for Florida Academic Freedom Bill Press Conference"
+        url: https://evolutionnews.org/2008/03/prepared_remarks_for_florida_a/
+        publicationDate: "2008-03-01"
+        framingNote: Advocacy-organization framing, supportive of the bill.
+        accessTier: citation-only
+      - outlet: Panda's Thumb
+        headline: "Explore the str[ategy]..."
+        url: https://pandasthumb.org/archives/2008/03/explore-the-str.html
+        publicationDate: "2008-03-01"
+        framingNote: NCSE-adjacent blog, critical framing.
+        accessTier: citation-only
+    themes: ["evolution", "academic-freedom-legislation", "legislative-fight"]
+    exhaustivenessCaveat: >
+      The exact House/Senate procedural standoff in late April 2008 (Tampa
+      Tribune, April 29 2008) was not independently fetched this session --
+      see source-notes confidence flag 5.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Discovery Institute's own site, Evolution News, Florida Citizens for
+        Science's news releases, and the Florida Senate's own bill-amendment
+        record -- all fetched and read directly.
+
+  - id: FLLP-CONTROVERSY-2017-hb989-textbook-challenges
+    slug: 2017-hb989-textbook-challenges
+    label: 2017-2018 textbook challenges against evolution/climate content under HB 989
+    jurisdiction: US-FL
+    controversyType: textbook-or-materials-challenge
+    topicArea: >
+      Whether specific adopted science textbooks' treatment of evolution
+      and/or human-caused climate change should be removed, stickered, or
+      otherwise altered, using HB 989's any-resident-may-object mechanism.
+    summary: >
+      Within months of HB 989 taking effect, residents in at least three
+      Florida counties (Nassau, Collier, Martin) filed formal objections
+      specifically targeting evolution and/or climate-change content in
+      adopted science textbooks. Nassau County's objection (the first
+      statewide) sought disclaimer stickers; it and the Collier/Martin County
+      objections were all rejected at the school-board level, but the
+      mechanism itself remained in place for future use.
+    dateStart: "2017-11-01"
+    dateEnd: "2018-12-31"
+    status: resolved-outcome-rejected
+    outcomeSummary: >
+      All three known 2017-18 evolution/climate-specific challenges failed
+      at the school-board vote stage (Nassau's sticker proposal voted down;
+      Collier and Martin both failed 3-2) -- the original textbooks were
+      retained unaltered in every case. Florida Citizens for Science reports
+      at least 7 total instructional-materials complaints statewide in HB
+      989's first 5 months, of which at least 2 specifically targeted
+      evolution/climate content.
+    outcomeDate: "2018-12-31"
+    recurrenceOf: []
+    contestedObjects:
+      - description: >
+          Whether specific adopted biology/science textbooks' evolution and
+          climate-change content should carry disclaimers or be removed from
+          adoption, under HB 989's instructional-materials-objection process.
+        relatedMandateIds:
+          - FLLP-MANDATE-hb989-2017-instructional-materials
+        relatedEventIds:
+          - FLLP-EVENT-hb989-2017-signed-into-law
+          - FLLP-EVENT-nassau-county-textbook-challenge-2017
+          - FLLP-EVENT-collier-martin-county-textbook-challenges-2018
+    positions:
+      - actorLabel: Nassau County resident objector (name not captured in sources reviewed)
+        stance: opposes-change
+        stanceSummary: >
+          Objected to evolution's "prominent place" in three textbooks,
+          stating a goal "to stop the teaching of Darwinian evolution as
+          fact," and requested disclaimer stickers.
+        sourceUrl: https://www.flascience.org/?p=2997
+        sourceDate: "2017-11-01"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-florida-citizens-for-science
+        actorLabel: Florida Citizens for Science
+        stance: supports-status-quo
+        stanceSummary: >
+          Tracked and publicized each challenge, supporting the textbooks as
+          adopted and opposing the stickering/removal requests.
+        sourceUrl: https://www.flascience.org/?p=3506
+        sourceDate: "2018-01-01"
+        accessTier: summary-only
+    mediaCoverage:
+      - outlet: The World (PRX)
+        headline: "Florida allows any resident to challenge textbooks — and it has some science supporters concerned"
+        url: https://theworld.org/stories/2017/09/10/florida-allows-any-resident-challenge-textbooks-and-it-has-some-science
+        publicationDate: "2017-09-10"
+        accessTier: citation-only
+    themes: ["evolution", "climate-change", "textbook-challenge", "instructional-materials-law"]
+    exhaustivenessCaveat: >
+      Covers the specific episodes named in sources reviewed (Nassau,
+      Collier, Martin counties); FCS's own count of 7+ total statewide
+      complaints in the first 5 months suggests other, non-evolution-specific
+      challenges this record does not individually enumerate.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Florida Citizens for Science's own reporting (flascience.org/?p=2997,
+        /?p=3506) and The World/PRX (Sept 10 2017) -- all fetched and read
+        directly.
+
+  - id: FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission
+    slug: 2026-proposed-standards-evolution-climate-omission
+    label: The 2026 fight over omitting "evolution" and "climate change" from Florida's first science-standards rewrite since 2008
+    jurisdiction: US-FL
+    controversyType: standards-adoption-fight
+    topicArea: >
+      Whether Florida's proposed 2026 K-12 science standards -- which do not
+      use the word "evolution" in high-school life-science content, and do
+      not use "climate change"/"global warming" anywhere -- should be revised
+      before adoption, and what the omissions mean about the state's intent.
+    summary: >
+      FLDOE's draft rewrite (the first full science-standards revision since
+      2008) removes explicit naming of both evolution and climate change,
+      drawing fierce, wide-ranging criticism from teachers, a science
+      specialist, the state teachers' union, and the National Center for
+      Science Education, while FLDOE's own leadership defends the draft as
+      still substantively covering the underlying science. As of this
+      record's provenance date, the dispute is active: a public-comment
+      listening tour is underway and a State Board vote is expected December
+      2026.
+    dateStart: "2026-09-25"
+    status: active
+    recurrenceOf: [FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight]
+    contestedObjects:
+      - description: >
+          Whether the 2026 draft's omission of the word "evolution" from
+          high-school life-science standards, and of "climate change"/"global
+          warming" from the entire document, should be corrected before the
+          State Board's expected December 2026 vote.
+        relatedMandateIds:
+          - FLLP-MANDATE-2026-draft-science-standards-evolution-omission
+          - FLLP-MANDATE-ngsss-2008-sc912l15-standard
+        relatedEventIds:
+          - FLLP-EVENT-2026-standards-review-process-begins
+          - FLLP-EVENT-2026-draft-standards-released-for-comment
+          - FLLP-EVENT-2026-listening-tour-armwood-hs
+          - FLLP-EVENT-2026-virtual-statewide-listening-session
+          - FLLP-EVENT-2026-orange-county-listening-session
+          - FLLP-EVENT-2026-state-board-vote-expected
+          - FLLP-EVENT-2024-textbook-climate-content-removal
+        relatedFindingIds:
+          - FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming
+    positions:
+      - actorId: FLLP-ACTOR-fldoe
+        actorLabel: Henry Mack (Florida Education Commissioner)
+        stance: supports-status-quo
+        stanceSummary: >
+          Defended the draft as substantively covering evolution and climate
+          science despite the wording concerns: "We want evolutionary biology
+          in the standards, they are in the standards... My kids are reading
+          Charles Darwin"; "We are teaching climate science... Sea level rise
+          is in the standards." Separately described the draft's philosophy
+          in explicitly classical/teleological terms: "Science begins in
+          wonder, not in ideology... Florida's new standards will form
+          students who observe carefully, reason rigorously, and treat the
+          natural world as something given to be known, not invented."
+        sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        sourceDate: "2026-09-30"
+        accessTier: excerpt-only
+      - actorLabel: Patricia Duncan (FLDOE Senior Education Manager)
+        stance: neutral-fact-finding
+        stanceSummary: >
+          Told a public listening session the omissions were "not
+          intentional," and that the listening tour was "the first of many
+          steps."
+        sourceUrl: https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected
+        sourceDate: "2026-09-30"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-ncse
+        actorLabel: Glenn Branch (NCSE Deputy Director)
+        stance: opposes-change
+        stanceSummary: >
+          "I would like to say something nice about the new standards, but
+          I can't." Criticized the draft's ~1,000 high-school benchmarks as
+          "a mile wide and an inch deep," much of it "fun-fact-style
+          trivia" rather than a teaching framework.
+        sourceUrl: https://ncse.ngo/proposed-new-florida-science-standards-attract-fierce-criticism
+        sourceDate: "2026-10-02"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-teacher-institute-for-evolutionary-science
+        actorLabel: Bertha Vazquez (Director, Teacher Institute for Evolutionary Science)
+        stance: opposes-change
+        stanceSummary: >
+          "Moving backward... If it's not broken, why the hell are we fixing
+          it? We had smash bang good standards."
+        sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        sourceDate: "2026-09-30"
+        accessTier: excerpt-only
+      - actorLabel: Robin Williams (retired biology/environmental-science teacher)
+        stance: opposes-change
+        stanceSummary: >
+          "Evolution is a fundamental underlying process unifying all of
+          biology. To leave it out is ideology posing as biology."
+        sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        sourceDate: "2026-09-30"
+        accessTier: excerpt-only
+      - actorLabel: Lindsey Craven (Science Specialist, grades 9-12, Pinellas County Schools)
+        stance: opposes-change
+        stanceSummary: >
+          Noted the standards "reference... evolution without actually...
+          stating evolution."
+        sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        sourceDate: "2026-09-30"
+        accessTier: excerpt-only
+      - actorId: FLLP-ACTOR-florida-education-association
+        actorLabel: Florida Education Association
+        stance: opposes-change
+        stanceSummary: >
+          Warned that teaching outside mainstream science leaves Florida
+          students "at a disadvantage," and formally requested extended
+          review periods and additional virtual town halls.
+        sourceUrl: https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected
+        sourceDate: "2026-10-14"
+        accessTier: excerpt-only
+    mediaCoverage:
+      - outlet: WUSF Public Media
+        headline: "Evolution and climate change are missing from Florida's new K-12 science standards"
+        url: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        publicationDate: "2026-09-30"
+        accessTier: citation-only
+      - outlet: Florida Phoenix
+        headline: "New K-12 science curriculum scrutinized; December vote by Board of Ed expected"
+        url: https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected
+        publicationDate: "2026-10-14"
+        framingNote: Also mirrored at Florida Trend and Yahoo News per this repo's research.
+        accessTier: citation-only
+      - outlet: National Center for Science Education (NCSE)
+        headline: "Proposed new Florida science standards attract fierce criticism"
+        url: https://ncse.ngo/proposed-new-florida-science-standards-attract-fierce-criticism
+        publicationDate: "2026-10-02"
+        framingNote: Advocacy-organization framing, critical of the draft.
+        accessTier: citation-only
+      - outlet: National Center for Science Education (NCSE)
+        headline: "Florida Opens Pandora's Box of Educational Horrors with Proposed New Science Standards"
+        url: https://ncse.ngo/florida-opens-pandoras-box-educational-horrors-proposed-new-science-standards
+        publicationDate: "2026-10-09"
+        framingNote: >
+          The article that prompted this repo's founding; itself mostly
+          links out to NCSE's own prior reporting and to Pat Beall's Fort
+          Lauderdale Sun Sentinel column (Oct 9 2026, not independently
+          fetched -- likely paywalled).
+        accessTier: citation-only
+    themes: ["evolution", "climate-change", "standards-adoption", "naming-explicitness", "recurring-fault-line"]
+    exhaustivenessCaveat: >
+      This record reflects news coverage of the draft and of public-comment
+      sessions, not a direct read of the draft standards document itself
+      (fldoe.org/standardsreview/ returned HTTP 403 on automated fetch this
+      session). Florida Citizens for Science's own 2026 position could not be
+      found despite being the historically central Florida-specific voice on
+      this issue -- a real gap, not an indication the organization has no
+      position. This controversy is ACTIVE and unresolved as of this
+      record's provenance date; update status/outcomeSummary/outcomeDate
+      once the State Board actually votes.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        WUSF (Nancy Guan, Sept 30 2026), Florida Phoenix (Jay Waagmeester,
+        Oct 14 2026), NCSE (Glenn Branch, Oct 2 and Oct 9 2026) -- all
+        fetched and read directly, the three sources listed in
+        docs/source-notes/ as independently verified rather than
+        search-snippeted.

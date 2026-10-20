@@ -1,0 +1,165 @@
+$schema: ../../../../schema/coherence-finding-record.schema.json
+$description: >
+  Empirical findings from comparing Florida's science-standards text across
+  editions (1996/1999, 2008 NGSSS, 2020 B.E.S.T. [ELA/Math only], 2026 draft).
+  See docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.
+
+findings:
+  - id: FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift
+    slug: evolution-naming-1996-to-2008-explicitness-shift
+    label: Florida's standards shifted from avoiding the word "evolution" (pre-2008) to explicitly naming it (2008)
+    findingType: standard-naming-explicitness-gap
+    objects:
+      - jurisdiction: US-FL
+        policyArea: 1996/1999 Sunshine State Standards, science
+        documentDate: "1996-05-01"
+        excerptText: "biological change over time (reported characterization, not a confirmed verbatim quotation -- see verificationStatus)"
+        sourceDocument: Sunshine State Standards (original), Science
+        sourceUrl: https://ncse.ngo/evolution-comes-floridas-science-standards
+        accessTier: summary-only
+      - jurisdiction: US-FL
+        policyArea: 2008 NGSSS, SC.912.L.15
+        documentDate: "2008-02-19"
+        excerptText: "the scientific theory of evolution... the fundamental concept underlying all of biology"
+        sourceDocument: Next Generation Sunshine State Standards (NGSSS), Science
+        sourceUrl: https://ncse.ngo/evolution-comes-floridas-science-standards
+        accessTier: excerpt-only
+    summary: >
+      Florida's original (1996/1999) science standards reportedly never used
+      the word "evolution," using only "biological change over time"
+      instead; the 2008 NGSSS was the first Florida standards document to use
+      "evolution" explicitly, and the Fordham Foundation's 2005 review (which
+      prompted much of the pressure for the 2008 rewrite) specifically
+      graded the pre-2008 standards an "F" for this avoidance.
+    policyRelevance: >
+      Establishes the baseline the 2026 draft is now being compared against
+      -- critics of the 2026 draft (see FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission)
+      are explicitly framing the omission as "moving backward" to a pre-2008
+      pattern, not merely a new development.
+    testsMandateIds: [FLLP-MANDATE-ngsss-2008-sc912l15-standard]
+    relatedControversyIds: [FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight]
+    themes: ["evolution", "standards-wording", "naming-explicitness"]
+    exhaustivenessCaveat: >
+      The 1996/1999 side of this comparison rests on secondary-source
+      characterization (the Winn quote, Fordham's 2005 review as cited by
+      NCSE), not a primary document read directly this session -- see
+      source-notes confidence flags 1-2. Treat the 1996/1999 object above as
+      provisional until the original text is located.
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Evolution Comes to Florida's Science Standards" and "Evolution
+        in the Florida state science standards," both fetched and read
+        directly; 1996/1999 side via AI-synthesized secondary-source summary.
+
+  - id: FLLP-FINDING-best-standards-2020-science-untouched
+    slug: best-standards-2020-science-untouched
+    label: The 2019-2020 B.E.S.T. Standards rewrite did not touch science -- SC.912.L.15 remained 2008-era text until 2026
+    findingType: benchmark-removed-or-added-across-editions
+    objects:
+      - jurisdiction: US-FL
+        policyArea: B.E.S.T. Standards (2020)
+        documentDate: "2020-02-12"
+        excerptText: ""
+        sourceDocument: FLDOE B.E.S.T. Standards Overview (July 20, 2020)
+        sourceUrl: https://www.fldoe.org/file/7576/BESTStandardsOverview.pdf
+        accessTier: citation-only
+      - jurisdiction: US-FL
+        policyArea: NGSSS SC.912.L.15 (2008, still in force through 2020)
+        documentDate: "2008-02-19"
+        excerptText: ""
+        sourceDocument: Next Generation Sunshine State Standards (NGSSS), Science
+        accessTier: citation-only
+    summary: >
+      Florida's 2019-2020 "B.E.S.T. Standards" rewrite (prompted by Gov.
+      DeSantis's Executive Order 19-32 eliminating Common Core) covered
+      English Language Arts and Mathematics only. Science standards,
+      including the 2008 evolution benchmarks, were not touched by that
+      process and remained in force unchanged until the 2026 rewrite --
+      confirming an 18-year gap (2008-2026) in Florida science-standards
+      revision, not the shorter gap a casual reading of "B.E.S.T. Standards"
+      news coverage from 2020 might suggest.
+    policyRelevance: >
+      Corrects a plausible misreading: Florida's evolution-standards content
+      did not change in 2019-2020. The 2026 rewrite is genuinely the first
+      science-specific revision since the 2008 NGSSS vote, which is why its
+      outcome carries the weight it does.
+    testsMandateIds: [FLLP-MANDATE-ngsss-2008-sc912l15-1, FLLP-MANDATE-ngsss-2008-sc912l15-standard]
+    themes: ["standards-revision-cycle", "scope-of-rewrite"]
+    exhaustivenessCaveat: >
+      Based on FLDOE's own Overview document and the Fordham Institute's 2020
+      review (confirmed to exist and to cover ELA/Math only via search, not
+      independently re-fetched in full this session) -- not a line-by-line
+      diff of the full 2020 B.E.S.T. rulemaking record.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        FLDOE B.E.S.T. Standards Overview (fldoe.org/file/7576/BESTStandardsOverview.pdf);
+        Fordham Institute, "The State of the Sunshine State Standards:
+        Florida's B.E.S.T. Edition" (June 2020, ERIC ED606003).
+
+  - id: FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming
+    slug: 2026-draft-omits-evolution-and-climate-explicit-naming
+    label: The 2026 draft standards omit explicit naming of both "evolution" and "climate change," reversing 2008's explicit-naming approach
+    findingType: standard-wording-change-across-editions
+    objects:
+      - jurisdiction: US-FL
+        policyArea: 2008 NGSSS, SC.912.L.15
+        documentDate: "2008-02-19"
+        excerptText: "the scientific theory of evolution... the fundamental concept underlying all of biology"
+        sourceDocument: Next Generation Sunshine State Standards (NGSSS), Science
+        accessTier: excerpt-only
+      - jurisdiction: US-FL
+        policyArea: 2026 draft high-school life-science standards
+        documentDate: "2026-09-25"
+        excerptText: ""
+        sourceDocument: Draft 2026 Florida K-12 Science Standards
+        sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+        accessTier: citation-only
+    summary: >
+      Where the 2008 NGSSS explicitly named "evolution" as "the fundamental
+      concept underlying all of biology," the 2026 draft does not use the
+      word "evolution" anywhere in its high-school life-science standards,
+      and does not use "climate change"/"global warming" anywhere in the
+      entire document -- a reversal of the 2008 standards' explicit-naming
+      approach for both concepts, per multiple named teacher/science-specialist
+      reviewers at public-comment sessions.
+    policyRelevance: >
+      This is the specific textual claim underlying
+      FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission.
+      Note this finding currently rests on reporting ABOUT the draft, not a
+      direct read of the draft text itself (see exhaustivenessCaveat) --
+      upgrading this finding to primary-source-confirmed is the single
+      highest-value follow-up action for this repo.
+    testsMandateIds:
+      - FLLP-MANDATE-ngsss-2008-sc912l15-standard
+      - FLLP-MANDATE-2026-draft-science-standards-evolution-omission
+    relatedControversyIds: [FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission]
+    themes: ["evolution", "climate-change", "standards-wording", "naming-explicitness"]
+    exhaustivenessCaveat: >
+      Based on named reviewers' public-comment-session characterizations as
+      reported by WUSF, Florida Phoenix, and NCSE -- not a direct line-by-line
+      read of the draft standards document itself, which could not be fetched
+      this session (fldoe.org/standardsreview/ returned HTTP 403).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        WUSF (Nancy Guan, Sept 30 2026), Florida Phoenix (Jay Waagmeester,
+        Oct 14 2026), NCSE (Glenn Branch, Oct 2 and Oct 9 2026) -- all
+        fetched and read directly; all are reporting about the draft rather
+        than the draft text itself.

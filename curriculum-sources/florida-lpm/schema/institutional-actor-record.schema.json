@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/florida-lpm/schema/institutional-actor-record.schema.json",
+  "title": "florida-lpm Institutional Actor Record",
+  "description": "An institution, agency, office, network, or role relevant to a state's curriculum-policy process -- a state education department, a governing board, a regional service agency, a school district, a nonprofit curriculum organization, an advocacy body. Not a person-tracking record: named individuals may appear in `currentHolder` but the record is anchored to the institutional role, which outlives any one office-holder. Modeled directly on deutsche_lp's institutional-actor-record.schema.json -- same shape, actorType vocabulary adapted to US education governance instead of transliterating German terms.",
+  "type": "object",
+  "required": ["id", "slug", "label", "actorType", "jurisdiction", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^FLLP-ACTOR-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md -- not an ecosystem-permanent identifier."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "actorType": {
+      "type": "string",
+      "enum": [
+        "state-education-department", "governing-board", "regional-service-agency",
+        "city-school-system", "school-district", "school",
+        "nonprofit-curriculum-organization", "affinity-network",
+        "university-research-center", "professional-association",
+        "advocacy-body", "think-tank", "other"
+      ]
+    },
+    "jurisdiction": {
+      "type": "string",
+      "description": "ISO-3166-2 style state code (e.g. US-FL) or 'US' for federal/multi-state.",
+      "pattern": "^US(-[A-Z]{2})?$"
+    },
+    "parentActor": {
+      "type": "string",
+      "pattern": "^FLLP-ACTOR-[a-z0-9-]+$",
+      "description": "Id of the actor this one reports into, is a division of, or was convened by, if any."
+    },
+    "role": {
+      "type": "string",
+      "description": "What this actor does with respect to curriculum policy specifically -- not a general institutional mission statement."
+    },
+    "currentHolder": {
+      "type": "object",
+      "description": "Named individual currently in this role, if applicable and known. Titles/incumbents change -- always check verificationStatus before treating this as current.",
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "asOf": { "type": "string", "format": "date" }
+      }
+    },
+    "url": { "type": "string", "format": "uri" },
+    "relatedActors": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^FLLP-ACTOR-[a-z0-9-]+$" }
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

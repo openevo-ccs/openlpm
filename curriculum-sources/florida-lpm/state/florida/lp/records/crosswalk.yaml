@@ -1,0 +1,122 @@
+$schema: ../../../../schema/curriculum-crosswalk-record.schema.json
+$description: >
+  Pointers from Florida's own evolution-related standards to machine-readable
+  curriculum-graph data elsewhere in this ecosystem -- this repo's own
+  hand-built CASE-format files (case/) and bio-core-k12's existing
+  natural-selection/adaptation LPM strand. See case/README.md and
+  docs/source-notes/2026-10-20-florida-machine-readable-standards-landscape-research.md
+  for why a hand-built CASE file was used rather than a live external feed.
+
+crosswalks:
+  - id: FLLP-CROSSWALK-sc912l15-common-standards-project-api
+    slug: sc912l15-common-standards-project-api
+    label: "SC.912.L.15 (2008 NGSSS) -- live source: Common Standards Project API"
+    jurisdiction: US-FL
+    standardOrAttribute: NGSSS (2008) SC.912.L.15 (Diversity and Evolution of Living Organisms), full 15-benchmark set plus Access Points
+    gradeRange: "9-12"
+    sourceSystem: common-standards-project-api
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      CONFIRMED LIVE 2026-10-20 (this session, via direct curl/REST calls,
+      not browser automation -- the JS-rendering wall that blocked CPALMS's
+      own Standards API page and the 1EdTech CASE Network registry did NOT
+      block this endpoint). Real, free, public, no-authentication-required
+      REST API: GET
+      https://api.commonstandardsproject.com/api/v1/jurisdictions (find
+      Florida's jurisdiction id, "80B94A122D3D4B95884660FF09CC357E") then GET
+      https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12
+      returns the complete Grades 9-12 Science (2008-) standard set (document
+      D1000338, "Science Next Generation Sunshine State Standards",
+      publicationStatus "Published", 546 standards total) as structured JSON
+      in the Achievement Standards Network (ASN) data model -- a
+      predecessor/cousin schema to CASE, not CASE itself. The dataset is
+      independently licensed CC BY 3.0 US by its compiler (rightsHolder:
+      Desire2Learn Incorporated). This is the record the hand-built case/
+      file (below) was transformed from, once this source was confirmed
+      reachable where CPALMS's own CASE Network feed was not.
+    licenseOrRightsNote: >
+      Florida State Board of Education-adopted benchmark text is a public
+      record under Fla. Stat. ch. 119, not subject to copyright. The Common
+      Standards Project's own compiled dataset is additionally and
+      independently licensed CC BY 3.0 US
+      (http://creativecommons.org/licenses/by/3.0/us/, rightsHolder Desire2Learn
+      Incorporated) -- attribute both when reusing this data elsewhere.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        api.commonstandardsproject.com, fetched directly and read in full
+        2026-10-20 (not a search snippet or secondary mirror).
+
+  - id: FLLP-CROSSWALK-sc912l15-case-2008-ngsss
+    slug: sc912l15-case-2008-ngsss
+    label: "SC.912.L.15 (2008 NGSSS, Diversity and Evolution of Living Organisms) -- CASE format"
+    jurisdiction: US-FL
+    standardOrAttribute: NGSSS (2008) SC.912.L.15 (Diversity and Evolution of Living Organisms)
+    gradeRange: "9-12"
+    sourceSystem: openevo-graph-case-format-local-file
+    sourceRepoPath: ../../../case/florida-ngsss-2008-evolution-benchmarks.json
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      Hand-built CFDocument/CFItem JSON (conforming to
+      openevo-graph/schema/case_schema.json), transformed from the
+      confirmed-live Common Standards Project data (see
+      FLLP-CROSSWALK-sc912l15-common-standards-project-api above) into
+      CASE's own shape -- now covers the full SC.912.L.15 standard (all 15
+      core benchmarks plus 2 representative Access Points), not just the 2
+      items this repo started with. Still NOT a complete re-publication of
+      the full ~500-item Grades 9-12 Science standard set (physical science,
+      earth/space science, and the rest of life science are out of scope for
+      this repo). CPALMS/FLDOE's OWN native CASE Network feed (as opposed to
+      the Common Standards Project's separate ASN-format data, now
+      confirmed) was still not confirmed reachable this session
+      (JS-rendering blocked automated verification of
+      casenetwork.1edtech.org/rosetta.commongoodlt.com). If a human confirms
+      that feed separately, compare it against this file for any
+      discrepancy before treating either as sole source of truth.
+    licenseOrRightsNote: >
+      Same dual basis as FLLP-CROSSWALK-sc912l15-common-standards-project-api
+      above (Florida public-record status + Common Standards Project's CC BY
+      3.0 US license on the compiled dataset this file was transformed from).
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Transformed from api.commonstandardsproject.com data, fetched
+        directly 2026-10-20 -- see case/README.md.
+
+  - id: FLLP-CROSSWALK-sc912l15-bio-core-k12-natural-selection
+    slug: sc912l15-bio-core-k12-natural-selection
+    label: "SC.912.L.15 -- crosswalk to bio-core-k12's natural-selection/adaptation LPM strand"
+    jurisdiction: US-FL
+    standardOrAttribute: NGSSS/B.E.S.T. (pending 2026 readoption) SC.912.L.15 (Diversity and Evolution of Living Organisms)
+    gradeRange: "9-12"
+    sourceSystem: openevo-conceptbase-competencybase-informal-refs
+    sourceRepoPath: ../../../../bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+    coverageStatus: canonical-items-concept-tagged
+    notes: >
+      Informal reference only (plain path, not a validated cross-repo link,
+      per this repo's own CONTRIBUTING.md convention) -- the real value here
+      is flagging that OpenEvo already has a mature, concept-tagged LPM
+      strand for exactly the content Florida's 2026 draft is reportedly
+      sidelining, which the design-concept-coach/curriculum-architect agents
+      (or a future policy-brief-manifest record) could draw on directly when
+      responding to Florida's public-comment process.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Confirmed bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml
+        exists in this ecosystem via direct file listing.

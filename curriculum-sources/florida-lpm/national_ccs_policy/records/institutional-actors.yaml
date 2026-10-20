@@ -1,0 +1,157 @@
+$schema: ../../schema/institutional-actor-record.schema.json
+$description: >
+  Federal/multi-state actors relevant to Florida's evolution-curriculum
+  politics but not themselves Florida institutions -- national advocacy
+  organizations, national standards-review bodies, and national press/science
+  organizations named repeatedly across the 2008 and 2026 episodes. Florida's
+  own actors (FLDOE, the State Board, Florida-specific advocacy groups) live
+  in state/florida/local_policy/records/institutional-actors.yaml.
+
+actors:
+  - id: FLLP-ACTOR-ncse
+    slug: ncse
+    label: National Center for Science Education (NCSE)
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      National nonprofit defending the teaching of evolution and climate
+      science in US public schools. The single most consistent, longest-running
+      named institutional voice on Florida's evolution-curriculum fights,
+      from the 2007-08 NGSSS episode (contemporaneous reporting) through the
+      2026 proposed-standards fight (three 2026 posts by Deputy Director
+      Glenn Branch, including the article that prompted this repo's
+      founding). NCSE's Board Chair, Kenneth R. Miller, is also a co-author
+      of a Florida-adopted biology textbook directly affected by the 2024
+      textbook-review climate-content removal.
+    currentHolder:
+      name: Glenn Branch
+      title: Deputy Director
+      asOf: "2026-10-20"
+    url: https://ncse.ngo
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's own site (ncse.ngo) and its 2026 articles, fetched and read
+        directly by this repo's founding research session. See
+        docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.
+
+  - id: FLLP-ACTOR-discovery-institute
+    slug: discovery-institute
+    label: Discovery Institute (Center for Science and Culture)
+    actorType: think-tank
+    jurisdiction: US
+    role: >
+      National intelligent-design-promoting think tank. Authored the model
+      "Academic Freedom Act" statute (posted at academicfreedompetition.com)
+      that Florida's 2008 SB 2692/HB 1483 followed closely, and the same
+      template later enacted in Louisiana (2008) and Tennessee (2012).
+      A Discovery Institute representative appeared at a closed March 2008
+      press event hosted by Rep. Alan Hays for Florida legislators. Already
+      modeled as group:discovery-institute in openevo-graph's own dispute
+      graph (og:dispute:openevo-vs-discovery-institute) for a separate,
+      scientific-content dispute (the bacterial-flagellum/Kitzmiller case)
+      -- this record is the same real-world institution, referenced here for
+      its distinct role in Florida's *legislative* history specifically, not
+      a duplicate or conflicting characterization.
+    url: https://www.discovery.org
+    relatedActors: []
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Discovery Institute's own site (discovery.org/a/4510/) and Evolution
+        News (evolutionnews.org/2008/03/prepared_remarks_for_florida_a/),
+        both cited directly in this repo's founding research. See
+        docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.
+
+  - id: FLLP-ACTOR-fordham-institute
+    slug: thomas-b-fordham-institute
+    label: Thomas B. Fordham Institute (formerly Foundation)
+    actorType: think-tank
+    jurisdiction: US
+    role: >
+      National education-policy think tank that periodically grades every
+      US state's K-12 science standards. Gave Florida's pre-2008 standards
+      an "F" in its 2005 report (The State of State Science Standards 2005,
+      lead author Paul R. Gross) for avoiding "the E-word," and reviewed the
+      post-2019 B.E.S.T. Standards in 2020 (ELA/Math only -- science was not
+      rewritten that cycle, so Fordham's 2020 review has no science content).
+      A 2012 50-state regrade reportedly also covered Florida's NGSSS, though
+      the exact before/after grade (an unconfirmed "D-then-revised-to-C")
+      was not independently verified this session.
+    url: https://fordhaminstitute.org
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Fordham's own 2005/2012 PDFs were not independently fetched this
+        session -- the organization's existence/role is well-confirmed, but
+        the exact Florida-specific grades/wording should be checked against
+        edexcellence.net directly before being quoted verbatim anywhere.
+      sourceProvenance: >
+        Referenced via NCSE's own articles (ncse.ngo/evolution-comes-floridas-science-standards,
+        ncse.ngo/evolution-florida-state-science-standards) and Education
+        Week (edweek.org/teaching-learning/many-states-receive-d-or-f-in-review-of-science-standards/2012/02),
+        not fetched from Fordham's own site directly this session.
+
+  - id: FLLP-ACTOR-national-academy-of-sciences
+    slug: national-academy-of-sciences
+    label: National Academy of Sciences (NAS)
+    actorType: professional-association
+    jurisdiction: US
+    role: >
+      Sent a letter endorsing the original (pre-"scientific theory of"
+      compromise) draft of Florida's 2008 NGSSS, cited directly by Florida
+      State Board member Roberto Martinez during the Feb 19, 2008 vote.
+    url: https://www.nasonline.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Evolution Comes to Florida's Science Standards"
+        (ncse.ngo/evolution-comes-floridas-science-standards), fetched and
+        read directly.
+
+  - id: FLLP-ACTOR-answers-in-genesis
+    slug: answers-in-genesis
+    label: Answers in Genesis (AiG)
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      National young-earth-creationist ministry. Published reactive
+      commentary on Florida's Feb 2008 NGSSS vote (quoting NCSE's Eugenie
+      Scott) but this repo's research found NO evidence of direct involvement
+      in shaping Florida's standards or legislation -- its role in Florida's
+      history specifically was commentary-only, distinct from Discovery
+      Institute's direct legislative-template role. Recorded here precisely
+      to document that absence of involvement, not to overstate its role.
+    url: https://answersingenesis.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Answers in Genesis's own site, "Florida Now Supports Teaching
+        Evolution" (Feb 23, 2008),
+        answersingenesis.org/public-school/science-standards/florida-now-supports-teaching-evolution/,
+        fetched and read directly.

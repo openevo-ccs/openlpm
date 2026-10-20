@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/florida-lpm/schema/policy-brief-manifest.schema.json",
+  "title": "florida-lpm Policy Brief Manifest",
+  "description": "The compilation unit: which policy-principle records go into one audience-tailored brief, in what order, with what framing. Identical purpose to deutsche_lp's policy-brief-manifest.schema.json -- a manifest is the input a future compiler would take, and today serves as an explicit, checkable record of 'this is what we'd tell audience X, built from exactly these grounded principles.'",
+  "type": "object",
+  "required": ["id", "slug", "label", "audience", "jurisdictionScope", "principleIds", "status", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^FLLP-BRIEF-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "state-education-official", "regional-service-agency-staff",
+        "curriculum-researcher", "teacher-educator", "school-leader",
+        "nonprofit-network-partner", "policy-actor", "general-public", "other"
+      ],
+      "description": "Who this brief is written for. Same vocabulary as nys_lp's policy-brief-manifest.schema.json (itself adapted from deutsche_lp for the US institutional landscape) -- 'nonprofit-network-partner' covers an advocacy/grassroots organization like Florida Citizens for Science as readily as a curriculum nonprofit; 'policy-actor' covers a state legislator's office or a State Board of Education member."
+    },
+    "audienceDetail": {
+      "type": "string",
+      "description": "Free-text specifics, e.g. 'Florida State Board of Education members ahead of a standards-adoption vote' rather than just 'state-education-official'."
+    },
+    "jurisdictionScope": {
+      "type": "string",
+      "pattern": "^US(-[A-Z]{2})?$"
+    },
+    "purpose": {
+      "type": "string",
+      "description": "What this brief is trying to accomplish with this audience -- one or two sentences."
+    },
+    "principleIds": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Ordered list of policy-principle ids this brief compiles. Order matters -- it's the brief's own argument order.",
+      "items": { "type": "string", "pattern": "^FLLP-PRINCIPLE-[a-z0-9-]+$" }
+    },
+    "framingNotes": {
+      "type": "string",
+      "description": "Tone/emphasis guidance for whoever (human or LLM) drafts the actual brief text from these principles."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "ready-to-draft", "drafted", "sent", "superseded"],
+      "description": "Manifest lifecycle -- distinct from whether an actual brief document has been written yet."
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

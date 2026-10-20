@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opensalt.net/api/v1/case/CFDocument",
+  "$generator": "OpenEvo florida-lpm founding research session, 2026-10-20",
+  "$generated": "2026-10-20T00:00:00Z",
+  "$fileDescription": "CFDocument-only placeholder (no CFItems) for Florida's proposed 2026 K-12 science standards rewrite. Deliberately does NOT enumerate CFItems/benchmarks, because this repo's founding research characterizes the draft only through news reporting about it (WUSF, Florida Phoenix, NCSE), not a direct read of the draft document itself -- fldoe.org/standardsreview/ returned HTTP 403 on automated fetch. Fabricating specific benchmark codes/text without having read the primary document would misrepresent this record's actual evidentiary basis. See state/florida/local_policy/records/mandates.yaml (FLLP-MANDATE-2026-draft-science-standards-evolution-omission), coherence-findings.yaml (FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming), and controversies.yaml (FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission) for the actual sourced analysis of what reporting says this draft contains and omits.",
+  "CFDocument": {
+    "identifier": "florida-2026-draft-science-standards",
+    "uri": "oe://case/framework/florida-2026-draft-science-standards",
+    "title": "Florida K-12 Science Standards (2026 proposed rewrite, draft)",
+    "creator": "Florida Department of Education (18-person development committee, 1 science-education professor)",
+    "publisher": "Florida Department of Education",
+    "description": "Florida's first full K-12 science-standards rewrite since 2008, released for public comment 2026-09-25. Per multiple independently-fetched 2026 news sources, the draft's roughly 1,000 high-school benchmarks do not use the word 'evolution' in the life-science standards, and do not use 'climate change'/'global warming' anywhere in the document (retaining only 'weather and climate', 'climate systems', 'climate impacts on biodiversity'). Not built on the National Research Council's 2012 Framework for K-12 Science Education. Public comment via fldoe.org/standardsreview/; State Board vote expected December 2026.",
+    "subject": ["Science"],
+    "language": "en",
+    "version": "2026-draft",
+    "adoptionStatus": "Draft",
+    "statusStart": "2026-09-25",
+    "lastChangeDateTime": "2026-10-20T00:00:00Z",
+    "gradeLevels": ["K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+    "gradeBand": "9-12",
+    "openEvoAnchors": [],
+    "notes": "No CFItems are populated in this file -- see $fileDescription above. Once the actual draft PDF/document is fetched and read directly (the single highest-value follow-up action flagged across this repo's docs/source-notes/ and schema/ contributor_notes), replace this placeholder with real CFItems and a replacedBy/exactMatchOf-style CFAssociation chain against florida-ngsss-2008-evolution-benchmarks.json's items, so a query can walk the exact wording change (or absence) benchmark-by-benchmark rather than relying on reporting-level characterization alone."
+  },
+  "CFItems": [],
+  "CFAssociations": []
+}
