@@ -26,10 +26,10 @@
 
    Also carries the RGB channel triplets for the handful of tokens used as
    translucent tints (chip backgrounds, notices, the graph legend backdrop)
-   -- rgb(var(--x-rgb) / <alpha>) needs channels, not a hex string. Kept
-   here, not in openevo-design-tokens.css, since that file is a faithful
-   vendored copy; these are OpenLPM's own derived values, re-synced by hand
-   if the source tokens (or the brand colors above) change. */
+   -- rgb(var(--x-rgb) / <alpha>) needs channels rather than a hex string.
+   openevo-design-tokens.css is a faithful vendored copy, so these derived
+   values live here instead, as OpenLPM's own, re-synced by hand if the
+   source tokens (or the brand colors above) change. */
 :root {
   --brand-navy: #272d63;
   --brand-teal: #006c66;
@@ -42,10 +42,10 @@
   --critical-rgb: 208 59 59;
 
   /* A small rotating palette for the Concepts map (concepts-page.tsx) --
-     cycled by index via modulo, not tied to any fixed concept count, so it
-     works whether a project has 3 root concepts or 20. Purely a visual
-     grouping aid (every node shares its top-level ancestor's color), not a
-     semantic status color like the tokens above.
+     cycled by index via modulo, independent of any fixed concept count, so
+     it works whether a project has 3 root concepts or 20. Purely a visual
+     grouping aid (every node shares its top-level ancestor's color), kept
+     separate from the semantic status colors above.
 
      Real feedback 478397f9 (Susan, 2026-10-02): wanted the 6 real Thuringia
      Basiskonzepte colored green/red/blue/brown/orange/purple, in that
@@ -129,10 +129,10 @@ code {
    topbar, and with it the whole page, wider than the device, so the
    browser zooms the entire app out to fit rather than laying it out at
    the real device width. Confirmed by measuring window.innerWidth (563)
-   against the real visual viewport (390) on a live page: not a rendering
-   quirk, a genuine forced-overflow bug, and the reason a mobile user's
-   whole session looks zoomed out and cramped, not just this one button
-   being hard to reach. The email address itself is the single biggest
+   against the real visual viewport (390) on a live page: a genuine
+   forced-overflow bug. It's the reason a mobile user's whole session looks
+   zoomed out and cramped -- this one button being hard to reach is just a
+   symptom of that same bug. The email address itself is the single biggest
    contributor (long test/real addresses easily run 250px+) and isn't
    essential chrome -- the Profile page already shows it. */
 @media (max-width: 480px) {
@@ -160,7 +160,8 @@ code {
    project name/badges/preview-button block (.project-side-info) hide
    via CSS rather than unmounting, so collapsing never loses React state
    or re-fetches anything. Width shrinks just enough for a centered
-   16px icon with real padding, not the narrowest possible rail. */
+   16px icon with real padding, deliberately wider than the narrowest
+   possible rail. */
 .project-side.collapsed { width: 52px; }
 .project-side.collapsed .project-side-info,
 .project-side.collapsed .project-side-title,
@@ -184,9 +185,10 @@ code {
 .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
 
 /* Real feedback b4b23580/74e440a3 (2026-10-01): a real visible box around a
-   group of cards, not just a heading -- one step lighter than .card (which
-   stays the brightest surface) so a frame full of cards reads as a group
-   sitting slightly off the page, not another card of its own. */
+   group of cards, stronger than a plain heading alone -- one step lighter
+   than .card (which stays the brightest surface) so a frame full of cards
+   reads as a group sitting slightly off the page, distinct from a card of
+   its own. */
 .frame { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
 
 /* Real feedback a4be05a6 (2026-10-01): "differentiate at the frame level
@@ -219,12 +221,13 @@ code {
 .btn-primary:hover { filter: brightness(0.92); }
 .btn-danger { color: var(--critical); border-color: var(--critical); }
 .btn-mini { padding: 2px 8px; font-size: 11px; border-radius: 10px; }
+.btn-mini.active { background: rgb(var(--primary-rgb) / 0.12); border-color: var(--series-a); color: var(--series-a); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-linklike { background: none; border: none; padding: 0; color: var(--series-a); cursor: pointer; font: inherit; text-decoration: underline; }
 
 /* Real finding from layout_check/capture.mjs's first live run, 2026-09-30:
-   .btn-mini renders ~21-25px tall everywhere (icon buttons throughout the
-   whole app, not just one page) -- well under the 44px touch-target
+   .btn-mini renders ~21-25px tall everywhere -- icon buttons across the
+   whole app, every page alike -- well under the 44px touch-target
    guideline, identically on phone, tablet AND desktop, because button
    sizing was never touch-aware at all. `pointer: coarse` (true for a
    finger, false for a mouse) is the correct, targeted fix: it only grows
@@ -246,8 +249,8 @@ code {
 }
 .field textarea { min-height: 80px; }
 
-/* ---- status chips: color by MEANING, not literal enum value, so any
-   status column in the app (literature/schema/branch/project status)
+/* ---- status chips: color by MEANING rather than literal enum value, so
+   any status column in the app (literature/schema/branch/project status)
    can reuse the same handful of classes. ---- */
 .chip {
   display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px;
@@ -669,9 +672,9 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 
 /* Small, text-only legal links reachable from every signed-in page --
-   German TMG/DDG imprint-duty applies to the whole service, not just the
-   page before sign-in, but the full logo footer above would eat real
-   working space on every dashboard screen, so this stays minimal. */
+   German TMG/DDG imprint-duty applies to the whole service, including every
+   page after sign-in. The full logo footer above would eat real working
+   space on every dashboard screen though, so this stays minimal. */
 .app-legal-footer {
   text-align: center; padding: 8px 12px; font-size: 11px; color: var(--text-muted);
 }

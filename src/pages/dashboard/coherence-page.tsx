@@ -4,7 +4,9 @@ import { AlertTriangle, CheckCircle2, Clock, GitCompare, Grid3x3, Layers, Plus, 
 import type { ProjectOutletContext } from './project-layout'
 import { TabPanels } from '@/components/tab-panels'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { LpmComparisonProfileCard } from '@/components/lpm-comparison-profile-card'
 import {
+  KNOWN_COMPARISON_PAIRS,
   createComparativeLink,
   getProjectComparisonProfile,
   listComparativeLinksBetweenProjects,
@@ -537,51 +539,17 @@ function StrandPairPanel({
 
 // Real feedback ae39e124: "plan for options for higher level comparative
 // analyses (How coherent is Germany's 7th grade curriculum across
-// states?) -- but that is secondary and more advanced in the UI." Not
-// built this session -- shown honestly as a real, named next step rather
-// than faked, since comparing across PROJECTS (not just within one) needs
-// its own access-control thinking first (a viewer here may not be a
-// member of the other project being compared against).
-// Real as of 2026-10-20 for exactly one real pair (Bio-Core LPM / Interdisciplinary
-// LPM, the deliberate DCR-vs-ICR comparison pair) -- the access-control question the
-// old stub's comment raised is answered by lpm_comparative_links' own RLS
-// ("either side's members can view/edit", migration 143), not by anything in this
-// component. Not yet a general "pick any project to compare against" picker --
-// that's real added complexity with only one real use case to build it against so
-// far; widen this map when a second real comparison pair exists.
-const KNOWN_COMPARISON_PAIRS: Record<string, string> = {
-  'bio-core-lpm-synth': 'interdisciplinary-lpm-synth',
-  'interdisciplinary-lpm-synth': 'bio-core-lpm-synth',
-}
+// states?) -- but that is secondary and more advanced in the UI." Shown
+// honestly here as a real, named next step. Comparing across PROJECTS is
+// a bigger question than comparing within one and needs its own access-
+// control thinking first: a viewer here may not be a member of the other
+// project being compared against. That access-control question is
+// answered at the lpm_comparative_links RLS layer itself ("either side's
+// members can view/edit", migration 143). KNOWN_COMPARISON_PAIRS itself now lives in
+// comparative-analysis.ts, shared with the German/US custom views' own
+// "Vergleich" tab (curriculum-connections-page.tsx) -- added 2026-10-20 so
+// both read one source of truth instead of two copies.
 
-function ProfileCard({ profile, label }: { profile: ProjectComparisonProfile; label: string }) {
-  return (
-    <div className="card">
-      <strong>{label}</strong>
-      <p className="muted" style={{ fontSize: 11, marginTop: 2, marginBottom: 8 }}>
-        Depth and breadth are kept separate on purpose — neither axis implies the other model is &quot;more finished.&quot;
-      </p>
-      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
-        <span>Breadth of scope</span>
-      </div>
-      <p style={{ fontSize: 12, margin: '2px 0 8px' }}>
-        {profile.strand_count} strands · {profile.subject_domain_count} subject domain{profile.subject_domain_count === 1 ? '' : 's'} · {profile.grade_bands_covered} grade bands
-      </p>
-      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
-        <span>Depth within that scope</span>
-      </div>
-      <p style={{ fontSize: 12, margin: '2px 0 8px' }}>
-        avg. {profile.avg_performance_indicators ?? 0} performance indicators/item · avg. {profile.avg_real_world_links ?? 0} real-world links/item
-      </p>
-      <div className="row" style={{ justifyContent: 'space-between', fontSize: 12 }}>
-        <span>Ecosystem grounding</span>
-      </div>
-      <p style={{ fontSize: 12, margin: '2px 0 0' }}>
-        {profile.theory_count} theories · {profile.literature_count} literature refs · {profile.curriculum_repository_link_count} real-world curriculum links
-      </p>
-    </div>
-  )
-}
 
 function CrossCurriculumStub() {
   const { project, defaultBranchId, role, supabase } = useOutletContext<ProjectOutletContext>()
@@ -626,7 +594,7 @@ function CrossCurriculumStub() {
           <p className="muted" style={{ maxWidth: 440, margin: '4px auto 0' }}>
             This view is built out for Bio-Core LPM (Synthetic) and Interdisciplinary LPM (Synthetic)
             specifically, the one real deliberate comparison pair in OpenLPM today. Widening it to any
-            two projects is a real next step, not done here.
+            two projects is a real future step.
           </p>
         </div>
       </div>
@@ -641,8 +609,8 @@ function CrossCurriculumStub() {
 
       {ownProfile && compareProfile && (
         <div className="grid grid-2" style={{ marginBottom: 14 }}>
-          <ProfileCard profile={ownProfile} label={project.name} />
-          <ProfileCard profile={compareProfile} label={compareName} />
+          <LpmComparisonProfileCard profile={ownProfile} label={project.name} />
+          <LpmComparisonProfileCard profile={compareProfile} label={compareName} />
         </div>
       )}
 
