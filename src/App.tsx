@@ -41,6 +41,9 @@ import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-pa
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
 import StudentPromptPage from '@/pages/dashboard/student/student-prompt-page'
 import CurriculumConnectionsPage from '@/pages/dashboard/student/curriculum-connections-page'
+import CurriculumNetworkPage from '@/pages/dashboard/student/curriculum-network-page'
+import CurriculumComparisonPage from '@/pages/dashboard/student/curriculum-comparison-page'
+import CurriculumReportPage from '@/pages/dashboard/student/curriculum-report-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -119,6 +122,9 @@ export default function App() {
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
             <Route path="curriculum-connections" element={<CurriculumConnectionsPage />} />
+            <Route path="curriculum-network" element={<CurriculumNetworkPage />} />
+            <Route path="curriculum-comparison" element={<CurriculumComparisonPage />} />
+            <Route path="curriculum-report" element={<CurriculumReportPage />} />
             <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
