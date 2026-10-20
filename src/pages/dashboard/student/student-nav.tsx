@@ -1,16 +1,18 @@
 import { NavLink } from 'react-router-dom'
-import { CalendarRange, ClipboardList, Dna, Link2, Sparkles, Users } from 'lucide-react'
+import { CalendarRange, ClipboardList, Dna, FileText, GitCompare, Network, Sparkles, Users } from 'lucide-react'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
+import { STRINGS } from './curriculum-connections-strings'
 
-// Two groups, four items -- EvoMentor DE v1.2's own real sidebar shape
-// (ERKUNDEN: Lernziele, Basiskonzepte / PLANEN: KI-Prompt-Generator,
-// Wochenplan), carried over deliberately since it's the exact reference
-// Dustin asked this student view to match. Intentionally narrow by design
-// for a first-time student user, not a placeholder to expand later --
-// which is why Groups (the one real exception) is its own clearly-separate
-// third section, shown only when the project owner has actually turned it
-// on (migration 075), rather than folded into ERKUNDEN/PLANEN as if it
-// were part of the original EvoMentor DE reference.
+// Two groups, four items -- EvoMentor DE v1.2's sidebar shape (ERKUNDEN:
+// Lernziele, Basiskonzepte / PLANEN: KI-Prompt-Generator, Wochenplan),
+// carried over deliberately since it's the exact reference Dustin asked
+// this student view to match. Intentionally narrow by design for a
+// first-time student user, kept that way rather than treated as a
+// placeholder to expand later -- which is why Groups (the one exception)
+// is its own clearly-separate third section, shown only when the project
+// owner has actually turned it on (migration 075), rather than folded
+// into ERKUNDEN/PLANEN as if it were part of the original EvoMentor DE
+// reference.
 //
 // Wochenplan (added 2026-10-11) links to the same /calendar route and
 // CalendarPage component every project uses -- this is the one place that
@@ -21,24 +23,33 @@ import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates
 // copy in German automatically for a German-only project (which this
 // template is always used by), so no extra plumbing is needed beyond
 // linking to it.
+//
 // The 4 2026-10-20 German/US custom views (bio-core/interdisciplinary x
-// Sachsen-Thüringen/New York-California) share one simple nav -- Learning
-// Goals plus Curriculum Connections, in the view's own language -- rather
-// than extending the Jena pilot's bespoke ERKUNDEN/PLANEN structure, which
-// is specifically modeled on EvoMentor DE and doesn't fit a generic
-// two-tab researcher workspace.
+// Sachsen-Thüringen/New York-California) originally shared one flat
+// two-item nav. Redesigned the same day into 2 groups / 4 items -- real
+// feedback: "much more strategic use of custom side bar menus to create
+// much more helpful navigation of a wider range of visualizations" -- each
+// item its own real page (curriculum-overview-page.tsx is this nav's root,
+// curriculum-network-page.tsx, curriculum-comparison-page.tsx,
+// curriculum-report-page.tsx) rather than tabs inside one page.
 function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 'de' | 'en' }) {
   const base = `/dashboard/${slug}`
-  const labels = language === 'de'
-    ? { goals: 'Lernziele', connections: 'Lehrplan-Verbindungen' }
-    : { goals: 'Learning Goals', connections: 'Curriculum Connections' }
+  const t = STRINGS[language]
   return (
     <nav className="student-nav">
-      <NavLink to={base} end title={labels.goals} className={({ isActive }) => (isActive ? 'active' : '')}>
-        <ClipboardList size={14} /><span className="nav-label">{labels.goals}</span>
+      <p className="muted student-nav-group">{t.groupExplore}</p>
+      <NavLink to={base} end title={t.navOverview} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <ClipboardList size={14} /><span className="nav-label">{t.navOverview}</span>
       </NavLink>
-      <NavLink to={`${base}/curriculum-connections`} title={labels.connections} className={({ isActive }) => (isActive ? 'active' : '')}>
-        <Link2 size={14} /><span className="nav-label">{labels.connections}</span>
+      <NavLink to={`${base}/curriculum-network`} title={t.navNetwork} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <Network size={14} /><span className="nav-label">{t.navNetwork}</span>
+      </NavLink>
+      <p className="muted student-nav-group">{t.groupAnalyze}</p>
+      <NavLink to={`${base}/curriculum-comparison`} title={t.navComparison} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <GitCompare size={14} /><span className="nav-label">{t.navComparison}</span>
+      </NavLink>
+      <NavLink to={`${base}/curriculum-report`} title={t.navReport} className={({ isActive }) => (isActive ? 'active' : '')}>
+        <FileText size={14} /><span className="nav-label">{t.navReport}</span>
       </NavLink>
     </nav>
   )
