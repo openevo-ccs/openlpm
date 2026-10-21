@@ -828,8 +828,13 @@ function LernzielCard({
             const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
             const rootIdx = rootIdxById.get(rootKey)
             return (
-              <span key={e.basiskonzept_id} className="row" style={{ gap: 3, fontSize: 11 }} title={bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}>
-                {bkAbbreviation(bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id)}
+              <span
+                key={e.basiskonzept_id}
+                className="row"
+                style={{ gap: 3, fontSize: 11 }}
+                title={bkLabels[e.basiskonzept_id] ?? `Konnte keinem Basiskonzept zugeordnet werden (interne Kennung: ${e.basiskonzept_id})`}
+              >
+                {bkLabels[e.basiskonzept_id] ? bkAbbreviation(bkLabels[e.basiskonzept_id]) : '?'}
                 <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
               </span>
             )
@@ -1083,7 +1088,23 @@ function BkRelevanceSection({
               <div key={e.basiskonzept_id} style={{ marginBottom: 10 }}>
                 <div className="row" style={{ gap: 6 }}>
                   <span className="bk-dot" style={{ background: rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined }} />
-                  <strong style={{ fontSize: 13 }}>{bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}</strong>
+                  {/* Real feedback fc94c627 (Susan, 2026-10-10): a raw internal
+                      id (e.g. "bk_stoff_energie_umwandlung") used to render
+                      here bare whenever buildBkLabelMap's token-match failed
+                      -- no visible sign it wasn't a real label, and no
+                      explanation anywhere in the app of what that id even
+                      was. It was never meant to be shown; it's a match
+                      failure, not a cross-reference. Now it shows an honest
+                      "not yet matched" placeholder with the raw id kept only
+                      as a hover title, so it's reportable instead of
+                      confusing. */}
+                  {bkLabels[e.basiskonzept_id] ? (
+                    <strong style={{ fontSize: 13 }}>{bkLabels[e.basiskonzept_id]}</strong>
+                  ) : (
+                    <strong className="muted" style={{ fontSize: 13, fontWeight: 400, fontStyle: 'italic' }} title={`Konnte keinem Basiskonzept zugeordnet werden (interne Kennung: ${e.basiskonzept_id})`}>
+                      Basiskonzept noch nicht zugeordnet
+                    </strong>
+                  )}
                   <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
                 </div>
                 {e.begruendung && <p className="muted" style={{ fontSize: 12.5, margin: '4px 0 0' }}>{e.begruendung}</p>}
