@@ -336,6 +336,94 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
   )
 }
 
+// Field names every base repo record roughly shares and that are already
+// shown elsewhere in the panel (id/label in the header, review_status
+// above) -- hidden here so the readable view doesn't repeat them.
+const HIDDEN_RECORD_FIELDS = new Set(['id', 'slug', '$schema'])
+
+function humanizeFieldName(key: string): string {
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/_/g, ' ')
+    .replace(/^./, (c) => c.toUpperCase())
+}
+
+// Real base-repo records nest arbitrarily (a method's protocolSteps is a
+// plain string array; its basiskonzeptbezug is an array of objects with
+// their own nested fields) -- recurse rather than special-case each repo's
+// shape, so this stays correct as new fields show up in any repo's data.
+function FieldValue({ value }: { value: unknown }) {
+  if (value === null || value === undefined || value === '') return <span className="muted">—</span>
+  if (Array.isArray(value)) {
+    if (value.length === 0) return <span className="muted">—</span>
+    // Short strings (ids, tags) read fine comma-joined on one line; longer
+    // ones (a method's protocolSteps, each a full sentence) need their own
+    // line each or they run together into an unreadable blob.
+    const isShortTagList = value.every((v) => (typeof v === 'string' || typeof v === 'number') && String(v).length <= 60)
+    if (isShortTagList) {
+      return <span>{value.map(String).join(', ')}</span>
+    }
+    if (value.every((v) => typeof v !== 'object' || v === null)) {
+      return (
+        <ol style={{ margin: '2px 0', paddingLeft: 18 }}>
+          {value.map((v, i) => (
+            <li key={i} style={{ marginBottom: 4 }}>{String(v)}</li>
+          ))}
+        </ol>
+      )
+    }
+    return (
+      <ul style={{ margin: '2px 0', paddingLeft: 16 }}>
+        {value.map((v, i) => (
+          <li key={i} style={{ marginBottom: 4 }}>
+            <FieldValue value={v} />
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  if (typeof value === 'object') {
+    return (
+      <div style={{ paddingLeft: 10, borderLeft: '2px solid var(--border)', marginTop: 2 }}>
+        {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
+          <div key={k} style={{ marginBottom: 4 }}>
+            <strong style={{ fontSize: 11 }}>{humanizeFieldName(k)}:</strong> <FieldValue value={v} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+  return <span style={{ whiteSpace: 'pre-wrap' }}>{String(value)}</span>
+}
+
+function RecordDetails({ data }: { data: Record<string, unknown> }) {
+  const [showRaw, setShowRaw] = useState(false)
+  const entries = Object.entries(data).filter(([k, v]) => !HIDDEN_RECORD_FIELDS.has(k) && v !== null && v !== undefined && v !== '')
+
+  return (
+    <div style={{ fontSize: 12 }}>
+      {entries.length === 0 ? (
+        <p className="muted">No further fields.</p>
+      ) : (
+        entries.map(([key, value]) => (
+          <div key={key} style={{ marginBottom: 10 }}>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{humanizeFieldName(key)}</div>
+            <div>
+              <FieldValue value={value} />
+            </div>
+          </div>
+        ))
+      )}
+      <button className="btn btn-mini" onClick={() => setShowRaw((v) => !v)} style={{ marginTop: 4 }}>
+        {showRaw ? 'Hide raw data' : 'View raw data'}
+      </button>
+      {showRaw && (
+        <pre style={{ fontSize: 10, maxHeight: 220, overflow: 'auto', whiteSpace: 'pre-wrap', marginTop: 6 }}>{JSON.stringify(data, null, 2)}</pre>
+      )}
+    </div>
+  )
+}
+
 function DetailPanel({
   nodeRef,
   supabase,
@@ -410,7 +498,9 @@ function DetailPanel({
 
       <details style={{ marginTop: 8 }}>
         <summary style={{ cursor: 'pointer', fontSize: 12 }} className="muted">Full record</summary>
-        <pre style={{ fontSize: 10, maxHeight: 220, overflow: 'auto', whiteSpace: 'pre-wrap' }}>{JSON.stringify(row.data, null, 2)}</pre>
+        <div style={{ maxHeight: 320, overflow: 'auto', marginTop: 6 }}>
+          <RecordDetails data={row.data} />
+        </div>
       </details>
 
       <div className="row" style={{ marginTop: 12, gap: 8 }}>
