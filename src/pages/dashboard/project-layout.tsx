@@ -17,6 +17,7 @@ import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav, type ProjectNavItem } from '@/components/project-nav'
 import { LpmSearchBar } from '@/components/lpm-search-bar'
+import { ProjectIntroBanner } from '@/components/project-intro-banner'
 import { StudentNav } from './student/student-nav'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 
@@ -478,6 +479,7 @@ export default function ProjectLayout() {
         <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
           <LpmSearchBar project={project} slug={slug} supabase={supabase} />
         </div>
+        <ProjectIntroBanner project={project} supabase={supabase} />
         <Outlet context={context} />
       </div>
     </div>

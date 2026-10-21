@@ -131,7 +131,6 @@ export default function DashboardPage() {
   return (
     <div>
       <h1>{project.name}</h1>
-      <p className="muted" style={{ marginBottom: 8 }}>{project.description}</p>
 
       {canManage && (
         <div className="row" style={{ marginBottom: 20, alignItems: 'center' }}>
