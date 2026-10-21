@@ -82,6 +82,8 @@ export default function AdminBaseRepoExplorerPage() {
   const [tab, setTab] = useState<TabKey>('all')
   const [view, setView] = useState<ViewMode>('table')
   const [search, setSearch] = useState('')
+  const [filterValue, setFilterValue] = useState<string>('')
+  const [sortBy, setSortBy] = useState<'label' | 'filterValue' | 'review_status'>('label')
   const [rowsByRepo, setRowsByRepo] = useState<Map<BaseRepoKey, SnapshotRow[]>>(new Map())
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<NodeRef | null>(null)
@@ -109,11 +111,35 @@ export default function AdminBaseRepoExplorerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin])
 
+  // Real feedback 68d278e2 (Susan, 2026-10-21): "add options to filter and
+  // sort, especially filter by Method-class." The filter dropdown only
+  // makes sense once a single repo is selected -- each repo's filterColumn
+  // means something different (method_class vs question_type vs
+  // source_vocabulary), so mixing them under "All" would filter apples
+  // against oranges. Resets whenever the tab changes so a stale filter
+  // value from one repo doesn't silently carry into another.
+  const activeFilterCfg = tab !== 'all' ? BASE_REPO_CONFIGS.find((c) => c.key === tab) : undefined
+  const activeFilterColumn = activeFilterCfg?.filterColumn
+  useEffect(() => { setFilterValue('') }, [tab])
+
   const allRows: NodeRef[] = useMemo(() => {
     const out: NodeRef[] = []
     for (const [repoKey, rows] of rowsByRepo) for (const row of rows) out.push({ repoKey, row })
-    return out
-  }, [rowsByRepo])
+    const filtered = filterValue ? out.filter((r) => r.row.filterValue === filterValue) : out
+    const sorted = [...filtered].sort((a, b) => {
+      const av = (sortBy === 'label' ? a.row.label : sortBy === 'filterValue' ? a.row.filterValue : a.row.review_status) ?? ''
+      const bv = (sortBy === 'label' ? b.row.label : sortBy === 'filterValue' ? b.row.filterValue : b.row.review_status) ?? ''
+      return av.localeCompare(bv)
+    })
+    return sorted
+  }, [rowsByRepo, filterValue, sortBy])
+
+  const filterOptions = useMemo(() => {
+    if (!activeFilterColumn) return []
+    const values = new Set<string>()
+    for (const rows of rowsByRepo.values()) for (const row of rows) if (row.filterValue) values.add(row.filterValue)
+    return Array.from(values).sort()
+  }, [rowsByRepo, activeFilterColumn])
 
   const totalCount = allRows.length
 
@@ -151,13 +177,24 @@ export default function AdminBaseRepoExplorerPage() {
       </div>
 
       <div className="row" style={{ gap: 8, marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <div className="row" style={{ gap: 8 }}>
+        <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <div className="field" style={{ marginBottom: 0 }}>
             <div className="row" style={{ gap: 6, alignItems: 'center' }}>
               <Search size={14} style={{ color: 'var(--text-muted)' }} />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search label…" />
             </div>
           </div>
+          {activeFilterColumn && (
+            <select value={filterValue} onChange={(e) => setFilterValue(e.target.value)}>
+              <option value="">All {filterColumnLabel(activeFilterColumn).toLowerCase()}</option>
+              {filterOptions.map((v) => <option key={v} value={v}>{v}</option>)}
+            </select>
+          )}
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
+            <option value="label">Sort: Label</option>
+            <option value="filterValue">Sort: {activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}</option>
+            <option value="review_status">Sort: Review status</option>
+          </select>
         </div>
         <div className="row" style={{ gap: 4 }}>
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
@@ -180,7 +217,7 @@ export default function AdminBaseRepoExplorerPage() {
           ) : totalCount === 0 ? (
             <div className="card empty"><p>No records match.</p></div>
           ) : view === 'table' ? (
-            <TableView rows={allRows} onSelect={setSelected} />
+            <TableView rows={allRows} onSelect={setSelected} detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'} />
           ) : view === 'cards' ? (
             <CardsView rows={allRows} onSelect={setSelected} />
           ) : (
@@ -201,14 +238,14 @@ export default function AdminBaseRepoExplorerPage() {
   )
 }
 
-function TableView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void }) {
+function TableView({ rows, onSelect, detailColumnLabel }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; detailColumnLabel: string }) {
   return (
     <table>
       <thead>
         <tr>
           <th>Repo</th>
           <th>Label</th>
-          <th>Detail</th>
+          <th>{detailColumnLabel}</th>
           <th>Review status</th>
         </tr>
       </thead>
@@ -348,6 +385,18 @@ function humanizeFieldName(key: string): string {
     .replace(/^./, (c) => c.toUpperCase())
 }
 
+// Real feedback d84ccffa (Susan, 2026-10-21): the filter/sort/detail-column
+// label for a repo's own filterColumn should read as that repo's actual
+// term, not the generic word-split of its snake_case DB column name --
+// "method_class" -> "Method-class" (MethodsBase's own real vocabulary
+// term), not "Method class".
+const FILTER_COLUMN_LABELS: Partial<Record<string, string>> = {
+  method_class: 'Method-class',
+}
+function filterColumnLabel(column: string): string {
+  return FILTER_COLUMN_LABELS[column] ?? humanizeFieldName(column)
+}
+
 // Real base-repo records nest arbitrarily (a method's protocolSteps is a
 // plain string array; its basiskonzeptbezug is an array of objects with
 // their own nested fields) -- recurse rather than special-case each repo's
@@ -407,7 +456,7 @@ function RecordDetails({ data }: { data: Record<string, unknown> }) {
       ) : (
         entries.map(([key, value]) => (
           <div key={key} style={{ marginBottom: 10 }}>
-            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{humanizeFieldName(key)}</div>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{filterColumnLabel(key)}</div>
             <div>
               <FieldValue value={value} />
             </div>
