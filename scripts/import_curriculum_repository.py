@@ -270,6 +270,57 @@ def most_conservative_tier(tiers):
     return max(tiers, key=lambda t: ACCESS_TIER_ORDER.index(t) if t in ACCESS_TIER_ORDER else len(ACCESS_TIER_ORDER))
 
 
+# Found live 2026-10-21: access_tier was computed correctly (including the
+# conservative 'citation-only' default above) but never actually enforced --
+# `content` was written verbatim regardless, so a record defaulted to
+# 'citation-only' because it simply had no accessTier field anywhere (true
+# for most institutional-mandate-record/policy-timeline-event rows authored
+# before accessTier was adopted as a convention) still shipped its full
+# quoted statementText/description to every project member, citation-only
+# tag or not. Confirmed against the live DB: 105 rows across deutsche-lpm,
+# nys-lpm, tennessee-lpm, and india-lpm had this exact mismatch.
+#
+# Scoped deliberately narrow: only the record types/fields that this
+# ecosystem's own schemas document as accessTier-governed verbatim-quote
+# fields (see each schema's own accessTier description) are touched here.
+# institutional-actor-record's `role`, policy-controversy-record's
+# `summary`, and similar narrative fields on other record types are
+# OpenEvo's own research writing rather than quoted source text, so they're
+# never redacted here even when their row also happens to default to
+# 'citation-only' -- that default only means an accessTier tag was never
+# found anywhere in the record. It says nothing about whether this specific
+# field is a licensing risk.
+GOVERNED_TOP_LEVEL_FIELD = {
+    "institutional-mandate-record": "statementText",
+    "policy-timeline-event": "description",
+}
+NESTED_GROUNDING_OBJECT_KEYS = ("objects", "curriculumObject", "baselineCurriculumObject")
+
+
+def redact_ungoverned_text(record_type, content, row_access_tier):
+    """Returns a copy of `content` with any accessTier-governed quoted-text
+    field removed wherever its own governing tier is 'citation-only' --
+    enforced at storage time so the DB row itself never carries more text
+    than its own access_tier allows, rather than trusting every reader to
+    respect it. Top-level fields are gated by the row's own overall
+    (already most-conservative) access_tier; nested grounding objects
+    (coherence-finding/latent-connection/synthetic-curriculum-redesign) are
+    gated by each object's OWN accessTier, since one array can mix tiers
+    across its own objects.
+    """
+    content = json.loads(json.dumps(content))  # cheap deep copy, no custom objects in here
+    top_level_field = GOVERNED_TOP_LEVEL_FIELD.get(record_type)
+    if top_level_field and row_access_tier == "citation-only" and content.get(top_level_field):
+        del content[top_level_field]
+    for key in NESTED_GROUNDING_OBJECT_KEYS:
+        value = content.get(key)
+        objects = value if isinstance(value, list) else [value] if isinstance(value, dict) else []
+        for obj in objects:
+            if isinstance(obj, dict) and obj.get("accessTier") == "citation-only" and obj.get("excerptText"):
+                del obj["excerptText"]
+    return content
+
+
 def record_type_from_schema_ref(schema_ref):
     if not schema_ref:
         return None
@@ -369,6 +420,7 @@ def parse_file(file_path, source_repo, default_jurisdiction, warnings, edges):
         tiers = list(find_recursive(r, "accessTier"))
         notes = list(find_recursive(r, "licenseOrRightsNote"))
         event_date, effective_from, effective_until = compute_standalone_dates(record_type, r)
+        access_tier = most_conservative_tier(tiers)
         out.append({
             "project_id": None,  # filled in once the target project exists
             "record_type": record_type,
@@ -376,8 +428,8 @@ def parse_file(file_path, source_repo, default_jurisdiction, warnings, edges):
             "source_repo": source_repo,
             "source_record_id": r["id"],
             "title": r["label"],
-            "content": r,
-            "access_tier": most_conservative_tier(tiers),
+            "content": redact_ungoverned_text(record_type, r, access_tier),
+            "access_tier": access_tier,
             "license_or_rights_note": notes[0] if notes else None,
             "event_date": event_date,
             "effective_from": effective_from,

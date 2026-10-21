@@ -208,7 +208,6 @@
         "dateStart": "2016-03-23",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The current generation of Bildungsplaene (BP2016), in force for all grades since 2023/24. Introduces the Leitperspektiven -- BNE, BTV, PG, BO, MB, VB -- defined as \"ein integraler Bestandteil der Bildungsplaene\" that \"sollen faecheruebergreifend in den Unterricht einbezogen werden\". Still the base document; everything since is a versioned update, not a replacement.\n",
         "involvedActors": [
           "DELP-ACTOR-bw-kultusministerium"
         ],
@@ -247,7 +246,6 @@
         "dateEnd": "2033-07-31",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Werden von der Kulturministerkonferenz (KMK) neue Bildungsstandards beschlossen, muessen die Bildungsplaene Baden-Wuerttembergs der jeweiligen Faecher und Schularten angepasst und implementiert werden.\" Versions BP2016.V2 (29.02.2024 / 10.03.2025) and BP2016 V3.0 (2026) roll out grade by grade per subject; the ministry's table spans 2024/25 through 2032/33. Englisch/Franzoesisch (revised from September 2023) took effect 2025/26.\n",
         "involvedActors": [
           "DELP-ACTOR-bw-kultusministerium",
           "DELP-ACTOR-bw-zsl"
@@ -287,7 +285,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "One hour per week from grade 5 at all weiterfuehrende Schulen from 2025/26; media education emphasized in lower grades, informatics in upper ones, \"beide Bereiche bewusst miteinander verzahnt\". A Bildungsplankommission is writing the subject's own plan, in force 2027/28; until then grades 5-6 use the Basiskurs Medienbildung plan plus a KM Lesehilfe. Enabled by the reworked Leitperspektive \"Leben und Lernen in einer digitalisierten Welt\" (LP LDW), which from 2026 replaces every reference to Leitperspektive Medienbildung.\n",
         "involvedActors": [
           "DELP-ACTOR-bw-kultusministerium"
         ],
@@ -326,7 +323,6 @@
         "dateEnd": "2027-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Per the ministry's FAQ Bildungsreform: subjects whose competencies and content are merely extended get adapted plans on 1 August 2026; Informatik und Medienbildung, Gemeinschaftskunde, Wirtschaft/Berufs- und Studienorientierung, and Naturwissenschaft und Technik follow on 1 August 2027. The 2027 set is the nearest dated window in which cross-subject \"human nature / society\" content is still being written in this state.\n",
         "involvedActors": [
           "DELP-ACTOR-bw-kultusministerium"
         ],
@@ -365,7 +361,6 @@
         "dateStart": "2026-05-06",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"Aus Verantwortung fuers Land -- Gemeinsam stark in stuermischen Zeiten\", presented 6 May 2026 after the 8 March election (Gruene 30.2 %, CDU 29.7 %), approved by both parties 9 May. Twelve-page education chapter: \"Die neuen Innovationselemente setzen wir um und fuehren die dazu erforderlichen Bildungsplananpassungen fort\"; Basiskompetenzen in Deutsch, Lesen, Mathematik; Informatik und Medienbildung \"durchgaengig in der Stundentafel als Fach\"; \"Schule soll ... ein Lernort fuer Demokratie sein\"; BNE \"greift wichtige Zukunftsthemen auf\". Continuity of the staged update, not a new curriculum generation.\n",
         "involvedActors": [
           "DELP-ACTOR-bw-kultusministerium"
         ],
@@ -475,7 +470,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "\"Seit dem Schuljahr 2025/2026 umfasst das Gymnasium die Jahrgangsstufen 5 bis 13. Fuer alle Jahrgangsstufen gilt der LehrplanPLUS.\" Completes the LehrplanPLUS rollout begun with the Grundschule in 2014/15.\n",
         "involvedActors": [
           "DELP-ACTOR-by-stmuk",
           "DELP-ACTOR-by-isb"
@@ -514,7 +508,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Der LehrplanPLUS erhaelt mit Beginn des Schuljahres 2026/27 ein neues Gewand\" -- a redesign of the online plan: clearer overview, design freedom made visible, direct links to support materials. A presentation relaunch, not a content revision; recorded because it is the only dated LehrplanPLUS change found for 2026.\n",
         "involvedActors": [
           "DELP-ACTOR-by-isb",
           "DELP-ACTOR-by-stmuk"
@@ -554,7 +547,6 @@
         "dateEnd": "2026-12-31",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "Bavarian year at the head of the national conference: motto \"Challenge up: Herzschlag und Hightech fuer Deutschlands Schuelerinnen und Schueler!\", priorities digital education and sport/movement. The national record is DELP-EVENT-bmk-praesidentschaft-bayern-2026; this Land-level mirror exists so Bayern's own timeline shows why its ministry sets the 2026 national agenda.\n",
         "involvedActors": [
           "DELP-ACTOR-by-stmuk",
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
@@ -667,7 +659,6 @@
         "dateEnd": "2024-12-31",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "First two waves of updating the 2017 joint Berlin-Brandenburg Rahmenlehrplan 1-10 to the weiterentwickelte KMK-Bildungsstandards: Fachteile C Deutsch and Mathematik (2023, to the 2022 ESA/MSA standards) and moderne Fremdsprachen (2024, to the 2023 standards).\n",
         "involvedActors": [
           "DELP-ACTOR-be-senbjf",
           "DELP-ACTOR-bb-mbjs",
@@ -707,7 +698,6 @@
         "dateStart": "2025-01-01",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Berlin ended the Staatsvertrag with Brandenburg on the joint Landesinstitut fuer Schule und Medien (LISUM). From 2025-01-01 Berlin runs BLiQ and Brandenburg runs LIBRA. Curriculum development for the still-joint RLP 1-10 is now commissioned to LIBRA by both governments. A one-year review (\"Ein Jahr BLiQ\") was published 2026-01-28.\n",
         "involvedActors": [
           "DELP-ACTOR-be-senbjf",
           "DELP-ACTOR-be-bliq"
@@ -747,7 +737,6 @@
         "dateEnd": "2027-07-31",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Ab dem Schuljahr 2025/2026 werden vom Landesinstitut Brandenburg fuer Schule und Lehrkraeftebildung (LIBRA) im Auftrag der Berliner Senatsverwaltung ... sowie des Brandenburgischen Ministeriums ... die Fachteile Naturwissenschaften 5/6, ... Biologie, Chemie und Physik im Hinblick auf die weiterentwickelten Bildungsstandards ueberarbeitet.\" Online survey of Fachkonferenzen 05.11.-20.12.2024; expert consultation and working groups 12/2024-03/2025; drafting 09/2025-06/2026; revision to 03/2027; Inkraftsetzung 06/2027; publication 07/2027. WP Naturwissenschaften 7-10 follows later.\n",
         "involvedActors": [
           "DELP-ACTOR-bb-libra",
           "DELP-ACTOR-be-senbjf",
@@ -788,7 +777,6 @@
         "dateEnd": "2026-10-31",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "\"fuehrt das Landesinstitut Brandenburg fuer Schule und Lehrkraeftebildung im Auftrag des MBJS und der SenBJF eine Anhoerung (Online-Befragung) durch\". The one currently open, dated, public channel in either state into a live science-curriculum draft -- directly relevant to where human evolution and Mensch-Natur content sits in Biologie/NaWi 5/6 and how it cross-references Gesellschaftswissenschaften.\n",
         "involvedActors": [
           "DELP-ACTOR-bb-libra"
         ],
@@ -827,7 +815,6 @@
         "dateStart": "2026-09-20",
         "dateGranularity": "day",
         "temporalStatus": "planned-future",
-        "description": "Ten days after this record was written. Bildung is one of the five dominant campaign themes per Tagesspiegel's programme analysis; no party position on the joint Rahmenlehrplan or on Brandenburg's exit was found. Every Berlin office-holder recorded here must be re-checked after this date.\n",
         "involvedActors": [
           "DELP-ACTOR-be-senbjf"
         ],
@@ -937,7 +924,6 @@
         "dateStart": "2026-01-06",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Ministerpraesident Dietmar Woidke announces the end of the SPD-BSW cooperation, opening the way to an SPD-CDU coalition -- the political precondition for Brandenburg's decision (below) to leave the joint Rahmenlehrplan with Berlin.\n",
         "involvedActors": [
           "DELP-ACTOR-bb-mbjs"
         ],
@@ -974,7 +960,6 @@
         "dateStart": "2026-03-05",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"Aus den gemeinsamen Rahmenlehrplaenen mit Berlin steigen wir aus und fuehren schrittweise verbindliche Lehrplaene fuer alle Faecher und alle Jahrgaenge ein, die sich an den nationalen Bildungsstandards orientieren.\" Also commits to a \"Bildungsland Brandenburg 2035\" strategy/participation process (Fortentwicklung of the Schulkongress), to strengthening Basiskompetenzen (a verpflichtendes Lese- und Rechenband, an extra Deutsch hour in Grundschule, more writing/reading practice across subjects, a repeated Sprachstandserhebung in Klasse 1), and names LIBRA as curriculum-quality \"Qualitaetsgarant\". Cabinet (Woidke V) formed 2026-03-18; Gordon Hoffmann (CDU) becomes the first non-SPD education minister since 1990.\n",
         "involvedActors": [
           "DELP-ACTOR-bb-mbjs"
         ],
@@ -1012,7 +997,6 @@
         "dateStart": "2026-09-01",
         "dateGranularity": "month",
         "temporalStatus": "current-in-progress",
-        "description": "Per a Bildungsministerium press statement: step 1, from school year 2027/28, sharpen and make more concrete the Mathematik, Deutsch and Englisch Fachteile of the current joint Rahmenlehrplan; step 2, a participation process beginning autumn 2026 to develop an entirely new, Brandenburg-only Lehrplangeneration for grades 1-10. This is the most substantial from-scratch curriculum rewrite identified anywhere in this 16-state search, and its cross-subject design (or lack of one) is unwritten as of 2026-09-10.\n",
         "involvedActors": [
           "DELP-ACTOR-bb-mbjs",
           "DELP-ACTOR-bb-libra"
@@ -1124,7 +1108,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "Three Gymnasien and five Oberschulen in Bremen and Bremerhaven pilot a new Informatik curriculum from 2025/26, starting at two hours a week and rising to four by the end of 2027. Developed since 2024 with Uni Oldenburg's Informatikdidaktik group, Calliope.cc and Wissensfabrik e.V. Senatorin Aulepp: \"Wir wollen den Schuelerinnen und Schuelern nicht nur technisches Wissen und Medienkompetenz vermitteln, sondern ihnen auch zeigen, welche Gestaltungsspielraeume in der digitalen Welt bestehen.\"\n",
         "involvedActors": [
           "DELP-ACTOR-hb-skb",
           "DELP-ACTOR-hb-lis"
@@ -1163,7 +1146,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Informatik Pflichtfach at all Sekundarstufe-I schools in Bremen from 2026/27, following the 2025/26 pilot. Its Bildungsplan is still an \"Erprobungsversion\" draft dated 2026-05-12, not yet a final adopted plan.\n",
         "involvedActors": [
           "DELP-ACTOR-hb-skb",
           "DELP-ACTOR-hb-lis"
@@ -1203,7 +1185,6 @@
         "dateStart": "2026-01-01",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Die mit dem Erlass 3/2026 angekuendigten Bildungsplaene fuer die Sek I stehen hier ab sofort zur Verfuegung\": new 2026 plans for Oberschule and Gymnasium in Darstellendes Spiel, Deutsch, Deutsche Gebaerdensprache, Mathematik, and a combined \"Naturwissenschaften, Biologie, Chemie, Physik\" plan. Englisch was still \"in Ueberarbeitung\" as of this session, expected end of September 2026. \"Gesellschaft und Politik\" at Oberschule remains only in its 2010 version -- the one named Sek-I subject with no 2026 update.\n",
         "involvedActors": [
           "DELP-ACTOR-hb-lis",
           "DELP-ACTOR-hb-skb"
@@ -1313,7 +1294,6 @@
         "dateStart": "2022-03-24",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "First public drafts of new curricula for Grundschule, Stadtteilschule and Gymnasium. Three Leitperspektiven anchored in every subject: \"Bildung fuer nachhaltige Entwicklung\"; \"Werte fuer ein gelingendes Zusammenleben in einer solidarischen, vielfaeltigen Gesellschaft\"; \"Leben und Lernen in einer digital gepraegten Welt\". Content cut by roughly 50% to a core; first full alignment with national KMK standards; durchgaengige Sprachbildung newly and concretely anchored in every subject framework.\n",
         "involvedActors": [
           "DELP-ACTOR-hh-bsfb"
         ],
@@ -1352,7 +1332,6 @@
         "dateEnd": "2026-07-31",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Stage 1 (2023/24): Grundschule, Sekundarstufe II, plus Deutsch/ Mathematik/Englisch/Religion in Sekundarstufe I. Stage 2 (2024/25): remaining Sekundarstufe-I subjects. Scientifically accompanied by IfBQ with a Begleit-AG (BSFB, LI, HIBB, schools) to review support measures during the trial itself, not only after.\n",
         "involvedActors": [
           "DELP-ACTOR-hh-bsfb",
           "DELP-ACTOR-hh-ifbq"
@@ -1392,7 +1371,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "Planned end of the three-year Erprobungsphase and full entry into force of the 2022/23 Bildungsplaene generation. IMPORTANT: this date is stated in 2022-era secondary sources describing the original plan; no 2026 press release confirming the trial actually concluded on schedule was found this session. The IfBQ evaluation itself continues through 2027-07-31 regardless.\n",
         "involvedActors": [
           "DELP-ACTOR-hh-bsfb"
         ],
@@ -1503,7 +1481,6 @@
         "dateStart": "2011-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "The Kerncurricula for Primarstufe and Sekundarstufe I, with their Bildungsstandards and Inhaltsfelder, entered force at the start of 2011/12 -- the generation the current Sekundarstufe-I adaptation (below) is now updating.\n",
         "involvedActors": [
           "DELP-ACTOR-he-kultusministerium"
         ],
@@ -1541,7 +1518,6 @@
         "dateStart": "2024-11-01",
         "dateGranularity": "month",
         "temporalStatus": "past-completed",
-        "description": "The Kerncurricula for the gymnasiale Oberstufe (KCGO) and the fachrichtungs-/schwerpunktbezogene Faecher im beruflichen Gymnasium (KCBG) were revised in November 2024 because, since the last APO-GOSt novellierung, all four Qualifikationsphase Halbjahre count toward written exams -- so Q4 material can now appear on the Abitur too. Content and competencies were redistributed evenly across Q1-Q4 in subjects with national Bildungsstandards. At the same time, per the 2023 CDU-SPD Koalitionsvertrag, the KC anchored Demokratieerziehung, Extremismuspraevention, Verbraucherbildung and psychische Gesundheit, plus the competencies of the KMK \"Strategie Bildung in der digitalen Welt\" and the KMK BNE-Empfehlung, and were reviewed for \"Kohaerenz, Konsistenz und Redundanzen\" across all subjects.\n",
         "involvedActors": [
           "DELP-ACTOR-he-kultusministerium",
           "DELP-ACTOR-he-lehrkraefteakademie"
@@ -1580,7 +1556,6 @@
         "dateStart": "2025-02-03",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The revised KCGO/KCBG became the verbindliche Grundlage fuer den Unterricht from 3 February 2025 (second half-year of the Einfuehrungsphase); first Landesabitur on this basis in 2027.\n",
         "involvedActors": [
           "DELP-ACTOR-he-kultusministerium"
         ],
@@ -1620,7 +1595,6 @@
         "dateEnd": "2025-07-01",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Gr\u00fcne Landtag members (Meier, May, Kinkel) filed Kleine Anfrage 21/2241 (2025-05-15) after practitioners at Umweltschulen criticized the KCGO Biologie resequencing (new Q2: Evolution and Informationsverarbeitung in Lebewesen; Q3: Strukturen und Zusammenhaenge in Oekosystemen, Stoffwechselphysiologie; Q4: Einfluss des Menschen auf Oekosysteme, Nachhaltigkeit, Biodiversitaet) for pushing outdoor ecology fieldwork into winter months. The minister's answer (16 June 2025, issued 1 July 2025) called the criticism \"nicht nachvollziehbar\", noting Q3 begins in August/September and that Freilandstudien are possible year-round with different seasonal foci. A real, documented case of one cross-cutting goal (exam-pool alignment) creating friction with another (BNE/outdoor learning) that no single mechanism had modeled together in advance.\n",
         "involvedActors": [
           "DELP-ACTOR-he-kultusministerium"
         ],
@@ -1658,7 +1632,6 @@
         "eventType": "curriculum-revision-begins",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Derzeit wird die Anpassung der Kerncurricula fuer die Sekundarstufe I an die weiterentwickelten KMK-Bildungsstandards fuer die Faecher Deutsch und Mathematik sowie fuer die weitergefuehrten Fremdsprachen und die Naturwissenschaften vorbereitet.\" No public timeline given as of this session. In parallel, first-ever competence-oriented Kerncurricula are being written for the Berufsschule (Deutsch, Fremdsprachen, Ethik, Politik und Wirtschaft, Sport -- the Ethik KC to cover all berufliche Schulformen except the berufliches Gymnasium), and Kerncurricula (replacing Lehrplaene) for evangelischen and katholischen Religionsunterricht at Berufsschulen, developed jointly with the churches.\n",
         "involvedActors": [
           "DELP-ACTOR-he-kultusministerium",
           "DELP-ACTOR-he-lehrkraefteakademie"
@@ -1769,7 +1742,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "New state school law: secures rural school locations via reduced minimum pupil counts, revises the Gymnasium Schullaufbahnempfehlung (average of 2.5 in Deutsch/Mathematik/Englisch required), organisationally phases out Foerderschulen with the focus \"Lernen\" by 2030, and legally anchors the \"Digitale Landesschule\" (video-conference Vertretungsunterricht). The legal frame the 2025/26 Stundentafel and subject changes sit inside.\n",
         "involvedActors": [
           "DELP-ACTOR-mv-bildungsministerium"
         ],
@@ -1807,7 +1779,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "Orientierungsstufe (grades 5-6): Geschichte newly starts in grade 5; \"Informatik und Medienbildung\" becomes an eigenstaendiges Fach from grade 5; AWT gets a Berufliche-Orientierung focus. Sekundarstufe I (7-10): Chemie starts again in grade 7; \"Das Fach Sozialkunde heisst Politische Bildung/Sozialkunde\" (1-2 Wochenstunden); Regional- and Gymnasialschulen get up to 11 extra weekly hours of Deutsch, Mathematik and Englisch across grades 7-10. Gymnasium: an additional compulsory hour of Berufliche Orientierung in grade 10. Regional Schools introduce a \"Praxislerntag\" of 4-6 hours a week in grade 8 or 9. Grundschule gets a daily 20-minute Leseband.\n",
         "involvedActors": [
           "DELP-ACTOR-mv-bildungsministerium",
           "DELP-ACTOR-mv-iq"
@@ -1848,7 +1819,6 @@
         "dateEnd": "2028-07-31",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Geplante Veroeffentlichungen der Rahmenplaene an allgemeinbildenden Schulen ... und in Ueberarbeitung befindliche Rahmenplaene fuer die Schuljahre 2025/26, 2026/27 und 2027/28\" -- an ongoing, subject-by-subject rollout run by IQ M-V, with a public \"Cover-Wettbewerb\" for the new plans' covers. Which specific subject lands in which year was shown only in a graphic on the ministry's page, not read this session -- individual subject Rahmenplaene (Biologie, Ethik, Geographie in particular) should be checked before assuming any one has or has not been rewritten yet.\n",
         "involvedActors": [
           "DELP-ACTOR-mv-iq",
           "DELP-ACTOR-mv-bildungsministerium"
@@ -1887,7 +1857,6 @@
         "dateStart": "2026-09-20",
         "dateGranularity": "day",
         "temporalStatus": "planned-future",
-        "description": "Ten days after this record was written. Teacher shortage and whether the current school structure still fits are named as central campaign issues; no party position on Rahmenplan governance specifically was found. Every MV office-holder recorded here must be re-checked after this date.\n",
         "involvedActors": [
           "DELP-ACTOR-mv-bildungsministerium"
         ],
@@ -1963,7 +1932,6 @@
         "dateStart": "2026-08-20",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "\"Die umfangreichste Neugestaltung der Oberstufe in Niedersachsen seit 21 Jahren\" (Ministerin Julia Willie Hamburg). Rigid subject- combination requirements (\"Schwerpunkte\") are dropped; five Pruefungsfaecher retained but freely combinable (no forced third foreign language or third social-science subject); recognition of study-abroad periods simplified; Facharbeit and Seminarfach abolished; schools may instead offer optional Projektkurse enabling faecheruebergreifende Zusammenarbeit; a \"kombinierter Leistungsnachweis\" replaces up to two written exams per Halbjahr with project-based/reflective work; the fourth exam subject becomes oral. Developed since 2024 with associations, interest groups, practitioners and school leaders.\n",
         "involvedActors": [
           "DELP-ACTOR-ni-kultusministerium"
         ],
@@ -2001,7 +1969,6 @@
         "dateStart": "2028-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "The new Qualifikationsphase already applies to students who entered grade 10 in the current (2026/27) school year; the first students formally begin the redesigned Oberstufe in 2028/29, with the first Abitur under the new regulation in 2030. Kerncurricula will be adapted \"as needed,\" varying by subject -- no full subject list published yet.\n",
         "involvedActors": [
           "DELP-ACTOR-ni-kultusministerium"
         ],
@@ -2041,7 +2008,6 @@
         "dateEnd": "2026-07-17",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "Three concurrent Kerncurricula revisions found this session: a new Mathematik-Grundschule plan drops schriftliches Dividieren and most Dezimalzahlen-Rechnen entirely, binding for grades 1-2 from 2026/27 and grades 3-4 from 2027/28; a Christliche-Religion Kerncurriculum for grades 5-10 went to Anhoerung 2026-02-25; a Werte-und-Normen Kerncurriculum for grades 1-4 went to Anhoerung 2026-07-17.\n",
         "involvedActors": [
           "DELP-ACTOR-ni-kultusministerium"
         ],
@@ -2117,7 +2083,6 @@
         "dateStart": "2025-12-10",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The state cabinet approved drafts of a new Ausbildungs- und Pruefungsordnung fuer die gymnasiale Oberstufe (APO-GOSt) and 38 new Kernlehrplaene, entering Verbaendebeteiligung (stakeholder consultation) through January 2026. Introduces a fifth Abiturfach alongside expanded subject choice.\n",
         "involvedActors": [
           "DELP-ACTOR-nw-schulministerium"
         ],
@@ -2155,7 +2120,6 @@
         "dateStart": "2026-07-08",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Final approval of the reform: a mandatory Projektkurs (3 h/week in the second Qualifikationsphase year) where students individually or in groups produce a study, artistic work, technical model, social- project concept, or science experiment, preparing them for Praesentationspruefungen; a fifth Abiturfach with its own Praesentationspruefung; three \"gleichwertige komplexe Leistungsnachweise\" replacing one Klausur each across three subjects from different Aufgabenfelder in both Einfuehrungs- and Qualifikationsphase; AI use permitted in these products if disclosed and accounted for in grading. Ministerin Feller: reform meant to \"staerken Kompetenzen, die fuer Studium, Ausbildung und Beruf immer wichtiger werden,\" citing artificial intelligence as reshaping the Berufswelt.\n",
         "involvedActors": [
           "DELP-ACTOR-nw-schulministerium"
         ],
@@ -2194,7 +2158,6 @@
         "dateStart": "2027-08-01",
         "dateGranularity": "day",
         "temporalStatus": "planned-future",
-        "description": "In force from 1 August 2027, first applying to students entering the Einfuehrungsphase in school year 2027/28, whose Abitur under the new rules falls in 2030. Kernlehrplaene issued 2026-08-07 per a lehrplannavigator.nrw.de PDF filename (not independently confirmed by a fetched page).\n",
         "involvedActors": [
           "DELP-ACTOR-nw-schulministerium"
         ],
@@ -2232,7 +2195,6 @@
         "eventType": "curriculum-revision-completes",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Der Kernlehrplan im Lernbereich Gesellschaftslehre fuer die Faecher Erdkunde, Geschichte, Politik wurde auf zeitgemaesse Anforderungen sowie die Erfordernisse der Schulform Hauptschule abgestimmt und novelliert.\" Feedback channel: KLPBeteiligung@msb.nrw.de. No in-force date visible on the page read this session. Combines three subjects into one Lernbereich -- the same integrating pattern seen in Niedersachsen's Gesellschaftslehre and (likely) Bremen's Gesellschaft und Politik.\n",
         "involvedActors": [
           "DELP-ACTOR-nw-schulministerium"
         ],
@@ -2308,7 +2270,6 @@
         "dateStart": "2026-03-22",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Election ending decades of SPD-led Bildungsministerien in Rheinland-Pfalz. Gordon Schnieder (CDU) becomes Ministerpraesident from 2026-05-18.\n",
         "involvedActors": [
           "DELP-ACTOR-rp-bildungsministerium"
         ],
@@ -2345,7 +2306,6 @@
         "dateStart": "2026-04-01",
         "dateGranularity": "month",
         "temporalStatus": "past-completed",
-        "description": "\"Wir modernisieren die Lehrplaene und verschlanken sie konsequent im Sinne eines modernen und innovativen Unterrichts. Dazu gehoeren fuer uns fruehzeitige und individuelle Angebote zur Berufsorientierung an allen weiterfuehrenden Schulen -- etwa durch verpflichtende Praktika im Bereich der Dualen Ausbildung ... sowie durch Projekt- und Trainingstage oder die bereits bestehenden Praktikumswochen.\" Also: \"Zugleich geht der Bildungsauftrag ueber die reine Wissensvermittlung hinaus: junge Menschen brauchen ein Wertefundament, sie muessen auch ueber soziale Kompetenzen und Medienkompetenz verfuegen ... Demokratiebildung [ist] fuer uns ein essentieller Bestandteil davon.\" MINT-Foerderung named as a priority. No fachuebergreifend/faecherverbindend language, no subject list, and no date were found in the education chapter.\n",
         "involvedActors": [
           "DELP-ACTOR-rp-bildungsministerium"
         ],
@@ -2384,7 +2344,6 @@
         "dateStart": "2026-05-18",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "First CDU Bildungsministerin in Rheinland-Pfalz in decades; previously a CSU member of the Bavarian Landtag and chair of its education committee. Follows Sven Teuber (SPD, 2025-26), who had himself followed Stefanie Hubig when she moved to the federal cabinet in May 2025.\n",
         "involvedActors": [
           "DELP-ACTOR-rp-bildungsministerium"
         ],
@@ -2460,7 +2419,6 @@
         "dateStart": "2024-11-20",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "New Gemeinschaftsschulverordnung adopted, in force from school year 2025/26. Streichert-Clivot: \"mehr als die Haelfte junger Menschen waehlen nach der Grundschule den Weg zur Gemeinschaftsschule.\" Regional information events began the same day.\n",
         "involvedActors": [
           "DELP-ACTOR-sl-mbk"
         ],
@@ -2498,7 +2456,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "New 2025-dated Lehrplaene for Gemeinschaftsschule: Gesellschafts- wissenschaften grades 5-10 (with an extra hour in grade 10); Naturwissenschaften for grades 5-6 and 7-8; Informatik integrated with six Jahreswochenstunden across grades 7-10; more flexible subject blocking to prioritize Lesen/Schreiben/Rechnen where needed; religion hours aligned to Gymnasium levels. A compendium was produced on \"Demokratiebildung in den verschiedenen Faechern\"; the reform \"ermoeglicht faecheruebergreifenden Unterricht\" and introduces school profiles (Nachhaltigkeit, kulturelle Bildung, Musik).\n",
         "involvedActors": [
           "DELP-ACTOR-sl-mbk"
         ],
@@ -2811,7 +2768,6 @@
         "dateStart": "2019-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "SMK commissioned a working group to think about the long-term strategic development of Saxon schooling toward 2030, explicitly \"ohne Denkverbote\" (without taboo topics). Predates the public Bildungsland Sachsen 2030 launch by five years.\n",
         "involvedActors": [
           "DELP-ACTOR-smk"
         ],
@@ -2848,7 +2804,6 @@
         "dateStart": "2021-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "The COVID period interrupted the 2019 working group's process; it resumed in 2021.",
         "involvedActors": [
           "DELP-ACTOR-smk"
         ],
@@ -2885,7 +2840,6 @@
         "dateStart": "2023-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "Public participation phase: expert councils, educational researchers, practitioners, students, parents, school leaders, municipalities/ school authorities, five regional education forums, internal SMK/LaSuB consultation. Produced 218 recommendations.\n",
         "involvedActors": [
           "DELP-ACTOR-smk",
           "DELP-ACTOR-lasub"
@@ -2923,7 +2877,6 @@
         "dateStart": "2024-05-16",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Strategy published with 4 fields (Lernen, Steuerung, Professionalisierung, Infrastruktur), 16 strategic goals, and 64 measures, drawing on 218 recommendations from the participatory phase.\n",
         "involvedActors": [
           "DELP-ACTOR-smk"
         ],
@@ -2961,7 +2914,6 @@
         "dateStart": "2025-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "Implementation of the published strategy started in school year 2025/26.",
         "involvedActors": [
           "DELP-ACTOR-smk",
           "DELP-ACTOR-lasub"
@@ -3000,7 +2952,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "SMK states that all 528 Lehrplandokumente across all subjects and school types are being modernized simultaneously in school year 2026/27 -- the first such comprehensive revision since 2004. Goals: strengthen competencies, create pedagogical space for practice and consolidation, strengthen democracy/media/language education, incorporate digitalization. THE CURRENT POLICY WINDOW this repo exists to engage with.\n",
         "involvedActors": [
           "DELP-ACTOR-smk",
           "DELP-ACTOR-lasub",
@@ -3041,7 +2992,6 @@
         "dateStart": "2030-08-01",
         "dateGranularity": "year",
         "temporalStatus": "planned-future",
-        "description": "Stated target for completing the full curriculum modernization.",
         "involvedActors": [
           "DELP-ACTOR-smk",
           "DELP-ACTOR-lasub"
@@ -3079,7 +3029,6 @@
         "eventType": "pilot-program",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
-        "description": "LaSuB experts (\"Expertinnen und Experten des Landesamtes f\u00fcr Schule und Bildung\") working together with Schulpraxis to develop, qualify, and implement Planungsbeispiele und Szenarien for Vernetzter Unterricht -- explicitly to test and reflect on what adaptation needs exist for future Stundentafeln, Lehrpl\u00e4ne, etc. The concept itself is being \"begleitend fortgeschrieben\" (continuously revised) alongside the pilot, concluding in an implementation Leitfaden (guide). The most direct existing hook for OpenEvo CCS's interdisciplinary- curriculum-design work. No specific start date given in the source.\n",
         "involvedActors": [
           "DELP-ACTOR-lasub"
         ],
@@ -3227,7 +3176,6 @@
         "dateStart": "2025-02-28",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"22 Fachlehrplankommissionen haben heute ihre Arbeit aufgenommen\" to revise the Sekundarschule curriculum, including three commissions writing entirely new subjects (Informatik, Spanisch, Italienisch). Priorities: the newer national KMK standards for Deutsch, Mathematik and the first foreign language; strengthening Bildungssprache; \"systematische Integration von Bildung f\u00fcr nachhaltige Entwicklung\" aligned with the UN SDGs; reviewing digital-learning requirements; Demokratiebildung and antisemitism prevention; cross-curricular work via Themenkomplexe; career orientation. Target school year for the result to become binding: 2027/28 (see DELP-EVENT-sachsenanhalt-sekundarschule-binding). Dr. Uta Bentke: \"Dies ist ein besonderer Moment: Heute sind in diesem Saal die Personen ... die festlegen, was ... im n\u00e4chsten Jahrzehnt gelehrt und gelernt wird.\"\n",
         "involvedActors": [
           "DELP-ACTOR-sachsenanhalt-mb",
           "DELP-ACTOR-lisa"
@@ -3266,7 +3214,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Revised primary-school curriculum enters into force, developed via ten Fachkommissionen (teachers, PD staff, Fachseminarleiter, university experts, LISA), implementing the 2022 KMK primary Bildungsstandards. Strengthens foundational competencies, language education/support, BNE, democracy education, digital-world education, and interdisciplinary work. Per the ministry's own 2026-01-21 announcement it is \"zunaechst zur Erprobung in Kraft gesetzt\" (initially set in force for a trial, see the implementation-evaluation-phase event below), following a formal Anhoerungsverfahren and Landtag notification in summer 2026. Minister Jan Riedel: \"Eine Absenkung der Leistungsstandards und damit der Qualitaet an Sachsen-Anhalts Grundschulen wird es nicht geben.\"\n",
         "involvedActors": [
           "DELP-ACTOR-sachsenanhalt-mb",
           "DELP-ACTOR-lisa"
@@ -3306,7 +3253,6 @@
         "dateEnd": "2030-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Four-year implementation/evaluation phase for the revised Grundschullehrplan, including a recurring digital \"Dialog: Lehrplan\" format where teachers discuss the curriculum directly with the LISA staff who developed it and can send feedback to the curriculum commission.\n",
         "involvedActors": [
           "DELP-ACTOR-lisa"
         ],
@@ -3344,7 +3290,6 @@
         "dateStart": "2027-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "Target school year for the revised Sekundarschule curricula (incl. new Informatik/Spanisch/Italienisch subjects) to become binding.",
         "involvedActors": [
           "DELP-ACTOR-sachsenanhalt-mb"
         ],
@@ -3382,7 +3327,6 @@
         "dateStart": "2026-09-06",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "AfD 43.8% (a record for any single party in Sachsen-Anhalt since reunification), CDU 17.2% (a historic low, second place), SPD 9.3%, Gruene 8.9%, Linke 8.6% (its worst result in the state), BSW 5.3% (clearing the threshold), FDP failed to enter parliament; turnout 77.8%. Government formation was still open as of 2026-09-11. Every Sachsen-Anhalt office-holder recorded in this repo, including Minister Jan Riedel, must be re-checked once a new government forms.\n",
         "involvedActors": [
           "DELP-ACTOR-sachsenanhalt-mb"
         ],
@@ -3491,7 +3435,6 @@
         "dateStart": "2024-08-01",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"Die Ergaenzung wurde 2024 ueberarbeitet, ab 01.08.24 gilt die 2. Auflage fuer alle Schulstufen.\" A cross-cutting supplement to the Fachanforderungen, not a subject in its own right.\n",
         "involvedActors": [
           "DELP-ACTOR-sh-iqsh"
         ],
@@ -3529,7 +3472,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Fachanforderungen Biologie, Chemie and Physik for Sekundarstufe I revised on the basis of KMK Bildungsstandards and further KMK requirements; presented at information events on 5, 6, 9 and 10 February 2026; take effect \"zum Beginn des Schuljahres 2026/27 aufwachsend fuer die jeweilige Jahrgangsstufe, in der das Fach beginnt.\" Worth reading directly for how it places human-evolution and ecology content, as a fifth data point alongside the Sachsen/Sachsen-Anhalt/Thueringen comparisons already in this repo.\n",
         "involvedActors": [
           "DELP-ACTOR-sh-iqsh",
           "DELP-ACTOR-sh-bildungsministerium"
@@ -3567,7 +3509,6 @@
         "eventType": "curriculum-revision-begins",
         "dateGranularity": "year",
         "temporalStatus": "current-in-progress",
-        "description": "\"In den folgenden Jahren ist geplant, die noch ausstehenden Fachanforderungen zu entwickeln sowie die bestehenden Fachanforderungen weiterzuentwickeln.\" Named in the pipeline: Englisch, Franzoesisch, Spanisch (2. Auflage, Sek I/II); Biologie, Chemie, Physik (4. Auflage, Sek I); Naturwissenschaften (2. Auflage, Sek I); a first set of Fachanforderungen for sonderpaedagogische Foerderung. No dates attached to any of these yet.\n",
         "involvedActors": [
           "DELP-ACTOR-sh-iqsh"
         ],
@@ -3677,7 +3618,6 @@
         "dateStart": "2024-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "past-completed",
-        "description": "A specific curriculum and cross-subject framework for digital competencies introduced starting school year 2024/25, with progressive integration into subject curricula, accompanying teacher PD, and digital course materials.\n",
         "involvedActors": [
           "DELP-ACTOR-thillm"
         ],
@@ -3714,7 +3654,6 @@
         "dateStart": "2026-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "\"Mit den neuen Lehrplaenen, der staerkeren Foerderung von Basiskompetenzen und einer systematischeren Qualitaetsentwicklung richten wir Schule staerker auf das aus, was Schuelerinnen und Schueler fuer ihren Bildungs- und Lebensweg brauchen\" (Minister Christian Tischner). Over 100 new Lehrplaene for various school types and subjects launch as Erprobungsfassungen (trial versions, not yet final) for school year 2026/27, gradually across all school types, including the first-ever standalone Gemeinschaftsschule Lehrplaene. Named Querschnittsaufgaben: \"von Sprach- und Medienbildung ueber Demokratiebildung und berufliche Orientierung bis zur kulturellen Bildung.\" Tischner: \"Schulentwicklung gelingt nicht vom Schreibtisch aus, sondern gemeinsam mit den Schulen\" -- the trial-then-feedback approach is explicit policy, not an afterthought. Also part of this school-year start: 50 more Grundschulen launch daily 20-minute reading bands (200 within two years), and continued Startchancen/QuaMath participation for mathematics.\n",
         "involvedActors": [
           "DELP-ACTOR-thueringen-bildungsministerium"
         ],
@@ -3752,7 +3691,6 @@
         "dateStart": "1999-08-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "The Th\u00fcringen Gymnasium Biologie curriculum in force from 1999 until its 2024 replacement -- a 25-year span, unusually long compared to the roughly decade-long cycle seen in other subjects' archived editions (e.g. Darstellen und Gestalten's 2006-2013 edition). Confirmed to exist via the Th\u00fcringer Schulportal's own official \"Archiv der nicht mehr g\u00fcltigen Th\u00fcringer Lehrpl\u00e4ne\" (archive of no-longer-valid Thuringia Lehrpl\u00e4ne, covering Gymnasium documents from 1999 onward), which lists exactly one Biologie entry (\"gy_lp_bi_1999.pdf\", 231 kB) and no intermediate edition between it and 2024. The PDF's own title page / Inkraftsetzung wording could not be independently extracted (older scanned-era PDF, not reliably OCR'd by the tools available this session) -- the existence and 1999 dating are primary-source-confirmed via the portal's archive listing itself; the exact original effective-date wording is not.\n",
         "involvedActors": [
           "DELP-ACTOR-thillm"
         ],
@@ -3834,7 +3772,6 @@
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
         "supersedes": "DELP-EVENT-thueringen-biologie-gymnasium-2024",
-        "description": "The specific Biologie Gymnasium curriculum within the broader \"over 100 new Lehrpl\u00e4ne\" 2026 batch (see DELP-EVENT-thueringen-lehrplaene-2026-batch). Published by ThILLM as a trial version (Erprobungsfassung), PDF dated 2026-08-13, in effect since 2026-08-01 but not yet finally adopted. Staged rollout by grade: Klassenstufen 7, 11, 12 in school year 2026/27; Klassenstufe 8 in 2027/28; Klassenstufe 9 in 2028/29; Klassenstufe 10 in 2029/30. Compared against the prior 2024 version, changes are concentrated at the individual learning-objective level rather than the six core Basiskonzepte themselves, which remain unchanged.\n",
         "involvedActors": [
           "DELP-ACTOR-thillm"
         ],
@@ -3913,7 +3850,6 @@
         "dateStart": "2027-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "The Th\u00fcringen cabinet advanced the founding of a new Landesinstitut f\u00fcr Lehrkr\u00e4ftebildung und Schulqualit\u00e4t, merging ThILLM (curriculum development, teacher PD, media) with the state's Studienseminare (the second phase of teacher training), starting school year 2027/28. Minister Tischner: current transitions \"zwischen Aus- und Fortbildung sowie zwischen Lehrplanentwicklung und Unterstuetzung der Schulen [sind] nicht eng genug\"; \"Unser Ziel ist deshalb groesser als eine Behoerdenreform\" -- explicitly meant to bind curriculum development more tightly to school support and teacher training. A separate, new monitoring institute will supply data for education- policy decisions. Described as largely cost-neutral. This means ThILLM as named in DELP-ACTOR-thillm is a transitional body, not a standing one -- any reference to it after 2027/28 should point at its successor instead.\n",
         "involvedActors": [
           "DELP-ACTOR-thillm",
           "DELP-ACTOR-thueringen-bildungsministerium"
@@ -3952,7 +3888,6 @@
         "dateStart": "2029-08-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "Implementation designed to grow through school year 2029/30.",
         "involvedActors": [
           "DELP-ACTOR-thillm"
         ],
@@ -5621,7 +5556,6 @@
         "issuingBody": "Kultusministerkonferenz (KMK)",
         "mandateType": "national-recommendation",
         "coordinationGrain": "unspecified",
-        "statementText": "\"F\u00f6rderung systemischen Denkens, des Umgangs mit Komplexit\u00e4t und Unsicherheit; fach\u00fcbergreifendes und f\u00e4cherverbindendes Lernen\"\n",
         "statementTextEn": "Point (d) of five named criteria for what BNE-oriented teaching requires: fostering systemic thinking and the handling of complexity and uncertainty; cross-subject and subject-linking learning.\n",
         "adoptionDate": "2024-06-13",
         "dateGranularity": "day",
@@ -5661,7 +5595,6 @@
         "issuingBody": "S\u00e4chsisches Staatsministerium f\u00fcr Kultus (SMK)",
         "mandateType": "state-strategy-goal",
         "coordinationGrain": "faecherverbindend",
-        "statementText": "\"2030 sind an den s\u00e4chsischen Schulen Fachunterricht und f\u00e4cherverbindendes Lernen gleicherma\u00dfen verbindlich und aufeinander abgestimmt und erg\u00e4nzen sich.\"\n",
         "statementTextEn": "By 2030, subject-based and subject-linking teaching are to be equally binding at Saxon schools, mutually coordinated, and complementary.\n",
         "adoptionDate": "2024-05-16",
         "dateGranularity": "day",
@@ -5702,7 +5635,6 @@
         "issuingBody": "S\u00e4chsisches Staatsministerium f\u00fcr Kultus (SMK)",
         "mandateType": "state-measure",
         "coordinationGrain": "faecherverbindend",
-        "statementText": "\"systematische Verankerung von Querschnittsthemen (zum Beispiel kulturelle und \u00e4sthetische Bildung, Pr\u00e4vention, Gesundheitsf\u00f6rderung und Achtsamkeit, politische Bildung, Medienbildung/Digitalisierung, BNE) sowie des f\u00e4cherverbindenden Kompetenzerwerbes\"\n",
         "adoptionDate": "2024-05-16",
         "dateGranularity": "day",
         "status": "adopted",
@@ -5741,7 +5673,6 @@
         "issuingBody": "S\u00e4chsisches Staatsministerium f\u00fcr Kultus (SMK)",
         "mandateType": "state-measure",
         "coordinationGrain": "faecherverbindend",
-        "statementText": "\"F\u00e4cherverbindender Unterricht wird verbindlich in den einschl\u00e4gigen Verwaltungsvorschriften verankert... In Lehrpl\u00e4nen werden Themen auf ihr Vernetzungspotenzial hin gepr\u00fcft und f\u00fcr das f\u00e4cherverbindende Lernen gekennzeichnet.\"\n",
         "statementTextEn": "Subject-linking teaching becomes binding in the relevant administrative regulations; Lehrplan themes are reviewed for their networking potential and flagged for subject-linking learning. Two to six Wochenstunden of faecherverbindendes Lernen become a binding allocation in the Stundentafeln for allgemeinbildende Schulen.\n",
         "adoptionDate": "2024-05-16",
         "dateGranularity": "day",
@@ -5781,7 +5712,6 @@
         "issuingBody": "S\u00e4chsisches Staatsministerium f\u00fcr Kultus (SMK)",
         "mandateType": "state-measure",
         "coordinationGrain": "faecherverbindend",
-        "statementText": "\"Die Umsetzungsm\u00f6glichkeiten f\u00fcr Stundentafeln und Lehrpl\u00e4ne werden so gestaltet, dass f\u00e4cherverbindender Unterricht im Umfang von zwei bis sechs Wochenstunden gem\u00e4\u00df Stundentafeln eigenverantwortlich durch die Schulen umgesetzt werden kann.\"\n",
         "adoptionDate": "2024-05-16",
         "dateGranularity": "day",
         "status": "adopted",
@@ -5820,7 +5750,6 @@
         "issuingBody": "Ministerium f\u00fcr Bildung des Landes Sachsen-Anhalt",
         "mandateType": "state-curriculum-framework",
         "coordinationGrain": "fachuebergreifend",
-        "statementText": "\"Aus \u00a7 1 des Schulgesetzes wurden die folgenden Themenkomplexe abgeleitet, die die Kernbotschaften der Weltnachhaltigkeitsziele aufgreifen: Gesundes und aktives Leben gestalten, Unsere Erde bewahren und nachhaltig gestalten, Wohlstand gerecht und nachhaltig gestalten, Partnerschaftliches und friedliches Zusammenleben gestalten.\"\n",
         "adoptionDate": "2015-08-01",
         "dateGranularity": "year",
         "status": "adopted",
@@ -5859,7 +5788,6 @@
         "issuingBody": "Th\u00fcringer Ministerium f\u00fcr Bildung, Wissenschaft und Kultur",
         "mandateType": "state-guiding-principle",
         "coordinationGrain": "unspecified",
-        "statementText": "\"F\u00e4cher\u00fcbergreifendes Arbeiten kann in verschiedenen Formen erfolgen, als fach\u00fcbergreifender Unterricht, d.h. die Lehrkraft stellt innerhalb ihres Unterrichts Bez\u00fcge zu anderen F\u00e4chern her, f\u00e4cherverbindender Unterricht, d.h. gemeinsame thematische Bez\u00fcge der Unterrichtsf\u00e4cher werden genutzt und in inhaltlicher und zeitlicher Abstimmung der Lehrkr\u00e4fte umgesetzt oder f\u00e4cherintegrierender Unterricht, d.h. F\u00e4cherstrukturen werden (zeitweilig) aufgehoben.\"\n",
         "adoptionDate": "2011-01-01",
         "dateGranularity": "year",
         "status": "adopted",
@@ -5898,7 +5826,6 @@
         "issuingBody": "Kultusministerkonferenz (KMK), now operating as \"Bildungsministerkonferenz\" (BMK) -- confirmed rebrand, see contributor_notes",
         "mandateType": "national-recommendation",
         "coordinationGrain": "fachuebergreifend",
-        "statementText": "\"F\u00e4cher\u00fcbergreifendes Unterrichtsprinzip: Ein f\u00e4cher\u00fcbergreifender Ansatz f\u00f6rdert die Verkn\u00fcpfung von Themen und Inhalten aus verschiedenen F\u00e4chern, um komplexe gesellschaftliche Fragestellungen zu beleuchten. Dies erm\u00f6glicht den Sch\u00fclerinnen und Sch\u00fclern, Zusammenh\u00e4nge zu erkennen und kritisch \u00fcber Themen wie Gerechtigkeit, Gleichheit und Mitbestimmung nachzudenken. Projekte, die verschiedene F\u00e4cher integrieren, vertiefen das Verst\u00e4ndnis f\u00fcr demokratische Prozesse und regen die Sch\u00fclerinnen und Sch\u00fcler zur aktiven Teilnahme an Diskussionen an.\"\n",
         "statementTextEn": "One of three named pillars (\"drei S\u00e4ulen\") of Demokratiebildung under Leitlinie 3 (\"Mehr ganzheitliche, individuelle F\u00f6rderung in einem toleranten und demokratischen Miteinander\"), alongside Fachunterricht in Politik/Geschichte and demokratische Schulentwicklung: a f\u00e4cher\u00fcbergreifend approach connects themes across subjects to illuminate complex societal questions, letting students recognize connections and think critically about justice, equality, and participation.\n",
         "adoptionDate": "2025-12-01",
         "dateGranularity": "month",
@@ -6542,7 +6469,6 @@
         "dateStart": "2024-06-13",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The KMK plenum adopts revised national standards for Biologie, Chemie and Physik at the Mittlerer Schulabschluss -- the last of three standards waves (Deutsch/Mathematik 2022; fortgefuehrte Fremdsprachen 2023; Naturwissenschaften 2024). Every Land has committed to transposing these into its own Lehrplaene, which is why Berlin/Brandenburg (NaWi revision 2025-27), Hessen (Sek-I KC adaptation in preparation), Schleswig-Holstein (Bio/Chem/Phys in force 2026/27), Sachsen-Anhalt (Sekundarschule 2027/28) and Baden-Wuerttemberg (BP2016 V2/V3) all cite them.\n",
         "involvedActors": [
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
         ],
@@ -6580,7 +6506,6 @@
         "dateStart": "2024-10-10",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"Handlungsempfehlung fuer die Bildungsverwaltung zum Umgang mit Kuenstlicher Intelligenz in schulischen Bildungsprozessen\", drafted by the Ad-hoc-AG KI under NRW's lead: all learners should be able to build competencies in dealing with AI; addresses all three phases of teacher education. Surfaces in state curricula as e.g. NRW's 2027 Oberstufe rule that AI may be used in Projektkurs products if disclosed, and Brandenburg's 2026 coalition line on \"verantwortungsvoller Umgang mit Kuenstlicher Intelligenz\".\n",
         "involvedActors": [
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
         ],
@@ -6618,7 +6543,6 @@
         "dateStart": "2025-04-08",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "\"Kompetenzen fuer den erfolgreichen Uebergang von der Sekundarstufe I in die berufliche Ausbildung sichern\". Six core recommendations incl. \"Verankerung der unverzichtbaren funktionalen Kompetenzen und ihrer Voraussetzungen in Lehrplaenen, Lernstandserhebungen und zentralen Abschlusspruefungen\"; to the BMK: \"Binden Sie gezielt berufs- und gesellschaftsrelevante Themen in die Curriculumsentwicklung ein\"; to the Landesinstitute: professionalize \"Aufgaben- und Lehrplankommissionen\". Names Digital Literacy, selbstreguliertes Lernen and Identitaetsentwicklung as ueberfachliche competence areas. The \"Basiskompetenzen\" priority visible in nearly every 2026 state programme (BB, BW, RP, ST, TH, BE) reads as the political uptake of this and the 2022 Grundschule Gutachten.\n",
         "involvedActors": [
           "DELP-ACTOR-swk",
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
@@ -6658,7 +6582,6 @@
         "dateEnd": "2026-12-31",
         "dateGranularity": "day",
         "temporalStatus": "current-in-progress",
-        "description": "Motto \"Challenge up: Herzschlag und Hightech fuer Deutschlands Schuelerinnen und Schueler!\" -- digital education plus sport and movement; also Bildungsgerechtigkeit, Kompetenzfoerderung, standards. Follows Mecklenburg-Vorpommern's 2025 presidency (whose Leitlinie 3 is already recorded as DELP-MANDATE-bmk-2025-leitlinie3-faecherubergreifend).\n",
         "involvedActors": [
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
         ],
@@ -6696,7 +6619,6 @@
         "dateStart": "2026-03-26",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Seven action fields, three prioritized first: data-driven quality development of schools and teaching; learning prerequisites incl. socio-emotional development; strengthening education research and transfer. Ten-year goal to cut the share of students below minimum standards. Anna Stolz: \"Von Daten zu Taten, vom Testen zur gezielten Foerderung\". NOTE: the roadmap text names no curriculum instrument (Lehrplaene, Bildungsstandards, Kerncurricula) -- the national \"Basiskompetenzen\" push is being routed through data, support programmes and teacher education, and reaches curricula only via each Land's own revisions.\n",
         "involvedActors": [
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
         ],
@@ -6734,7 +6656,6 @@
         "dateStart": "2026-06-15",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Documents \"ruecklaeufige Kompetenzentwicklungen insbesondere in Mathematik sowie bei computer- und informationsbezogenen Kompetenzen\" and early social disparities. Recorded as the evidence base the 2026 state programmes cite when they justify Basiskompetenzen-first curriculum revisions.\n",
         "involvedActors": [
           "DELP-ACTOR-kmk-bildungsministerkonferenz"
         ],
@@ -6772,7 +6693,6 @@
         "dateStart": "2026-09-03",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The Fachausschuesse for Real-/Hauptschulen and Gymnasien call for a \"grundlegende Ueberpruefung der Lerninhalte und Pruefungsanforderungen\": \"Bildungsqualitaet bemesse sich nicht an der moeglichst grossen Stoffmenge\" but at whether students can understand and apply knowledge for \"Alltag, Beruf, Studium und gesellschaftliche Teilhabe\". A demand-side counterpart to the \"Entschlackung\" language in the 2026 Rheinland-Pfalz coalition agreement and Hamburg's 50 % content reduction.\n",
         "involvedActors": [
           "DELP-ACTOR-bundeselternrat"
         ],
@@ -8003,7 +7923,6 @@
         "issuingBody": "New York State Board of Regents",
         "mandateType": "regents-adopted-framework",
         "interdisciplinaryExplicitness": "implies-cross-subject-via-pathway",
-        "statementText": "\"A unifying vision of what it means to be a graduate in New York State... describing the essential skills and dispositions that all students should develop to be successful in college, careers, and civic life.\" Six attributes -- Academically Prepared, Creative Innovator, Critical Thinker, Effective Communicator, Global Citizen, Reflective and Future-Focused -- all grounded in Culturally Responsive-Sustaining Education. \"All students must demonstrate proficiency in each component of the Portrait of a Graduate to earn a high school diploma.\"\n",
         "adoptionDate": "2025-07-14",
         "dateGranularity": "day",
         "status": "adopted",
@@ -8040,7 +7959,6 @@
         "issuingBody": "New York State Education Department (NYSED) and Board of Regents, jointly",
         "mandateType": "state-policy-announcement",
         "interdisciplinaryExplicitness": "names-interdisciplinary-explicitly",
-        "statementText": "\"This work represents a bold reimagining of what education can and should be. It challenges long-held assumptions about how learning is measured.\" (Chancellor Lester W. Young, Jr.) \"New York is leading the nation by ensuring that a diploma represents something meaningful, a demonstrated readiness for opportunities.\" (Commissioner Betty A. Rosa) Students will demonstrate readiness through \"evidence of learning developed over time,\" including \"career-connected learning, interdisciplinary project-based learning, and capstone projects,\" assessed against \"statewide performance standards and common rubrics\" (not yet published as of this record's date) rather than standardized tests alone.\n",
         "adoptionDate": "2026-06-15",
         "dateGranularity": "day",
         "status": "proposed",
@@ -8077,7 +7995,6 @@
         "issuingBody": "New York State Board of Regents",
         "mandateType": "state-graduation-requirement",
         "interdisciplinaryExplicitness": "silent-on-cross-subject",
-        "statementText": "\"Students will no longer need to 'pass the Regents' or a +1 Pathway Assessment to graduate. State assessments will continue to be administered per federal ESSA requirements.\"\n",
         "adoptionDate": "2025-07-14",
         "dateGranularity": "day",
         "targetDate": "2027-09-01",
@@ -8117,7 +8034,6 @@
         "issuingBody": "Blue Ribbon Commission on Graduation Measures",
         "mandateType": "commission-recommendation",
         "interdisciplinaryExplicitness": "unspecified",
-        "statementText": "Full recommendation text not retrieved this session -- known only via the June 2024 Regents deck's own summary framing of the pipeline \"Research and Feedback\" -> \"4 Priority Areas\" -> \"12 Recommendations\" -> \"NYS Portrait of a Graduate\" (slide 2). Verify against the Commission's own November 2023 published report before citing specific recommendation content in any outreach material.\n",
         "adoptionDate": "2023-11-13",
         "dateGranularity": "day",
         "status": "adopted",
@@ -8157,7 +8073,6 @@
         "dateStart": "2019-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "Board of Regents and NYSED launch an initiative to explore what a New York State diploma should signify, aiming at educational excellence and equity for all students. The root of everything that follows.\n",
         "involvedActors": [
           "NYLP-ACTOR-board-of-regents",
           "NYLP-ACTOR-nysed"
@@ -8194,7 +8109,6 @@
         "dateStart": "2023-11-13",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "The Commission presents 12 recommendations organized under 4 priority areas, the direct input into the eventual Portrait of a Graduate.\n",
         "involvedActors": [
           "NYLP-ACTOR-blue-ribbon-commission"
         ],
@@ -8232,7 +8146,6 @@
         "dateStart": "2024-06-01",
         "dateGranularity": "month",
         "temporalStatus": "past-completed",
-        "description": "A Board of Regents Update slide deck (\"A Transformational Vision\") presents a seven-attribute Portrait of a Graduate wheel (Critical Thinker, Innovative Problem Solver, Literate Across the Content Areas, Cultural Competence, Social-Emotional Competence, Effective Communicator, Global Citizen) as part of \"Transformation #1: Adopt the NYS Portrait of a Graduate\" -- still framed as a future step, not yet adopted. This draft's structure was later consolidated to six attributes with different names by the actual 2025-07-14 adoption -- see NYLP-FINDING-portrait-attribute-consolidation-2024-to-2025.\n",
         "involvedActors": [
           "NYLP-ACTOR-board-of-regents"
         ],
@@ -8270,7 +8183,6 @@
         "dateStart": "2024-11-01",
         "dateGranularity": "month",
         "temporalStatus": "past-completed",
-        "description": "NY Inspires -- the umbrella name for the multi-year effort to overhaul high school graduation requirements -- is announced with an implementation timeline, situating the Portrait of a Graduate within a broader, ongoing transformation plan rather than a single one-time policy change.\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed",
           "NYLP-ACTOR-board-of-regents"
@@ -8308,7 +8220,6 @@
         "dateStart": "2025-07-14",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Final six-attribute framework (Academically Prepared, Creative Innovator, Critical Thinker, Effective Communicator, Global Citizen, Reflective and Future-Focused -- all grounded in Culturally Responsive-Sustaining Education) adopted by Regents vote, accelerated from a planned November 2025 vote at Chancellor Young's urging (\"Why can't we communicate our expectations today?\"). Commissioner Rosa voiced concern about the accelerated summer timeline even while supporting the substance. This vote does not itself change current graduation requirements -- it adopts the framework future requirements will be organized around.\n",
         "involvedActors": [
           "NYLP-ACTOR-board-of-regents",
           "NYLP-ACTOR-nysed"
@@ -8346,7 +8257,6 @@
         "dateStart": "2026-02-27",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Full-day symposium (180+ attendees: educators, partners, NYC Public Schools staff/leaders) showcasing performance-based assessment, project-based learning, career-connected learning, SEL integration, and multilingual-learner support strategies from five affinity networks. The most concrete existing practitioner-facing convening found in this research.\n",
         "involvedActors": [
           "NYLP-ACTOR-new-visions",
           "NYLP-ACTOR-outward-bound",
@@ -8387,7 +8297,6 @@
         "dateStart": "2026-06-15",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "NYSED and the Board of Regents jointly announce the next phase of NY Inspires: a shift from time-based graduation measures to demonstrated competency, explicitly naming \"career-connected learning, interdisciplinary project-based learning, and capstone projects\" as evidence pathways, grounded in statewide performance standards and common rubrics (not yet published as of this event). Framed as \"first-in-the-nation.\" A policy direction, not yet itself a finalized binding graduation requirement -- see NYLP-MANDATE-competency-based-diploma-direction (status: proposed).\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed",
           "NYLP-ACTOR-board-of-regents"
@@ -8425,7 +8334,6 @@
         "dateStart": "2027-09-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "Students entering ninth grade fall 2027 (Class of 2031) become the first cohort under new Portrait-organized credit requirements, including at least one CTE credit. State guidance on the redefined credits and learning standards is expected summer 2027, immediately before this date.\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed",
           "NYLP-ACTOR-board-of-regents"
@@ -8463,7 +8371,6 @@
         "dateStart": "2027-09-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "Students will no longer need to \"pass the Regents\" or a +1 Pathway Assessment to graduate. State assessments continue to be administered per federal ESSA requirements, but passing them is no longer a diploma gate -- proficiency is instead demonstrated through the Portrait's \"exhibits of evidence\" (capstones, CTE programs, work/ service-based learning, courses, credentials/seals, arts participation, or an approved assessment as one option among several).\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed",
           "NYLP-ACTOR-board-of-regents"
@@ -8501,7 +8408,6 @@
         "dateStart": "2029-09-01",
         "dateGranularity": "school-year",
         "temporalStatus": "planned-future",
-        "description": "Students entering 9th grade in school year 2029-30 are the first cohort required to demonstrate full proficiency in both the learning standards and every Portrait of a Graduate component; a statewide transcript becomes mandatory. The furthest-out concrete milestone in NYSED's own published timeline.\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed",
           "NYLP-ACTOR-board-of-regents"
@@ -8539,7 +8445,6 @@
         "dateStart": "2026-09-01",
         "dateGranularity": "school-year",
         "temporalStatus": "current-in-progress",
-        "description": "Reported in initial search results as new requirements beginning the 2026-27 school year. NOT independently confirmed via direct fetch of an official NYSED source this session -- this fact came only from a WebSearch aggregated summary (traced to a WBNG/WWNY local-news report), not a directly-fetched primary document. Treat as a lead to verify, not settled fact, before citing in any outreach material.\n",
         "involvedActors": [
           "NYLP-ACTOR-nysed"
         ],
@@ -9708,7 +9613,6 @@
         "dateStart": "1997-01-01",
         "dateGranularity": "year",
         "temporalStatus": "past-completed",
-        "description": "One of Kerala's two Eklavya Model Residential Schools under the central Ministry of Tribal Affairs scheme (the other, EMRS Painavu, is in Idukki district) -- a residential (boarding) school specifically for Scheduled Tribe students, run on the Jawahar Navodaya Vidyalaya model. Nationally, EMRS serves from Class VI onward. This is one of the concrete institutional answers to this project's own framing question -- where forest-area tribal children who board away from their families actually attend school -- though this repo has not yet directly read the Ministry's own EMRS list PDF to confirm the exact establishment year or current status of either Kerala school.\n",
         "involvedActors": [
           "INLP-ACTOR-ministry-of-tribal-affairs-india"
         ],
@@ -15558,7 +15462,6 @@
         "dateStart": "2021-04-14",
         "dateGranularity": "day",
         "temporalStatus": "past-completed",
-        "description": "Carl Malamud's Public.Resource.Org, with Nashville law professor David Hudson, wrote a letter to Tennessee's Revisor of Statutes asking the state confirm the Tennessee Code Annotated is public domain and remove copyright notices, citing Georgia v. Public.Resource.Org, Inc. (2020).\n",
         "involvedActors": [
           "TNLP-ACTOR-public-resource-org"
         ],

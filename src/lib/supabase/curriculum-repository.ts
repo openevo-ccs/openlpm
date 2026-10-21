@@ -49,7 +49,7 @@ const SAFE_ALWAYS_KEYS = new Set([
 const NARRATIVE_KEYS = new Set([
   'description', 'statementText', 'summary', 'connectionNarrative', 'proposedRedesign',
   'role', 'evidenceMethod', 'tradeoffAssessment', 'theoreticalGrounding', 'strengthAssessment',
-  'objects', 'baselineCurriculumObject',
+  'objects', 'curriculumObject', 'baselineCurriculumObject',
 ])
 
 // `supersedes`/`supersededBy` are the raw source-repo ids the import script
