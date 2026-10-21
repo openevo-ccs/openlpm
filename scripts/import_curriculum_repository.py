@@ -103,6 +103,7 @@ REPOS = {
         "path": ROOT / "curriculum-sources" / "florida-lpm",  # lives inside openlpm from founding, same precedent as india-lpm (2026-10-09)
         "project_slug": "florida-curriculum-repository",
         "project_name": "Florida Curriculum Repository",
+        "parent_project_slug": "united-states-curriculum-repository",  # fixed 2026-10-21 -- see apply_import's own comment on this field
         "region_tags": ["US-FL"],
         "default_jurisdiction": "US-FL",
         # Single-state repo (like nys_lp) -- no state_projects sub-split
@@ -115,6 +116,7 @@ REPOS = {
         "path": ROOT / "curriculum-sources" / "pennsylvania-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/india-lpm
         "project_slug": "pennsylvania-curriculum-repository",
         "project_name": "Pennsylvania Curriculum Repository",
+        "parent_project_slug": "united-states-curriculum-repository",  # fixed 2026-10-21 -- see apply_import's own comment on this field
         "region_tags": ["US-PA"],
         "default_jurisdiction": "US-PA",
         # Single-state repo (like nys_lp/florida-lpm) -- no state_projects
@@ -129,6 +131,7 @@ REPOS = {
         "path": ROOT / "curriculum-sources" / "tennessee-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/pennsylvania-lpm
         "project_slug": "tennessee-curriculum-repository",
         "project_name": "Tennessee Curriculum Repository",
+        "parent_project_slug": "united-states-curriculum-repository",  # fixed 2026-10-21 -- see apply_import's own comment on this field
         "region_tags": ["US-TN"],
         "default_jurisdiction": "US-TN",
         # Single-state repo (like nys_lp/florida-lpm/pennsylvania-lpm) -- no
@@ -144,6 +147,8 @@ REPOS = {
         "path": ROOT / "curriculum-sources" / "us-evolution-education-lpm",  # lives inside openlpm from founding, same precedent as florida-lpm/pennsylvania-lpm/tennessee-lpm
         "project_slug": "us-evolution-education-curriculum-repository",
         "project_name": "US Evolution Education Curriculum Repository",
+        "parent_project_slug": "united-states-curriculum-repository",  # fixed 2026-10-21 -- see apply_import's own comment on this field
+        "focus_type": "thematic",  # a comparative/analytic lens applied across the whole nation rather than one place -- see apply_import's own comment
         "region_tags": ["US"],
         "default_jurisdiction": "US",
         # National apex repo, founded 2026-10-20 right after florida-lpm/
@@ -152,7 +157,11 @@ REPOS = {
         # every state at once and the national actors/pattern the three
         # state repos' own histories sit underneath. No state_projects
         # sub-split: this repo has no state/ folder at all, by design (see
-        # its own GOVERNANCE.md).
+        # its own GOVERNANCE.md). This is this ecosystem's first "thematic"
+        # Curriculum Repository sub-space (Dustin, 2026-10-21): a reusable
+        # pattern any nation can repeat for a comparative/analytic topic
+        # that cuts across its own regional sub-spaces, rather than a
+        # one-off exception to the regional-sub-space shape.
     },
 }
 
@@ -556,10 +565,26 @@ def rest(method, path, key, **kwargs):
     return res.json() if res.text else None
 
 
+#  Found live 2026-10-21: a repo's own top-level project (e.g. the one
+# backing florida-lpm) was left with no parent at all, a sibling of the
+# real united-states-curriculum-repository nation entry rather than a
+# child of it -- state_projects (below) always got parent_project_id
+# right on creation, but a top-level REPOS entry had no way to declare
+# "I belong under this other nation project" at all. Reconciling these two
+# fields here, every run, is what makes that declaration durable: once a
+# REPOS entry says where it belongs, a future session re-running this
+# script can't silently drift it back out from under its nation again.
+RECONCILED_ON_EVERY_RUN = ("parent_project_id", "focus_type")
+
+
 def get_or_create_project(key, slug, fields, owner_user_id):
     existing = rest("GET", f"projects?slug=eq.{slug}&select=id", key)
     if existing:
-        return existing[0]["id"]
+        project_id = existing[0]["id"]
+        patch = {k: fields[k] for k in RECONCILED_ON_EVERY_RUN if k in fields}
+        if patch:
+            rest("PATCH", f"projects?id=eq.{project_id}", key, headers={"Prefer": "return=minimal"}, json=patch)
+        return project_id
     created = rest(
         "POST", "projects", key,
         headers={"Prefer": "return=representation"},
@@ -570,6 +595,13 @@ def get_or_create_project(key, slug, fields, owner_user_id):
     # as owner. Confirmed live -- an explicit insert here 409s on the
     # trigger's own row.
     return created[0]["id"]
+
+
+def resolve_project_id_by_slug(key, slug):
+    rows = rest("GET", f"projects?slug=eq.{slug}&select=id", key)
+    if not rows:
+        sys.exit(f"parent_project_slug {slug!r} does not exist live -- create it first (this script never creates a bare nation container on its own).")
+    return rows[0]["id"]
 
 
 def upsert_records(key, records):
@@ -637,16 +669,35 @@ def apply_import(by_repo, owner_email, edges):
     # 2026-10-02: no more shared "Curriculum Repositories" hub project --
     # migration 081 already retired that (feedback 283570ae: nations are
     # real top-level entries; states nest under their own nation instead of
-    # a generic hub). Each repo's main project is created top-level
-    # (parent_project_id left unset/null) to match; get_or_create_project
-    # only INSERTs when a slug is genuinely new, so this is a no-op for
-    # germany-curriculum-repository/new-york-curriculum-repository, which
-    # already exist live with parent_project_id already fixed by 081.
+    # a generic hub). A REPOS entry is top-level-by-default (no parent set)
+    # to match -- germany-curriculum-repository/india-curriculum-repository
+    # are real nation containers and stay that way. But "top-level by
+    # default" is NOT the same as "every repo must be a nation" -- a repo
+    # can instead declare parent_project_slug to live as a real sub-space
+    # under an EXISTING nation container (one this script doesn't itself
+    # create; see resolve_project_id_by_slug), the same way state_projects
+    # below already nests a region under the repo's own project. This is
+    # how florida-lpm/pennsylvania-lpm/tennessee-lpm/us-evolution-education-lpm
+    # correctly nest under united-states-curriculum-repository (fixed
+    # 2026-10-21, having wrongly been created as top-level siblings of it
+    # instead) -- and the pattern a future thematic/comparative sub-space
+    # for any OTHER nation should also declare, rather than repeating this
+    # mistake. focus_type distinguishes the two real kinds of sub-space a
+    # nation can hold: 'regional' (a state/province, the default below) vs
+    # 'thematic' (a comparative/analytic cross-cutting repo like
+    # us-evolution-education-lpm: one lens applied across the whole
+    # nation, with no single place it belongs to).
     for source_repo, cfg in REPOS.items():
         records = by_repo.get(source_repo, [])
         if not records:
             print(f"Skipping {source_repo}: no records parsed")
             continue
+
+        project_fields = {
+            "focus_type": cfg.get("focus_type", "regional"),
+        }
+        if cfg.get("parent_project_slug"):
+            project_fields["parent_project_id"] = resolve_project_id_by_slug(key, cfg["parent_project_slug"])
 
         project_id = get_or_create_project(
             key, cfg["project_slug"], {
@@ -654,9 +705,9 @@ def apply_import(by_repo, owner_email, edges):
                 "epistemic_status": "field-validated-curriculum",
                 "epistemic_status_note": "Real, sourced curriculum-policy material; individual records carry their own verificationStatus/review_status for finer-grained trust.",
                 "is_private": True,
-                "focus_type": "regional",
                 "region_tags": cfg["region_tags"],
                 "project_kind": "curriculum-repository",
+                **project_fields,
             }, owner_id,
         )
         print(f"{cfg['project_name']}: {project_id}")

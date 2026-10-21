@@ -297,6 +297,18 @@ function ProjectCard({
   const [expanded, setExpanded] = useState(false)
   const visibleChildren = expanded ? children : children.slice(0, CAP)
   const hiddenCount = children.length - visibleChildren.length
+  // Dustin, 2026-10-21: a nation-level Curriculum Repository can hold two
+  // real kinds of sub-space -- a region (Florida, Saxony) and a
+  // comparative/analytic repo that cuts across the whole nation instead of
+  // belonging to one place (US Evolution Education). Flattening both into
+  // one list reads as a plain state directory until a thematic entry shows
+  // up in it unexplained. Only worth splitting into two labeled groups once
+  // a thematic child actually exists -- a nation with regions alone (every
+  // one of them today except the US) still renders as the single flat list
+  // this always was.
+  const thematicChildren = visibleChildren.filter((c) => (c.project as any).focus_type === 'thematic')
+  const regionalChildren = visibleChildren.filter((c) => (c.project as any).focus_type !== 'thematic')
+  const showGroups = thematicChildren.length > 0 && regionalChildren.length > 0
   return (
     <div
       className="card"
@@ -343,12 +355,31 @@ function ProjectCard({
       </Link>
       {children.length > 0 && (
         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-          <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
-          {visibleChildren.map((c) => (
-            <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
-              {c.project.name}
-            </Link>
-          ))}
+          {showGroups ? (
+            <>
+              <span className="muted" style={{ fontSize: 12 }}>States / regions:</span>
+              {regionalChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+              <span className="muted" style={{ fontSize: 12, marginTop: 8, display: 'block' }}>Thematic / comparative repositories:</span>
+              {thematicChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+            </>
+          ) : (
+            <>
+              <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
+              {visibleChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+            </>
+          )}
           {hiddenCount > 0 && (
             <button
               type="button"
