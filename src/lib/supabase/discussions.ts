@@ -11,6 +11,42 @@ export async function listTopics(supabase: Client, projectId: string): Promise<D
   return data ?? []
 }
 
+/** Site-wide counterpart of listTopics, for a linked target with no project (Base Repo Explorer). Migration 156. */
+export async function listGlobalTopicsForTarget(supabase: Client, linkedType: string, linkedId: string): Promise<DiscussionTopicRow[]> {
+  // Cast: 'base_repo_record' (migration 156) isn't in linked_type's known
+  // union until the next type regen.
+  const { data } = await (supabase as any)
+    .from('discussion_topics')
+    .select('*')
+    .is('project_id', null)
+    .eq('linked_type', linkedType)
+    .eq('linked_id', linkedId)
+    .order('created_at', { ascending: false })
+  return data ?? []
+}
+
+/** Site-wide counterpart of starting a new discussion thread, for Base Repo Explorer records. */
+export async function createGlobalTopic(
+  supabase: Client,
+  params: { title: string; description?: string; linkedType: string; linkedId: string }
+) {
+  return (supabase as any)
+    .from('discussion_topics')
+    .insert({ project_id: null, title: params.title, description: params.description ?? null, linked_type: params.linkedType, linked_id: params.linkedId })
+    .select('*')
+    .single()
+}
+
+export async function createPost(supabase: Client, params: { topicId: string; content: string; parentId?: string | null }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  return supabase.from('discussion_posts').insert({
+    topic_id: params.topicId,
+    user_id: user?.id ?? null,
+    content: params.content,
+    parent_id: params.parentId ?? null,
+  })
+}
+
 export async function listTopicTags(supabase: Client, topicIds: string[]): Promise<Map<string, string[]>> {
   if (topicIds.length === 0) return new Map()
   const { data } = await supabase.from('discussion_topic_tags').select('topic_id, tag').in('topic_id', topicIds)
