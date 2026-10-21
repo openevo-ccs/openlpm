@@ -1,0 +1,137 @@
+{
+  "instrument": "evoflex_comparative_cognition",
+  "contrast_vignette_ids": [
+    "delay_gratification"
+  ],
+  "vignettes": [
+    {
+      "id": "overimitation",
+      "prompt": "Children from diverse cultural backgrounds overimitate causally-irrelevant actions in tool-use tasks far more than chimpanzees/orangutans. This overimitation varies by culture, with some cultures showing higher rates than others. How do you explain this difference in overimitation rates?",
+      "items": [
+        {
+          "id": 1,
+          "category": "integrated_reasoning",
+          "correct": true,
+          "text": "The difference in overimitation rates across cultures reflects both a species-general capacity for social learning and cultural variability in the emphasis on conformity and teaching methods."
+        },
+        {
+          "id": 2,
+          "category": "species_culture_essentialism",
+          "correct": false,
+          "text": "Children from some cultures are inherently more prone to overimitation because of a species-specific cognitive bias that is more pronounced in those populations."
+        },
+        {
+          "id": 3,
+          "category": "blank_slate_pure_transmission",
+          "correct": false,
+          "text": "Overimitation is purely a product of cultural teaching and learning practices; there is no underlying species-general capacity for social learning."
+        },
+        {
+          "id": 4,
+          "category": "false_uniqueness_bias",
+          "correct": false,
+          "text": "The fact that children overimitate more than chimpanzees shows that only humans have a unique capacity for social learning that is not shared with other primates."
+        }
+      ]
+    },
+    {
+      "id": "delay_gratification",
+      "prompt": "Great apes and children from different cultural backgrounds were given delay-of-gratification tasks. While absolute delay times varied across cultures, the relative order of individuals (e.g., who could wait longer) was fairly stable. How do you explain this stability in relative order across cultures?",
+      "items": [
+        {
+          "id": 1,
+          "category": "blank_slate_pure_transmission",
+          "correct": false,
+          "text": "The stability in relative order across cultures suggests that self-control is entirely a product of cultural learning and has no underlying species-general basis."
+        },
+        {
+          "id": 2,
+          "category": "species_culture_essentialism",
+          "correct": false,
+          "text": "The stability in relative order across cultures indicates that there is a hard-wired species-specific capacity for self-control that is expressed differently depending on cultural norms."
+        },
+        {
+          "id": 3,
+          "category": "integrated_reasoning",
+          "correct": true,
+          "text": "The stability in relative order across cultures suggests that there is a species-general capacity for self-control that is modulated by cultural factors, such as the value placed on patience and the specific strategies taught for self-regulation."
+        },
+        {
+          "id": 4,
+          "category": "false_uniqueness_bias",
+          "correct": false,
+          "text": "The stability in relative order across cultures shows that only humans have a unique capacity for self-control that is not shared with great apes, reflecting a qualitatively different cognitive ability."
+        }
+      ]
+    },
+    {
+      "id": "cooperative_problem-solving",
+      "prompt": "In cooperative-pulling tasks, primates and preschoolers from different cultural backgrounds were observed. Preschoolers from some cultures were more successful in these tasks than others, but all showed some level of cooperative problem-solving. How do you explain the differences in cooperative problem-solving across cultures and species?",
+      "items": [
+        {
+          "id": 1,
+          "category": "integrated_reasoning",
+          "correct": true,
+          "text": "The differences in cooperative problem-solving reflect a species-general capacity for shared intentionality, which is then shaped and developed through cultural practices and teaching methods that emphasize cooperation and joint goal understanding."
+        },
+        {
+          "id": 2,
+          "category": "species_culture_essentialism",
+          "correct": false,
+          "text": "The differences in cooperative problem-solving are due to species-specific differences in social cognition; for example, only humans have a unique capacity for shared intentionality that is not present in other primates."
+        },
+        {
+          "id": 3,
+          "category": "blank_slate_pure_transmission",
+          "correct": false,
+          "text": "The differences in cooperative problem-solving are entirely due to cultural factors and do not reflect any underlying species-general capacity for shared intentionality."
+        },
+        {
+          "id": 4,
+          "category": "false_uniqueness_bias",
+          "correct": false,
+          "text": "The fact that preschoolers from some cultures are more successful in cooperative tasks than others shows that only humans have a unique capacity for cooperative problem-solving that is not shared with other primates."
+        }
+      ]
+    },
+    {
+      "id": "false_uniqueness_bias",
+      "prompt": "In tasks measuring theory of mind or perspective-taking, adult humans consistently outperform young children and non-human primates. How do you explain this difference in performance?",
+      "items": [
+        {
+          "id": 1,
+          "category": "integrated_reasoning",
+          "correct": false,
+          "text": "The difference in performance reflects a species-general capacity for social cognition that is expressed more fully in adult humans due to developmental maturation and cultural learning."
+        },
+        {
+          "id": 2,
+          "category": "species_culture_essentialism",
+          "correct": false,
+          "text": "The difference in performance is due to a species-specific cognitive ability that is uniquely human and not found in other primates or young children."
+        },
+        {
+          "id": 3,
+          "category": "blank_slate_pure_transmission",
+          "correct": false,
+          "text": "The difference in performance is entirely due to cultural and educational factors; without these, the gap between humans and other species would not exist."
+        },
+        {
+          "id": 4,
+          "category": "false_uniqueness_bias",
+          "correct": true,
+          "text": "The fact that adult humans outperform other species in these tasks shows that only humans have a unique capacity for complex social cognition that is not shared with other primates or young children."
+        }
+      ]
+    }
+  ],
+  "_draft_provenance": {
+    "generator": "gwdg-dataset-forge/assessment-items",
+    "gwdg_model": "apertus-70b-instruct-2509",
+    "model_selection_reason": "pinned via GWDG_MODEL_REASON env override",
+    "generated_date": "2026-07-23",
+    "status": "AI-DRAFT-UNPILOTED",
+    "note": "Unreviewed, unpiloted draft. Per skills/integrated-causal-reasoning-assessment/SKILL.md 'What NOT to do': do not present this as validated for this domain. A human should review category assignments and pilot before treating results as diagnostic.",
+    "remaining_validation_issues": []
+  }
+}
