@@ -26,6 +26,8 @@ DECLARE
   v_pa_project UUID;
   v_tn_project UUID;
   v_us_thematic_project UUID;
+  v_view_id UUID;
+  v_role TEXT;
 BEGIN
   SELECT id INTO v_bio_project FROM projects WHERE slug = 'bio-core-lpm-synth';
   SELECT id INTO v_inter_project FROM projects WHERE slug = 'interdisciplinary-lpm-synth';
@@ -181,5 +183,36 @@ BEGIN
     'This thematic repository''s own explicit methodological caution -- that a real, documented national pattern is not the same thing as a single national rule -- is directly relevant to how this strand should talk about "culture" at national scale without overclaiming uniformity across jurisdictions.'
   FROM curriculum_repository_records r WHERE r.source_record_id = 'USLP-PRINCIPLE-a-national-pattern-is-not-a-national-rule'
   ON CONFLICT (data_object_id, repository_record_id, relation_type) DO NOTHING;
+
+  -- ==========================================================================
+  -- Level 3 -- the two new student-view-template registry entries
+  -- (bio-core-us-fl-pa-tn-en / interdisciplinary-us-fl-pa-tn-en, added this
+  -- same migration's PR to src/lib/student-view-templates.ts) are useless
+  -- without a matching project_dashboard_views row + role assignments --
+  -- exactly the same two-step 142 already did for the Sachsen/Thüringen and
+  -- New York/California views. Caught live, in-session, verifying the real
+  -- "Viewing" dropdown: without this, the registry entries above compile
+  -- fine but are never actually selectable by anyone.
+  -- ==========================================================================
+
+  INSERT INTO project_dashboard_views (project_id, name, kind, template_id)
+  SELECT v_bio_project, 'Florida / Pennsylvania / Tennessee (US)', 'template', 'bio-core-us-fl-pa-tn-en'
+  WHERE NOT EXISTS (SELECT 1 FROM project_dashboard_views WHERE project_id = v_bio_project AND template_id = 'bio-core-us-fl-pa-tn-en');
+  SELECT id INTO v_view_id FROM project_dashboard_views WHERE project_id = v_bio_project AND template_id = 'bio-core-us-fl-pa-tn-en';
+  FOREACH v_role IN ARRAY ARRAY['editor', 'contributor', 'reviewer', 'viewer'] LOOP
+    INSERT INTO project_dashboard_view_assignments (view_id, target_type, target_value)
+    VALUES (v_view_id, 'role', v_role)
+    ON CONFLICT DO NOTHING;
+  END LOOP;
+
+  INSERT INTO project_dashboard_views (project_id, name, kind, template_id)
+  SELECT v_inter_project, 'Florida / Pennsylvania / Tennessee (US)', 'template', 'interdisciplinary-us-fl-pa-tn-en'
+  WHERE NOT EXISTS (SELECT 1 FROM project_dashboard_views WHERE project_id = v_inter_project AND template_id = 'interdisciplinary-us-fl-pa-tn-en');
+  SELECT id INTO v_view_id FROM project_dashboard_views WHERE project_id = v_inter_project AND template_id = 'interdisciplinary-us-fl-pa-tn-en';
+  FOREACH v_role IN ARRAY ARRAY['editor', 'contributor', 'reviewer', 'viewer'] LOOP
+    INSERT INTO project_dashboard_view_assignments (view_id, target_type, target_value)
+    VALUES (v_view_id, 'role', v_role)
+    ON CONFLICT DO NOTHING;
+  END LOOP;
 
 END $MIGRATION$;
