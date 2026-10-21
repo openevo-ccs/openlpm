@@ -41,6 +41,18 @@ export const STUDENT_VIEW_TEMPLATES: StudentViewTemplate[] = [
     description:
       'English-language view connecting Interdisciplinary LPM (Synthetic)’s strands to real New York/California curriculum-policy content, with room to comment on each connection.',
   },
+  {
+    id: 'bio-core-us-fl-pa-tn-en',
+    label: 'Florida / Pennsylvania / Tennessee (US)',
+    description:
+      'English-language view connecting Bio-Core LPM (Synthetic)’s strands to real Florida/Pennsylvania/Tennessee curriculum-policy content, with room to comment on each connection.',
+  },
+  {
+    id: 'interdisciplinary-us-fl-pa-tn-en',
+    label: 'Florida / Pennsylvania / Tennessee (US)',
+    description:
+      'English-language view connecting Interdisciplinary LPM (Synthetic)’s strands to real Florida/Pennsylvania/Tennessee curriculum-policy content, with room to comment on each connection.',
+  },
 ]
 
 export function getStudentViewTemplate(id: string | null): StudentViewTemplate | null {
@@ -82,6 +94,28 @@ export const CURRICULUM_CONNECTIONS_VIEWS: Record<string, CurriculumConnectionsV
     language: 'en',
     regionSlugs: ['united-states-curriculum-repository', 'new-york-curriculum-repository', 'california-curriculum-repository'],
     regionLabel: 'New York / California',
+  },
+  'bio-core-us-fl-pa-tn-en': {
+    language: 'en',
+    regionSlugs: [
+      'united-states-curriculum-repository',
+      'florida-curriculum-repository',
+      'pennsylvania-curriculum-repository',
+      'tennessee-curriculum-repository',
+      'us-evolution-education-curriculum-repository',
+    ],
+    regionLabel: 'Florida / Pennsylvania / Tennessee',
+  },
+  'interdisciplinary-us-fl-pa-tn-en': {
+    language: 'en',
+    regionSlugs: [
+      'united-states-curriculum-repository',
+      'florida-curriculum-repository',
+      'pennsylvania-curriculum-repository',
+      'tennessee-curriculum-repository',
+      'us-evolution-education-curriculum-repository',
+    ],
+    regionLabel: 'Florida / Pennsylvania / Tennessee',
   },
 }
 

@@ -20,6 +20,9 @@ export interface ConnectionsStrings {
   regionsNoLinks: string
   regionsStrandLabel: string
   regionsNoStrandLinks: string
+  regionsSelectAll: string
+  regionsClearAll: string
+  regionsSelectPrompt: string
 
   overviewTitle: string
   overviewIntro: (region: string) => string
@@ -95,11 +98,14 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     groupAnalyze: 'ANALYSIEREN',
 
     regionsTitle: 'Nach Bundesland',
-    regionsHelp: 'Wie sich die Stränge dieses LPM auf jedes einzelne Bundesland stützen, statt nur gepoolt gezeigt zu werden. Wähle ein Bundesland, um seine eigenen realen Verknüpfungen zu sehen.',
+    regionsHelp: 'Wie sich die Stränge dieses LPM auf jedes einzelne Bundesland stützen, statt nur gepoolt gezeigt zu werden. Wähle ein oder mehrere Bundesländer, um sie Seite an Seite zu vergleichen.',
     regionsCoverage: (covered: number, total: number) => `${covered} von ${total} Strängen haben eine Verknüpfung aus diesem Bundesland`,
     regionsNoLinks: 'Für dieses Bundesland liegt noch keine Verknüpfung vor.',
     regionsStrandLabel: 'Strang',
     regionsNoStrandLinks: 'Kein Bezug aus diesem Bundesland.',
+    regionsSelectAll: 'Alle auswählen',
+    regionsClearAll: 'Auswahl zurücksetzen',
+    regionsSelectPrompt: 'Wähle oben mindestens ein Bundesland.',
 
     overviewTitle: 'Verbindungen zum Lehrplan',
     overviewIntro: (region: string) =>
@@ -174,11 +180,14 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     groupAnalyze: 'ANALYZE',
 
     regionsTitle: 'By State',
-    regionsHelp: 'How this LPM\'s strands are grounded in each individual state, rather than pooled together. Pick a state to see its own real connections.',
+    regionsHelp: 'How this LPM\'s strands are grounded in each individual state, rather than pooled together. Pick one or more states to compare them side by side.',
     regionsCoverage: (covered: number, total: number) => `${covered} of ${total} strands have a connection from this state`,
     regionsNoLinks: 'No connections from this state yet.',
     regionsStrandLabel: 'Strand',
     regionsNoStrandLinks: 'No grounding from this state.',
+    regionsSelectAll: 'Select all',
+    regionsClearAll: 'Clear selection',
+    regionsSelectPrompt: 'Pick at least one state above.',
 
     overviewTitle: 'Curriculum Connections',
     overviewIntro: (region: string) =>
