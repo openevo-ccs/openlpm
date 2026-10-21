@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeftRight, Building2, CalendarClock, FileText, Flag, GitBranch, Lightbulb, Scale, type LucideIcon } from 'lucide-react'
+import { AlertTriangle, ArrowLeftRight, Building2, CalendarClock, FileText, Flag, GitBranch, Lightbulb, Scale, Swords, type LucideIcon } from 'lucide-react'
 import { RECORD_TYPE_LABEL, type RepositoryRecordRow } from './supabase/curriculum-repository'
 
 type RecordType = RepositoryRecordRow['record_type']
@@ -27,6 +27,7 @@ export const RECORD_TYPE_ICON: Record<RecordType, LucideIcon> = {
   'synthetic-curriculum-redesign-record': Lightbulb,
   'policy-principle-record': Flag,
   'policy-brief-manifest': FileText,
+  'policy-controversy-record': Swords,
 }
 
 export const RECORD_TYPE_COLOR: Record<RecordType, string> = {
@@ -39,6 +40,7 @@ export const RECORD_TYPE_COLOR: Record<RecordType, string> = {
   'synthetic-curriculum-redesign-record': 'var(--map-6)',
   'policy-principle-record': 'var(--map-6)',
   'policy-brief-manifest': 'var(--map-4)',
+  'policy-controversy-record': 'var(--map-2)',
 }
 
 // One plain sentence explaining what this kind of record actually IS --
@@ -56,6 +58,7 @@ export const RECORD_TYPE_BLURB: Record<RecordType, string> = {
   'synthetic-curriculum-redesign-record': 'A draft proposal for how a piece of curriculum could be restructured -- a suggestion, not something official.',
   'policy-principle-record': "A stated guiding principle behind this jurisdiction's curriculum policy.",
   'policy-brief-manifest': 'A short written brief summarizing policy findings or recommendations.',
+  'policy-controversy-record': 'A real, documented public dispute over a curriculum policy -- who took what position, and how it was covered or resolved.',
 }
 
 /** Small icon + colored dot matching a record's kind, for consistent use in list rows, map sidebars, and detail headers. */

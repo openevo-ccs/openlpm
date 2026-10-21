@@ -892,7 +892,7 @@ export type Database = {
         Row: {
           id: string
           project_id: string
-          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest' | 'policy-controversy-record'
           jurisdiction: string | null
           source_repo: string
           source_record_id: string
@@ -911,7 +911,7 @@ export type Database = {
         Insert: {
           id?: string
           project_id: string
-          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          record_type: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest' | 'policy-controversy-record'
           jurisdiction?: string | null
           source_repo: string
           source_record_id: string
@@ -930,7 +930,7 @@ export type Database = {
         Update: {
           id?: string
           project_id?: string
-          record_type?: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest'
+          record_type?: 'institutional-actor-record' | 'institutional-mandate-record' | 'policy-timeline-event' | 'coherence-finding-record' | 'latent-connection-record' | 'curriculum-crosswalk-record' | 'synthetic-curriculum-redesign-record' | 'policy-principle-record' | 'policy-brief-manifest' | 'policy-controversy-record'
           jurisdiction?: string | null
           source_repo?: string
           source_record_id?: string

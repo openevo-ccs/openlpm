@@ -22,6 +22,9 @@ const JURISDICTION_NAMES: Record<string, string> = {
   'DE': 'Deutschland',
   'US-NY': 'New York',
   'US-CA': 'California',
+  'US-FL': 'Florida',
+  'US-PA': 'Pennsylvania',
+  'US-TN': 'Tennessee',
   'US': 'USA',
 }
 

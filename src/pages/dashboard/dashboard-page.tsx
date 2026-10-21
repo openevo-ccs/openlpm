@@ -30,9 +30,39 @@ async function countFor(supabase: ProjectOutletContext['supabase'], table: Count
   return count ?? 0
 }
 
+// Real feedback, 2026-10-21: a Curriculum Repository project (Florida,
+// Germany, etc.) "doesn't seem to have data" -- the four generic LPM-project
+// tiles below (literature_references/lpm_schema_elements/lpm_data_objects/
+// discussion_topics) are all genuinely, correctly empty for this project
+// kind, since its real content lives entirely in curriculum_repository_records
+// instead. Showing four zeroes next to a repo that actually holds 49 real
+// records is the wrong four numbers being shown, a display problem rather
+// than a real absence of data. Four facts about its own real content
+// instead: how many records, how many
+// distinct kinds of record, how many jurisdictions it covers, and how many of
+// its records are an actual sub-space of this nation (vs. living flat on the
+// nation itself) -- the same regional/thematic split project-switcher-page.tsx
+// now surfaces in the parent's own card.
+async function curriculumRepositoryStats(supabase: ProjectOutletContext['supabase'], projectId: string) {
+  const { data, count } = await supabase
+    .from('curriculum_repository_records')
+    .select('record_type, jurisdiction', { count: 'exact' })
+    .eq('project_id', projectId)
+  const rows = data ?? []
+  const recordTypes = new Set(rows.map((r) => r.record_type)).size
+  const jurisdictions = new Set(rows.map((r) => r.jurisdiction).filter((j): j is string => !!j)).size
+  const { count: subSpaceCount } = await supabase
+    .from('projects')
+    .select('*', { count: 'exact', head: true })
+    .eq('parent_project_id', projectId)
+  return { total: count ?? 0, recordTypes, jurisdictions, subSpaceCount: subSpaceCount ?? 0 }
+}
+
 export default function DashboardPage() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const isCurriculumRepository = (project as any).project_kind === 'curriculum-repository'
   const [counts, setCounts] = useState<[number, number, number, number] | null>(null)
+  const [repoStats, setRepoStats] = useState<Awaited<ReturnType<typeof curriculumRepositoryStats>> | null>(null)
   const [pendingReviews, setPendingReviews] = useState<number | null>(null)
   const [activity, setActivity] = useState<ActivityEntry[] | null>(null)
   const [maturity, setMaturity] = useState(project.maturity)
@@ -41,6 +71,11 @@ export default function DashboardPage() {
   const canManage = role === 'owner' || role === 'maintainer'
 
   useEffect(() => {
+    if (isCurriculumRepository) {
+      setRepoStats(null)
+      curriculumRepositoryStats(supabase, project.id).then(setRepoStats)
+      return
+    }
     setCounts(null)
     Promise.all([
       countFor(supabase, 'literature_references', project.id),
@@ -48,7 +83,7 @@ export default function DashboardPage() {
       countFor(supabase, 'lpm_data_objects', project.id),
       countFor(supabase, 'discussion_topics', project.id),
     ]).then((c) => setCounts(c as [number, number, number, number]))
-  }, [supabase, project.id])
+  }, [supabase, project.id, isCurriculumRepository])
 
   useEffect(() => {
     setPendingReviews(null)
@@ -79,12 +114,19 @@ export default function DashboardPage() {
     if (!error) setMaturity(next)
   }
 
-  const stats = [
-    { label: 'Papers and sources', count: counts?.[0] ?? 0, icon: BookOpen },
-    { label: 'Concepts', count: counts?.[1] ?? 0, icon: FileText },
-    { label: 'Learning goals', count: counts?.[2] ?? 0, icon: FileText },
-    { label: 'Discussion topics', count: counts?.[3] ?? 0, icon: MessageSquare },
-  ]
+  const stats = isCurriculumRepository
+    ? [
+        { label: 'Curriculum Repository records', count: repoStats?.total ?? 0, icon: FileText },
+        { label: 'Kinds of record', count: repoStats?.recordTypes ?? 0, icon: FolderKanban },
+        { label: 'Jurisdictions covered', count: repoStats?.jurisdictions ?? 0, icon: BookOpen },
+        { label: 'Sub-spaces inside', count: repoStats?.subSpaceCount ?? 0, icon: MessageSquare },
+      ]
+    : [
+        { label: 'Papers and sources', count: counts?.[0] ?? 0, icon: BookOpen },
+        { label: 'Concepts', count: counts?.[1] ?? 0, icon: FileText },
+        { label: 'Learning goals', count: counts?.[2] ?? 0, icon: FileText },
+        { label: 'Discussion topics', count: counts?.[3] ?? 0, icon: MessageSquare },
+      ]
 
   return (
     <div>
@@ -118,7 +160,7 @@ export default function DashboardPage() {
               <span className="muted">{label}</span>
               <Icon size={14} style={{ color: 'var(--text-muted)' }} />
             </div>
-            <div style={{ fontSize: 24, fontWeight: 700 }}>{counts === null ? '—' : count}</div>
+            <div style={{ fontSize: 24, fontWeight: 700 }}>{(isCurriculumRepository ? repoStats === null : counts === null) ? '—' : count}</div>
           </div>
         ))}
       </div>

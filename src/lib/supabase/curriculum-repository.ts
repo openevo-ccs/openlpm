@@ -17,6 +17,7 @@ export const RECORD_TYPE_LABEL: Record<RepositoryRecordRow['record_type'], strin
   'synthetic-curriculum-redesign-record': 'Proposed redesign',
   'policy-principle-record': 'Policy principle',
   'policy-brief-manifest': 'Policy brief',
+  'policy-controversy-record': 'Public controversy',
 }
 
 export const ACCESS_TIER_LABEL: Record<RepositoryRecordRow['access_tier'], string> = {
