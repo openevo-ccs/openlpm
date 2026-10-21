@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import { LogOut, User, Users } from 'lucide-react'
+import { BookOpen, LogOut, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -39,6 +39,12 @@ export default function DashboardLayout() {
             <Link to="/dashboard/admin/users" className="btn btn-mini">
               <Users size={12} />
               Admin
+            </Link>
+          )}
+          {isAdmin && (
+            <Link to="/dashboard/admin/explore" className="btn btn-mini">
+              <BookOpen size={12} />
+              Explore
             </Link>
           )}
           <HelpWidget />
