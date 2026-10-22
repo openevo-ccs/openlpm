@@ -212,7 +212,7 @@ for i, r in enumerate(rows):
     emit(
         f"  ({J(pid)}, {J(slug)}, {J(name)}, {J(desc)}, '{status}', 'designed-thought-experiment', "
         f"{J(epi_note)}, '{hosting}', '{maturity}', {parent_var}, '{focus}', "
-        f"ARRAY{json.dumps(theme_tags.strip('{}').split(','))}::TEXT[], {langs}){sep}"
+        "ARRAY[" + ",".join(J(t) for t in theme_tags.strip("{}").split(",")) + f"]::TEXT[], {langs}){sep}"
     )
 emit("")
 
