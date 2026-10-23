@@ -1,3 +1,17 @@
+-- Renumbered 163 -> 165, 2026-10-23. Three sessions working the same day
+-- independently claimed migration number 163 for three different features
+-- (this one, 163_alien_space_of_science_comparative_literature_link.sql,
+-- 163_literature_collections.sql) -- no atomic-reservation script exists for
+-- migration numbers the way reserve_proposal_number.py covers RFC numbers,
+-- so nothing caught it before all three merged to main. The live database's
+-- migration-history table already has "163" recorded as applied (from
+-- whichever of the three got pushed first, directly from its own branch) --
+-- re-running this file under 163 would be silently skipped rather than
+-- actually applied, so content_license never existed live despite PR #88
+-- merging.
+-- This file's actual content is unchanged from PR #88; only the number and
+-- this note are new.
+--
 -- content_license: lets a project owner set the license for their project's
 -- own original work (strands, Lernziele, data objects), distinct from the
 -- per-record rights tracking third-party source documents already have

@@ -513,7 +513,9 @@ export type Database = {
           theme_tags: string[]
           working_languages: string[]
           // The license for this project's OWN original work -- migration
-          // 163. Null = inherits the ecosystem default (CC BY-NC-SA 4.0), or
+          // 165 (renumbered from 163, a same-day collision with two other
+          // sessions' migrations -- see that file's own header). Null =
+          // inherits the ecosystem default (CC BY-NC-SA 4.0), or
           // a parent project's own resolved license for a nested sub-project.
           // Distinct from curriculum_repository_records.access_tier, which
           // governs third-party source material this project quotes rather
