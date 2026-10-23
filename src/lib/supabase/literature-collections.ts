@@ -4,11 +4,12 @@ import type { LiteraturebaseSnapshotRow } from './literature'
 
 type Client = SupabaseClient<Database>
 
-// migration 167 hasn't been pushed to production yet, so these tables
-// aren't in database.types.ts's generated types -- cast at the query
-// boundary (`as any).from(...)`) rather than block on a regen that needs
-// the real push to happen first anyway. Matches every existing example of
-// this in the codebase (grep `as any).from(` for the pattern).
+// migration 170 (originally 167, renumbered after a same-day collision --
+// see that file's own header) isn't in database.types.ts's generated types
+// yet, since that needs a fresh `supabase gen types` run against the live
+// database. Cast at the query boundary (`as any).from(...)`) rather than
+// block on that regen. Matches every existing example of this in the
+// codebase (grep `as any).from(` for the pattern).
 const db = (supabase: Client) => supabase as any
 
 export interface LiteratureCollectionRow {
@@ -67,7 +68,7 @@ export async function getCollection(supabase: Client, collectionId: string): Pro
   return data ?? null
 }
 
-/** A canonical collection's papers are computed live from the real LiteratureBase snapshot -- see migration 167's header note for why. A branch's papers are whatever is in literature_collection_items. */
+/** A canonical collection's papers are computed live from the real LiteratureBase snapshot -- see migration 170's header note for why. A branch's papers are whatever is in literature_collection_items. */
 export async function getCollectionPapers(supabase: Client, collection: LiteratureCollectionRow): Promise<LiteraturebaseSnapshotRow[]> {
   if (collection.owner_project_id === null) {
     const { data } = await supabase
