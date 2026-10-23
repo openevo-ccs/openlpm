@@ -6,11 +6,12 @@
 
 - The OpenLPM application itself (Vite/React app, Supabase schema, API integrations).
 - The [AI Ethics Framework](ethics/ai-ethics-framework.md) governing how generative AI may be used inside an OpenLPM-hosted project.
+- The [Data Rights & Licensing Framework](ethics/data-rights-and-licensing-framework.md) ([RFC-0007](proposals/0007-data-rights-and-licensing-framework.md)) governing who owns what's stored here, how it may be reused, and what citation and liability terms apply.
 - The data model for literature references, schema elements, LPM data objects, peer review, and discussion threads.
 
 ## What this repo does not own
 
-OpenLPM is application infrastructure, not a curriculum authority. It does not adjudicate what any specific working group's Learning Progression Model should say — that decision belongs entirely to the group using the tool. Groups that want their finished LPM content interoperable with the wider OpenEvo Computational Curriculum Studies (CCS) ecosystem can additionally align it to [OpenEvo ConceptBase](https://github.com/openevo-ccs/conceptbase)'s schemas, but that's an opt-in choice, not a requirement of using OpenLPM.
+OpenLPM is application infrastructure. It is not a curriculum authority and does not adjudicate what any specific working group's Learning Progression Model should say — that decision belongs entirely to the group using the tool. Groups that want their finished LPM content interoperable with the wider OpenEvo Computational Curriculum Studies (CCS) ecosystem can optionally align it to [OpenEvo ConceptBase](https://github.com/openevo-ccs/conceptbase)'s schemas — using OpenLPM itself never requires that.
 
 ## Roles
 
@@ -33,3 +34,5 @@ The application version follows semver. The AI Ethics Framework versions indepen
 
 - **Content** (this document, the AI Ethics Framework, proposals, documentation): [CC BY-NC-SA 4.0](LICENSE)
 - **Code** (the application itself): [MIT](LICENSE-CODE)
+
+How this applies to a specific project's own content, to third-party source material stored here, and what citation/liability terms apply: see the [Data Rights & Licensing Framework](ethics/data-rights-and-licensing-framework.md).
