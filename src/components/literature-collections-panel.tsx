@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { BookMarked, ChevronDown, ChevronRight, GitFork, Link2, Plus, X } from 'lucide-react'
+import { Activity, BookMarked, ChevronDown, ChevronRight, GitFork, Link2, Plus, X } from 'lucide-react'
 import type { Database } from '@/lib/supabase/database.types'
 import {
   attachCollection,
@@ -16,6 +16,8 @@ import {
   type ProjectLiteratureCollectionLinkRow,
 } from '@/lib/supabase/literature-collections'
 import type { LiteraturebaseSnapshotRow } from '@/lib/supabase/literature'
+import { buildRelationGraph, computeEvidenceStrength, EVIDENCE_LABEL_TEXT } from '@/lib/literature-analytics'
+import { LiteratureRelationsGraph } from '@/components/literature-relations-graph'
 
 type Client = SupabaseClient<Database>
 
@@ -167,6 +169,7 @@ function CollectionLinkRow({
 }) {
   const [count, setCount] = useState<number | null>(null)
   const [papers, setPapers] = useState<LiteraturebaseSnapshotRow[] | null>(null)
+  const [showGraph, setShowGraph] = useState(false)
 
   useEffect(() => {
     countCollectionPapers(supabase, link.collection).then(setCount)
@@ -176,6 +179,9 @@ function CollectionLinkRow({
   useEffect(() => {
     if (expanded && papers === null) getCollectionPapers(supabase, link.collection).then(setPapers)
   }, [expanded, papers, supabase, link.collection])
+
+  const graph = useMemo(() => (papers ? buildRelationGraph(papers) : null), [papers])
+  const evidence = useMemo(() => (graph ? computeEvidenceStrength(graph) : null), [graph])
 
   return (
     <div style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
@@ -199,15 +205,39 @@ function CollectionLinkRow({
         ) : papers.length === 0 ? (
           <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>No papers in here yet.</p>
         ) : (
-          <div style={{ marginTop: 4, maxHeight: 220, overflow: 'auto' }}>
-            {papers.map((p) => (
-              <div key={p.id} style={{ fontSize: 12, padding: '3px 0' }}>
-                <a href={`https://github.com/openevo-ccs/literaturebase/blob/main/records/${p.slug}.yaml`} target="_blank" rel="noreferrer">
-                  {p.title}
-                </a>
-                <span className="muted"> ({p.year ?? 'n.d.'})</span>
+          <div style={{ marginTop: 4 }}>
+            {evidence && (
+              <div className="row" style={{ gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
+                <span
+                  className="chip"
+                  style={{ fontSize: 10 }}
+                  title={`${evidence.reinforcingCount} reinforcing link${evidence.reinforcingCount === 1 ? '' : 's'}, ${evidence.tensionCount} contradicts/criticises link${evidence.tensionCount === 1 ? '' : 's'}, out of ${evidence.edgeCount} total real links between these papers — a heuristic over the papers' own recorded relations, not a formal meta-analysis.`}
+                >
+                  <Activity size={10} style={{ marginRight: 3 }} />{EVIDENCE_LABEL_TEXT[evidence.label]} ({evidence.edgeCount} linked relation{evidence.edgeCount === 1 ? '' : 's'})
+                </span>
+                <button className="btn-linklike" style={{ fontSize: 11 }} onClick={() => setShowGraph(!showGraph)}>
+                  {showGraph ? 'Hide relation map' : 'View relation map'}
+                </button>
               </div>
-            ))}
+            )}
+            {showGraph && graph && (
+              <div style={{ marginBottom: 8 }}>
+                <LiteratureRelationsGraph graph={graph} onOpenPaper={(id) => {
+                  const url = papers.find((p) => p.id === id)?.slug
+                  if (url) window.open(`https://github.com/openevo-ccs/literaturebase/blob/main/records/${url}.yaml`, '_blank')
+                }} />
+              </div>
+            )}
+            <div style={{ maxHeight: 220, overflow: 'auto' }}>
+              {papers.map((p) => (
+                <div key={p.id} style={{ fontSize: 12, padding: '3px 0' }}>
+                  <a href={`https://github.com/openevo-ccs/literaturebase/blob/main/records/${p.slug}.yaml`} target="_blank" rel="noreferrer">
+                    {p.title}
+                  </a>
+                  <span className="muted"> ({p.year ?? 'n.d.'})</span>
+                </div>
+              ))}
+            </div>
           </div>
         )
       )}
