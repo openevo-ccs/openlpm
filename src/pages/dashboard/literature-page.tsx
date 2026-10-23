@@ -21,6 +21,7 @@ import {
   type ProjectBaseLinkRow,
 } from '@/lib/supabase/literature'
 import { buildLiteratureBaseDraftYaml } from '@/lib/literaturebase-export'
+import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
 
 type LiteratureRow = Database['public']['Tables']['literature_references']['Row']
 type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase'
@@ -300,7 +301,9 @@ export default function LiteraturePage() {
         <div className={`notice notice-${notice.kind}`}>{notice.text}</div>
       )}
 
-      <div className="card">
+      <LiteratureCollectionsPanel projectId={project.id} canManage={canEdit} supabase={supabase} />
+
+      <div className="card" style={{ marginTop: 16 }}>
         <h3>Search for literature</h3>
         <div className="row" style={{ gap: 6, marginBottom: 10 }}>
           {(Object.keys(ENGINE_LABEL) as Engine[]).filter((e) => e !== 'literaturebase' || linked).map((e) => (
