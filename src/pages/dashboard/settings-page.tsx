@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, ExternalLink, GraduationCap, Globe, Layers, Library, Link2, Mail, MapPin, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
+import { AlertTriangle, Check, Copy, ExternalLink, GraduationCap, Globe, Layers, Library, Link2, Mail, MapPin, Plus, Scale, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
@@ -985,6 +985,7 @@ function ProjectDetailsSection({
       <SubjectAreaSubsection project={project} supabase={supabase} />
       <GradeBandSubsection project={project} supabase={supabase} />
       <SourceDeclarationsSubsection project={project} supabase={supabase} />
+      <LicenseSubsection project={project} supabase={supabase} />
     </div>
   )
 }
@@ -1306,6 +1307,99 @@ function SourceDeclarationsSubsection({
         </div>
         <button className="btn btn-mini" disabled={busy || !draft.sourceName.trim()} onClick={add}><Plus size={12} />Add source</button>
       </div>
+    </div>
+  )
+}
+
+// License for this project's OWN original work (strands, Lernziele, data
+// objects) -- RFC-0007 / migration 163. Distinct from a curriculum
+// repository record's own access_tier/license_or_rights_note, which governs
+// third-party source material this project quotes, never what it authors
+// itself -- see SourceDeclarationsSubsection above for that.
+const CONTENT_LICENSE_LABEL: Record<string, string> = {
+  'cc-by-4.0': 'Creative Commons Attribution 4.0 — credit required, commercial use allowed',
+  'cc0-1.0': 'Public domain (CC0) — no rights reserved',
+  'all-rights-reserved': 'All rights reserved — not ready to share yet',
+  'custom': 'Custom (see note)',
+}
+
+function LicenseSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [choice, setChoice] = useState<string>(project.content_license ?? '')
+  const [note, setNote] = useState(project.content_license_note ?? '')
+  const [busy, setBusy] = useState(false)
+  const [parentLabel, setParentLabel] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!project.parent_project_id) return
+    supabase
+      .from('projects')
+      .select('name, content_license')
+      .eq('id', project.parent_project_id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return
+        const resolved = data.content_license ? CONTENT_LICENSE_LABEL[data.content_license] : 'the ecosystem default (CC BY-NC-SA 4.0)'
+        setParentLabel(`${data.name} (${resolved})`)
+      })
+  }, [supabase, project.parent_project_id])
+
+  const save = async (next: string) => {
+    const previous = choice
+    setChoice(next)
+    setBusy(true)
+    const { error } = await supabase
+      .from('projects')
+      .update({ content_license: (next || null) as any, content_license_note: next === 'custom' ? (note || null) : null })
+      .eq('id', project.id)
+    setBusy(false)
+    if (error) setChoice(previous)
+  }
+
+  const saveNote = async () => {
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ content_license_note: note || null }).eq('id', project.id)
+    setBusy(false)
+    if (error) setNote(project.content_license_note ?? '')
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Scale size={14} />License for this project's own content</h4>
+      <p className="muted" style={{ marginBottom: 10 }}>
+        Covers {project.name}'s own strands, Lernziele, and data objects — not material quoted from
+        outside sources, which always keeps its own terms (set per record under Curriculum Sources).
+      </p>
+      <div className="field">
+        <select value={choice} disabled={busy} onChange={(e) => save(e.target.value)}>
+          <option value="">
+            {project.parent_project_id
+              ? `Inherit from parent project${parentLabel ? ` — ${parentLabel}` : ''}`
+              : 'Ecosystem default — CC BY-NC-SA 4.0 (credit required, non-commercial, share-alike)'}
+          </option>
+          {Object.entries(CONTENT_LICENSE_LABEL).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </div>
+      {choice === 'custom' && (
+        <div className="field">
+          <label>Describe the terms</label>
+          <input
+            type="text"
+            value={note}
+            disabled={busy}
+            onChange={(e) => setNote(e.target.value)}
+            onBlur={saveNote}
+            placeholder="e.g. available for non-commercial classroom use, contact the project owner for anything else"
+          />
+        </div>
+      )}
     </div>
   )
 }
