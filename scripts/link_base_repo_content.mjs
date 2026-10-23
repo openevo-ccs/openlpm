@@ -102,7 +102,11 @@ const REPOS = {
     toRow(entry) {
       return {
         id: entry.id,
-        label: entry.statement?.en ?? entry.humanCodingScheme ?? '(untitled competency)',
+        // statement is keyed by language (RFC-0025's KMK records are
+        // de-only, with no en key at all) -- fall through to German before
+        // the bare coding scheme, so a German-only record shows its real
+        // competency text instead of e.g. "B 1".
+        label: entry.statement?.en ?? entry.statement?.de ?? entry.humanCodingScheme ?? '(untitled competency)',
         source_vocabulary: entry.sourceVocabulary ?? null,
         domain: entry.domain ?? null,
         record_status: entry.status ?? null,
