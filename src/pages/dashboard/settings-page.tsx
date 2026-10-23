@@ -1312,7 +1312,8 @@ function SourceDeclarationsSubsection({
 }
 
 // License for this project's OWN original work (strands, Lernziele, data
-// objects) -- RFC-0007 / migration 163. Distinct from a curriculum
+// objects) -- RFC-0007 / migration 165 (originally numbered 163, renumbered
+// to resolve a migration-number collision, PR #93). Distinct from a curriculum
 // repository record's own access_tier/license_or_rights_note, which governs
 // third-party source material this project quotes, never what it authors
 // itself -- see SourceDeclarationsSubsection above for that.
