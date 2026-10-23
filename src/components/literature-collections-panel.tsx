@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { Activity, BookMarked, ChevronDown, ChevronRight, GitFork, Link2, Plus, X } from 'lucide-react'
+import { Activity, BookMarked, ChevronDown, ChevronRight, Flag, GitFork, Link2, Plus, X } from 'lucide-react'
 import type { Database } from '@/lib/supabase/database.types'
 import {
   attachCollection,
@@ -16,6 +16,13 @@ import {
   type ProjectLiteratureCollectionLinkRow,
 } from '@/lib/supabase/literature-collections'
 import type { LiteraturebaseSnapshotRow } from '@/lib/supabase/literature'
+import {
+  listFlagsForPapers,
+  raiseFlag,
+  STANCE_LABEL,
+  type LiteratureDisputeFlagRow,
+  type Stance,
+} from '@/lib/supabase/literature-dispute-flags'
 import { buildRelationGraph, computeEvidenceStrength, EVIDENCE_LABEL_TEXT } from '@/lib/literature-analytics'
 import { LiteratureRelationsGraph } from '@/components/literature-relations-graph'
 
@@ -105,6 +112,7 @@ export function LiteratureCollectionsPanel({
             link={l}
             supabase={supabase}
             canManage={canManage}
+            projectId={projectId}
             expanded={expanded === l.id}
             onToggle={() => setExpanded(expanded === l.id ? null : l.id)}
             onRemove={() => detach(l.id)}
@@ -156,6 +164,7 @@ function CollectionLinkRow({
   link,
   supabase,
   canManage,
+  projectId,
   expanded,
   onToggle,
   onRemove,
@@ -163,12 +172,14 @@ function CollectionLinkRow({
   link: ProjectLiteratureCollectionLinkRow & { collection: LiteratureCollectionRow }
   supabase: Client
   canManage: boolean
+  projectId: string
   expanded: boolean
   onToggle: () => void
   onRemove: () => void
 }) {
   const [count, setCount] = useState<number | null>(null)
   const [papers, setPapers] = useState<LiteraturebaseSnapshotRow[] | null>(null)
+  const [flags, setFlags] = useState<LiteratureDisputeFlagRow[]>([])
   const [showGraph, setShowGraph] = useState(false)
 
   useEffect(() => {
@@ -177,7 +188,12 @@ function CollectionLinkRow({
   }, [supabase, link.collection.id])
 
   useEffect(() => {
-    if (expanded && papers === null) getCollectionPapers(supabase, link.collection).then(setPapers)
+    if (expanded && papers === null) {
+      getCollectionPapers(supabase, link.collection).then(async (p) => {
+        setPapers(p)
+        setFlags(await listFlagsForPapers(supabase, p.map((x) => x.id)))
+      })
+    }
   }, [expanded, papers, supabase, link.collection])
 
   const graph = useMemo(() => (papers ? buildRelationGraph(papers) : null), [papers])
@@ -228,18 +244,111 @@ function CollectionLinkRow({
                 }} />
               </div>
             )}
-            <div style={{ maxHeight: 220, overflow: 'auto' }}>
+            <div style={{ maxHeight: 280, overflow: 'auto' }}>
               {papers.map((p) => (
-                <div key={p.id} style={{ fontSize: 12, padding: '3px 0' }}>
-                  <a href={`https://github.com/openevo-ccs/literaturebase/blob/main/records/${p.slug}.yaml`} target="_blank" rel="noreferrer">
-                    {p.title}
-                  </a>
-                  <span className="muted"> ({p.year ?? 'n.d.'})</span>
-                </div>
+                <PaperRow
+                  key={p.id}
+                  paper={p}
+                  flags={flags.filter((f) => f.literaturebase_id === p.id)}
+                  projectId={projectId}
+                  supabase={supabase}
+                  onFlagged={(f) => setFlags([f, ...flags])}
+                />
               ))}
             </div>
           </div>
         )
+      )}
+    </div>
+  )
+}
+
+/** One paper in a collection, with its open disagreement flags (if any) and a way to raise a new one -- decision 3: a real disagreement about what a paper shows gets captured here as a structured draft, for a maintainer to actually turn into a real openevo-graph dispute-graph edge by hand, the same "draft, don't auto-write a shared resource" shape as proposing a reference to LiteratureBase itself. */
+function PaperRow({
+  paper,
+  flags,
+  projectId,
+  supabase,
+  onFlagged,
+}: {
+  paper: LiteraturebaseSnapshotRow
+  flags: LiteratureDisputeFlagRow[]
+  projectId: string
+  supabase: Client
+  onFlagged: (flag: LiteratureDisputeFlagRow) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [stance, setStance] = useState<Stance>('challenges')
+  const [targetDescription, setTargetDescription] = useState('')
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const submit = async () => {
+    if (!targetDescription.trim()) return
+    setBusy(true)
+    setError(null)
+    try {
+      const flag = await raiseFlag(supabase, projectId, paper.id, stance, targetDescription.trim(), note.trim() || undefined)
+      onFlagged(flag)
+      setOpen(false)
+      setTargetDescription('')
+      setNote('')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not raise this flag.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div style={{ padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 12 }}>
+          <a href={`https://github.com/openevo-ccs/literaturebase/blob/main/records/${paper.slug}.yaml`} target="_blank" rel="noreferrer">
+            {paper.title}
+          </a>
+          <span className="muted"> ({paper.year ?? 'n.d.'})</span>
+        </div>
+        <button className="btn-linklike" style={{ fontSize: 10.5, flexShrink: 0, marginLeft: 6 }} title="Flag a disagreement about what this paper shows" onClick={() => setOpen(!open)}>
+          <Flag size={10} style={{ marginRight: 2 }} />{flags.length > 0 ? `${flags.length} flag${flags.length === 1 ? '' : 's'}` : 'Flag'}
+        </button>
+      </div>
+      {flags.length > 0 && (
+        <div style={{ marginTop: 2 }}>
+          {flags.map((f) => (
+            <div key={f.id} className="muted" style={{ fontSize: 10.5, padding: '1px 0' }}>
+              {STANCE_LABEL[f.stance]} {f.target_description}
+              <span className="chip" style={{ fontSize: 9, marginLeft: 4 }}>{f.status.replace(/_/g, ' ')}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {open && (
+        <div className="card" style={{ marginTop: 4, background: 'var(--surface-1)' }}>
+          <div className="field">
+            <label>How does this relate to what you're flagging?</label>
+            <select value={stance} onChange={(e) => setStance(e.target.value as Stance)}>
+              {(Object.keys(STANCE_LABEL) as Stance[]).map((s) => <option key={s} value={s}>{STANCE_LABEL[s]}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>What claim, paper, or curriculum content is this in tension with?</label>
+            <input value={targetDescription} onChange={(e) => setTargetDescription(e.target.value)} placeholder="e.g. the Kampourakis dispute's design-stance position" />
+          </div>
+          <div className="field">
+            <label>Note (optional)</label>
+            <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} />
+          </div>
+          {error && <div className="notice notice-bad">{error}</div>}
+          <div className="row" style={{ gap: 6 }}>
+            <button className="btn btn-mini btn-primary" disabled={busy || !targetDescription.trim()} onClick={submit}>{busy ? 'Raising…' : 'Raise flag'}</button>
+            <button className="btn-linklike" onClick={() => setOpen(false)}>Cancel</button>
+          </div>
+          <p className="muted" style={{ fontSize: 10.5, marginTop: 4 }}>
+            This records a draft flag for a maintainer to review -- it doesn&apos;t change the real LiteratureBase record or the dispute graph by itself.
+          </p>
+        </div>
       )}
     </div>
   )
