@@ -20,6 +20,7 @@ import {
   type SupersessionInfo,
 } from '@/lib/supabase/curriculum-repository'
 import { RECORD_TYPE_BLURB, RECORD_TYPE_COLOR, RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
 
 // "Browse + connect" -- real sourced national/regional curriculum-policy
 // material (deutsche-lpm/nys-lpm today), invite-only. Any member can look at
@@ -346,6 +347,13 @@ function RecordDetail({
           />
         )}
       </section>
+
+      <LiteratureCollectionsPanel
+        projectId={currentProject.id}
+        scope={{ curriculumRepositoryRecordId: recordId }}
+        canManage={canManage}
+        supabase={supabase}
+      />
     </div>
   )
 }

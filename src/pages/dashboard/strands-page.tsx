@@ -5,6 +5,7 @@ import type { ProjectOutletContext } from './project-layout'
 import { Chip } from '@/components/chip'
 import { getFullThread, type FullThread, type ThreadRow } from '@/lib/supabase/curriculum'
 import { addParentStrand, listChildStrands, listParentStrands, removeParentStrand } from '@/lib/supabase/strands'
+import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
 
 // New sidebar space, 2026-09-13 restructure. Every strand here is a row
 // that already existed as an `lpm_threads` narrative (a named, curated,
@@ -86,7 +87,7 @@ export default function StrandsPage() {
 
           <div className="card" style={{ minHeight: 200 }}>
             {strandId ? (
-              <StrandDetail strandId={strandId} strands={strands} canManage={canManage} supabase={supabase} />
+              <StrandDetail strandId={strandId} strands={strands} canManage={canManage} supabase={supabase} projectId={project.id} />
             ) : (
               <p className="muted">Pick a strand on the left to see its stations and nesting.</p>
             )}
@@ -102,11 +103,13 @@ function StrandDetail({
   strands,
   canManage,
   supabase,
+  projectId,
 }: {
   strandId: string
   strands: ThreadRow[]
   canManage: boolean
   supabase: ProjectOutletContext['supabase']
+  projectId: string
 }) {
   const [full, setFull] = useState<FullThread | null>(null)
   const [parents, setParents] = useState<ThreadRow[]>([])
@@ -202,6 +205,13 @@ function StrandDetail({
           ))}
         </ol>
       </section>
+
+      <LiteratureCollectionsPanel
+        projectId={projectId}
+        scope={{ lpmThreadId: strandId }}
+        canManage={canManage}
+        supabase={supabase}
+      />
     </div>
   )
 }
