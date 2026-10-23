@@ -4,7 +4,7 @@ import type { LiteraturebaseSnapshotRow } from './literature'
 
 type Client = SupabaseClient<Database>
 
-// migration 163 hasn't been pushed to production yet, so these tables
+// migration 167 hasn't been pushed to production yet, so these tables
 // aren't in database.types.ts's generated types -- cast at the query
 // boundary (`as any).from(...)`) rather than block on a regen that needs
 // the real push to happen first anyway. Matches every existing example of
@@ -67,7 +67,7 @@ export async function getCollection(supabase: Client, collectionId: string): Pro
   return data ?? null
 }
 
-/** A canonical collection's papers are computed live from the real LiteratureBase snapshot -- see migration 163's header note for why. A branch's papers are whatever is in literature_collection_items. */
+/** A canonical collection's papers are computed live from the real LiteratureBase snapshot -- see migration 167's header note for why. A branch's papers are whatever is in literature_collection_items. */
 export async function getCollectionPapers(supabase: Client, collection: LiteratureCollectionRow): Promise<LiteraturebaseSnapshotRow[]> {
   if (collection.owner_project_id === null) {
     const { data } = await supabase
