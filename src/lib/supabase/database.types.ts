@@ -512,6 +512,14 @@ export type Database = {
           region_tags: string[]
           theme_tags: string[]
           working_languages: string[]
+          // The license for this project's OWN original work -- migration
+          // 163. Null = inherits the ecosystem default (CC BY-NC-SA 4.0), or
+          // a parent project's own resolved license for a nested sub-project.
+          // Distinct from curriculum_repository_records.access_tier, which
+          // governs third-party source material this project quotes rather
+          // than what it authors itself.
+          content_license: 'cc-by-4.0' | 'cc0-1.0' | 'all-rights-reserved' | 'custom' | null
+          content_license_note: string | null
           // Draft vs. established -- migration 016. Distinct from
           // epistemic_status (is this content real vs. a thought
           // experiment): maturity is "how far along is this Project," not
@@ -549,6 +557,8 @@ export type Database = {
           region_tags?: string[]
           theme_tags?: string[]
           working_languages?: string[]
+          content_license?: 'cc-by-4.0' | 'cc0-1.0' | 'all-rights-reserved' | 'custom' | null
+          content_license_note?: string | null
           maturity?: 'draft' | 'established'
           grade_framework_id?: string | null
           prompt_template_library_id?: string | null
@@ -573,6 +583,8 @@ export type Database = {
           region_tags?: string[]
           theme_tags?: string[]
           working_languages?: string[]
+          content_license?: 'cc-by-4.0' | 'cc0-1.0' | 'all-rights-reserved' | 'custom' | null
+          content_license_note?: string | null
           maturity?: 'draft' | 'established'
           grade_framework_id?: string | null
           prompt_template_library_id?: string | null
