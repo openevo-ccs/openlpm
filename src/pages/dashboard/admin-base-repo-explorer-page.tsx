@@ -597,6 +597,7 @@ function ReviewQueuePanel({
   supabase: ReturnType<typeof createClient>
   onReviewed: () => void
 }) {
+  const { session } = useSession()
   const [reviewText, setReviewText] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState<string | null>(null)
 
@@ -619,25 +620,36 @@ function ReviewQueuePanel({
       ) : pending.length === 0 ? (
         <p className="muted">Nothing waiting for review.</p>
       ) : (
-        pending.map((item) => (
-          <div key={item.assignment.id} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
-            <p><strong>{item.label}</strong> {item.detail && <span className="muted">— {item.detail}</span>}</p>
-            <div className="row" style={{ gap: 6 }}>
-              <input
-                placeholder="Your reasoning…"
-                value={reviewText[item.assignment.id] ?? ''}
-                onChange={(e) => setReviewText((s) => ({ ...s, [item.assignment.id]: e.target.value }))}
-                style={{ fontSize: 12, flex: 1 }}
-              />
-              <button className="btn btn-mini" disabled={busy === item.assignment.id} onClick={() => decide(item.assignment.id, 'accept')}>
-                <CheckCircle2 size={13} />Accept
-              </button>
-              <button className="btn btn-mini btn-danger" disabled={busy === item.assignment.id} onClick={() => decide(item.assignment.id, 'reject')}>
-                <XCircle size={13} />Reject
-              </button>
+        pending.map((item) => {
+          // A2 fix (2026-10-23 mechanism audit): mirrors review-page.tsx's GenericReviewCard --
+          // the DB-level guard (migration 164) now excludes a self-submitted assignment too, but
+          // this UI check is what actually stops an admin from seeing their own Accept/Reject
+          // form in the first place, same as every other reviewable type already does.
+          const isOwnProposal = !!session && item.assignment.submitted_by === session.user.id
+          return (
+            <div key={item.assignment.id} style={{ marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
+              <p><strong>{item.label}</strong> {item.detail && <span className="muted">— {item.detail}</span>}</p>
+              {isOwnProposal ? (
+                <div className="notice">You submitted this one — someone else needs to review it.</div>
+              ) : (
+                <div className="row" style={{ gap: 6 }}>
+                  <input
+                    placeholder="Your reasoning…"
+                    value={reviewText[item.assignment.id] ?? ''}
+                    onChange={(e) => setReviewText((s) => ({ ...s, [item.assignment.id]: e.target.value }))}
+                    style={{ fontSize: 12, flex: 1 }}
+                  />
+                  <button className="btn btn-mini" disabled={busy === item.assignment.id} onClick={() => decide(item.assignment.id, 'accept')}>
+                    <CheckCircle2 size={13} />Accept
+                  </button>
+                  <button className="btn btn-mini btn-danger" disabled={busy === item.assignment.id} onClick={() => decide(item.assignment.id, 'reject')}>
+                    <XCircle size={13} />Reject
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        ))
+          )
+        })
       )}
     </div>
   )
