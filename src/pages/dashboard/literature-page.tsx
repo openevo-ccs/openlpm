@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useOutletContext, useSearchParams } from 'react-router-dom'
-import { BookOpen, CheckCircle2, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
+import { BookOpen, CheckCircle2, Download, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
 import { searchOpenAlex, type SearchResult as OpenAlexResult } from '@/lib/api/openalex'
 import { searchSemanticScholar, type SearchResult as SemanticScholarResult } from '@/lib/api/semantic-scholar'
 import { searchCrossRef, verifyDOI, type CrossRefSearchResult } from '@/lib/api/crossref'
+import { fetchZoteroLibrary, type ZoteroResult } from '@/lib/api/zotero'
+import { toBibTeX, toCSLJSON, toRIS, downloadText, type ExportableReference } from '@/lib/export/bibliography'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
@@ -24,7 +26,7 @@ import { buildLiteratureBaseDraftYaml } from '@/lib/literaturebase-export'
 import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
 
 type LiteratureRow = Database['public']['Tables']['literature_references']['Row']
-type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase'
+type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase' | 'zotero'
 
 // Real feedback c327878b (Dustin Eirdosh, 2026-10-02): "expand the search
 // options with radio-selectors for OpenAlex, cross-ref, semantic scholar."
@@ -38,7 +40,7 @@ type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase'
 // OpenEvo's own curated library directly, and every result -- regardless
 // of which engine found it -- gets cross-checked by DOI against that same
 // library so a "this is already a trusted source" badge shows either way.
-const ENGINE_LABEL: Record<Engine, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', crossref: 'Crossref', literaturebase: 'OpenEvo LiteratureBase' }
+const ENGINE_LABEL: Record<Engine, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', crossref: 'Crossref', literaturebase: 'OpenEvo LiteratureBase', zotero: 'My Zotero library' }
 const STATUS_OPTIONS: LiteratureRow['status'][] = ['draft', 'submitted', 'under_review', 'accepted', 'rejected']
 
 interface LitResult {
@@ -69,6 +71,10 @@ const fromCrossRef = (r: CrossRefSearchResult): LitResult => ({
 const fromLiteraturebase = (r: LiteraturebaseSnapshotRow): LitResult => ({
   key: r.id, doi: r.doi, title: r.title, authors: r.authors ?? [], year: r.year, venue: r.venue, type: r.type ?? 'article',
   openalexId: null, semanticScholarId: null, literaturebaseId: r.id,
+})
+const fromZotero = (r: ZoteroResult): LitResult => ({
+  key: `zotero:${r.key}`, doi: r.doi, title: r.title, authors: r.authors, year: r.year, venue: r.venue, type: r.type,
+  openalexId: null, semanticScholarId: null, literaturebaseId: null,
 })
 
 interface EditDraft {
@@ -104,6 +110,10 @@ export default function LiteraturePage() {
   const [savingEdit, setSavingEdit] = useState(false)
   const [baseLink, setBaseLink] = useState<ProjectBaseLinkRow | null | undefined>(undefined)
   const [savedMatches, setSavedMatches] = useState<Map<string, LiteraturebaseSnapshotRow>>(new Map())
+  const [zoteroLibraryId, setZoteroLibraryId] = useState('')
+  const [zoteroApiKey, setZoteroApiKey] = useState('')
+  const [zoteroLibraryType, setZoteroLibraryType] = useState<'user' | 'group'>('user')
+  const [zoteroError, setZoteroError] = useState<string | null>(null)
 
   const linked = !!baseLink
 
@@ -164,6 +174,23 @@ export default function LiteraturePage() {
       setResultMatches(new Map())
     } else {
       setResultMatches(await findLiteraturebaseMatchesByDoi(supabase, found.map((r) => r.doi).filter((d): d is string => !!d)))
+    }
+    setSearching(false)
+  }
+
+  const fetchZotero = async () => {
+    if (!zoteroLibraryId.trim() || !zoteroApiKey.trim()) return
+    setSearching(true)
+    setNotice(null)
+    setZoteroError(null)
+    const { results: zoteroResults, error } = await fetchZoteroLibrary(zoteroLibraryId.trim(), zoteroApiKey.trim(), zoteroLibraryType)
+    if (error) {
+      setZoteroError(error)
+      setResults(null)
+    } else {
+      const found = zoteroResults.map(fromZotero)
+      setResults(found)
+      setResultMatches(linked ? await findLiteraturebaseMatchesByDoi(supabase, found.map((r) => r.doi).filter((d): d is string => !!d)) : new Map())
     }
     setSearching(false)
   }
@@ -317,19 +344,54 @@ export default function LiteraturePage() {
             </button>
           ))}
         </div>
-        <form onSubmit={runSearch} className="row">
-          <input
-            type="search"
-            placeholder="Search for papers by title, author, or topic…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{ flex: 1, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
-          />
-          <button type="submit" className="btn btn-primary" disabled={searching}>
-            <Search size={14} />
-            {searching ? 'Searching…' : 'Search'}
-          </button>
-        </form>
+        {engine === 'zotero' ? (
+          <div>
+            <p className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
+              Pulls your Zotero library in — nothing here is ever written back to Zotero. Your API
+              key is used for this one fetch only and isn&apos;t stored. Find your user ID and
+              create a read-only key at{' '}
+              <a href="https://www.zotero.org/settings/keys" target="_blank" rel="noreferrer">zotero.org/settings/keys</a>.
+            </p>
+            <div className="row" style={{ gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+              <select value={zoteroLibraryType} onChange={(e) => setZoteroLibraryType(e.target.value as 'user' | 'group')}>
+                <option value="user">My library</option>
+                <option value="group">A group library</option>
+              </select>
+              <input
+                placeholder={zoteroLibraryType === 'user' ? 'Your Zotero user ID' : 'Group ID'}
+                value={zoteroLibraryId}
+                onChange={(e) => setZoteroLibraryId(e.target.value)}
+                style={{ padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+              />
+              <input
+                type="password"
+                placeholder="Zotero API key (read access)"
+                value={zoteroApiKey}
+                onChange={(e) => setZoteroApiKey(e.target.value)}
+                style={{ flex: 1, minWidth: 180, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+              />
+              <button type="button" className="btn btn-primary" disabled={searching || !zoteroLibraryId.trim() || !zoteroApiKey.trim()} onClick={fetchZotero}>
+                <Search size={14} />
+                {searching ? 'Fetching…' : 'Fetch my library'}
+              </button>
+            </div>
+            {zoteroError && <div className="notice notice-bad">{zoteroError}</div>}
+          </div>
+        ) : (
+          <form onSubmit={runSearch} className="row">
+            <input
+              type="search"
+              placeholder="Search for papers by title, author, or topic…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ flex: 1, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+            />
+            <button type="submit" className="btn btn-primary" disabled={searching}>
+              <Search size={14} />
+              {searching ? 'Searching…' : 'Search'}
+            </button>
+          </form>
+        )}
 
         {results !== null && (
           <div style={{ marginTop: 14 }}>
@@ -393,7 +455,10 @@ export default function LiteraturePage() {
         )}
       </div>
 
-      <h2 style={{ marginTop: 20 }}>{project.name}&apos;s collection</h2>
+      <div className="row" style={{ marginTop: 20, justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h2 style={{ margin: 0 }}>{project.name}&apos;s collection</h2>
+        {items && items.length > 0 && <ExportMenu items={items} />}
+      </div>
       {items === null ? (
         <p className="muted">Loading…</p>
       ) : items.length === 0 ? (
@@ -499,6 +564,41 @@ export default function LiteraturePage() {
               )}
             </div>
           )})}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Export -- the other half of decision 2 (standard bibliographic formats
+// out, as a plain client-side text download; nothing round-trips to
+// Zotero or anywhere else).
+// ============================================================================
+
+function ExportMenu({ items }: { items: LiteratureRow[] }) {
+  const [open, setOpen] = useState(false)
+  const toExportable = (): ExportableReference[] =>
+    items.map((it) => ({ key: it.id, title: it.title, authors: Array.isArray(it.authors) ? it.authors : [], year: it.year, venue: it.venue, doi: it.doi, type: it.type }))
+
+  const run = (format: 'bibtex' | 'ris' | 'csl') => {
+    const refs = toExportable()
+    if (format === 'bibtex') downloadText('literature.bib', 'application/x-bibtex', toBibTeX(refs))
+    else if (format === 'ris') downloadText('literature.ris', 'application/x-research-info-systems', toRIS(refs))
+    else downloadText('literature.json', 'application/vnd.citationstyles.csl+json', toCSLJSON(refs))
+    setOpen(false)
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button className="btn btn-mini" onClick={() => setOpen(!open)}>
+        <Download size={12} />Export
+      </button>
+      {open && (
+        <div className="card" style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, zIndex: 5, minWidth: 160 }}>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('bibtex')}>BibTeX (.bib)</button>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('ris')}>RIS (.ris)</button>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('csl')}>CSL-JSON (.json)</button>
         </div>
       )}
     </div>

@@ -65,16 +65,27 @@ export async function getLiteraturebaseSnapshotByIds(supabase: Client, ids: stri
   return byId
 }
 
+// Matches on title AND each record's own plain-language summary text, not
+// title alone -- a real improvement over a title-only search, but an
+// honest one: this is full-text keyword matching, not semantic search.
+// GWDG's live model roster has zero embedding-capable models right now
+// (checked directly, 2026-10-23), so true semantic search over this
+// corpus needs an embedding model this lab's infrastructure doesn't have
+// yet -- not something to fake with a relabeled keyword search.
 export async function searchLiteraturebaseSnapshot(supabase: Client, query: string): Promise<LiteraturebaseSnapshotRow[]> {
   const q = query.trim()
   if (q.length < 2) {
     const { data } = await supabase.from('literaturebase_snapshot').select('*').order('title', { ascending: true }).limit(40)
     return data ?? []
   }
+  // PostgREST's `.or()` filter string has its own comma/parenthesis syntax
+  // -- strip those out of free-typed search text rather than risk a typed
+  // "," or "(" breaking the filter expression.
+  const safe = q.replace(/[,()]/g, ' ').trim()
   const { data } = await supabase
     .from('literaturebase_snapshot')
     .select('*')
-    .ilike('title', `%${q}%`)
+    .or(`title.ilike.%${safe}%,data->plain_language_summary->>text.ilike.%${safe}%`)
     .limit(40)
   return data ?? []
 }

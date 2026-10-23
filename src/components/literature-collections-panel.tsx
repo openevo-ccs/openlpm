@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { BookMarked, ChevronDown, ChevronRight, Flag, GitFork, Link2, Plus, X } from 'lucide-react'
+import { Activity, BookMarked, ChevronDown, ChevronRight, Flag, GitFork, Link2, Plus, X } from 'lucide-react'
 import type { Database } from '@/lib/supabase/database.types'
 import {
   attachCollection,
@@ -23,6 +23,8 @@ import {
   type LiteratureDisputeFlagRow,
   type Stance,
 } from '@/lib/supabase/literature-dispute-flags'
+import { buildRelationGraph, computeEvidenceStrength, EVIDENCE_LABEL_TEXT } from '@/lib/literature-analytics'
+import { LiteratureRelationsGraph } from '@/components/literature-relations-graph'
 
 type Client = SupabaseClient<Database>
 
@@ -178,6 +180,7 @@ function CollectionLinkRow({
   const [count, setCount] = useState<number | null>(null)
   const [papers, setPapers] = useState<LiteraturebaseSnapshotRow[] | null>(null)
   const [flags, setFlags] = useState<LiteratureDisputeFlagRow[]>([])
+  const [showGraph, setShowGraph] = useState(false)
 
   useEffect(() => {
     countCollectionPapers(supabase, link.collection).then(setCount)
@@ -192,6 +195,9 @@ function CollectionLinkRow({
       })
     }
   }, [expanded, papers, supabase, link.collection])
+
+  const graph = useMemo(() => (papers ? buildRelationGraph(papers) : null), [papers])
+  const evidence = useMemo(() => (graph ? computeEvidenceStrength(graph) : null), [graph])
 
   return (
     <div style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
@@ -215,17 +221,41 @@ function CollectionLinkRow({
         ) : papers.length === 0 ? (
           <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>No papers in here yet.</p>
         ) : (
-          <div style={{ marginTop: 4, maxHeight: 280, overflow: 'auto' }}>
-            {papers.map((p) => (
-              <PaperRow
-                key={p.id}
-                paper={p}
-                flags={flags.filter((f) => f.literaturebase_id === p.id)}
-                projectId={projectId}
-                supabase={supabase}
-                onFlagged={(f) => setFlags([f, ...flags])}
-              />
-            ))}
+          <div style={{ marginTop: 4 }}>
+            {evidence && (
+              <div className="row" style={{ gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
+                <span
+                  className="chip"
+                  style={{ fontSize: 10 }}
+                  title={`${evidence.reinforcingCount} reinforcing link${evidence.reinforcingCount === 1 ? '' : 's'}, ${evidence.tensionCount} contradicts/criticises link${evidence.tensionCount === 1 ? '' : 's'}, out of ${evidence.edgeCount} total real links between these papers — a heuristic over the papers' own recorded relations, not a formal meta-analysis.`}
+                >
+                  <Activity size={10} style={{ marginRight: 3 }} />{EVIDENCE_LABEL_TEXT[evidence.label]} ({evidence.edgeCount} linked relation{evidence.edgeCount === 1 ? '' : 's'})
+                </span>
+                <button className="btn-linklike" style={{ fontSize: 11 }} onClick={() => setShowGraph(!showGraph)}>
+                  {showGraph ? 'Hide relation map' : 'View relation map'}
+                </button>
+              </div>
+            )}
+            {showGraph && graph && (
+              <div style={{ marginBottom: 8 }}>
+                <LiteratureRelationsGraph graph={graph} onOpenPaper={(id) => {
+                  const url = papers.find((p) => p.id === id)?.slug
+                  if (url) window.open(`https://github.com/openevo-ccs/literaturebase/blob/main/records/${url}.yaml`, '_blank')
+                }} />
+              </div>
+            )}
+            <div style={{ maxHeight: 280, overflow: 'auto' }}>
+              {papers.map((p) => (
+                <PaperRow
+                  key={p.id}
+                  paper={p}
+                  flags={flags.filter((f) => f.literaturebase_id === p.id)}
+                  projectId={projectId}
+                  supabase={supabase}
+                  onFlagged={(f) => setFlags([f, ...flags])}
+                />
+              ))}
+            </div>
           </div>
         )
       )}
