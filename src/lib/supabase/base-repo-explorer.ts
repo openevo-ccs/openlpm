@@ -191,7 +191,17 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       { header: 'Teilbereich', get: (row) => (row.data as any)?.__competencySubArea ?? '—' },
       { header: 'Source', get: (row) => row.secondary ?? '—' },
     ],
-    relationFields: [{ field: 'broader', targetRepo: 'competencybase' }],
+    // Susan Hanisch, 2026-10-23 (feedback 84efcad2): "add a column on
+    // pedagogical approaches" -- competencybase RFC-0027 added a real
+    // schema field for this (pedagogicalApproaches, an array of real
+    // MethodsBase method ids). Listed here the same way every other
+    // relation field already is, so the existing generic machinery (the
+    // detail panel's idLabels resolution, the Graph view's edges) picks
+    // it up for free -- no new UI mechanism needed.
+    relationFields: [
+      { field: 'broader', targetRepo: 'competencybase' },
+      { field: 'pedagogicalApproaches', targetRepo: 'methodsbase' },
+    ],
   },
   {
     key: 'projectbase',
