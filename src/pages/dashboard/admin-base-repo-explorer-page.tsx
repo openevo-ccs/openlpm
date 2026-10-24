@@ -6,8 +6,11 @@ import { useSession } from '@/state/session'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
+  resolveCrossRepoLabels,
   type BaseRepoKey,
   type SnapshotRow,
+  type TableColumn,
+  type ResolvedLabel,
 } from '@/lib/supabase/base-repo-explorer'
 import {
   completeGenericReview,
@@ -84,7 +87,8 @@ export default function AdminBaseRepoExplorerPage() {
   const [search, setSearch] = useState('')
   const [filterValue, setFilterValue] = useState<string>('')
   const [langFilter, setLangFilter] = useState<string>('')
-  const [sortBy, setSortBy] = useState<'label' | 'filterValue' | 'review_status'>('label')
+  const [secondaryFilterValue, setSecondaryFilterValue] = useState<string>('')
+  const [sortBy, setSortBy] = useState<'label' | 'filterValue' | 'review_status' | 'secondaryFilter'>('label')
   const [rowsByRepo, setRowsByRepo] = useState<Map<BaseRepoKey, SnapshotRow[]>>(new Map())
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<NodeRef | null>(null)
@@ -121,7 +125,15 @@ export default function AdminBaseRepoExplorerPage() {
   // value from one repo doesn't silently carry into another.
   const activeFilterCfg = tab !== 'all' ? BASE_REPO_CONFIGS.find((c) => c.key === tab) : undefined
   const activeFilterColumn = activeFilterCfg?.filterColumn
-  useEffect(() => { setFilterValue(''); setLangFilter('') }, [tab])
+  // Real feedback cc89fc1c (Susan, 2026-10-21... reconfirmed 2026-10-24):
+  // "once one has selected a Repo, do not show the column 'Repo' because
+  // there is no information added for the user" -- and that's also
+  // exactly when a repo's own column set (tableColumns) applies, since the
+  // generic cross-repo table only makes sense across more than one repo.
+  const showRepoColumn = tab === 'all'
+  const activeTableColumns: TableColumn[] | undefined = activeFilterCfg?.tableColumns
+  const activeSecondaryFilter = activeFilterCfg?.secondaryFilter
+  useEffect(() => { setFilterValue(''); setLangFilter(''); setSecondaryFilterValue('') }, [tab])
 
   // Real feedback a3408216 (Susan, 2026-10-24): no way to tell, or filter,
   // which language a record's text is actually in -- MethodsBase content
@@ -147,13 +159,17 @@ export default function AdminBaseRepoExplorerPage() {
     let filtered = filterValue ? out.filter((r) => r.row.filterValue === filterValue) : out
     if (langFilter === '__untagged__') filtered = filtered.filter((r) => r.row.languages.length === 0)
     else if (langFilter) filtered = filtered.filter((r) => r.row.languages.includes(langFilter))
+    if (secondaryFilterValue) filtered = filtered.filter((r) => r.row.secondaryFilterValues.includes(secondaryFilterValue))
     const sorted = [...filtered].sort((a, b) => {
-      const av = (sortBy === 'label' ? a.row.label : sortBy === 'filterValue' ? a.row.filterValue : a.row.review_status) ?? ''
-      const bv = (sortBy === 'label' ? b.row.label : sortBy === 'filterValue' ? b.row.filterValue : b.row.review_status) ?? ''
-      return av.localeCompare(bv)
+      const value = (r: NodeRef) =>
+        sortBy === 'label' ? r.row.label
+        : sortBy === 'filterValue' ? r.row.filterValue
+        : sortBy === 'secondaryFilter' ? r.row.secondaryFilterValues.join(', ')
+        : r.row.review_status
+      return (value(a) ?? '').localeCompare(value(b) ?? '')
     })
     return sorted
-  }, [rowsByRepo, filterValue, langFilter, sortBy])
+  }, [rowsByRepo, filterValue, langFilter, secondaryFilterValue, sortBy])
 
   const filterOptions = useMemo(() => {
     if (!activeFilterColumn) return []
@@ -161,6 +177,13 @@ export default function AdminBaseRepoExplorerPage() {
     for (const rows of rowsByRepo.values()) for (const row of rows) if (row.filterValue) values.add(row.filterValue)
     return Array.from(values).sort()
   }, [rowsByRepo, activeFilterColumn])
+
+  const secondaryFilterOptions = useMemo(() => {
+    if (!activeSecondaryFilter) return []
+    const values = new Set<string>()
+    for (const rows of rowsByRepo.values()) for (const row of rows) for (const v of row.secondaryFilterValues) values.add(v)
+    return Array.from(values).sort()
+  }, [rowsByRepo, activeSecondaryFilter])
 
   const totalCount = allRows.length
 
@@ -218,9 +241,16 @@ export default function AdminBaseRepoExplorerPage() {
               <option value="__untagged__">Not yet language-tagged</option>
             </select>
           )}
+          {activeSecondaryFilter && (
+            <select value={secondaryFilterValue} onChange={(e) => setSecondaryFilterValue(e.target.value)}>
+              <option value="">All {activeSecondaryFilter.label.toLowerCase()}s</option>
+              {secondaryFilterOptions.map((v) => <option key={v} value={v}>{v}</option>)}
+            </select>
+          )}
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
             <option value="label">Sort: Label</option>
             <option value="filterValue">Sort: {activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}</option>
+            {activeSecondaryFilter && <option value="secondaryFilter">Sort: {activeSecondaryFilter.label}</option>}
             <option value="review_status">Sort: Review status</option>
           </select>
         </div>
@@ -245,9 +275,16 @@ export default function AdminBaseRepoExplorerPage() {
           ) : totalCount === 0 ? (
             <div className="card empty"><p>No records match.</p></div>
           ) : view === 'table' ? (
-            <TableView rows={allRows} onSelect={setSelected} detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'} showLanguage={anyLanguageTagged} />
+            <TableView
+              rows={allRows}
+              onSelect={setSelected}
+              detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}
+              showLanguage={anyLanguageTagged}
+              showRepoColumn={showRepoColumn}
+              columns={activeTableColumns}
+            />
           ) : view === 'cards' ? (
-            <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} />
+            <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} />
           ) : (
             <GraphView rows={allRows} onSelect={setSelected} />
           )}
@@ -289,30 +326,34 @@ function TableView({
   onSelect,
   detailColumnLabel,
   showLanguage,
+  showRepoColumn,
+  columns,
 }: {
   rows: NodeRef[]
   onSelect: (r: NodeRef) => void
   detailColumnLabel: string
   showLanguage: boolean
+  showRepoColumn: boolean
+  columns?: TableColumn[]
 }) {
   return (
     <table>
       <thead>
         <tr>
-          <th>Repo</th>
-          <th>Label</th>
+          {showRepoColumn && <th>Repo</th>}
+          {columns ? columns.map((c) => <th key={c.header}>{c.header}</th>) : <th>Label</th>}
           {showLanguage && <th>Language</th>}
-          <th>{detailColumnLabel}</th>
+          {!columns && <th>{detailColumnLabel}</th>}
           <th>Review status</th>
         </tr>
       </thead>
       <tbody>
         {rows.map(({ repoKey, row }) => (
           <tr key={`${repoKey}:${row.id}`} onClick={() => onSelect({ repoKey, row })} style={{ cursor: 'pointer' }}>
-            <td><span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey] }}>{repoKey}</span></td>
-            <td>{row.label}</td>
+            {showRepoColumn && <td><span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey] }}>{repoKey}</span></td>}
+            {columns ? columns.map((c) => <td key={c.header}>{c.get(row)}</td>) : <td>{row.label}</td>}
             {showLanguage && <td><LanguageBadge languages={row.languages} /></td>}
-            <td className="muted">{row.secondary ?? row.filterValue ?? ''}</td>
+            {!columns && <td className="muted">{row.secondary ?? row.filterValue ?? ''}</td>}
             <td className="muted">{row.review_status ?? '—'}</td>
           </tr>
         ))}
@@ -321,13 +362,23 @@ function TableView({
   )
 }
 
-function CardsView({ rows, onSelect, showLanguage }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; showLanguage: boolean }) {
+function CardsView({
+  rows,
+  onSelect,
+  showLanguage,
+  showRepoChip,
+}: {
+  rows: NodeRef[]
+  onSelect: (r: NodeRef) => void
+  showLanguage: boolean
+  showRepoChip: boolean
+}) {
   return (
     <div className="grid grid-3">
       {rows.map(({ repoKey, row }) => (
         <div key={`${repoKey}:${row.id}`} className="card" style={{ cursor: 'pointer' }} onClick={() => onSelect({ repoKey, row })}>
           <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey], marginBottom: 6 }}>{repoKey}</span>
+            {showRepoChip && <span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey], marginBottom: 6 }}>{repoKey}</span>}
             {showLanguage && <LanguageBadge languages={row.languages} />}
           </div>
           <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
@@ -458,12 +509,40 @@ function filterColumnLabel(column: string): string {
   return FILTER_COLUMN_LABELS[column] ?? humanizeFieldName(column)
 }
 
+// Picks a field's display text/array out of a language-keyed object (e.g.
+// MethodsBase's label/description/whenToUse/protocolSteps, now
+// {"en": ..., "de": ...} per the 2026-10-24 language-field work) -- prefers
+// English, then German, then whatever's there. Leaves anything that isn't
+// a flat language-code-keyed object alone (a normal nested object like
+// `citation` has keys like "title"/"authors", which never match).
+function pickLang(value: unknown): unknown {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const obj = value as Record<string, unknown>
+    const keys = Object.keys(obj)
+    if (keys.length > 0 && keys.every((k) => /^[a-z]{2}(-[A-Z]{2})?$/.test(k))) {
+      return obj.en ?? obj.de ?? obj[keys[0]]
+    }
+  }
+  return value
+}
+
 // Real base-repo records nest arbitrarily (a method's protocolSteps is a
 // plain string array; its basiskonzeptbezug is an array of objects with
 // their own nested fields) -- recurse rather than special-case each repo's
 // shape, so this stays correct as new fields show up in any repo's data.
-function FieldValue({ value }: { value: unknown }) {
+//
+// idLabels (Susan Hanisch, 2026-10-24, feedback aee0b27e): when a string
+// value is itself a real Base Repo id (e.g. "OE-METHOD-cooperative-
+// learning") and its readable label was already resolved, show that label
+// instead of the raw id -- anywhere in the generic field dump, for any
+// repo, not just the one field Susan named, since it's the same
+// mechanism either way.
+function FieldValue({ value, idLabels }: { value: unknown; idLabels?: Map<string, ResolvedLabel> }) {
   if (value === null || value === undefined || value === '') return <span className="muted">—</span>
+  if (typeof value === 'string') {
+    const resolved = idLabels?.get(value)
+    if (resolved) return <span>{resolved.label}</span>
+  }
   if (Array.isArray(value)) {
     if (value.length === 0) return <span className="muted">—</span>
     // Short strings (ids, tags) read fine comma-joined on one line; longer
@@ -471,7 +550,16 @@ function FieldValue({ value }: { value: unknown }) {
     // line each or they run together into an unreadable blob.
     const isShortTagList = value.every((v) => (typeof v === 'string' || typeof v === 'number') && String(v).length <= 60)
     if (isShortTagList) {
-      return <span>{value.map(String).join(', ')}</span>
+      return (
+        <span>
+          {value
+            .map((v) => {
+              const resolved = typeof v === 'string' ? idLabels?.get(v) : undefined
+              return resolved ? resolved.label : String(v)
+            })
+            .join(', ')}
+        </span>
+      )
     }
     if (value.every((v) => typeof v !== 'object' || v === null)) {
       return (
@@ -486,7 +574,7 @@ function FieldValue({ value }: { value: unknown }) {
       <ul style={{ margin: '2px 0', paddingLeft: 16 }}>
         {value.map((v, i) => (
           <li key={i} style={{ marginBottom: 4 }}>
-            <FieldValue value={v} />
+            <FieldValue value={v} idLabels={idLabels} />
           </li>
         ))}
       </ul>
@@ -497,7 +585,7 @@ function FieldValue({ value }: { value: unknown }) {
       <div style={{ paddingLeft: 10, borderLeft: '2px solid var(--border)', marginTop: 2 }}>
         {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
           <div key={k} style={{ marginBottom: 4 }}>
-            <strong style={{ fontSize: 11 }}>{humanizeFieldName(k)}:</strong> <FieldValue value={v} />
+            <strong style={{ fontSize: 11 }}>{humanizeFieldName(k)}:</strong> <FieldValue value={v} idLabels={idLabels} />
           </div>
         ))}
       </div>
@@ -506,9 +594,20 @@ function FieldValue({ value }: { value: unknown }) {
   return <span style={{ whiteSpace: 'pre-wrap' }}>{String(value)}</span>
 }
 
-function RecordDetails({ data }: { data: Record<string, unknown> }) {
+function RecordDetails({
+  data,
+  skipKeys,
+  idLabels,
+}: {
+  data: Record<string, unknown>
+  /** Field keys already shown in a repo-specific ordered section above this one -- left out here so "Other info" doesn't repeat them. */
+  skipKeys?: Set<string>
+  idLabels?: Map<string, ResolvedLabel>
+}) {
   const [showRaw, setShowRaw] = useState(false)
-  const entries = Object.entries(data).filter(([k, v]) => !HIDDEN_RECORD_FIELDS.has(k) && v !== null && v !== undefined && v !== '')
+  const entries = Object.entries(data).filter(
+    ([k, v]) => !HIDDEN_RECORD_FIELDS.has(k) && !skipKeys?.has(k) && v !== null && v !== undefined && v !== ''
+  )
 
   return (
     <div style={{ fontSize: 12 }}>
@@ -519,7 +618,7 @@ function RecordDetails({ data }: { data: Record<string, unknown> }) {
           <div key={key} style={{ marginBottom: 10 }}>
             <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{filterColumnLabel(key)}</div>
             <div>
-              <FieldValue value={value} />
+              <FieldValue value={value} idLabels={idLabels} />
             </div>
           </div>
         ))
@@ -530,6 +629,129 @@ function RecordDetails({ data }: { data: Record<string, unknown> }) {
       {showRaw && (
         <pre style={{ fontSize: 10, maxHeight: 220, overflow: 'auto', whiteSpace: 'pre-wrap', marginTop: 6 }}>{JSON.stringify(data, null, 2)}</pre>
       )}
+    </div>
+  )
+}
+
+function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{label}</div>
+      <div style={{ whiteSpace: 'pre-wrap' }}>{children}</div>
+    </div>
+  )
+}
+
+// Susan Hanisch, 2026-10-24 (feedback 859758b3): "show fields in this
+// order (similar to how Zotero does it): Type, title, authors, year,
+// Publication (journal/book, volume, issue, pages), doi/url, abstract,
+// keywords, then any further info." LiteratureBase has no literal
+// "keywords" field -- domains (the closest existing analog, a topic-tag
+// list) is shown under that label.
+function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
+  const citation = (data.citation as Record<string, unknown>) ?? {}
+  const authors = Array.isArray(citation.authors) ? (citation.authors as unknown[]).map(String) : []
+  const pubParts: string[] = []
+  if (citation.venue) pubParts.push(String(citation.venue))
+  if (citation.publisher) pubParts.push(String(citation.publisher))
+  if (citation.volume) pubParts.push(`vol. ${citation.volume}`)
+  if (citation.issue) pubParts.push(`no. ${citation.issue}`)
+  if (citation.pages) pubParts.push(`pp. ${citation.pages}`)
+  const publicationInfo = pubParts.join(', ')
+  const doiOrUrl = citation.doi ? `doi.org/${citation.doi}` : (citation.open_access_url as string | undefined) ?? (citation.isbn as string | undefined) ?? null
+  const abstract = (data.plain_language_summary as Record<string, unknown> | undefined)?.text as string | undefined
+  const keywords = Array.isArray(data.domains) ? (data.domains as unknown[]).map(String) : []
+
+  const skip = new Set(['citation', 'type', 'plain_language_summary', 'domains'])
+
+  return (
+    <div style={{ fontSize: 12 }}>
+      {!!data.type && <DetailRow label="Type">{String(data.type)}</DetailRow>}
+      {!!citation.title && <DetailRow label="Title">{String(citation.title)}</DetailRow>}
+      {authors.length > 0 && <DetailRow label="Authors">{authors.join(', ')}</DetailRow>}
+      {!!citation.year && <DetailRow label="Year">{String(citation.year)}</DetailRow>}
+      {!!publicationInfo && <DetailRow label="Publication">{publicationInfo}</DetailRow>}
+      {!!doiOrUrl && <DetailRow label="DOI / URL">{doiOrUrl}</DetailRow>}
+      {!!abstract && <DetailRow label="Abstract">{abstract}</DetailRow>}
+      {keywords.length > 0 && <DetailRow label="Keywords">{keywords.join(', ')}</DetailRow>}
+      <details style={{ marginTop: 8 }}>
+        <summary className="muted" style={{ cursor: 'pointer', fontSize: 12 }}>Other info</summary>
+        <div style={{ marginTop: 6 }}>
+          <RecordDetails data={data} skipKeys={skip} />
+        </div>
+      </details>
+    </div>
+  )
+}
+
+// Susan Hanisch, 2026-10-24 (feedback c4eea3fd): "show information in this
+// order: Label, Learning approach, discipline, lesson phases, When to use,
+// description, protocol steps, related approaches, primary sources, then
+// other info (active/review status etc.)." Related approaches resolves to
+// the real target method's own label via idLabels (feedback aee0b27e) --
+// skips the optional "class info in parentheses" idea from that same
+// feedback, since most method labels already carry their own parenthetical
+// (e.g. "Cooperative Learning (Kooperative Lernformen)"), and appending the
+// method_class enum value too (e.g. "(pedagogical-practice)") produced a
+// confusing double-parenthetical rather than something more readable.
+function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknown>; idLabels: Map<string, ResolvedLabel> }) {
+  const label = pickLang(data.label) as string | undefined
+  const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
+  const discipline = data.discipline as string | undefined
+  const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
+  const whenToUse = pickLang(data.whenToUse) as string | undefined
+  const description = pickLang(data.description) as string | undefined
+  const protocolSteps = pickLang(data.protocolSteps) as string[] | undefined
+  const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
+  const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
+
+  const skip = new Set([
+    'label', 'learningApproaches', 'discipline', 'lessonPhases', 'whenToUse',
+    'description', 'protocolSteps', 'relatedApproaches', 'primarySources',
+  ])
+
+  return (
+    <div style={{ fontSize: 12 }}>
+      {!!label && <DetailRow label="Label">{label}</DetailRow>}
+      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.join(', ')}</DetailRow>}
+      {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
+      {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.join(', ')}</DetailRow>}
+      {!!whenToUse && <DetailRow label="When to use">{whenToUse}</DetailRow>}
+      {!!description && <DetailRow label="Description">{description}</DetailRow>}
+      {!!protocolSteps?.length && (
+        <DetailRow label="Protocol steps">
+          <ol style={{ margin: 0, paddingLeft: 18 }}>
+            {protocolSteps.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{s}</li>)}
+          </ol>
+        </DetailRow>
+      )}
+      {relatedApproaches.length > 0 && (
+        <DetailRow label="Related approaches">
+          {relatedApproaches
+            .map((id) => {
+              const resolved = idLabels.get(id)
+              return resolved ? resolved.label : id
+            })
+            .join(', ')}
+        </DetailRow>
+      )}
+      {primarySources.length > 0 && (
+        <DetailRow label="Primary sources">
+          <ul style={{ margin: 0, paddingLeft: 16 }}>
+            {primarySources.map((s, i) => (
+              <li key={i} style={{ marginBottom: 4 }}>
+                {s.citation ?? s.literatureRef ?? s.doi ?? s.url ?? '—'}
+              </li>
+            ))}
+          </ul>
+        </DetailRow>
+      )}
+      <details style={{ marginTop: 8 }}>
+        <summary className="muted" style={{ cursor: 'pointer', fontSize: 12 }}>Other info</summary>
+        <div style={{ marginTop: 6 }}>
+          <RecordDetails data={data} skipKeys={skip} idLabels={idLabels} />
+        </div>
+      </details>
     </div>
   )
 }
@@ -553,6 +775,7 @@ function DetailPanel({
   const [newTopicTitle, setNewTopicTitle] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [idLabels, setIdLabels] = useState<Map<string, ResolvedLabel>>(new Map())
 
   useEffect(() => {
     let active = true
@@ -567,6 +790,31 @@ function DetailPanel({
     })
     return () => { active = false }
   }, [repoKey, row.id, supabase])
+
+  // Real feedback aee0b27e (Susan, 2026-10-24): resolve this record's own
+  // relation fields (e.g. a method's relatedApproaches/relatedQuestions)
+  // into readable labels before rendering, flattened by bare id so
+  // FieldValue's generic fallback can use the same map regardless of
+  // which field an id turns up in.
+  useEffect(() => {
+    let active = true
+    setIdLabels(new Map())
+    const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
+    const refs: { repoKey: BaseRepoKey; id: string }[] = []
+    for (const rel of cfg?.relationFields ?? []) {
+      const raw = (row.data as any)?.[rel.field]
+      const ids: string[] = Array.isArray(raw) ? raw.filter((v) => typeof v === 'string') : typeof raw === 'string' ? [raw] : []
+      for (const id of ids) refs.push({ repoKey: rel.targetRepo, id })
+    }
+    if (refs.length === 0) return
+    resolveCrossRepoLabels(supabase, refs).then((resolved) => {
+      if (!active) return
+      const flat = new Map<string, ResolvedLabel>()
+      for (const [key, value] of resolved) flat.set(key.split(':').slice(1).join(':'), value)
+      setIdLabels(flat)
+    })
+    return () => { active = false }
+  }, [repoKey, row.data, supabase])
 
   const submitReview = async () => {
     setBusy(true); setNotice(null)
@@ -609,7 +857,13 @@ function DetailPanel({
       <details style={{ marginTop: 8 }}>
         <summary style={{ cursor: 'pointer', fontSize: 12 }} className="muted">Full record</summary>
         <div style={{ maxHeight: 320, overflow: 'auto', marginTop: 6 }}>
-          <RecordDetails data={row.data} />
+          {repoKey === 'literaturebase' ? (
+            <LiteratureDetailSections data={row.data} />
+          ) : repoKey === 'methodsbase' ? (
+            <MethodsDetailSections data={row.data} idLabels={idLabels} />
+          ) : (
+            <RecordDetails data={row.data} idLabels={idLabels} />
+          )}
         </div>
       </details>
 
