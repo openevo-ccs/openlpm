@@ -83,6 +83,7 @@ export default function AdminBaseRepoExplorerPage() {
   const [view, setView] = useState<ViewMode>('table')
   const [search, setSearch] = useState('')
   const [filterValue, setFilterValue] = useState<string>('')
+  const [langFilter, setLangFilter] = useState<string>('')
   const [sortBy, setSortBy] = useState<'label' | 'filterValue' | 'review_status'>('label')
   const [rowsByRepo, setRowsByRepo] = useState<Map<BaseRepoKey, SnapshotRow[]>>(new Map())
   const [loading, setLoading] = useState(false)
@@ -120,19 +121,39 @@ export default function AdminBaseRepoExplorerPage() {
   // value from one repo doesn't silently carry into another.
   const activeFilterCfg = tab !== 'all' ? BASE_REPO_CONFIGS.find((c) => c.key === tab) : undefined
   const activeFilterColumn = activeFilterCfg?.filterColumn
-  useEffect(() => { setFilterValue('') }, [tab])
+  useEffect(() => { setFilterValue(''); setLangFilter('') }, [tab])
+
+  // Real feedback a3408216 (Susan, 2026-10-24): no way to tell, or filter,
+  // which language a record's text is actually in -- MethodsBase content
+  // reads as an undifferentiated mix. Only shown once at least one loaded
+  // row actually carries a language tag (today: MethodsBase, since that's
+  // the one repo whose schema was changed for this -- see base-repo-
+  // explorer.ts's detectLanguages), so every other repo's view is
+  // unchanged until it gets the same treatment.
+  const anyLanguageTagged = useMemo(() => {
+    for (const rows of rowsByRepo.values()) for (const row of rows) if (row.languages.length > 0) return true
+    return false
+  }, [rowsByRepo])
+
+  const langFilterOptions = useMemo(() => {
+    const values = new Set<string>()
+    for (const rows of rowsByRepo.values()) for (const row of rows) for (const l of row.languages) values.add(l)
+    return Array.from(values).sort()
+  }, [rowsByRepo])
 
   const allRows: NodeRef[] = useMemo(() => {
     const out: NodeRef[] = []
     for (const [repoKey, rows] of rowsByRepo) for (const row of rows) out.push({ repoKey, row })
-    const filtered = filterValue ? out.filter((r) => r.row.filterValue === filterValue) : out
+    let filtered = filterValue ? out.filter((r) => r.row.filterValue === filterValue) : out
+    if (langFilter === '__untagged__') filtered = filtered.filter((r) => r.row.languages.length === 0)
+    else if (langFilter) filtered = filtered.filter((r) => r.row.languages.includes(langFilter))
     const sorted = [...filtered].sort((a, b) => {
       const av = (sortBy === 'label' ? a.row.label : sortBy === 'filterValue' ? a.row.filterValue : a.row.review_status) ?? ''
       const bv = (sortBy === 'label' ? b.row.label : sortBy === 'filterValue' ? b.row.filterValue : b.row.review_status) ?? ''
       return av.localeCompare(bv)
     })
     return sorted
-  }, [rowsByRepo, filterValue, sortBy])
+  }, [rowsByRepo, filterValue, langFilter, sortBy])
 
   const filterOptions = useMemo(() => {
     if (!activeFilterColumn) return []
@@ -190,6 +211,13 @@ export default function AdminBaseRepoExplorerPage() {
               {filterOptions.map((v) => <option key={v} value={v}>{v}</option>)}
             </select>
           )}
+          {anyLanguageTagged && (
+            <select value={langFilter} onChange={(e) => setLangFilter(e.target.value)}>
+              <option value="">All languages</option>
+              {langFilterOptions.map((v) => <option key={v} value={v}>{LANGUAGE_NAMES[v] ?? v.toUpperCase()}</option>)}
+              <option value="__untagged__">Not yet language-tagged</option>
+            </select>
+          )}
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
             <option value="label">Sort: Label</option>
             <option value="filterValue">Sort: {activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}</option>
@@ -217,9 +245,9 @@ export default function AdminBaseRepoExplorerPage() {
           ) : totalCount === 0 ? (
             <div className="card empty"><p>No records match.</p></div>
           ) : view === 'table' ? (
-            <TableView rows={allRows} onSelect={setSelected} detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'} />
+            <TableView rows={allRows} onSelect={setSelected} detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'} showLanguage={anyLanguageTagged} />
           ) : view === 'cards' ? (
-            <CardsView rows={allRows} onSelect={setSelected} />
+            <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} />
           ) : (
             <GraphView rows={allRows} onSelect={setSelected} />
           )}
@@ -238,13 +266,42 @@ export default function AdminBaseRepoExplorerPage() {
   )
 }
 
-function TableView({ rows, onSelect, detailColumnLabel }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; detailColumnLabel: string }) {
+// Full names in the filter dropdown and the detail panel; short codes in
+// the dense table/card badge (EN/DE), same two-letter tags methodsbase's
+// own records now use as language keys.
+const LANGUAGE_NAMES: Partial<Record<string, string>> = { en: 'English', de: 'German' }
+
+function LanguageBadge({ languages }: { languages: string[] }) {
+  if (languages.length === 0) {
+    return <span className="chip muted" title="No language tag yet -- this record predates the language-tagging work">untagged</span>
+  }
+  return (
+    <span className="row" style={{ gap: 3, display: 'inline-flex' }}>
+      {languages.map((l) => (
+        <span key={l} className="chip" title={LANGUAGE_NAMES[l] ?? l} style={{ fontSize: 10 }}>{l.toUpperCase()}</span>
+      ))}
+    </span>
+  )
+}
+
+function TableView({
+  rows,
+  onSelect,
+  detailColumnLabel,
+  showLanguage,
+}: {
+  rows: NodeRef[]
+  onSelect: (r: NodeRef) => void
+  detailColumnLabel: string
+  showLanguage: boolean
+}) {
   return (
     <table>
       <thead>
         <tr>
           <th>Repo</th>
           <th>Label</th>
+          {showLanguage && <th>Language</th>}
           <th>{detailColumnLabel}</th>
           <th>Review status</th>
         </tr>
@@ -254,6 +311,7 @@ function TableView({ rows, onSelect, detailColumnLabel }: { rows: NodeRef[]; onS
           <tr key={`${repoKey}:${row.id}`} onClick={() => onSelect({ repoKey, row })} style={{ cursor: 'pointer' }}>
             <td><span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey] }}>{repoKey}</span></td>
             <td>{row.label}</td>
+            {showLanguage && <td><LanguageBadge languages={row.languages} /></td>}
             <td className="muted">{row.secondary ?? row.filterValue ?? ''}</td>
             <td className="muted">{row.review_status ?? '—'}</td>
           </tr>
@@ -263,12 +321,15 @@ function TableView({ rows, onSelect, detailColumnLabel }: { rows: NodeRef[]; onS
   )
 }
 
-function CardsView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void }) {
+function CardsView({ rows, onSelect, showLanguage }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; showLanguage: boolean }) {
   return (
     <div className="grid grid-3">
       {rows.map(({ repoKey, row }) => (
         <div key={`${repoKey}:${row.id}`} className="card" style={{ cursor: 'pointer' }} onClick={() => onSelect({ repoKey, row })}>
-          <span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey], marginBottom: 6 }}>{repoKey}</span>
+          <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey], marginBottom: 6 }}>{repoKey}</span>
+            {showLanguage && <LanguageBadge languages={row.languages} />}
+          </div>
           <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
           {row.secondary && <p className="muted" style={{ fontSize: 12 }}>{row.secondary}</p>}
           {row.review_status && <p className="muted" style={{ fontSize: 11 }}>Review: {row.review_status}</p>}
