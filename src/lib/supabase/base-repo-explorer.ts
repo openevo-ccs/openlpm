@@ -28,6 +28,31 @@ export type BaseRepoKey =
   | 'competencybase'
   | 'projectbase'
 
+/**
+ * A repo's own column set for the single-repo table view (Susan Hanisch,
+ * 2026-10-24: "each repo probably needs a different view... similar to how
+ * a reference manager like Zotero shows a citation"). Only used once a
+ * single repo tab is selected -- the cross-repo "All" table stays the
+ * generic Label/Detail layout, since a column like "Authors" means
+ * nothing for a TheoryBase row.
+ */
+export interface TableColumn {
+  header: string
+  get: (row: SnapshotRow) => string
+}
+
+/**
+ * A second, array-valued field worth its own filter/sort beyond
+ * filterColumn (which only supports a single flat value) -- e.g.
+ * MethodsBase's learningApproaches, where one method can carry several
+ * tags at once (Susan Hanisch, 2026-10-24, feedback 6649af0d).
+ */
+export interface SecondaryFilter {
+  /** Field name inside `data` holding a string or string[] value. */
+  dataKey: string
+  label: string
+}
+
 export interface BaseRepoConfig {
   key: BaseRepoKey
   name: string
@@ -40,8 +65,21 @@ export interface BaseRepoConfig {
   secondaryColumn?: string
   /** Column used to group/filter (method_class, question_type, source_vocabulary, ...). */
   filterColumn?: string
+  /** Per-repo table column set for the single-repo view (see TableColumn). */
+  tableColumns?: TableColumn[]
+  /** A second, array-valued filter/sort field (see SecondaryFilter). */
+  secondaryFilter?: SecondaryFilter
   /** JSONB field names inside `data` that point at other Base Repo records, for the graph view. Each is {targetRepo, field}. */
   relationFields: { field: string; targetRepo: BaseRepoKey }[]
+}
+
+// Susan Hanisch, 2026-10-24: "show only the first two authors, then 'et
+// al.'" if there are more.
+function formatAuthorsShort(authors: unknown): string {
+  if (!Array.isArray(authors) || authors.length === 0) return '—'
+  const names = authors.map(String)
+  if (names.length <= 2) return names.join(', ')
+  return `${names[0]}, ${names[1]}, et al.`
 }
 
 export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
@@ -65,6 +103,13 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     idColumn: 'id',
     labelColumn: 'title',
     secondaryColumn: 'year',
+    // Susan Hanisch, 2026-10-24 (feedback 1ad705ff): "default columns should
+    // be Authors (first two + et al.), Year, Title."
+    tableColumns: [
+      { header: 'Authors', get: (row) => formatAuthorsShort((row.data as any)?.citation?.authors) },
+      { header: 'Year', get: (row) => String((row.data as any)?.citation?.year ?? row.secondary ?? '—') },
+      { header: 'Title', get: (row) => row.label },
+    ],
     relationFields: [],
   },
   {
@@ -75,7 +120,24 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     labelColumn: 'label',
     secondaryColumn: 'method_class',
     filterColumn: 'method_class',
-    relationFields: [{ field: 'relatedQuestions', targetRepo: 'questionbase' }],
+    // Susan Hanisch, 2026-10-24 (feedback 6649af0d): "Learning approaches"
+    // as its own filterable/sortable column.
+    secondaryFilter: { dataKey: 'learningApproaches', label: 'Learning approach' },
+    tableColumns: [
+      { header: 'Label', get: (row) => row.label },
+      { header: 'Method-class', get: (row) => row.secondary ?? '—' },
+      {
+        header: 'Learning approaches',
+        get: (row) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.join(', ') : '—'),
+      },
+    ],
+    relationFields: [
+      { field: 'relatedQuestions', targetRepo: 'questionbase' },
+      // Susan Hanisch, 2026-10-24 (feedback aee0b27e): "related approaches"
+      // shouldn't show raw "OE-METHOD-..." ids -- resolve to the real
+      // method's own readable label instead.
+      { field: 'relatedApproaches', targetRepo: 'methodsbase' },
+    ],
   },
   {
     key: 'questionbase',
@@ -148,6 +210,14 @@ export interface SnapshotRow {
    * error (Susan Hanisch's feedback, OpenLPM, 2026-10-24).
    */
   languages: string[]
+  /** Values from this repo's secondaryFilter.dataKey, coerced to an array -- [] if the repo has no secondaryFilter or the record has no values. */
+  secondaryFilterValues: string[]
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String)
+  if (typeof value === 'string' && value) return [value]
+  return []
 }
 
 // Fields worth checking for a per-record language tag, in priority order.
@@ -176,6 +246,7 @@ function normalizeRow(cfg: BaseRepoConfig, raw: any): SnapshotRow {
     review_status: raw.review_status ?? data?.provenance?.review_status ?? null,
     data,
     languages: detectLanguages(data),
+    secondaryFilterValues: cfg.secondaryFilter ? toStringArray((data as any)?.[cfg.secondaryFilter.dataKey]) : [],
   }
 }
 
@@ -202,12 +273,25 @@ export async function searchAllSnapshots(supabase: Client, search: string): Prom
   return result
 }
 
-/** Resolves a short list of (repoKey, id) pairs across possibly-different repos into display labels, for rendering a relation field's targets. */
+export interface ResolvedLabel {
+  label: string
+}
+
+/**
+ * Resolves a short list of (repoKey, id) pairs across possibly-different
+ * repos into display labels, for rendering a relation field's targets
+ * (e.g. a method's relatedApproaches ids) as reader-friendly text instead
+ * of raw "OE-METHOD-..." ids -- Susan Hanisch, 2026-10-24 (feedback
+ * aee0b27e). Keyed `${repoKey}:${id}`; a caller with just a raw id string
+ * and no known target repo (e.g. FieldValue's generic fallback) builds its
+ * own flat id-keyed map from this one's entries, since OE-* id prefixes
+ * are unique per repo.
+ */
 export async function resolveCrossRepoLabels(
   supabase: Client,
   refs: { repoKey: BaseRepoKey; id: string }[]
-): Promise<Map<string, string>> {
-  const out = new Map<string, string>()
+): Promise<Map<string, ResolvedLabel>> {
+  const out = new Map<string, ResolvedLabel>()
   const byRepo = new Map<BaseRepoKey, string[]>()
   for (const r of refs) {
     const list = byRepo.get(r.repoKey) ?? []
@@ -219,7 +303,7 @@ export async function resolveCrossRepoLabels(
       const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
       if (!cfg) return
       const { data } = await (supabase as any).from(cfg.table).select(`id, ${cfg.labelColumn}`).in('id', ids)
-      for (const row of data ?? []) out.set(`${repoKey}:${row.id}`, row[cfg.labelColumn] ?? row.id)
+      for (const row of data ?? []) out.set(`${repoKey}:${row.id}`, { label: row[cfg.labelColumn] ?? row.id })
     })
   )
   return out
