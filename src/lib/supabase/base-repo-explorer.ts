@@ -173,7 +173,25 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     labelColumn: 'label',
     secondaryColumn: 'source_vocabulary',
     filterColumn: 'source_vocabulary',
-    relationFields: [],
+    // Real feedback (Susan Hanisch, 2026-10-23): show a standard's own
+    // official code (e.g. the German KMK Biologie-Abitur's "B 1"), and
+    // split its place in the vocabulary's own hierarchy into two columns --
+    // the top-level competency area ("Kompetenzbereich") and, where the
+    // chain goes deeper, the narrower sub-area ("Teilbereich"). Built
+    // entirely from each record's own real `broader` relation chain (see
+    // resolveCompetencyHierarchy below) -- no new schema field, no
+    // fabricated data. Exact for vocabularies shaped like KMK's three-tier
+    // structure; best-effort (often blank) for flatter or differently-
+    // shaped ones, since not every source vocabulary's broader/narrower
+    // tree maps cleanly onto "area" + "sub-area."
+    tableColumns: [
+      { header: 'ID', get: (row) => (row.data as any)?.humanCodingScheme ?? '—' },
+      { header: 'Label', get: (row) => row.label },
+      { header: 'Competency area', get: (row) => (row.data as any)?.__competencyArea ?? '—' },
+      { header: 'Teilbereich', get: (row) => (row.data as any)?.__competencySubArea ?? '—' },
+      { header: 'Source', get: (row) => row.secondary ?? '—' },
+    ],
+    relationFields: [{ field: 'broader', targetRepo: 'competencybase' }],
   },
   {
     key: 'projectbase',
@@ -250,6 +268,57 @@ function normalizeRow(cfg: BaseRepoConfig, raw: any): SnapshotRow {
   }
 }
 
+interface CompetencyNode {
+  label: string
+  broader: string[]
+}
+
+/**
+ * Walks a competency record's own real `broader` chain (fetched unfiltered,
+ * so a search filter on the display rows can't cut an ancestor out of the
+ * lookup) to find its top-level competency area and, when the chain goes
+ * deeper than one level, its narrower sub-area ("Teilbereich"). Only
+ * follows the first `broader` target per step -- real records are
+ * overwhelmingly single-parent, and the display is best-effort for the
+ * few that aren't. `seen` guards against a cycle in hand-authored data.
+ */
+function resolveCompetencyHierarchy(
+  id: string,
+  nodes: Map<string, CompetencyNode>
+): { area: string | null; subArea: string | null } {
+  const chain: string[] = []
+  const seen = new Set<string>([id])
+  let current = id
+  for (let i = 0; i < 10; i++) {
+    const parentId = nodes.get(current)?.broader[0]
+    if (!parentId || seen.has(parentId)) break
+    chain.push(parentId)
+    seen.add(parentId)
+    current = parentId
+  }
+  if (chain.length === 0) return { area: null, subArea: null }
+  return {
+    area: nodes.get(chain[chain.length - 1])?.label ?? null,
+    subArea: chain.length > 1 ? nodes.get(chain[0])?.label ?? null : null,
+  }
+}
+
+async function enrichCompetencyHierarchy(supabase: Client, rows: SnapshotRow[]): Promise<void> {
+  const { data } = await (supabase as any).from('competencybase_snapshot').select('id, label, data')
+  const nodes = new Map<string, CompetencyNode>()
+  for (const r of data ?? []) {
+    const broaderRaw = (r.data as any)?.broader
+    nodes.set(r.id, {
+      label: r.label ?? r.id,
+      broader: Array.isArray(broaderRaw) ? broaderRaw : broaderRaw ? [broaderRaw] : [],
+    })
+  }
+  for (const row of rows) {
+    const { area, subArea } = resolveCompetencyHierarchy(row.id, nodes)
+    row.data = { ...row.data, __competencyArea: area, __competencySubArea: subArea }
+  }
+}
+
 export async function listSnapshotRows(supabase: Client, repoKey: BaseRepoKey, search?: string): Promise<SnapshotRow[]> {
   const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
   if (!cfg) return []
@@ -258,7 +327,9 @@ export async function listSnapshotRows(supabase: Client, repoKey: BaseRepoKey, s
     query = query.ilike(cfg.labelColumn, `%${search.trim()}%`)
   }
   const { data } = await query
-  return ((data ?? []) as any[]).map((r) => normalizeRow(cfg, r))
+  const rows = ((data ?? []) as any[]).map((r) => normalizeRow(cfg, r))
+  if (repoKey === 'competencybase' && rows.length > 0) await enrichCompetencyHierarchy(supabase, rows)
+  return rows
 }
 
 /** One search across every configured Base Repo's snapshot, for the cross-repo view. */
