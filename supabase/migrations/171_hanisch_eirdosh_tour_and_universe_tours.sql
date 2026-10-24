@@ -37,6 +37,42 @@
 SET search_path = public, extensions;
 
 -- ============================================================
+-- Part 0 (added 2026-10-23, same day, before this migration's first
+-- successful push): Part 1's own INSERT below never actually succeeded --
+-- it violates literature_references_literaturebase_id_fkey, because this
+-- migration never populated literaturebase_snapshot with a row for
+-- OE-LITERATURE-hanisch-eirdosh-2023-primary-teacher-competencies in the
+-- first place (the same gap 163/172's own authors independently had to
+-- solve for their own records). Caught live, on this exact migration,
+-- while pushing 172 in the same batch -- fixed in place here rather than
+-- with a superseding migration (170's own precedent for a *settled,
+-- already-applied* slot), because this file had never once applied
+-- successfully before this fix.
+-- ============================================================
+
+INSERT INTO literaturebase_snapshot (id, slug, title, authors, year, venue, doi, type, license, domains, status, review_status, data)
+VALUES (
+  'OE-LITERATURE-hanisch-eirdosh-2023-primary-teacher-competencies',
+  'hanisch-eirdosh-2023-primary-teacher-competencies',
+  'Developing Teacher Competencies for Teaching Evolution across the Primary School Curriculum: A Design Study of a Pre-Service Teacher Education Module',
+  ARRAY['Hanisch, Susan', 'Eirdosh, Dustin']::text[],
+  2023,
+  'Education Sciences',
+  '10.3390/educsci13080797',
+  'journal-article',
+  'cc-by-4.0',
+  ARRAY['Evolution Education', 'Teacher Education', 'Conceptual Change', 'Teaching Methods']::text[],
+  'accepted',
+  'author-draft',
+  '{"$schema": "../schema/literature-record.schema.json", "id": "OE-LITERATURE-hanisch-eirdosh-2023-primary-teacher-competencies", "slug": "hanisch-eirdosh-2023-primary-teacher-competencies", "citation": {"title": "Developing Teacher Competencies for Teaching Evolution across the Primary School Curriculum: A Design Study of a Pre-Service Teacher Education Module", "year": 2023, "authors": ["Hanisch, Susan", "Eirdosh, Dustin"], "venue": "Education Sciences", "publisher": "MDPI AG", "volume": "13", "issue": "8", "pages": "797", "doi": "10.3390/educsci13080797", "open_access_url": "https://www.mdpi.com/2227-7102/13/8/797"}, "type": "journal-article", "license": "cc-by-4.0", "domains": ["Evolution Education", "Teacher Education", "Conceptual Change", "Teaching Methods"], "plain_language_summary": {"text": "This paper describes building and testing a semester-long course that helps future primary-school teachers learn to teach evolution, not as its own subject, but woven into science, math, art, history, social studies, ethics, language, and health. It reviews existing teaching methods for evolution in primary school (its Table 1) and identifies many more curriculum connections nobody had tried yet, especially ones that build social-emotional skills like cooperation and self-regulation (its Table 2). Across two real course runs with 36 pre-service teachers, participants became more able and willing to teach evolutionary ideas across these different subjects.", "written_by": "llm", "model": "claude-sonnet-5", "date": "2026-10-23"}, "related": [{"id": "OE-LITERATURE-ziadie-andrews-2018", "relation": "extends", "note": "Cited by name in the paper''s own text as the review of collective PCK for teaching evolution at the secondary/undergraduate level that this study extends to the primary-school level, where no such review existed."}, {"id": "OE-LITERATURE-asghar-2013", "relation": "related", "note": "Cited by name in the paper''s own text (Asghar et al.) as prior evidence that pre-service primary teachers lack sufficient content and pedagogical content knowledge about evolution despite it being in the curriculum -- the same gap this study''s module is designed to address."}], "relevant_to_theory": [], "status": "accepted", "provenance": {"extracted_by": "llm", "model": "claude-sonnet-5", "added_by": "agent:claude-code/claude-sonnet-5", "date": "2026-10-23", "review_status": "author-draft", "version": "0.1.0", "contributor_notes": "Requested directly by Dustin Eirdosh (co-author of this paper) for full ingestion of its Table 1 and Table 2 content across ConceptBase/MethodsBase/LiteratureBase."}}'::jsonb
+)
+ON CONFLICT (id) DO UPDATE SET
+  slug = EXCLUDED.slug, title = EXCLUDED.title, authors = EXCLUDED.authors, year = EXCLUDED.year,
+  venue = EXCLUDED.venue, doi = EXCLUDED.doi, type = EXCLUDED.type, license = EXCLUDED.license,
+  domains = EXCLUDED.domains, status = EXCLUDED.status, review_status = EXCLUDED.review_status,
+  data = EXCLUDED.data, synced_at = NOW();
+
+-- ============================================================
 -- Part 1: the paper, linked for real
 -- ============================================================
 
