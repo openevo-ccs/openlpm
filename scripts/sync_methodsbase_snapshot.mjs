@@ -78,6 +78,26 @@ function parseArgs(argv) {
   return out
 }
 
+// label/description/whenToUse became language-keyed objects (e.g.
+// {"en": "...", "de": "..."}) 2026-10-24, matching conceptbase's and
+// competencybase's own pattern -- closes Susan Hanisch's feedback that
+// MethodsBase content had no way to tell what language a field was
+// actually in. The flat snapshot columns below stay plain text (prefer
+// "en", else whichever language exists) so existing sorts/search/the
+// `.label` column type keep working unchanged; the full per-language
+// object is preserved losslessly in the `data` column (the raw entry),
+// which is what the Explorer's language badge/filter actually reads.
+function pickDisplayText(value, fallback) {
+  if (value == null) return fallback
+  if (typeof value === 'string') return value
+  if (typeof value === 'object') {
+    if (typeof value.en === 'string') return value.en
+    const firstString = Object.values(value).find((v) => typeof v === 'string')
+    if (firstString) return firstString
+  }
+  return fallback
+}
+
 function loadSnapshotRows(methodsbasePath) {
   const recordsFile = path.join(methodsbasePath, 'records', 'methods.yaml')
   if (!existsSync(recordsFile)) throw new Error(`No records/methods.yaml found at ${recordsFile} -- is --methodsbase-path correct?`)
@@ -89,10 +109,10 @@ function loadSnapshotRows(methodsbasePath) {
     rows.push({
       id: entry.id,
       slug: entry.slug ?? entry.id,
-      label: entry.label ?? '(untitled)',
+      label: pickDisplayText(entry.label, '(untitled)'),
       method_class: entry.methodClass ?? null,
-      description: entry.description ?? null,
-      when_to_use: entry.whenToUse ?? null,
+      description: pickDisplayText(entry.description, null),
+      when_to_use: pickDisplayText(entry.whenToUse, null),
       discipline: entry.discipline ?? null,
       status: entry.status ?? null,
       review_status: entry.provenance?.review_status ?? null,

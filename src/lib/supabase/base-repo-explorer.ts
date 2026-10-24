@@ -134,16 +134,48 @@ export interface SnapshotRow {
   filterValue: string | null
   review_status: string | null
   data: Record<string, unknown>
+  /**
+   * Which languages this record's own text is tagged in, e.g. ["en"] or
+   * ["de"] -- derived from the raw record's own fields (methodsbase's
+   * label/description/whenToUse/protocolSteps are now language-keyed
+   * objects, e.g. {"en": "...", "de": "..."}, matching conceptbase's and
+   * competencybase's pattern). A field still stored as a plain string isn't
+   * tagged at all -- reported here as [] ("untagged"), not guessed at,
+   * since guessing a language from untagged text risks being wrong. Works
+   * for any repo generically: a repo with no language-keyed fields yet
+   * (the common case today, outside MethodsBase) just reports [] for every
+   * row, which the UI treats as "nothing to show here yet" rather than an
+   * error (Susan Hanisch's feedback, OpenLPM, 2026-10-24).
+   */
+  languages: string[]
+}
+
+// Fields worth checking for a per-record language tag, in priority order.
+// Not every repo/record has all of these; whichever ones exist and are
+// language-keyed objects contribute their keys.
+const LANGUAGE_CANDIDATE_FIELDS = ['label', 'description', 'whenToUse', 'protocolSteps', 'statement']
+
+function detectLanguages(data: Record<string, unknown>): string[] {
+  const found = new Set<string>()
+  for (const field of LANGUAGE_CANDIDATE_FIELDS) {
+    const value = (data as any)?.[field]
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      for (const key of Object.keys(value)) found.add(key)
+    }
+  }
+  return Array.from(found).sort()
 }
 
 function normalizeRow(cfg: BaseRepoConfig, raw: any): SnapshotRow {
+  const data = raw.data ?? {}
   return {
     id: raw.id,
     label: raw[cfg.labelColumn] ?? raw.id,
     secondary: cfg.secondaryColumn ? raw[cfg.secondaryColumn] ?? null : null,
     filterValue: cfg.filterColumn ? raw[cfg.filterColumn] ?? null : null,
-    review_status: raw.review_status ?? raw.data?.provenance?.review_status ?? null,
-    data: raw.data ?? {},
+    review_status: raw.review_status ?? data?.provenance?.review_status ?? null,
+    data,
+    languages: detectLanguages(data),
   }
 }
 
