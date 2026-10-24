@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useSearchParams } from 'react-router-dom'
-import { BookOpen, CheckCircle2, Download, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
+import { BarChart3, BookOpen, CheckCircle2, Download, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
 import { searchOpenAlex, type SearchResult as OpenAlexResult } from '@/lib/api/openalex'
 import { searchSemanticScholar, type SearchResult as SemanticScholarResult } from '@/lib/api/semantic-scholar'
 import { searchCrossRef, verifyDOI, type CrossRefSearchResult } from '@/lib/api/crossref'
@@ -24,6 +24,8 @@ import {
 } from '@/lib/supabase/literature'
 import { buildLiteratureBaseDraftYaml } from '@/lib/literaturebase-export'
 import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
+import { LiteratureRelationsGraph } from '@/components/literature-relations-graph'
+import { buildRelationGraph, computeEvidenceStrength, EVIDENCE_LABEL_TEXT } from '@/lib/literature-analytics'
 
 type LiteratureRow = Database['public']['Tables']['literature_references']['Row']
 type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase' | 'zotero'
@@ -116,6 +118,36 @@ export default function LiteraturePage() {
   const [zoteroError, setZoteroError] = useState<string | null>(null)
 
   const linked = !!baseLink
+
+  // Real feedback 2d5c7530 (Dustin Eirdosh, 2026-10-24): "a view [of] quick
+  // stats about the state of the literature collection... a graph of top
+  // literature links... word cloud of tags." Everything here is derived
+  // from data already loaded on this page (items, savedMatches) -- no new
+  // query. The relation graph/evidence-strength signal below reuses the
+  // exact same analytics built for a project's attached Collections
+  // (literature-analytics.ts, 2026-10-23), applied to this project's own
+  // flat reference list instead of a collection, so "no collection
+  // attached yet" no longer means "no overview at all."
+  const statusCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const it of items ?? []) counts.set(it.status, (counts.get(it.status) ?? 0) + 1)
+    return counts
+  }, [items])
+
+  const tagCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const it of items ?? []) for (const t of ((it as any).tags ?? []) as string[]) counts.set(t, (counts.get(t) ?? 0) + 1)
+    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 20)
+  }, [items])
+
+  const relationGraph = useMemo(() => buildRelationGraph(Array.from(savedMatches.values())), [savedMatches])
+  const evidenceStrength = useMemo(() => computeEvidenceStrength(relationGraph), [relationGraph])
+
+  const openPaperInCollection = (literaturebaseId: string) => {
+    const match = (items ?? []).find((it) => (it as any).literaturebase_id === literaturebaseId)
+    const el = match ? highlightRefs.current.get(match.id) : undefined
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
 
   const reload = async () => {
     const { data } = await supabase
@@ -326,6 +358,17 @@ export default function LiteraturePage() {
 
       {notice && (
         <div className={`notice notice-${notice.kind}`}>{notice.text}</div>
+      )}
+
+      {items && items.length > 0 && (
+        <LiteratureOverview
+          totalCount={items.length}
+          statusCounts={statusCounts}
+          tagCounts={tagCounts}
+          relationGraph={relationGraph}
+          evidenceStrength={evidenceStrength}
+          onOpenPaper={openPaperInCollection}
+        />
       )}
 
       <LiteratureCollectionsPanel projectId={project.id} canManage={canEdit} supabase={supabase} />
@@ -564,6 +607,92 @@ export default function LiteraturePage() {
               )}
             </div>
           )})}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Overview -- real feedback 2d5c7530 (Dustin Eirdosh, 2026-10-24). Shows
+// regardless of whether a Collection is attached, since it's built from
+// this project's own flat reference list (items), not a collection.
+// ============================================================================
+
+function tagFontSize(count: number, max: number): number {
+  if (max <= 1) return 12
+  const scale = 11 + (count / max) * 9 // 11px for the rarest shown tag, 20px for the most frequent
+  return Math.round(scale)
+}
+
+function LiteratureOverview({
+  totalCount,
+  statusCounts,
+  tagCounts,
+  relationGraph,
+  evidenceStrength,
+  onOpenPaper,
+}: {
+  totalCount: number
+  statusCounts: Map<string, number>
+  tagCounts: [string, number][]
+  relationGraph: ReturnType<typeof buildRelationGraph>
+  evidenceStrength: ReturnType<typeof computeEvidenceStrength>
+  onOpenPaper: (literaturebaseId: string) => void
+}) {
+  const maxTagCount = tagCounts.length > 0 ? tagCounts[0][1] : 0
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row" style={{ marginBottom: 10 }}><BarChart3 size={15} style={{ color: 'var(--text-muted)' }} />Overview</h3>
+      <div className="row" style={{ gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Collection</div>
+          <div style={{ fontSize: 22, fontWeight: 600 }}>{totalCount}</div>
+          <div className="muted" style={{ fontSize: 11 }}>{totalCount === 1 ? 'reference' : 'references'}</div>
+        </div>
+        {statusCounts.size > 0 && (
+          <div>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>By status</div>
+            <div className="row" style={{ gap: 6, flexWrap: 'wrap', maxWidth: 240 }}>
+              {Array.from(statusCounts.entries()).map(([status, count]) => (
+                <span key={status} className="row" style={{ gap: 3 }}>
+                  <Chip status={status as LiteratureRow['status']} /><span className="muted" style={{ fontSize: 11 }}>{count}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {evidenceStrength.edgeCount > 0 && (
+          <div>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Evidence signal</div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>{EVIDENCE_LABEL_TEXT[evidenceStrength.label]}</div>
+            <div className="muted" style={{ fontSize: 11 }}>
+              {evidenceStrength.reinforcingCount} reinforcing, {evidenceStrength.tensionCount} contested, of {evidenceStrength.edgeCount} linked relations
+            </div>
+          </div>
+        )}
+      </div>
+
+      {tagCounts.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 6 }}>Top tags</div>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'baseline' }}>
+            {tagCounts.map(([tag, count]) => (
+              <span key={tag} title={`${count} reference${count === 1 ? '' : 's'}`} style={{ fontSize: tagFontSize(count, maxTagCount), color: 'var(--text-secondary)' }}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {relationGraph.papers.length > 1 && (
+        <div style={{ marginTop: 16 }}>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 6 }}>
+            How these papers relate to each other
+          </div>
+          <LiteratureRelationsGraph graph={relationGraph} onOpenPaper={onOpenPaper} />
         </div>
       )}
     </div>
