@@ -348,7 +348,9 @@ export default function TimePage() {
     if (!pid) { setPartnerMsg('The partner space is not visible to you.'); return }
     const [d, c, psrc] = await Promise.all([loadTimeData(supabase, pid), loadTimeContent(supabase, pid), loadOrderSources(supabase, pid)])
     // Same pattern, same order direction, and the same way of drawing on subjects when the partner has such a plan.
-    const sameKind = d.plans.filter((p) => (p.parameters as Partial<StarterParams>)?.preset === effParams.preset && p.axis_id && d.axes.find((a) => a.id === p.axis_id)?.kind === axisRow?.kind)
+    const keyOf = (pp: Record<string, unknown> | undefined) => (pp?.preset as string | undefined) ?? (pp?.realized as string | undefined) ?? null
+    const myKey = keyOf(effParams as Record<string, unknown>)
+    const sameKind = d.plans.filter((p) => keyOf(p.parameters) === myKey && p.axis_id && d.axes.find((a) => a.id === p.axis_id)?.kind === axisRow?.kind)
     const dir = (p: TimePlanRow) => (p.parameters as Partial<StarterParams>).sequence_order ?? 'dependency'
     const sameDir = sameKind.filter((p) => effParams.preset !== 'sequenced' || dir(p) === (effParams.sequence_order ?? 'dependency'))
     const pool = sameDir.length > 0 ? sameDir : sameKind
@@ -511,7 +513,7 @@ export default function TimePage() {
                 </>
               )}
 
-              {hostCtx && hasPreset && content && measures && (
+              {hostCtx && content && measures && (
                 <>
                   <h2>Hours by school subject</h2>
                   <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
@@ -519,13 +521,14 @@ export default function TimePage() {
                       The content of this space is taught inside school subjects that already have a timetable. Choose which subjects give the hours and how the hours of each
                       topic are shared between them. The split below is a placeholder written by an AI and unreviewed. Argue it topic by topic.
                     </p>
-                    <div className="field" style={{ maxWidth: 520 }}>
+                    {!hasPreset && <p className="muted">This plan lists its placements one by one, so the split of a topic's time over subjects is read from them and cannot be edited here. The hours of each subject can still be changed below.</p>}
+                    {hasPreset && <div className="field" style={{ maxWidth: 520 }}>
                       <label>Where the hours come from</label>
                       <select value={effHosts.basis} disabled={!canEdit} onChange={(e) => setParamEdits({ ...paramEdits, hosts: { ...effHosts, basis: e.target.value as HostBasis } })}>
                         {HOST_BASES.map((b) => <option key={b.key} value={b.key}>{b.label}</option>)}
                       </select>
                       <p className="muted" style={{ fontSize: 12, margin: '4px 0 0' }}>{HOST_BASES.find((b) => b.key === effHosts.basis)?.hint}</p>
-                    </div>
+                    </div>}
 
                     <h3>What each subject gives</h3>
                     <p className="muted" style={{ marginTop: 0 }}>Hours of {contentLabel.toLowerCase()} time taken from each subject in each grade band, and the share of that subject's own hours. Grain: grade band.</p>
@@ -560,7 +563,7 @@ export default function TimePage() {
                       )
                     })}
 
-                    <h3>How each topic's time is shared</h3>
+                    {hasPreset && <><h3>How each topic's time is shared</h3>
                     <p className="muted" style={{ marginTop: 0 }}>Percent of the topic's time taken from each subject. Numbers that do not add up to 100 are scaled to 100.</p>
                     <table>
                       <thead><tr><th>Band</th><th>Topic</th>{hostCtx.hosts.map((h) => <th key={h.subject}>{h.label}</th>)}<th>Sum</th></tr></thead>
@@ -583,7 +586,7 @@ export default function TimePage() {
                         })}
                       </tbody>
                     </table>
-                    {canEdit && <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setParamEdits({ ...paramEdits, hosts: { ...effHosts, split: {} } })}>Teach everything in {hostCtx.hosts[0].label.toLowerCase()}</button>}
+                    {canEdit && <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setParamEdits({ ...paramEdits, hosts: { ...effHosts, split: {} } })}>Teach everything in {hostCtx.hosts[0].label.toLowerCase()}</button>}</>}
                   </div>
                 </>
               )}
