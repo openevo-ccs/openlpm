@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { AxisDef, ConceptRef, Placement, StageRef } from '@/lib/time'
+import type { AxisDef, ConceptRef, OrderSources, Placement, StageRef } from '@/lib/time'
 
 // Data layer for the time layer (migration 176). None of these tables is in the generated types yet, so the
 // client is cast at the boundary, the same convention as dashboard-views.ts and comparative-analysis.ts.
@@ -199,4 +199,37 @@ export async function startAssumptionDiscussion(supabase: Client, projectId: str
     })
     .select('id')
     .single()
+}
+
+/**
+ * The ordering claims an LPM already holds: stage and strand prerequisite links, which stage belongs to which
+ * strand, and the stations of each accepted thread in sequence.
+ */
+export async function loadOrderSources(supabase: Client, projectId: string): Promise<OrderSources> {
+  const [objs, conns, threads] = await Promise.all([
+    supabase.from('lpm_data_objects').select('id, object_type').eq('project_id', projectId),
+    supabase.from('lpm_connections').select('relation_type, from_object_id, to_object_id, status').eq('project_id', projectId),
+    supabase.from('lpm_threads').select('id, slug, title, status').eq('project_id', projectId).eq('status', 'accepted'),
+  ])
+  const type = new Map(((objs.data ?? []) as { id: string; object_type: string }[]).map((o) => [o.id, o.object_type]))
+  const stageStrand: Record<string, string> = {}
+  const strandEdges: OrderSources['strandEdges'] = []
+  const stageEdges: OrderSources['stageEdges'] = []
+  for (const c of (conns.data ?? []) as { relation_type: string; from_object_id: string; to_object_id: string; status: string }[]) {
+    if (c.status !== 'accepted') continue
+    const a = type.get(c.from_object_id)
+    const b = type.get(c.to_object_id)
+    if (c.relation_type === 'isChildOf' && a === 'substrand' && b === 'strand') stageStrand[c.from_object_id] = c.to_object_id
+    else if (c.relation_type === 'prerequisiteOf' || c.relation_type === 'foundationalTo') {
+      if (a === 'strand' && b === 'strand') strandEdges.push({ from: c.from_object_id, to: c.to_object_id, relation: c.relation_type })
+      else if (a === 'substrand' && b === 'substrand') stageEdges.push({ from: c.from_object_id, to: c.to_object_id, relation: c.relation_type })
+    }
+  }
+  const threadRows = (threads.data ?? []) as { id: string; slug: string; title: string }[]
+  const stations = threadRows.length
+    ? await supabase.from('lpm_thread_stations').select('thread_id, data_object_id, sequence').in('thread_id', threadRows.map((t) => t.id)).order('sequence')
+    : { data: [] as unknown[] }
+  const byThread = new Map<string, string[]>()
+  for (const st of (stations.data ?? []) as { thread_id: string; data_object_id: string }[]) byThread.set(st.thread_id, [...(byThread.get(st.thread_id) ?? []), st.data_object_id])
+  return { stageStrand, strandEdges, stageEdges, threads: threadRows.map((t) => ({ id: t.id, slug: t.slug, title: t.title, stageIds: byThread.get(t.id) ?? [] })) }
 }

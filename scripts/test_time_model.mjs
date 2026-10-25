@@ -196,3 +196,82 @@ test('explicit axis and unlimited length', () => {
   assert.equal(big.units.length, 13 * 40 * 3)
   assert.throws(() => T.expandAxis({ kind: 'generated', levels: [{ key: 'a', per_parent: 1000 }, { key: 'b', per_parent: 1000 }] }, { maxUnits: 5000 }))
 })
+
+// ---- order checks ----
+const sources = {
+  stageStrand: { s1: 'A', s2: 'B', s3: 'A', s4: 'A', s5: 'B' },
+  strandEdges: [{ from: 'A', to: 'B', relation: 'prerequisiteOf' }],
+  stageEdges: [],
+  threads: [{ id: 't', slug: 't', title: 'T', stageIds: ['s1', 's3', 's4'] }],
+}
+const BANDS = ['K-2', '3-5', '6-8', '9-12']
+
+test('order edges: four rules, merged per pair, restricted to the stages in the plan', () => {
+  const edges = T.deriveOrderEdges(sources, stages, BANDS)
+  const find = (a, b) => edges.find((e) => e.from === a && e.to === b)
+  assert.deepEqual(find('s1', 's2').rules, ['strand-prerequisite'])
+  assert.deepEqual(find('s1', 's3').rules.sort(), ['band-order', 'thread-order'])
+  assert.ok(find('s2', 's5'))
+  assert.equal(find('s3', 's2'), undefined)
+  const only = T.deriveOrderEdges(sources, stages, BANDS, ['thread-order'])
+  assert.equal(only.length, 2)
+  const missing = T.deriveOrderEdges(sources, stages.slice(0, 2), BANDS)
+  assert.equal(missing.length, 1)
+})
+
+test('order check: a threaded plan leaves same-band pairs unordered, bands stay in order', () => {
+  const axis = T.expandAxis(T.k12TierAxis())
+  const edges = T.deriveOrderEdges(sources, stages, BANDS)
+  const ps = T.generateStarterPlacements(stages, { preset: 'threaded', share: { low: 0.2, high: 0.2 } }, BANDS, edges)
+  const r = T.checkOrder(axis, ps, edges)
+  const item = (a, b) => r.items.find((i) => i.edge.from === a && i.edge.to === b)
+  assert.equal(item('s1', 's2').status, 'unordered')
+  assert.equal(item('s1', 's3').status, 'in-order')
+  assert.equal(item('s3', 's4').status, 'in-order')
+  assert.ok(r.unorderedShare > 0 && r.unorderedShare < 1)
+})
+
+test('sequenced plans: dependency order satisfies the check, reverse order is a negative control', () => {
+  const axis = T.expandAxis(T.k12TierAxis())
+  const three = [stage('t1', 'K-2', 'A', []), stage('t2', 'K-2', 'B', []), stage('t3', 'K-2', 'C', [])]
+  const src = { stageStrand: { t1: 'A', t2: 'B', t3: 'C' }, strandEdges: [{ from: 'A', to: 'B', relation: 'prerequisiteOf' }, { from: 'B', to: 'C', relation: 'foundationalTo' }], stageEdges: [], threads: [] }
+  const edges = T.deriveOrderEdges(src, three, BANDS)
+  assert.deepEqual(T.orderStagesWithinBand(three, edges).map((s) => s.id), ['t1', 't2', 't3'])
+  assert.deepEqual(T.orderStagesWithinBand(three, edges, 'reverse').map((s) => s.id), ['t3', 't2', 't1'])
+  const share = { low: 0.2, high: 0.2 }
+  const good = T.checkOrder(axis, T.generateStarterPlacements(three, { preset: 'sequenced', share, sequence_order: 'dependency' }, BANDS, edges), edges)
+  assert.equal(good.summary['in-order'], 2)
+  assert.equal(good.orderedShare, 1)
+  const bad = T.checkOrder(axis, T.generateStarterPlacements(three, { preset: 'sequenced', share, sequence_order: 'reverse' }, BANDS, edges), edges)
+  assert.equal(bad.summary['out-of-order'], 2)
+  assert.equal(bad.orderedShare, 0)
+  // Same evolution hours as the other presets.
+  const m = T.computePlanMeasures(axis, T.generateStarterPlacements(three, { preset: 'sequenced', share, sequence_order: 'dependency' }, BANDS, edges), three, [])
+  const m2 = T.computePlanMeasures(axis, T.generateStarterPlacements(three, { preset: 'threaded', share }, BANDS, edges), three, [])
+  close(m.totalEvolution.low, m2.totalEvolution.low, 1e-6)
+  // Unplaced stages are reported, not guessed.
+  const none = T.checkOrder(axis, [], edges)
+  assert.equal(none.summary['not-placed'], edges.length)
+  assert.equal(none.orderedShare, null)
+  // A cycle does not lose stages.
+  const cyc = [{ from: 't1', to: 't2', rules: ['stage-prerequisite'] }, { from: 't2', to: 't1', rules: ['stage-prerequisite'] }]
+  assert.equal(T.orderStagesWithinBand(three, cyc).length, 3)
+})
+
+test('structural profile: reach, concentration and order edges', () => {
+  const edges = T.deriveOrderEdges(sources, stages, BANDS)
+  const p = T.structuralProfile(stages, concepts, edges, BANDS)
+  assert.equal(p.stages, 5)
+  assert.equal(p.strands, 2)
+  assert.equal(p.conceptsUsed, 4)
+  const c1 = p.perConcept.find((c) => c.id === 'c1')
+  assert.deepEqual([c1.stages, c1.strands, c1.bands, c1.mainStages], [3, 2, 3, 2])
+  assert.equal(p.reachStages.max, 3)
+  assert.ok(p.reachStages.entropyBits > 0 && p.reachStages.entropyBits <= Math.log2(4) + 1e-9)
+  assert.ok(p.reachStages.gini >= 0 && p.reachStages.gini <= 1)
+  assert.equal(p.conceptStageLinks, 9)
+  assert.equal(p.orderEdges, edges.length)
+  const even = T.structuralProfile([stage('a', 'K-2', 'A', [{ id: 'x', emphasis: 'primary' }]), stage('b', 'K-2', 'A', [{ id: 'y', emphasis: 'primary' }])], [], [], BANDS)
+  assert.equal(even.reachStages.gini, 0)
+  close(even.reachStages.entropyBits, 1)
+})

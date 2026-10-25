@@ -1,9 +1,10 @@
+import { generateSequencedPlacements, type OrderEdge } from './order'
 import type { AxisDef, Placement, Range } from './types'
 
 // Presets turn a few numbers into ordinary placements. They carry no special status in the data: a plan stores
 // the placements, and the preset is only a quick way to write them.
 
-export type Preset = 'capstone' | 'threaded' | 'spiral'
+export type Preset = 'capstone' | 'threaded' | 'spiral' | 'sequenced'
 
 export interface StageRef {
   id: string
@@ -25,6 +26,8 @@ export interface StarterParams {
   thread_fraction?: number
   /** Fraction of a topic's time given to its reinforcing concepts as threaded time. */
   reinforcing_share?: number
+  /** Sequenced: order of the stages inside each band. 'reverse' is a negative control for the order check. */
+  sequence_order?: 'dependency' | 'reverse'
 }
 
 export const BAND_NAMES = ['K-2', '3-5', '6-8', '9-12']
@@ -65,9 +68,10 @@ function ratio(share: Range, m: number, n: number): { low: number; high: number 
 }
 
 /** Starter placements: each stage of a band takes an equal part of the band's evolution time. */
-export function generateStarterPlacements(stages: StageRef[], params: StarterParams, bandNames: string[] = BAND_NAMES): Placement[] {
+export function generateStarterPlacements(stages: StageRef[], params: StarterParams, bandNames: string[] = BAND_NAMES, orderEdges: OrderEdge[] = []): Placement[] {
   const m = (params.share.low + params.share.high) / 2
   if (m <= 0) return []
+  if (params.preset === 'sequenced') return generateSequencedPlacements(stages, params, orderEdges, bandNames)
   const out: Placement[] = []
   bandNames.forEach((band, bi) => {
     const inBand = stages.filter((s) => s.band === band)
