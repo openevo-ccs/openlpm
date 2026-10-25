@@ -1,3 +1,4 @@
+import { splitAcrossHosts, type HostContext, type HostParams, type HostSplitResult } from './hosts'
 import { generateSequencedPlacements, type OrderEdge } from './order'
 import type { AxisDef, Placement, Range } from './types'
 
@@ -28,6 +29,8 @@ export interface StarterParams {
   reinforcing_share?: number
   /** Sequenced: order of the stages inside each band. 'reverse' is a negative control for the order check. */
   sequence_order?: 'dependency' | 'reverse'
+  /** Which subjects give the time. Without it every topic is taught in the plan's own subject. */
+  hosts?: HostParams
 }
 
 export const BAND_NAMES = ['K-2', '3-5', '6-8', '9-12']
@@ -39,15 +42,26 @@ export interface TierHours {
   upper: Range
 }
 
-/** Hours of biology teaching per school year. Placeholders from Dustin's estimates (2026-10-25). */
+/**
+ * Hours of biology teaching per school year. Placeholders. Dustin first gave 15-45, 40-80 and 100-150 (2026-10-25),
+ * then lowered the upper tier to 50-70 the same day and suggested scaling the lower tiers by the same ratio.
+ * The lower and middle figures are that scaling (about 0.5 at the low end and 0.47 at the high end).
+ */
 export const DEFAULT_TIER_HOURS: TierHours = {
-  lower: { low: 15, high: 45 },
-  middle: { low: 40, high: 80 },
-  upper: { low: 100, high: 150 },
+  lower: { low: 8, high: 21 },
+  middle: { low: 20, high: 38 },
+  upper: { low: 50, high: 70 },
+}
+
+/** Notes shown beside each tier. */
+export const TIER_NOTES = {
+  lower: 'Placeholder, scaled from Dustin 2026-10-25: his first range of 15-45 hours, cut by the same ratio as the upper tier.',
+  middle: 'Placeholder, scaled the same way from the earlier default of 40-80 hours. Adjustable to local conditions.',
+  upper: 'Placeholder from Dustin 2026-10-25: 50-70 hours a year. His first figure of 100-150 was likely too high.',
 }
 
 /** K-12 axis: four grade bands of 3, 3, 3 and 4 years, with three tiers that sit beside the bands. */
-export function k12TierAxis(tiers: TierHours = DEFAULT_TIER_HOURS): AxisDef {
+export function k12TierAxis(tiers: TierHours = DEFAULT_TIER_HOURS, notes: typeof TIER_NOTES = TIER_NOTES): AxisDef {
   const h = (r: Range) => ({ low: `PT${r.low}H`, high: `PT${r.high}H` })
   return {
     kind: 'generated',
@@ -56,9 +70,9 @@ export function k12TierAxis(tiers: TierHours = DEFAULT_TIER_HOURS): AxisDef {
       { key: 'year', label: 'Year', per_parent: [3, 3, 3, 4], names: GRADE_NAMES },
     ],
     segments: [
-      { key: 'lower', label: 'Lower grades (K-4)', where: { year: { range: [1, 5], absolute: true } }, duration: h(tiers.lower), note: 'Placeholder from Dustin 2026-10-25: 15-45 hours a year.' },
-      { key: 'middle', label: 'Middle grades (5-8)', where: { year: { range: [6, 9], absolute: true } }, duration: h(tiers.middle), note: 'Default 40-80 hours a year, adjustable to local conditions.' },
-      { key: 'upper', label: 'Upper grades (9-12)', where: { year: { range: [10, 13], absolute: true } }, duration: h(tiers.upper), note: 'Placeholder from Dustin 2026-10-25: 100-150 hours a year.' },
+      { key: 'lower', label: 'Lower grades (K-4)', where: { year: { range: [1, 5], absolute: true } }, duration: h(tiers.lower), note: notes.lower },
+      { key: 'middle', label: 'Middle grades (5-8)', where: { year: { range: [6, 9], absolute: true } }, duration: h(tiers.middle), note: notes.middle },
+      { key: 'upper', label: 'Upper grades (9-12)', where: { year: { range: [10, 13], absolute: true } }, duration: h(tiers.upper), note: notes.upper },
     ],
   }
 }
@@ -67,8 +81,22 @@ function ratio(share: Range, m: number, n: number): { low: number; high: number 
   return { low: share.low / m / n, high: share.high / m / n }
 }
 
-/** Starter placements: each stage of a band takes an equal part of the band's evolution time. */
-export function generateStarterPlacements(stages: StageRef[], params: StarterParams, bandNames: string[] = BAND_NAMES, orderEdges: OrderEdge[] = []): Placement[] {
+/**
+ * Starter placements: each stage of a band takes an equal part of the band's evolution time. When the plan carries
+ * a subject split and the host timetables are given, the time of each topic is spread over the subjects.
+ */
+export function generateStarterPlacements(stages: StageRef[], params: StarterParams, bandNames: string[] = BAND_NAMES, orderEdges: OrderEdge[] = [], hostCtx?: HostContext): Placement[] {
+  return generateStarterResult(stages, params, bandNames, orderEdges, hostCtx).placements
+}
+
+/** The same placements with plain-language notes about weights that had to move to other subjects. */
+export function generateStarterResult(stages: StageRef[], params: StarterParams, bandNames: string[] = BAND_NAMES, orderEdges: OrderEdge[] = [], hostCtx?: HostContext): HostSplitResult {
+  const base = generateBasePlacements(stages, params, bandNames, orderEdges)
+  if (params.hosts && hostCtx && hostCtx.hosts.length > 0) return splitAcrossHosts(base, stages, params.hosts, hostCtx, bandNames)
+  return { placements: base, notes: [] }
+}
+
+function generateBasePlacements(stages: StageRef[], params: StarterParams, bandNames: string[], orderEdges: OrderEdge[]): Placement[] {
   const m = (params.share.low + params.share.high) / 2
   if (m <= 0) return []
   if (params.preset === 'sequenced') return generateSequencedPlacements(stages, params, orderEdges, bandNames)

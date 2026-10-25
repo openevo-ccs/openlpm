@@ -212,6 +212,14 @@ ALTER TABLE discussion_topics ADD CONSTRAINT discussion_topics_linked_type_check
 // ---- seeds ----
 const AXIS_SOURCE = 'Hours per year: Dustin Eirdosh, 2026-10-25 (lower grades 15-45, upper grades 100-150; middle 40-80 as the default he gave). All placeholders.'
 const SHARE = { low: 0.1, high: 0.3 }
+// The hours this migration seeded. The library defaults were lowered later (migration 179), so they are pinned here
+// and regenerating this file still gives the SQL that ran.
+const LEGACY_TIERS = { lower: { low: 15, high: 45 }, middle: { low: 40, high: 80 }, upper: { low: 100, high: 150 } }
+const LEGACY_NOTES = {
+  lower: 'Placeholder from Dustin 2026-10-25: 15-45 hours a year.',
+  middle: 'Default 40-80 hours a year, adjustable to local conditions.',
+  upper: 'Placeholder from Dustin 2026-10-25: 100-150 hours a year.',
+}
 const PRESETS = [
   { preset: 'capstone', name: 'Starter plan: one unit at the end of each year', summary: 'Evolution is taught as one unit in the last part of each school year. Placeholder numbers. It shows a shape and makes no recommendation.' },
   { preset: 'threaded', name: 'Starter plan: a slice of every session', summary: 'A slice of every biology session links its topic to the evolution concepts, all year. Placeholder numbers. It shows a shape and makes no recommendation.' },
@@ -247,7 +255,7 @@ for (const [slug, pid] of Object.entries(PROJECTS)) {
   const axis2 = uid('axis', pid, 'generic-year')
   const axis3 = uid('axis', pid, 'example-dated-year')
   const axes = [
-    [axis1, 'K-12 by grade band and year, with three hour tiers', 'Four grade bands of 3, 3, 3 and 4 years. Three hour tiers (lower K-4, middle 5-8, upper 9-12) sit beside the bands, so grade 5 is in the 3-5 band and in the middle tier. Hours are placeholders and editable.', 'generated', T.k12TierAxis(), AXIS_SOURCE],
+    [axis1, 'K-12 by grade band and year, with three hour tiers', 'Four grade bands of 3, 3, 3 and 4 years. Three hour tiers (lower K-4, middle 5-8, upper 9-12) sit beside the bands, so grade 5 is in the 3-5 band and in the middle tier. Hours are placeholders and editable.', 'generated', T.k12TierAxis(LEGACY_TIERS, LEGACY_NOTES), AXIS_SOURCE],
     [axis2, 'Generic 365-day school year, K-12 (13 years)', 'A year of 365 days with no weekdays, holidays or start month, repeated for 13 years. Plans written here can be projected onto any dated calendar.', 'generic-year', T.genericYearAxis(13, 365), 'Design note 2026-10-25, section 5.9.'],
     [axis3, 'Example school year 2026/27 (placeholder dates)', 'An example dated calendar for showing the fit report. The dates, the weekly timetable and the breaks are placeholders and match no jurisdiction. Replace them with a real calendar and its source.', 'dated', exampleDated, 'Placeholder. Not an official calendar.'],
   ]

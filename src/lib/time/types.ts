@@ -132,6 +132,8 @@ export interface Placement {
   target_id: string
   role?: PlacementRole
   resource?: string
+  /** The axis this placement lands on. Empty means the plan's own axis. A host subject's timetable is an axis. */
+  axis_id?: string | null
   selector: Selector
   amount: Amount
   note?: string

@@ -16,6 +16,8 @@ export interface TimeAxisRow {
   jurisdiction: string | null
   source: string | null
   status: string
+  /** The school subject whose timetable this axis describes, when it stands for one (migration 179). */
+  subject: string | null
 }
 
 export interface TimePlanRow {
@@ -130,7 +132,9 @@ export async function savePlanCopy(
     summary: string | null
     parameters: Record<string, unknown>
     placements: Placement[]
-    axis: { existingId: string } | { name: string; description: string | null; kind: string; definition: AxisDef; source: string | null }
+    axis: { existingId: string } | { name: string; description: string | null; kind: string; definition: AxisDef; source: string | null; subject?: string | null }
+    /** Subject timetables whose hours were edited. Each is saved as a new axis and the placements follow it. */
+    hostAxes?: { oldId: string; name: string; description: string | null; kind: string; definition: AxisDef; source: string | null; subject: string | null }[]
   },
 ): Promise<{ planId: string } | { error: string }> {
   let axisId: string
@@ -139,11 +143,21 @@ export async function savePlanCopy(
     const a = params.axis
     const { data, error } = await supabase
       .from('lpm_time_axes')
-      .insert({ project_id: params.projectId, name: a.name, description: a.description, kind: a.kind, definition: a.definition, source: a.source, status: 'proposed' })
+      .insert({ project_id: params.projectId, name: a.name, description: a.description, kind: a.kind, definition: a.definition, source: a.source, status: 'proposed', ...(a.subject ? { subject: a.subject } : {}) })
       .select('id')
       .single()
     if (error || !data) return { error: error?.message ?? 'Could not save the axis' }
     axisId = (data as { id: string }).id
+  }
+  const hostIdMap = new Map<string, string>()
+  for (const h of params.hostAxes ?? []) {
+    const { data, error } = await supabase
+      .from('lpm_time_axes')
+      .insert({ project_id: params.projectId, name: h.name, description: h.description, kind: h.kind, definition: h.definition, source: h.source, status: 'proposed', ...(h.subject ? { subject: h.subject } : {}) })
+      .select('id')
+      .single()
+    if (error || !data) return { error: error?.message ?? 'Could not save a subject timetable' }
+    hostIdMap.set(h.oldId, (data as { id: string }).id)
   }
   const { data: plan, error: pErr } = await supabase
     .from('lpm_time_plans')
@@ -159,6 +173,7 @@ export async function savePlanCopy(
       target_id: p.target_id,
       role: p.role ?? null,
       resource: p.resource ?? 'instructional_time',
+      ...(p.axis_id ? { axis_id: hostIdMap.get(p.axis_id) ?? p.axis_id } : {}),
       selector: p.selector,
       amount: p.amount,
       note: p.note ?? null,
