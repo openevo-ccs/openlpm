@@ -27,6 +27,10 @@ import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 // space's standing (synthetic, unreviewed, and so on) is the first thing read.
 // The column does not exist until migration 173 is applied; a project without
 // text renders nothing.
+function capitalizeFirst(text: string) {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text
+}
+
 function ProjectIntroduction({ text }: { text: string | null }) {
   if (!text || !text.trim()) return null
   const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
@@ -36,7 +40,7 @@ function ProjectIntroduction({ text }: { text: string | null }) {
         i === 0 && para.startsWith('Status:') ? (
           <div key={i} className="notice" style={{ alignItems: 'flex-start' }}>
             <span>
-              <strong>Status.</strong> {para.slice('Status:'.length).trim()}
+              <strong>Status:</strong> {capitalizeFirst(para.slice('Status:'.length).trim())}
             </span>
           </div>
         ) : (
