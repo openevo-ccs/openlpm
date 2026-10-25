@@ -4,7 +4,7 @@ import { Hourglass, MessageSquare } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { Chip } from '@/components/chip'
 import { getProjectBySlug } from '@/lib/supabase/projects'
-import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
+import { COMPARISON_SET_LABELS, KNOWN_COMPARISON_PAIRS, comparisonPartners } from '@/lib/supabase/comparative-analysis'
 import {
   addAssumption, loadAssumptionTopics, loadOrderSources, loadPlacements, loadTimeContent, loadTimeData, savePlanCopy, startAssumptionDiscussion, updateAssumption,
   type PlacementRow, type TimeAssumptionRow, type TimeAxisRow, type TimeData, type TimePlanRow,
@@ -76,7 +76,7 @@ function yearSegments(axis: Axis, placements: Placement[], unitsByYear: Map<numb
   return out
 }
 
-function YearStrip({ axis, placements }: { axis: Axis; placements: Placement[] }) {
+function YearStrip({ axis, placements, what }: { axis: Axis; placements: Placement[]; what: string }) {
   const yi = axis.levels.indexOf('year')
   const data = useMemo(() => {
     if (yi < 0) return null
@@ -95,7 +95,7 @@ function YearStrip({ axis, placements }: { axis: Axis; placements: Placement[] }
   const left = 78
   const width = 640
   return (
-    <svg viewBox={`0 0 ${left + width + 8} ${years.length * rowH + 6}`} role="img" aria-label="Where evolution time sits inside each school year" style={{ width: '100%', maxWidth: 760, height: 'auto' }}>
+    <svg viewBox={`0 0 ${left + width + 8} ${years.length * rowH + 6}`} role="img" aria-label={`Where ${what} time sits inside each school year`} style={{ width: '100%', maxWidth: 760, height: 'auto' }}>
       {years.map((y, i) => {
         const top = i * rowH + 3
         const segs = data.segs.get(y) ?? []
@@ -222,6 +222,9 @@ function TierEditor({ segments, edits, onChange, disabled }: { segments: AxisSeg
 export default function TimePage() {
   const { project, supabase, role } = useOutletContext<ProjectOutletContext>()
   const canEdit = EDIT_ROLES.includes(role)
+  // The two evolution spaces count evolution time against biology. The domain cores count their own content against their home subject.
+  const isEvolutionSpace = project.slug === 'bio-core-lpm-synth' || project.slug === 'interdisciplinary-lpm-synth'
+  const contentLabel = isEvolutionSpace ? 'Evolution' : 'Content of this space'
   const [data, setData] = useState<TimeData | null>(null)
   const [content, setContent] = useState<{ stages: StageRef[]; concepts: ConceptRef[] } | null>(null)
   const [planId, setPlanId] = useState<string | null>(null)
@@ -241,6 +244,7 @@ export default function TimePage() {
   const [sources, setSources] = useState<OrderSources>(EMPTY_SOURCES)
   const [rules, setRules] = useState<OrderRule[]>(ORDER_RULES.map((r) => r.key))
   const [partnerMsg, setPartnerMsg] = useState<string | null>(null)
+  const [partnerChoice, setPartnerChoice] = useState<string | null>(null)
 
   const reload = useCallback(async (select?: string) => {
     const [d, c, t, src] = await Promise.all([loadTimeData(supabase, project.id), loadTimeContent(supabase, project.id), loadAssumptionTopics(supabase, project.id), loadOrderSources(supabase, project.id)])
@@ -255,6 +259,7 @@ export default function TimePage() {
 
   const plan: TimePlanRow | null = data?.plans.find((p) => p.id === planId) ?? null
   const axisRow = data?.axes.find((a) => a.id === plan?.axis_id) ?? null
+  const hostLabel = subjectLabel(axisRow?.subject ?? 'biology')
 
   useEffect(() => {
     setSegEdits({}); setHostEdits({}); setParamEdits({}); setAxisJson(null); setPlacementsJson(null); setJsonError(null); setMessage(null); setRule(null)
@@ -331,7 +336,8 @@ export default function TimePage() {
   }, [axis, projection, targetRow, effPlacements, rule])
 
   // The partner space (Bio-Core and Interdisciplinary): the same preset on the same axis shape.
-  const partnerSlug = KNOWN_COMPARISON_PAIRS[project.slug]
+  const partnerOptions = comparisonPartners(project.slug)
+  const partnerSlug = partnerChoice && partnerOptions.includes(partnerChoice) ? partnerChoice : partnerOptions.includes(KNOWN_COMPARISON_PAIRS[project.slug]) ? KNOWN_COMPARISON_PAIRS[project.slug] : partnerOptions[0]
   async function loadPartner() {
     setPartnerMsg(null)
     if (!partnerSlug || !plan || !axis) return
@@ -462,7 +468,7 @@ export default function TimePage() {
                         </select>
                       </div>
                       <div className="field">
-                        <label>Evolution's share of biology time (percent, low to high)</label>
+                        <label>{isEvolutionSpace ? "Evolution's share of biology time" : `Share of ${hostLabel.toLowerCase()} time taken by this space`} (percent, low to high)</label>
                         <div className="row" style={{ gap: 6 }}>
                           <input type="number" min={0} max={100} style={{ width: 70 }} disabled={!canEdit} value={Math.round((effParams.share?.low ?? 0) * 100)}
                             onChange={(e) => setParamEdits({ ...paramEdits, share: { low: Number(e.target.value) / 100, high: effParams.share?.high ?? 0 } })} />
@@ -521,7 +527,7 @@ export default function TimePage() {
                     </div>
 
                     <h3>What each subject gives</h3>
-                    <p className="muted" style={{ marginTop: 0 }}>Hours of evolution time taken from each subject in each grade band, and the share of that subject's own hours. Grain: grade band.</p>
+                    <p className="muted" style={{ marginTop: 0 }}>Hours of {contentLabel.toLowerCase()} time taken from each subject in each grade band, and the share of that subject's own hours. Grain: grade band.</p>
                     <table>
                       <thead><tr><th>Subject</th><th>Its hours</th>{measures.bands.map((b) => <th key={b.band}>{b.band}</th>)}<th>Whole span</th></tr></thead>
                       <tbody>
@@ -596,7 +602,7 @@ export default function TimePage() {
                 <p className="muted" style={{ marginTop: 0 }}>
                   Each row is a school year. Green is a unit of teaching, blue is a slice that runs through the year. Total over the whole axis: <strong>{range(planTotal)}</strong>.
                 </p>
-                <YearStrip axis={axis} placements={effPlacements} />
+                <YearStrip axis={axis} placements={effPlacements} what={contentLabel.toLowerCase()} />
               </div>
 
               {measures && (
@@ -606,7 +612,7 @@ export default function TimePage() {
                     <p className="muted" style={{ marginTop: 0 }}>Grain: grade band. Ranges run from the low to the high end of every assumption.</p>
                     <table>
                       <thead>
-                        <tr><th>Band</th><th>Years</th><th>Biology time</th><th>Evolution time</th><th>Share</th><th>Stages</th><th>Outcomes</th><th>Per outcome</th><th>New main concepts</th><th>Per 10 h</th><th>Shared across strands</th></tr>
+                        <tr><th>Band</th><th>Years</th><th>{hostLabel} time</th><th>{contentLabel} time</th><th>Share</th><th>Stages</th><th>Outcomes</th><th>Per outcome</th><th>New main concepts</th><th>Per 10 h</th><th>Shared across strands</th></tr>
                       </thead>
                       <tbody>
                         {measures.bands.map((b) => (
@@ -619,7 +625,7 @@ export default function TimePage() {
                       </tbody>
                     </table>
                     <p className="muted" style={{ marginBottom: 0 }}>
-                      Total evolution time: {range(measures.totalEvolution)}. Dedicated: {range(measures.dedicatedMinutes)}. Threaded: {range(measures.threadedMinutes)}.
+                      Total {contentLabel.toLowerCase()} time: {range(measures.totalEvolution)}. Dedicated: {range(measures.dedicatedMinutes)}. Threaded: {range(measures.threadedMinutes)}.
                       {Object.keys(measures.byTag).length > 0 && ' By tier: ' + Object.entries(measures.byTag).map(([k, v]) => `${k} ${range(v)}`).join('; ') + '.'}
                       {' '}This measures crowding. It says nothing about which content matters or how well it is learned.
                     </p>
@@ -627,11 +633,18 @@ export default function TimePage() {
 
                   {partnerSlug && (
                     <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
-                      <div className="row" style={{ justifyContent: 'space-between' }}>
-                        <h3 style={{ margin: 0 }}>Compare with the partner space</h3>
-                        <button className="btn btn-mini" onClick={loadPartner}>{partner ? 'Refresh' : 'Compare'}</button>
+                      <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                        <h3 style={{ margin: 0 }}>Compare with another space</h3>
+                        <div className="row" style={{ gap: 8 }}>
+                          {partnerOptions.length > 1 && (
+                            <select aria-label="Space to compare with" value={partnerSlug} onChange={(e) => { setPartnerChoice(e.target.value); setPartner(null); setPartnerMsg(null) }}>
+                              {partnerOptions.map((slug) => <option key={slug} value={slug}>{COMPARISON_SET_LABELS[slug] ?? slug}</option>)}
+                            </select>
+                          )}
+                          <button className="btn btn-mini" onClick={loadPartner}>{partner ? 'Refresh' : 'Compare'}</button>
+                        </div>
                       </div>
-                      <p className="muted">Same hours for both spaces: each gets the same biology time and the same pattern. The numbers show how crowded each design is under that budget.</p>
+                      <p className="muted">Same hours for both spaces: each gets the same {hostLabel.toLowerCase()} time and the same pattern. The numbers show how crowded each design is under that budget.</p>
                       {partnerMsg && <p className="muted">{partnerMsg}</p>}
                       {partner && (
                         <table>
