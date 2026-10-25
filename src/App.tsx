@@ -19,6 +19,7 @@ import ConceptsPage from '@/pages/dashboard/concepts-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
 import CalendarPage from '@/pages/dashboard/calendar-page'
+import TimePage from '@/pages/dashboard/time-page'
 import MethodsPage from '@/pages/dashboard/methods-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
 import TimelinePage from '@/pages/dashboard/timeline-page'
@@ -142,6 +143,7 @@ export default function App() {
             <Route path="strands" element={<StrandsPage />} />
             <Route path="strands/:strandId" element={<StrandsPage />} />
             <Route path="calendar" element={<CalendarPage />} />
+            <Route path="time" element={<TimePage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
             <Route path="timeline" element={<TimelinePage />} />
