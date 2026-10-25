@@ -6,12 +6,12 @@ import { Chip } from '@/components/chip'
 import { getProjectBySlug } from '@/lib/supabase/projects'
 import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
 import {
-  addAssumption, loadAssumptionTopics, loadPlacements, loadTimeContent, loadTimeData, savePlanCopy, startAssumptionDiscussion, updateAssumption,
+  addAssumption, loadAssumptionTopics, loadOrderSources, loadPlacements, loadTimeContent, loadTimeData, savePlanCopy, startAssumptionDiscussion, updateAssumption,
   type PlacementRow, type TimeAssumptionRow, type TimeData, type TimePlanRow,
 } from '@/lib/supabase/time-plans'
 import {
-  computePlanMeasures, expandAxis, generateStarterPlacements, placementMinutes, projectPlan, selectUnits,
-  type Axis, type AxisDef, type ConceptRef, type Placement, type PlanMeasures, type Preset, type ProjectionRule, type StageRef, type StarterParams, type Unit,
+  checkOrder, computePlanMeasures, deriveOrderEdges, EMPTY_SOURCES, expandAxis, generateStarterPlacements, ORDER_RULES, placementMinutes, projectPlan, selectUnits, structuralProfile,
+  type Axis, type OrderRule, type OrderSources, type OrderStatus, type StructuralProfile, type AxisDef, type ConceptRef, type Placement, type PlanMeasures, type Preset, type ProjectionRule, type StageRef, type StarterParams, type Unit,
 } from '@/lib/time'
 
 // The Time page. Time stays out of the LPM content: a plan places the content of this space onto an axis (a
@@ -116,6 +116,46 @@ function YearStrip({ axis, placements }: { axis: Axis; placements: Placement[] }
   )
 }
 
+const ORDER_LABEL: Record<OrderStatus, string> = {
+  'in-order': 'in order', 'leans-in-order': 'leans in order', 'unordered': 'order left open',
+  'leans-out-of-order': 'leans out of order', 'out-of-order': 'out of order', 'not-placed': 'not in this plan',
+}
+const ORDER_CHIP: Record<OrderStatus, string> = {
+  'in-order': 'accepted', 'leans-in-order': 'pending', 'unordered': 'draft', 'leans-out-of-order': 'pending', 'out-of-order': 'rejected', 'not-placed': 'merged',
+}
+const ORDER_SORT: OrderStatus[] = ['out-of-order', 'leans-out-of-order', 'unordered', 'leans-in-order', 'in-order', 'not-placed']
+
+function structureRows(a: StructuralProfile, b: StructuralProfile | null, bo: { orderedShare: number | null; unorderedShare: number | null } | null, order: { orderedShare: number | null; unorderedShare: number | null } | null) {
+  const n = (v: number, d = 1) => (Number.isInteger(v) ? String(v) : v.toFixed(d))
+  const p = (v: number) => `${Math.round(v * 100)}%`
+  const share = (o: { orderedShare: number | null } | null) => (o && o.orderedShare !== null ? p(o.orderedShare) : 'none')
+  const open = (o: { unorderedShare: number | null } | null) => (o && o.unorderedShare !== null ? p(o.unorderedShare) : 'none')
+  const row = (label: string, hint: string, f: (x: StructuralProfile) => string, ra?: string, rb?: string) => ({ label, hint, a: ra ?? f(a), b: rb ?? (b ? f(b) : '') })
+  return [
+    row('Stages', 'Units of teaching in the space', (x) => String(x.stages)),
+    row('Outcomes', 'Performance indicators across all stages', (x) => String(x.outcomes)),
+    row('Strands', 'Learning paths running through the grade bands', (x) => String(x.strands)),
+    row('Concepts used', 'Concepts that appear in at least one stage', (x) => String(x.conceptsUsed)),
+    row('Main ideas per stage', 'Concepts a stage is mainly about', (x) => n(x.primaryPerStage)),
+    row('Supporting concepts per stage', 'Concepts a stage reinforces', (x) => n(x.reinforcingPerStage)),
+    row('Reach: stages per concept', 'Mean, median and maximum number of stages a concept appears in', (x) => `${n(x.reachStages.mean)}, ${n(x.reachStages.median)}, ${x.reachStages.max}`),
+    row('Reach: strands per concept', 'Mean and maximum number of strands a concept crosses', (x) => `${n(x.reachStrands.mean)}, ${x.reachStrands.max}`),
+    row('Concepts in three or more stages', 'The recurring vocabulary', (x) => p(x.reachStages.shareInThreePlus)),
+    row('Concepts in one stage only', 'Vocabulary that never returns', (x) => String(x.reachStages.appearOnce)),
+    row('Spread of use (entropy, bits)', 'Higher means use is spread evenly over concepts', (x) => n(x.reachStages.entropyBits, 2)),
+    row('Concentration (Gini)', '0 is even use, 1 is all use on one concept', (x) => n(x.reachStages.gini, 2)),
+    row('Share held by the top three concepts', 'How much of the vocabulary load three concepts carry', (x) => p(x.reachStages.topThreeShare)),
+    row('Concepts that are never a main idea', 'Used only in support', (x) => String(x.neverMain)),
+    row('Ordering claims', 'Prerequisite, thread and band links among stages', (x) => String(x.orderEdges)),
+    row('Share ordered by this plan', 'Of the claims the plan can place', () => '', share(order), bo ? share(bo) : ''),
+    row('Share left open by this plan', 'Claims whose stages share the same time', () => '', open(order), bo ? open(bo) : ''),
+  ]
+}
+
+function bandNamesOf(axis: Axis | null): string[] {
+  return axis && axis.levels[0] === 'band' ? axis.def.levels[0]?.names ?? [] : []
+}
+
 function safeExpand(def: AxisDef): { axis: Axis | null; error: string | null } {
   try {
     return { axis: expandAxis(def), error: null }
@@ -146,11 +186,14 @@ export default function TimePage() {
   const [copyName, setCopyName] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [rule, setRule] = useState<ProjectionRule | null>(null)
-  const [partner, setPartner] = useState<{ name: string; measures: PlanMeasures } | null>(null)
+  const [partner, setPartner] = useState<{ name: string; measures: PlanMeasures; structure: StructuralProfile; orderedShare: number | null; unorderedShare: number | null; edges: number } | null>(null)
+  const [sources, setSources] = useState<OrderSources>(EMPTY_SOURCES)
+  const [rules, setRules] = useState<OrderRule[]>(ORDER_RULES.map((r) => r.key))
   const [partnerMsg, setPartnerMsg] = useState<string | null>(null)
 
   const reload = useCallback(async (select?: string) => {
-    const [d, c, t] = await Promise.all([loadTimeData(supabase, project.id), loadTimeContent(supabase, project.id), loadAssumptionTopics(supabase, project.id)])
+    const [d, c, t, src] = await Promise.all([loadTimeData(supabase, project.id), loadTimeContent(supabase, project.id), loadAssumptionTopics(supabase, project.id), loadOrderSources(supabase, project.id)])
+    setSources(src)
     setData(d)
     setContent(c)
     setTopics(t)
@@ -186,15 +229,22 @@ export default function TimePage() {
 
   const { axis, error: axisError } = useMemo(() => (effAxisDef ? safeExpand(effAxisDef) : { axis: null, error: null }), [effAxisDef])
 
+  // Every ordering claim, used to put stages in dependency order inside a band.
+  const allEdges = useMemo(() => (content ? deriveOrderEdges(sources, content.stages, bandNamesOf(axis)) : []), [sources, content, axis])
+
   const effPlacements: Placement[] = useMemo(() => {
     if (placementsJson !== null) {
       try { return JSON.parse(placementsJson) as Placement[] } catch { return placements }
     }
-    if (hasPreset && content && Object.keys(paramEdits).length > 0) return generateStarterPlacements(content.stages, effParams)
+    if (hasPreset && content && Object.keys(paramEdits).length > 0) return generateStarterPlacements(content.stages, effParams, bandNamesOf(axis), allEdges)
     return placements
-  }, [placementsJson, placements, hasPreset, content, paramEdits, effParams])
+  }, [placementsJson, placements, hasPreset, content, paramEdits, effParams, axis, allEdges])
 
   const measures = useMemo(() => (content ? measuresFor(axis, effPlacements, content.stages, content.concepts, effParams) : null), [axis, effPlacements, content, effParams])
+
+  const checkedEdges = useMemo(() => (content ? deriveOrderEdges(sources, content.stages, bandNamesOf(axis), rules) : []), [sources, content, axis, rules])
+  const order = useMemo(() => (axis && measures ? checkOrder(axis, effPlacements, checkedEdges) : null), [axis, measures, effPlacements, checkedEdges])
+  const structure = useMemo(() => (content && axis && measures ? structuralProfile(content.stages, content.concepts, allEdges, bandNamesOf(axis)) : null), [content, axis, measures, allEdges])
 
   const dirty = Object.keys(segEdits).length > 0 || Object.keys(paramEdits).length > 0 || axisJson !== null || placementsJson !== null
 
@@ -226,15 +276,18 @@ export default function TimePage() {
     const pr = res.project
     const pid = pr?.id
     if (!pid) { setPartnerMsg('The partner space is not visible to you.'); return }
-    const [d, c] = await Promise.all([loadTimeData(supabase, pid), loadTimeContent(supabase, pid)])
+    const [d, c, psrc] = await Promise.all([loadTimeData(supabase, pid), loadTimeContent(supabase, pid), loadOrderSources(supabase, pid)])
     const match = d.plans.find((p) => (p.parameters as Partial<StarterParams>)?.preset === effParams.preset && p.axis_id && d.axes.find((a) => a.id === p.axis_id)?.kind === axisRow?.kind)
     if (!match) { setPartnerMsg('The partner space has no plan with the same pattern yet.'); return }
     const defP = effAxisDef as AxisDef
     const ax = safeExpand(defP).axis
     if (!ax) return
-    const pl = effParams.preset ? generateStarterPlacements(c.stages, { ...(match.parameters as unknown as StarterParams), ...paramEdits }) : await loadPlacements(supabase, match.id)
+    const bands = bandNamesOf(ax)
+    const pedges = deriveOrderEdges(psrc, c.stages, bands)
+    const pl = effParams.preset ? generateStarterPlacements(c.stages, { ...(match.parameters as unknown as StarterParams), ...paramEdits }, bands, pedges) : await loadPlacements(supabase, match.id)
     const m = measuresFor(ax, pl, c.stages, c.concepts, match.parameters)
-    if (m) setPartner({ name: pr?.name ?? partnerSlug, measures: m })
+    const ord = checkOrder(ax, pl, deriveOrderEdges(psrc, c.stages, bands, rules))
+    if (m) setPartner({ name: pr?.name ?? partnerSlug, measures: m, structure: structuralProfile(c.stages, c.concepts, pedges, bands), orderedShare: ord.orderedShare, unorderedShare: ord.unorderedShare, edges: pedges.length })
   }
 
   async function saveCopy() {
@@ -350,6 +403,7 @@ export default function TimePage() {
                           <option value="capstone">One unit at the end of each year</option>
                           <option value="threaded">A slice of every session</option>
                           <option value="spiral">Short blocks that return, plus a thread</option>
+                          <option value="sequenced">Stages in sequence, in dependency order</option>
                         </select>
                       </div>
                       <div className="field">
@@ -362,6 +416,15 @@ export default function TimePage() {
                             onChange={(e) => setParamEdits({ ...paramEdits, share: { low: effParams.share?.low ?? 0, high: Number(e.target.value) / 100 } })} />
                         </div>
                       </div>
+                      {effParams.preset === 'sequenced' && (
+                        <div className="field">
+                          <label>Order inside each band</label>
+                          <select value={effParams.sequence_order ?? 'dependency'} disabled={!canEdit} onChange={(e) => setParamEdits({ ...paramEdits, sequence_order: e.target.value as 'dependency' | 'reverse' })}>
+                            <option value="dependency">Dependency order</option>
+                            <option value="reverse">Reverse order (a control for the order check)</option>
+                          </select>
+                        </div>
+                      )}
                       {effParams.preset === 'spiral' && (
                         <>
                           <div className="field">
@@ -478,6 +541,76 @@ export default function TimePage() {
                             <td>{c.occasions}</td><td>{c.strands}</td><td>{c.bands.join(', ')}</td><td>{c.firstMainBand ?? 'never'}</td><td>{c.returns}</td>
                             <td>{c.returns ? `${c.longestGapYears.toFixed(1)} years` : 'none'}</td>
                           </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+
+              {order && content && axis && (
+                <>
+                  <h2>Order checks</h2>
+                  <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                      Does this plan put the content in an order that the space's own sequencing claims allow? Each claim below is a rule you can switch off.
+                      Where two stages share the same units of time, the plan leaves their order open. That describes the plan and makes no claim that it is wrong.
+                      Grain: {axis.levels[axis.levels.length - 1]}.
+                    </p>
+                    <div className="row" style={{ gap: 14, flexWrap: 'wrap', marginBottom: 8 }}>
+                      {ORDER_RULES.map((r) => (
+                        <label key={r.key} className="row" style={{ gap: 6 }}>
+                          <input type="checkbox" checked={rules.includes(r.key)} onChange={(e) => setRules(e.target.checked ? [...rules, r.key] : rules.filter((x) => x !== r.key))} />
+                          <span>{r.label} ({allEdges.filter((e) => e.rules.includes(r.key)).length})</span>
+                        </label>
+                      ))}
+                    </div>
+                    <p>
+                      Claims checked: {order.items.length}. {(['in-order', 'leans-in-order', 'unordered', 'leans-out-of-order', 'out-of-order', 'not-placed'] as OrderStatus[]).map((k) => `${ORDER_LABEL[k]} ${order.summary[k]}`).join(', ')}.
+                      {order.orderedShare !== null && ` Share ordered by the plan: ${Math.round(order.orderedShare * 100)}%. Share left open: ${Math.round((order.unorderedShare ?? 0) * 100)}%.`}
+                    </p>
+                    {order.items.length > 0 && (
+                      <table>
+                        <thead><tr><th>Comes first</th><th>Comes second</th><th>Rule</th><th>Result</th><th>First: time</th><th>Second: time</th></tr></thead>
+                        <tbody>
+                          {[...order.items].sort((a, b) => ORDER_SORT.indexOf(a.status) - ORDER_SORT.indexOf(b.status)).slice(0, 80).map((it) => {
+                            const label = (id: string) => content.stages.find((s) => s.id === id)?.title ?? id
+                            const span = (t: { first: number; last: number } | null) => {
+                              if (!t) return 'none'
+                              const a = axis.units[t.first - 1]?.label ?? String(t.first)
+                              const b = axis.units[t.last - 1]?.label ?? String(t.last)
+                              return a === b ? a : `${a} to ${b}`
+                            }
+                            return (
+                              <tr key={`${it.edge.from}|${it.edge.to}`}>
+                                <td>{label(it.edge.from)}</td><td>{label(it.edge.to)}</td>
+                                <td>{it.edge.rules.map((r) => ORDER_RULES.find((x) => x.key === r)?.label.split(',')[0]).join('; ')}</td>
+                                <td><Chip status={ORDER_CHIP[it.status]}>{ORDER_LABEL[it.status]}</Chip></td>
+                                <td>{span(it.from)}</td><td>{span(it.to)}</td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
+                    )}
+                    {order.items.length > 80 && <p className="muted" style={{ marginBottom: 0 }}>Showing the first 80 of {order.items.length}, with the most serious results first.</p>}
+                  </div>
+                </>
+              )}
+
+              {structure && (
+                <>
+                  <h2>Structure of this space</h2>
+                  <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                      Numbers read from the content alone, with no time in them. A time model takes these as inputs, and they let spaces with different aims be compared on the same measures.
+                      {!partner && partnerSlug && ' Press Compare above to add the partner space.'}
+                    </p>
+                    <table>
+                      <thead><tr><th>Measure</th><th>{project.name}</th>{partner && <th>{partner.name}</th>}</tr></thead>
+                      <tbody>
+                        {structureRows(structure, partner?.structure ?? null, partner ? { orderedShare: partner.orderedShare, unorderedShare: partner.unorderedShare } : null, order).map((r) => (
+                          <tr key={r.label}><td>{r.label}<div className="muted" style={{ fontSize: 11.5 }}>{r.hint}</div></td><td>{r.a}</td>{partner && <td>{r.b}</td>}</tr>
                         ))}
                       </tbody>
                     </table>
