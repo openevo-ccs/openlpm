@@ -1,3 +1,4 @@
+import { axisFor } from './hosts'
 import { placementMinutes } from './placements'
 import type { StageRef } from './presets'
 import type { Axis, Placement } from './types'
@@ -136,11 +137,11 @@ export interface StageTime {
 }
 
 /** Where each stage sits on the axis under a plan. Stages with no time are left out. */
-export function stageTimes(axis: Axis, placements: Placement[]): Map<string, StageTime> {
+export function stageTimes(axis: Axis, placements: Placement[], extra?: Record<string, Axis>): Map<string, StageTime> {
   const acc = new Map<string, { first: number; last: number; wsum: number; w: number }>()
   for (const p of placements) {
     if (p.target_type !== 'topic') continue
-    for (const m of placementMinutes(axis, p)) {
+    for (const m of placementMinutes(axisFor(p, axis, extra), p)) {
       const w = (m.low + m.high) / 2
       if (w <= 0) continue
       const cur = acc.get(p.target_id) ?? { first: Infinity, last: -Infinity, wsum: 0, w: 0 }
@@ -183,8 +184,8 @@ const blank = (): Record<OrderStatus, number> => Object.fromEntries(STATUSES.map
  * Checks each ordering claim against the plan. Stages whose time intervals do not touch are ordered by the plan.
  * Stages whose intervals overlap are not, though their time centres may still lean one way.
  */
-export function checkOrder(axis: Axis, placements: Placement[], edges: OrderEdge[]): OrderReport {
-  const times = stageTimes(axis, placements)
+export function checkOrder(axis: Axis, placements: Placement[], edges: OrderEdge[], extra?: Record<string, Axis>): OrderReport {
+  const times = stageTimes(axis, placements, extra)
   const items: OrderItem[] = edges.map((edge) => {
     const a = times.get(edge.from) ?? null
     const b = times.get(edge.to) ?? null

@@ -7,11 +7,11 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
 import {
   addAssumption, loadAssumptionTopics, loadOrderSources, loadPlacements, loadTimeContent, loadTimeData, savePlanCopy, startAssumptionDiscussion, updateAssumption,
-  type PlacementRow, type TimeAssumptionRow, type TimeData, type TimePlanRow,
+  type PlacementRow, type TimeAssumptionRow, type TimeAxisRow, type TimeData, type TimePlanRow,
 } from '@/lib/supabase/time-plans'
 import {
-  checkOrder, computePlanMeasures, deriveOrderEdges, EMPTY_SOURCES, expandAxis, generateStarterPlacements, ORDER_RULES, placementMinutes, projectPlan, selectUnits, structuralProfile,
-  type Axis, type OrderRule, type OrderSources, type OrderStatus, type StructuralProfile, type AxisDef, type ConceptRef, type Placement, type PlanMeasures, type Preset, type ProjectionRule, type StageRef, type StarterParams, type Unit,
+  axesAligned, axisFor, checkOrder, computePlanMeasures, deriveOrderEdges, EMPTY_SOURCES, expandAxis, generateStarterResult, HOST_BASES, ORDER_RULES, placementMinutes, projectPlan, selectUnits, structuralProfile,
+  type Axis, type HostBasis, type HostContext, type HostInfo, type HostParams, type OrderRule, type OrderSources, type OrderStatus, type StructuralProfile, type AxisDef, type ConceptRef, type Placement, type PlanMeasures, type Preset, type ProjectionRule, type Segment as AxisSegment, type StageRef, type StarterParams, type Unit,
 } from '@/lib/time'
 
 // The Time page. Time stays out of the LPM content: a plan places the content of this space onto an axis (a
@@ -164,9 +164,59 @@ function safeExpand(def: AxisDef): { axis: Axis | null; error: string | null } {
   }
 }
 
-function measuresFor(axis: Axis | null, placements: Placement[], stages: StageRef[], concepts: ConceptRef[], params: Record<string, unknown>): PlanMeasures | null {
+function measuresFor(axis: Axis | null, placements: Placement[], stages: StageRef[], concepts: ConceptRef[], params: Record<string, unknown>, hosts?: HostContext | null): PlanMeasures | null {
   if (!axis || axis.levels[0] !== 'band') return null
-  return computePlanMeasures(axis, placements, stages, concepts, { reinforcing_share: typeof params.reinforcing_share === 'number' ? params.reinforcing_share : undefined })
+  return computePlanMeasures(axis, placements, stages, concepts, { reinforcing_share: typeof params.reinforcing_share === 'number' ? params.reinforcing_share : undefined, hosts: hosts ?? undefined })
+}
+
+type TierEdits = Record<string, { low: number; high: number }>
+
+function subjectLabel(subject: string): string {
+  const t = subject.replace(/[-_]+/g, ' ')
+  return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
+function withTierEdits(def: AxisDef, edits: TierEdits | undefined): AxisDef {
+  if (!edits || Object.keys(edits).length === 0) return def
+  return { ...def, segments: (def.segments ?? []).map((s) => (edits[s.key] ? { ...s, duration: { low: `PT${edits[s.key].low}H`, high: `PT${edits[s.key].high}H` } } : s)) }
+}
+
+/** The subject timetables of a project that line up with the plan's axis, with the plan's own axis first. */
+function buildHostContext(axisRows: TimeAxisRow[], planAxisRow: TimeAxisRow | null, planAxis: Axis | null, hostEdits: Record<string, TierEdits>): HostContext | null {
+  if (!planAxisRow || !planAxis) return null
+  const reference = planAxisRow.subject ?? 'primary'
+  const hosts: HostInfo[] = [{ axisId: planAxisRow.id, subject: reference, label: subjectLabel(reference), axis: planAxis }]
+  for (const a of axisRows) {
+    if (!a.subject || a.id === planAxisRow.id || a.subject === reference) continue
+    const ex = safeExpand(withTierEdits(a.definition, hostEdits[a.id])).axis
+    if (ex && axesAligned(planAxis, ex)) hosts.push({ axisId: a.id, subject: a.subject, label: subjectLabel(a.subject), axis: ex })
+  }
+  return hosts.length > 1 ? { reference, hosts } : null
+}
+
+function TierEditor({ segments, edits, onChange, disabled }: { segments: AxisSegment[]; edits: TierEdits; onChange: (e: TierEdits) => void; disabled: boolean }) {
+  return (
+    <div className="grid grid-3">
+      {segments.map((s) => {
+        const low = edits[s.key]?.low ?? Number(String(s.duration.low).replace(/[^0-9.]/g, '').replace(/^$/, '0'))
+        const high = edits[s.key]?.high ?? Number(String(s.duration.high ?? s.duration.low).replace(/[^0-9.]/g, '').replace(/^$/, '0'))
+        return (
+          <div key={s.key} className="field">
+            <label>{s.label ?? s.key}</label>
+            <div className="row" style={{ gap: 6 }}>
+              <input type="number" min={0} value={low} disabled={disabled} aria-label={`${s.label} low hours`} style={{ width: 80 }}
+                onChange={(e) => onChange({ ...edits, [s.key]: { low: Number(e.target.value), high } })} />
+              <span>to</span>
+              <input type="number" min={0} value={high} disabled={disabled} aria-label={`${s.label} high hours`} style={{ width: 80 }}
+                onChange={(e) => onChange({ ...edits, [s.key]: { low, high: Number(e.target.value) } })} />
+              <span className="muted">h a year</span>
+            </div>
+            {s.note && <p className="muted" style={{ fontSize: 12, margin: '4px 0 0' }}>{s.note}</p>}
+          </div>
+        )
+      })}
+    </div>
+  )
 }
 
 export default function TimePage() {
@@ -178,7 +228,8 @@ export default function TimePage() {
   const [placements, setPlacements] = useState<PlacementRow[]>([])
   const [placementsFor, setPlacementsFor] = useState<string | null>(null)
   const [topics, setTopics] = useState<Map<string, string>>(new Map())
-  const [segEdits, setSegEdits] = useState<Record<string, { low: number; high: number }>>({})
+  const [segEdits, setSegEdits] = useState<TierEdits>({})
+  const [hostEdits, setHostEdits] = useState<Record<string, TierEdits>>({})
   const [paramEdits, setParamEdits] = useState<Partial<StarterParams>>({})
   const [axisJson, setAxisJson] = useState<string | null>(null)
   const [placementsJson, setPlacementsJson] = useState<string | null>(null)
@@ -206,7 +257,7 @@ export default function TimePage() {
   const axisRow = data?.axes.find((a) => a.id === plan?.axis_id) ?? null
 
   useEffect(() => {
-    setSegEdits({}); setParamEdits({}); setAxisJson(null); setPlacementsJson(null); setJsonError(null); setMessage(null); setRule(null)
+    setSegEdits({}); setHostEdits({}); setParamEdits({}); setAxisJson(null); setPlacementsJson(null); setJsonError(null); setMessage(null); setRule(null)
     setCopyName(plan ? `${plan.name} (copy)` : '')
     setPlacementsFor(null)
     if (!plan) { setPlacements([]); return }
@@ -222,9 +273,7 @@ export default function TimePage() {
     if (axisJson !== null) {
       try { return JSON.parse(axisJson) as AxisDef } catch { return axisRow.definition }
     }
-    const def = axisRow.definition
-    if (Object.keys(segEdits).length === 0) return def
-    return { ...def, segments: (def.segments ?? []).map((s) => (segEdits[s.key] ? { ...s, duration: { low: `PT${segEdits[s.key].low}H`, high: `PT${segEdits[s.key].high}H` } } : s)) }
+    return withTierEdits(axisRow.definition, segEdits)
   }, [axisRow, segEdits, axisJson])
 
   const { axis, error: axisError } = useMemo(() => (effAxisDef ? safeExpand(effAxisDef) : { axis: null, error: null }), [effAxisDef])
@@ -232,29 +281,43 @@ export default function TimePage() {
   // Every ordering claim, used to put stages in dependency order inside a band.
   const allEdges = useMemo(() => (content ? deriveOrderEdges(sources, content.stages, bandNamesOf(axis)) : []), [sources, content, axis])
 
+  // Subject timetables of this project that line up with the plan's axis (migration 179).
+  const hostCtx = useMemo(() => buildHostContext(data?.axes ?? [], axisRow, axis, hostEdits), [data, axisRow, axis, hostEdits])
+  const extraAxes = useMemo(() => (hostCtx ? Object.fromEntries(hostCtx.hosts.map((h) => [h.axisId, h.axis])) : undefined), [hostCtx])
+  const effHosts: HostParams = effParams.hosts ?? { basis: 'matched-hours', split: {} }
+
+  // A preset plan is written again whenever its settings or the hours behind a subject split change, so the total hours stay matched.
+  const hoursEdited = Object.keys(segEdits).length > 0 || Object.keys(hostEdits).length > 0
+  const regenerate = hasPreset && !!content && (Object.keys(paramEdits).length > 0 || (!!effParams.hosts && hoursEdited))
+  const generated = useMemo(
+    () => (hasPreset && content && (regenerate || (effParams.hosts && hostCtx)) ? generateStarterResult(content.stages, effParams, bandNamesOf(axis), allEdges, hostCtx ?? undefined) : null),
+    [hasPreset, content, regenerate, effParams, axis, allEdges, hostCtx],
+  )
+  const hostNotes = generated?.notes ?? []
+
   const effPlacements: Placement[] = useMemo(() => {
     if (placementsJson !== null) {
       try { return JSON.parse(placementsJson) as Placement[] } catch { return placements }
     }
-    if (hasPreset && content && Object.keys(paramEdits).length > 0) return generateStarterPlacements(content.stages, effParams, bandNamesOf(axis), allEdges)
+    if (regenerate && generated) return generated.placements
     return placements
-  }, [placementsJson, placements, hasPreset, content, paramEdits, effParams, axis, allEdges])
+  }, [placementsJson, placements, regenerate, generated])
 
-  const measures = useMemo(() => (content ? measuresFor(axis, effPlacements, content.stages, content.concepts, effParams) : null), [axis, effPlacements, content, effParams])
+  const measures = useMemo(() => (content ? measuresFor(axis, effPlacements, content.stages, content.concepts, effParams, hostCtx) : null), [axis, effPlacements, content, effParams, hostCtx])
 
   const checkedEdges = useMemo(() => (content ? deriveOrderEdges(sources, content.stages, bandNamesOf(axis), rules) : []), [sources, content, axis, rules])
-  const order = useMemo(() => (axis && measures ? checkOrder(axis, effPlacements, checkedEdges) : null), [axis, measures, effPlacements, checkedEdges])
+  const order = useMemo(() => (axis && measures ? checkOrder(axis, effPlacements, checkedEdges, extraAxes) : null), [axis, measures, effPlacements, checkedEdges, extraAxes])
   const structure = useMemo(() => (content && axis && measures ? structuralProfile(content.stages, content.concepts, allEdges, bandNamesOf(axis)) : null), [content, axis, measures, allEdges])
 
-  const dirty = Object.keys(segEdits).length > 0 || Object.keys(paramEdits).length > 0 || axisJson !== null || placementsJson !== null
+  const dirty = Object.keys(segEdits).length > 0 || Object.keys(hostEdits).length > 0 || Object.keys(paramEdits).length > 0 || axisJson !== null || placementsJson !== null
 
   const planTotal = useMemo(() => {
     if (!axis) return { low: 0, high: 0 }
     return effPlacements.reduce((s, p) => {
-      const m = placementMinutes(axis, p)
+      const m = placementMinutes(axisFor(p, axis, extraAxes), p)
       return { low: s.low + m.reduce((a, b) => a + b.low, 0), high: s.high + m.reduce((a, b) => a + b.high, 0) }
     }, { low: 0, high: 0 })
-  }, [axis, effPlacements])
+  }, [axis, effPlacements, extraAxes])
 
   // Projection of a plan written on a generic axis onto a dated axis.
   const projection = data?.projections.find((p) => p.source_axis_id === axisRow?.id) ?? null
@@ -277,16 +340,24 @@ export default function TimePage() {
     const pid = pr?.id
     if (!pid) { setPartnerMsg('The partner space is not visible to you.'); return }
     const [d, c, psrc] = await Promise.all([loadTimeData(supabase, pid), loadTimeContent(supabase, pid), loadOrderSources(supabase, pid)])
-    const match = d.plans.find((p) => (p.parameters as Partial<StarterParams>)?.preset === effParams.preset && p.axis_id && d.axes.find((a) => a.id === p.axis_id)?.kind === axisRow?.kind)
+    // Same pattern, same order direction, and the same way of drawing on subjects when the partner has such a plan.
+    const sameKind = d.plans.filter((p) => (p.parameters as Partial<StarterParams>)?.preset === effParams.preset && p.axis_id && d.axes.find((a) => a.id === p.axis_id)?.kind === axisRow?.kind)
+    const dir = (p: TimePlanRow) => (p.parameters as Partial<StarterParams>).sequence_order ?? 'dependency'
+    const sameDir = sameKind.filter((p) => effParams.preset !== 'sequenced' || dir(p) === (effParams.sequence_order ?? 'dependency'))
+    const pool = sameDir.length > 0 ? sameDir : sameKind
+    const basisOf = (p: TimePlanRow) => (p.parameters as Partial<StarterParams>).hosts?.basis ?? null
+    const match = pool.find((p) => basisOf(p) === (effParams.hosts?.basis ?? null)) ?? pool.find((p) => basisOf(p) === null) ?? pool[0]
     if (!match) { setPartnerMsg('The partner space has no plan with the same pattern yet.'); return }
     const defP = effAxisDef as AxisDef
     const ax = safeExpand(defP).axis
     if (!ax) return
     const bands = bandNamesOf(ax)
     const pedges = deriveOrderEdges(psrc, c.stages, bands)
-    const pl = effParams.preset ? generateStarterPlacements(c.stages, { ...(match.parameters as unknown as StarterParams), ...paramEdits }, bands, pedges) : await loadPlacements(supabase, match.id)
-    const m = measuresFor(ax, pl, c.stages, c.concepts, match.parameters)
-    const ord = checkOrder(ax, pl, deriveOrderEdges(psrc, c.stages, bands, rules))
+    // Both spaces are measured on the same hours, so the partner uses this page's subject timetables.
+    const { hosts: _mine, ...sharedEdits } = paramEdits // eslint-disable-line @typescript-eslint/no-unused-vars
+    const pl = effParams.preset ? generateStarterResult(c.stages, { ...(match.parameters as unknown as StarterParams), ...sharedEdits }, bands, pedges, hostCtx ?? undefined).placements : await loadPlacements(supabase, match.id)
+    const m = measuresFor(ax, pl, c.stages, c.concepts, match.parameters, hostCtx)
+    const ord = checkOrder(ax, pl, deriveOrderEdges(psrc, c.stages, bands, rules), extraAxes)
     if (m) setPartner({ name: pr?.name ?? partnerSlug, measures: m, structure: structuralProfile(c.stages, c.concepts, pedges, bands), orderedShare: ord.orderedShare, unorderedShare: ord.unorderedShare, edges: pedges.length })
   }
 
@@ -294,6 +365,7 @@ export default function TimePage() {
     if (!plan || !axisRow || !axis || !content) return
     setMessage(null)
     const changedAxis = axisJson !== null || Object.keys(segEdits).length > 0
+    const editedHosts = (data?.axes ?? []).filter((a) => a.subject && a.id !== axisRow.id && Object.keys(hostEdits[a.id] ?? {}).length > 0)
     const result = await savePlanCopy(supabase, {
       projectId: project.id,
       from: plan,
@@ -302,8 +374,9 @@ export default function TimePage() {
       parameters: { ...(plan.parameters ?? {}), ...paramEdits },
       placements: effPlacements,
       axis: changedAxis && effAxisDef
-        ? { name: `${axisRow.name} (edited)`, description: axisRow.description, kind: axisRow.kind, definition: effAxisDef, source: axisRow.source }
+        ? { name: `${axisRow.name} (edited)`, description: axisRow.description, kind: axisRow.kind, definition: effAxisDef, source: axisRow.source, subject: axisRow.subject }
         : { existingId: axisRow.id },
+      hostAxes: editedHosts.map((a) => ({ oldId: a.id, name: `${a.name} (edited)`, description: a.description, kind: a.kind, definition: withTierEdits(a.definition, hostEdits[a.id]), source: a.source, subject: a.subject })),
     })
     if ('error' in result) { setMessage(`Could not save: ${result.error}`); return }
     setMessage('Saved as a new plan. The original is unchanged.')
@@ -325,7 +398,8 @@ export default function TimePage() {
 
   if (!data || !content) return <p className="muted">Loading…</p>
 
-  const assumptions = data.assumptions.filter((a) => a.plan_id === plan?.id || a.axis_id === plan?.axis_id || (projection && a.projection_id === projection.id))
+  const usedAxisIds = new Set(effPlacements.map((p) => p.axis_id).filter((x): x is string => !!x))
+  const assumptions = data.assumptions.filter((a) => a.plan_id === plan?.id || a.axis_id === plan?.axis_id || (a.axis_id !== null && usedAxisIds.has(a.axis_id)) || (projection && a.projection_id === projection.id))
   const segments = effAxisDef?.segments ?? []
 
   return (
@@ -370,26 +444,7 @@ export default function TimePage() {
                   Hours of teaching time per year in each tier. Change them to match local conditions. Changes preview at once and are saved as a copy.
                   Tiers sit beside the grade bands, so one grade can belong to a band and to a tier.
                 </p>
-                <div className="grid grid-3">
-                  {segments.map((s) => {
-                    const low = segEdits[s.key]?.low ?? Number(String(s.duration.low).replace(/[^0-9.]/g, '').replace(/^$/, '0'))
-                    const high = segEdits[s.key]?.high ?? Number(String(s.duration.high ?? s.duration.low).replace(/[^0-9.]/g, '').replace(/^$/, '0'))
-                    return (
-                      <div key={s.key} className="field">
-                        <label>{s.label ?? s.key}</label>
-                        <div className="row" style={{ gap: 6 }}>
-                          <input type="number" min={0} value={low} disabled={!canEdit || axisJson !== null} aria-label={`${s.label} low hours`} style={{ width: 80 }}
-                            onChange={(e) => setSegEdits({ ...segEdits, [s.key]: { low: Number(e.target.value), high } })} />
-                          <span>to</span>
-                          <input type="number" min={0} value={high} disabled={!canEdit || axisJson !== null} aria-label={`${s.label} high hours`} style={{ width: 80 }}
-                            onChange={(e) => setSegEdits({ ...segEdits, [s.key]: { low, high: Number(e.target.value) } })} />
-                          <span className="muted">h a year</span>
-                        </div>
-                        {s.note && <p className="muted" style={{ fontSize: 12, margin: '4px 0 0' }}>{s.note}</p>}
-                      </div>
-                    )
-                  })}
-                </div>
+                <TierEditor segments={segments} edits={segEdits} onChange={setSegEdits} disabled={!canEdit || axisJson !== null} />
               </div>}
 
               {hasPreset && (
@@ -449,12 +504,89 @@ export default function TimePage() {
                 </>
               )}
 
+              {hostCtx && hasPreset && content && measures && (
+                <>
+                  <h2>Hours by school subject</h2>
+                  <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                      The content of this space is taught inside school subjects that already have a timetable. Choose which subjects give the hours and how the hours of each
+                      topic are shared between them. The split below is a placeholder written by an AI and unreviewed. Argue it topic by topic.
+                    </p>
+                    <div className="field" style={{ maxWidth: 520 }}>
+                      <label>Where the hours come from</label>
+                      <select value={effHosts.basis} disabled={!canEdit} onChange={(e) => setParamEdits({ ...paramEdits, hosts: { ...effHosts, basis: e.target.value as HostBasis } })}>
+                        {HOST_BASES.map((b) => <option key={b.key} value={b.key}>{b.label}</option>)}
+                      </select>
+                      <p className="muted" style={{ fontSize: 12, margin: '4px 0 0' }}>{HOST_BASES.find((b) => b.key === effHosts.basis)?.hint}</p>
+                    </div>
+
+                    <h3>What each subject gives</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>Hours of evolution time taken from each subject in each grade band, and the share of that subject's own hours. Grain: grade band.</p>
+                    <table>
+                      <thead><tr><th>Subject</th><th>Its hours</th>{measures.bands.map((b) => <th key={b.band}>{b.band}</th>)}<th>Whole span</th></tr></thead>
+                      <tbody>
+                        {measures.hosts.map((h) => (
+                          <tr key={h.axisId}>
+                            <td>{h.label}</td>
+                            <td>{range(h.available)}</td>
+                            {h.bands.map((b) => <td key={b.band}>{b.claimed.high > 0 ? `${range(b.claimed)} (${pct(b.share)})` : 'none'}</td>)}
+                            <td>{h.claimed.high > 0 ? `${range(h.claimed)} (${pct(h.share)})` : 'none'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="muted">
+                      Topics that draw on more than one subject: {measures.crossSubjectTopics} of {measures.topics.filter((t) => t.minutes.high > 0).length}.
+                      Mean number of subjects per topic: {measures.meanSubjectsPerTopic.toFixed(2)}. Each extra subject is one more timetable to coordinate.
+                    </p>
+                    {hostNotes.map((n) => <p key={n} className="muted" style={{ margin: '2px 0' }}>{n}</p>)}
+
+                    <h3>Hours per school year in the other subjects</h3>
+                    {hostCtx.hosts.filter((h) => h.axisId !== axisRow?.id).map((h) => {
+                      const row = data.axes.find((a) => a.id === h.axisId)
+                      return (
+                        <div key={h.axisId} style={{ marginBottom: 8 }}>
+                          <strong>{h.label}</strong>
+                          <TierEditor segments={row?.definition.segments ?? []} edits={hostEdits[h.axisId] ?? {}} disabled={!canEdit || axisJson !== null}
+                            onChange={(e) => setHostEdits({ ...hostEdits, [h.axisId]: e })} />
+                        </div>
+                      )
+                    })}
+
+                    <h3>How each topic's time is shared</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>Percent of the topic's time taken from each subject. Numbers that do not add up to 100 are scaled to 100.</p>
+                    <table>
+                      <thead><tr><th>Band</th><th>Topic</th>{hostCtx.hosts.map((h) => <th key={h.subject}>{h.label}</th>)}<th>Sum</th></tr></thead>
+                      <tbody>
+                        {[...content.stages].sort((a, b) => bandNamesOf(axis).indexOf(a.band) - bandNamesOf(axis).indexOf(b.band) || a.strand.localeCompare(b.strand) || a.title.localeCompare(b.title)).map((st) => {
+                          const cur = effHosts.split[st.id] ?? { [hostCtx.reference]: 1 }
+                          const sum = Math.round(hostCtx.hosts.reduce((t, h) => t + (cur[h.subject] ?? 0), 0) * 100)
+                          return (
+                            <tr key={st.id}>
+                              <td>{st.band}</td><td>{st.title}</td>
+                              {hostCtx.hosts.map((h) => (
+                                <td key={h.subject}>
+                                  <input type="number" min={0} max={100} style={{ width: 62 }} disabled={!canEdit} aria-label={`${st.title}: percent from ${h.label}`} value={Math.round((cur[h.subject] ?? 0) * 100)}
+                                    onChange={(e) => setParamEdits({ ...paramEdits, hosts: { ...effHosts, split: { ...effHosts.split, [st.id]: { ...cur, [h.subject]: Number(e.target.value) / 100 } } } })} />
+                                </td>
+                              ))}
+                              <td style={sum === 100 ? undefined : { color: 'var(--danger, #b3261e)' }}>{sum}%</td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                    {canEdit && <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setParamEdits({ ...paramEdits, hosts: { ...effHosts, split: {} } })}>Teach everything in {hostCtx.hosts[0].label.toLowerCase()}</button>}
+                  </div>
+                </>
+              )}
+
               {dirty && canEdit && (
                 <div className="notice" style={{ marginBottom: 16, flexWrap: 'wrap' }}>
                   <span>Unsaved changes. The tables below show a preview.</span>
                   <input value={copyName} onChange={(e) => setCopyName(e.target.value)} aria-label="Name of the copy" style={{ minWidth: 220 }} />
                   <button className="btn btn-mini" onClick={saveCopy}>Save as a copy</button>
-                  <button className="btn btn-mini" onClick={() => { setSegEdits({}); setParamEdits({}); setAxisJson(null); setPlacementsJson(null); setJsonError(null) }}>Reset</button>
+                  <button className="btn btn-mini" onClick={() => { setSegEdits({}); setHostEdits({}); setParamEdits({}); setAxisJson(null); setPlacementsJson(null); setJsonError(null) }}>Reset</button>
                 </div>
               )}
               {message && <div className="notice notice-ok" style={{ marginBottom: 16 }}>{message}</div>}
@@ -520,6 +652,31 @@ export default function TimePage() {
                             })}
                           </tbody>
                         </table>
+                      )}
+                      {partner && measures.hosts.length > 0 && (
+                        <>
+                          <h3>Time taken from each subject, whole span</h3>
+                          <table>
+                            <thead><tr><th>Subject</th><th>{project.name}: hours</th><th>share of its time</th><th>{partner.name}: hours</th><th>share of its time</th></tr></thead>
+                            <tbody>
+                              {measures.hosts.map((h) => {
+                                const o = partner.measures.hosts.find((x) => x.subject === h.subject)
+                                return (
+                                  <tr key={h.subject}>
+                                    <td>{h.label}</td>
+                                    <td>{h.claimed.high > 0 ? range(h.claimed) : 'none'}</td><td>{h.claimed.high > 0 ? pct(h.share) : ''}</td>
+                                    <td>{o && o.claimed.high > 0 ? range(o.claimed) : 'none'}</td><td>{o && o.claimed.high > 0 ? pct(o.share) : ''}</td>
+                                  </tr>
+                                )
+                              })}
+                              <tr>
+                                <td>Topics on more than one subject</td>
+                                <td>{measures.crossSubjectTopics}</td><td>mean {measures.meanSubjectsPerTopic.toFixed(2)} per topic</td>
+                                <td>{partner.measures.crossSubjectTopics}</td><td>mean {partner.measures.meanSubjectsPerTopic.toFixed(2)} per topic</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </>
                       )}
                     </div>
                   )}

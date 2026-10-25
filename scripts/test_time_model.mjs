@@ -38,9 +38,10 @@ test('K-12 axis: irregular bands, tiers beside the bands', () => {
   assert.equal(g5.coords[0], 2)
   assert.ok(g5.tags.includes('middle'))
   assert.equal(g5.label.includes('Grade 5'), true)
-  assert.deepEqual(axis.units[0].duration, { low: 900, high: 2700 })
-  assert.deepEqual(axis.units[5].duration, { low: 2400, high: 4800 })
-  assert.deepEqual(axis.units[12].duration, { low: 6000, high: 9000 })
+  // Defaults after Dustin's revision (2026-10-25): lower 8-21 h, middle 20-38 h, upper 50-70 h a year.
+  assert.deepEqual(axis.units[0].duration, { low: 480, high: 1260 })
+  assert.deepEqual(axis.units[5].duration, { low: 1200, high: 2280 })
+  assert.deepEqual(axis.units[12].duration, { low: 3000, high: 4200 })
 })
 
 test('selectors: constraints, every-k with offset, absolute indexes', () => {
@@ -71,8 +72,8 @@ test('amounts: duration, share and total', () => {
   const dur = T.sumMinutes(T.placementMinutes(axis, { target_type: 'topic', target_id: 'a', selector: { where }, amount: { kind: 'duration', low: 'PT2H', high: 'PT3H' } }))
   assert.deepEqual(dur, { low: 360, high: 540 })
   const share = T.sumMinutes(T.placementMinutes(axis, { target_type: 'topic', target_id: 'a', selector: { where }, amount: { kind: 'share', low: 0.1, high: 0.2 } }))
-  close(share.low, 0.1 * 900 * 3)
-  close(share.high, 0.2 * 2700 * 3)
+  close(share.low, 0.1 * 480 * 3)
+  close(share.high, 0.2 * 1260 * 3)
   const tot = T.sumMinutes(T.placementMinutes(axis, { target_type: 'topic', target_id: 'a', selector: { where }, amount: { kind: 'total', low: 'PT6H', high: 'PT9H' } }))
   assert.deepEqual(tot, { low: 360, high: 540 })
 })
@@ -274,4 +275,102 @@ test('structural profile: reach, concentration and order edges', () => {
   const even = T.structuralProfile([stage('a', 'K-2', 'A', [{ id: 'x', emphasis: 'primary' }]), stage('b', 'K-2', 'A', [{ id: 'y', emphasis: 'primary' }])], [], [], BANDS)
   assert.equal(even.reachStages.gini, 0)
   close(even.reachStages.entropyBits, 1)
+})
+
+// ---- host subjects ----
+const mkHost = (subject, label, tiers) => ({ axisId: `ax-${subject}`, subject, label, axis: T.expandAxis(T.k12TierAxis(tiers)) })
+const BIO = mkHost('biology', 'Biology', T.DEFAULT_TIER_HOURS)
+const SOC = mkHost('social-studies', 'Social studies', { lower: { low: 20, high: 40 }, middle: { low: 30, high: 60 }, upper: { low: 40, high: 80 } })
+const CSC = mkHost('computer-science', 'Computer science', { lower: { low: 0, high: 0 }, middle: { low: 8, high: 20 }, upper: { low: 20, high: 40 } })
+const HOSTS = { reference: 'biology', hosts: [BIO, SOC, CSC] }
+const SPLIT = {
+  s1: { biology: 0.5, 'social-studies': 0.5 },
+  s2: { biology: 1 },
+  s3: { biology: 0.5, 'social-studies': 0.5 },
+  s4: { biology: 0.5, 'social-studies': 0.25, 'computer-science': 0.25 },
+  s5: { biology: 0.2, 'social-studies': 0.4, 'computer-science': 0.4 },
+}
+const SHARE = { low: 0.1, high: 0.3 }
+const bandTotals = (ms) => ms.bands.map((b) => b.evolution)
+
+test('hosts: matched hours keep the total of the one-subject plan for every pattern', () => {
+  for (const preset of ['capstone', 'threaded', 'spiral', 'sequenced']) {
+    const params = { preset, share: SHARE, returns_per_year: 2, thread_fraction: 0.25 }
+    const one = T.computePlanMeasures(BIO.axis, T.generateStarterPlacements(stages, params, BANDS, []), stages, concepts, { hosts: HOSTS })
+    const many = T.generateStarterPlacements(stages, { ...params, hosts: { basis: 'matched-hours', split: SPLIT } }, BANDS, [], HOSTS)
+    const mm = T.computePlanMeasures(BIO.axis, many, stages, concepts, { hosts: HOSTS })
+    bandTotals(one).forEach((b, i) => {
+      close(mm.bands[i].evolution.low, b.low, 1e-6)
+      close(mm.bands[i].evolution.high, b.high, 1e-6)
+    })
+    // Biology carries less than in the one-subject plan, and the other subjects carry the difference.
+    const bio1 = one.hosts.find((h) => h.subject === 'biology').claimed
+    const bio2 = mm.hosts.find((h) => h.subject === 'biology').claimed
+    assert.ok(bio2.high < bio1.high, `${preset}: biology should carry less`)
+    assert.ok(mm.hosts.find((h) => h.subject === 'social-studies').claimed.high > 0)
+  }
+})
+
+test('hosts: home share gives every used subject the same share of its own hours', () => {
+  const params = { preset: 'threaded', share: SHARE, hosts: { basis: 'home-share', split: SPLIT } }
+  const ps = T.generateStarterPlacements(stages, params, BANDS, [], HOSTS)
+  const m = T.computePlanMeasures(BIO.axis, ps, stages, concepts, { hosts: HOSTS })
+  // Band 4 (9-12) has s5 only: biology, social studies and computer science all give the full share of their time.
+  for (const h of m.hosts) {
+    const b = h.bands[3]
+    close(b.share.low, SHARE.low, 1e-6)
+    close(b.share.high, SHARE.high, 1e-6)
+  }
+  // Band 1 (K-2) has s1 and s2: computer science has no hours there and no weight, so it claims nothing.
+  assert.equal(m.hosts.find((h) => h.subject === 'computer-science').bands[0].claimed.high, 0)
+})
+
+test('hosts: a subject with no hours in a band gives its weight to the others, and says so', () => {
+  const stage1 = [stage('z1', 'K-2', 'A', [{ id: 'c1', emphasis: 'primary' }])]
+  const split = { z1: { biology: 0.5, 'computer-science': 0.5 } }
+  const res = T.splitAcrossHosts(T.generateStarterPlacements(stage1, { preset: 'capstone', share: SHARE }, BANDS, []), stage1, { basis: 'matched-hours', split }, HOSTS, BANDS)
+  assert.ok(res.notes.some((n) => /Computer science has no hours in K-2/.test(n)))
+  assert.ok(res.placements.every((p) => !p.axis_id))
+  const m = T.computePlanMeasures(BIO.axis, res.placements, stage1, [], { hosts: HOSTS })
+  close(m.hosts[0].claimed.low, m.totalEvolution.low, 1e-6)
+})
+
+test('hosts: no split leaves the plan as it was', () => {
+  const params = { preset: 'spiral', share: SHARE, returns_per_year: 2, thread_fraction: 0.25 }
+  const base = T.generateStarterPlacements(stages, params, BANDS, [])
+  const same = T.generateStarterPlacements(stages, { ...params, hosts: { basis: 'matched-hours', split: {} } }, BANDS, [], HOSTS)
+  assert.deepEqual(same.map((p) => p.amount), base.map((p) => p.amount))
+  assert.deepEqual(same.map((p) => p.selector), base.map((p) => p.selector))
+})
+
+test('hosts: measures count subjects per topic and per concept', () => {
+  const params = { preset: 'capstone', share: SHARE, hosts: { basis: 'matched-hours', split: SPLIT } }
+  const ps = T.generateStarterPlacements(stages, params, BANDS, [], HOSTS)
+  const m = T.computePlanMeasures(BIO.axis, ps, stages, concepts, { hosts: HOSTS })
+  assert.equal(m.crossSubjectTopics, 4)
+  close(m.meanSubjectsPerTopic, (2 + 1 + 2 + 3 + 3) / 5, 1e-9)
+  const c1 = m.concepts.find((c) => c.id === 'c1')
+  assert.deepEqual([...c1.subjects].sort(), ['biology', 'computer-science', 'social-studies'])
+  const c2 = m.concepts.find((c) => c.id === 'c2')
+  assert.deepEqual([...c2.subjects].sort(), ['biology', 'social-studies'])
+  // Without a host context the plan reports no subjects.
+  const plain = T.computePlanMeasures(BIO.axis, T.generateStarterPlacements(stages, { preset: 'capstone', share: SHARE }, BANDS, []), stages, concepts)
+  assert.equal(plain.hosts.length, 0)
+  assert.equal(plain.crossSubjectTopics, 0)
+})
+
+test('hosts: the order check does not change when time is split over subjects', () => {
+  const edges = T.deriveOrderEdges(sources, stages, BANDS)
+  const extra = Object.fromEntries(HOSTS.hosts.map((h) => [h.axisId, h.axis]))
+  const params = { preset: 'sequenced', share: SHARE, sequence_order: 'dependency' }
+  const one = T.checkOrder(BIO.axis, T.generateStarterPlacements(stages, params, BANDS, edges), edges)
+  const many = T.checkOrder(BIO.axis, T.generateStarterPlacements(stages, { ...params, hosts: { basis: 'matched-hours', split: SPLIT } }, BANDS, edges, HOSTS), edges, extra)
+  assert.deepEqual(many.summary, one.summary)
+})
+
+test('hosts: weights are scaled to one and misaligned axes are flagged', () => {
+  assert.deepEqual(T.normalizeWeights({ a: 2, b: 2, c: 0, d: -1 }), { a: 0.5, b: 0.5 })
+  assert.deepEqual(T.normalizeWeights({ a: 0 }), {})
+  assert.equal(T.axesAligned(BIO.axis, SOC.axis), true)
+  assert.equal(T.axesAligned(BIO.axis, T.expandAxis(T.genericYearAxis(13, 10))), false)
 })

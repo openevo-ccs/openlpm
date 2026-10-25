@@ -1,7 +1,8 @@
 import { available } from './axis'
+import { axisFor, bandMinutes, type HostContext } from './hosts'
 import { placementMinutes, type RangeMinutes } from './placements'
 import type { StageRef } from './presets'
-import type { Axis, Placement } from './types'
+import type { Axis, Placement, Unit } from './types'
 
 // Measures derived from a plan plus the LPM content. Nothing here is stored. Every value names its grain:
 // bands unless a measure says otherwise.
@@ -15,6 +16,8 @@ export interface MeasureParams {
   /** Fraction of a topic's time given to its reinforcing concepts as threaded time (default 0.15). */
   reinforcing_share?: number
   bandNames?: string[]
+  /** Host subjects, when the plan puts time on more than one timetable. */
+  hosts?: HostContext
 }
 
 export interface ConceptMeasure {
@@ -34,6 +37,29 @@ export interface ConceptMeasure {
   longestGapYears: number
   /** Returns per school year spanned (grain: band centres). Null for a concept that appears once. */
   returnsPerYear: number | null
+  /** Subjects whose time carries topics of this concept. Empty when the plan names no host subjects. */
+  subjects: string[]
+}
+
+export interface HostBandMeasure {
+  band: string
+  available: RangeMinutes
+  claimed: RangeMinutes
+  /** Claimed time as a share of the subject's own time in the band. */
+  share: { low: number; high: number }
+}
+
+/** What a plan takes from one subject's timetable. Grain: grade band. */
+export interface HostMeasure {
+  axisId: string
+  subject: string
+  label: string
+  available: RangeMinutes
+  claimed: RangeMinutes
+  share: { low: number; high: number }
+  bands: HostBandMeasure[]
+  /** Topics that get time in this subject. */
+  topics: number
 }
 
 export interface BandMeasure {
@@ -62,6 +88,12 @@ export interface PlanMeasures {
   bands: BandMeasure[]
   byTag: Record<string, RangeMinutes>
   placementsWithoutTarget: number
+  /** One entry per host subject, in the order of the host context. Empty when the plan names none. */
+  hosts: HostMeasure[]
+  /** Topics that draw time from more than one subject. */
+  crossSubjectTopics: number
+  /** Mean number of subjects per topic that has time. */
+  meanSubjectsPerTopic: number
 }
 
 const ZERO: RangeMinutes = { low: 0, high: 0 }
@@ -87,10 +119,27 @@ export function computePlanMeasures(axis: Axis, placements: Placement[], stages:
   let threaded = ZERO
   let placementsWithoutTarget = 0
 
+  const extra: Record<string, Axis> = {}
+  const subjectOfAxis = new Map<string, string>()
+  const hostCtx = params.hosts
+  if (hostCtx) for (const h of hostCtx.hosts) { extra[h.axisId] = h.axis; subjectOfAxis.set(h.axisId, h.subject) }
+  const subjectOf = (p: Placement) => (p.axis_id && subjectOfAxis.get(p.axis_id)) || hostCtx?.reference || ''
+  const hostBand = new Map<string, RangeMinutes[]>()
+  const hostTopics = new Map<string, Set<string>>()
+  const topicSubjects = new Map<string, Map<string, number>>()
+  const unitCache = new Map<Axis, Map<number, Unit>>()
+  const unitsOf = (ax: Axis) => {
+    let m = unitCache.get(ax)
+    if (!m) { m = new Map(ax.units.map((u) => [u.abs, u])); unitCache.set(ax, m) }
+    return m
+  }
+
   for (const p of placements) {
     if (p.target_type === 'topic' && !stageById.has(p.target_id)) placementsWithoutTarget += 1
-    const per = placementMinutes(axis, p)
-    const unitByAbs = new Map(axis.units.map((u) => [u.abs, u]))
+    const ax = axisFor(p, axis, extra)
+    const per = placementMinutes(ax, p)
+    const unitByAbs = unitsOf(ax)
+    const subject = subjectOf(p)
     let sum = ZERO
     for (const m of per) {
       const u = unitByAbs.get(m.abs)
@@ -99,8 +148,22 @@ export function computePlanMeasures(axis: Axis, placements: Placement[], stages:
       sum = add(sum, v)
       byBand.set(u.coords[0], add(byBand.get(u.coords[0]) ?? ZERO, v))
       for (const tag of u.tags) byTag[tag] = add(byTag[tag] ?? ZERO, v)
+      if (subject) {
+        const arr = hostBand.get(subject) ?? bandNames.map(() => ZERO)
+        if (u.coords[0] >= 1 && u.coords[0] <= arr.length) arr[u.coords[0] - 1] = add(arr[u.coords[0] - 1], v)
+        hostBand.set(subject, arr)
+      }
     }
-    if (p.target_type === 'topic') topicMinutes.set(p.target_id, add(topicMinutes.get(p.target_id) ?? ZERO, sum))
+    if (p.target_type === 'topic') {
+      topicMinutes.set(p.target_id, add(topicMinutes.get(p.target_id) ?? ZERO, sum))
+      if (subject && sum.high > 0) {
+        if (!hostTopics.has(subject)) hostTopics.set(subject, new Set())
+        hostTopics.get(subject)!.add(p.target_id)
+        const ts = topicSubjects.get(p.target_id) ?? new Map<string, number>()
+        ts.set(subject, (ts.get(subject) ?? 0) + (sum.low + sum.high) / 2)
+        topicSubjects.set(p.target_id, ts)
+      }
+    }
     if ((p.role ?? 'dedicated') === 'threaded') threaded = add(threaded, sum)
     else dedicated = add(dedicated, sum)
   }
@@ -157,6 +220,7 @@ export function computePlanMeasures(axis: Axis, placements: Placement[], stages:
       longestGapBands: gapBands,
       longestGapYears: gapYears,
       returnsPerYear: spanYears > 0 ? (bands.length - 1) / spanYears : null,
+      subjects: [...new Set(where.flatMap((st) => [...(topicSubjects.get(st.id)?.keys() ?? [])]))],
     }
   })
 
@@ -197,6 +261,28 @@ export function computePlanMeasures(axis: Axis, placements: Placement[], stages:
     }
   })
 
+  const hostMeasures: HostMeasure[] = (hostCtx?.hosts ?? []).map((h) => {
+    const avail = bandMinutes(h.axis, bandNames.length)
+    const used = hostBand.get(h.subject) ?? bandNames.map(() => ZERO)
+    const bands: HostBandMeasure[] = bandNames.map((band, i) => ({
+      band,
+      available: avail[i],
+      claimed: used[i],
+      share: { low: avail[i].low > 0 ? used[i].low / avail[i].low : 0, high: avail[i].high > 0 ? used[i].high / avail[i].high : 0 },
+    }))
+    const totalAvail = avail.reduce((a, b) => add(a, b), ZERO)
+    const totalUsed = used.reduce((a, b) => add(a, b), ZERO)
+    return {
+      axisId: h.axisId, subject: h.subject, label: h.label,
+      available: totalAvail, claimed: totalUsed,
+      share: { low: totalAvail.low > 0 ? totalUsed.low / totalAvail.low : 0, high: totalAvail.high > 0 ? totalUsed.high / totalAvail.high : 0 },
+      bands, topics: hostTopics.get(h.subject)?.size ?? 0,
+    }
+  })
+  const withTime = [...topicSubjects.values()]
+  const crossSubjectTopics = withTime.filter((m) => m.size > 1).length
+  const meanSubjectsPerTopic = withTime.length > 0 ? withTime.reduce((a, m) => a + m.size, 0) / withTime.length : 0
+
   return {
     totalEvolution: add(dedicated, threaded),
     dedicatedMinutes: dedicated,
@@ -206,5 +292,8 @@ export function computePlanMeasures(axis: Axis, placements: Placement[], stages:
     bands: bandMeasures,
     byTag,
     placementsWithoutTarget,
+    hosts: hostMeasures,
+    crossSubjectTopics,
+    meanSubjectsPerTopic,
   }
 }
