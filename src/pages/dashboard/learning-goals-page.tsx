@@ -3,6 +3,7 @@ import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom
 import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Rows3, Search, Shapes } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { TabPanels } from '@/components/tab-panels'
+import { CURATION } from '@/components/epistemic-status-badge'
 import {
   getAssertedConnections,
   getFullThread,
@@ -475,6 +476,18 @@ function ConnLine({
   )
 }
 
+// What kind of path a thread is, in plain words (lpm_threads.thread_type).
+const THREAD_KIND: Record<string, string> = {
+  vertical: 'A path across grade levels',
+  horizontal: 'A link across subjects',
+  vertical_horizontal: 'A path across grade levels and subjects',
+}
+
+// Dustin, feedback 43c9b51b (2026-10-25): "Suggested connection" was not
+// explained, and for a learning goal inside a strand its first line was the
+// goal's own entry, so it looked like the goal suggesting itself. The card now
+// says what kind of path it is, shows where this goal sits on it, and carries a
+// short explanation of what it is, where it comes from and how to use it.
 function ThreadCard({
   station,
   currentObjectId,
@@ -486,18 +499,25 @@ function ThreadCard({
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
 }) {
+  const { project } = useOutletContext<ProjectOutletContext>()
   const [expanded, setExpanded] = useState(false)
   const [full, setFull] = useState<FullThread | null>(null)
 
-  const toggle = async () => {
-    if (!expanded && !full) {
-      const f = await getFullThread(supabase, station.thread_id)
-      setFull(f)
-    }
-    setExpanded((v) => !v)
-  }
+  // Loaded up front (one small query per path) so the card can show the steps
+  // and this goal's place among them without a click.
+  useEffect(() => {
+    let active = true
+    getFullThread(supabase, station.thread_id).then((f) => { if (active) setFull(f) })
+    return () => { active = false }
+  }, [supabase, station.thread_id])
+
+  const toggle = () => setExpanded((v) => !v)
 
   const hubLabel = station.thread.explained_by?.label ?? null
+  const steps = full?.stations ?? []
+  const stepIndex = steps.findIndex((st) => st.data_object_id === currentObjectId)
+  const kind = THREAD_KIND[station.thread.thread_type] ?? 'A learning path'
+  const isSynthetic = CURATION[project.epistemic_status] === 'synthetic-theoretical'
 
   return (
     <div className="card conn-suggested" style={{ marginBottom: 10 }}>
@@ -505,12 +525,69 @@ function ThreadCard({
         <span className="chip chip-draft">Suggested connection</span>
         {hubLabel && <span className="muted" style={{ fontSize: 12 }}>tied together by: {hubLabel}</span>}
       </div>
-      <h3 style={{ marginTop: 8, marginBottom: 4 }}>{station.thread.title}</h3>
-      <p style={{ marginBottom: 8 }}>{station.role_note}</p>
+      <h3 style={{ marginTop: 8, marginBottom: 2 }}>{station.thread.title}</h3>
+      <p className="muted" style={{ marginTop: 0, marginBottom: 8, fontSize: 12 }}>
+        {kind}{steps.length > 0 ? `, ${steps.length} steps` : ''}
+      </p>
+
+      {steps.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+            {stepIndex >= 0 ? `This goal is step ${stepIndex + 1} of ${steps.length}:` : 'Steps on this path:'}
+          </div>
+          <div className="row" style={{ gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+            {steps.map((st, i) => (
+              <span key={st.id} className="row" style={{ gap: 4, alignItems: 'center' }}>
+                {i > 0 && <span className="muted" aria-hidden="true">→</span>}
+                {st.data_object_id === currentObjectId ? (
+                  <span className="chip" aria-current="step" style={{ fontWeight: 700, borderColor: 'var(--series-a)', color: 'var(--series-a)' }}>
+                    {gradeLabel(st.object.grade_band)} (this goal)
+                  </span>
+                ) : (
+                  <Link to={`/dashboard/${projectSlug}/learning-goals/${st.object.id}`} className="chip" title={st.object.title} style={{ textDecoration: 'none' }}>
+                    {gradeLabel(st.object.grade_band)}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <p style={{ marginBottom: 8 }}>
+        <span className="muted" style={{ fontSize: 12 }}>What this goal adds to the path: </span>
+        {station.role_note}
+      </p>
+
+      <details style={{ marginBottom: 8, fontSize: 13 }}>
+        <summary style={{ cursor: 'pointer' }}>What is a suggested connection?</summary>
+        <div style={{ marginTop: 6 }}>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>What it is.</strong> A learning path that runs through this goal. It lists goals in teaching
+            order, usually one per grade level, so you can see what builds on what.
+          </p>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>Where it comes from.</strong> Someone proposed this path (the people or the AI tool that built
+            this space, or a project member) and it was accepted into the space. When it is recorded, the note
+            &ldquo;How this was identified&rdquo; under the full explanation says how it was found.
+            {isSynthetic && ' In this space the paths were drafted by AI from published research, and no subject-matter expert has reviewed them yet.'}
+          </p>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>How it differs from &ldquo;Required order&rdquo;.</strong> Required order comes from the
+            curriculum&rsquo;s own structure. A suggested connection is a recommendation. You can follow it, adapt
+            it or ignore it.
+          </p>
+          <p style={{ margin: 0 }}>
+            <strong>How to use it.</strong> Open the full explanation to read why the goals belong together and
+            see every step. Click a grade level above to open that goal. Use the &ldquo;Try this in class&rdquo; idea
+            when one is given. If a path looks wrong or has a gap, raise it in this space&rsquo;s Discussions.
+          </p>
+        </div>
+      </details>
 
       <button className="btn btn-mini" onClick={toggle}>
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {expanded ? 'Hide the full explanation' : 'Why does this connect? See the full thread'}
+        {expanded ? 'Hide the full explanation' : 'Why does this connect? See the full explanation'}
       </button>
 
       {expanded && (

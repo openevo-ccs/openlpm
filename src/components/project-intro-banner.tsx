@@ -19,7 +19,10 @@ type Project = Database['public']['Tables']['projects']['Row']
 // actually holds which role -- not shown anywhere outside Settings today.
 // Rendered once, here, rather than once per page, so every page gets it
 // automatically and no individual page has to remember to add it.
-export function ProjectIntroBanner({ project, supabase }: { project: Project; supabase: SupabaseClient<Database> }) {
+// `showDescription` is off on the project Dashboard, where the introduction text
+// sits under the stat tiles instead (Dustin, feedback 0fba8647, 2026-10-25), so
+// the same words are not shown twice on one page. Every other page keeps it.
+export function ProjectIntroBanner({ project, supabase, showDescription = true }: { project: Project; supabase: SupabaseClient<Database>; showDescription?: boolean }) {
   const [members, setMembers] = useState<MemberWithUser[] | null>(null)
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export function ProjectIntroBanner({ project, supabase }: { project: Project; su
     listMembers(supabase, project.id).then(setMembers)
   }, [supabase, project.id])
 
-  if (!project.description && members === null) return null
+  if (!(showDescription && project.description) && members === null) return null
 
   const owners = (members ?? []).filter((m) => m.role === 'owner' || m.role === 'maintainer')
   const editors = (members ?? []).filter((m) => m.role === 'editor')
@@ -45,7 +48,7 @@ export function ProjectIntroBanner({ project, supabase }: { project: Project; su
 
   return (
     <div className="card">
-      {project.description && <p style={{ margin: 0, marginBottom: 6 }}>{project.description}</p>}
+      {showDescription && project.description && <p style={{ margin: 0, marginBottom: 6 }}>{project.description}</p>}
       <p className="muted" style={{ margin: 0, fontSize: 12 }}>{roleLine}</p>
     </div>
   )
