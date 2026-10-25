@@ -187,7 +187,8 @@ function buildHostContext(axisRows: TimeAxisRow[], planAxisRow: TimeAxisRow | nu
   const reference = planAxisRow.subject ?? 'primary'
   const hosts: HostInfo[] = [{ axisId: planAxisRow.id, subject: reference, label: subjectLabel(reference), axis: planAxis }]
   for (const a of axisRows) {
-    if (!a.subject || a.id === planAxisRow.id || a.subject === reference) continue
+    // Timetables belong to a set. The placeholder set has no jurisdiction, and the Sachsen set is marked DE-SN.
+    if (!a.subject || a.id === planAxisRow.id || a.subject === reference || (a.jurisdiction ?? null) !== (planAxisRow.jurisdiction ?? null)) continue
     const ex = safeExpand(withTierEdits(a.definition, hostEdits[a.id])).axis
     if (ex && axesAligned(planAxis, ex)) hosts.push({ axisId: a.id, subject: a.subject, label: subjectLabel(a.subject), axis: ex })
   }
