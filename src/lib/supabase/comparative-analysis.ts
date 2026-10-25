@@ -15,6 +15,22 @@ export const KNOWN_COMPARISON_PAIRS: Record<string, string> = {
   'interdisciplinary-lpm-synth': 'bio-core-lpm-synth',
 }
 
+// The four synthetic spaces of the comparison, in reading order. The Time page compares any one of them with any other.
+// KNOWN_COMPARISON_PAIRS stays as it is, because the comparative analysis tables hold links for that one pair only.
+export const COMPARISON_SET = ['bio-core-lpm-synth', 'social-core-lpm-synth', 'computational-core-lpm-synth', 'interdisciplinary-lpm-synth']
+
+export const COMPARISON_SET_LABELS: Record<string, string> = {
+  'bio-core-lpm-synth': 'Bio-Core',
+  'social-core-lpm-synth': 'Social-Core',
+  'computational-core-lpm-synth': 'Computational-Core',
+  'interdisciplinary-lpm-synth': 'Interdisciplinary',
+}
+
+/** The other spaces of the set that a space can be compared with. Empty for a project outside the set. */
+export function comparisonPartners(slug: string): string[] {
+  return COMPARISON_SET.includes(slug) ? COMPARISON_SET.filter((x) => x !== slug) : []
+}
+
 // None of this (lpm_comparative_links, lpm_divergence_reviews, and the two
 // views built on top of them, migration 143/144) is in the generated types
 // yet -- cast at the query boundary, same convention as dashboard-views.ts.
