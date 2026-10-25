@@ -8,6 +8,18 @@ import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { conceptDefinition, conceptSource } from '@/lib/concept-source'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import {
+  DEFAULT_GRAPH_SETTINGS,
+  arcHeight,
+  lineOpacity,
+  physicsLayoutOptions,
+  pickVisibleLabels,
+  truncateLabel,
+  type GraphEdgeMode,
+  type GraphViewSettings,
+  type LabelCandidate,
+} from '@/lib/graph-standards'
 
 cytoscape.use(dagre)
 
@@ -408,24 +420,15 @@ function ConceptMapTab() {
       </div>
 
       {view === 'map' ? (
-        <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <ConceptGraph taxonomy={taxonomy} hitsByTaxId={hitsByTaxId} roots={roots} relations={relations} selectedId={selectedNode?.id ?? null} onSelect={selectNode} />
-          <div className="drawer-shell wide">
-            <div className="drawer">
-              {!selectedNode ? (
-                <>
-                  <h2>Concept map</h2>
-                  <p className="muted">
-                    Each circle is a concept, sized by how much real content touches it. Click one to see what
-                    connects to it. Scroll to zoom, drag to pan.
-                  </p>
-                </>
-              ) : (
-                <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
-              )}
-            </div>
-          </div>
-        </div>
+        <ConceptMapPanel
+          taxonomy={taxonomy}
+          hitsByTaxId={hitsByTaxId}
+          roots={roots}
+          relations={relations}
+          selectedNode={selectedNode}
+          onSelect={selectNode}
+          onClose={closeNode}
+        />
       ) : (
         <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
           <div className="card">
@@ -458,6 +461,117 @@ function ConceptMapTab() {
   )
 }
 
+// The Concepts map follows the OpenLPM graph standard (see
+// lab_manager/docs/design-notes/openlpm-graph-visualization-standards-proposal-
+// 2026-10-25.md, tracker row 2). Roles here:
+//   item        a concept
+//   group       a top-level concept (always labeled), when the taxonomy has a hierarchy
+//   main link   the parent-to-child line of the hierarchy (always drawn)
+//   other link  a named concept-to-concept relation (lpm_concept_relations)
+//   arc         the number of relations between two top-level concepts' subtrees
+// Two shapes of data exist today. A hierarchy of about six top-level concepts
+// (EvoMentor) gets the tree layout and counted arcs. A flat list of 17 to 29
+// concepts with dozens of co-occurrence relations (the synthetic spaces) gets
+// a ring layout, because a tree layout would invent a ranking among peers, and
+// the relations are the only structure, drawn quiet and brought into focus on
+// hover.
+function ConceptMapPanel({
+  taxonomy,
+  hitsByTaxId,
+  roots,
+  relations,
+  selectedNode,
+  onSelect,
+  onClose,
+}: {
+  taxonomy: SchemaElement[]
+  hitsByTaxId: Map<string, Hit[]>
+  roots: SchemaElement[]
+  relations: ConceptRelation[]
+  selectedNode: SchemaElement | null
+  onSelect: (n: SchemaElement) => void
+  onClose: () => void
+}) {
+  const hasHierarchy = useMemo(() => taxonomy.some((n) => !!n.parent_id), [taxonomy])
+  const relationCount = useMemo(() => {
+    const ids = new Set(taxonomy.map((n) => n.id))
+    return relations.filter((r) => ids.has(r.from_element_id) && ids.has(r.to_element_id)).length
+  }, [taxonomy, relations])
+
+  const defaults = useMemo(() => ({ ...DEFAULT_GRAPH_SETTINGS, edges: (hasHierarchy ? 'bundled' : 'all') as GraphEdgeMode }), [hasHierarchy])
+  const [gs, updateGs, resetGs] = useGraphSettings(hasHierarchy ? 'concepts-map-tree' : 'concepts-map-flat', defaults)
+  // Physics spacing fires on every pixel of a drag; the layout recomputes once it holds still.
+  const [physicsSpacing, setPhysicsSpacing] = useState(gs.spacing)
+  useEffect(() => {
+    const t = window.setTimeout(() => setPhysicsSpacing(gs.spacing), 250)
+    return () => window.clearTimeout(t)
+  }, [gs.spacing])
+
+  const apiRef = useRef<{ zoomBy: (f: number) => void; fit: () => void } | null>(null)
+
+  return (
+    <>
+      <GraphControls
+        settings={gs}
+        onChange={updateGs}
+        onReset={() => resetGs()}
+        lang="en"
+        showConnections={relationCount > 0}
+        edgeModes={hasHierarchy ? ['tree', 'bundled', 'all'] : ['tree', 'all']}
+        wording={{
+          tree: hasHierarchy
+            ? { label: 'Hierarchy only', hint: 'Only the parent and child lines. A concept’s named relations appear when you point at it or select it.' }
+            : { label: 'On hover only', hint: 'No relation lines until you point at a concept or select it.' },
+          bundled: { label: 'Bundled', hint: 'The hierarchy, plus thick arcs between the top-level concepts with the number of relations between their subtrees. A concept’s own relations appear when you point at it.' },
+          all: { label: 'All relations', hint: 'Every named relation is drawn. Pointing at a concept brings its relations forward.' },
+          fixed: hasHierarchy
+            ? { label: 'Tree', hint: 'A fixed top-down tree, always the same.' }
+            : { label: 'Ring', hint: 'A fixed ring in alphabetical order, always the same.' },
+        }}
+        onZoomIn={() => apiRef.current?.zoomBy(1.25)}
+        onZoomOut={() => apiRef.current?.zoomBy(0.8)}
+        onFit={() => apiRef.current?.fit()}
+      />
+      <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+        <ConceptGraph
+          taxonomy={taxonomy}
+          hitsByTaxId={hitsByTaxId}
+          roots={roots}
+          relations={relations}
+          selectedId={selectedNode?.id ?? null}
+          onSelect={onSelect}
+          gs={gs}
+          physicsSpacing={physicsSpacing}
+          hasHierarchy={hasHierarchy}
+          apiRef={apiRef}
+        />
+        <div className="drawer-shell wide">
+          <div className="drawer">
+            {!selectedNode ? (
+              <>
+                <h2>Concept map</h2>
+                <p className="muted">
+                  Each circle is a concept, sized by how much real content touches it
+                  {hasHierarchy ? '' : ' and by how many relations it has'}. Click one to see what connects to
+                  it. Scroll to zoom, drag to pan.
+                </p>
+                {relationCount > 0 && (
+                  <p className="muted">
+                    {relationCount} named relations connect these concepts. Point at a concept to bring its own
+                    relations forward, or change what is drawn with the controls above the map.
+                  </p>
+                )}
+              </>
+            ) : (
+              <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={onClose} />
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // A real interactive diagram instead of an indented list -- the single
 // biggest gap found comparing this page against EvoMentor DE v1.2's concept
 // map (2026-09-19). Reuses the same graph-drawing library (Cytoscape)
@@ -473,6 +587,10 @@ function ConceptGraph({
   relations,
   selectedId,
   onSelect,
+  gs,
+  physicsSpacing,
+  hasHierarchy,
+  apiRef,
 }: {
   taxonomy: SchemaElement[]
   hitsByTaxId: Map<string, Hit[]>
@@ -480,9 +598,15 @@ function ConceptGraph({
   relations: ConceptRelation[]
   selectedId: string | null
   onSelect: (n: SchemaElement) => void
+  gs: GraphViewSettings
+  physicsSpacing: number
+  hasHierarchy: boolean
+  apiRef: React.MutableRefObject<{ zoomBy: (f: number) => void; fit: () => void } | null>
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
+  const selectedIdRef = useRef<string | null>(selectedId)
+  selectedIdRef.current = selectedId
 
   const rootIndexOf = useMemo(() => {
     const byId = new Map(taxonomy.map((e) => [e.id, e]))
@@ -513,121 +637,208 @@ function ConceptGraph({
     return memo
   }, [taxonomy])
 
+  // Colors mean "which top-level concept this belongs to", so they only appear
+  // when there is a hierarchy with few enough top-level concepts for the
+  // six-color palette. A flat list of 29 peers would cycle the six colors
+  // with no meaning, so it gets one neutral color instead.
+  const groupColored = hasHierarchy && roots.length <= MAP_PALETTE.length
+
   useEffect(() => {
     if (!containerRef.current) return
 
     const taxIds = new Set(taxonomy.map((n) => n.id))
+    const validRelations = relations.filter((r) => taxIds.has(r.from_element_id) && taxIds.has(r.to_element_id))
+    const neutral = cssVar('--series-a', '#2a78d6')
+
+    // Rule 2: one counted arc per pair of top-level concepts, summarizing the
+    // relations between their subtrees. Only meaningful with a hierarchy.
+    const bundleEdges: ElementDefinition[] = []
+    if (hasHierarchy && gs.edges !== 'tree') {
+      const pairCount = new Map<string, number>()
+      for (const r of validRelations) {
+        const a = rootIndexOf.get(r.from_element_id) ?? 0
+        const b = rootIndexOf.get(r.to_element_id) ?? 0
+        if (a === b) continue
+        const key = a < b ? `${a}|${b}` : `${b}|${a}`
+        pairCount.set(key, (pairCount.get(key) ?? 0) + 1)
+      }
+      for (const [key, count] of pairCount) {
+        const [a, b] = key.split('|').map(Number)
+        bundleEdges.push({
+          data: { id: `b-${key}`, source: roots[a].id, target: roots[b].id, weight: count, tooltip: `${count} relations between “${roots[a].label}” and “${roots[b].label}”` },
+          classes: 'bundle',
+        })
+      }
+    }
+
+    // In a flat list there is no hierarchy to size by, so a concept grows with
+    // how many relations it has: the hubs stand out.
+    const degree = new Map<string, number>()
+    for (const r of validRelations) {
+      degree.set(r.from_element_id, (degree.get(r.from_element_id) ?? 0) + 1)
+      degree.set(r.to_element_id, (degree.get(r.to_element_id) ?? 0) + 1)
+    }
+
     const elements: ElementDefinition[] = [
       ...taxonomy.map((n) => {
         const count = hitsByTaxId.get(n.id)?.length ?? 0
         const depth = depthOf.get(n.id) ?? 0
         const colorVar = MAP_PALETTE[(rootIndexOf.get(n.id) ?? 0) % MAP_PALETTE.length]
-        const size = Math.max(10, 36 - depth * 8) + Math.min(count, 10) * 1.3
-        return { data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size, depth } }
+        const base = hasHierarchy ? Math.max(10, 36 - depth * 8) : 22
+        const size = base + Math.min(count, 10) * 1.3 + (hasHierarchy ? 0 : Math.min(degree.get(n.id) ?? 0, 16) * 1.1)
+        // Labels at depth 0 and 1 are on while the tree is laid out, so the
+        // layout leaves room for them; the final set is chosen afterwards.
+        return { data: { id: n.id, label: depth < 2 ? n.label : '', fullLabel: n.label, color: groupColored ? cssVar(colorVar, '#2a78d6') : neutral, size, depth } }
       }),
       ...taxonomy
         .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
-        .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id } })),
-      // lpm_concept_relations -- a real, separate many-to-many concept
-      // network (migration 087), distinct from the parent_id tree above.
-      // Only rendered when both ends are actually in this taxonomy (a
-      // relation can point at a concept outside the currently-loaded
-      // project set) -- silently dropped rather than crashing Cytoscape,
-      // same defensive shape as the tree-edge dedup fix above.
-      ...relations
-        .filter((r) => taxIds.has(r.from_element_id) && taxIds.has(r.to_element_id))
-        .map((r) => ({
-          data: { id: `rel-${r.id}`, source: r.from_element_id, target: r.to_element_id, relationType: r.relation_type },
-          classes: 'relation',
-        })),
+        .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id }, classes: 'tree' })),
+      // lpm_concept_relations: a separate many-to-many network (migration
+      // 087), distinct from the parent_id tree. Dropped silently when one end
+      // is outside the loaded set, so Cytoscape never sees a dangling edge.
+      ...validRelations.map((r) => ({
+        data: { id: `rel-${r.id}`, source: r.from_element_id, target: r.to_element_id, relationType: r.relation_type },
+        classes: 'relation',
+      })),
+      ...bundleEdges,
     ]
 
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       boxSelectionEnabled: false,
-      // Real feedback 2427b091 (Dustin): the hand-rolled tiered layout this
-      // replaced (itself a 2026-10-01 fix for breadthfirst/cose both
-      // tangling this same tree -- see Netz's own identical history) still
-      // overlapped nodes and labels once a root had many real children: it
-      // split the canvas evenly across root concepts regardless of how
-      // many descendants each one actually has, so a root with a large
-      // subtree (Evolutive Entwicklung, EvoMentor Thuringia's biggest)
-      // spilled into its neighbors' lanes. dagre (cytoscape-dagre) is a
-      // real hierarchical-graph layout algorithm built specifically to
-      // avoid exactly this for a tree -- every subtree gets the width it
-      // actually needs instead of a hand-estimated square, and
-      // nodeDimensionsIncludeLabels makes it account for each node's real
-      // rendered size (not just the circle) when spacing siblings.
-      layout: {
-        name: 'dagre',
-        rankDir: 'TB',
-        nodeSep: 26,
-        rankSep: 64,
-        nodeDimensionsIncludeLabels: true,
-        fit: false,
-        animate: false,
-      } as any,
+      layout: { name: 'preset' },
       minZoom: 0.1,
       maxZoom: 3,
       style: [
         {
           selector: 'node',
           style: {
-            'background-color': 'data(color)',
+            'background-color': 'data(color)', 'background-opacity': 0.92,
+            'border-width': 1.5, 'border-color': cssVar('--surface-0', '#ffffff'),
             width: 'data(size)', height: 'data(size)',
             label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '70px',
             'text-valign': 'bottom', 'text-margin-y': 4, color: cssVar('--text-primary', '#0b0b0b'),
-          },
-        },
-        {
-          // Real bug found live 2026-10-01: every sub-concept's label
-          // permanently on, all at once, overlapped into unreadable text
-          // -- the same fix Netz already proved: deep (leaf-ish) labels
-          // only show on hover, same as a Lernziel node there.
-          selector: 'node[depth >= 2]',
-          style: { label: '' },
+          } as any,
         },
         {
           selector: 'node.hover-label',
           style: {
-            label: 'data(label)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            label: 'data(fullLabel)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
             'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1,
             'text-background-padding': '3px', 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc'),
           } as any,
         },
         { selector: 'node:selected', style: { 'border-width': 3, 'border-color': cssVar('--text-primary', '#0b0b0b') } },
         {
-          selector: 'edge',
+          selector: 'edge.tree',
           style: { width: 1, 'line-color': cssVar('--baseline', '#c3c2b7'), 'curve-style': 'bezier', 'target-arrow-shape': 'none' },
         },
         {
-          // Real, separate concept-to-concept relations (lpm_concept_relations)
-          // vs. the parent/child tree edges above -- a different line style
-          // (dashed, accent color, unbundled curve so it doesn't try to
-          // follow dagre's rank-based routing meant for tree edges) keeps
-          // the two kinds of connection visually distinct rather than
-          // implying a false hierarchy.
+          // Named relations: thin, solid, quiet (opacity comes from the line
+          // strength control through data(op)). Hidden unless the mode is
+          // "all", and brought forward on hover or selection (.reveal).
           selector: 'edge.relation',
           style: {
-            width: 1.5,
-            'line-color': cssVar('--series-a', '#006c66'),
-            'line-style': 'dashed',
-            'curve-style': 'unbundled-bezier',
-            'control-point-distances': 20,
-            'control-point-weights': 0.5,
-            opacity: 0.8,
+            width: 0.9, 'line-color': '#6f7d8c', 'curve-style': 'bezier', 'target-arrow-shape': 'none',
+            opacity: 'data(op)', display: gs.edges === 'all' ? 'element' : 'none',
           } as any,
         },
+        { selector: 'edge.relation.reveal, edge.relation.reveal-selected', style: { display: 'element', opacity: 0.85, width: 1.8, 'line-color': cssVar('--series-a', '#006c66'), 'z-index': 50 } as any },
+        {
+          selector: 'edge.bundle',
+          style: {
+            width: 'mapData(weight, 1, 40, 1.5, 8)', 'line-color': '#8896a5', opacity: 0.3, 'curve-style': 'unbundled-bezier',
+            'target-arrow-shape': 'none', 'z-index': 1,
+          } as any,
+        },
+        {
+          selector: 'edge.bundle.hover-label',
+          style: {
+            opacity: 0.7, label: 'data(tooltip)', 'font-size': 10, 'font-weight': 600, 'text-wrap': 'wrap', 'text-max-width': '180px', 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1, 'text-background-padding': '4px',
+          } as any,
+        },
+        { selector: '.dimmed', style: { opacity: 0.1 } },
       ],
     })
+
+    // ---- Layout (graph standards rule 6): fixed by default, physics optional ----
+    // A hierarchy is laid out with dagre on the parent/child lines only. Left
+    // to see the relations too, dagre ranked peers above and below one another
+    // and implied a hierarchy that does not exist.
+    const runFixed = () => {
+      if (hasHierarchy) {
+        cy.elements().not('.relation').not('.bundle').layout({
+          name: 'dagre', rankDir: 'TB', nodeSep: 26, rankSep: 64, nodeDimensionsIncludeLabels: true, fit: false, animate: false,
+        } as any).run()
+      } else {
+        cy.nodes().layout({
+          name: 'circle', animate: false, fit: false, padding: 40,
+          sort: (a: any, b: any) => String(a.data('fullLabel')).localeCompare(String(b.data('fullLabel'))),
+        } as any).run()
+      }
+    }
+    runFixed()
+    if (gs.layout === 'physics') {
+      cy.edges('.bundle').style('curve-style', 'bezier')
+      // With a hierarchy, the top-level concepts stay put (when there are few
+      // enough to read as groups) and the rest moves around them. A flat set
+      // has no groups to pin; its relations pull related concepts together.
+      const pinned = hasHierarchy && roots.length <= MAP_PALETTE.length ? cy.nodes('[depth = 0]') : cy.collection()
+      pinned.lock()
+      const simulated = hasHierarchy ? cy.elements().not('.relation').not('.bundle') : cy.elements().not('.bundle')
+      simulated.layout(physicsLayoutOptions(physicsSpacing) as any).run()
+      pinned.unlock()
+    }
+
+    cy.edges('.bundle').forEach((e) => {
+      const gap = Math.abs(e.source().position('x') - e.target().position('x'))
+      e.style('control-point-distances', [-arcHeight(gap, Math.max(95, Math.min(420, gap * 0.14)))])
+      e.style('control-point-weights', [0.5])
+    })
+
+    // ---- Labels (graph standards rule 4): none overlap ----
+    {
+      const candidates: LabelCandidate[] = cy.nodes().map((n) => ({
+        id: n.id(), label: n.data('fullLabel'), x: n.position('x'), y: n.position('y'), size: n.data('size'),
+        priority: n.data('size'), alwaysShow: hasHierarchy && n.data('depth') === 0, fontPx: 9, maxWidthPx: 70, labelSide: 'below',
+      }))
+      const visible = gs.labels === 'few' ? pickVisibleLabels(candidates) : null
+      cy.nodes().forEach((n) => {
+        const full = String(n.data('fullLabel'))
+        const isGroup = hasHierarchy && n.data('depth') === 0
+        if (visible && !visible.has(n.id())) n.data('label', '')
+        else n.data('label', isGroup ? full : truncateLabel(full, gs.labels === 'few' ? 24 : 30))
+      })
+    }
+
+    // Line strength is applied through data(op) so the hover styles above can
+    // still override it (a direct style bypass would win over them).
+    cy.edges('.relation').forEach((e) => { e.data('op', lineOpacity(1.5, gs.lineStrength)) })
 
     cy.on('tap', 'node', (evt) => {
       const n = taxonomy.find((e) => e.id === evt.target.id())
       if (n) onSelect(n)
     })
-    cy.on('mouseover', 'node', (evt) => evt.target.addClass('hover-label'))
-    cy.on('mouseout', 'node', (evt) => evt.target.removeClass('hover-label'))
+    // Pointing at a concept shows its full name and brings its relations
+    // forward, dimming the rest. A concept with no relations just shows its name.
+    cy.on('mouseover', 'node', (evt) => {
+      const node = evt.target
+      node.addClass('hover-label')
+      const rel = node.connectedEdges('.relation')
+      if (rel.length === 0) return
+      rel.addClass('reveal')
+      cy.elements().not(node.closedNeighborhood()).addClass('dimmed')
+    })
+    cy.on('mouseout', 'node', (evt) => {
+      evt.target.removeClass('hover-label')
+      cy.elements().removeClass('dimmed')
+      cy.edges('.reveal').removeClass('reveal')
+    })
+    cy.on('mouseout', (evt) => { if (evt.target === cy) { cy.elements().removeClass('dimmed'); cy.edges('.reveal').removeClass('reveal') } })
+    cy.on('mouseover', 'edge.bundle', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'edge.bundle', (evt) => evt.target.removeClass('hover-label'))
 
     // `.graph-canvas` fills whatever height its flex parent gives it
     // (position:absolute; inset:0 -- unlike the student Netz tab's plain
@@ -637,20 +848,43 @@ function ConceptGraph({
     // (which `inset:0` would just override anyway).
     fitWithReadableFloor(cy)
     cyRef.current = cy
-    return () => { cy.destroy() }
+    apiRef.current = {
+      zoomBy: (factor: number) => {
+        if (!containerRef.current) return
+        const rect = containerRef.current.getBoundingClientRect()
+        cy.zoom({ level: cy.zoom() * factor, renderedPosition: { x: rect.width / 2, y: rect.height / 2 } })
+      },
+      fit: () => fitWithReadableFloor(cy),
+    }
+    // A rebuild (new setting or new data) keeps the concept that is selected.
+    const keep = selectedIdRef.current
+    if (keep) {
+      const el = cy.getElementById(keep)
+      if (el.length) { el.select(); el.connectedEdges('.relation').addClass('reveal-selected') }
+    }
+    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null; apiRef.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [taxonomy, hitsByTaxId, relations, rootIndexOf, depthOf])
+  }, [taxonomy, hitsByTaxId, relations, rootIndexOf, depthOf, gs.edges, gs.labels, gs.layout, physicsSpacing, hasHierarchy])
+
+  // Line strength restyles the existing lines in place (no rebuild, so zoom and pan are kept).
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    cy.edges('.relation').forEach((e) => { e.data('op', lineOpacity(1.5, gs.lineStrength)) })
+  }, [gs.lineStrength, taxonomy, relations])
 
   // Keep the graph's own selection in sync with the URL-driven selectedId
   // (a search-bar link, a shared link, or a plain refresh) without
-  // re-running the mount/layout effect above.
+  // re-running the mount/layout effect above. The selected concept's
+  // relations stay forward until another concept is chosen.
   useEffect(() => {
     const cy = cyRef.current
     if (!cy) return
     cy.nodes(':selected').unselect()
+    cy.edges('.reveal-selected').removeClass('reveal-selected')
     if (selectedId) {
       const el = cy.getElementById(selectedId)
-      if (el.length) { el.select(); cy.center(el) }
+      if (el.length) { el.select(); el.connectedEdges('.relation').addClass('reveal-selected'); cy.center(el) }
     }
   }, [selectedId])
 
@@ -690,7 +924,7 @@ function ConceptGraph({
           className="btn btn-mini"
           aria-label="Fit to screen"
           title="Fit to screen"
-          onClick={() => { if (cyRef.current) fitWithReadableFloor(cyRef.current) }}
+          onClick={() => apiRef.current?.fit()}
         >
           <Maximize2 size={12} />
         </button>

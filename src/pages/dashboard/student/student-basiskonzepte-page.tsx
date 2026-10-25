@@ -938,14 +938,14 @@ function NetzTab({
           selector: 'edge[kind="relevance"]',
           style: {
             width: 'mapData(weight, 0, 3, 0.8, 2.2)', 'line-color': 'data(color)', 'curve-style': 'bezier',
-            'target-arrow-shape': 'none', 'transition-property': 'opacity', 'transition-duration': 180,
+            'target-arrow-shape': 'none', opacity: 'data(op)', 'transition-property': 'opacity', 'transition-duration': 180,
           } as any,
         },
         {
           // A Lernziel's other (non-strongest) links: hidden unless the edge
           // mode is "all", and shown on hover (.reveal) otherwise.
           selector: 'edge[kind="cross"]',
-          style: { width: 0.8, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', display: gs.edges === 'all' ? 'element' : 'none' } as any,
+          style: { width: 0.8, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 'data(op)', display: gs.edges === 'all' ? 'element' : 'none' } as any,
         },
         { selector: 'edge[kind="cross"].reveal', style: { display: 'element', opacity: 0.7, width: 1.6, 'z-index': 50 } as any },
         {
@@ -1032,8 +1032,10 @@ function NetzTab({
   useEffect(() => {
     const cy = cyRef.current
     if (!cy) return
-    cy.edges('[kind="relevance"]').forEach((e) => { e.style('opacity', lineOpacity(e.data('weight'), gs.lineStrength)) })
-    cy.edges('[kind="cross"]').forEach((e) => { e.style('opacity', lineOpacity(e.data('weight'), gs.lineStrength) * 0.45) })
+    // Opacity goes through data(op), not a direct style, so the hover style
+    // (.reveal) can still bring a hidden link forward at full strength.
+    cy.edges('[kind="relevance"]').forEach((e) => { e.data('op', lineOpacity(e.data('weight'), gs.lineStrength)) })
+    cy.edges('[kind="cross"]').forEach((e) => { e.data('op', lineOpacity(e.data('weight'), gs.lineStrength) * 0.45) })
     cy.edges('[kind="relevance"]').forEach((e) => { e.style('width', lineWidth(e.data('weight'))) })
   }, [model, gs.lineStrength, gs.layout, gs.edges, physicsSpacing])
 

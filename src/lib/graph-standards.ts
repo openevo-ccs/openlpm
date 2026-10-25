@@ -41,14 +41,20 @@ export const DEFAULT_GRAPH_SETTINGS: GraphViewSettings = {
 
 const STORAGE_PREFIX = 'openlpm-graph-settings:'
 
-/** Reads a graph's remembered settings. Falls back to the defaults if storage is missing, blocked or holds junk. */
-export function loadGraphSettings(graphId: string): GraphViewSettings {
+/**
+ * Reads a graph's remembered settings. Falls back to `defaults` (the standard
+ * defaults unless the graph passes its own) if nothing is saved, storage is
+ * blocked or the saved value is junk. A graph whose data has a different shape
+ * can pass its own defaults, for example a flat concept list with no
+ * hierarchy to bundle.
+ */
+export function loadGraphSettings(graphId: string, defaults: GraphViewSettings = DEFAULT_GRAPH_SETTINGS): GraphViewSettings {
   try {
     const raw = window.localStorage.getItem(STORAGE_PREFIX + graphId)
-    if (!raw) return DEFAULT_GRAPH_SETTINGS
-    return sanitizeGraphSettings(JSON.parse(raw))
+    if (!raw) return defaults
+    return sanitizeGraphSettings(JSON.parse(raw), defaults)
   } catch {
-    return DEFAULT_GRAPH_SETTINGS
+    return defaults
   }
 }
 
@@ -61,16 +67,16 @@ export function saveGraphSettings(graphId: string, settings: GraphViewSettings):
 }
 
 /** Keeps only valid values, so an old or hand-edited saved setting can never break the graph. */
-export function sanitizeGraphSettings(input: unknown): GraphViewSettings {
+export function sanitizeGraphSettings(input: unknown, defaults: GraphViewSettings = DEFAULT_GRAPH_SETTINGS): GraphViewSettings {
   const o = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>
   const num = (v: unknown, lo: number, hi: number, fallback: number) =>
     typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : fallback
   return {
-    edges: o.edges === 'tree' || o.edges === 'bundled' || o.edges === 'all' ? o.edges : DEFAULT_GRAPH_SETTINGS.edges,
-    labels: o.labels === 'few' || o.labels === 'all' ? o.labels : DEFAULT_GRAPH_SETTINGS.labels,
-    layout: o.layout === 'fixed' || o.layout === 'physics' ? o.layout : DEFAULT_GRAPH_SETTINGS.layout,
-    lineStrength: num(o.lineStrength, 10, 100, DEFAULT_GRAPH_SETTINGS.lineStrength),
-    spacing: num(o.spacing, 0, 100, DEFAULT_GRAPH_SETTINGS.spacing),
+    edges: o.edges === 'tree' || o.edges === 'bundled' || o.edges === 'all' ? o.edges : defaults.edges,
+    labels: o.labels === 'few' || o.labels === 'all' ? o.labels : defaults.labels,
+    layout: o.layout === 'fixed' || o.layout === 'physics' ? o.layout : defaults.layout,
+    lineStrength: num(o.lineStrength, 10, 100, defaults.lineStrength),
+    spacing: num(o.spacing, 0, 100, defaults.spacing),
   }
 }
 
@@ -93,9 +99,14 @@ export function lineWidth(weight: number): number {
 
 // ---- Rule 2: counted arcs between groups -----------------------------------
 
-/** How far above the row of groups an arc between two of them bows out, in px. Wider gaps bow more, up to a cap. */
-export function arcHeight(horizontalGap: number): number {
-  return Math.min(95, 22 + horizontalGap * 0.09)
+/**
+ * How far above the row of groups an arc between two of them bows out, in px.
+ * Wider gaps bow more, up to a cap. A graph much wider than the Netz (a deep
+ * hierarchy laid out by dagre can run to several thousand px) passes a higher
+ * cap so its arcs do not flatten into straight lines.
+ */
+export function arcHeight(horizontalGap: number, cap = 95): number {
+  return Math.min(cap, 22 + horizontalGap * 0.09)
 }
 
 // ---- Rule 4: labels never overlap -------------------------------------------
@@ -109,6 +120,8 @@ export interface LabelCandidate {
   size: number
   /** Higher = keeps its label first when two collide. */
   priority: number
+  /** Where the label sits relative to the node. Default 'above' (the hierarchy graphs); 'below' suits a ring or grid. */
+  labelSide?: 'above' | 'below'
   /** True for items whose label is always shown (the top-level groups). They also block others. */
   alwaysShow?: boolean
   fontPx: number
@@ -152,6 +165,7 @@ export function pickVisibleLabels(items: LabelCandidate[]): Set<string> {
     const w = Math.min(natural, c.maxWidthPx) + 6
     const lines = Math.max(1, Math.ceil(natural / c.maxWidthPx))
     const h = lines * c.fontPx * 1.2 + 4
+    if (c.labelSide === 'below') return { x0: c.x - w / 2, x1: c.x + w / 2, y0: c.y + c.size / 2 + 3, y1: c.y + c.size / 2 + 3 + h }
     return { x0: c.x - w / 2, x1: c.x + w / 2, y0: c.y - c.size / 2 - 3 - h, y1: c.y - c.size / 2 - 3 }
   }
   const nodeBox = (c: LabelCandidate): Box => ({ x0: c.x - c.size / 2, x1: c.x + c.size / 2, y0: c.y - c.size / 2, y1: c.y + c.size / 2 })

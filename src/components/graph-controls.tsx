@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
-import { DEFAULT_GRAPH_SETTINGS, loadGraphSettings, saveGraphSettings, type GraphViewSettings } from '@/lib/graph-standards'
+import { DEFAULT_GRAPH_SETTINGS, loadGraphSettings, saveGraphSettings, type GraphEdgeMode, type GraphViewSettings } from '@/lib/graph-standards'
 
 // The one control panel every OpenLPM graph shows (rule 6 of the graph
 // standards). A graph passes which groups of controls make sense for it, so
@@ -59,8 +59,11 @@ const TEXT: Record<Lang, Record<string, string>> = {
 }
 
 /** Remembers a graph's settings in this browser, per graph. */
-export function useGraphSettings(graphId: string): [GraphViewSettings, (patch: Partial<GraphViewSettings>) => void, () => void] {
-  const [settings, setSettings] = useState<GraphViewSettings>(() => loadGraphSettings(graphId))
+export function useGraphSettings(
+  graphId: string,
+  defaults: GraphViewSettings = DEFAULT_GRAPH_SETTINGS,
+): [GraphViewSettings, (patch: Partial<GraphViewSettings>) => void, () => void] {
+  const [settings, setSettings] = useState<GraphViewSettings>(() => loadGraphSettings(graphId, defaults))
   const update = useCallback((patch: Partial<GraphViewSettings>) => {
     setSettings((prev) => {
       const next = { ...prev, ...patch }
@@ -69,10 +72,11 @@ export function useGraphSettings(graphId: string): [GraphViewSettings, (patch: P
     })
   }, [graphId])
   const reset = useCallback(() => {
-    const defaults = { ...DEFAULT_GRAPH_SETTINGS }
-    saveGraphSettings(graphId, defaults)
-    setSettings(defaults)
-  }, [graphId])
+    const fresh = { ...defaults }
+    saveGraphSettings(graphId, fresh)
+    setSettings(fresh)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graphId, defaults.edges, defaults.labels, defaults.layout, defaults.lineStrength, defaults.spacing])
   return [settings, update, reset]
 }
 
@@ -83,14 +87,24 @@ export interface GraphControlsProps {
   lang?: Lang
   /** Show the choice between main link, bundled and all links. Leave off for graphs with few links per item. */
   showConnections?: boolean
+  /** Which connection modes this graph offers (default all three). A flat list with no groups has nothing to bundle. */
+  edgeModes?: GraphEdgeMode[]
+  /** Graph-specific wording for a connection mode or the fixed layout, when the standard wording does not fit. */
+  wording?: Partial<Record<'tree' | 'bundled' | 'all' | 'fixed', { label: string; hint?: string }>>
   showLayout?: boolean
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFit?: () => void
 }
 
-export function GraphControls({ settings, onChange, onReset, lang = 'de', showConnections = true, showLayout = true, onZoomIn, onZoomOut, onFit }: GraphControlsProps) {
+export function GraphControls({ settings, onChange, onReset, lang = 'de', showConnections = true, edgeModes = ['tree', 'bundled', 'all'], wording = {}, showLayout = true, onZoomIn, onZoomOut, onFit }: GraphControlsProps) {
   const t = TEXT[lang]
+  const word = (key: 'tree' | 'bundled' | 'all' | 'fixed', fallbackLabel: string, fallbackHint: string) => ({
+    label: wording[key]?.label ?? fallbackLabel,
+    hint: wording[key]?.hint ?? fallbackHint,
+  })
+  const modeText = { tree: word('tree', t.tree, t.treeHint), bundled: word('bundled', t.bundled, t.bundledHint), all: word('all', t.all, t.allHint) }
+  const fixedText = word('fixed', t.fixed, t.fixedHint)
   const chip = (active: boolean) => `chip-btn${active ? ' active' : ''}`
   const physics = settings.layout === 'physics'
   return (
@@ -98,9 +112,9 @@ export function GraphControls({ settings, onChange, onReset, lang = 'de', showCo
       {showConnections && (
         <div className="netz-control-group">
           <span className="muted" style={{ fontSize: 11 }}>{t.connections}:</span>
-          <button className={chip(settings.edges === 'tree')} title={t.treeHint} onClick={() => onChange({ edges: 'tree' })}>{t.tree}</button>
-          <button className={chip(settings.edges === 'bundled')} title={t.bundledHint} onClick={() => onChange({ edges: 'bundled' })}>{t.bundled}</button>
-          <button className={chip(settings.edges === 'all')} title={t.allHint} onClick={() => onChange({ edges: 'all' })}>{t.all}</button>
+          {edgeModes.map((mode) => (
+            <button key={mode} className={chip(settings.edges === mode)} title={modeText[mode].hint} onClick={() => onChange({ edges: mode })}>{modeText[mode].label}</button>
+          ))}
         </div>
       )}
       <div className="netz-control-group">
@@ -111,7 +125,7 @@ export function GraphControls({ settings, onChange, onReset, lang = 'de', showCo
       {showLayout && (
         <div className="netz-control-group">
           <span className="muted" style={{ fontSize: 11 }}>{t.layout}:</span>
-          <button className={chip(!physics)} title={t.fixedHint} onClick={() => onChange({ layout: 'fixed' })}>{t.fixed}</button>
+          <button className={chip(!physics)} title={fixedText.hint} onClick={() => onChange({ layout: 'fixed' })}>{fixedText.label}</button>
           <button className={chip(physics)} title={t.physicsHint} onClick={() => onChange({ layout: 'physics' })}>{t.physics}</button>
         </div>
       )}
