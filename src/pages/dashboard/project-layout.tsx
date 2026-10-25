@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Outlet, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
@@ -77,6 +77,8 @@ function readStoredSidebarCollapsed(): boolean {
 
 export default function ProjectLayout() {
   const { project: slug } = useParams<{ project: string }>()
+  // The Dashboard home shows the introduction text under its stat tiles, so the top banner leaves it out there.
+  const onDashboardHome = useLocation().pathname.replace(/\/+$/, '') === `/dashboard/${slug}`
   const [searchParams, setSearchParams] = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
   const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null } | null>(null)
@@ -479,7 +481,7 @@ export default function ProjectLayout() {
         <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
           <LpmSearchBar project={project} slug={slug} supabase={supabase} />
         </div>
-        <ProjectIntroBanner project={project} supabase={supabase} />
+        <ProjectIntroBanner project={project} supabase={supabase} showDescription={!onDashboardHome} />
         <Outlet context={context} />
       </div>
     </div>

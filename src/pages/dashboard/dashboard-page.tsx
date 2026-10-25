@@ -157,8 +157,6 @@ export default function DashboardPage() {
     <div>
       <h1>{project.name}</h1>
 
-      <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? null} />
-
       {canManage && (
         <div className="row" style={{ marginBottom: 20, alignItems: 'center' }}>
           <span className="muted" style={{ fontSize: 13 }}>Status:</span>
@@ -190,6 +188,11 @@ export default function DashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* Introduction under the stat tiles (feedback 0fba8647). A space with no written
+          introduction shows its short description here, since the page-top banner no
+          longer repeats it on this page. */}
+      <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? project.description ?? null} />
 
       <ProjectsSection project={project} canManage={canManage} supabase={supabase} />
 

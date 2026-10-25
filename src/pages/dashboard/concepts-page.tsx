@@ -7,6 +7,7 @@ import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
+import { conceptDefinition, conceptSource } from '@/lib/concept-source'
 
 cytoscape.use(dagre)
 
@@ -768,7 +769,7 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
         <h3 style={{ marginTop: 0 }}>{node.label}</h3>
         <button className="btn btn-mini" onClick={onClose}><X size={11} /></button>
       </div>
-      {node.definition && <p className="muted">{node.definition}</p>}
+      {conceptDefinition(node) && <p className="muted" style={{ whiteSpace: 'pre-line' }}>{conceptDefinition(node)}</p>}
       {hits.length === 0 ? (
         <p className="muted">No real learning goal has been tagged to this specific concept yet — it may still be relevant, just not tied to it at this level of detail.</p>
       ) : (
@@ -1025,11 +1026,8 @@ function ManageConceptDetail({
   onSelect: (id: string) => void
   onViewInMap: () => void
 }) {
-  const metadata = (node.metadata ?? {}) as Record<string, unknown>
-  const source =
-    metadata.source === 'conceptbase'
-      ? `Imported from ConceptBase — ${(metadata.vocabulary as string) ?? 'vocabulary unknown'}${metadata.version ? ` v${metadata.version}` : ''}`
-      : 'Added directly to this project.'
+  const definition = conceptDefinition(node)
+  const origin = conceptSource(node)
 
   return (
     <div>
@@ -1043,8 +1041,18 @@ function ManageConceptDetail({
           Part of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>
         </p>
       )}
-      <p style={{ marginTop: 8 }}>{node.definition || 'No definition yet.'}</p>
-      <p className="muted" style={{ fontSize: 12 }}>{source}</p>
+      <p style={{ marginTop: 8, whiteSpace: 'pre-line' }}>{definition || 'No definition yet.'}</p>
+      {origin.kind === 'conceptbase' ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Linked to ConceptBase{origin.vocabulary ? ` — ${origin.vocabulary}${origin.version ? ` v${origin.version}` : ''}` : ''}.{' '}
+          {definition ? 'The definition above comes from there. ' : ''}
+          <a href={origin.url} target="_blank" rel="noopener noreferrer">See the ConceptBase record ({origin.conceptbaseId})</a>
+        </p>
+      ) : (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Added directly to this project. It is not linked to a ConceptBase record{definition ? '' : ', so it has no shared definition yet'}.
+        </p>
+      )}
 
       {kids.length > 0 && (
         <div style={{ marginTop: 12 }}>
