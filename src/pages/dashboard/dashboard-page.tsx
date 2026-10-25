@@ -22,6 +22,31 @@ import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 // status/stats/navigation: the maturity badge, the stat tiles, this
 // project's own sub-projects, and recent activity.
 
+// Introduction text (migration 173). Paragraphs are separated by blank lines.
+// A first paragraph that starts with "Status:" is shown as a notice so the
+// space's standing (synthetic, unreviewed, and so on) is the first thing read.
+// The column does not exist until migration 173 is applied; a project without
+// text renders nothing.
+function ProjectIntroduction({ text }: { text: string | null }) {
+  if (!text || !text.trim()) return null
+  const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+  return (
+    <div style={{ marginBottom: 20, maxWidth: 760 }}>
+      {paragraphs.map((para, i) =>
+        i === 0 && para.startsWith('Status:') ? (
+          <div key={i} className="notice" style={{ alignItems: 'flex-start' }}>
+            <span>
+              <strong>Status.</strong> {para.slice('Status:'.length).trim()}
+            </span>
+          </div>
+        ) : (
+          <p key={i} style={{ marginTop: 0, lineHeight: 1.55 }}>{para}</p>
+        ),
+      )}
+    </div>
+  )
+}
+
 type CountTable = 'literature_references' | 'lpm_schema_elements' | 'lpm_data_objects' | 'discussion_topics'
 type Project = Database['public']['Tables']['projects']['Row']
 
@@ -131,6 +156,8 @@ export default function DashboardPage() {
   return (
     <div>
       <h1>{project.name}</h1>
+
+      <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? null} />
 
       {canManage && (
         <div className="row" style={{ marginBottom: 20, alignItems: 'center' }}>
