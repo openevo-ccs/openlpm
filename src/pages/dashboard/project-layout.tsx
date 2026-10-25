@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
@@ -340,6 +340,7 @@ export default function ProjectLayout() {
     { key: 'theories', href: `/dashboard/${slug}/theories`, icon: <Lightbulb size={14} />, label: 'Theories', end: false },
     { key: 'strands', href: `/dashboard/${slug}/strands`, icon: <GitBranch size={14} />, label: 'Strands', end: false },
     { key: 'calendar', href: `/dashboard/${slug}/calendar`, icon: <CalendarRange size={14} />, label: isGermanOnly ? 'Wochenplan' : 'Calendar' },
+    { key: 'time', href: `/dashboard/${slug}/time`, icon: <Hourglass size={14} />, label: 'Time' },
     { key: 'literature', href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
     { key: 'review', href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
     { key: 'discussions', href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
