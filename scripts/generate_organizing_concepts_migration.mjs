@@ -265,7 +265,7 @@ for (const [spaceKey, sp] of Object.entries(SPACES)) {
   for (const o of sp.ocs) {
     const meta = { definition: o.definition, vocabulary: sp.vocab, conceptbase_id: ocCb(o.key), level: 'organizing', proposed_not_in_conceptbase: true, proposed_on: '2026-10-25', excludes: o.excludes, counterpart_in_partner_space: o.counterpart, grounding: NOTE }
     w('INSERT INTO lpm_schema_elements (id, project_id, element_type, label, definition, parent_id, metadata, status, core_principles)')
-    w(`VALUES (${q(ocId(o.key))}, ${q(sp.pid)}, 'concept', ${q(o.label)}, ${q(o.definition)}, NULL, ${jq(meta)}, 'proposed', ${jq(o.principles)}) ON CONFLICT (id) DO NOTHING;`)
+    w(`VALUES (${q(ocId(o.key))}, ${q(sp.pid)}, 'concept', ${q(o.label)}, ${q(o.definition)}, NULL, ${jq(meta)}, 'proposed', ARRAY[${o.principles.map(q).join(', ')}]::text[]) ON CONFLICT (id) DO NOTHING;`)
   }
   for (const f of sp.facets) {
     const parent = byLabel.get(f.parent)
@@ -292,7 +292,7 @@ for (const [spaceKey, sp] of Object.entries(SPACES)) {
   for (const { stage, links } of stageLinks) {
     if (links.length === 0) continue
     const arr = links.map((l) => ({ id: ocCb(l.k), emphasis: l.emphasis }))
-    w(`UPDATE lpm_data_objects SET content = content || jsonb_build_object('organizingConcepts', ${jq(arr)}, 'organizingConceptsNote', ${q(NOTE)}) WHERE id = ${q(stage.id)} AND NOT (content ? 'organizingConcepts');`)
+    w(`UPDATE lpm_data_objects SET content = content || jsonb_build_object('organizingConcepts', ${jq(arr)}, 'organizingConceptsNote', ${q(NOTE)}) WHERE id = ${q(stage.id)} AND NOT jsonb_exists(content, 'organizingConcepts');`)
   }
   w('')
 }
