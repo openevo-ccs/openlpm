@@ -1,0 +1,1361 @@
+[
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7063-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "1",
+  "title": "Merkmale des Lebens",
+  "zeitrichtwertUstd": 3.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7064-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "2",
+  "title": "Fische in ihren Lebensräumen",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7065-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "3",
+  "title": "Lurche in ihren Lebensräumen",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7066-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "4",
+  "title": "Kriechtiere in ihren Lebensräumen",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7067-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "5",
+  "title": "Vögel in ihren Lebensräumen",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7068-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "6",
+  "title": "Säugetiere in ihren Lebensräumen",
+  "zeitrichtwertUstd": 13.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7069-1",
+  "subject": "biologie",
+  "grades": [
+   5
+  ],
+  "number": "7",
+  "title": "Systematisierung",
+  "zeitrichtwertUstd": 3.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7201-1",
+  "subject": "biologie",
+  "grades": [
+   6
+  ],
+  "number": "1",
+  "title": "Samenpflanzen",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7202-1",
+  "subject": "biologie",
+  "grades": [
+   6
+  ],
+  "number": "2",
+  "title": "Wirbellose Tiere in ihren Lebensräumen",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7203-1",
+  "subject": "biologie",
+  "grades": [
+   6
+  ],
+  "number": "3",
+  "title": "Systematisierung",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7204-1",
+  "subject": "biologie",
+  "grades": [
+   6
+  ],
+  "number": "4",
+  "title": "Wald als Lebensgemeinschaft",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7205-1",
+  "subject": "biologie",
+  "grades": [
+   6
+  ],
+  "number": "5",
+  "title": "Pflanzliche und tierische Zellen",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7313-1",
+  "subject": "biologie",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Bakterien und Viren",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7314-1",
+  "subject": "biologie",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Blutkreislauf des Menschen und Immunbiologie",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7315-1",
+  "subject": "biologie",
+  "grades": [
+   7
+  ],
+  "number": "3",
+  "title": "Ernährung, Verdauung und Ausscheidung beim Menschen",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7316-1",
+  "subject": "biologie",
+  "grades": [
+   7
+  ],
+  "number": "4",
+  "title": "Stütz- und Bewegungssystem des Menschen",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7406-1",
+  "subject": "biologie",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Sinnesorgane, Nerven- und Hormonsystem des Menschen",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7407-1",
+  "subject": "biologie",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Sexualität des Menschen",
+  "zeitrichtwertUstd": 11.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7478-1",
+  "subject": "biologie",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Anatomie und Physiologie der Samenpflanzen",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7479-1",
+  "subject": "biologie",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Zusammenhänge im Ökosystem",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7600-1",
+  "subject": "biologie",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Genetik",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7601-1",
+  "subject": "biologie",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Entstehung der Artenvielfalt",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-522-1/lernbereich-7602-1",
+  "subject": "biologie",
+  "grades": [
+   10
+  ],
+  "number": "3",
+  "title": "Stammesgeschichte des Menschen",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-11934-1",
+  "subject": "ethik",
+  "grades": [
+   5
+  ],
+  "number": "1",
+  "title": "Fragen an die Welt",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-11935-1",
+  "subject": "ethik",
+  "grades": [
+   5
+  ],
+  "number": "2",
+  "title": "Mythische und religiöse Erklärungen der Welt",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-11936-1",
+  "subject": "ethik",
+  "grades": [
+   5
+  ],
+  "number": "3",
+  "title": "Der Mensch in der Gemeinschaft",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-11937-1",
+  "subject": "ethik",
+  "grades": [
+   5
+  ],
+  "number": "4",
+  "title": "Von und mit der Natur leben",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12000-1",
+  "subject": "ethik",
+  "grades": [
+   6
+  ],
+  "number": "1",
+  "title": "Wahrnehmung und Wahrheit",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12001-1",
+  "subject": "ethik",
+  "grades": [
+   6
+  ],
+  "number": "2",
+  "title": "Judentum",
+  "zeitrichtwertUstd": 18.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12002-1",
+  "subject": "ethik",
+  "grades": [
+   6
+  ],
+  "number": "3",
+  "title": "Urteil und Vorurteil",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-11970-1",
+  "subject": "ethik",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Verstehen und Verständigung",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12036-1",
+  "subject": "ethik",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Christentum",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12038-1",
+  "subject": "ethik",
+  "grades": [
+   7
+  ],
+  "number": "3",
+  "title": "Medien: Ein Spiegel der Wirklichkeit",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12057-1",
+  "subject": "ethik",
+  "grades": [
+   7
+  ],
+  "number": "4",
+  "title": "Mensch und Tier",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12111-1",
+  "subject": "ethik",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Ethisches Argumentieren",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12112-1",
+  "subject": "ethik",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Islam",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12113-1",
+  "subject": "ethik",
+  "grades": [
+   8
+  ],
+  "number": "3",
+  "title": "Auf der Suche nach Sinn und Orientierung",
+  "zeitrichtwertUstd": 20.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12162-1",
+  "subject": "ethik",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Entscheidungen treffen",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12163-1",
+  "subject": "ethik",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Hinduismus und Buddhismus",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12164-1",
+  "subject": "ethik",
+  "grades": [
+   9
+  ],
+  "number": "3",
+  "title": "Das Phänomen Liebe",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12165-1",
+  "subject": "ethik",
+  "grades": [
+   9
+  ],
+  "number": "4",
+  "title": "Reflexionen über den Tod",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12223-1",
+  "subject": "ethik",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Wissenschaft, Technik und Verantwortung",
+  "zeitrichtwertUstd": 26.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12224-1",
+  "subject": "ethik",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Religion in der Gegenwart",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-77-1/lernbereich-12225-1",
+  "subject": "ethik",
+  "grades": [
+   10
+  ],
+  "number": "3",
+  "title": "Utopien",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4857-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Leben in der Gesellschaft",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4858-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Demokratie und Partizipationsmöglichkeiten in der Kommune",
+  "zeitrichtwertUstd": 11.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4891-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Jugendliche als Marktteilnehmer",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4892-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Jugendliche und Medien in einer digitalisierten Welt",
+  "zeitrichtwertUstd": 13.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4926-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Politische Ordnung in der Bundesrepublik Deutschland",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4927-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Recht und Rechtsordnung in der Bundesrepublik Deutschland",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4970-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Wirtschaft und Wirtschaftsordnung in der Bundesrepublik Deutschland",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-76-1/lernbereich-4971-1",
+  "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Herausforderungen für Europa in einer globalen Welt",
+  "zeitrichtwertUstd": 25.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3610-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "1",
+  "title": "Unsere Erde",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3611-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "2",
+  "title": "Orientierung in Deutschland",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3612-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "3",
+  "title": "Nord- und Ostseeküste",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3613-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "4",
+  "title": "Tiefland",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3614-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "5",
+  "title": "Ausgewählte Ballungsgebiete",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3615-1",
+  "subject": "geographie",
+  "grades": [
+   5
+  ],
+  "number": "6",
+  "title": "Mittelgebirgsland",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3755-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "1",
+  "title": "Europa im Überblick",
+  "zeitrichtwertUstd": 5.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3756-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "2",
+  "title": "Klima und Vegetation in Europa",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3757-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "3",
+  "title": "Im Norden Europas",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3758-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "4",
+  "title": "Europa zwischen Atlantik und Ural",
+  "zeitrichtwertUstd": 13.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3759-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "5",
+  "title": "Im Alpenraum",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3760-1",
+  "subject": "geographie",
+  "grades": [
+   6
+  ],
+  "number": "6",
+  "title": "Im Süden Europas",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3857-1",
+  "subject": "geographie",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Bewegung und Aufbau der Erde",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3858-1",
+  "subject": "geographie",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Afrika im Überblick",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3859-1",
+  "subject": "geographie",
+  "grades": [
+   7
+  ],
+  "number": "3",
+  "title": "Klima und Vegetation Afrikas",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3860-1",
+  "subject": "geographie",
+  "grades": [
+   7
+  ],
+  "number": "4",
+  "title": "Afrika südlich der Sahara",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3861-1",
+  "subject": "geographie",
+  "grades": [
+   7
+  ],
+  "number": "5",
+  "title": "Arabischer Raum",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3974-1",
+  "subject": "geographie",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Asien im Überblick",
+  "zeitrichtwertUstd": 5.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3975-1",
+  "subject": "geographie",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Indien",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3976-1",
+  "subject": "geographie",
+  "grades": [
+   8
+  ],
+  "number": "3",
+  "title": "Volksrepublik China",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-3977-1",
+  "subject": "geographie",
+  "grades": [
+   8
+  ],
+  "number": "4",
+  "title": "Der asiatisch-pazifische Wirtschaftsraum",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4047-1",
+  "subject": "geographie",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Nordamerika",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4048-1",
+  "subject": "geographie",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Lateinamerika",
+  "zeitrichtwertUstd": 11.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4096-1",
+  "subject": "geographie",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Das Weltmeer und seine Nutzung",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4097-1",
+  "subject": "geographie",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Naturraum Sachsen",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4098-1",
+  "subject": "geographie",
+  "grades": [
+   10
+  ],
+  "number": "3",
+  "title": "Wirtschaftsraum Sachsen",
+  "zeitrichtwertUstd": 20.0
+ },
+ {
+  "topicId": "lehrplan-74-1/lernbereich-4099-1",
+  "subject": "geographie",
+  "grades": [
+   10
+  ],
+  "number": "4",
+  "title": "Europa im Wandel",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-766-1",
+  "subject": "geschichte",
+  "grades": [
+   5
+  ],
+  "number": "1",
+  "title": "Orientierung in der Vergangenheit",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-772-1",
+  "subject": "geschichte",
+  "grades": [
+   5
+  ],
+  "number": "2",
+  "title": "Von der Steinzeit zur Hochkultur – Menschen organisieren ihr Zusammenleben",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-792-1",
+  "subject": "geschichte",
+  "grades": [
+   5
+  ],
+  "number": "3",
+  "title": "Zusammenleben im antiken Griechenland",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-803-1",
+  "subject": "geschichte",
+  "grades": [
+   5
+  ],
+  "number": "4",
+  "title": "Längsschnitt: Mensch und Natur",
+  "zeitrichtwertUstd": 2.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-823-1",
+  "subject": "geschichte",
+  "grades": [
+   6
+  ],
+  "number": "1",
+  "title": "Die römische Zivilisation und ihre prägende Wirkung für Europa",
+  "zeitrichtwertUstd": 18.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-841-1",
+  "subject": "geschichte",
+  "grades": [
+   6
+  ],
+  "number": "2",
+  "title": "Herrschaft und Lebensformen im Mittelalter",
+  "zeitrichtwertUstd": 20.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-866-1",
+  "subject": "geschichte",
+  "grades": [
+   6
+  ],
+  "number": "3",
+  "title": "Religionen und Kulturen im Mit- und Gegeneinander",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-882-1",
+  "subject": "geschichte",
+  "grades": [
+   6
+  ],
+  "number": "4",
+  "title": "Längsschnitt: Erziehung zum Bürger",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-901-1",
+  "subject": "geschichte",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Aufbruch in die Neuzeit – Das Welt- und Menschenbild verändert sich",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-920-1",
+  "subject": "geschichte",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Staat und Gesellschaft im Zeitalter von Absolutismus und Aufklärung",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-933-1",
+  "subject": "geschichte",
+  "grades": [
+   7
+  ],
+  "number": "3",
+  "title": "Formen der Beschränkung der Alleinherrschaft",
+  "zeitrichtwertUstd": 18.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-943-1",
+  "subject": "geschichte",
+  "grades": [
+   7
+  ],
+  "number": "4",
+  "title": "Längsschnitt: Legitimation von Herrschaft in der Geschichte",
+  "zeitrichtwertUstd": 4.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-967-1",
+  "subject": "geschichte",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Die Vorstellungen des deutschen Bürgertums von Einheit und Freiheit",
+  "zeitrichtwertUstd": 18.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-982-1",
+  "subject": "geschichte",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Das Doppelgesicht des Fortschritts – Industrialisierung und die Folgen",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1000-1",
+  "subject": "geschichte",
+  "grades": [
+   8
+  ],
+  "number": "3",
+  "title": "Längsschnitt: Industrialisierung und Kinderarbeit",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1012-1",
+  "subject": "geschichte",
+  "grades": [
+   8
+  ],
+  "number": "4",
+  "title": "Vom übersteigerten Nationalismus zum Ersten Weltkrieg",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1038-1",
+  "subject": "geschichte",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Versuche der Zukunftsgestaltung in Europa nach dem Ersten Weltkrieg",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1039-1",
+  "subject": "geschichte",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Deutschlands Weg von der Demokratie zur Diktatur",
+  "zeitrichtwertUstd": 22.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1040-1",
+  "subject": "geschichte",
+  "grades": [
+   9
+  ],
+  "number": "3",
+  "title": "Die nationalsozialistische Diktatur – ein System von Terror und Gewalt",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1041-1",
+  "subject": "geschichte",
+  "grades": [
+   9
+  ],
+  "number": "4",
+  "title": "Längsschnitt: Deutsche Außenpolitik zwischen Ausgleich und Konfrontation",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1113-1",
+  "subject": "geschichte",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Längsschnitt: Beziehungen zwischen USA und UdSSR im 20. Jahrhundert",
+  "zeitrichtwertUstd": 16.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1115-1",
+  "subject": "geschichte",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Der Ost-West-Konflikt – Ursachen und Auswirkungen für Deutschland",
+  "zeitrichtwertUstd": 22.0
+ },
+ {
+  "topicId": "lehrplan-65-1/lernbereich-1117-1",
+  "subject": "geschichte",
+  "grades": [
+   10
+  ],
+  "number": "3",
+  "title": "Politische Wandlungsprozesse in Europa",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118698-2",
+  "subject": "informatik",
+  "grades": [
+   7
+  ],
+  "number": "1",
+  "title": "Informationen und Daten",
+  "zeitrichtwertUstd": 13.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118726-2",
+  "subject": "informatik",
+  "grades": [
+   7
+  ],
+  "number": "2",
+  "title": "Informatiksysteme",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118740-2",
+  "subject": "informatik",
+  "grades": [
+   7
+  ],
+  "number": "3",
+  "title": "Algorithmen",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118763-2",
+  "subject": "informatik",
+  "grades": [
+   8
+  ],
+  "number": "1",
+  "title": "Algorithmen",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118774-2",
+  "subject": "informatik",
+  "grades": [
+   8
+  ],
+  "number": "2",
+  "title": "Vernetzte Systeme",
+  "zeitrichtwertUstd": 10.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118802-2",
+  "subject": "informatik",
+  "grades": [
+   8
+  ],
+  "number": "3",
+  "title": "Komplexaufgabe",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118824-2",
+  "subject": "informatik",
+  "grades": [
+   9
+  ],
+  "number": "1",
+  "title": "Informationen und Daten",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118841-2",
+  "subject": "informatik",
+  "grades": [
+   9
+  ],
+  "number": "2",
+  "title": "Künstliche Intelligenz",
+  "zeitrichtwertUstd": 5.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118850-2",
+  "subject": "informatik",
+  "grades": [
+   9
+  ],
+  "number": "3",
+  "title": "Netzwerke",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118883-2",
+  "subject": "informatik",
+  "grades": [
+   10
+  ],
+  "number": "1",
+  "title": "Algorithmen",
+  "zeitrichtwertUstd": 11.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118897-2",
+  "subject": "informatik",
+  "grades": [
+   10
+  ],
+  "number": "2",
+  "title": "Sprachen",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-630-1/lernbereich-118909-2",
+  "subject": "informatik",
+  "grades": [
+   10
+  ],
+  "number": "3",
+  "title": "Komplexaufgabe",
+  "zeitrichtwertUstd": 6.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5585-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "1",
+  "title": "Zusammen leben und lernen",
+  "zeitrichtwertUstd": 8.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5621-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "2",
+  "title": "Mein Körper und meine Gesundheit",
+  "zeitrichtwertUstd": 20.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5661-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "3",
+  "title": "Begegnungen mit Pflanzen und Tieren",
+  "zeitrichtwertUstd": 45.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5717-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "4",
+  "title": "Begegnung mit Phänomenen der unbelebten Natur",
+  "zeitrichtwertUstd": 26.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5784-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "5",
+  "title": "Begegnung mit Raum und Zeit",
+  "zeitrichtwertUstd": 26.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5831-1",
+  "subject": "sachunterricht",
+  "grades": [
+   1,
+   2
+  ],
+  "number": "6",
+  "title": "Durch unsere ersten Schuljahre",
+  "zeitrichtwertUstd": 5.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-5980-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "1",
+  "title": "Zusammen leben und lernen",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6012-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "2",
+  "title": "Mein Körper und meine Gesundheit",
+  "zeitrichtwertUstd": 5.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6032-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "3",
+  "title": "Begegnungen mit Pflanzen und Tieren",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6063-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "4",
+  "title": "Begegnung mit Phänomenen der unbelebten Natur",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6101-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "5",
+  "title": "Begegnung mit Raum und Zeit",
+  "zeitrichtwertUstd": 14.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6156-1",
+  "subject": "sachunterricht",
+  "grades": [
+   3
+  ],
+  "number": "6",
+  "title": "Durch Experimentieren gezielt untersuchen",
+  "zeitrichtwertUstd": 2.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6230-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "1",
+  "title": "Zusammen leben und lernen",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6276-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "2",
+  "title": "Mein Körper und meine Gesundheit",
+  "zeitrichtwertUstd": 9.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6293-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "3",
+  "title": "Begegnungen mit Pflanzen und Tieren",
+  "zeitrichtwertUstd": 23.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6320-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "4",
+  "title": "Begegnung mit Phänomenen der unbelebten Natur",
+  "zeitrichtwertUstd": 7.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6331-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "5",
+  "title": "Begegnung mit Raum und Zeit",
+  "zeitrichtwertUstd": 24.0
+ },
+ {
+  "topicId": "lehrplan-80-1/lernbereich-6356-1",
+  "subject": "sachunterricht",
+  "grades": [
+   4
+  ],
+  "number": "6",
+  "title": "Medien – Informationsbeschaffung und -aufbereitung",
+  "zeitrichtwertUstd": 3.0
+ },
+ {
+  "topicId": "lehrplan-130-1/lernbereich-30700-1",
+  "subject": "technik-computer",
+  "grades": [
+   5,
+   6
+  ],
+  "number": "1",
+  "title": "Grundlagen im Umgang mit digitalen Medien",
+  "zeitrichtwertUstd": 13.0
+ },
+ {
+  "topicId": "lehrplan-130-1/lernbereich-30736-1",
+  "subject": "technik-computer",
+  "grades": [
+   5,
+   6
+  ],
+  "number": "2",
+  "title": "Konstruieren technischer Objekte",
+  "zeitrichtwertUstd": 12.0
+ },
+ {
+  "topicId": "lehrplan-130-1/lernbereich-30753-1",
+  "subject": "technik-computer",
+  "grades": [
+   5,
+   6
+  ],
+  "number": "3",
+  "title": "Fertigen eines technischen Objektes",
+  "zeitrichtwertUstd": 25.0
+ }
+]
