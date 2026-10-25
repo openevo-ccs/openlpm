@@ -55,13 +55,24 @@
      canonical order, see basiskonzepte.ts's getRootConcepts) picks this up
      automatically. Red (--map-2) deliberately isn't identical to
      --critical-rgb above -- a different, slightly deeper red, so a concept
-     dot never reads as a status/error indicator at a glance. */
-  --map-1: #1c8a4e;
-  --map-2: #b3372e;
-  --map-3: #2a78d6;
-  --map-4: #8a5a2a;
-  --map-5: #d9791f;
-  --map-6: #7a3ec2;
+     dot never reads as a status/error indicator at a glance.
+
+     Re-tuned 2026-10-25 (Dustin's graph-standards decision: softer colors
+     after a color-blind check). Same six hue families and same order, so
+     Susan's green/red/blue/brown/orange/purple mapping is unchanged. The
+     previous palette's red and brown were nearly identical to someone with
+     red-green color blindness (CIEDE2000 distance 1.9; under about 10 two
+     colors read as the same). This set keeps every pair at 13.6 or more
+     under normal vision and under simulated protanopia, deuteranopia and
+     tritanopia (dark mode: 11.1 or more), and every color at 3:1 or better
+     against its background. Checked with a script (Machado 2009 simulation
+     matrices, CIEDE2000); re-run it before changing any of these. */
+  --map-1: #719f87;
+  --map-2: #c94856;
+  --map-3: #275c8d;
+  --map-4: #755323;
+  --map-5: #c68724;
+  --map-6: #a96fc1;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -70,7 +81,7 @@
     --series-a: var(--brand-teal);
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
-    --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
+    --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
   }
 }
 :root[data-theme="dark"] {
@@ -79,7 +90,7 @@
   --series-a: var(--brand-teal);
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
-  --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
+  --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
 }
 
 * { box-sizing: border-box; }

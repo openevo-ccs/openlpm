@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { Anchor, Info, Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
+import { Anchor, Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { arcHeight, lineOpacity, lineWidth, physicsLayoutOptions, pickVisibleLabels, truncateLabel, type LabelCandidate } from '@/lib/graph-standards'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
@@ -307,7 +309,10 @@ function looksLikeBk(bkId: string, label: string): boolean {
 // indicators would read as "yes, this genuinely relates."
 const RELEVANCE_EDGE_THRESHOLD = 2
 
-const BK_ROW_Y = 50
+// Top-level row's height above the first row of sub-concepts. The counted arcs
+// between concepts (bundled view) bow out above it, so it gets extra room then.
+const BK_ROW_Y_BASE = 50
+const BK_ROW_Y_FOR_ARCS = 80
 const UK_ROW_GAP = 60
 const UK_ROW_HEIGHT_BASE = 34
 const UK_CHILD_WIDTH_BASE = 96
@@ -335,7 +340,7 @@ interface GraphEdgeDatum {
   target: string
   color: string
   weight: number
-  kind: 'hierarchy' | 'relevance' | 'relation'
+  kind: 'hierarchy' | 'relevance' | 'relation' | 'cross' | 'bundle'
   tooltip?: string
 }
 interface NetzInsightUk { id: string; label: string; rootLabel: string; rootIdx: number; count: number }
@@ -374,6 +379,16 @@ function NetzTab({
   const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [sizeBy, setSizeBy] = useState<SizeBy>('count')
   const [density, setDensity] = useState<Density>('kompakt')
+  // Shared graph standards (src/lib/graph-standards.ts): which connections to
+  // draw, label overlap handling, layout, line strength. Remembered per browser.
+  const [gs, updateGs, resetGs] = useGraphSettings('basiskonzepte-netz')
+  // The physics spacing slider fires on every pixel of a drag; the layout is only
+  // recomputed once the value has held still for a moment.
+  const [physicsSpacing, setPhysicsSpacing] = useState(gs.spacing)
+  useEffect(() => {
+    const t = window.setTimeout(() => setPhysicsSpacing(gs.spacing), 250)
+    return () => window.clearTimeout(t)
+  }, [gs.spacing])
   const [highlightId, setHighlightId] = useState<string | null>(null)
   // Tracks the real rendered width so column sizing actually adapts when
   // the window/pane is resized, not just once at first mount -- the real
@@ -488,6 +503,7 @@ function NetzTab({
     if (!topics || rootConcepts.length === 0) return null
     const width = containerWidth || containerRef.current?.clientWidth || 900
     const scale = DENSITY_SCALE[density]
+    const BK_ROW_Y = gs.edges === 'tree' ? BK_ROW_Y_BASE : BK_ROW_Y_FOR_ARCS
     const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
     const rootColor = (rootId: string) => cssVar(MAP_PALETTE[(rootIndex.get(rootId) ?? 0) % 6], '#2a78d6')
 
@@ -729,7 +745,7 @@ function NetzTab({
         const tooltipBase = el.definition ? `${el.label}: ${el.definition}` : el.label
         nodes.push({
           id: ukId, label: el.label.length > 22 ? el.label.slice(0, 20) + '…' : el.label, kind: 'uk',
-          color: root ? rootColor(root.id) : '#999', size: Math.min(26, 11 + Math.sqrt(metricVal) * 3), opacity: 0.88,
+          color: root ? rootColor(root.id) : '#999', size: Math.min(20, 9 + Math.sqrt(metricVal) * 2.2), opacity: 0.92,
           x: pos.x, y: pos.y,
           tooltip: (tooltipBase.length > 180 ? tooltipBase.slice(0, 178) + '…' : tooltipBase) + (beispiel ? ` (Beispiel: ${beispiel.length > 80 ? beispiel.slice(0, 78) + '…' : beispiel})` : ''),
         })
@@ -742,9 +758,28 @@ function NetzTab({
         if (!pos) continue
         nodes.push({
           id: topicId, label: '', kind: 'lz',
-          color: rootColor(p.rootId), size: Math.min(26, 9 + Math.sqrt(p.totalWeight) * 5), opacity: Math.max(0.4, p.totalWeight / 6),
+          color: rootColor(p.rootId), size: Math.min(13, 6 + Math.sqrt(p.totalWeight) * 2), opacity: Math.max(0.55, Math.min(0.9, p.totalWeight / 5)),
           x: pos.x, y: pos.y, tooltip: title,
         })
+      }
+    }
+
+    // ---- Labels (graph standards rule 4): none overlap ----
+    // Top-level concepts always keep their label. Sub-concepts compete for
+    // space by size; one that would collide stays blank until hovered (the
+    // full text is in its tooltip).
+    {
+      const candidates: LabelCandidate[] = nodes
+        .filter((n) => n.kind === 'bk' || n.kind === 'uk')
+        .map((n) => ({
+          id: n.id, label: n.label, x: n.x, y: n.y, size: n.size, priority: n.size,
+          alwaysShow: n.kind === 'bk', fontPx: n.kind === 'bk' ? 11 : 8.5, maxWidthPx: n.kind === 'bk' ? 100 : 80,
+        }))
+      const visible = gs.labels === 'few' ? pickVisibleLabels(candidates) : null
+      for (const n of nodes) {
+        if (n.kind !== 'bk' && n.kind !== 'uk') continue
+        if (visible && !visible.has(n.id)) n.label = ''
+        else if (n.kind === 'uk') n.label = truncateLabel(n.label, gs.labels === 'few' ? 18 : 22)
       }
     }
 
@@ -761,9 +796,30 @@ function NetzTab({
       }
     }
     if (showLz) {
+      // Rule 1: each Lernziel's strongest link is its main link ('relevance');
+      // the rest are 'cross' links, hidden until asked for (see the edge mode).
       rawEdges.forEach((e, i) => {
-        edges.push({ id: `r-${i}`, source: e.targetId, target: e.topicId, color: rootColor(e.rootId), weight: e.weight, kind: 'relevance' })
+        const isMain = primaryByTopic.get(e.topicId)?.targetId === e.targetId
+        edges.push({ id: `r-${i}`, source: e.targetId, target: e.topicId, color: rootColor(e.rootId), weight: e.weight, kind: isMain ? 'relevance' : 'cross' })
       })
+    }
+    // Rule 2: one counted arc per pair of top-level concepts, in place of the
+    // many separate lines their shared Lernziele would otherwise draw.
+    if (gs.edges !== 'tree') {
+      const pairCount = new Map<string, number>()
+      for (const roots of crossCuttingByTopic.values()) {
+        const ids = Array.from(roots).sort()
+        for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
+          const key = `${ids[i]}|${ids[j]}`
+          pairCount.set(key, (pairCount.get(key) ?? 0) + 1)
+        }
+      }
+      for (const [key, count] of pairCount) {
+        const [a, b] = key.split('|')
+        const labelA = rootConcepts.find((r) => r.id === a)?.label ?? '?'
+        const labelB = rootConcepts.find((r) => r.id === b)?.label ?? '?'
+        edges.push({ id: `b-${key}`, source: a, target: b, color: '#6f7d8c', weight: count, kind: 'bundle', tooltip: `${count} Lernziele verbinden „${labelA}“ und „${labelB}“` })
+      }
     }
     // Real feedback e7333af2 (Susan, 2026-10-02): named, directed links
     // between any two concepts. Only rendered when BOTH endpoints are
@@ -816,7 +872,7 @@ function NetzTab({
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
     return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, density, containerWidth])
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, density, containerWidth, gs.edges, gs.labels])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
@@ -838,6 +894,7 @@ function NetzTab({
         {
           selector: 'node',
           style: {
+            'border-width': 1.5, 'border-color': cssVar('--surface-0', '#ffffff'),
             'background-color': 'data(color)', 'background-opacity': 'data(opacity)',
             width: 'data(size)', height: 'data(size)',
             label: 'data(label)', 'font-size': 8, 'text-wrap': 'wrap', 'text-max-width': '60px',
@@ -880,8 +937,29 @@ function NetzTab({
           // into a near-solid block of color. Real 2026-10-01 feedback.
           selector: 'edge[kind="relevance"]',
           style: {
-            width: 'mapData(weight, 0, 3, 1, 4)', 'line-color': 'data(color)', 'curve-style': 'bezier',
-            'target-arrow-shape': 'none', opacity: 'mapData(weight, 0, 3, 0.12, 0.5)', 'transition-property': 'opacity', 'transition-duration': 180,
+            width: 'mapData(weight, 0, 3, 0.8, 2.2)', 'line-color': 'data(color)', 'curve-style': 'bezier',
+            'target-arrow-shape': 'none', 'transition-property': 'opacity', 'transition-duration': 180,
+          } as any,
+        },
+        {
+          // A Lernziel's other (non-strongest) links: hidden unless the edge
+          // mode is "all", and shown on hover (.reveal) otherwise.
+          selector: 'edge[kind="cross"]',
+          style: { width: 0.8, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', display: gs.edges === 'all' ? 'element' : 'none' } as any,
+        },
+        { selector: 'edge[kind="cross"].reveal', style: { display: 'element', opacity: 0.7, width: 1.6, 'z-index': 50 } as any },
+        {
+          selector: 'edge[kind="bundle"]',
+          style: {
+            width: 'mapData(weight, 1, 60, 1.5, 8)', 'line-color': '#8896a5', opacity: 0.3, 'curve-style': 'unbundled-bezier',
+            'target-arrow-shape': 'none', 'z-index': 1,
+          } as any,
+        },
+        {
+          selector: 'edge[kind="bundle"].hover-label',
+          style: {
+            opacity: 0.7, label: 'data(tooltip)', 'font-size': 10, 'font-weight': 600, 'text-wrap': 'wrap', 'text-max-width': '180px', 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1, 'text-background-padding': '4px',
           } as any,
         },
         {
@@ -912,6 +990,26 @@ function NetzTab({
       ],
     })
     cyRef.current = cy
+    cy.edges('[kind="bundle"]').forEach((e) => {
+      const gap = Math.abs(e.source().position('x') - e.target().position('x'))
+      e.style('control-point-distances', [-arcHeight(gap)])
+      e.style('control-point-weights', [0.5])
+    })
+    if (gs.layout === 'physics') {
+      // Top-level concepts stay where they are; only the smaller nodes move.
+      cy.edges('[kind="bundle"]').style('curve-style', 'bezier')
+      const pinned = cy.nodes('[kind="bk"]')
+      pinned.lock()
+      cy.elements().not('[kind="cross"]').not('[kind="bundle"]').layout(physicsLayoutOptions(physicsSpacing) as any).run()
+      pinned.unlock()
+      cy.fit(undefined, 30)
+    }
+    cy.on('mouseover', 'node[kind="lz"]', (evt) => evt.target.connectedEdges('[kind="cross"]').addClass('reveal'))
+    cy.on('mouseout', 'node[kind="lz"]', (evt) => evt.target.connectedEdges('[kind="cross"]').removeClass('reveal'))
+    // The pointer can leave the whole graph without a per-node mouseout firing.
+    cy.on('mouseout', (evt) => { if (evt.target === cy) cy.edges('.reveal').removeClass('reveal') })
+    cy.on('mouseover', 'edge[kind="bundle"]', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'edge[kind="bundle"]', (evt) => evt.target.removeClass('hover-label'))
 
     cy.on('tap', 'node[kind="lz"]', (evt) => navigate(`/dashboard/${project.slug}/${evt.target.id()}`))
     cy.on('tap', 'node[kind="bk"], node[kind="uk"]', (evt) => setHighlightId((prev) => (prev === evt.target.id() ? null : evt.target.id())))
@@ -927,7 +1025,17 @@ function NetzTab({
     cy.on('mouseover', 'edge[kind="relation"]', (evt) => evt.target.addClass('hover-label'))
     cy.on('mouseout', 'edge[kind="relation"]', (evt) => evt.target.removeClass('hover-label'))
     return () => { cy.destroy(); cyRef.current = null }
-  }, [model, project.slug, navigate])
+  }, [model, project.slug, navigate, gs.layout, gs.edges, physicsSpacing])
+
+  // Line strength (graph standards rule 3). Restyles the existing lines in
+  // place when the slider moves, so zoom and pan are kept.
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    cy.edges('[kind="relevance"]').forEach((e) => { e.style('opacity', lineOpacity(e.data('weight'), gs.lineStrength)) })
+    cy.edges('[kind="cross"]').forEach((e) => { e.style('opacity', lineOpacity(e.data('weight'), gs.lineStrength) * 0.45) })
+    cy.edges('[kind="relevance"]').forEach((e) => { e.style('width', lineWidth(e.data('weight'))) })
+  }, [model, gs.lineStrength, gs.layout, gs.edges, physicsSpacing])
 
   // Click-to-highlight: applies/clears the .dimmed class on the ALREADY
   // rendered graph (no rebuild, no lost zoom/pan) -- expands outward up to
@@ -943,6 +1051,8 @@ function NetzTab({
       const next: string[] = []
       for (const id of frontier) {
         cy.getElementById(id).connectedEdges().forEach((edge) => {
+          const kind = edge.data('kind')
+          if (kind === 'bundle' || (kind === 'cross' && gs.edges !== 'all')) return // arcs and hidden links would light up the whole graph
           const other = edge.source().id() === id ? edge.target().id() : edge.source().id()
           if (!visited.has(other)) { visited.add(other); next.push(other) }
         })
@@ -951,7 +1061,7 @@ function NetzTab({
     }
     cy.nodes().forEach((n) => { n.toggleClass('dimmed', !visited.has(n.id())) })
     cy.edges().forEach((e) => { e.toggleClass('dimmed', !(visited.has(e.source().id()) && visited.has(e.target().id()))) })
-  }, [highlightId])
+  }, [highlightId, gs.edges])
 
   const zoomBy = (factor: number) => {
     const cy = cyRef.current
@@ -998,22 +1108,29 @@ function NetzTab({
           <button className={`chip-btn${density === 'kompakt' ? ' active' : ''}`} onClick={() => setDensity('kompakt')}>Kompakt</button>
           <button className={`chip-btn${density === 'weit' ? ' active' : ''}`} onClick={() => setDensity('weit')}>Weit</button>
         </div>
-        <div className="netz-control-group">
-          <button className="btn btn-mini" aria-label="Verkleinern" onClick={() => zoomBy(0.8)}><ZoomOut size={13} /></button>
-          <button className="btn btn-mini" aria-label="Einpassen" onClick={fitView}><Maximize2 size={13} /></button>
-          <button className="btn btn-mini" aria-label="Vergrößern" onClick={() => zoomBy(1.25)}><ZoomIn size={13} /></button>
-        </div>
       </div>
+      <GraphControls
+        settings={gs}
+        onChange={updateGs}
+        onReset={resetGs}
+        lang="de"
+        onZoomIn={() => zoomBy(1.25)}
+        onZoomOut={() => zoomBy(0.8)}
+        onFit={fitView}
+      />
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div ref={containerRef} style={{ height: 480, minHeight: 480 }} />
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
-        Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre echten Unterkonzepte'}.
-        {showLz && ' Kleine Punkte = einzelne Lernziele, mit einer echten, bewerteten Linie zu '}
-        {showLz && (showUk ? 'dem Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'jedem Basiskonzept')}
-        {showLz && ', dem sie wirklich zugeordnet sind — viele Lernziele gehören zu mehreren Konzepten zugleich, deshalb kreuzen manche Linien.'}
-        {' '}Dickere, kräftigere Linien = höhere bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
+        Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre Unterkonzepte'}.
+        {showLz && ' Kleine Punkte = einzelne Lernziele. Jedes Lernziel hängt mit einer Linie an dem '}
+        {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
+        {showLz && ', zu dem es am stärksten passt.'}
+        {showLz && gs.edges === 'bundled' && ' Viele Lernziele gehören zu mehreren Konzepten zugleich: Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl). Zeigt man auf ein Lernziel, erscheinen seine weiteren Verbindungen.'}
+        {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
+        {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
+        {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
       </p>
 
       {showRelations && (
