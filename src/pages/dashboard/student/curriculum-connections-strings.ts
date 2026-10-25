@@ -58,10 +58,6 @@ export interface ConnectionsStrings {
   controlZoomIn: string
   controlZoomOut: string
   controlDownload: string
-  controlLabelsAlways: string
-  controlLabelsHover: string
-  controlSpacingLess: string
-  controlSpacingMore: string
 
   comparisonTitle: string
   comparisonHelp: string
@@ -134,7 +130,7 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     selectTopic: 'Wähle links ein Lernziel.',
 
     networkTitle: 'Netzwerk',
-    networkHelp: 'Ein interaktives Diagramm: Lernziele (große Punkte) verbunden mit realen Lehrplan-Dokumenten (kleine Punkte). Klicke einen Punkt an, um seine Verbindungen hervorzuheben; die Steuerung oben rechts passt Abstand, Zoom und Beschriftungen an.',
+    networkHelp: 'Ein interaktives Diagramm: Lernziele (große Punkte) verbunden mit Lehrplan-Dokumenten (kleine Punkte). Klicke einen Punkt an, um seine Verbindungen hervorzuheben; die Steuerung über dem Diagramm passt Anordnung, Linienstärke, Zoom und Beschriftungen an.',
     graphHint: 'Lernziele (groß) und reale Lehrplan-Dokumente (klein), verbunden durch echte Verknüpfungen. Klicken zum Hervorheben.',
     legendTopic: 'Lernziel',
     legendRecord: 'Lehrplan-Dokument',
@@ -142,10 +138,6 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     controlZoomIn: 'Vergrößern',
     controlZoomOut: 'Verkleinern',
     controlDownload: 'Als PNG herunterladen',
-    controlLabelsAlways: 'Alle Beschriftungen zeigen',
-    controlLabelsHover: 'Beschriftungen nur bei Hover',
-    controlSpacingLess: 'Enger anordnen',
-    controlSpacingMore: 'Weiter auseinanderziehen',
 
     comparisonTitle: 'Vergleich',
     comparisonHelp: 'Vergleicht dieses LPM mit seinem Gegenstück anhand von Umfang, Tiefe und Verankerung, plus den einzelnen Vergleichsnotizen zwischen beiden. Das Flussdiagramm unten zeigt, welche Stränge bereits miteinander verglichen wurden und wie oft.',
@@ -216,7 +208,7 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     selectTopic: 'Select a learning goal on the left.',
 
     networkTitle: 'Network',
-    networkHelp: 'An interactive diagram: learning goals (larger dots) connected to real curriculum documents (smaller dots). Click a dot to highlight its connections; the controls in the top right adjust spacing, zoom, and labels.',
+    networkHelp: 'An interactive diagram: learning goals (larger dots) connected to curriculum documents (smaller dots). Click a dot to highlight its connections; the controls above the diagram adjust layout, line strength, zoom, and labels.',
     graphHint: 'Learning goals (larger) and real curriculum documents (smaller), connected by real links. Click one to highlight it.',
     legendTopic: 'Learning goal',
     legendRecord: 'Curriculum document',
@@ -224,10 +216,6 @@ export const STRINGS: Record<'de' | 'en', ConnectionsStrings> = {
     controlZoomIn: 'Zoom in',
     controlZoomOut: 'Zoom out',
     controlDownload: 'Download as PNG',
-    controlLabelsAlways: 'Show all labels',
-    controlLabelsHover: 'Show labels on hover only',
-    controlSpacingLess: 'Pack tighter',
-    controlSpacingMore: 'Spread out',
 
     comparisonTitle: 'Comparison',
     comparisonHelp: 'Compares this LPM against its counterpart on scope, depth, and grounding, plus the individual comparison notes between the two. The flow diagram below shows which strands have already been compared, and how often.',

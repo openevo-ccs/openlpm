@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 import { GitCompare } from 'lucide-react'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import coseBilkent from 'cytoscape-cose-bilkent'
-import { Download, Grid3x3, Maximize2, Minus, Plus, ZoomIn, ZoomOut } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { useCurriculumConnectionsData } from './use-curriculum-connections-data'
 import { STRINGS } from './curriculum-connections-strings'
 import { RECORD_TYPE_LABEL, type DataObjectLinkWithRecord } from '@/lib/supabase/curriculum-repository'
 import type { TopicListItem } from '@/lib/supabase/curriculum'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { layoutTier } from '@/lib/graph-layout'
+import { lineOpacity, pickVisibleLabels, truncateLabel, type LabelCandidate } from '@/lib/graph-standards'
 
 cytoscape.use(coseBilkent)
 
@@ -20,23 +23,64 @@ function cssVar(name: string, fallback: string) {
 // a plain cy.fit() on a real, non-overlapping layout zooms out far enough
 // to make every label illegible once the graph has any real size.
 const MIN_READABLE_ZOOM = 0.45
+// A graph with only a few linked goals would otherwise be blown up to fill the
+// whole frame, with oversized labels. Never start larger than this.
+const MAX_FIT_ZOOM = 1.1
 function fitWithReadableFloor(cy: Core) {
   cy.fit(undefined, 32)
   if (cy.zoom() < MIN_READABLE_ZOOM) { cy.zoom(MIN_READABLE_ZOOM); cy.center() }
+  else if (cy.zoom() > MAX_FIT_ZOOM) { cy.zoom(MAX_FIT_ZOOM); cy.center() }
 }
 
-// Spacing is a multiplier on cose-bilkent's own idealEdgeLength/nodeRepulsion
-// (1 = its tuned defaults for this graph's typical size); the "Pack
-// tighter"/"Spread out" buttons below step through this list live, re-running
-// layout on the existing cy instance rather than rebuilding the graph.
-const SPACING_STEPS = [0.65, 0.85, 1, 1.3, 1.7]
+// A record is not a concept group, so it does not take one of the six
+// concept colors (they mean "which top-level concept", see the graph
+// standards note). Learning goals use the brand teal; curriculum documents a
+// neutral slate that keeps 3:1 contrast against the page.
+const RECORD_COLOR = '#6f7d8c'
 
-function buildGraphLayout(spacing: number, animate: boolean) {
+// The graph standards, applied to the Curriculum network (tracker row 3 in
+// lab_manager/docs/design-notes/openlpm-graph-visualization-standards-
+// proposal-2026-10-25.md). Roles here: item = a learning goal or a curriculum
+// document; every link is a plain goal-to-document link, so there are no
+// groups, main versus other links or arcs, and the connection choice is left
+// off. What applies: a fixed layout by default (two rows, ordered to keep
+// the lines apart), labels that never overlap, line strength, optional
+// physics, and the shared control panel. Before 2026-10-25 this graph
+// started a physics simulation from random positions every time it loaded.
+const GRADE_ORDER = ['K-2', '3-5', '6-8', '9-12']
+const gradeRank = (g: string | null) => {
+  const i = GRADE_ORDER.indexOf(g ?? '')
+  return i >= 0 ? i : GRADE_ORDER.length
+}
+
+const LAYOUT_WIDTH = 1000
+const TOPIC_SPACING = 170
+const RECORD_SPACING = 64
+
+/** One centered row if it fits the width, otherwise the shared staggered grid. */
+function placeRow(ids: string[], y: number, spacing: number): { positions: Map<string, { x: number; y: number }>; height: number } {
+  const positions = new Map<string, { x: number; y: number }>()
+  if (ids.length * spacing <= LAYOUT_WIDTH) {
+    const start = LAYOUT_WIDTH / 2 - ((ids.length - 1) * spacing) / 2
+    ids.forEach((id, i) => positions.set(id, { x: start + i * spacing, y }))
+    return { positions, height: ids.length ? 1 : 0 }
+  }
+  const { positions: grid, rows } = layoutTier(ids.map((id) => ({ id })), LAYOUT_WIDTH / 2, y, LAYOUT_WIDTH, 56, spacing)
+  for (const [id, p] of grid) positions.set(id, p)
+  return { positions, height: rows }
+}
+
+// Spacing 0 to 100 maps to a multiplier on cose-bilkent's own tuned
+// idealEdgeLength and nodeRepulsion (50 = the values this graph always used).
+const spacingMultiplier = (spacing: number) => 0.4 + spacing * 0.012
+
+function physicsLayout(spacing: number) {
+  const m = spacingMultiplier(spacing)
   return {
     name: 'cose-bilkent',
     quality: 'proof',
-    nodeRepulsion: 5500 * spacing,
-    idealEdgeLength: 110 * spacing,
+    nodeRepulsion: 5500 * m,
+    idealEdgeLength: 110 * m,
     edgeElasticity: 0.4,
     nestingFactor: 0.1,
     gravity: 0.25,
@@ -45,11 +89,10 @@ function buildGraphLayout(spacing: number, animate: boolean) {
     tile: true,
     tilingPaddingVertical: 20,
     tilingPaddingHorizontal: 20,
-    animate: animate ? 'end' : false,
-    animationDuration: 500,
-    randomize: true,
-    fit: true,
-    padding: 36,
+    animate: false,
+    // Starts from the fixed layout's positions, so the same data gives the same picture.
+    randomize: false,
+    fit: false,
     nodeDimensionsIncludeLabels: true,
   } as any
 }
@@ -60,30 +103,53 @@ function buildGraphLayout(spacing: number, animate: boolean) {
 export default function CurriculumNetworkPage() {
   const { config, topics, linksByObject } = useCurriculumConnectionsData()
   const t = STRINGS[config?.language ?? 'en']
+  const lang = config?.language === 'de' ? 'de' : 'en'
 
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
   const [selected, setSelected] = useState<{ label: string; detail: string } | null>(null)
-  const [spacingIdx, setSpacingIdx] = useState(2)
-  const [labelsAlways, setLabelsAlways] = useState(false)
+  const [gs, updateGs, resetGs] = useGraphSettings('curriculum-network')
+  // The spacing slider fires on every pixel of a drag; physics recomputes once it holds still.
+  const [physicsSpacing, setPhysicsSpacing] = useState(gs.spacing)
+  useEffect(() => {
+    const timer = window.setTimeout(() => setPhysicsSpacing(gs.spacing), 250)
+    return () => window.clearTimeout(timer)
+  }, [gs.spacing])
 
   useEffect(() => {
     if (!containerRef.current || !topics) return
-    const connectedTopics = topics.filter((tp) => (linksByObject[tp.id]?.length ?? 0) > 0)
+    const connectedTopics = topics
+      .filter((tp) => (linksByObject[tp.id]?.length ?? 0) > 0)
+      .sort((a, b) => gradeRank(a.grade_band) - gradeRank(b.grade_band) || a.title.localeCompare(b.title))
     const recordById = new Map<string, DataObjectLinkWithRecord['record']>()
     for (const tp of connectedTopics) for (const link of linksByObject[tp.id]) recordById.set(link.record.id, link.record)
 
-    const truncate = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
+    // ---- Fixed layout: learning goals in a row, documents in the row below ----
+    const topicRow = placeRow(connectedTopics.map((tp) => `topic:${tp.id}`), 0, TOPIC_SPACING)
+    const topicX = new Map(connectedTopics.map((tp) => [tp.id, topicRow.positions.get(`topic:${tp.id}`)!.x]))
+    // A document sits near the goals it links to, which keeps the lines short and apart.
+    const centerOf = (recordId: string) => {
+      const xs = connectedTopics.filter((tp) => linksByObject[tp.id].some((l) => l.record.id === recordId)).map((tp) => topicX.get(tp.id)!)
+      return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : LAYOUT_WIDTH / 2
+    }
+    const recordsSorted = Array.from(recordById.values()).sort((a, b) => centerOf(a.id) - centerOf(b.id) || a.title.localeCompare(b.title))
+    const recordsY = (topicRow.height > 1 ? topicRow.height * 56 : 0) + 260
+    const recordRow = placeRow(recordsSorted.map((r) => `record:${r.id}`), recordsY, RECORD_SPACING)
+
+    const linkCount = new Map<string, number>()
+    for (const tp of connectedTopics) for (const link of linksByObject[tp.id]) linkCount.set(link.record.id, (linkCount.get(link.record.id) ?? 0) + 1)
 
     const elements: ElementDefinition[] = [
       ...connectedTopics.map((tp: TopicListItem) => ({
         data: {
-          id: `topic:${tp.id}`, label: truncate(tp.title, 30), fullLabel: tp.title, kind: 'topic',
+          id: `topic:${tp.id}`, label: '', fullLabel: tp.title, kind: 'topic',
           size: 24 + Math.min(16, (linksByObject[tp.id]?.length ?? 0) * 3),
         },
+        position: topicRow.positions.get(`topic:${tp.id}`),
       })),
-      ...Array.from(recordById.values()).map((r) => ({
-        data: { id: `record:${r.id}`, label: truncate(r.title, 24), fullLabel: r.title, kind: 'record', recordType: RECORD_TYPE_LABEL[r.record_type] },
+      ...recordsSorted.map((r) => ({
+        data: { id: `record:${r.id}`, label: '', fullLabel: r.title, kind: 'record', recordType: RECORD_TYPE_LABEL[r.record_type], links: linkCount.get(r.id) ?? 1 },
+        position: recordRow.positions.get(`record:${r.id}`),
       })),
       ...connectedTopics.flatMap((tp) =>
         (linksByObject[tp.id] ?? []).map((link) => ({ data: { id: `e-${link.id}`, source: `topic:${tp.id}`, target: `record:${link.record.id}` } }))
@@ -94,7 +160,7 @@ export default function CurriculumNetworkPage() {
       container: containerRef.current,
       elements,
       boxSelectionEnabled: false,
-      layout: buildGraphLayout(SPACING_STEPS[spacingIdx], false),
+      layout: { name: 'preset' },
       minZoom: 0.15,
       maxZoom: 3,
       wheelSensitivity: 0.25,
@@ -114,16 +180,18 @@ export default function CurriculumNetworkPage() {
         {
           selector: 'node[kind="record"]',
           style: {
-            'background-color': '#3fae70', 'border-width': 1.5, 'border-color': cssVar('--surface-0', '#fff') as any,
-            width: 13, height: 13, label: '',
+            'background-color': RECORD_COLOR, 'border-width': 1.5, 'border-color': cssVar('--surface-0', '#fff') as any,
+            width: 13, height: 13,
+            label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 4,
+            color: cssVar('--text-primary', '#0b0b0b') as any,
             'transition-property': 'opacity, border-width' as any, 'transition-duration': 150 as any,
           },
         },
         {
-          selector: 'node.hover-label, node.labels-always[kind="record"]',
+          selector: 'node.hover-label',
           style: {
-            label: 'data(label)', 'font-size': 9, 'z-index': 999,
-            'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 4,
+            label: 'data(fullLabel)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            'text-wrap': 'wrap', 'text-max-width': '160px', 'text-valign': 'bottom', 'text-margin-y': 4,
             color: cssVar('--text-primary', '#0b0b0b') as any,
             'text-background-color': cssVar('--surface-0', '#fff') as any, 'text-background-opacity': 1,
             'text-background-padding': '3px' as any, 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc') as any,
@@ -133,8 +201,8 @@ export default function CurriculumNetworkPage() {
         {
           selector: 'edge',
           style: {
-            width: 1.3, 'line-color': cssVar('--border', '#c3c2b7') as any, 'curve-style': 'bezier',
-            'target-arrow-shape': 'none', opacity: 0.55,
+            width: 1.3, 'line-color': '#8896a5' as any, 'curve-style': 'bezier',
+            'target-arrow-shape': 'none', opacity: 'data(op)' as any,
             'transition-property': 'opacity, width' as any, 'transition-duration': 150 as any,
           },
         },
@@ -142,6 +210,27 @@ export default function CurriculumNetworkPage() {
         { selector: '.dim', style: { opacity: 0.12 } },
       ],
     })
+
+    if (gs.layout === 'physics') cy.layout(physicsLayout(physicsSpacing)).run()
+
+    // ---- Labels: none overlap. Learning goals always keep theirs. ----
+    {
+      const candidates: LabelCandidate[] = cy.nodes().map((n) => {
+        const isTopic = n.data('kind') === 'topic'
+        return {
+          id: n.id(), label: n.data('fullLabel'), x: n.position('x'), y: n.position('y'), size: isTopic ? n.data('size') : 13,
+          priority: isTopic ? 1000 : n.data('links') ?? 1, alwaysShow: isTopic, fontPx: isTopic ? 11 : 9, maxWidthPx: isTopic ? 120 : 100, labelSide: 'below',
+        }
+      })
+      const visible = gs.labels === 'few' ? pickVisibleLabels(candidates) : null
+      cy.nodes().forEach((n) => {
+        const full = String(n.data('fullLabel'))
+        const isTopic = n.data('kind') === 'topic'
+        if (visible && !visible.has(n.id())) n.data('label', '')
+        else n.data('label', isTopic ? truncateLabel(full, 60) : truncateLabel(full, 28))
+      })
+    }
+    cy.edges().forEach((e) => { e.data('op', lineOpacity(2, gs.lineStrength)) })
 
     cy.on('tap', 'node', (evt) => {
       const n = evt.target
@@ -159,22 +248,16 @@ export default function CurriculumNetworkPage() {
 
     fitWithReadableFloor(cy)
     cyRef.current = cy
-    return () => { cy.destroy() }
+    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [topics, linksByObject])
+  }, [topics, linksByObject, gs.layout, gs.labels, physicsSpacing])
 
+  // Line strength restyles the existing lines in place, keeping zoom and pan.
   useEffect(() => {
     const cy = cyRef.current
     if (!cy) return
-    cy.layout(buildGraphLayout(SPACING_STEPS[spacingIdx], true)).run()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spacingIdx])
-
-  useEffect(() => {
-    const cy = cyRef.current
-    if (!cy) return
-    cy.nodes('[kind="record"]').toggleClass('labels-always', labelsAlways)
-  }, [labelsAlways])
+    cy.edges().forEach((e) => { e.data('op', lineOpacity(2, gs.lineStrength)) })
+  }, [gs.lineStrength, topics, linksByObject])
 
   const zoomBy = (factor: number) => {
     const cy = cyRef.current
@@ -201,36 +284,22 @@ export default function CurriculumNetworkPage() {
       <h1 className="row"><GitCompare size={18} style={{ color: 'var(--text-muted)' }} />{t.networkTitle}</h1>
       <p className="muted" style={{ marginBottom: 14, maxWidth: 680 }}>{t.networkHelp}</p>
 
+      <GraphControls
+        settings={gs}
+        onChange={updateGs}
+        onReset={resetGs}
+        lang={lang}
+        showConnections={false}
+        wording={{ fixed: { label: lang === 'de' ? 'Zwei Reihen' : 'Two rows', hint: lang === 'de' ? 'Lernziele oben, Lehrplan-Dokumente darunter, immer gleich angeordnet.' : 'Learning goals on top, curriculum documents below, always arranged the same way.' } }}
+        onZoomIn={() => zoomBy(1.25)}
+        onZoomOut={() => zoomBy(0.8)}
+        onFit={() => { if (cyRef.current) fitWithReadableFloor(cyRef.current) }}
+      />
+
       <div className="graph-host" style={{ height: 640, borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
         <div ref={containerRef} className="graph-canvas" />
 
         <div className="row" style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, gap: 6 }}>
-          <button className="btn btn-mini" aria-label={t.controlSpacingLess} title={t.controlSpacingLess}
-            disabled={spacingIdx === 0} onClick={() => setSpacingIdx((i) => Math.max(0, i - 1))}>
-            <Minus size={12} />
-          </button>
-          <button className="btn btn-mini" aria-label={t.controlSpacingMore} title={t.controlSpacingMore}
-            disabled={spacingIdx === SPACING_STEPS.length - 1} onClick={() => setSpacingIdx((i) => Math.min(SPACING_STEPS.length - 1, i + 1))}>
-            <Plus size={12} />
-          </button>
-          <button className="btn btn-mini" aria-label={t.controlZoomOut} title={t.controlZoomOut} onClick={() => zoomBy(0.8)}>
-            <ZoomOut size={12} />
-          </button>
-          <button className="btn btn-mini" aria-label={t.controlZoomIn} title={t.controlZoomIn} onClick={() => zoomBy(1.25)}>
-            <ZoomIn size={12} />
-          </button>
-          <button className="btn btn-mini" aria-label={t.controlFit} title={t.controlFit}
-            onClick={() => { if (cyRef.current) fitWithReadableFloor(cyRef.current) }}>
-            <Maximize2 size={12} />
-          </button>
-          <button
-            className={`btn btn-mini${labelsAlways ? ' active' : ''}`}
-            aria-label={labelsAlways ? t.controlLabelsHover : t.controlLabelsAlways}
-            title={labelsAlways ? t.controlLabelsHover : t.controlLabelsAlways}
-            onClick={() => setLabelsAlways((v) => !v)}
-          >
-            <Grid3x3 size={12} />
-          </button>
           <button className="btn btn-mini" aria-label={t.controlDownload} title={t.controlDownload} onClick={downloadPng}>
             <Download size={12} />
           </button>
@@ -238,7 +307,7 @@ export default function CurriculumNetworkPage() {
 
         <div className="legend">
           <span><span className="dept-sw" style={{ background: 'var(--series-a)' }} />{t.legendTopic}</span>
-          <span><span className="dept-sw" style={{ background: '#3fae70' }} />{t.legendRecord}</span>
+          <span><span className="dept-sw" style={{ background: RECORD_COLOR }} />{t.legendRecord}</span>
         </div>
       </div>
       {selected && (
