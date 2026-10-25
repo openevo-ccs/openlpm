@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { BookOpen, CheckCircle2, Clock, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, CheckCircle2, Clock, Filter, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
+  rowMatchesSearch,
   resolveCrossRepoLabels,
   type BaseRepoKey,
   type SnapshotRow,
@@ -78,6 +79,25 @@ interface NodeRef {
   row: SnapshotRow
 }
 
+// One table column. Built per tab in the page (see `columns` below) from the
+// repo's own tableColumns, or from the generic Label/Detail layout, plus the
+// Repo, Language and Review status columns where they apply. Sorting and
+// filtering both hang off the same definition, so the heading is the one
+// place to do either (Susan Hanisch, 2026-10-25, feedback 1f216e51).
+interface ColumnDef {
+  id: string
+  header: string
+  get: (n: NodeRef) => string
+  /** Present = the heading gets a filter control with these values as its choices. */
+  filterValues?: (n: NodeRef) => string[]
+  filterLabel?: (value: string) => string
+  render?: (n: NodeRef) => ReactNode
+}
+
+type SortState = { id: string; dir: 'asc' | 'desc' }
+
+const compareText = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+
 export default function AdminBaseRepoExplorerPage() {
   const { isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
@@ -85,10 +105,11 @@ export default function AdminBaseRepoExplorerPage() {
   const [tab, setTab] = useState<TabKey>('all')
   const [view, setView] = useState<ViewMode>('table')
   const [search, setSearch] = useState('')
-  const [filterValue, setFilterValue] = useState<string>('')
-  const [langFilter, setLangFilter] = useState<string>('')
-  const [secondaryFilterValue, setSecondaryFilterValue] = useState<string>('')
-  const [sortBy, setSortBy] = useState<'label' | 'filterValue' | 'review_status' | 'secondaryFilter'>('label')
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({})
+  const [sort, setSort] = useState<SortState | null>(null)
+  // A base is loaded once and kept, so switching tabs back and forth (and
+  // searching) never refetches. Searching happens in the browser over the
+  // whole loaded record -- see rowMatchesSearch.
   const [rowsByRepo, setRowsByRepo] = useState<Map<BaseRepoKey, SnapshotRow[]>>(new Map())
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<NodeRef | null>(null)
@@ -99,30 +120,29 @@ export default function AdminBaseRepoExplorerPage() {
 
   useEffect(() => {
     if (!isAdmin) return
+    const wanted: BaseRepoKey[] = tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
+    const missing = wanted.filter((key) => !rowsByRepo.has(key))
+    if (missing.length === 0) return
     let active = true
     setLoading(true)
-    const repoKeys: BaseRepoKey[] = tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
-    Promise.all(repoKeys.map(async (key) => [key, await listSnapshotRows(supabase, key, search)] as const)).then((pairs) => {
+    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key)] as const)).then((pairs) => {
       if (!active) return
-      setRowsByRepo(new Map(pairs))
+      setRowsByRepo((prev) => {
+        const next = new Map(prev)
+        for (const [key, rows] of pairs) next.set(key, rows)
+        return next
+      })
       setLoading(false)
     })
     return () => { active = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, isAdmin, tab, search])
+  }, [supabase, isAdmin, tab])
 
   useEffect(() => {
     if (isAdmin) reloadReviewQueue()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin])
 
-  // Real feedback 68d278e2 (Susan, 2026-10-21): "add options to filter and
-  // sort, especially filter by Method-class." The filter dropdown only
-  // makes sense once a single repo is selected -- each repo's filterColumn
-  // means something different (method_class vs question_type vs
-  // source_vocabulary), so mixing them under "All" would filter apples
-  // against oranges. Resets whenever the tab changes so a stale filter
-  // value from one repo doesn't silently carry into another.
   const activeFilterCfg = tab !== 'all' ? BASE_REPO_CONFIGS.find((c) => c.key === tab) : undefined
   const activeFilterColumn = activeFilterCfg?.filterColumn
   // Real feedback cc89fc1c (Susan, 2026-10-21... reconfirmed 2026-10-24):
@@ -132,60 +152,100 @@ export default function AdminBaseRepoExplorerPage() {
   // generic cross-repo table only makes sense across more than one repo.
   const showRepoColumn = tab === 'all'
   const activeTableColumns: TableColumn[] | undefined = activeFilterCfg?.tableColumns
-  const activeSecondaryFilter = activeFilterCfg?.secondaryFilter
-  useEffect(() => { setFilterValue(''); setLangFilter(''); setSecondaryFilterValue('') }, [tab])
+  // A filter or sort set for one base's columns means nothing on another's.
+  useEffect(() => { setColumnFilters({}); setSort(null) }, [tab])
+
+  // The rows for this tab, before any search or filter.
+  const tabRows: NodeRef[] = useMemo(() => {
+    const out: NodeRef[] = []
+    const keys: BaseRepoKey[] = tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
+    for (const repoKey of keys) for (const row of rowsByRepo.get(repoKey) ?? []) out.push({ repoKey, row })
+    return out
+  }, [rowsByRepo, tab])
 
   // Real feedback a3408216 (Susan, 2026-10-24): no way to tell, or filter,
   // which language a record's text is actually in -- MethodsBase content
   // reads as an undifferentiated mix. Only shown once at least one loaded
-  // row actually carries a language tag (today: MethodsBase, since that's
-  // the one repo whose schema was changed for this -- see base-repo-
-  // explorer.ts's detectLanguages), so every other repo's view is
-  // unchanged until it gets the same treatment.
-  const anyLanguageTagged = useMemo(() => {
-    for (const rows of rowsByRepo.values()) for (const row of rows) if (row.languages.length > 0) return true
-    return false
-  }, [rowsByRepo])
+  // row carries a language tag (today: MethodsBase), so every other
+  // repo's view is unchanged until it gets the same treatment.
+  const anyLanguageTagged = useMemo(() => tabRows.some((n) => n.row.languages.length > 0), [tabRows])
 
-  const langFilterOptions = useMemo(() => {
-    const values = new Set<string>()
-    for (const rows of rowsByRepo.values()) for (const row of rows) for (const l of row.languages) values.add(l)
-    return Array.from(values).sort()
-  }, [rowsByRepo])
+  const columns: ColumnDef[] = useMemo(() => {
+    const cols: ColumnDef[] = []
+    if (showRepoColumn) {
+      cols.push({
+        id: 'repo', header: 'Repo', get: (n) => n.repoKey, filterValues: (n) => [n.repoKey],
+        render: (n) => <span className="chip" style={{ borderColor: REPO_COLOR[n.repoKey], color: REPO_COLOR[n.repoKey] }}>{n.repoKey}</span>,
+      })
+    }
+    if (activeTableColumns) {
+      for (const c of activeTableColumns) {
+        cols.push({
+          id: `col:${c.header}`, header: c.header, get: (n) => c.get(n.row),
+          filterValues: c.filterValues ? (n) => c.filterValues!(n.row) : undefined,
+        })
+      }
+    } else {
+      cols.push({ id: 'label', header: 'Label', get: (n) => n.row.label })
+    }
+    if (anyLanguageTagged) {
+      cols.push({
+        id: 'language', header: 'Language',
+        get: (n) => (n.row.languages.length > 0 ? n.row.languages.join(' ') : 'untagged'),
+        filterValues: (n) => (n.row.languages.length > 0 ? n.row.languages : ['__untagged__']),
+        filterLabel: (v) => (v === '__untagged__' ? 'Not yet language-tagged' : LANGUAGE_NAMES[v] ?? v.toUpperCase()),
+        render: (n) => <LanguageBadge languages={n.row.languages} />,
+      })
+    }
+    if (!activeTableColumns) {
+      cols.push({
+        id: 'detail', header: activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail',
+        get: (n) => n.row.secondary ?? n.row.filterValue ?? '',
+        filterValues: activeFilterColumn ? (n) => (n.row.filterValue ? [n.row.filterValue] : []) : undefined,
+        render: (n) => <span className="muted">{n.row.secondary ?? n.row.filterValue ?? ''}</span>,
+      })
+    }
+    cols.push({
+      id: 'review', header: 'Review status', get: (n) => n.row.review_status ?? '—',
+      filterValues: (n) => [n.row.review_status ?? '—'],
+      render: (n) => <span className="muted">{n.row.review_status ?? '—'}</span>,
+    })
+    return cols
+  }, [showRepoColumn, activeTableColumns, anyLanguageTagged, activeFilterColumn])
+
+  // Each filterable column's choices come from every row loaded for the tab,
+  // so picking one filter doesn't shrink the choices in another heading.
+  const filterOptions = useMemo(() => {
+    const out = new Map<string, string[]>()
+    for (const col of columns) {
+      if (!col.filterValues) continue
+      const values = new Set<string>()
+      for (const n of tabRows) for (const v of col.filterValues(n)) values.add(v)
+      out.set(col.id, Array.from(values).sort(compareText))
+    }
+    return out
+  }, [columns, tabRows])
+
+  const searched = useMemo(() => tabRows.filter((n) => rowMatchesSearch(n.row, search)), [tabRows, search])
+
+  // Until someone clicks a heading, rows are in title order, as before.
+  const defaultSortColumn = columns.find((c) => c.id === 'label' || c.header === 'Label' || c.header === 'Title') ?? columns.find((c) => c.id !== 'repo') ?? columns[0]
+  const effectiveSort: SortState = sort ?? { id: defaultSortColumn.id, dir: 'asc' }
 
   const allRows: NodeRef[] = useMemo(() => {
-    const out: NodeRef[] = []
-    for (const [repoKey, rows] of rowsByRepo) for (const row of rows) out.push({ repoKey, row })
-    let filtered = filterValue ? out.filter((r) => r.row.filterValue === filterValue) : out
-    if (langFilter === '__untagged__') filtered = filtered.filter((r) => r.row.languages.length === 0)
-    else if (langFilter) filtered = filtered.filter((r) => r.row.languages.includes(langFilter))
-    if (secondaryFilterValue) filtered = filtered.filter((r) => r.row.secondaryFilterValues.includes(secondaryFilterValue))
-    const sorted = [...filtered].sort((a, b) => {
-      const value = (r: NodeRef) =>
-        sortBy === 'label' ? r.row.label
-        : sortBy === 'filterValue' ? r.row.filterValue
-        : sortBy === 'secondaryFilter' ? r.row.secondaryFilterValues.join(', ')
-        : r.row.review_status
-      return (value(a) ?? '').localeCompare(value(b) ?? '')
-    })
-    return sorted
-  }, [rowsByRepo, filterValue, langFilter, secondaryFilterValue, sortBy])
+    const active = columns.filter((c) => c.filterValues && columnFilters[c.id])
+    const filtered = searched.filter((n) => active.every((c) => c.filterValues!(n).includes(columnFilters[c.id])))
+    const sortCol = columns.find((c) => c.id === effectiveSort.id) ?? columns[0]
+    const dir = effectiveSort.dir === 'desc' ? -1 : 1
+    return [...filtered].sort((a, b) => dir * compareText(sortCol.get(a) ?? '', sortCol.get(b) ?? ''))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searched, columns, columnFilters, effectiveSort.id, effectiveSort.dir])
 
-  const filterOptions = useMemo(() => {
-    if (!activeFilterColumn) return []
-    const values = new Set<string>()
-    for (const rows of rowsByRepo.values()) for (const row of rows) if (row.filterValue) values.add(row.filterValue)
-    return Array.from(values).sort()
-  }, [rowsByRepo, activeFilterColumn])
-
-  const secondaryFilterOptions = useMemo(() => {
-    if (!activeSecondaryFilter) return []
-    const values = new Set<string>()
-    for (const rows of rowsByRepo.values()) for (const row of rows) for (const v of row.secondaryFilterValues) values.add(v)
-    return Array.from(values).sort()
-  }, [rowsByRepo, activeSecondaryFilter])
+  const activeFilterChips = columns.filter((c) => c.filterValues && columnFilters[c.id])
 
   const totalCount = allRows.length
+  // Tab counts cover every base already loaded, including tabs that aren't open, and follow the search box.
+  const searchedCountFor = (key: BaseRepoKey) => (rowsByRepo.get(key) ?? []).filter((r) => rowMatchesSearch(r, search)).length
 
   if (!isAdmin) {
     return (
@@ -207,7 +267,7 @@ export default function AdminBaseRepoExplorerPage() {
 
       <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <button className={`btn btn-mini${tab === 'all' ? ' btn-primary' : ''}`} onClick={() => setTab('all')}>
-          All ({totalCount})
+          All{tab === 'all' && !loading ? ` (${totalCount})` : ''}
         </button>
         {BASE_REPO_CONFIGS.map((cfg) => (
           <button
@@ -215,7 +275,7 @@ export default function AdminBaseRepoExplorerPage() {
             className={`btn btn-mini${tab === cfg.key ? ' btn-primary' : ''}`}
             onClick={() => setTab(cfg.key)}
           >
-            {cfg.name} ({rowsByRepo.get(cfg.key)?.length ?? 0})
+            {cfg.name}{rowsByRepo.has(cfg.key) ? ` (${searchedCountFor(cfg.key)})` : ''}
           </button>
         ))}
       </div>
@@ -225,34 +285,41 @@ export default function AdminBaseRepoExplorerPage() {
           <div className="field" style={{ marginBottom: 0 }}>
             <div className="row" style={{ gap: 6, alignItems: 'center' }}>
               <Search size={14} style={{ color: 'var(--text-muted)' }} />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search label…" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search all fields…"
+                title="Searches everything in each record: title, authors, abstract, keywords, descriptions, related ids and more. Every word you type has to appear somewhere in the record."
+                aria-label="Search all fields"
+                style={{ minWidth: 240 }}
+              />
             </div>
           </div>
-          {activeFilterColumn && (
-            <select value={filterValue} onChange={(e) => setFilterValue(e.target.value)}>
-              <option value="">All {filterColumnLabel(activeFilterColumn).toLowerCase()}</option>
-              {filterOptions.map((v) => <option key={v} value={v}>{v}</option>)}
+          {view !== 'table' && (
+            // The table sorts from its column headings; the card and graph
+            // views have no headings, so they get a plain sort menu instead.
+            <select
+              value={sort?.id ?? ''}
+              onChange={(e) => setSort(e.target.value ? { id: e.target.value, dir: 'asc' } : null)}
+              aria-label="Sort by"
+            >
+              <option value="">Sort: default</option>
+              {columns.map((c) => <option key={c.id} value={c.id}>Sort: {c.header}</option>)}
             </select>
           )}
-          {anyLanguageTagged && (
-            <select value={langFilter} onChange={(e) => setLangFilter(e.target.value)}>
-              <option value="">All languages</option>
-              {langFilterOptions.map((v) => <option key={v} value={v}>{LANGUAGE_NAMES[v] ?? v.toUpperCase()}</option>)}
-              <option value="__untagged__">Not yet language-tagged</option>
-            </select>
+          {activeFilterChips.map((c) => (
+            <button
+              key={c.id}
+              className="btn btn-mini active"
+              title="Clear this filter"
+              onClick={() => setColumnFilters((f) => ({ ...f, [c.id]: '' }))}
+            >
+              {c.header}: {(c.filterLabel ?? ((v: string) => v))(columnFilters[c.id])} ×
+            </button>
+          ))}
+          {activeFilterChips.length > 1 && (
+            <button className="btn-linklike" style={{ fontSize: 12 }} onClick={() => setColumnFilters({})}>Clear all</button>
           )}
-          {activeSecondaryFilter && (
-            <select value={secondaryFilterValue} onChange={(e) => setSecondaryFilterValue(e.target.value)}>
-              <option value="">All {activeSecondaryFilter.label.toLowerCase()}s</option>
-              {secondaryFilterOptions.map((v) => <option key={v} value={v}>{v}</option>)}
-            </select>
-          )}
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as typeof sortBy)}>
-            <option value="label">Sort: Label</option>
-            <option value="filterValue">Sort: {activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}</option>
-            {activeSecondaryFilter && <option value="secondaryFilter">Sort: {activeSecondaryFilter.label}</option>}
-            <option value="review_status">Sort: Review status</option>
-          </select>
         </div>
         <div className="row" style={{ gap: 4 }}>
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
@@ -277,11 +344,13 @@ export default function AdminBaseRepoExplorerPage() {
           ) : view === 'table' ? (
             <TableView
               rows={allRows}
+              columns={columns}
+              filterOptions={filterOptions}
+              columnFilters={columnFilters}
+              sort={effectiveSort}
+              onSort={setSort}
+              onFilter={(id, value) => setColumnFilters((f) => ({ ...f, [id]: value }))}
               onSelect={setSelected}
-              detailColumnLabel={activeFilterColumn ? filterColumnLabel(activeFilterColumn) : 'Detail'}
-              showLanguage={anyLanguageTagged}
-              showRepoColumn={showRepoColumn}
-              columns={activeTableColumns}
             />
           ) : view === 'cards' ? (
             <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} />
@@ -323,42 +392,125 @@ function LanguageBadge({ languages }: { languages: string[] }) {
 
 function TableView({
   rows,
-  onSelect,
-  detailColumnLabel,
-  showLanguage,
-  showRepoColumn,
   columns,
+  filterOptions,
+  columnFilters,
+  sort,
+  onSort,
+  onFilter,
+  onSelect,
 }: {
   rows: NodeRef[]
+  columns: ColumnDef[]
+  filterOptions: Map<string, string[]>
+  columnFilters: Record<string, string>
+  sort: SortState
+  onSort: (s: SortState) => void
+  onFilter: (columnId: string, value: string) => void
   onSelect: (r: NodeRef) => void
-  detailColumnLabel: string
-  showLanguage: boolean
-  showRepoColumn: boolean
-  columns?: TableColumn[]
 }) {
   return (
     <table>
       <thead>
         <tr>
-          {showRepoColumn && <th>Repo</th>}
-          {columns ? columns.map((c) => <th key={c.header}>{c.header}</th>) : <th>Label</th>}
-          {showLanguage && <th>Language</th>}
-          {!columns && <th>{detailColumnLabel}</th>}
-          <th>Review status</th>
+          {columns.map((c) => {
+            const sorted = sort.id === c.id
+            const options = filterOptions.get(c.id)
+            return (
+              <th key={c.id} aria-sort={sorted ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+                <span className="row" style={{ gap: 2, alignItems: 'center', flexWrap: 'nowrap' }}>
+                  <button
+                    type="button"
+                    className="btn-linklike"
+                    style={{ color: 'inherit', textDecoration: 'none', textTransform: 'inherit', letterSpacing: 'inherit', fontSize: 'inherit', fontWeight: 'inherit', display: 'inline-flex', alignItems: 'center', gap: 3 }}
+                    title={`Sort by ${c.header.toLowerCase()}`}
+                    onClick={() => onSort({ id: c.id, dir: sorted && sort.dir === 'asc' ? 'desc' : 'asc' })}
+                  >
+                    {c.header}
+                    {sorted
+                      ? (sort.dir === 'asc' ? <ArrowUp size={11} /> : <ArrowDown size={11} />)
+                      : <ArrowUpDown size={11} style={{ opacity: 0.35 }} />}
+                  </button>
+                  {options && options.length > 0 && (
+                    <HeaderFilter
+                      header={c.header}
+                      options={options}
+                      value={columnFilters[c.id] ?? ''}
+                      labelFor={c.filterLabel}
+                      onChange={(v) => onFilter(c.id, v)}
+                    />
+                  )}
+                </span>
+              </th>
+            )
+          })}
         </tr>
       </thead>
       <tbody>
-        {rows.map(({ repoKey, row }) => (
-          <tr key={`${repoKey}:${row.id}`} onClick={() => onSelect({ repoKey, row })} style={{ cursor: 'pointer' }}>
-            {showRepoColumn && <td><span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey] }}>{repoKey}</span></td>}
-            {columns ? columns.map((c) => <td key={c.header}>{c.get(row)}</td>) : <td>{row.label}</td>}
-            {showLanguage && <td><LanguageBadge languages={row.languages} /></td>}
-            {!columns && <td className="muted">{row.secondary ?? row.filterValue ?? ''}</td>}
-            <td className="muted">{row.review_status ?? '—'}</td>
+        {rows.map((n) => (
+          <tr key={`${n.repoKey}:${n.row.id}`} onClick={() => onSelect(n)} style={{ cursor: 'pointer' }}>
+            {columns.map((c) => <td key={c.id}>{c.render ? c.render(n) : c.get(n)}</td>)}
           </tr>
         ))}
       </tbody>
     </table>
+  )
+}
+
+// A small filter button that lives in a column heading and opens a pick-list
+// of that column's values. Closes on a click anywhere else or on Escape.
+function HeaderFilter({
+  header,
+  options,
+  value,
+  labelFor,
+  onChange,
+}: {
+  header: string
+  options: string[]
+  value: string
+  labelFor?: (value: string) => string
+  onChange: (value: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
+  }, [open])
+  const label = (v: string) => (labelFor ? labelFor(v) : v)
+  return (
+    <span ref={ref} style={{ position: 'relative', display: 'inline-flex', textTransform: 'none', letterSpacing: 'normal' }}>
+      <button
+        type="button"
+        className={`btn btn-mini${value ? ' active' : ''}`}
+        style={{ padding: '1px 4px', minHeight: 0, lineHeight: 1 }}
+        aria-label={`Filter ${header}${value ? ` (currently ${label(value)})` : ''}`}
+        aria-expanded={open}
+        title={value ? `Filtered: ${label(value)}` : `Filter ${header.toLowerCase()}`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <Filter size={11} />
+      </button>
+      {open && (
+        <div className="popover" style={{ width: 'max-content', minWidth: 160, maxWidth: 320, maxHeight: 320, overflowY: 'auto', padding: 6, fontWeight: 400, fontSize: 13, color: 'var(--text-primary)' }}>
+          <div className="menu">
+            <button type="button" onClick={() => { onChange(''); setOpen(false) }} style={{ fontWeight: value === '' ? 600 : 400 }}>
+              All
+            </button>
+            {options.map((o) => (
+              <button key={o} type="button" onClick={() => { onChange(o); setOpen(false) }} style={{ fontWeight: value === o ? 600 : 400 }}>
+                {label(o)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </span>
   )
 }
 

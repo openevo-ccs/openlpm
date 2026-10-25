@@ -39,6 +39,13 @@ export type BaseRepoKey =
 export interface TableColumn {
   header: string
   get: (row: SnapshotRow) => string
+  /**
+   * Values this column can be filtered by, for the filter control in its
+   * heading (Susan Hanisch, 2026-10-25: "sorting and filtering options
+   * directly in the column headers"). Leave unset for free-text columns
+   * (a title, an author list) where a pick-list wouldn't make sense.
+   */
+  filterValues?: (row: SnapshotRow) => string[]
 }
 
 /**
@@ -74,10 +81,21 @@ export interface BaseRepoConfig {
 }
 
 // Susan Hanisch, 2026-10-24: "show only the first two authors, then 'et
-// al.'" if there are more.
+// al.'" if there are more. 2026-10-25 (feedback cf58ce4b): "show authors in
+// this column only with last names." LiteratureBase stores people as
+// "Last, First Middle" (4,662 of 4,675 author strings in the source repo),
+// so the last name is everything before the first comma. The few entries
+// with no comma are organisations ("Supreme Court of the United States") or
+// single-word names, and stay as written.
+export function authorLastName(author: string): string {
+  const name = author.trim()
+  const comma = name.indexOf(',')
+  return comma > 0 ? name.slice(0, comma).trim() : name
+}
+
 function formatAuthorsShort(authors: unknown): string {
   if (!Array.isArray(authors) || authors.length === 0) return '—'
-  const names = authors.map(String)
+  const names = authors.map((a) => authorLastName(String(a)))
   if (names.length <= 2) return names.join(', ')
   return `${names[0]}, ${names[1]}, et al.`
 }
@@ -125,10 +143,15 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     secondaryFilter: { dataKey: 'learningApproaches', label: 'Learning approach' },
     tableColumns: [
       { header: 'Label', get: (row) => row.label },
-      { header: 'Method-class', get: (row) => row.secondary ?? '—' },
+      {
+        header: 'Method-class',
+        get: (row) => row.secondary ?? '—',
+        filterValues: (row) => (row.filterValue ? [row.filterValue] : []),
+      },
       {
         header: 'Learning approaches',
         get: (row) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.join(', ') : '—'),
+        filterValues: (row) => row.secondaryFilterValues,
       },
     ],
     relationFields: [
@@ -187,9 +210,17 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     tableColumns: [
       { header: 'ID', get: (row) => (row.data as any)?.humanCodingScheme ?? '—' },
       { header: 'Label', get: (row) => row.label },
-      { header: 'Competency area', get: (row) => (row.data as any)?.__competencyArea ?? '—' },
+      {
+        header: 'Competency area',
+        get: (row) => (row.data as any)?.__competencyArea ?? '—',
+        filterValues: (row) => ((row.data as any)?.__competencyArea ? [(row.data as any).__competencyArea] : []),
+      },
       { header: 'Teilbereich', get: (row) => (row.data as any)?.__competencySubArea ?? '—' },
-      { header: 'Source', get: (row) => row.secondary ?? '—' },
+      {
+        header: 'Source',
+        get: (row) => row.secondary ?? '—',
+        filterValues: (row) => (row.filterValue ? [row.filterValue] : []),
+      },
     ],
     // Susan Hanisch, 2026-10-23 (feedback 84efcad2): "add a column on
     // pedagogical approaches" -- competencybase RFC-0027 added a real
@@ -329,17 +360,52 @@ async function enrichCompetencyHierarchy(supabase: Client, rows: SnapshotRow[]):
   }
 }
 
-export async function listSnapshotRows(supabase: Client, repoKey: BaseRepoKey, search?: string): Promise<SnapshotRow[]> {
+// PostgREST returns at most 1,000 rows per request, so a base with more
+// records than that has to be read in pages. Before 2026-10-25 this read a
+// single request capped at 500, which silently hid records from a base that
+// outgrew it (LiteratureBase's source repo holds ~1,970).
+const PAGE_SIZE = 1000
+
+/**
+ * Every snapshot row for one base. Search is no longer done here: the page
+ * loads a base once and searches it in the browser (see rowMatchesSearch),
+ * so a search can look at the whole record. Before 2026-10-25 it matched titles only.
+ */
+export async function listSnapshotRows(supabase: Client, repoKey: BaseRepoKey): Promise<SnapshotRow[]> {
   const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
   if (!cfg) return []
-  let query = (supabase as any).from(cfg.table).select('*').order(cfg.labelColumn, { ascending: true }).limit(500)
-  if (search?.trim()) {
-    query = query.ilike(cfg.labelColumn, `%${search.trim()}%`)
+  const raw: any[] = []
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data } = await (supabase as any)
+      .from(cfg.table)
+      .select('*')
+      .order(cfg.labelColumn, { ascending: true })
+      .order(cfg.idColumn, { ascending: true })
+      .range(from, from + PAGE_SIZE - 1)
+    const page = (data ?? []) as any[]
+    raw.push(...page)
+    if (page.length < PAGE_SIZE) break
   }
-  const { data } = await query
-  const rows = ((data ?? []) as any[]).map((r) => normalizeRow(cfg, r))
+  const rows = raw.map((r) => normalizeRow(cfg, r))
   if (repoKey === 'competencybase' && rows.length > 0) await enrichCompetencyHierarchy(supabase, rows)
   return rows
+}
+
+// One lowercase text blob per row, built the first time that row is
+// searched and kept for later keystrokes. Covers the row's id, label and its
+// whole record (authors, abstract, keywords, descriptions, related ids...).
+const searchTextCache = new WeakMap<SnapshotRow, string>()
+
+export function rowMatchesSearch(row: SnapshotRow, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  let text = searchTextCache.get(row)
+  if (text === undefined) {
+    text = [row.id, row.label, JSON.stringify(row.data ?? {})].join(' ').toLowerCase()
+    searchTextCache.set(row, text)
+  }
+  // Every word has to appear somewhere in the record, in any order.
+  return q.split(/\s+/).every((word) => text!.includes(word))
 }
 
 /** One search across every configured Base Repo's snapshot, for the cross-repo view. */
@@ -347,7 +413,7 @@ export async function searchAllSnapshots(supabase: Client, search: string): Prom
   const result = new Map<BaseRepoKey, SnapshotRow[]>()
   await Promise.all(
     BASE_REPO_CONFIGS.map(async (cfg) => {
-      const rows = await listSnapshotRows(supabase, cfg.key, search)
+      const rows = (await listSnapshotRows(supabase, cfg.key)).filter((r) => rowMatchesSearch(r, search))
       if (rows.length) result.set(cfg.key, rows)
     })
   )

@@ -32,7 +32,17 @@ function formatRange(item: TimelineItem): string {
 // real min/max span -- zooming in shows fewer effective days at once even
 // though the underlying date range hasn't changed, so it should get the
 // finer month grid a zoomed-out view of the same raw span wouldn't need.
-function buildTicks(min: Date, max: Date, tickSpanDays: number): { date: Date; label: string }[] {
+// Smallest label gap that still leaves room for a four-digit year.
+const MIN_TICK_GAP_PX = 56
+const YEAR_STEPS = [1, 2, 5, 10, 20, 50, 100]
+
+// `tickSpanDays` decides monthly-vs-yearly ticks and can differ from the
+// real min/max span -- zooming in shows fewer effective days at once even
+// though the underlying date range hasn't changed, so it should get the
+// finer month grid a zoomed-out view of the same raw span wouldn't need.
+// Yearly ticks skip years (every 2nd, 5th, 10th...) when the span is wide
+// enough that a label for every year would overlap its neighbours.
+function buildTicks(min: Date, max: Date, tickSpanDays: number, pxPerDay: number): { date: Date; label: string }[] {
   const ticks: { date: Date; label: string }[] = []
   if (tickSpanDays <= MONTHLY_TICK_SPAN_DAYS) {
     const cursor = new Date(min.getFullYear(), min.getMonth(), 1)
@@ -41,10 +51,12 @@ function buildTicks(min: Date, max: Date, tickSpanDays: number): { date: Date; l
       cursor.setMonth(cursor.getMonth() + 1)
     }
   } else {
-    const cursor = new Date(min.getFullYear(), 0, 1)
+    const pxPerYear = pxPerDay * 365.25
+    const step = YEAR_STEPS.find((n) => n * pxPerYear >= MIN_TICK_GAP_PX) ?? YEAR_STEPS[YEAR_STEPS.length - 1]
+    const cursor = new Date(Math.floor(min.getFullYear() / step) * step, 0, 1)
     while (cursor <= max) {
       if (cursor >= min) ticks.push({ date: new Date(cursor), label: String(cursor.getFullYear()) })
-      cursor.setFullYear(cursor.getFullYear() + 1)
+      cursor.setFullYear(cursor.getFullYear() + step)
     }
   }
   return ticks
@@ -84,6 +96,12 @@ export default function TimelinePage() {
   // change, the way any normal map/image zoom control behaves.
   const scrollRef = useRef<HTMLDivElement>(null)
   const prevPxPerDayRef = useRef<number | null>(null)
+  // Width of the scrolling area on screen, so "full range" can fit
+  // it. Before 2026-10-25 the full-range width was a fixed ~1400px target,
+  // wider than the space beside the details card -- on a 30-year span (the
+  // Florida repository, 1996 to today) only the first ~3 years were visible
+  // and the rest sat off-screen to the right with no cue that it was there.
+  const [viewportWidth, setViewportWidth] = useState(0)
 
   // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
@@ -142,7 +160,19 @@ export default function TimelinePage() {
   }, [filtered])
 
   const totalDays = Math.max(1, Math.round((maxDate.getTime() - minDate.getTime()) / DAY_MS))
-  const basePxPerDay = Math.min(24, Math.max(0.6, 1400 / totalDays))
+  const hasItems = items !== null && filtered.length > 0
+  useLayoutEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const measure = () => setViewportWidth(el.clientWidth)
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [hasItems])
+  // Zoom 1 = the whole date range fits the visible width. Before the first
+  // measurement, fall back to a typical width rather than 0.
+  const basePxPerDay = Math.min(24, (viewportWidth > 0 ? viewportWidth : 800) / totalDays)
   const pxPerDay = basePxPerDay * zoom
   const width = Math.round(totalDays * pxPerDay)
   const x = (d: Date) => Math.round(((d.getTime() - minDate.getTime()) / DAY_MS) * pxPerDay)
@@ -157,7 +187,7 @@ export default function TimelinePage() {
     prevPxPerDayRef.current = pxPerDay
   }, [pxPerDay])
 
-  const ticks = useMemo(() => buildTicks(minDate, maxDate, totalDays / zoom), [minDate, maxDate, totalDays, zoom])
+  const ticks = useMemo(() => buildTicks(minDate, maxDate, totalDays / zoom, pxPerDay), [minDate, maxDate, totalDays, zoom, pxPerDay])
   const today = new Date()
   const showToday = today >= minDate && today <= maxDate
 
