@@ -337,7 +337,7 @@ export default function TimePage() {
 
   // The partner space (Bio-Core and Interdisciplinary): the same preset on the same axis shape.
   const partnerOptions = comparisonPartners(project.slug)
-  const partnerSlug = partnerChoice && partnerOptions.includes(partnerChoice) ? partnerChoice : partnerOptions.includes(KNOWN_COMPARISON_PAIRS[project.slug]) ? KNOWN_COMPARISON_PAIRS[project.slug] : partnerOptions[0]
+  const partnerSlug = partnerChoice && partnerOptions.includes(partnerChoice) ? partnerChoice : partnerOptions.includes(KNOWN_COMPARISON_PAIRS[project.slug]) ? KNOWN_COMPARISON_PAIRS[project.slug] : partnerOptions.includes('interdisciplinary-lpm-synth') ? 'interdisciplinary-lpm-synth' : partnerOptions[0]
   async function loadPartner() {
     setPartnerMsg(null)
     if (!partnerSlug || !plan || !axis) return
