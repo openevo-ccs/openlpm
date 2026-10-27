@@ -49,6 +49,15 @@ const SPACES = {
   int: { slug: 'interdisciplinary-lpm-synth', name: 'Interdisciplinary', prefix: 'OE-CONCEPT-oe-interdisciplinary-' },
 }
 const DOMAIN_SLUG = { biology: 'biology', culture: 'culture', technology: 'technology', education: 'education', 'AI and computation': 'ai', cognition: 'cognition' }
+async function snapshotIds() {
+  const ids = new Set()
+  for (let from = 0; ; from += 1000) {
+    const page = await rest(`literaturebase_snapshot?select=id&order=id&limit=1000&offset=${from}`)
+    page.forEach((r) => ids.add(r.id))
+    if (page.length < 1000) break
+  }
+  return ids
+}
 const lines = []
 const w = (s = '') => lines.push(s)
 const warnings = []
@@ -159,8 +168,12 @@ for (const [key, sp] of Object.entries(SPACES)) {
   w(`UPDATE projects SET introduction = introduction || ${q('\n\n' + para)} WHERE id = ${q(project.id)} AND introduction NOT LIKE ${q('%Information. This space treats information in its own terms.%')};`)
   // 5. Literature rows
   const have = new Set((await rest(`literature_references?select=literaturebase_id&project_id=eq.${project.id}&limit=2000`)).map((r) => r.literaturebase_id))
+  // literature_references.literaturebase_id has a foreign key to literaturebase_snapshot, so only records the snapshot already holds can be linked
+  const inSnapshot = await snapshotIds()
+  const pending = []
   for (const lbid of [PAPER, ...evidenceIds.filter((e) => e !== PAPER)]) {
     if (have.has(lbid)) continue
+    if (!inSnapshot.has(lbid)) { pending.push(lbid); continue }
     const slug = lbid.replace(/^OE-LITERATURE-/, '')
     const f = [`${slug}.yaml`, `lit-${slug}.yaml`].map((n) => path.join(LB, 'records', n)).find((x) => existsSync(x))
     if (!f) { warnings.push(`${key}: ${lbid} not found in ${LB}`); continue }
@@ -172,6 +185,7 @@ for (const [key, sp] of Object.entries(SPACES)) {
     w(`SELECT ${q(project.id)}, ${q(lbid)}, ${q(c.title ?? lbid)}, ${jq(c.authors ?? [])}, ${c.year ?? 'NULL'}, ${c.doi ? q(c.doi) : 'NULL'}, ${c.venue ?? c.publisher ? q(c.venue ?? c.publisher) : 'NULL'}, ${TYPE_MAP[rec.type] ? q(TYPE_MAP[rec.type]) : 'NULL'}, 'draft', ${q(`${role} of ${sp.name} (AI-drafted 2026-10-27, no expert review).`)}, ${arr(['information', 'proposed-link'])}`)
     w(`WHERE NOT EXISTS (SELECT 1 FROM literature_references WHERE project_id = ${q(project.id)} AND literaturebase_id = ${q(lbid)});`)
   }
+  if (pending.length) { w(`-- Not linked yet, absent from literaturebase_snapshot (add after the LiteratureBase pull request merges and the snapshot syncs): ${pending.join(', ')}`); warnings.push(`${key}: ${pending.length} literature row(s) wait for the snapshot`) }
   w('')
   stats[key] = { stations: st.stations.length, newConcepts: (st.newConcepts ?? []).length, notes: (st.conceptNotes ?? []).length, rows: created.length, evidence: evidenceIds.length }
 }
