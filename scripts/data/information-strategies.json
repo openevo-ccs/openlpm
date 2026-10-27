@@ -1,0 +1,2542 @@
+{
+ "strategies": {
+  "bio": {
+   "space": "bio",
+   "senseOfInformation": "In Bio-Core, information is what a living system receives, stores, copies, passes on, processes and responds to, as the standards use the word. It covers genetic information that is copied and inherited, what organisms take in through their senses, and signals between cells and between organisms. Every description says what is received and what follows.",
+   "boundary": "Biology only, at the level of the standards. Bio-Core says what is received, copied, passed on and followed by a response, and stops there. It teaches no link between structure and meaning. No cell, gene or animal understands, intends or wants anything. Human messages, media, bits and codes written by someone belong to other spaces. The deeper analysis sits in the Interdisciplinary space.",
+   "aimFit": "Bio-Core explains evolution as variation, inheritance and selection on populations, with no organism that wants or plans. Its Gene and Inheritance definitions already use the word information without a concept behind it. The new concepts define the word as the standards use it. Three stations carry a selection question, three follow copying and descent, and two (K-2 and the ant trail) only describe what is received and passed on. Structure and meaning are left to the Interdisciplinary space.",
+   "sequence": "The order follows the standards. The paper's structure-first step stays with the Interdisciplinary space. K-2: something is taken in and a response follows. 3-5: two animals, with what passes between them. 6-8: three steps, copying of genetic information, a receptor that starts a signal, and a trail made by many local signals. 9-12: molecular steps, two uses of the word, and a group of cells.",
+   "dimensions": {
+    "structure": {
+     "status": "translated",
+     "how": "Only the descriptive part the standards share: a gene's sequence is stored in DNA and copied to offspring, and senses take in physical changes. The analysis of structure without a sender, and of how structure relates to meaning, is left to the Interdisciplinary space by design.",
+     "basis": "Project lead instruction, 2026-10-27. Standards wording: KMK 2020 p.19 and NGSS Table 1, quoted in paper p.6-8. The paper's own treatment is p.10-12."
+    },
+    "receivers": {
+     "status": "translated",
+     "how": "Treated as in the standards: organisms receive, pass on and react, and cells and animals exchange signals. Bio-Core names the sender, what passes and what follows, with plain sentence frames. It builds no theory of cues, honest or dishonest signals or signaling games, and it adds no goals or intention to any animal or cell.",
+     "basis": "KMK 2020 p.19 and NGSS Table 1 (paper p.6-8). The paper's own account is p.12-22; its use in Interdisciplinary is a separate design. Own extension of the paper for the plain sentence frames."
+    },
+    "decentralized": {
+     "status": "translated",
+     "how": "Kept light and descriptive. A trail of ants and a group of cells show a pattern that comes from many members each receiving and passing on a local signal. No member holds the whole pattern or steers it. The caution against queens, leaders and master genes is the only added idea.",
+     "basis": "Paper p.22-23 (cells, quorum sensing, ants and bees; Resnick 1996). KMK: communication at several system levels. Own extension of the paper for the caution against queens, leaders and master genes. Complex-systems analysis stays in Interdisciplinary."
+    }
+   },
+   "falseFriends": [
+    "Information as media or data. Sachsen Informatik Kl. 7 ('Informationen und Daten') and Sachunterricht Kl. 4 (Medien) use the word for facts and files. Bio-Core uses it for what a living system receives, copies or passes on, and counts nothing in bits.",
+    "Code. Sachsen Genetik (Kl. 10) teaches the 'genetischer Code', and in computing a code is written by a person. In Bio-Core the genetic code is the rule that pairs each three-base group with an amino acid. It arose in evolution and nobody wrote it.",
+    "Sender and receiver. Sachsen Kl. 5 Säugetiere teaches a 'Sender-Empfänger-Modell' for dog and cat, which can suggest a sender who means to send. In Bio-Core a sender is an animal or cell whose body produces a signal. Intent plays no part.",
+    "Signal. In technology it travels on a wire or through the air. Sachsen Kl. 8 speaks of Reiz, elektrische Impulse and Überträgerstoffe. Bio-Core's Signal is any change passing between parts or organisms that is followed by a response. It says nothing on how it arose.",
+    "Meaning and understanding. Ethik Kl. 7 ('Verstehen und Verständigung') uses communication for people who understand each other. Bio-Core never says a cell, gene or animal understands. 'Carries instructions' is a figure of speech for how a base sequence affects the protein made.",
+    "Information as evidence. NGSS uses 'genetic information' for what an organism copies and for sequences scientists compare to show common ancestry (paper Table 1, p.8). Bio-Core names which use is meant each time."
+   ],
+   "newConcepts": [
+    {
+     "label": "Information",
+     "definition": "What a living system receives, stores, copies, passes on, processes and responds to. It has three common uses: genetic information, which DNA stores, offspring inherit and which affects the proteins made; what senses take in; and what signals carry between cells or organisms.",
+     "why": "The accepted Gene and Inheritance definitions use the word, the German standards name it a core concept, and NGSS use it in several senses. Bio-Core has no concept for it. Students meet it in Sachsen Kl. 5, 8 and 10.",
+     "excludes": "Meaning, understanding or intention in a cell, gene or animal. Human messages, media, data and bits. Any account of how structure relates to meaning, which the Interdisciplinary space covers.",
+     "parent": null,
+     "basis": [
+      "KMK 2020 p.19 as quoted in paper p.6",
+      "NGSS Table 1 in paper p.7-8",
+      "OE-COMPETENCY-ngss-life-science-ms-ls1-8",
+      "OE-COMPETENCY-ngss-life-science-ms-ls3-2",
+      "OE-COMPETENCY-ngss-life-science-hs-ls3-1",
+      "Project lead instruction, 2026-10-27"
+     ]
+    },
+    {
+     "label": "Signal",
+     "definition": "A chemical, electrical, sound or light change that passes from one part of a living system to another, or from one organism to another, and is followed by a response in the receiver. Hormones, nerve impulses and animal calls are examples.",
+     "why": "Both standards use signals for what passes between cells and between organisms (signal transduction, messages from receptors, communication). Bio-Core has no concept for what passes between parts.",
+     "excludes": "A message written by a sender who means something. Meaning or intent in cells or animals. The theory of cues, honesty and signaling games, which the Interdisciplinary space covers.",
+     "parent": null,
+     "basis": [
+      "KMK 2020 p.19 as quoted in paper p.6 (signal transduction)",
+      "OE-COMPETENCY-ngss-life-science-ms-ls1-8",
+      "NGSS 1-LS1-2 (signals that offspring make; checked on nextgenscience.org; absent from CompetencyBase)",
+      "Sachsen Kl. 8 Sinnesorgane, Nerven- und Hormonsystem (lehrplan-522-1/lernbereich-7406-1)"
+     ]
+    },
+    {
+     "label": "Communication",
+     "definition": "An exchange of signals between organisms, or between parts of one organism, in which a response follows in the receiver. It happens at several levels: between cells, between organs, and between animals, as in courtship, alarm calls and life in groups.",
+     "why": "KMK names communication at several system levels as part of the Basiskonzept, and Sachsen Kl. 5 and 6 teach it for birds, mammals and the honeybee. No Bio-Core concept covers it.",
+     "excludes": "Language, media or any exchange of meaning between people. Any sender who intends to tell, warn or deceive. Any member that directs a group.",
+     "parent": null,
+     "basis": [
+      "KMK 2020 p.19 as quoted in paper p.6",
+      "Sachsen Kl. 5 Vögel and Säugetiere (lehrplan-522-1/lernbereich-7067-1 and 7068-1) and Kl. 6 Wirbellose (7202-1)",
+      "NGSS 1-LS1-2 (checked on nextgenscience.org; absent from CompetencyBase)"
+     ]
+    }
+   ],
+   "conceptNotes": [
+    {
+     "concept": "Gene",
+     "note": "The accepted definition says 'encoding information'. Here that phrase is read as the standards read it: the base sequence is copied and affects which protein is made. 'Code' and 'instructions' are figures of speech. Cell conditions also matter, and nobody wrote the sequence."
+    },
+    {
+     "concept": "Inheritance",
+     "note": "The accepted definition speaks of genetic information passed to offspring. Stations describe this as copying: asexual reproduction gives identical copies, sexual reproduction gives new combinations (NGSS MS-LS3-2). Nothing is sent or told."
+    },
+    {
+     "concept": "Mutation",
+     "note": "A mutation is a change in the copied information. Its effect, if any, shows in the protein made and the trait that follows (NGSS MS-LS3-1). Mutations arise without regard to need, which keeps the existing B1 point about random variation."
+    },
+    {
+     "concept": "Allele",
+     "note": "Alleles are alternative forms of the stored information at one place on a chromosome. A receptor gene with two alleles can give two versions of the receptor protein, and so two responses to the same signal."
+    },
+    {
+     "concept": "Adaptation",
+     "note": "Sense organs and signalling behaviours can be tested as adaptations like any other trait, with the same four components and the stage's rival explanations. Stations describe what the trait receives or sends. They give no separate theory of how signals evolve."
+    },
+    {
+     "concept": "Phylogeny",
+     "note": "Molecular trees compare sequences. Here the sequences are evidence that scientists read, which differs from the information an organism copies and uses (NGSS HS-LS4-1). The B3:9-12 station asks students to say which use is meant."
+    }
+   ],
+   "stations": [
+    {
+     "band": "K-2",
+     "stage": "B2:K-2",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Children match picture cards: a body part (nose, eye, ear, shoot tip), what it takes in (smell of food, a moving shape, a sound, window light) and what follows (a hedgehog sniffs on, a bird turns its head, a seedling bends). They say 'the nose takes in the smell, then the hedgehog goes to the snail'. The teacher replaces 'it wants' with 'then'.",
+     "example": "A hedgehog's nose picking up the smell of a snail, a bird's eye picking up a moving shape, a seedling leaning towards window light.",
+     "representation": "Three-column picture cards: body part, what it takes in, what follows, joined by arrows.",
+     "challenge": "Say what passes from the surroundings to the body and what follows, with no wish word. Young children give purposes to everything, so the teacher models 'takes in, then'. No study tests this at K-2.",
+     "concepts": [
+      "Information",
+      "Adaptation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "K-2",
+       "stage": "B2:K-2",
+       "index": 1
+      },
+      {
+       "tool": "payoff",
+       "band": "K-2",
+       "stage": "B2:K-2",
+       "index": 0
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7063-1"
+     ],
+     "evidence": [
+      "S11",
+      "paper p.7 (Table 1, first row)",
+      "design bet"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Struktur und Funktion"
+     ]
+    },
+    {
+     "band": "3-5",
+     "stage": "B2:3-5",
+     "dimension": 2,
+     "level": "precursor",
+     "move": "Students read two short stories: a hen's alarm call and chicks that crouch, and a dog's growl and a cat that backs away. In a four-box row they fill in who makes the sound, what passes, who takes it in and what follows. They then predict which chicks are more likely to live, those that crouch or those that do not.",
+     "example": "A hen's alarm call as a hawk passes and chicks that crouch; a dog's growl and a cat that backs away.",
+     "representation": "Four-box row of cards: maker, what passes, receiver, what follows.",
+     "challenge": "Describe an exchange between two animals with no wish words, then link the response to who is more likely to live. The Kl. 5 sender-receiver sketch invites 'the dog tells the cat'. No study tests this at 3-5.",
+     "concepts": [
+      "Communication",
+      "Signal",
+      "Natural Selection"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "3-5",
+       "stage": "B2:3-5",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7068-1",
+      "lehrplan-522-1/lernbereich-7067-1"
+     ],
+     "evidence": [
+      "S15",
+      "S11",
+      "paper p.6-8",
+      "design bet"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Evolutive Entwicklung"
+     ]
+    },
+    {
+     "band": "6-8",
+     "stage": "B1:6-8",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Students lay out two bead strings for the haemoglobin gene, one with a single bead changed. They copy a string for offspring, once with a copying slip, and follow each version to the protein it leads to and the red blood cell shape. They sort sentences into 'copied', 'changed in the copy' and 'passed on', and replace any wish wording.",
+     "example": "One changed base in the haemoglobin gene gives a changed protein and sickle-shaped red blood cells in some people.",
+     "representation": "Bead strings, copy-step cards and a three-link chain: copy, protein, trait.",
+     "challenge": "Follow one copied change through to a protein and a trait. Mutations arise without regard to need, a point many students miss. The bead strings model the case and leave out how cells copy DNA.",
+     "concepts": [
+      "Information",
+      "Gene",
+      "Mutation",
+      "Allele"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "6-8",
+       "stage": "B1:6-8",
+       "index": 5
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "OE-COMPETENCY-ngss-life-science-ms-ls3-1",
+      "OE-COMPETENCY-ngss-life-science-ms-ls3-2",
+      "S19",
+      "paper p.7-8"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Evolutive Entwicklung"
+     ]
+    },
+    {
+     "band": "6-8",
+     "stage": "B2:6-8",
+     "dimension": 2,
+     "level": "full",
+     "move": "Students trace a hand touching a hot surface: heat reaches a skin receptor, an impulse passes along nerves to the spinal cord and on to a muscle, and the hand pulls back. They fill the four-row sheet from the fox station. For the survival row they compare people with the reflex and rare cases of people born unable to feel pain.",
+     "example": "Hand withdrawal: heat at the skin, a nerve impulse through the spinal cord, a muscle that pulls the hand back. In a rare inherited condition people feel no pain and often injure themselves badly.",
+     "representation": "Four-row sheet with a labelled body drawing showing receptor, nerve and muscle.",
+     "challenge": "Join a how-it-works chain (receptor, impulse, response) with an evolution question that has a variant to compare. Students often answer one question with the other (shown in university physiology), so the sheet keeps them apart.",
+     "concepts": [
+      "Information",
+      "Signal",
+      "Adaptation",
+      "Natural Selection"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "6-8",
+       "stage": "B2:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7406-1"
+     ],
+     "evidence": [
+      "OE-COMPETENCY-ngss-life-science-ms-ls1-8",
+      "S21",
+      "paper p.14"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Struktur und Funktion",
+      "Evolutive Entwicklung"
+     ]
+    },
+    {
+     "band": "6-8",
+     "stage": "B2:6-8",
+     "dimension": 3,
+     "level": "precursor",
+     "move": "Students play ants on a floor grid. Ants that find food drop a scent card on the way back, and every ant follows the strongest scent card nearby. Food sits at one end and a nest at the other. They map what each ant takes in and passes on, watch a trail form, then ask which single ant held the route. They check that no card acts like a leader.",
+     "example": "A foraging ant trail: ants that find food lay scent on the way back and others follow the stronger scent. The queen gives no orders.",
+     "representation": "Floor grid with scent cards, then a signed-arrow map with one loop.",
+     "challenge": "Explain a group pattern that no member holds or plans. The Kl. 6 word Tierstaat, taught with the honeybee, and a ruling-queen picture push students to look for a leader. Evidence comes from older students: a design bet.",
+     "concepts": [
+      "Communication",
+      "Signal"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "B2:6-8",
+       "index": 3
+      },
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "B3:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7202-1"
+     ],
+     "evidence": [
+      "S41",
+      "S42",
+      "paper p.23",
+      "design bet"
+     ],
+     "kmk": [
+      "Information und Kommunikation"
+     ]
+    },
+    {
+     "band": "9-12",
+     "stage": "B1:9-12",
+     "dimension": 2,
+     "level": "full",
+     "move": "Students follow an allele of a colour-vision gene on the X chromosome: DNA transcribed to RNA, RNA used to build a light-receptor protein, the receptor responding to light, and a nerve signal to the brain. They compare two alleles, use the bead jar to estimate how many people carry each version, and rewrite 'code', 'reads' and 'instructions' as the physical step.",
+     "example": "Red-green colour vision: alleles of a light-receptor gene on the X chromosome change which colours the receptor responds to.",
+     "representation": "Chain diagram from DNA to protein to signal to brain, plus a two-column table of phrases and physical steps.",
+     "challenge": "Rewrite 'code', 'reads' and 'instructions' as physical steps, then link the chain, allele to receptor to signal, to how often each version occurs. This needs the teacher's lead, because the standards use those figures themselves.",
+     "concepts": [
+      "Information",
+      "Signal",
+      "Allele",
+      "Gene"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "B1:9-12",
+       "index": 4
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7600-1",
+      "lehrplan-522-1/lernbereich-7406-1"
+     ],
+     "evidence": [
+      "OE-COMPETENCY-ngss-life-science-hs-ls1-1",
+      "OE-COMPETENCY-ngss-life-science-hs-ls3-1",
+      "paper p.15",
+      "paper p.18-19",
+      "design bet"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Struktur und Funktion",
+      "Evolutive Entwicklung"
+     ]
+    },
+    {
+     "band": "9-12",
+     "stage": "B3:9-12",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Students compare a short stretch of the same gene from four species, count the differences and build a tree. They sort statements about 'genetic information' into two piles: what an organism copies and uses, and what scientists read from sequences as evidence. They list the independent lines of evidence a shared ancestor would need.",
+     "example": "A short stretch of beta-globin sequence from human, chimpanzee, mouse and chicken, used to build a tree.",
+     "representation": "Aligned sequence table, a tree drawing and a two-pile statement sort.",
+     "challenge": "Keep two uses of one phrase apart: what a cell copies and what a scientist compares. NGSS blends them. The tree work is familiar, so the new demand is naming the use each time.",
+     "concepts": [
+      "Information",
+      "Phylogeny",
+      "Common Ancestor",
+      "Mutation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "9-12",
+       "stage": "B3:9-12",
+       "index": 7
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7600-1",
+      "lehrplan-522-1/lernbereich-7601-1"
+     ],
+     "evidence": [
+      "OE-COMPETENCY-ngss-life-science-hs-ls4-1",
+      "paper p.8 (Table 1)",
+      "design bet"
+     ],
+     "kmk": [
+      "Information und Kommunikation",
+      "Evolutive Entwicklung"
+     ]
+    },
+    {
+     "band": "9-12",
+     "stage": "B2:9-12",
+     "dimension": 3,
+     "level": "extended",
+     "move": "Students model bacteria as cards on a table. Each card adds signal tokens to a shared pool and switches on a light when the pool passes a level. They vary the number of cards and watch lights come on together. They write what each cell takes in and passes on, check that no cell counts the group, and test one benefit claim against a rival.",
+     "example": "Glowing Vibrio bacteria in a squid's light organ, where light switches on only when many cells are close together.",
+     "representation": "Cards and tokens on a table, then a signed-arrow map with one reinforcing loop.",
+     "challenge": "Explain a threshold: cells stay dark below a certain number and light up together above it, though no cell counts the group. Then test a benefit claim against a rival, as the stage asks.",
+     "concepts": [
+      "Signal",
+      "Communication",
+      "Information",
+      "Adaptation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "B3:6-8",
+       "index": 4
+      },
+      {
+       "tool": "tinbergen",
+       "band": "9-12",
+       "stage": "B2:9-12",
+       "index": 6
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7479-1"
+     ],
+     "evidence": [
+      "OE-COMPETENCY-ngss-life-science-hs-ls2-8",
+      "S41",
+      "S42",
+      "paper p.23"
+     ],
+     "kmk": [
+      "Information und Kommunikation"
+     ]
+    }
+   ],
+   "crossLinks": [
+    "KMK Basiskonzept 'Information und Kommunikation' (receive, pass on, process, store, react). Station map: take in 1 and 4; pass on 2, 5 and 8; process 4 and 6; store 3 and 6; react 1, 2 and 4. KMK defines neither word, so the three concepts give Bio-Core's definitions.",
+    "NGSS items from CompetencyBase: MS-LS1-8 (receptors, messages to the brain), MS-LS3-1 and MS-LS3-2, HS-LS1-1 and HS-LS3-1, HS-LS2-8 (animal group behaviour, loose fit for station 8), HS-LS4-1 (evidence). Checked on nextgenscience.org and absent from CompetencyBase: 4-LS1-2 (animals receive, process and respond to information) and 1-LS1-2 (offspring signals, parents' responses).",
+    "Sachsen: Kl. 5 Vögel (7067) introduces the Information field through birdsong. Säugetiere (7068) has the dog-cat sketch (station 2). Kl. 6 Wirbellose (7202) has the honeybee Tierstaat and Kommunikation (station 5). Kl. 8 (7406) has the Reflexbogen (station 4). Kl. 10 Genetik (7600) has 'genetischer Code' (stations 6, 7).",
+    "The deeper analysis lives in the Interdisciplinary space: structure without a sender, what a receiver able to use a pattern makes of it, cue and signal, honest and dishonest signals, signaling games and decentralized dynamics as the paper has them. Bio-Core stays descriptive and links there.",
+    "Tool stations reused: the bead jar (station 6), the fox four-row sheet (station 4), the apple-maggot loop map with its leader check (stations 5 and 8), the tail-feather map and the adaptation grid (station 8). The moth map has no leader check.",
+    "Existing threads: the B2 thread 'exclusively decentralized causal vocabulary' fits stations 5 and 8, which show group patterns with no member in charge. The B1 thread on variation and inheritance is the copy story of stations 3 and 6.",
+    "Left unlinked: learning, memory and the brain beyond MS-LS1-8; neural networks (paper p.24); computing; human media and fake news. Bio-Core excludes these. The Computational-Core, Social-Core and Interdisciplinary spaces hold them. AI4K12 does not apply to Bio-Core."
+   ],
+   "gaps": [
+    "No study of students' conceptions of information in biology exists (paper p.6) and no classroom has tested any station. Every station is a proposal.",
+    "Evidence for K-2 and 3-5 is thin. S11 shows young children give purposes to things and S15 shows second and third graders learn selection from a teacher-led unit. Nothing found tests how children describe signals.",
+    "Bio-Core has no stage for physiology. Station 4 borrows B2:6-8 through its evolution question. Nerve cell, synapse and hormone loop detail from Sachsen Kl. 8 has no home here.",
+    "Sachsen teaches genes only in Kl. 10, so station 3 comes years before students meet the word Genetik.",
+    "The standards' own wording ('instructions', 'code', 'messages') is figurative. The paper (Table 1, p.7-8) lists the risks. The caution in the concepts is short on purpose and its effect on students is untested."
+   ],
+   "reviewNotes": [
+    "Everything here is AI-drafted and no subject expert has reviewed it. A reviewer has checked the draft once and the changes are merged in. Confidence is medium for the fit with KMK and NGSS wording and low for classroom use.",
+    "Check first: the three definitions against KMK and NGSS wording, and that none of them says or implies meaning, understanding or intention. The word 'alarm' in the Communication definition is the one purposive-sounding word.",
+    "The project lead directed on 2026-10-27 that Bio-Core should carry an Information concept at the level of the standards. This revisits the TheoryBase decision that Bio-Core has none by design. The TheoryBase pull request supersedes that decision and proposes a standards-level one. Register the concepts only after a person has accepted it.",
+    "Bio-Core Signal is broader than the paper's signal (a trait shaped by selection for its effect on a receiver). The Interdisciplinary note must contrast the two. Cue versus signal, honesty and signaling games stay in the Interdisciplinary space.",
+    "Examples taken from general biology and not looked up: hen alarm calls, the haemoglobin change, the hand withdrawal reflex and its evolution answer, the ant trail game, red-green colour vision alleles on the X chromosome, the beta-globin comparison (a reviewer checked that it builds the expected tree, human and chimpanzee together, mouse and chicken apart), and quorum sensing in Vibrio fischeri.",
+    "Station 4 (the reflex) compares people with the reflex and people born unable to feel pain, so the survival row has a variant to compare. Teachers need a caution for the pain-insensitivity case: it is a rare inherited condition and some students may know someone affected.",
+    "NGSS 4-LS1-2 and 1-LS1-2 were checked on nextgenscience.org by a reviewer. They are not yet in CompetencyBase, so the K-5 stations carry them by name only.",
+    "HS-LS2-8 is about group behaviour in animals. Station 8 uses bacteria, so the match is loose.",
+    "None of the three new concepts is on any stage's concept list. This is the same follow-up as D3 in the thinking-tool design note.",
+    "Whether the map cards in stations 5 and 8 act like a leader is the main quality check. The apple-maggot map has a leader check. The moth map has none.",
+    "Two evidence items were judged weak by the reviewer: Grossnickle et al. at K-2 and S64 at colour vision do not support the moves they are attached to. Treat those moves as design bets.",
+    "A German version needs terms for Signal, Kommunikation and Reiz that match KMK usage. Not checked.",
+    "A plant or bacterial example earlier than 9-12, beyond the seedling card, would answer the point in paper Table 1 that the NGSS tie information processing to animal nervous systems."
+   ],
+   "confidence": "medium"
+  },
+  "soc": {
+   "space": "soc",
+   "senseOfInformation": "Information is what people record, tell, share, withhold, check and rely on to act or to find out. It includes things made for another purpose, such as a ruin or an old bill, and messages made to tell. People give it meaning together and build rules and institutions to send, keep and check it.",
+   "boundary": "Information is always for someone: a person or group with goals. No selection of signals, no fitness, no genes and no cultural-evolution mechanism. No bits, channels, noise or feedback loops as explanation, and no machine that understands. Signal, message, code and source keep their human sense. Spread without a central sender is explained by people's reasons, norms and contact.",
+   "aimFit": "The aim is to explain why groups cooperate, conflict, hold rules and change. Information bears on each. Cooperation rests on whom people trust to tell the truth. Conflict grows from false reports and withheld facts. Rules include the records and checks that institutions keep. Change includes how ideas, habits and rumours spread. The strategy adds three concepts and reuses Communication, Knowledge, Norms, Institutions, Power and Diffusion. It borrows no mechanism from biology or computing.",
+   "sequence": "The paper's order is the spine: structure, then receivers, then spread with no central sender. Structure comes first so children can tell what was left behind from what was made to tell later people. Each band revisits all three at a higher level. K-2: sort traces from messages, pass a message on. 3-5: set a message beside a trace, trust a call, watch a habit spread. 6-8: ask who made the evidence, catch a false report, follow a rumour. 9-12: judge who can check a record, weigh two explanations of a legend.",
+   "dimensions": {
+    "structure": {
+     "status": "translated",
+     "how": "Separate things made for another purpose (a ruin, a worn path, an old bill) from things made to tell later people (a chronicle, a memoir). A ruin has no sender. A bill has one but was not written for later readers. Either becomes information when someone reads it with a question. A coin is both.",
+     "basis": "Paper p. 10-11. Droysen's Remains, Monuments and Sources, read in the Andrews 1893 translation, sections 21-24. Bernheim's Überrest-Tradition pair known only from a Hildesheim handout (2017), unverified. Social reading: own extension of the paper."
+    },
+    "receivers": {
+     "status": "translated",
+     "how": "Leave out evolved receivers, cues and signals. Teach the human counterpart: reasons, practices and institutions that people build to send, record and check information (writing, press, archives, courts, schools), plus reliability, perspective, interests and misinformation, deliberate or careless. Start from students' own ideas of information, knowledge and truth.",
+     "basis": "Paper p. 5-6 (student conceptions: Grossnickle et al. 2015, Alexander et al. 2012) and p. 12-22 (receivers). Selection and signalling parts left out. Own extension of the paper."
+    },
+    "decentralized": {
+     "status": "translated",
+     "how": "Use spread with no central sender: a stadium wave, a habit seen by other classes, a rumour. Add a legend that leaders pushed and many repeated. Explain spread by each person's reasons, norms and contact. Students often assume a boss behind a pattern, so they ask who was in charge, and who passed it on.",
+     "basis": "Paper p. 22-23 (wave; norms and practices spread without one authoritative sender), S40 and S41 for the boss assumption. Own extension for Social-Core."
+    }
+   },
+   "falseFriends": [
+    "Biologie Kl. 5 (Vögel, Säugetiere), Kl. 8 (Nerven- und Hormonsystem) and Kl. 10 (Genetik) use 'information' for cues, nerve signals and genes. Here information needs a person or group with goals who reads or passes it on. Genes and nerve signals stay with Bio-Core.",
+    "Informatik Kl. 7 (Informationen und Daten) and Kl. 8 (Vernetzte Systeme) treat information as coded data held and moved by machines. Here it depends on a person's question and trust. No bits, channels or noise. Machine cases stay with Computational-Core.",
+    "'Code' in genetics and programming means a fixed mapping or instructions. In Social-Core a code is a convention that people made and can change by agreement, such as a language or a code of conduct. Gene and program code talk is left out.",
+    "In biology a 'signal' can be a trait shaped for sending and 'meaning' a link between cue and response. Here a signal is a sign people agree on, such as a whistle, and meaning is shared and can be disputed. No selection is involved.",
+    "Geschichte Kl. 5 'Quelle' includes objects made for another purpose, such as a tool or a bill. 'Informationsquelle' in Sachunterricht Kl. 4 and Technik/Computer Kl. 5-6 means a book or website made to inform. Social-Core's Source covers both and asks which kind a thing is.",
+    "Some students treat information and truth as one thing, and tie it to knowledge (Grossnickle et al. 2015, via the paper). Here information can be true or false. Knowledge is what a group holds and can justify. Ethik Kl. 7 media work needs this split."
+   ],
+   "newConcepts": [
+    {
+     "label": "Information",
+     "definition": "What people record, tell, share, withhold or check in order to act or to find out, such as a deed, a timetable, a news report or a rumour. A trace becomes information when someone reads it with a question.",
+     "why": "Social-Core has Communication and Knowledge but no word for the thing that is recorded, passed on and checked. Students already use the word, and Sachsen's media and history topics use it.",
+     "excludes": "Bits, channels and noise. Cues and signals shaped by selection. DNA as a code. Data handled by machines. Knowledge itself, which a group holds and justifies.",
+     "parent": null,
+     "basis": [
+      "paper p. 4-6 and 10-11",
+      "OE-LITERATURE-grossnickle-2015",
+      "OE-LITERATURE-alexander-2012",
+      "own extension of the paper"
+     ]
+    },
+    {
+     "label": "Source",
+     "definition": "Anything people use to find something out. A trace was made for another purpose, such as a tool or a bill. A report was made to tell later people, such as a chronicle. Coins and inscriptions are both. Users weigh who made it and why.",
+     "why": "The paper's first dimension, structure without a sender, becomes source work in this space. German historical method separates remains from reports, and Sachsen Geschichte Kl. 5 asks students to judge what historical sources can and cannot show.",
+     "excludes": "Biological cues and signals. In computing, the place data comes from, and source code.",
+     "parent": "Knowledge",
+     "basis": [
+      "paper p. 10-11",
+      "Droysen, Outline of the Principles of History (Andrews 1893 translation), sections 21-24: Remains, Monuments, Sources (read)",
+      "Hildesheim history department handout 'Quellenkunde' (2017): Überreste and Tradition, Bernheim's pair. Handout only; primary text not read; author name unconfirmed (file says Peter Müller)",
+      "Sachsen geschichte lernbereich-766-1 and lernbereich-772-1",
+      "Sachsen technik-computer lernbereich-30700-1 (reliability of online information)",
+      "own extension of the paper"
+     ]
+    },
+    {
+     "label": "Misinformation",
+     "definition": "False or misleading information passed on by mistake or on purpose. On purpose it is often called disinformation. It travels by talk, press, posters and posts. Groups answer with checks, corrections, rules and people whose job is to check.",
+     "why": "The paper treats dishonest signals as part of receiver evolution. Social-Core needs the human case: reasons to mislead, reasons to repeat carelessly, and ways groups correct it.",
+     "excludes": "Mimicry, camouflage and false alarms in animals. Faulty output from a machine.",
+     "parent": "Communication",
+     "basis": [
+      "paper p. 20-22 (the biological case, left out here)",
+      "Sachsen ethik lernbereich-12038-1",
+      "Sachsen geschichte lernbereich-1039-1",
+      "own extension of the paper"
+     ]
+    }
+   ],
+   "conceptNotes": [
+    {
+     "concept": "Communication",
+     "note": "The accepted definition already holds meaning and shared codes. The strategy adds one point: a message has a maker with a purpose. A trace was made for another purpose. Traces belong under Source. Misinformation sits here as a kind of message."
+    },
+    {
+     "concept": "Knowledge",
+     "note": "Knowledge stays what a group holds and justifies. Records, archives and checking practices are cases of how a group justifies what it holds. Information feeds knowledge. Students often tie the two closely (paper p. 5), so stations keep them apart."
+    },
+    {
+     "concept": "Institutions",
+     "note": "Writing systems, the press, archives, courts and schools are institutions for sending, recording and checking information. Stations use them as cases of Institutions and need no new institution concept."
+    },
+    {
+     "concept": "Norms",
+     "note": "Norms about telling the truth, passing on gossip and keeping secrets are the informal side of information. A worn path shows a habit and may be no norm at all, since a norm needs approval and disapproval behind it."
+    },
+    {
+     "concept": "Diffusion",
+     "note": "Diffusion already covers spread through contact and adoption. A rumour, a habit seen by other classes and a stadium wave show spread with nobody in charge. Each person who passes it on has reasons. No selection language is used."
+    },
+    {
+     "concept": "Power",
+     "note": "Control over what is recorded, shown or kept secret is a form of power. The rumour, grading and legend stations use it. The accepted definition is unchanged."
+    },
+    {
+     "concept": "Incentive",
+     "note": "A false report pays or costs depending on who checks. The reporting station uses Incentive to show why a check changes what people say. The accepted definition is unchanged."
+    },
+    {
+     "concept": "Cooperation",
+     "note": "Trust that others tell the truth is one form of the trust that sustains Cooperation. The passing-game station uses it. The accepted definition is unchanged."
+    }
+   ],
+   "stations": [
+    {
+     "stage": "S3:K-2",
+     "band": "K-2",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Children meet three kinds of evidence about market day in the town square: a worn cobblestone and an old market scale, an old photo, and an older person's story. They sort them into two boxes: used for something else, and made to tell us. They say what each one shows and ask the older person what changed.",
+     "example": "Market day in the square: a worn cobblestone and a market scale, an old photo, and a grandparent's story.",
+     "representation": "Picture cards sorted into two boxes: used for something else, and made to tell us.",
+     "challenge": "Ask for the first time who made a thing and why. Sort things that were used from things made to tell. Evidence for this age is thin, so treat it as a trial.",
+     "concepts": [
+      "Social Change",
+      "Source",
+      "Information"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "K-2",
+       "stage": "S3:K-2",
+       "index": 0
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "paper p. 10-11",
+      "design bet: no study found of sorting evidence by the maker's purpose at K-2"
+     ]
+    },
+    {
+     "stage": "S1:K-2",
+     "band": "K-2",
+     "dimension": 2,
+     "level": "precursor",
+     "move": "The class lines up and passes the line-up rule by whisper from child to child. The last child says it aloud. The class compares it with the picture card the teacher kept and with what the teacher says. Children say where the rule changed, why it might have changed, and how a group can keep it right.",
+     "example": "The line-up rule whispered down a row of six children and checked against a picture card.",
+     "representation": "A row of children and one picture card to check the last whisper against.",
+     "challenge": "Notice that a message can arrive changed, give one reason why, and name one way a group checks it. This is the first time a message is held against its first form.",
+     "concepts": [
+      "Communication",
+      "Norms",
+      "Group",
+      "Information"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "K-2",
+       "stage": "S1:K-2",
+       "index": 1
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S50",
+      "paper p. 5-6",
+      "design bet: no study found of whisper passing as a lesson on messages"
+     ]
+    },
+    {
+     "stage": "S1:3-5",
+     "band": "3-5",
+     "dimension": 1,
+     "level": "full",
+     "move": "Groups read the 'Quiet please' sign in the library, then count how many children talk during a ten-minute visit. The sign is a message made to inform. The count shows the custom, what people do when nobody is told. They compare the two, say what each tells about the rule, and name the role of the person who keeps it.",
+     "example": "The library sign 'Quiet please' and a tally of who talks during a class visit.",
+     "representation": "Two-column sheet: what the sign says, what the tally shows, with a row for where they differ.",
+     "challenge": "Set a message beside evidence of what people do and say where they agree or differ. A rule written down and a custom can part ways.",
+     "concepts": [
+      "Norms",
+      "Source",
+      "Role",
+      "Information"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "3-5",
+       "stage": "S1:3-5",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-65-1/lernbereich-766-1",
+      "lehrplan-65-1/lernbereich-772-1",
+      "lehrplan-80-1/lernbereich-6101-1"
+     ],
+     "evidence": [
+      "paper p. 10-11"
+     ]
+    },
+    {
+     "stage": "S2:3-5",
+     "band": "3-5",
+     "dimension": 2,
+     "level": "full",
+     "move": "In a passing game a teammate shouts 'I'm free!'. Some calls are true and some are false. Pairs fill a two-by-two table: I pass or keep, the call was true or false, with a sentence in each cell. They name one reason to call falsely, then say what makes a player trust the next call: past calls, a friend, or a rule against false calls.",
+     "example": "A teammate shouts 'I'm free!' in a school football game. Pass or keep?",
+     "representation": "Two-by-two table: pass or keep against call true or false, with a sentence in each cell.",
+     "challenge": "Add the truth of the call as a second unknown. Say what makes a listener trust the next call. Evidence is thin at this age.",
+     "concepts": [
+      "Cooperation",
+      "Incentive",
+      "Source",
+      "Communication"
+     ],
+     "toolLinks": [
+      {
+       "tool": "payoff",
+       "band": "3-5",
+       "stage": "S2:3-5",
+       "index": 1
+      },
+      {
+       "tool": "causal",
+       "band": "3-5",
+       "stage": "S2:3-5",
+       "index": 1
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S51",
+      "S53",
+      "paper p. 16-17 (table form only; the paper's payoffs are fitness benefits, here they are what players want)",
+      "design bet: no study found of children reading a table with a true-or-false column"
+     ]
+    },
+    {
+     "stage": "S3:3-5",
+     "band": "3-5",
+     "dimension": 3,
+     "level": "precursor",
+     "move": "Children trace how a recycling habit reached the whole school. They gather what happened from three sources: a child in each class, a teacher and the school newsletter. They draw who saw it, who told whom and who joined. They ask whether anyone announced it. The class also tries a wave with no leader and says who was in charge.",
+     "example": "A recycling habit that spread from one class to the whole school, and a wave in the school hall.",
+     "representation": "Cards for classes joined by arrows that show who saw or told whom.",
+     "challenge": "Explain a pattern that many people made without a boss. Name one reason for each person who passed it on.",
+     "concepts": [
+      "Diffusion",
+      "Communication",
+      "Source",
+      "Knowledge"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "3-5",
+       "stage": "S3:3-5",
+       "index": 2
+      },
+      {
+       "tool": "analogy",
+       "band": "3-5",
+       "stage": "S3:3-5",
+       "index": 2
+      }
+     ],
+     "sachsen": [
+      "lehrplan-80-1/lernbereich-6230-1",
+      "lehrplan-80-1/lernbereich-6356-1"
+     ],
+     "evidence": [
+      "S40",
+      "S41",
+      "S36",
+      "paper p. 22-23"
+     ]
+    },
+    {
+     "stage": "S3:6-8",
+     "band": "6-8",
+     "dimension": 1,
+     "level": "full",
+     "move": "Students compare what survives from Rome and from the peoples the Romans called Germani. They sort evidence into traces (tools, pottery, graves, house outlines) and reports (a Roman writer's account, made for readers in Rome). For each piece they ask who made it, for whom and what it leaves out. A coin was money and also carried an emperor's picture, so it fits both boxes.",
+     "example": "A Roman coin found beyond the frontier, and a Roman writer's account of the Germani, written for readers in Rome.",
+     "representation": "Two-column sort of traces and reports, each with who made it, for whom and what is missing.",
+     "challenge": "Say what a trace can show that a report cannot, and the reverse. Find a piece that is both, and say what it leaves out.",
+     "concepts": [
+      "Culture",
+      "Source",
+      "Knowledge"
+     ],
+     "toolLinks": [],
+     "sachsen": [
+      "lehrplan-65-1/lernbereich-823-1"
+     ],
+     "evidence": [
+      "paper p. 10-11",
+      "Droysen, Outline of the Principles of History (Andrews 1893 translation), sections 21-24: Remains, Monuments, Sources",
+      "design bet: no study found of pupils sorting sources by the maker's purpose"
+     ]
+    },
+    {
+     "stage": "S2:6-8",
+     "band": "6-8",
+     "dimension": 2,
+     "level": "full",
+     "move": "Students extend the garden-club water table with a second choice: what each member reports about their use, true or false. They find the cell where a false report pays when nobody checks. They redo the table with a meter or a shared logbook and note what the check costs and who does it.",
+     "example": "Invented case: two garden-club members share one water tank. Each says how much they took.",
+     "representation": "Two tables: reports unchecked and reports checked by a meter, changed cells shaded, plus a cost column.",
+     "challenge": "Separate what a person does from what the person reports. Show how a check changes the payoffs and say who pays for it.",
+     "concepts": [
+      "Incentive",
+      "Collective Action",
+      "Misinformation",
+      "Source"
+     ],
+     "toolLinks": [
+      {
+       "tool": "payoff",
+       "band": "6-8",
+       "stage": "S2:6-8",
+       "index": 3
+      },
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "S2:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S47",
+      "S53",
+      "paper p. 20-22 (table form only; the paper's payoffs are selection payoffs, here they are what members want)"
+     ]
+    },
+    {
+     "stage": "S1:6-8",
+     "band": "6-8",
+     "dimension": 3,
+     "level": "full",
+     "move": "A rumour about who cut in at the canteen goes round the class group chat. Students map who passed it on and why: to warn, to joke, to join in. They mark where the story changed, ask who started it and who could stop it, and say whether passing it on works as disapproval of queue-jumping.",
+     "example": "Invented case: a rumour in the class group chat about who jumped the canteen queue. Versions differ.",
+     "representation": "Map of people with arrows for who told whom, a reason on each arrow and a mark where the story changed.",
+     "challenge": "Give each person who passes it on a reason of their own. Find where nobody was in charge and where a rule or role could change the spread.",
+     "concepts": [
+      "Norms",
+      "Diffusion",
+      "Misinformation",
+      "Power"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "6-8",
+       "stage": "S1:6-8",
+       "index": 4
+      },
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "S1:6-8",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-77-1/lernbereich-12038-1",
+      "lehrplan-76-1/lernbereich-4892-1",
+      "lehrplan-130-1/lernbereich-30700-1",
+      "lehrplan-77-1/lernbereich-11970-1"
+     ],
+     "evidence": [
+      "S40",
+      "S41",
+      "S37",
+      "paper p. 22-23"
+     ]
+    },
+    {
+     "stage": "S1:9-12",
+     "band": "9-12",
+     "dimension": 2,
+     "level": "extended",
+     "move": "Students compare fair grading under a central exam board and under each teacher's own marks, asking what a mark tells someone who was not in the room. Rows: who made the record, who can check it, who can challenge it, who gains from it. They rank the breaks by how far each lets outsiders rely on the mark.",
+     "example": "Invented case: a final mark read by a university, set by a central exam board or by one teacher.",
+     "representation": "Two-column map with four shared rows on the record, a break column and a ranking.",
+     "challenge": "Judge an institution by how well outsiders can check its records. Separate what a mark says from who can confirm it.",
+     "concepts": [
+      "Institutions",
+      "Source",
+      "Power",
+      "Incentive"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "S1:9-12",
+       "index": 5
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S62",
+      "S67"
+     ]
+    },
+    {
+     "stage": "S3:9-12",
+     "band": "9-12",
+     "dimension": 3,
+     "level": "extended",
+     "move": "Students take the stab-in-the-back legend after 1918, a false claim that civilians had betrayed an undefeated army. They set two explanations of its spread side by side: army leaders pushed it from above, or many people repeated it because it suited them. They sort speeches, newspapers and letters for each, mark where one cause alone fails, and tag each claim about who spread it supported, disputed or a guess.",
+     "example": "The stab-in-the-back legend after 1918: army leaders told it, and parties, newspapers and many ordinary people repeated it.",
+     "representation": "Two-column evidence sheet, one column per explanation, each claim tagged supported, disputed or a guess.",
+     "challenge": "Weigh two explanations against the same evidence and say where each alone fails. Ask who gained from the story, who it blamed and who checked it.",
+     "concepts": [
+      "Diffusion",
+      "Power",
+      "Misinformation",
+      "Agency"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "9-12",
+       "stage": "S3:9-12",
+       "index": 6
+      },
+      {
+       "tool": "tinbergen",
+       "band": "9-12",
+       "stage": "S3:9-12",
+       "index": 6
+      }
+     ],
+     "sachsen": [
+      "lehrplan-65-1/lernbereich-1039-1"
+     ],
+     "evidence": [
+      "S40",
+      "S41",
+      "paper p. 22-23",
+      "design bet: S40 and S41 come from older students and adults"
+     ]
+    }
+   ],
+   "crossLinks": [
+    "Strands: S1 carries signs, records and rumour. S2 carries trust and reporting. S3 carries source work and spread. Information adds no new topic. Each station extends the move its stage already asks for.",
+    "Tool stations reused: market day, the line-up rule, library talking rules, the passing game, the class party cake, the recycling habit, bread and marbles, the canteen queue, yard litter, the garden-club water tank, fair grading, votes for women 1918-19 and trade unions. No tool station changes.",
+    "Maps here carry a reason people act on at each arrow. Stations use no loop, feedback or flow language. The existing recycling and litter tool stations draw cycles of people responding to each other. The pack's owner should confirm that stays inside the boundary.",
+    "Sachsen links by station: Geschichte Kl. 5, Kl. 6 and Sachunterricht Kl. 3 for source work. Sachunterricht Kl. 4 for news and sources. Ethik Kl. 7, GRW Kl. 8 and Technik/Computer Kl. 5-6 for rumour and online reliability. Geschichte Kl. 9 for the legend and propaganda.",
+    "Sachsen lists no cross-reference between its Biologie information topics and the media topics. Social-Core covers the media and history side only. Joining the two sides, and saying where the word changes meaning, is work for the Interdisciplinary space.",
+    "Bio-Core keeps cues, signals and genetic information (Biologie Kl. 5, 8, 10). Computational-Core keeps Informationen und Daten (Informatik Kl. 7, 9). No station here uses those cases as examples or as evidence.",
+    "Existing concepts carry the new ones. Knowledge parents Source, which also holds reliability. Communication parents Misinformation. Information has no parent in the vocabulary, since it covers traces that nobody sent. Institutions, Norms, Power and Diffusion are used as they stand.",
+    "Left unlinked: Ethik Kl. 10 Wissenschaft, Technik und Verantwortung (Knowledge) and Informatik Vernetzte Systeme (Communication in its technology sense). The first concerns scientific change and could take a peer-review station later. The second treats communication between machines."
+   ],
+   "gaps": [
+    "No Social-Core concept for information existed. The three new concepts (Information, Source, Misinformation) are a proposal. Reliability was folded into Source after review.",
+    "The paper reports no study of students' conceptions of information in biology, and its framework has no classroom test. The Social-Core reading is an extension. Nothing here has been tried in a classroom.",
+    "Grossnickle et al. (2015) and Alexander et al. (2012) are used as the paper reports them (p. 5). Their grade ranges were not checked and no K-2 sample is known.",
+    "The grounding set has no source on how children or teenagers judge the reliability of sources or trust informants. The Rome, rumour and grading stations rest on design bets.",
+    "The evidence on students assuming a boss behind a spread pattern (S40, S41) comes from older students and adults. Its use at grades 3-5 is a design bet.",
+    "Sachsen tags no information topic before Sachunterricht Kl. 3, so the K-2 stations have no Sachsen link.",
+    "Not built: a first probe of students' own ideas of information, knowledge and truth before the first stations (the paper says learners bring everyday intuitions, p. 6), a dimension 1 station at 9-12 on digital trails (GRW Kl. 8 'Datenspur'), a station where a trace and a report about the same event disagree, a market or price station, and a shared knowledge project station.",
+    "Archives and courts are named in the strategy but have no station of their own."
+   ],
+   "reviewNotes": [
+    "Confidence is medium for the conceptual fit and low for every developmental claim. Everything here is AI-drafted and unreviewed by a subject expert. A reviewer has checked the draft once and the changes are merged in.",
+    "Source-criticism terms: Überrest (Droysen's Remains) was read in the Andrews 1893 translation, sections 21-24, pp. 18-20. The German original was not read. Droysen's test is whether something served later memory, so letters, bills and laws are remains. Tradition as the partner of Überrest is Bernheim's 1889 pair. It was checked only against one university handout (Hildesheim, PDF dated 2017, author field Peter Müller, not confirmed) and is unverified. The handout names von Brandt (Werkzeug des Historikers) and Quirin as further reading. These primary texts were not read.",
+    "A historian or history teacher should check the Rome and Germania station and the stab-in-the-back station: the facts, the framing for a classroom, and the handling of the legend's antisemitic use. Coins are monuments, 'Germanic' is a Roman label, and Tacitus relied on second-hand reports. The 1918 facts (Hindenburg and Ludendorff pushed the legend, the army had been beaten, the legend scapegoated socialists, civilians and Jews) come from general knowledge and were not checked against a source.",
+    "The group-chat rumour, the water reports and the final mark carry an 'Invented case' label in their stations. The market day, library, whisper game, passing game and recycling case are invented teaching scenarios too. None of them is a documented case.",
+    "The passing-game and water-report stations borrow the paper's use of payoff tables for signals (p. 16-17, 20-22), which are fitness-benefit games. Here the payoffs are what people want. Check that the tables read as social tables and never as selection of signals.",
+    "The trace-versus-told sort at K-2 has no direct evidence. S25 supports only the sense of old and new. The whisper station rests on S50 and is a design bet.",
+    "Each dimension is marked translated. This is the design's own extension of a biology education paper. The paper itself says its framework is not definitive.",
+    "Grossnickle et al. and Alexander et al. were not read. They are used only as the paper reports them. Sachsen tags are AI-made and unaudited, and truncated content hints (for example in Ethik Kl. 7 media) were not read in full.",
+    "Information has no parent concept here because it covers traces that nobody sent. Check whether it should sit under Communication or Knowledge.",
+    "Reliability was folded into Source after review, because it has no meaning apart from a source.",
+    "Tool links: the Rome station's dike link was dropped. The cake, unions and votes-for-women links are loose fits and stay.",
+    "Open handoff: a named mapping to the Interdisciplinary space of the Social-Core senses of Information (record, tell, check, rely), with the break that information here is always for a person or group with goals."
+   ],
+   "confidence": "medium"
+  },
+  "comp": {
+   "space": "comp",
+   "senseOfInformation": "Information is a pattern that narrows the set of messages a receiver must tell apart, counted in bits. A receiver is a program that applies a rule. The count rests on a stated set of possible messages and an encoding scheme both ends share. Data are recorded values. Meaning and truth lie outside the count.",
+   "boundary": "Information is a property of data and messages in systems that people built. A program is a receiver only in the sense that it applies a decoding rule. No intention, belief, honesty, meaning or understanding is credited to a machine. No organism, selection, gene or DNA serves as explanation, and 'code' never means DNA. Meaning, truth and trust belong to people and to other spaces.",
+   "aimFit": "The aim is a formal vocabulary for what computing systems do, with no intention credited to machines. The strategy keeps information a measure on data and codes, so the space stays formal. Each of the paper's three ideas becomes something a program does or a person built: a program uses a regularity, a decoder follows a shared code, many simple rules give a group result. Words such as listen, trust, know and understand give way to follow a rule, check and adjust a parameter.",
+   "sequence": "Pattern first, then receivers, then decentralized dynamics, as in the paper. Machine receivers follow written rules, so receivers can start early without agent talk. K-2: tell a recorded pattern from a sent note, and see that a robot follows only its key card. 3-5: use a pattern in a rule and trace a wrong result to its input. 6-8: two ends agree on an encoding scheme, and many nodes follow one local rule. 9-12: count bits, test a trained model with crafted input, compare central and distributed designs.",
+   "dimensions": {
+    "structure": {
+     "status": "translated",
+     "how": "A regularity in recorded values (a repeat, a trend, a link between two columns) exists without a sender, and a sensor log holds regularities and no message. It becomes information only for a program built to use it, to predict the next value or to shorten the data. The bit count comes at 9-12.",
+     "basis": "Paper p. 10-13 (structure without a sender; it becomes information when a system can exploit it, p. 11 and 13). Shannon 1948 for the bit count. Reading structure as compressible regularity is own extension of the paper."
+    },
+    "receivers": {
+     "status": "translated",
+     "how": "Three parts. A decoder must share the encoder's encoding scheme, which people wrote down. A system's behaviour changes through design, versions and training on data. Noisy, mistyped, spam or crafted input breaks a rule or slips past it. Evolved goals, selection and honest signals are left out.",
+     "basis": "Paper p. 12-22 (receivers p. 12-16, cue and signal p. 17-18, misinformation p. 20-22). Rahwan et al. 2019 (S8) for design and training as machine development. Own extension of the paper."
+    },
+    "decentralized": {
+     "status": "translated",
+     "how": "Many components follow the same simple local rule with no central controller, and the group result is held by no single component. Taught with agent-based simulations, averaging among neighbouring nodes and file-sharing networks. Cells, bees and crowds are left to other spaces.",
+     "basis": "Paper p. 22-23 (no controller, emergent group results; Resnick 1996, S41). The computing cases are own extension of the paper."
+    }
+   },
+   "falseFriends": [
+    "Code. Biology says genes 'code for' traits and computing treats coding as human-made (paper p. 7). Here a code is a table people wrote, so it has an author. That is why 'DNA is a code' misleads. Sachsen Biologie Kl. 10 Genetik lists 'genetischer Code'.",
+    "Information as data plus meaning. Sachsen Informatik Kl. 7 lists 'Unterscheidung der Begriffe' and 'Darstellung von Informationen als Daten', so information may be taught as what data stand for. Here the bit count leaves meaning out.",
+    "Information as true facts. Children define information with 'knowledge' and 'truth' (paper p. 5). A false message carries as many bits as a true one. Sachsen Informatik Kl. 8 asks students to judge information sources. That is a question of truth, outside the count.",
+    "Signal, sender, receiver. In biology a signal is a trait shaped for communication. Here a signal is a physical quantity, a message is a block of symbols under a protocol, and a receiver is a program that applies a rule (Sachsen Informatik Kl. 9 Netzwerke).",
+    "Learning, memory, neuron. Sachsen Biologie Kl. 8 teaches memory and nerve cells. Here memory is storage, learning is adjusting parameters from data, and a neural network is numeric units with weights. The paper's neural-network bridge (p. 24) is read this way."
+   ],
+   "newConcepts": [
+    {
+     "label": "Regularity",
+     "definition": "A repeat, trend or dependence in recorded values that a program can use to predict the next value or to shorten the data. It exists whether or not anyone sent it. The more of it, the fewer bits the data need.",
+     "why": "The Information definition joins a pattern and its measure. Dimension 1 needs the pattern named on its own, so students can meet it before any sender, receiver or bit count.",
+     "excludes": "A message, a signal or anything sent on purpose. Also any claim that the pattern means something or that the machine notices it.",
+     "parent": "Data",
+     "basis": [
+      "paper p.10-12",
+      "OE-LITERATURE-eirdosh-hanisch-2026",
+      "OE-LITERATURE-shannon-1948",
+      "own extension of the paper"
+     ]
+    },
+    {
+     "label": "Encoding Scheme",
+     "definition": "A rule or table, written down by people, that maps data to symbols and back, so a decoder can recover what an encoder wrote. Encoder and decoder must use the same one.",
+     "why": "Dimension 2 needs a name for what a decoder must share. It also separates a code as an agreed table from a code as genes or as program text.",
+     "excludes": "DNA or any genetic code, program source text, and encryption. An encoding scheme need not hide anything.",
+     "parent": "Representation",
+     "basis": [
+      "OE-LITERATURE-shannon-1948",
+      "paper p.4",
+      "paper p.7",
+      "own extension of the paper"
+     ]
+    }
+   ],
+   "conceptNotes": [
+    {
+     "concept": "Information",
+     "note": "Keep the accepted meaning. A regularity makes data predictable, so a receiver that applies it needs fewer bits, and a fully predictable message adds none (paper p. 2). The count is relative to a stated set of possible messages and says nothing about meaning or truth."
+    },
+    {
+     "concept": "Data",
+     "note": "Data stay recorded values. A sensor log is data with or without a regularity. Data become a message only when a sender puts them into an agreed encoding scheme for a receiver. A pattern in a log is not a signal."
+    },
+    {
+     "concept": "Representation",
+     "note": "Includes learned representations: the numbers a trained model builds from data, such as weights. They stand for something only to the people who read them. Nobody wrote a scheme for them, and reading them is hard work. Text in a character table is read through a stated scheme."
+    },
+    {
+     "concept": "Abstraction",
+     "note": "Shannon's sender-receiver model is an abstraction. It hides meaning, how sender and receiver came to share an encoding scheme, and the parallel, many-part dynamics of distributed systems (paper p. 4, 22). Students name what a model hides, as C1:3-5 already asks of a chart."
+    },
+    {
+     "concept": "Distributed System",
+     "note": "The group result, such as a total, an agreement or a route, is held by no single component. Students find where it is stored at each step. No component receives all the inputs. Cells, bees and crowds stay out of this space."
+    },
+    {
+     "concept": "Machine Learning",
+     "note": "Neural networks appear as one model whose parameters, the weights, are adjusted from data. The units are numeric functions and training changes numbers. Paper p. 24 asks how meaning arises in natural and artificial neural systems. This space covers the artificial side as numbers. Interdisciplinary holds the comparison."
+    },
+    {
+     "concept": "Specification",
+     "note": "Includes what a program does with input that fails its specification, such as a mistyped or damaged message. A check cannot catch input that is valid but misleading, such as a padded spam message. People write the checks before the input arrives."
+    }
+   ],
+   "stations": [
+    {
+     "stage": "C1:K-2",
+     "band": "K-2",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Children get two strips. One shows light readings a sensor took each hour: dark, dark, bright, bright, and so on. The other is a card message a friend laid out with symbols. They find the part of the sensor strip that repeats and say what comes next. They say which strip was sent to them and which was only recorded.",
+     "example": "Sensor strip: dark, dark, bright, bright, dark, dark. Friend's cards: house, arrow, ball. Only the second was sent.",
+     "representation": "Two strips of coloured squares and symbol cards, laid side by side.",
+     "challenge": "Tell a pattern that was recorded from a note that was sent, and use the pattern to say what comes next.",
+     "concepts": [
+      "Data",
+      "Regularity",
+      "Representation"
+     ],
+     "toolLinks": [],
+     "sachsen": [],
+     "evidence": [
+      "paper p.4-5",
+      "S28",
+      "design bet (no study found of this task at K-2; S72 rests on its title and does not cover it)"
+     ],
+     "ai4k12": []
+    },
+    {
+     "stage": "C3:K-2",
+     "band": "K-2",
+     "dimension": 2,
+     "level": "precursor",
+     "move": "Pairs play programmer and robot. The programmer lays out arrow cards. The robot moves a floor figure using only a key card that says what each arrow means. They swap in a second key card for the same arrows and watch the path change. They say who wrote each key and what the robot does with an arrow that is not on its key.",
+     "example": "Key A: up arrow means one step forward. Key B: up arrow means one step back. Same cards, two different paths.",
+     "representation": "A row of arrow cards, two key cards and a floor grid.",
+     "challenge": "Say that the robot can only follow the key it was handed, so the same cards give different moves under different keys.",
+     "concepts": [
+      "Program",
+      "Encoding Scheme",
+      "Representation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "K-2",
+       "stage": "C2:K-2",
+       "index": 0
+      },
+      {
+       "tool": "causal",
+       "band": "K-2",
+       "stage": "C3:K-2",
+       "index": 0
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S72",
+      "S73"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-4-d-i-k-2-eu",
+      "OE-COMPETENCY-ai4k12-2-a-ii-k-2-eu"
+     ]
+    },
+    {
+     "stage": "C1:3-5",
+     "band": "3-5",
+     "dimension": 1,
+     "level": "full",
+     "move": "Groups record the room temperature each hour in a table and chart it. They write a rule that predicts the next reading and test it on a new day. They shuffle the same numbers and test the rule again. In pairs they play twenty questions to find a hidden reading, with and without the rule, and count the questions.",
+     "example": "Hourly readings rise after lunch, so 'one degree warmer than the hour before' predicts well. Shuffled readings give the rule nothing to use.",
+     "representation": "A table and line chart of one day's readings, beside a shuffled copy.",
+     "challenge": "Tell data a rule can predict from data it cannot, and show that the rule cuts the number of questions needed to find a reading.",
+     "concepts": [
+      "Data",
+      "Regularity",
+      "Representation",
+      "Information"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "3-5",
+       "stage": "C1:3-5",
+       "index": 2
+      }
+     ],
+     "sachsen": [
+      "lehrplan-74-1/lernbereich-3614-1",
+      "lehrplan-80-1/lernbereich-6101-1"
+     ],
+     "evidence": [
+      "paper p.4-5",
+      "design bet (no study found of the twenty-questions count at 3-5)"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-3-a-i-3-5-eu"
+     ]
+    },
+    {
+     "stage": "C2:3-5",
+     "band": "3-5",
+     "dimension": 2,
+     "level": "precursor",
+     "move": "Children build a class-poll program that counts votes for each lunch choice. They test it with a vote typed 'Pizzza' and a vote entered twice. They trace the stored counts, find where the program went wrong, and add a condition that catches one kind of bad vote. They say what the program cannot tell.",
+     "example": "The poll counts 'Pizzza' as a new lunch choice. A check against the list of choices catches it. A double vote from one child passes the check.",
+     "representation": "A trace table of the stored counts after each vote.",
+     "challenge": "Explain a wrong result from the input and the program's rules alone, and say what a check can catch and what it cannot.",
+     "concepts": [
+      "Program",
+      "State",
+      "Specification"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "3-5",
+       "stage": "C2:3-5",
+       "index": 1
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S68",
+      "S69",
+      "S77"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-2-b-i-3-5-lo"
+     ]
+    },
+    {
+     "stage": "C1:6-8",
+     "band": "6-8",
+     "dimension": 2,
+     "level": "full",
+     "move": "Pairs encode a short word in ASCII using one character table and pass the bits on paper strips. The receiver decodes with the same table, then with a different one. The teacher flips one bit in transit. They add a check bit to each character, detect the flip, and write the decoder's specification, including what it does when the check fails.",
+     "example": "'HI' read with a shifted table gives other letters. Flipping the last bit of the byte for I (01001001) gives H (01001000). A check bit that keeps the count of 1s even shows the flip.",
+     "representation": "Bit strips under two character tables, each character followed by a check bit.",
+     "challenge": "Show that the same bits give different data under different encoding schemes, and that a check bit detects one flipped bit but cannot say which one changed.",
+     "concepts": [
+      "Encoding Scheme",
+      "Specification",
+      "Representation",
+      "Data"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "C1:6-8",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-630-1/lernbereich-118698-2"
+     ],
+     "evidence": [
+      "OE-LITERATURE-shannon-1948",
+      "paper p.2-4",
+      "design bet (no study found of 6-8 students on shared codes and check bits)"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-3-c-i-6-8-eu"
+     ]
+    },
+    {
+     "stage": "C3:6-8",
+     "band": "6-8",
+     "dimension": 3,
+     "level": "full",
+     "move": "Students run an agent-based model of 100 sensor nodes in a grid. Each node holds a number. A random pair of neighbours repeatedly both take the average of their two numbers. No node sees the whole grid. They watch the nodes settle near the overall average, say where that average is stored at the start and the end, then change the pairing rule and report the effect.",
+     "example": "Nodes start with random temperatures. After many pairings each node shows about the grid average. No node ever received all the readings.",
+     "representation": "A grid of coloured cells and a line graph of the highest and lowest value over time.",
+     "challenge": "Say where the group result is stored at each step, and show that changing the local rule changes the result for the whole group.",
+     "concepts": [
+      "Distributed System",
+      "Simulation",
+      "State",
+      "Feedback"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "C3:6-8",
+       "index": 4
+      },
+      {
+       "tool": "tinbergen",
+       "band": "6-8",
+       "stage": "C3:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S41",
+      "S40",
+      "S42",
+      "S24",
+      "paper p.22-23"
+     ],
+     "ai4k12": []
+    },
+    {
+     "stage": "C1:9-12",
+     "band": "9-12",
+     "dimension": 1,
+     "level": "extended",
+     "move": "Students compress three files with a program: a thousand repeats of one letter, a page of text, and a thousand random bytes. They relate each compressed size to how predictable the file is. They count the bits needed to pick one of N equally likely messages and change N. They name what the bit count leaves out.",
+     "example": "A thousand A's shrink to a few bytes. Random bytes do not shrink. One of 8 equally likely messages costs 3 bits, true or false.",
+     "representation": "A table of original size, compressed size and bits per message for each file.",
+     "challenge": "Show that the more predictable a file, the fewer bits it needs, and name what the count leaves out: meaning, truth and how the two ends came to share an encoding scheme.",
+     "concepts": [
+      "Information",
+      "Regularity",
+      "Representation",
+      "Data"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "9-12",
+       "stage": "C1:9-12",
+       "index": 7
+      }
+     ],
+     "sachsen": [
+      "lehrplan-630-1/lernbereich-118698-2"
+     ],
+     "evidence": [
+      "OE-LITERATURE-shannon-1948",
+      "OE-LITERATURE-shannon-1956",
+      "paper p.2-4",
+      "design bet (no study found of 9-12 students on bit counts and compression)"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-3-c-i-9-12-eu"
+     ]
+    },
+    {
+     "stage": "C3:9-12",
+     "band": "9-12",
+     "dimension": 2,
+     "level": "extended",
+     "move": "Students train a one-neuron spam model by hand, then in a spreadsheet, on 40 short messages labelled spam or not spam, using counts of five words. They print the weights, retrain on a different 40 to make version 2, and compare weights and errors. They write a message that slips past a version and explain the wrong output from the data, the weights and the input.",
+     "example": "'free' gets a high weight if set A has it mostly in spam, and a low one if set B has it in ordinary mail. Padding spam with negatively weighted words lowers its score.",
+     "representation": "A table of word counts, a weight for each word and each message's score.",
+     "challenge": "Trace a wrong output through the weights back to the training data. Say what retraining fixes and what it cannot, and why the model cannot be said to know, trust, lie or understand.",
+     "concepts": [
+      "Machine Learning",
+      "Data",
+      "Model",
+      "Specification"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "9-12",
+       "stage": "C3:9-12",
+       "index": 6
+      },
+      {
+       "tool": "tinbergen",
+       "band": "9-12",
+       "stage": "C3:9-12",
+       "index": 5
+      },
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "C3:9-12",
+       "index": 5
+      }
+     ],
+     "sachsen": [
+      "lehrplan-630-1/lernbereich-118841-2",
+      "lehrplan-630-1/lernbereich-118774-2"
+     ],
+     "evidence": [
+      "S75",
+      "S77",
+      "S8",
+      "paper p.24",
+      "design bet (S75 ages not retrieved; no study found of 9-12 students training a one-neuron model; teacher prepares both sets of 40 messages; the padding effect needs a test run on that data)"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-3-a-ii-9-12-lo",
+      "OE-COMPETENCY-ai4k12-3-b-ii-6-8-lo",
+      "OE-COMPETENCY-ai4k12-3-c-iii-9-12-eu"
+     ]
+    },
+    {
+     "stage": "C3:9-12",
+     "band": "9-12",
+     "dimension": 3,
+     "level": "extended",
+     "move": "Students run a file-sharing network on cards. Twelve peers hold pieces of a file, each of eight pieces on three peers, and no peer holds all of them. They trace a request, remove two peers and check that the file can still be rebuilt. They repeat with one server holding the file and compare what each design guarantees when a part fails.",
+     "example": "Eight pieces, each held by three of twelve peers. Remove any two peers and every piece survives. Remove the single server and the file is gone.",
+     "representation": "A card for each peer listing its pieces, and a diagram of who asks whom.",
+     "challenge": "Compare a central and a distributed design on what each guarantees when parts fail, and say why no peer needs to hold the whole file.",
+     "concepts": [
+      "Distributed System",
+      "State",
+      "Specification"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "C3:9-12",
+       "index": 5
+      }
+     ],
+     "sachsen": [
+      "lehrplan-630-1/lernbereich-118850-2"
+     ],
+     "evidence": [
+      "paper p.22-23",
+      "S8",
+      "S41"
+     ],
+     "ai4k12": []
+    }
+   ],
+   "crossLinks": [
+    "The stations at C1:K-2, C1:3-5, C1:6-8 and C1:9-12 extend the Data and Representation strand and add no new topic. C2:3-5 hosts the bad-input trace. C3 hosts the group-result, training and file-sharing stations. Together they form one new Information thread. The four thinking-tool threads stay as they are.",
+    "The check-bit station sits beside the causal map of a message in two character tables, the averaging model beside the traffic model, the file-sharing station beside the spam analogy. The paper's misinformation payoff matrix (p. 21-22) has no station, since its payoffs would belong to people. Interdisciplinary may take it.",
+    "Sachsen: Informatik Kl. 7 'Informationen und Daten' carries the encoding and compression stations. Kl. 9 'Informationen und Daten' covers databases and has no station. Kl. 9 'Netzwerke' carries file sharing, Kl. 9 'Künstliche Intelligenz' training, Kl. 8 'Vernetzte Systeme' bad input.",
+    "Interdisciplinary holds cue and signal, honest signals, code versus genetic code, and natural versus artificial neural systems. Bio-Core stays at standards level. Social-Core keeps the meaning, trust and truth of a message. This space counts bits for built systems only (Shannon 1956) and makes no claim for organisms or societies.",
+    "AI4K12 Big Idea 3 meets the pattern, training and spam stations. AI4K12 has no item on bits, check bits, shared encoding schemes or distributed systems, so those stations carry a weak id or none. Neural networks stay a model example with no new stage (open decision D2, thinking-tools design note).",
+    "Left unlinked: Sachsen Biologie Kl. 10 Genetik (7600-1) and Kl. 8 Sinnesorgane, Nerven- und Hormonsystem (7406-1). They use the information words in the biological sense. Stations on them would import biology. The false friends cover the overlap, and the join belongs to Interdisciplinary."
+   ],
+   "gaps": [
+    "No study found on how students aged 5 to 18 understand information in computing contexts. The paper reports none for biology (p. 6). Every station is a design bet to test.",
+    "Sachsen tags show no informatics topic before Kl. 7 and none on agent-based models. Stations 1 to 4 and 6 have no Sachsen informatics home. Station 3 links to chart reading and the sun's daily arc, a loose fit.",
+    "AI4K12 has no counterpart for bits, shared codes, check bits or distributed systems.",
+    "Neural networks are absent from the vocabulary. Station 8 uses a one-neuron model without a new concept. Whether the space grows toward AI4K12 is open decision D2.",
+    "No station for the paper's misinformation payoff matrix (p. 21-22). Payoffs for a spam sender and a filter designer belong to people.",
+    "Learned representations at depth (embeddings, hidden layers) have no stage. Only the weights of one unit appear.",
+    "How the Sachsen Informatik Kl. 7 topic defines information and data is unknown. Only the topic statements were read."
+   ],
+   "reviewNotes": [
+    "All text here is AI-drafted and has not been reviewed by a subject expert. A reviewer has checked the draft once and the changes are merged in.",
+    "Check the Shannon statements: the bit count is relative to a stated set of messages; one of 8 equally likely messages costs 3 bits; a fully predictable signal carries zero information (paper p. 2); practical compressors approach but do not reach the limit; random bytes do not shrink, while random letters shrink to about 60 percent.",
+    "Check the parity example: in 8-bit ASCII, I is 01001001 and H is 01001000, so one flipped bit turns I into H, and one parity bit exposes it. Two flipped bits would pass the check.",
+    "Run station 6 before use. Pairwise averaging on a grid settles slowly, and nodes reach the overall average only as the number of pairings grows.",
+    "Test station 8 on the chosen data. A word-count model with negative weights on common words can be slipped past by padding, but the effect depends on the training set. The attack is known in the machine-learning security literature as a good word attack (Lowd and Meek 2005), which was not read here.",
+    "Check the card layout of station 9 so that every piece sits on three different peers and any two removals leave each piece available.",
+    "Developmental sources are thin. S72 and S73 rest on titles or six children, S75 gives no ages, S78 names no age bands, S68 is from 1986. They support direction only. No source was found for 9-12 students training or attacking a model, or for K-2 children telling recorded from sent (S28 supports noticing dependence only).",
+    "The K-2 sensor strip needs a light sensor or a prepared strip. A worksheet version avoids hardware.",
+    "Levels (precursor, full, extended) and dimension statuses are the drafter's call. All three dimensions are marked translated because the paper's examples are biological.",
+    "The paper's cue and signal terms (p. 17-18) are left out on purpose. A reviewer should check that Regularity carries the same teaching without borrowing the biology. The paper says a regularity alone is not information (p. 12-13), and the stations show that the more predictable a message, the fewer bits it needs.",
+    "Message and Faulty Input were dropped as new concepts after review. Data already carries Message, and the Faulty Input definition failed for the padded-spam and double-vote cases.",
+    "The Sachsen links to Kl. 9 'Informationen und Daten' (118824-2) were removed after review, because that topic covers databases. The facts about Sachsen topics come from titles and hints in the data, and the full curriculum text was not read.",
+    "Eirdosh and Hanisch (2020) is not cited."
+   ],
+   "confidence": "medium"
+  },
+  "int": {
+   "space": "int",
+   "senseOfInformation": "Information is a pattern that varies in step with something else. It becomes information for a receiver that can use the link. What the receiver makes of it, the response or expectation it triggers, is its meaning for that receiver. Whether a sender, an intention or a bit count applies differs by domain.",
+   "boundary": "Every cross-domain claim names its domains and the break: is a sender or intention needed, did selection shape the receiver, does a bit count capture meaning, is there a controller. On one account (teleosemantics, p.14) biological meaning is a selection-shaped coupling, and 'goal' for a cell is shorthand. Machines get no belief or understanding. It does not claim that all systems process information alike.",
+   "aimFit": "The space joins the disciplinary readings and says where a shared word stops meaning the same thing. This strategy makes that its main work and models the paper's recommendations: the three dimensions in the paper's order, with the step from structure to meaning as the central contribution. Stations 5, 6 and 10 fill a table of where the shared word breaks. Perception and sensing get a home that no stage carried. Anything beyond biology is the design's own extension of the paper.",
+   "sequence": "The paper's order is kept. K-2 sorts patterns nobody sent from patterns made to tell. Grades 3-5 compare what different receivers can pick up and ask who sends a passed-on pattern. Grades 6-8 ask what shaped the receiver and what the pattern means to it: cue, signal, honesty, bit counts. Grades 9-12 remove the controller and test where sender, receiver and meaning stop applying. Evolution enters at 3-5 and returns at 6-8 and 9-12. Dimension 3 starts at 9-12 because evidence for younger students is thin.",
+   "dimensions": {
+    "structure": {
+     "status": "used",
+     "how": "Structure comes first, as in the paper. Students meet patterns nobody sent, such as paw prints, clouds and DNA, and sort them from patterns made to tell. At 6-8 a bit count measures how unlikely a message is and ignores meaning. Examples widen from biology and weather to culture, technology and AI.",
+     "basis": "paper p.10-12 (rotting fruit, stars, pulsars, DNA as repository; Shannon). Widening to culture, technology, AI and cognition is own extension of the paper."
+    },
+    "receivers": {
+     "status": "used",
+     "how": "Students ask what made each receiver able to use a pattern and what it means. Meaning has different grounds: on the teleosemantic account (p.14) a selection-shaped coupling in a bacterium, and in people also intention and convention. Cue, signal, signalling games, misinformation and pathways follow the paper. Perception and non-biology cases are own extension.",
+     "basis": "paper p.12-22, 24 (Jablonka; Potter and Mitchell; Planer and Godfrey-Smith; Maynard Smith and Harper; Levy; Figs. 2-5). Non-biology cases and sensing: own extension of the paper."
+    },
+    "decentralized": {
+     "status": "used",
+     "how": "Students explain whole-system patterns with no controller in the map: cells, swarms, a stadium wave, a feed. A neural-network station sets brains beside trained networks, as the paper suggests. Students then test designed systems that do have a rule-setter. That contrast is the design's addition.",
+     "basis": "paper p.22-24 (cell, quorum sensing, La-Ola wave, brain without homunculus, machine culture, neural networks). Controller contrast and AI cases: own extension of the paper."
+    }
+   },
+   "falseFriends": [
+    "Information. Bits in Informatik Kl. 7 (Informationen und Daten) count binary digits and storage and ignore meaning. Media topics in Ethik Kl. 7 need truth and source checks. Genetik Kl. 10 uses the word for DNA. Stations 5 and 10 set them side by side.",
+    "Signal. In biology a trait produced for its effect on a receiver. In sensors and AI4K12 a 'sensory signal' is a measured quantity that nobody shaped for the receiver, called a cue here. KMK also uses signal for signal transduction inside cells.",
+    "Code. 'Genetic code' invites the question who coded it (paper p.10). Here a code maps one pattern to another. Design sets it in technology and convention in culture. The genetic code's origin is debated. Genetik Kl. 10 teaches it, Informatik Kl. 7 binary numbers.",
+    "Sender-receiver model. Biologie Kl. 5 names it for dogs and cats, Informatik Kl. 8 covers e-mail, Ethik Kl. 7 covers talk. One diagram can fit all three. The biological account needs no intention, a router no understanding, a speaker intends to be understood.",
+    "Meaning. In biology, on the teleosemantic account (paper p.13-14), a coupling between a pattern and a response that selection shaped. In people it can also rest on intention and shared conventions. In AI4K12 perception 'extracts meaning' by assigning labels that trainers chose.",
+    "Source. In history a source is evidence a student reads (Geschichte Kl. 5, Orientierung in der Vergangenheit). In Shannon's model a source produces messages. In Jablonka's account a source becomes input when a receiver can react to its form. Here, ask who reads it."
+   ],
+   "newConcepts": [
+    {
+     "label": "Cue",
+     "definition": "A pattern that varies in step with something else and that a receiver uses to expect or act, although nothing produced it in order to be used. The receiver's ability to use it is what makes it a cue.",
+     "why": "Communication mentions the cue inside its sender frame. Dimension 1 needs the pattern first, before any sender exists, from K-2. A separate entry lets stages tag cue against signal and gives sensing and shortcut cases a home.",
+     "excludes": "A cue is no message and has no sender, and it is not a hint given on purpose. It can mislead and says nothing about cause. What made the receiver able to read it differs by domain: selection, learning or design.",
+     "parent": "Information",
+     "basis": [
+      "paper p.17-18 (Maynard Smith and Harper 2003, cue and signal, Fig. 3; the book was not read here)",
+      "OE-LITERATURE-maynard-smith-harper-2003",
+      "paper p.10-11 (rotting fruit, stars)",
+      "OE-LITERATURE-planer-godfrey-smith-2021",
+      "paper p.13 (Planer and Godfrey-Smith: reliable associations reduce uncertainty)",
+      "AI4K12 3-C-iii-6-8-eu (irrelevant correlations in training data)",
+      "non-biology senses: own extension of the paper"
+     ],
+     "domainSenses": {
+      "biology": "A feature of the setting that organisms evolved to respond to: rotting-fruit smell, day length, the sun's position, a predator's eyes. Selection shaped the receiver's response. The feature itself was not shaped to inform the receiver.",
+      "cognition": "A feature a person has learned to read: dark clouds before rain, a frown, a hush in the classroom. Experience builds many of these links, and some, such as attention to faces, start early in infancy. People can misread a cue.",
+      "culture": "A trace people read as evidence although nobody left it as a message: footprints, tree rings, worn paths, pottery pieces. Records written to tell are a different kind of source. Readers check how the trace formed.",
+      "technology": "A physical quantity that a device is built to read, such as light, temperature or a pulse. The device is designed. The quantity was not produced for the device.",
+      "AI and computation": "An input feature a trained program uses because it varied in step with the label in the training data, such as a background that matches the label. It may be unrelated to the cause. The program cannot tell."
+     }
+    },
+    {
+     "label": "Signal",
+     "definition": "A pattern produced because of its effect on a receiver, so that producer and receiver are both set up to use it. What set them up differs by domain: selection, convention or design.",
+     "why": "The paper's second dimension turns on cue against signal. Communication's biology sense already holds the signal idea. A separate entry lets stages tag the signal alone and records that technology and AI4K12 use the same word for a measured quantity.",
+     "excludes": "A signal needs a producer shaped or built to send it. It does not require intention, honesty or meaning. An electronic or AI4K12 'signal' that nobody shaped for the receiver is a cue here.",
+     "parent": "Communication",
+     "basis": [
+      "paper p.16-18 (Lewis; Skyrms; Maynard Smith and Harper; Figs. 2-3)",
+      "OE-LITERATURE-planer-godfrey-smith-2021",
+      "OE-LITERATURE-maynard-smith-harper-2003",
+      "OE-LITERATURE-skyrms-2010",
+      "Maynard Smith and Harper and Skyrms were not read here",
+      "vocabulary: Communication note",
+      "AI4K12 1-B-i-3-5-eu (sensory signals)",
+      "convention and design senses: own extension of the paper"
+     ],
+     "domainSenses": {
+      "biology": "A trait or act that selection shaped because it changes what a receiver does: alarm calls, the honeybee dance, moth eyespots. Sender and receiver traits evolved together. No intention is needed. Inside a body, sender-receiver wording models causal roles (paper p.18-19).",
+      "culture": "Words, gestures, flags, sirens and badges that people produce to be read under shared conventions. The sender intends an effect. Conventions can be learned and changed. A signal can be honest, mistaken or false.",
+      "technology": "A designed variation in voltage, light or radio waves that carries an encoded message under an agreed protocol. Engineers define the code. Noise can corrupt it, and nobody has to understand it.",
+      "cognition": "On one account, eye contact and infant-directed speech tell an infant that what follows is meant to teach. The infant then treats what is shown as general knowledge.",
+      "AI and computation": "A value that one part of a program passes to another, such as a reward signal or an output vector. Designers decide what it stands for. The receiving part responds by rule or by trained weights."
+     }
+    },
+    {
+     "label": "Meaning",
+     "definition": "What a pattern is for a particular receiver: the responses, expectations or uses that the receiver's makeup ties to it. The same pattern can mean different things to different receivers, and nothing to one that cannot use it.",
+     "why": "The paper's central step runs from structure to meaning, and the vocabulary uses the word in many notes without defining it. A named concept lets stages and stations state where meaning enters and where it stays out, as in a bit count.",
+     "excludes": "Meaning is not located in the pattern alone. In biology it needs no sender, consciousness or understanding. 'Meaning', 'goal' and 'good' for a single cell are shorthand and invite anthropomorphic reading (paper p.14). The Communication entry's 'no meaning is needed' for animals means human-type meaning.",
+     "parent": "Information",
+     "basis": [
+      "paper p.13-15 (Jablonka 2002; Potter and Mitchell 2022; teleosemantics, Macdonald and Papineau 2006 unverified)",
+      "paper p.19-20 (Planer and Godfrey-Smith 2021 on meaning as facts about sender and receiver policies)",
+      "paper p.8-9, 18 (Kattmann and Levy dispute this reading)",
+      "OE-LITERATURE-potter-mitchell-2022",
+      "OE-LITERATURE-jablonka-2002",
+      "AI4K12 4-A-ii and 4-A-iii (ambiguity; word embeddings)"
+     ],
+     "domainSenses": {
+      "biology": "On one account (teleosemantics), a coupling between a pattern and a response that selection shaped. A food chemical means 'approach' to a bacterium because approaching paid off in earlier generations. The cell holds no goal or picture. Other accounts reject this.",
+      "cognition": "What a percept or word brings to mind, built from experience. Once internal representations sit between input and action, the response no longer follows the input directly, and a person can think about what is absent.",
+      "culture": "What a speaker intends and a listener takes, under shared conventions that can be learned and changed. Context decides the reading, and the two sides can differ. Words, maps and signs carry meaning for people who share the code.",
+      "technology": "Engineers set meaning aside. A channel moves coded messages and treats all alike, and a message can arrive intact while nobody understands it. Meaning stays with the people who use the message.",
+      "AI and computation": "Technical reading: a bit count ignores meaning. A language model places words used in similar contexts near each other, and people read that as closeness in meaning. The program has no experience of what words stand for.",
+      "education": "Learners connect a new pattern to ideas they already hold, so one lesson can mean different things to different students. Teachers check what a learner has taken from it."
+     }
+    },
+    {
+     "label": "Misinformation",
+     "definition": "A pattern that leads a receiver to expect or do something that does not fit the facts it appears to track. It may be made to mislead, or arise by mistake, by chance or by copying error.",
+     "why": "Information and Communication say only that messages can mislead. The paper treats dishonest signals as part of dimension 2, and students already link information with truth (p.5, p.20). The 6-8 and 9-12 work needs a named concept.",
+     "excludes": "It does not require a lie: honest error counts, and deliberate deceit has its own name in culture (disinformation). A student misconception is another thing. A false signal in biology involves no intent to deceive.",
+     "parent": "Information",
+     "basis": [
+      "paper p.20-22 (dishonest signals, mimicry, eyespots, Figs. 4-5)",
+      "OE-LITERATURE-grossnickle-2015",
+      "OE-LITERATURE-alexander-2012",
+      "AI4K12 5-B-ii-3-5-eu (deepfakes)",
+      "honest error, noise, copying error and all non-biology senses: own extension of the paper",
+      "misinformation against disinformation wording: unverified, common usage"
+     ],
+     "domainSenses": {
+      "biology": "A signal or appearance that makes a receiver act as if a state held when it does not, such as moth eyespots that resemble predators' eyes. On a prominent hypothesis, selection favoured it because the sender gains. No intent is needed.",
+      "culture": "False or misleading claims, pictures and rumours that people pass on. Some are made to deceive, some are honest mistakes, and copying can distort them. People check the source, compare reports and ask who gains.",
+      "technology": "A message altered or forged on the way: bits flipped by noise, a spoofed sender address, a phishing email. Error checks catch noise. They do not catch a forged sender.",
+      "AI and computation": "Fluent but false output from a language model, or a deepfake image made to pass as a record. The program has no aim to deceive. People who build or use it may.",
+      "cognition": "A false belief formed from a misleading cue, or a memory rebuilt wrongly at recall. Ideas a person already holds shape which claims that person accepts.",
+      "education": "Learners practise checking where a claim came from, who made it and what evidence backs it before relying on it. Media lessons teach this as source criticism."
+     }
+    },
+    {
+     "label": "Perception",
+     "definition": "A receiver's step from raw input to a reading it can act on. Sensing detects a physical quantity. Perceiving turns the detection into something usable, using what the receiver already holds.",
+     "why": "Agency and Information mention sensing in passing. No concept or stage carries it, and the AI4K12 Perception big idea has no counterpart here. Dimension 2 needs it, because what a receiver can pick up limits what counts as information for it.",
+     "excludes": "Perception here says nothing on consciousness or experience, and nothing on whether a sensor, a plant or a model feels anything. Perceiving in a program is labelling input with trained categories.",
+     "parent": "Information",
+     "basis": [
+      "AI4K12 1-A-i, 1-A-ii, 1-B-i (items in the reviewed alignment's unmatched list)",
+      "paper p.12-14, 24 (receiver competencies; Potter and Mitchell 2022; neural networks)",
+      "OE-LITERATURE-potter-mitchell-2022",
+      "vocabulary: Information cognition sense and Agency definition"
+     ],
+     "domainSenses": {
+      "biology": "Sense organs and receptor cells detect light, sound, chemicals or touch. Species differ in what they pick up: bees see ultraviolet and echolocating bats hear echoes of their own calls. Plants and microbes sense with no nervous system.",
+      "cognition": "The brain builds a percept from sensory input and from what the person expects. Combining senses such as sight and sound helps with ambiguous input. Illusions show the building.",
+      "technology": "Sensors such as cameras, microphones and accelerometers measure physical quantities and output numbers. A sensor detects only what it was built to measure, and can pick up what people cannot, such as infrared.",
+      "AI and computation": "Technical reading: a program maps sensor numbers to labels it was trained to give, such as a word or an object name. AI4K12 calls this extracting meaning from sensory signals. The labels are the trainers' categories."
+     }
+    },
+    {
+     "label": "Emergence",
+     "definition": "A pattern of a whole system that arises from many parts reacting to local conditions and to one another. No part directs the whole or holds the whole pattern. Parts can be cells, animals, people or programs.",
+     "why": "The comparative flagship note lists system and emergence as concepts no space defines. Dimension 3 needs a name for no-controller patterns that claims nothing about quality, as Collective Intelligence does, or about human thinking, as Distributed Cognition does.",
+     "excludes": "It does not mean mysterious or unexplainable, and the outcome need not be good. A planned parade is directed and does not count. No controller in the system leaves room for rules, leaders or designers elsewhere.",
+     "parent": null,
+     "basis": [
+      "paper p.22-23 (cell, quorum sensing, La-Ola wave, brain, norms, machine-human culture)",
+      "OE-LITERATURE-resnick-1996",
+      "OE-LITERATURE-jacobson-2001",
+      "OE-LITERATURE-falandays-2023",
+      "S40, S41, S42",
+      "technology and AI senses: own extension of the paper"
+     ],
+     "domainSenses": {
+      "biology": "Bacterial quorum sensing, ant trails, honeybee nest-site choice and gene regulation in a cell. No molecule, cell or animal holds the whole outcome. Each part reacts to local signals and to others, and the pattern follows.",
+      "cognition": "Brain activity comes from billions of neurons with no single place where a controlling self sits. People still tend to imagine a small inner controller, and students often explain such patterns by a controlling agent.",
+      "culture": "A stadium wave, a traffic jam, a passing trend or a spreading norm. A few people cannot reliably start, steer or end it. Institutions can add control, which makes the case partly directed.",
+      "technology": "Many networks pass messages through routers that each follow local rules, so no one machine controls the whole route. People still set the shared protocols and the rules.",
+      "AI and computation": "Agent-based models give each agent a simple rule and show group patterns such as flocks. A neural network's output comes from many units and weights. Designers choose the units, the rules and the training."
+     }
+    }
+   ],
+   "conceptNotes": [
+    {
+     "concept": "Information",
+     "note": "The paper sharpens the accepted entry. A pattern exists with no sender and becomes information only for a receiver able to use it. A bit count states how unlikely a message is among known options and ignores its meaning. Stations tag these points and add meaning. The definition stays."
+    },
+    {
+     "concept": "Communication",
+     "note": "The paper splits the accepted structure in two. A cue is read and was never sent. A signal exists because of its effect on a receiver. In the paper selection sets up both sides. Convention and design are this design's extension. Cue and Signal name the parts. The definition stays."
+    },
+    {
+     "concept": "Representation",
+     "note": "The entry: a stand-in works only for a user who treats it as one. The strategy applies this to the thought that DNA is a message needing a coder (p.10). DNA is a structure used by machinery that evolved to use it, and a sender is hard to specify (p.11)."
+    },
+    {
+     "concept": "Knowledge",
+     "note": "Students link information with knowledge and truth (paper p.5-6). Knowledge needs a holder with grounds, so a cue, a signal or a stored trace is not yet knowledge. No station tags it. Teachers can use it to separate information, misinformation and what a group has checked."
+    },
+    {
+     "concept": "Agency",
+     "note": "The paper reads organism-level meaning through selection and warns against anthropomorphism for single cells (p.14). The Agency note already needs no intention in biology and gives software designer-set goals. Receivers in biology stations never choose. Sensing is the half of Agency that the new Perception entry covers."
+    },
+    {
+     "concept": "Learning",
+     "note": "Receiver competencies can be evolved, developed or learned (paper p.12). The strategy uses Learning for the within-lifetime case: a child learns which cue to trust, a program adjusts numbers. Selection explains the across-generations case. Stations ask which of these made the receiver able to read a pattern."
+    },
+    {
+     "concept": "Culture",
+     "note": "The paper cites Brinkmann et al. on machine intelligences and human cultures (p.23). The AI sense of Culture, a proposed extension, is the home for the machine-culture case in station 7. Its debate note applies: whether machines learn socially is open, and the station says so."
+    },
+    {
+     "concept": "Feedback",
+     "note": "Feedback loops make an input's significance depend on context in a cell (paper p.22). Many emergent cases include a loop, and the Emergence entry does not require one. Negative feedback damps change and positive feedback amplifies it. Station 7 uses the AI sense, where outputs return as later input."
+    },
+    {
+     "concept": "Collective Intelligence",
+     "note": "Collective Intelligence compares a group with its members and needs a measure of doing better. Emergence names patterns with no controller whether or not they are good. Stations use Collective Intelligence only when quality is compared, as in the jar-guess case. Bee nest choice fits both."
+    },
+    {
+     "concept": "Distributed Cognition",
+     "note": "Distributed Cognition covers thinking spread over people and tools for a human task. Emergence covers patterns with no controller where no thinking task is involved, such as a stadium wave or quorum sensing. A computer network belongs here only when it serves a human thinking task, as the entry says."
+    }
+   ],
+   "stations": [
+    {
+     "stage": "I1:K-2",
+     "band": "K-2",
+     "dimension": 1,
+     "level": "precursor",
+     "move": "Children collect things that tell them something though nobody made them to: paw prints in mud, dark clouds, the smell of baking. They sort the cards, then add a few things made to tell, such as a stop sign and a wave. They say who can use each pattern: a dog, a child, a toy robot. Some will say clouds are for rain. Ask who made them to tell.",
+     "example": "Paw prints tell a child that an animal passed by. A drawn stop sign was made to tell drivers.",
+     "representation": "Two sorting mats of picture cards, with a 'who can use it?' sticker on each card.",
+     "challenge": "Notice that a pattern can tell something though nobody made it, and that who it tells depends on who can use it.",
+     "concepts": [
+      "Communication",
+      "Information",
+      "Cue",
+      "Representation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "K-2",
+       "stage": "I2:K-2",
+       "index": 1
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "S28",
+      "S58",
+      "S11",
+      "S73",
+      "paper p.4-6 (infants detect regularities; no study of children's conceptions of information in biology)",
+      "design bet: no study of this sorting task found. S11 and S73 report purpose and want explanations for clouds and robots, so expect them"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-2-a-ii-k-2-lo",
+      "OE-COMPETENCY-ai4k12-1-a-i-k-2-lo"
+     ],
+     "senses": [
+      "biology",
+      "culture",
+      "technology"
+     ]
+    },
+    {
+     "stage": "I2:3-5",
+     "band": "3-5",
+     "dimension": 2,
+     "level": "precursor",
+     "move": "Students compare what a bee, a dog, an insect-eating bat, a child and a camera can pick up in the same garden: colours, smells, echoes, heat. A table lists the pattern, the organ or sensor, and who can use it. They ask why a bee sees flower patterns that a child cannot, and try an illusion to see the brain fill in.",
+     "example": "Flowers carry ultraviolet patterns that a bee sees and a child does not. A thermal camera shows heat that eyes miss.",
+     "representation": "Table with one row per receiver: pattern picked up, organ or sensor, who can use it.",
+     "challenge": "Same surroundings, different receivers. Say what each can use and why, with a first selection story: bees that saw flower patterns found more nectar and raised more young. Mark what a camera does that a sense organ does not.",
+     "concepts": [
+      "Perception",
+      "Information",
+      "Cue",
+      "Agency"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "3-5",
+       "stage": "I2:3-5",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-80-1/lernbereich-6012-1",
+      "lehrplan-522-1/lernbereich-7068-1"
+     ],
+     "evidence": [
+      "S33",
+      "S60",
+      "S74",
+      "S76",
+      "S15",
+      "paper p.12-13, 24"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-1-a-i-3-5-lo",
+      "OE-COMPETENCY-ai4k12-1-a-ii-3-5-lo",
+      "OE-COMPETENCY-ai4k12-1-b-i-3-5-eu"
+     ],
+     "senses": [
+      "biology",
+      "cognition",
+      "technology",
+      "AI and computation"
+     ]
+    },
+    {
+     "stage": "I4:3-5",
+     "band": "3-5",
+     "dimension": 1,
+     "level": "full",
+     "move": "Students set two things that are passed on side by side: eye colour from parent to child and the rules of a game taught to a new class. For each they ask who sends it, what reads it, what can change on the way and whether anyone meant to send it. They treat DNA as a structure that cell machinery uses and ask who its sender would be.",
+     "example": "Nobody means to send eye colour to a child. A classmate is told the rules of a playground game on purpose.",
+     "representation": "Two-column table with rows for holder, sender, what reads it, change on the way, and meant or unmeant.",
+     "challenge": "Add the question 'did anyone mean to send it?' to a passing-on comparison and see that the answer differs between the two columns.",
+     "concepts": [
+      "Inheritance",
+      "Transmission",
+      "Information",
+      "Communication"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "3-5",
+       "stage": "I4:3-5",
+       "index": 2
+      },
+      {
+       "tool": "tinbergen",
+       "band": "K-2",
+       "stage": "I4:K-2",
+       "index": 0
+      }
+     ],
+     "sachsen": [],
+     "evidence": [
+      "paper p.10-11",
+      "S26",
+      "S55",
+      "S11",
+      "S16",
+      "design bet: no study of DNA as a structure at this band"
+     ],
+     "ai4k12": [],
+     "senses": [
+      "biology",
+      "culture"
+     ]
+    },
+    {
+     "stage": "I2:6-8",
+     "band": "6-8",
+     "dimension": 2,
+     "level": "full",
+     "move": "Students draw the paper's two causal maps for a forager. In the cue map, a smell leads to a response that selection shaped in the receiver only. In the signal map, sender trait and receiver response are shaped together. They write what each pattern means to the receiver as the response it triggers. They then add a second cue and see how two cues settle an unclear reading.",
+     "example": "Rotting-fruit smell is a cue for a fly and an alarm call is a signal. A person combines sight and sound, and a self-driving car combines camera and radar.",
+     "representation": "Two causal maps with arrows, a 'means to the receiver' box on each, and a note on what shaped each side.",
+     "challenge": "Say what shaped each side of each map (selection, learning, design) and what each pattern means to that receiver. For a fly, 'means' only names a response selection favoured. Show a case where a second cue changes the reading.",
+     "concepts": [
+      "Cue",
+      "Signal",
+      "Meaning",
+      "Agency"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "I2:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7202-1",
+      "lehrplan-522-1/lernbereich-7406-1"
+     ],
+     "evidence": [
+      "paper p.13-19 (Figs. 2-3)",
+      "S10",
+      "S27",
+      "S33",
+      "S37",
+      "S40",
+      "design bet: no study of cue and signal maps at 6-8. S37 reports one-way causal thinking and the signal map is a two-way loop. The forager case and the second cue are own extension of the paper"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-1-a-i-6-8-lo",
+      "OE-COMPETENCY-ai4k12-1-a-ii-6-8-lo"
+     ],
+     "senses": [
+      "biology",
+      "cognition",
+      "technology",
+      "AI and computation"
+     ]
+    },
+    {
+     "stage": "I4:6-8",
+     "band": "6-8",
+     "dimension": 1,
+     "level": "extended",
+     "move": "Students find a hidden pick among 2, 4 and 8 equally likely options with yes-or-no questions and count the questions. They compare two messages of the same size, one trivial and one urgent, and a true and a false one. They list what the count includes and what it leaves out, and who must read the message for it to matter.",
+     "example": "One of 8 cards takes 3 yes-or-no questions. For a finch beak or an app feature nobody knows the odds, so the count does not apply directly.",
+     "representation": "A tally of questions per game, then a table of what a bit count includes and leaves out.",
+     "challenge": "Count uncertainty for equal options, then show that two messages with the same count can differ in meaning, in truth and in who can use them.",
+     "concepts": [
+      "Information",
+      "Representation",
+      "Transmission",
+      "Meaning"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "6-8",
+       "stage": "I4:6-8",
+       "index": 3
+      },
+      {
+       "tool": "analogy",
+       "band": "6-8",
+       "stage": "I1:6-8",
+       "index": 5
+      }
+     ],
+     "sachsen": [
+      "lehrplan-630-1/lernbereich-118698-2"
+     ],
+     "evidence": [
+      "paper p.2-4, 12-13",
+      "OE-LITERATURE-shannon-1948",
+      "Sachsen Informatik Kl. 7 teaches binary numbers (topic text), so students meet the content at this age",
+      "design bet: no study of this age found in the evidence bank"
+     ],
+     "ai4k12": [],
+     "senses": [
+      "AI and computation",
+      "biology",
+      "culture"
+     ]
+    },
+    {
+     "stage": "I1:6-8",
+     "band": "6-8",
+     "dimension": 2,
+     "level": "full",
+     "move": "Students fill the paper's payoff table for an alarm-call game: states of the world, receiver acts and payoffs for both sides, and see which pairings pay. They add a mimic that copies a predator's eyes and see which pairing now pays the sender. They compare a rumour and a phishing email in a break table: who gains, who meant it, can the receiver check?",
+     "example": "In the table's made-up numbers an alarm call pays caller and listeners. Moth eyespots may scare birds by copying a predator's eyes. A phishing email copies a bank.",
+     "representation": "Payoff table for states, receiver acts and both payoffs, plus a break table: who gains, who meant it, can it be checked.",
+     "challenge": "Separate a false pattern shaped by selection, one made on purpose, one made by mistake and one made by noise, and say which a receiver can check.",
+     "concepts": [
+      "Misinformation",
+      "Signal",
+      "Incentive",
+      "Selection"
+     ],
+     "toolLinks": [
+      {
+       "tool": "payoff",
+       "band": "6-8",
+       "stage": "I2:6-8",
+       "index": 3
+      },
+      {
+       "tool": "payoff",
+       "band": "6-8",
+       "stage": "I1:6-8",
+       "index": 2
+      }
+     ],
+     "sachsen": [
+      "lehrplan-77-1/lernbereich-12038-1",
+      "lehrplan-630-1/lernbereich-118774-2",
+      "lehrplan-76-1/lernbereich-4892-1"
+     ],
+     "evidence": [
+      "paper p.16-17, 20-22 (Figs. 2, 4, 5)",
+      "S49",
+      "S53",
+      "OE-LITERATURE-grossnickle-2015",
+      "design bet: no study of payoff tables at 6-8. S49 covers adults and S53 strategic play in children"
+     ],
+     "ai4k12": [],
+     "senses": [
+      "biology",
+      "culture",
+      "technology"
+     ]
+    },
+    {
+     "stage": "I1:9-12",
+     "band": "9-12",
+     "dimension": 3,
+     "level": "full",
+     "move": "Students collect cases where a pattern of the whole appears with no one steering it: bacteria switching on a shared behaviour, a bee swarm choosing a nest, a stadium wave, routers passing messages, a feed trained on clicks. For each they draw who senses what, mark the missing controller and mark who set the rules. They change one local rule in a swarm simulation.",
+     "example": "Honeybee scouts compare nest sites and the swarm moves once enough scouts agree. No bee holds the plan.",
+     "representation": "Cue and signal arrows between many parts, with an empty box where a controller would sit.",
+     "challenge": "Explain a whole-system pattern with no controller in the map. Find a case where a designer sets the rules and still does not direct the outcome. Is a feed that learns from people a culture? Researchers disagree.",
+     "concepts": [
+      "Emergence",
+      "Collective Intelligence",
+      "Signal",
+      "Feedback"
+     ],
+     "toolLinks": [
+      {
+       "tool": "causal",
+       "band": "9-12",
+       "stage": "I1:9-12",
+       "index": 6
+      },
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "I1:9-12",
+       "index": 8
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7202-1",
+      "lehrplan-522-1/lernbereich-7479-1",
+      "lehrplan-630-1/lernbereich-118850-2"
+     ],
+     "evidence": [
+      "paper p.22-23",
+      "S40",
+      "S41",
+      "S42",
+      "S37",
+      "S9"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-1-c-i-9-12-eu",
+      "OE-COMPETENCY-ai4k12-5-b-i-9-12-eu"
+     ],
+     "senses": [
+      "biology",
+      "culture",
+      "technology",
+      "AI and computation"
+     ]
+    },
+    {
+     "stage": "I2:9-12",
+     "band": "9-12",
+     "dimension": 3,
+     "level": "extended",
+     "move": "Students wire a small network by hand: three cue cards in, two units that each fire when enough inputs agree, one output. They set the weights from examples, then compare it with a neuron and a trained network. They ask where meaning sits: in a unit, in the weights, or in what the output is used for.",
+     "example": "Units sum smell, colour and softness cues and fire for 'ripe'. A neuron also sums inputs and fires but is far more complex. A trained image network has millions of such units.",
+     "representation": "Hand-built network of cards and weights beside labelled drawings of a neuron and a layered network.",
+     "challenge": "Find no controller inside each system, then name who set the weights. Say how a unit differs from a neuron. Say where meaning sits and why; the question is open.",
+     "concepts": [
+      "Emergence",
+      "Perception",
+      "Meaning",
+      "Representation"
+     ],
+     "toolLinks": [
+      {
+       "tool": "tinbergen",
+       "band": "9-12",
+       "stage": "I2:9-12",
+       "index": 5
+      },
+      {
+       "tool": "analogy",
+       "band": "3-5",
+       "stage": "I2:3-5",
+       "index": 3
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7406-1",
+      "lehrplan-630-1/lernbereich-118841-2"
+     ],
+     "evidence": [
+      "paper p.23-24 (Rosenbaum 2014 on the brain; p.24 calls neural networks an underexplored approach)",
+      "S41",
+      "S75",
+      "design bet: hand-built unit is untested at this band. S75 gives no ages"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-3-b-i-6-8-lo",
+      "OE-COMPETENCY-ai4k12-3-b-ii-9-12-eu"
+     ],
+     "senses": [
+      "biology",
+      "cognition",
+      "AI and computation"
+     ]
+    },
+    {
+     "stage": "I3:9-12",
+     "band": "9-12",
+     "dimension": 2,
+     "level": "extended",
+     "move": "Students pick one pathway, a hormone acting on a cell or DNA to protein. They first write each step as 'this changes that' with no sender-receiver words. They retell it with the words send, read, decode and code, and mark each use as holding, misleading or unclear, using three tests: direction, matching states, active against passive parts.",
+     "example": "Insulin binds to a cell's receptor and the cell takes up sugar. A ribosome is said to read a messenger RNA. Does anything read, or does one structure change another?",
+     "representation": "Causal chain of steps, then a table: metaphor word, holds or misleads, why.",
+     "challenge": "Keep the information words that track a causal role. Drop reader and coder talk where it implies an interpreter or a designer, and say what each dropped word hid.",
+     "concepts": [
+      "Information",
+      "Representation",
+      "Analogical Reasoning",
+      "Intuitive Theories"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "I3:9-12",
+       "index": 6
+      },
+      {
+       "tool": "causal",
+       "band": "6-8",
+       "stage": "I2:6-8",
+       "index": 4
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7600-1",
+      "lehrplan-522-1/lernbereich-7406-1"
+     ],
+     "evidence": [
+      "paper p.9-11, 15, 18-19 (Kattmann; Levy)",
+      "OE-LITERATURE-levy-2011",
+      "S12",
+      "S18",
+      "S67",
+      "design bet: evidence for naming where an analogy breaks is thin with school students"
+     ],
+     "ai4k12": [],
+     "senses": [
+      "biology",
+      "technology",
+      "cognition"
+     ]
+    },
+    {
+     "stage": "I4:9-12",
+     "band": "9-12",
+     "dimension": 2,
+     "level": "extended",
+     "move": "Students fill one analogy map for four receivers: a bacterium, a bird hearing song, a reader of a news post and a trained classifier. Rows: the pattern, who sent it, what made the receiver able to use it, what it means to that receiver, whether a bit count applies. They name what shaped each receiver and which Selection sense, if any, fits. Break cells use the vocabulary notes.",
+     "example": "Selection shaped the bacterium. Selection and learning shaped the bird. Convention and learning shaped the reader. Training against a score shaped the classifier.",
+     "representation": "Four-column analogy map with a filled break column, built from the does-not-carry-over notes.",
+     "challenge": "Say, row by row, where sender, receiver and meaning stop meaning the same thing, and which case needs no sender at all. For the bacterium, say why 'means' is shorthand for a response selection favoured.",
+     "concepts": [
+      "Information",
+      "Selection",
+      "Meaning",
+      "Perception"
+     ],
+     "toolLinks": [
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "I4:9-12",
+       "index": 7
+      },
+      {
+       "tool": "payoff",
+       "band": "9-12",
+       "stage": "I4:9-12",
+       "index": 4
+      },
+      {
+       "tool": "analogy",
+       "band": "9-12",
+       "stage": "I3:9-12",
+       "index": 6
+      }
+     ],
+     "sachsen": [
+      "lehrplan-522-1/lernbereich-7600-1",
+      "lehrplan-630-1/lernbereich-118841-2",
+      "lehrplan-522-1/lernbereich-7067-1"
+     ],
+     "evidence": [
+      "paper p.10, 24",
+      "paper p.12-15",
+      "S54",
+      "S62",
+      "S63",
+      "S67",
+      "design bet: evidence covers two-case comparisons. Four receivers is a bet"
+     ],
+     "ai4k12": [
+      "OE-COMPETENCY-ai4k12-1-b-i-9-12-lo",
+      "OE-COMPETENCY-ai4k12-4-a-ii-9-12-eu",
+      "OE-COMPETENCY-ai4k12-1-a-ii-9-12-lo"
+     ],
+     "senses": [
+      "biology",
+      "cognition",
+      "culture",
+      "technology",
+      "AI and computation"
+     ]
+    }
+   ],
+   "crossLinks": [
+    "Bio-Core carries Information and communication at standards level (NGSS, KMK): what is received, stored, copied, passed on and responded to in genes, cells, senses and between organisms. It has no agency or goals and does not relate structure to meaning. This space does, building on those descriptions.",
+    "Signal differs by space. Bio-Core uses it for signal transduction and communication signals, as KMK does. Here a signal is a trait produced for its effect on a receiver. Station 9 tests the words send, read, decode and code on a pathway that KMK calls signal transduction.",
+    "Social-Core and Computational-Core keep their own terms: goals, rules and messages among people; data, state and programs. Stations 5, 6 and 10 state the break each way. A bit count ignores meaning, a rumour is judged by who gains and who meant it, and a program labels input without understanding.",
+    "Tool stations carry the forms. The paper's cue and signal causal maps are station 4 and its payoff tables for alarm calls and eyespots are station 6. Station 10 is an analogy map with a break column. Station 8 shares a stage with Tinbergen's bird song and feed case.",
+    "Station 7 links to Bridge Case B6 (Machine Culture and AI) via its feed case. The I2:9-12 indicator asks what stays the same and what differs. Stations 8 and 10 carry the 'what differs' half. Bridge Case B1 can reuse cue and signal. The I4 strand carries evolution from 3-5.",
+    "NetLogo collection: BeeSmart Hive Finding (waggle dances, quorum, no coordinator) and Swarming (emergence, no strand yet) can run in station 7. Evolution of Resource Use Through Behavior Imitation shows norms emerging from imitation bias. This design writes no NetLogo strand.",
+    "The Sachsen sample has no Verweis between the Biologie information topics (Kl. 5, 8, 10), Informatik Kl. 7 and the media topics of Ethik and Sachunterricht. Stations name several of them. The reading card (pattern, receiver, what shaped it, what it means, who sent it) gives teachers shared questions.",
+    "TheoryBase holds the cross-domain construct OE-CROSSDOMAINCONSTRUCT-information-processing-domain-general and a design principle asking for cross-references across subjects (OE-DESIGNPRINCIPLE-domain-general-competencies-cross-referenced). ConceptBase holds the earlier Information entry. New concepts should link to them on registration. Found by search only, records not opened.",
+    "Left unlinked: the I3:3-5 guess-my-rule stage has an AI4K12 link but no information station, because it tests rules and has no receiver question. AI4K12 consciousness items (4-D-i) stay with the Agency stages. Emotion reading (4-C-i) has no station."
+   ],
+   "gaps": [
+    "No classroom study of the three-dimension framework exists, and the authors found no study of students' conceptions of information in biology (paper p.6). Every station is a proposal to test.",
+    "The evidence bank covers component skills such as analogy, causal maps, payoff games and systems thinking. It holds no study of information. Most stations rest on design bets, and each station's evidence field names the thin ones.",
+    "Dimension 3 has stations only at 9-12. A 6-8 precursor such as a class wave or an ant-trail model is left out because systems-thinking evidence for younger students is thin (S37, S40, S41).",
+    "AI4K12 items on digital encoding at 9-12 (1-A-iii) and on feature extraction and abstraction pipelines (1-B-ii to 1-B-iv) have no station. They belong to Computational-Core. A neural-network precursor at 3-5 or 6-8 is not placed, because no stage there could host it without adding a topic.",
+    "The stage concept lists still carry the old concepts. Cue, Signal, Meaning, Misinformation, Perception and Emergence appear in stations only until a person tags the stages.",
+    "The Sachsen sample has no information topic for Kl. 1-2, so station 1 has no Sachsen anchor, and station 3 runs ahead of Genetik in Kl. 10.",
+    "Not built: a station that maps the stimulus-response model taught in Sachsen Biologie Kl. 8 (Reflexbogen) to the cue and receiver model (paper p.14, 19), a joint Biologie, Informatik and Ethik lesson (paper p.25), a station on Knowledge and truth (paper p.5-6), and any evolution work at K-2."
+   ],
+   "reviewNotes": [
+    "Everything here is AI-drafted and no subject expert has reviewed it. A reviewer has checked the draft once and the changes are merged in.",
+    "Check first: Meaning as a selection-shaped coupling (teleosemantics, Potter and Mitchell) is one philosophical account. The paper presents it as one account, uses goal language with a warning (p.13-15), and cites Kattmann (p.8-9) and Levy (p.18) against it. The Meaning entry, the boundary and stations 4, 8, 9 and 10 need a philosopher of biology or a biology educator.",
+    "Unverified: Maynard Smith and Harper (2003), Macdonald and Papineau (2006), Johnson (2011) and the journal version of Brinkmann et al. (2023) were not read here. Claims about them come from the paper's text or the evidence bank.",
+    "Levy is cited in the paper as 2010. The LiteratureBase record is OE-LITERATURE-levy-2011 (Information in Biology: A Fictionalist Account).",
+    "The TheoryBase construct was revised in a pull request (version 2.0.0) to withdraw the claim that Shannon's definition applies identically across systems. Until that merges, the accepted text still says so. This strategy does not repeat that reading. Reconcile before registering the new concepts.",
+    "Bit counts need known odds. The analogy map in the last 9-12 station has a row asking whether a bit count applies to each receiver, so students see that nobody knows the odds for a bacterium or a bird.",
+    "Hormones inside a body are listed as signals in some accounts. Levy (p.18-19) treats such talk as a useful fiction, and station 9 questions it. The Signal entry says what set producer and receiver up differs by domain.",
+    "Stations 7 and 8 were reworded after review, because routers, a feed and student-set weights all have rule-setters. The station tasks now ask where control sits.",
+    "Station 6 is the heaviest at 6-8: a payoff table, a mimic table and a rumour table. If the load is too high, drop the mimic table or the rumour table first. The 6-8 bit-counting game (station 5) and the hand-built network (station 8) have no age evidence in the bank. Test whether students can run them and whether they separate bits from meaning.",
+    "Facts to check: bee vision and ultraviolet flower patterns, bats and echoes, moth eyespots (a hypothesis, p.20), bacterial quorum sensing, router behaviour, and the claims about Sachsen topics, which come from topic titles, statements and hints in the data. The full curriculum text was not read.",
+    "The culture sense of Cue, trace against record, echoes the history-teaching distinction between remains and tradition. That link is unverified and is not used as a citation.",
+    "Signal is the weakest of the six new concepts, because it largely repeats the biology sense of Communication. If the registry wants fewer entries, fold Signal into a note on Communication first.",
+    "The Bio-Core, Social-Core and Computational-Core strategies were reviewed separately. Bio-Core uses 'Signal' more broadly than the paper does (a change that passes between parts and is followed by a response), and this space contrasts the two."
+   ],
+   "confidence": "medium"
+  }
+ },
+ "stageRefs": {
+  "bio|B1:K-2": {
+   "id": "8e62e70a-437d-540d-83f6-90a0fe54783a",
+   "title": "Noticing Variation and Family Resemblance",
+   "band": "K-2"
+  },
+  "bio|B1:3-5": {
+   "id": "70cf40f5-cb5d-508a-95dc-d18eaa465e94",
+   "title": "Heritable Traits and Simple Population Description",
+   "band": "3-5"
+  },
+  "bio|B1:6-8": {
+   "id": "8a1c0b8f-8e98-526f-bd7a-8cb2795daa85",
+   "title": "Genes, Alleles, and the Origin of Variation",
+   "band": "6-8"
+  },
+  "bio|B1:9-12": {
+   "id": "6c0b740a-cb12-5c3d-8a32-75fc01624ddf",
+   "title": "Population-Level Genetics and Allele Frequency",
+   "band": "9-12"
+  },
+  "bio|B2:K-2": {
+   "id": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "title": "Organisms and Their Habitats",
+   "band": "K-2"
+  },
+  "bio|B2:3-5": {
+   "id": "ae85f5be-aead-5819-99df-8b3d431f79d1",
+   "title": "Trait Advantage and Simple Selection Scenarios",
+   "band": "3-5"
+  },
+  "bio|B2:6-8": {
+   "id": "4f1b4d5d-6232-5ef5-b44c-a850224b58a5",
+   "title": "The Four-Component Natural Selection Mechanism",
+   "band": "6-8"
+  },
+  "bio|B2:9-12": {
+   "id": "b8bf5ec4-fe31-593a-8177-15b8109517b4",
+   "title": "Evaluating Adaptationist Claims",
+   "band": "9-12"
+  },
+  "bio|B3:K-2": {
+   "id": "76c205d2-33d4-5532-ba5a-cab715380b5e",
+   "title": "Many Different Kinds of Living Things",
+   "band": "K-2"
+  },
+  "bio|B3:3-5": {
+   "id": "a4cd9b9e-d3a1-52bd-b76f-eb6173ab7259",
+   "title": "Species, Relatedness, and Extinction",
+   "band": "3-5"
+  },
+  "bio|B3:6-8": {
+   "id": "ca152c60-d9a5-509f-afdb-e2e7bdf983b4",
+   "title": "How Populations Become New Species",
+   "band": "6-8"
+  },
+  "bio|B3:9-12": {
+   "id": "60df174a-b374-5cd1-9d06-9d76ecc4af9f",
+   "title": "Evidence, Deep Time, and Patterns of Extinction",
+   "band": "9-12"
+  },
+  "soc|S1:K-2": {
+   "id": "c4836b7e-c2ac-5eda-9368-08e410453278",
+   "title": "Groups We Belong To and Their Rules",
+   "band": "K-2"
+  },
+  "soc|S1:3-5": {
+   "id": "f21b382b-ed4a-5e4e-b69b-d603834fbbe9",
+   "title": "Roles and Why Rules Differ",
+   "band": "3-5"
+  },
+  "soc|S1:6-8": {
+   "id": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "title": "How Norms Are Enforced",
+   "band": "6-8"
+  },
+  "soc|S1:9-12": {
+   "id": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "title": "Formal Institutions and Informal Norms",
+   "band": "9-12"
+  },
+  "soc|S2:K-2": {
+   "id": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "title": "Sharing and Taking Turns",
+   "band": "K-2"
+  },
+  "soc|S2:3-5": {
+   "id": "3d964122-338c-548e-882b-d833d2ec4209",
+   "title": "Why People Cooperate or Hold Back",
+   "band": "3-5"
+  },
+  "soc|S2:6-8": {
+   "id": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "title": "Shared-Resource Problems",
+   "band": "6-8"
+  },
+  "soc|S2:9-12": {
+   "id": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "title": "Governing Shared Resources: Power and Conflict",
+   "band": "9-12"
+  },
+  "soc|S3:K-2": {
+   "id": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "title": "Communities Then and Now",
+   "band": "K-2"
+  },
+  "soc|S3:3-5": {
+   "id": "aae0bca6-2dfa-5fb1-a2bd-4e8d4381b87c",
+   "title": "How a Practice Spreads",
+   "band": "3-5"
+  },
+  "soc|S3:6-8": {
+   "id": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "title": "Why Societies Differ",
+   "band": "6-8"
+  },
+  "soc|S3:9-12": {
+   "id": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "title": "Explaining Large-Scale Change",
+   "band": "9-12"
+  },
+  "comp|C1:K-2": {
+   "id": "528aba11-45e9-5ec4-b5da-4ddf071ff6a2",
+   "title": "Sorting, Labelling and Symbols",
+   "band": "K-2"
+  },
+  "comp|C1:3-5": {
+   "id": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+   "title": "Recording and Charting Data",
+   "band": "3-5"
+  },
+  "comp|C1:6-8": {
+   "id": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+   "title": "Encoding Text, Images and Numbers",
+   "band": "6-8"
+  },
+  "comp|C1:9-12": {
+   "id": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+   "title": "Information, Compression and the Limits of Representation",
+   "band": "9-12"
+  },
+  "comp|C2:K-2": {
+   "id": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+   "title": "Following and Writing Steps",
+   "band": "K-2"
+  },
+  "comp|C2:3-5": {
+   "id": "8c7bc083-021f-5891-b502-de2f708a1e09",
+   "title": "Sequences, Loops and Conditions",
+   "band": "3-5"
+  },
+  "comp|C2:6-8": {
+   "id": "31f4c2e2-f909-5cf1-ae61-ca82e22bda0e",
+   "title": "Decomposition, Functions and Testing",
+   "band": "6-8"
+  },
+  "comp|C2:9-12": {
+   "id": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+   "title": "Correctness and Efficiency",
+   "band": "9-12"
+  },
+  "comp|C3:K-2": {
+   "id": "04edbe9b-292d-5101-a009-fc46ead81427",
+   "title": "Machines Follow Rules People Write",
+   "band": "K-2"
+  },
+  "comp|C3:3-5": {
+   "id": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+   "title": "Models and Simulations of Everyday Systems",
+   "band": "3-5"
+  },
+  "comp|C3:6-8": {
+   "id": "45c484c9-e753-5bb3-86af-086bc28fce31",
+   "title": "Agent-Based and Feedback Models",
+   "band": "6-8"
+  },
+  "comp|C3:9-12": {
+   "id": "e6374470-9533-570e-8d98-0e5b24060f4d",
+   "title": "Machine Learning, Search and Distributed Systems Compared",
+   "band": "9-12"
+  },
+  "int|I1:K-2": {
+   "id": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "title": "Groups, Rules, and Tools",
+   "band": "K-2"
+  },
+  "int|I1:3-5": {
+   "id": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "title": "Comparing Communities and Changing Tools Over Time",
+   "band": "3-5"
+  },
+  "int|I1:6-8": {
+   "id": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "title": "Culture as Transmitted, Institutions as Stabilizing Structures",
+   "band": "6-8"
+  },
+  "int|I1:9-12": {
+   "id": "e820dc2d-9317-57d1-8475-22a701fc486a",
+   "title": "Collective Intelligence, Distributed Cognition, and Coevolving Technology",
+   "band": "9-12"
+  },
+  "int|I2:K-2": {
+   "id": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "title": "Living Things Act to Meet Their Needs",
+   "band": "K-2"
+  },
+  "int|I2:3-5": {
+   "id": "31b2be29-7a8c-5f98-a447-55ecf57f1ff9",
+   "title": "Comparing How Different Living Things Act, Learn, and Teach",
+   "band": "3-5"
+  },
+  "int|I2:6-8": {
+   "id": "3a112595-4435-5db0-950d-ca7c6da5160d",
+   "title": "Agency, Niche Construction, and Selection",
+   "band": "6-8"
+  },
+  "int|I2:9-12": {
+   "id": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+   "title": "Agency and Niche Construction Across Biological and Technological Systems",
+   "band": "9-12"
+  },
+  "int|I3:K-2": {
+   "id": "8363df74-ecd8-54e9-82f1-e93623f9995c",
+   "title": "Ideas That Are Like Other Ideas",
+   "band": "K-2"
+  },
+  "int|I3:3-5": {
+   "id": "a64224d1-ac36-5b1c-b475-3c5af3aa4656",
+   "title": "Good Guesses, Better Guesses: Testing Ideas",
+   "band": "3-5"
+  },
+  "int|I3:6-8": {
+   "id": "d2dc3119-7af8-55d8-8bfe-b63a4ec56acb",
+   "title": "How Minds and Cultures Search for Better Ideas",
+   "band": "6-8"
+  },
+  "int|I3:9-12": {
+   "id": "ba60a3be-0135-5b53-b88f-a7aecfe0ed96",
+   "title": "The Shared Structure of Discovery: Darwin's Notebooks and the History of Science",
+   "band": "9-12"
+  },
+  "int|I4:K-2": {
+   "id": "04d57493-ac2f-5ec6-a1ba-0596eae3158a",
+   "title": "Things That Get Passed On",
+   "band": "K-2"
+  },
+  "int|I4:3-5": {
+   "id": "db1fca08-0dcf-5910-a3df-2de902e8630a",
+   "title": "Comparing Biological and Cultural Transmission",
+   "band": "3-5"
+  },
+  "int|I4:6-8": {
+   "id": "6315aad7-35b7-52dc-9dd2-1b82d707a768",
+   "title": "The General Pattern: Variation, Selection, Transmission",
+   "band": "6-8"
+  },
+  "int|I4:9-12": {
+   "id": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
+   "title": "Selection Across Biology, Culture, Education, and AI",
+   "band": "9-12"
+  }
+ },
+ "toolStations": {
+  "bio": {
+   "tinbergen|K-2|B1:K-2|0": "Coat colour in a litter of puppies and their parents, including a puppy that matches only one parent.",
+   "tinbergen|K-2|B2:K-2|1": "Thick or thin fur in a group of animals through a cold winter.",
+   "tinbergen|3-5|B1:3-5|2": "Eye colour, a scar, a learned trick and coat stripes sorted by origin.",
+   "tinbergen|3-5|B2:3-5|3": "Green and brown beetles on dark soil with hungry birds.",
+   "tinbergen|6-8|B2:6-8|4": "Tameness in silver foxes bred at Novosibirsk from 1959, where only the tamest were allowed to breed.",
+   "tinbergen|6-8|B1:6-8|5": "Antibiotic resistance in a bacterial population. The variant usually exists before the drug is used, and some bacteria also pick up resistance genes from each other.",
+   "tinbergen|9-12|B2:9-12|6": "The red colour of vertebrate blood, which comes from the iron-containing protein that carries oxygen.",
+   "tinbergen|9-12|B3:9-12|7": "Flipper bones of whales compared with the arm bones of land mammals.",
+   "causal|K-2|B3:K-2|0": "A long dry time and a kind of plant that grew in only one valley.",
+   "causal|3-5|B1:3-5|1": "The number of ducks on a pond, with births and population size.",
+   "causal|3-5|B2:3-5|2": "Winter-white and winter-brown snowshoe hares when snow comes late.",
+   "causal|6-8|B2:6-8|3": "Light and dark peppered moths on soot-darkened tree bark.",
+   "causal|6-8|B3:6-8|4": "Apple maggot flies that prefer hawthorn fruit or apple fruit and mate on that fruit.",
+   "causal|9-12|B1:9-12|5": "The sickle-cell allele in a region where malaria occurs.",
+   "causal|9-12|B2:9-12|6": "Long tail feathers in male birds that raise mating success and lower survival.",
+   "payoff|K-2|B2:K-2|0": "Green and brown caterpillars on a green leaf with a hungry bird.",
+   "payoff|3-5|B2:3-5|1": "Long and short bills of birds at deep and shallow flowers.",
+   "payoff|6-8|B2:6-8|2": "Two male types competing for mates: fighters and display-only males.",
+   "payoff|6-8|B3:6-8|3": "Matings within and between two frog populations whose calls differ.",
+   "payoff|9-12|B2:9-12|4": "Tall or short growth in neighbouring trees that compete for light.",
+   "analogy|K-2|B3:K-2|0": "A mammoth that no longer lives and an elephant that does.",
+   "analogy|3-5|B3:3-5|1": "A dog family's three-generation tree compared with a tree of dog, fox and cat.",
+   "analogy|6-8|B2:6-8|2": "Wild cabbage bred into kale, broccoli and Brussels sprouts, compared with ground finches in a drought year.",
+   "analogy|6-8|B3:6-8|3": "Anolis lizards on Cuba and Jamaica compared with benthic and limnetic stickleback pairs in two British Columbia lakes.",
+   "analogy|9-12|B1:9-12|4": "A bead jar standing for the two alleles of a gene in an island population.",
+   "analogy|9-12|B3:9-12|5": "Wings of birds, bats and insects compared by function and by ancestry."
+  },
+  "soc": {
+   "tinbergen|K-2|S3:K-2|0": "Market day in the town square, long ago and now.",
+   "tinbergen|K-2|S1:K-2|1": "The class rule of lining up at the door.",
+   "tinbergen|3-5|S3:3-5|2": "A family custom the pair chooses, such as a holiday dish or a birthday habit, and how it came to the family.",
+   "tinbergen|3-5|S1:3-5|3": "Talking rules in the library and on the playground at break.",
+   "tinbergen|6-8|S1:6-8|4": "Queueing at the school canteen.",
+   "tinbergen|6-8|S3:6-8|5": "Dutch lowland districts keep dikes through water boards. Swiss mountain villages keep shared pasture through village associations.",
+   "tinbergen|9-12|S3:9-12|6": "Votes for women in Germany: decreed in November 1918, first used in January 1919.",
+   "causal|K-2|S2:K-2|0": "One child keeps the ball, so the others stop inviting her.",
+   "causal|3-5|S2:3-5|1": "Who brings a cake to the class party table.",
+   "causal|3-5|S3:3-5|2": "A recycling habit spreading from one class to the whole school.",
+   "causal|6-8|S1:6-8|3": "Keeping the school yard litter-free once monitors stop checking.",
+   "causal|6-8|S2:6-8|4": "A garden club sharing one water tank in a dry summer.",
+   "causal|9-12|S2:9-12|5": "Two clubs sharing a sports hall, where the bigger club gains more say.",
+   "causal|9-12|S3:9-12|6": "Trade unions growing in industrial towns over generations.",
+   "payoff|K-2|S2:K-2|0": "Sharing a tub of building blocks, or keeping it.",
+   "payoff|3-5|S2:3-5|1": "Passing the ball or keeping it in a school football game.",
+   "payoff|6-8|S3:6-8|2": "Which side of the road to drive on: Britain and France, and Sweden's change in 1967.",
+   "payoff|6-8|S2:6-8|3": "Two garden-club members sharing one water tank.",
+   "payoff|9-12|S1:9-12|4": "A deposit on drink bottles changes what leaving one on the ground costs.",
+   "payoff|9-12|S2:9-12|5": "Upstream and downstream villages sharing a river's water.",
+   "analogy|K-2|S1:K-2|0": "Rules at the dinner table and in the music class.",
+   "analogy|3-5|S1:3-5|1": "A child who is goalkeeper at football and the oldest sibling at home.",
+   "analogy|3-5|S3:3-5|2": "How a bread recipe and a marbles game each reached a new town.",
+   "analogy|6-8|S1:6-8|3": "Silence in an exam hall and quiet in a cinema.",
+   "analogy|6-8|S2:6-8|4": "A classroom token-sharing game and the upkeep of a shared school common room, where each user can leave the tidying to others.",
+   "analogy|9-12|S1:9-12|5": "Fair grading under a central exam board and under each teacher's own marks.",
+   "analogy|9-12|S2:9-12|6": "A village water council and an international climate agreement, both governing a shared resource."
+  },
+  "comp": {
+   "tinbergen|K-2|C3:K-2|0": "A classroom timer that rings a bell at a set time.",
+   "tinbergen|3-5|C2:3-5|1": "A class poll program that shows last week's totals after an update.",
+   "tinbergen|3-5|C1:3-5|2": "A newsletter chart of favourite lunches used to plan the menu.",
+   "tinbergen|6-8|C2:6-8|3": "The remix tree of a shared maze-game project.",
+   "tinbergen|6-8|C3:6-8|4": "Buses bunching together in a model of buses on one route.",
+   "tinbergen|9-12|C3:9-12|5": "A video recommender that is retrained each week on what people clicked.",
+   "tinbergen|9-12|C3:9-12|6": "A route app that sends drivers down a quiet side street.",
+   "causal|K-2|C3:K-2|0": "A toy that plays a song when its button is pressed.",
+   "causal|3-5|C2:3-5|1": "A loop that counts up to ten and stops one pass early.",
+   "causal|3-5|C3:3-5|2": "A traffic-light model with a timer, a light colour and a count of waiting cars.",
+   "causal|6-8|C1:6-8|3": "A short text message encoded and decoded with two different character tables.",
+   "causal|6-8|C3:6-8|4": "A traffic model in which each car slows for the car ahead.",
+   "causal|6-8|C2:6-8|5": "A report program split into read the scores, add them up and print the result.",
+   "causal|9-12|C3:9-12|6": "A video recommender that is retrained each week on what people clicked.",
+   "causal|9-12|C1:9-12|7": "A running total of 0.1 added ten thousand times drifts away from 1000.",
+   "payoff|K-2|C3:K-2|0": "Two toy trains at a one-track bridge, each with a go-first or wait rule card.",
+   "payoff|3-5|C2:3-5|1": "Two game sprites that each take the left or right lane by a rule, with points set by the designer.",
+   "payoff|6-8|C3:6-8|2": "Two computers sharing one network link, each sending at full or half rate.",
+   "payoff|9-12|C3:9-12|3": "Two online shops with pricing programs that hold or undercut.",
+   "analogy|K-2|C2:K-2|0": "A recipe card for a sandwich beside arrow cards that steer a floor robot.",
+   "analogy|K-2|C3:K-2|1": "A snack vending machine beside a pedestrian traffic light.",
+   "analogy|3-5|C3:3-5|2": "A counter-and-card simulation of the lunch line beside the lunch line itself.",
+   "analogy|6-8|C1:6-8|3": "One drawing stored as an 8 by 8 grid of pixels and as a 4 by 4 grid.",
+   "analogy|6-8|C3:6-8|4": "A thermostat simulation beside the heating system of their classroom.",
+   "analogy|9-12|C3:9-12|5": "A spam filter, a route finder and a file-sharing network.",
+   "analogy|9-12|C2:9-12|6": "Linear search and binary search for a name in a sorted list."
+  },
+  "int": {
+   "tinbergen|K-2|I4:K-2|0": "Curly hair that runs in a family, and a grandmother's soup recipe that two cousins both cook.",
+   "tinbergen|3-5|I2:3-5|1": "A young chimpanzee learning to crack nuts by watching its mother, and a child learning to tie shoelaces.",
+   "tinbergen|3-5|I1:3-5|2": "Writing tools over centuries: charcoal, quill, pencil, ballpoint pen.",
+   "tinbergen|6-8|I4:6-8|3": "Beak shape in a finch population, and a swipe feature kept across versions of a phone app.",
+   "tinbergen|6-8|I2:6-8|4": "Earthworms mixing and loosening soil so that later worms and plants do better.",
+   "tinbergen|9-12|I2:9-12|5": "Bird song, a student's habit of checking a feed, and a video recommendation algorithm.",
+   "tinbergen|9-12|I1:9-12|6": "The ranking feature of a short-video app across five years of versions.",
+   "tinbergen|9-12|I3:9-12|7": "The sentence 'giraffes grew long necks because they needed to reach leaves'. The cause of long necks is debated, so the rewrite is one hypothesis.",
+   "causal|K-2|I2:K-2|0": "A bird that looks for food, feeds its chicks, and has chicks that look for food in turn.",
+   "causal|3-5|I1:3-5|1": "A paint set shared by two table groups, with taking turns or grabbing.",
+   "causal|3-5|I2:3-5|2": "A child learning to ride a bicycle while a helper lets go a little at a time.",
+   "causal|6-8|I3:6-8|3": "A class worked-example library that grows as each problem is solved.",
+   "causal|6-8|I2:6-8|4": "Herding families, milk in the diet, and the spread of milk digestion in adults.",
+   "causal|6-8|I4:6-8|5": "A local word for a playground game, spreading through a town and then fading as children stop passing it on.",
+   "causal|9-12|I1:9-12|6": "Guessing the beans in a jar, with and without seeing others' guesses.",
+   "causal|9-12|I2:9-12|7": "A news-ranking feed, its readers and the writers who adjust headlines to it.",
+   "payoff|K-2|I3:K-2|0": "Two children and one box of blocks at choosing time.",
+   "payoff|3-5|I1:3-5|1": "Two classes and one playground ball in a rainy week.",
+   "payoff|6-8|I1:6-8|2": "Two fishers sharing one lake.",
+   "payoff|6-8|I2:6-8|3": "Birds that fight over a food patch and birds that back off.",
+   "payoff|9-12|I4:9-12|4": "A shared-resource dilemma read as animal strategies, neighbours' water use and two programs' rewards.",
+   "payoff|9-12|I3:9-12|5": "A repeated two-choice game against a classmate, then against a rule-following program.",
+   "analogy|K-2|I3:K-2|0": "A bird's nest and a child's pillow fort, both built as a shelter.",
+   "analogy|K-2|I2:K-2|1": "A bird finding seeds and a toy robot rolling to its charger.",
+   "analogy|3-5|I4:3-5|2": "Eye colour passing to a child, and a playground game's rules passing to a new class.",
+   "analogy|3-5|I2:3-5|3": "A kitten learning to hunt, a child learning to read and a photo-sorting program trained on labelled pictures.",
+   "analogy|6-8|I3:6-8|4": "A student revising an essay over three drafts and a bird population over many generations.",
+   "analogy|6-8|I1:6-8|5": "A school floor plan, a child's mental picture of the school and a robot's stored corridor grid.",
+   "analogy|9-12|I3:9-12|6": "A breeder choosing pigeons, a wild finch population and a genetic algorithm, set beside Darwin's use of the breeder analogy.",
+   "analogy|9-12|I4:9-12|7": "A tree of species beside a lineage of language-model versions, where one update can reach millions of copies at once.",
+   "analogy|9-12|I1:9-12|8": "A honeybee swarm choosing a nest site and a school council choosing a rule."
+  }
+ },
+ "sachsenTopics": {
+  "lehrplan-522-1/lernbereich-7063-1": "biologie Kl. 5: Merkmale des Lebens",
+  "lehrplan-522-1/lernbereich-7068-1": "biologie Kl. 5: Säugetiere in ihren Lebensräumen",
+  "lehrplan-522-1/lernbereich-7067-1": "biologie Kl. 5: Vögel in ihren Lebensräumen",
+  "lehrplan-522-1/lernbereich-7406-1": "biologie Kl. 8: Sinnesorgane, Nerven- und Hormonsystem des Menschen",
+  "lehrplan-522-1/lernbereich-7202-1": "biologie Kl. 6: Wirbellose Tiere in ihren Lebensräumen",
+  "lehrplan-522-1/lernbereich-7600-1": "biologie Kl. 10: Genetik",
+  "lehrplan-522-1/lernbereich-7601-1": "biologie Kl. 10: Entstehung der Artenvielfalt",
+  "lehrplan-522-1/lernbereich-7479-1": "biologie Kl. 9: Zusammenhänge im Ökosystem",
+  "lehrplan-65-1/lernbereich-766-1": "geschichte Kl. 5: Orientierung in der Vergangenheit",
+  "lehrplan-65-1/lernbereich-772-1": "geschichte Kl. 5: Von der Steinzeit zur Hochkultur – Menschen organisieren ihr Zusammenleben",
+  "lehrplan-80-1/lernbereich-6101-1": "sachunterricht Kl. 3: Begegnung mit Raum und Zeit",
+  "lehrplan-80-1/lernbereich-6230-1": "sachunterricht Kl. 4: Zusammen leben und lernen",
+  "lehrplan-80-1/lernbereich-6356-1": "sachunterricht Kl. 4: Medien – Informationsbeschaffung und -aufbereitung",
+  "lehrplan-65-1/lernbereich-823-1": "geschichte Kl. 6: Die römische Zivilisation und ihre prägende Wirkung für Europa",
+  "lehrplan-77-1/lernbereich-12038-1": "ethik Kl. 7: Medien: Ein Spiegel der Wirklichkeit",
+  "lehrplan-76-1/lernbereich-4892-1": "gemeinschaftskunde-rechtserziehung-wirtschaft Kl. 8: Jugendliche und Medien in einer digitalisierten Welt",
+  "lehrplan-130-1/lernbereich-30700-1": "technik-computer Kl. 5-6: Grundlagen im Umgang mit digitalen Medien",
+  "lehrplan-77-1/lernbereich-11970-1": "ethik Kl. 7: Verstehen und Verständigung",
+  "lehrplan-65-1/lernbereich-1039-1": "geschichte Kl. 9: Deutschlands Weg von der Demokratie zur Diktatur",
+  "lehrplan-74-1/lernbereich-3614-1": "geographie Kl. 5: Ausgewählte Ballungsgebiete",
+  "lehrplan-630-1/lernbereich-118698-2": "informatik Kl. 7: Informationen und Daten",
+  "lehrplan-630-1/lernbereich-118841-2": "informatik Kl. 9: Künstliche Intelligenz",
+  "lehrplan-630-1/lernbereich-118774-2": "informatik Kl. 8: Vernetzte Systeme",
+  "lehrplan-630-1/lernbereich-118850-2": "informatik Kl. 9: Netzwerke",
+  "lehrplan-80-1/lernbereich-6012-1": "sachunterricht Kl. 3: Mein Körper und meine Gesundheit"
+ },
+ "ai4k12Codes": {
+  "OE-COMPETENCY-ai4k12-4-d-i-k-2-eu": "4-D-i-k-2-EU",
+  "OE-COMPETENCY-ai4k12-2-a-ii-k-2-eu": "2-A-ii-k-2-EU",
+  "OE-COMPETENCY-ai4k12-3-a-i-3-5-eu": "3-A-i-3-5-EU",
+  "OE-COMPETENCY-ai4k12-2-b-i-3-5-lo": "2-B-i-3-5-LO",
+  "OE-COMPETENCY-ai4k12-3-c-i-6-8-eu": "3-C-i-6-8-EU",
+  "OE-COMPETENCY-ai4k12-3-c-i-9-12-eu": "3-C-i-9-12-EU",
+  "OE-COMPETENCY-ai4k12-3-a-ii-9-12-lo": "3-A-ii-9-12-LO",
+  "OE-COMPETENCY-ai4k12-3-b-ii-6-8-lo": "3-B-ii-6-8-LO",
+  "OE-COMPETENCY-ai4k12-3-c-iii-9-12-eu": "3-C-iii-9-12-EU",
+  "OE-COMPETENCY-ai4k12-2-a-ii-k-2-lo": "2-A-ii-k-2-LO",
+  "OE-COMPETENCY-ai4k12-1-a-i-k-2-lo": "1-A-i-k-2-LO",
+  "OE-COMPETENCY-ai4k12-1-a-i-3-5-lo": "1-A-i-3-5-LO",
+  "OE-COMPETENCY-ai4k12-1-a-ii-3-5-lo": "1-A-ii-3-5-LO",
+  "OE-COMPETENCY-ai4k12-1-b-i-3-5-eu": "1-B-i-3-5-EU",
+  "OE-COMPETENCY-ai4k12-1-a-i-6-8-lo": "1-A-i-6-8-LO",
+  "OE-COMPETENCY-ai4k12-1-a-ii-6-8-lo": "1-A-ii-6-8-LO",
+  "OE-COMPETENCY-ai4k12-1-c-i-9-12-eu": "1-C-i-9-12-EU",
+  "OE-COMPETENCY-ai4k12-5-b-i-9-12-eu": "5-B-i-9-12-EU",
+  "OE-COMPETENCY-ai4k12-3-b-i-6-8-lo": "3-B-i-6-8-LO",
+  "OE-COMPETENCY-ai4k12-3-b-ii-9-12-eu": "3-B-ii-9-12-EU",
+  "OE-COMPETENCY-ai4k12-1-b-i-9-12-lo": "1-B-i-9-12-LO",
+  "OE-COMPETENCY-ai4k12-4-a-ii-9-12-eu": "4-A-ii-9-12-EU",
+  "OE-COMPETENCY-ai4k12-1-a-ii-9-12-lo": "1-A-ii-9-12-LO"
+ }
+}
