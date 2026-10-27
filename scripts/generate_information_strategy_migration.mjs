@@ -41,7 +41,7 @@ const slugify = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/
 const NOTE = 'AI-drafted on 2026-10-27 from the paper by Eirdosh and Hanisch (2026, in press), the vocabulary and stages of the space, the Sachsen tagging and the thinking-tool strategy. No subject-matter expert has reviewed it and no classroom has tested it.'
 const PAPER = 'OE-LITERATURE-eirdosh-hanisch-2026'
 const DIM = { 1: 'structure without a sender', 2: 'systems that use information', 3: 'decentralized processing' }
-const TYPE_MAP = { 'journal-article': 'article', article: 'article', 'book-chapter': 'chapter', chapter: 'chapter', book: 'book', report: 'report', thesis: 'thesis', 'conference-paper': 'article', other: 'other' }
+const TYPE_MAP = { 'journal-article': 'article', article: 'article', 'book-chapter': 'chapter', chapter: 'chapter', book: 'book', report: 'report', thesis: 'thesis', 'conference-paper': 'article' }
 const SPACES = {
   bio: { slug: 'bio-core-lpm-synth', name: 'Bio-Core', prefix: 'OE-CONCEPT-bio-core-' },
   soc: { slug: 'social-core-lpm-synth', name: 'Social-Core', prefix: 'OE-CONCEPT-social-core-' },
