@@ -97,7 +97,8 @@ export function ComparisonProvider({ context, children }: { context: ProjectOutl
   const { templateId } = context
   const config = getCurriculumConnectionsViewConfig(templateId)
   if (!config || !templateId) return <p className="muted">Unknown view configuration.</p>
-  return <Loaded context={context} config={config} templateId={templateId}>{children}</Loaded>
+  // Keyed by view, so switching views starts from that view's own saved scope instead of carrying the last one over.
+  return <Loaded key={templateId} context={context} config={config} templateId={templateId}>{children}</Loaded>
 }
 
 function Loaded({ context, config, templateId, children }: { context: ProjectOutletContext; config: CurriculumConnectionsViewConfig; templateId: string; children: ReactNode }) {
