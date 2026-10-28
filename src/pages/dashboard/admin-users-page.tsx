@@ -7,7 +7,7 @@ import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole }
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
 import { projectColorHexOrDefault, projectColorTint } from '@/lib/project-colors'
-import { CURATION } from '@/components/epistemic-status-badge'
+import { CURATION, EPISTEMIC_STATUS_OPTIONS } from '@/components/epistemic-status-badge'
 import {
   addAdminJoinRule,
   listAllJoinRules,
@@ -63,11 +63,6 @@ const COMMON_LANGUAGES: { code: string; label: string }[] = [
   { code: 'ar', label: 'Arabic' },
 ]
 
-const EPISTEMIC_STATUS_OPTIONS: { value: AdminProjectRow['epistemic_status']; label: string }[] = [
-  { value: 'in-development', label: 'Human-curated — real content, still being built' },
-  { value: 'field-validated-curriculum', label: 'Human-curated — already in real classroom use' },
-  { value: 'designed-thought-experiment', label: 'Synthetic-theoretical — a designed comparison or research construct' },
-]
 
 export default function AdminUsersPage() {
   const { session, isAdmin } = useSession()
