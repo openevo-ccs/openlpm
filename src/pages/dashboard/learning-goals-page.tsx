@@ -61,6 +61,7 @@ import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-
 import { listMethodsBaseByVocabulary, listMethodLernzielLinks, reviewMethodLernzielLink, type MethodsBaseRecord, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
 import { METHOD_ICON } from './student/student-lernziele-page'
 import { Check, Info, Sparkle, X } from 'lucide-react'
+import { ReviewQuestionsPanel } from '@/components/review-questions-panel'
 
 // 2026-09-13 restructure: renamed from "Standards" (RFC-0003 stub) and
 // merged with the standalone "Explore" tab (which is removed -- Dustin's
@@ -352,7 +353,7 @@ function BrowseTab() {
         <div className="drawer-shell wide">
           <div className="drawer">
             {objectId ? (
-              <TopicDetail objectId={objectId} projectSlug={project.slug} supabase={supabase} />
+              <TopicDetail objectId={objectId} projectId={project.id} projectSlug={project.slug} supabase={supabase} />
             ) : (
               <div className="empty" style={{ paddingTop: 60 }}>
                 <Compass size={32} />
@@ -369,10 +370,12 @@ function BrowseTab() {
 
 function TopicDetail({
   objectId,
+  projectId,
   projectSlug,
   supabase,
 }: {
   objectId: string
+  projectId: string
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
 }) {
@@ -446,6 +449,8 @@ function TopicDetail({
       {connections?.length === 0 && stations?.length === 0 && (
         <p className="muted">No recorded connections for this learning goal yet.</p>
       )}
+
+      <ReviewQuestionsPanel supabase={supabase} projectId={projectId} projectSlug={projectSlug} linkedType="data_object" linkedId={objectId} />
     </div>
   )
 }

@@ -9,6 +9,7 @@ import type { Database } from '@/lib/supabase/database.types'
 import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { conceptDefinition, conceptSource } from '@/lib/concept-source'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { ReviewQuestionsPanel } from '@/components/review-questions-panel'
 import {
   DEFAULT_GRAPH_SETTINGS,
   arcHeight,
@@ -1198,6 +1199,7 @@ function ManageConceptsTab() {
                 kids={childrenOf(selected.id)}
                 onSelect={setSelectedId}
                 onViewInMap={() => navigate(`/dashboard/${project.slug}/concepts/${selected.id}`)}
+                questions={<ReviewQuestionsPanel supabase={supabase} projectId={project.id} projectSlug={project.slug} linkedType="schema_element" linkedId={selected.id} />}
               />
             )}
           </div>
@@ -1263,12 +1265,14 @@ function ManageConceptDetail({
   kids,
   onSelect,
   onViewInMap,
+  questions,
 }: {
   node: SchemaElement
   parent: SchemaElement | null
   kids: SchemaElement[]
   onSelect: (id: string) => void
   onViewInMap: () => void
+  questions?: React.ReactNode
 }) {
   const definition = conceptDefinition(node)
   const origin = conceptSource(node)
@@ -1312,6 +1316,7 @@ function ManageConceptDetail({
       <button className="btn btn-mini" style={{ marginTop: 14 }} onClick={onViewInMap}>
         <Network size={12} />See how this connects to real content
       </button>
+      {questions}
     </div>
   )
 }
