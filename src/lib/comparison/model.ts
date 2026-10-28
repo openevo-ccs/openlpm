@@ -39,6 +39,21 @@ export interface CmpRecord {
   date: string | null
   dateEnd: string | null
   summary: string
+  /** Set for records that are one unit of an official Lehrplan. */
+  unit?: CurriculumUnit
+  /** Address of the page the record was read from, when it carries one. */
+  sourceUrl?: string
+}
+
+export interface CurriculumUnit {
+  subject: string
+  schoolType: string | null
+  gradeFrom: number
+  gradeTo: number
+  hours: number | null
+  courseLevel: string | null
+  tags: string[]
+  titleDe: string | null
 }
 
 export interface CmpLink {
@@ -111,11 +126,16 @@ export function splitJurisdictions(raw: string | null | undefined): string[] {
 
 // ---- Record families ---------------------------------------------------------
 
-export type RecordFamily = 'mandate' | 'event' | 'actor' | 'principle' | 'finding' | 'controversy' | 'other'
+export type RecordFamily = 'mandate' | 'unit' | 'event' | 'actor' | 'principle' | 'finding' | 'controversy' | 'other'
 
-export const RECORD_FAMILIES: RecordFamily[] = ['mandate', 'event', 'actor', 'principle', 'finding', 'controversy', 'other']
+export const RECORD_FAMILIES: RecordFamily[] = ['mandate', 'unit', 'event', 'actor', 'principle', 'finding', 'controversy', 'other']
 
-export function familyOf(recordType: string): RecordFamily {
+/**
+ * The family of a record. A mandate whose type is 'curriculum-unit' is one unit of an official Lehrplan
+ * (subject, grades, hours, topic tags) and counts as its own family, since it speaks to what is taught when.
+ */
+export function familyOf(recordType: string, mandateType?: string | null): RecordFamily {
+  if (recordType === 'institutional-mandate-record' && mandateType === 'curriculum-unit') return 'unit'
   switch (recordType) {
     case 'institutional-mandate-record':
     case 'curriculum-crosswalk-record': return 'mandate'

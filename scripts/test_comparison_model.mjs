@@ -302,3 +302,58 @@ test('years from partial dates', () => {
   assert.equal(C.yearOf(null), null)
   assert.equal(C.yearOf('soon'), null)
 })
+
+// ---- placement ("when is it taught") ---------------------------------------------------
+
+const unitRec = (id, subject, gradeFrom, gradeTo, hours, tags) => ({
+  id, title: id, type: 'institutional-mandate-record', family: 'unit', jurisdictions: ['DE-XX'], date: null, dateEnd: null, summary: '',
+  unit: { subject, schoolType: 'Gymnasium', gradeFrom, gradeTo, hours, courseLevel: null, tags, titleDe: null },
+})
+const placed = (placeId, rec) => ({ placeId, record: rec })
+
+test('a mandate of type curriculum-unit is its own family', () => {
+  assert.equal(C.familyOf('institutional-mandate-record', 'curriculum-unit'), 'unit')
+  assert.equal(C.familyOf('institutional-mandate-record', 'standards-adoption'), 'mandate')
+  assert.equal(C.familyOf('institutional-mandate-record'), 'mandate')
+})
+
+test('placement profiles share hours over the grades of a unit and ignore other subjects', () => {
+  const units = [
+    placed('A', unitRec('u1', 'bio', 10, 10, 16, ['evolution'])),
+    placed('A', unitRec('u2', 'bio', 9, 10, 10, ['inheritance_variation'])),
+    placed('A', unitRec('u3', 'inf', 7, 7, 8, ['algorithms_programming'])),
+    placed('B', unitRec('u4', 'bio', 12, 12, null, ['evolution'])),
+  ]
+  const grades = C.gradeRange(units)
+  assert.deepEqual(grades, [5, 6, 7, 8, 9, 10, 11, 12])
+  const all = C.placementProfiles(units, 'bio', null, grades, ['A', 'B'])
+  close(all[0].hours[grades.indexOf(10)], 16 + 5)
+  close(all[0].hours[grades.indexOf(9)], 5)
+  assert.equal(all[0].unitCount, 2)
+  assert.equal(all[1].unitsWithoutHours, 1)
+  close(all[1].hours[grades.indexOf(12)], 0)
+  assert.equal(all[1].units[grades.indexOf(12)], 1)
+  const evo = C.placementProfiles(units, 'bio', new Set(['evolution']), grades, ['A'])
+  assert.equal(evo[0].unitCount, 1)
+})
+
+test('first grade, band shares and distance between places', () => {
+  const units = [
+    placed('A', unitRec('u1', 'bio', 10, 10, 16, ['evolution'])),
+    placed('A', unitRec('u2', 'bio', 6, 6, 4, ['evolution'])),
+    placed('B', unitRec('u3', 'bio', 12, 12, 20, ['evolution'])),
+  ]
+  assert.equal(C.firstGrade(units, 'A', 'bio', 'evolution'), 6)
+  assert.equal(C.firstGrade(units, 'B', 'bio', 'evolution'), 12)
+  assert.equal(C.firstGrade(units, 'B', 'bio', 'ecology_populations'), null)
+  const grades = C.gradeRange(units)
+  const [pa, pb] = C.placementProfiles(units, 'bio', null, grades, ['A', 'B'])
+  const sa = C.bandShares(pa, grades)
+  assert.equal(sa.basis, 'hours')
+  close(sa.shares.reduce((x, y) => x + y, 0), 1)
+  close(sa.shares[0], 0.2)
+  close(C.profileDistance(pa, pa), 0)
+  close(C.profileDistance(pa, pb), 1) // no grade in common
+  const empty = C.placementProfiles(units, 'inf', null, grades, ['A'])[0]
+  assert.equal(C.profileDistance(pa, empty), null)
+})

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, GraduationCap, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 import { makeT, type StringKey } from '../comparison/strings'
 import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
@@ -25,6 +25,7 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
       {item(`${base}/timeline`, 'navTimeline', CalendarRange)}
       <p className="muted student-nav-group">{t('groupCompare')}</p>
       {item(`${base}/flows`, 'navFlows', Waypoints)}
+      {item(`${base}/school-years`, 'navSchoolYears', GraduationCap)}
       {item(`${base}/measures`, 'navMeasures', BarChart3)}
       {item(`${base}/side-by-side`, 'navSideBySide', Columns2)}
       {KNOWN_COMPARISON_PAIRS[slug] && item(`${base}/spaces`, 'navSpaces', GitCompare)}

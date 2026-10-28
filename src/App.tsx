@@ -51,6 +51,7 @@ import ComparisonCoveragePage from '@/pages/dashboard/comparison/coverage-page'
 import ComparisonNetworkPage from '@/pages/dashboard/comparison/network-page'
 import ComparisonTimelinePage from '@/pages/dashboard/comparison/timeline-page'
 import ComparisonFlowsPage from '@/pages/dashboard/comparison/flows-page'
+import ComparisonSchoolYearsPage from '@/pages/dashboard/comparison/school-years-page'
 import ComparisonMeasuresPage from '@/pages/dashboard/comparison/measures-page'
 import ComparisonSideBySidePage from '@/pages/dashboard/comparison/side-by-side-page'
 import ComparisonCuratePage from '@/pages/dashboard/comparison/curate-page'
@@ -141,6 +142,7 @@ export default function App() {
             <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
             <Route path="timeline" element={<ComparisonOnly><ComparisonTimelinePage /></ComparisonOnly>} />
             <Route path="flows" element={<ComparisonOnly><ComparisonFlowsPage /></ComparisonOnly>} />
+            <Route path="school-years" element={<ComparisonOnly><ComparisonSchoolYearsPage /></ComparisonOnly>} />
             <Route path="measures" element={<ComparisonOnly><ComparisonMeasuresPage /></ComparisonOnly>} />
             <Route path="side-by-side" element={<ComparisonOnly><ComparisonSideBySidePage /></ComparisonOnly>} />
             <Route path="spaces" element={<ComparisonOnly><ComparisonSpacesPage /></ComparisonOnly>} />
