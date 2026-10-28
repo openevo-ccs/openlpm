@@ -31,6 +31,12 @@ export const STUDENT_VIEW_TEMPLATES: StudentViewTemplate[] = [
     description:
       'German-language Lernziele/Basiskonzepte/KI-Prompt-Generator view modeled on EvoMentor DE v1.2, built for the Uni Jena Winter Semester 2026 pilot.',
   },
+  {
+    id: 'jena-biologiedidaktik-sandbox-de',
+    label: 'Jena Biologiedidaktik (Sandbox, synthetische Studierende)',
+    description:
+      'Same pages as the Jena Biologiedidaktik view, for a separate test space that only synthetic (AI-generated) students use. Shows a Sandbox banner so test data is never mistaken for real student work.',
+  },
   ...COMPARISON_SPACES.flatMap(({ key, label }): StudentViewTemplate[] => [
     {
       id: `${key}-germany-de`,
@@ -58,6 +64,19 @@ const LEGACY_TEMPLATE_ALIASES: Record<string, string> = {
   'interdisciplinary-sachsen-thueringen-de': 'interdisciplinary-germany-de',
   'interdisciplinary-us-ny-ca-en': 'interdisciplinary-united-states-en',
   'interdisciplinary-us-fl-pa-tn-en': 'interdisciplinary-united-states-en',
+}
+
+// The Jena view exists twice with identical pages: the one for the semester
+// and a sandbox twin for synthetic students. Everything that treats "the Jena
+// view" specially (route lock, nav, German chrome) asks this.
+export const JENA_TEMPLATE_IDS = ['jena-biologiedidaktik-de', 'jena-biologiedidaktik-sandbox-de']
+
+export function isJenaTemplate(id: string | null | undefined): boolean {
+  return !!id && JENA_TEMPLATE_IDS.includes(id)
+}
+
+export function isSandboxTemplate(id: string | null | undefined): boolean {
+  return id === 'jena-biologiedidaktik-sandbox-de'
 }
 
 export function getStudentViewTemplate(id: string | null): StudentViewTemplate | null {

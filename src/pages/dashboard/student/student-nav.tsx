@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileText, GitCompare, Grid3x3, ListChecks, Network, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 import { makeT, type StringKey } from '../comparison/strings'
 import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
@@ -51,6 +51,10 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
       </NavLink>
       <NavLink to={`${base}/basiskonzepte`} title="Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Dna size={14} /><span className="nav-label">Basiskonzepte</span>
+      </NavLink>
+      <p className="muted student-nav-group">MEINE ARBEIT</p>
+      <NavLink to={`${base}/meine-arbeit`} title="Meine Arbeit und Abgabe" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <PenLine size={14} /><span className="nav-label">Meine Arbeit und Abgabe</span>
       </NavLink>
       <p className="muted student-nav-group">PLANEN</p>
       <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>

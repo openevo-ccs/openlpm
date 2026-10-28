@@ -6,6 +6,7 @@ import { useSession } from '@/state/session'
 import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listAllProjects } from '@/lib/supabase/admin-users'
 import { listMyPendingRequests, respondToMemberRequest, type PendingRequestForUser } from '@/lib/supabase/members'
+import { listMyJoinableProjects } from '@/lib/supabase/join'
 
 // Admin-only: a project the admin can see exists (migration 049's directory
 // reach) but isn't personally a member of -- role is null rather than one
@@ -111,6 +112,17 @@ export default function ProjectSwitcherPage() {
       navigate(`/dashboard/${memberships[0].project.slug}`, { replace: true })
     }
   }, [isAdmin, memberships, pendingRequests, navigate])
+
+  // A brand-new account that matches exactly one self-join rule (the seminar
+  // case: a student who confirmed their email on another device than the one
+  // they signed up on, so the welcome page's redirect never fired) goes
+  // straight to that space's join screen instead of an empty list.
+  useEffect(() => {
+    if (isAdmin || memberships === null || memberships.length > 0) return
+    listMyJoinableProjects(supabase).then((joinable) => {
+      if (joinable.length === 1) navigate(`/join/${joinable[0].project.slug}`, { replace: true })
+    })
+  }, [isAdmin, memberships, supabase, navigate])
 
   const stillLoading = memberships === null || pendingRequests === null || (isAdmin && allProjects === null)
   const redirecting = !isAdmin && memberships?.length === 1 && pendingRequests?.length === 0

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
@@ -20,7 +20,8 @@ import { LpmSearchBar } from '@/components/lpm-search-bar'
 import { ProjectIntroBanner } from '@/components/project-intro-banner'
 import { StudentNav } from './student/student-nav'
 import { ComparisonProvider } from './comparison/context'
-import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
+import { getCurriculumConnectionsViewConfig, isJenaTemplate, isSandboxTemplate } from '@/lib/student-view-templates'
+import { logStudentEvent } from '@/lib/supabase/student-work'
 
 export interface ProjectOutletContext {
   project: ProjectRow
@@ -78,6 +79,47 @@ function readStoredSidebarCollapsed(): boolean {
   } catch {
     return false
   }
+}
+
+// Pages a student in the Jena view may open. The sidebar only links to these,
+// but the app's other routes are reachable by typing the address, so a
+// student (anyone who is not an owner/maintainer) is sent back to the start
+// page for anything else. The route table itself stays shared with the
+// researcher view; this is the one place that decides who sees what.
+const JENA_STUDENT_PATHS = [
+  /^$/,
+  /^basiskonzepte(\/[^/]+)?$/,
+  /^planen$/,
+  /^calendar$/,
+  /^groups(\/[0-9a-f-]{36})?$/,
+  /^meine-arbeit$/,
+  /^[0-9a-f-]{36}$/,
+]
+
+function JenaStudentGate({
+  slug,
+  projectId,
+  supabase,
+  locked,
+  children,
+}: {
+  slug: string
+  projectId: string
+  supabase: ReturnType<typeof createClient>
+  locked: boolean
+  children: React.ReactNode
+}) {
+  const { pathname } = useLocation()
+  const rel = pathname.replace(`/dashboard/${slug}`, '').replace(/^\/+|\/+$/g, '')
+  const allowed = JENA_STUDENT_PATHS.some((re) => re.test(rel))
+
+  useEffect(() => {
+    if (locked && allowed) void logStudentEvent(supabase, projectId, 'page_view', { path: rel || 'lernziele' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rel, locked, allowed])
+
+  if (locked && !allowed) return <Navigate to={`/dashboard/${slug}`} replace />
+  return <>{children}</>
 }
 
 export default function ProjectLayout() {
@@ -441,7 +483,16 @@ export default function ProjectLayout() {
               </button>
             </div>
           )}
-          {getCurriculumConnectionsViewConfig(templateId) ? (
+          {isSandboxTemplate(templateId) && (
+            <div className="notice notice-bad" style={{ marginBottom: 12 }}>
+              <strong>SANDBOX.</strong> Dieser Bereich ist für synthetische (KI-erzeugte) Testpersonen. Nichts hier stammt von echten Studierenden.
+            </div>
+          )}
+          {isJenaTemplate(templateId) ? (
+            <JenaStudentGate slug={slug} projectId={project.id} supabase={supabase} locked={!canManage}>
+              <Outlet context={context} />
+            </JenaStudentGate>
+          ) : getCurriculumConnectionsViewConfig(templateId) ? (
             <ComparisonProvider context={context}>
               <Outlet context={context} />
             </ComparisonProvider>

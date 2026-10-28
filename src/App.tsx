@@ -39,6 +39,8 @@ import AdminUsersPage from '@/pages/dashboard/admin-users-page'
 import AdminBaseRepoExplorerPage from '@/pages/dashboard/admin-base-repo-explorer-page'
 import AdminContentEditorPage from '@/pages/dashboard/admin-content-editor-page'
 import JoinPage from '@/pages/join-page'
+import WelcomePage from '@/pages/welcome-page'
+import StudentWorkPage from '@/pages/dashboard/student/student-work-page'
 import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
@@ -103,6 +105,7 @@ export default function App() {
         <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
         <Route path="/impressum" element={<ImpressumPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/willkommen/:slug" element={<WelcomePage />} />
         <Route
           path="/join/:slug"
           element={
@@ -133,6 +136,7 @@ export default function App() {
             <Route path="basiskonzepte" element={<StudentBasiskonzeptePage />} />
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
+            <Route path="meine-arbeit" element={<StudentWorkPage />} />
             <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
             <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
             <Route path="timeline" element={<ComparisonOnly><ComparisonTimelinePage /></ComparisonOnly>} />
