@@ -75,7 +75,7 @@ export default function GroupDetailPage() {
         ) : (
           members.map((m) => (
             <div key={m.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
-              <span>{m.user.name}{canManage && <span className="muted"> {m.user.email}</span>}</span>
+              <span>{m.user.name}{(role === 'owner' || role === 'maintainer') && <span className="muted"> {m.user.email}</span>}</span>
             </div>
           ))
         )}

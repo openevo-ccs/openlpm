@@ -42,6 +42,7 @@ async function add() {
       if (!user) throw new Error(`users row for ${email} did not appear`)
     }
     await rest('POST', 'project_members', {
+      qs: 'on_conflict=project_id,user_id',
       body: { project_id: projectId, user_id: user.id, role: 'contributor', joined_via: 'self_join_rule' },
       prefer: 'resolution=ignore-duplicates,return=minimal',
     })
@@ -61,7 +62,7 @@ async function remove() {
 
 async function list() {
   const projectId = await getProjectId(SANDBOX_SLUG)
-  const rows = await rest('GET', 'project_members', { qs: `select=role,joined_via,user:users(name,email)&project_id=eq.${projectId}` })
+  const rows = await rest('GET', 'project_members', { qs: `select=role,joined_via,user:users!project_members_user_id_fkey(name,email)&project_id=eq.${projectId}` })
   for (const r of rows) console.log(r.role.padEnd(12), String(r.joined_via ?? '-').padEnd(16), r.user?.name, r.user?.email)
   console.log(rows.length, 'members')
 }

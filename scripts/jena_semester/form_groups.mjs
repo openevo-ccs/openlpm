@@ -71,7 +71,7 @@ console.log(JSON.stringify(named, null, 2))
 if (has('apply')) {
   const projectId = await getProjectId(SANDBOX_SLUG)
   for (const [name, members] of Object.entries(named)) {
-    await rest('POST', 'project_groups', { body: { project_id: projectId, name }, prefer: 'resolution=ignore-duplicates,return=minimal' })
+    await rest('POST', 'project_groups', { qs: 'on_conflict=project_id,name', body: { project_id: projectId, name }, prefer: 'resolution=ignore-duplicates,return=minimal' })
     const [grp] = await rest('GET', 'project_groups', { qs: `select=id&project_id=eq.${projectId}&name=eq.${encodeURIComponent(name)}` })
     for (const id of members) {
       // Each student joins their own group as themselves, through the same

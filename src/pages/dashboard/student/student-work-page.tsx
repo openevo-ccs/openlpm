@@ -317,11 +317,19 @@ function LernzielCard({
   save: Save
   remove: Remove
 }) {
-  const suggested = bkEntries(content)
+  // The curriculum data rates all six Basiskonzepte for most Lernziele. The
+  // clear suggestions (medium and high) are shown first; the weak ones (low)
+  // sit behind a toggle, still judgeable, and stay visible once judged.
+  const [showLow, setShowLow] = useState(false)
+  const all = bkEntries(content)
     .filter((e) => e.relevanz_beurteilung >= 1)
     .sort((a, b) => b.relevanz_beurteilung - a.relevanz_beurteilung)
+  const isJudged = (id: string) => !!entryOf('link_judgment', linkKey(topic.id, id))
+  const low = all.filter((e) => e.relevanz_beurteilung < 2)
+  const suggested = all.filter((e) => e.relevanz_beurteilung >= 2 || showLow || isJudged(e.basiskonzept_id))
+  const hiddenLow = low.filter((e) => !suggested.includes(e)).length
   const proposals = entries.filter((e) => e.kind === 'link_proposal' && e.payload.lernziel_id === topic.id)
-  const judged = suggested.filter((s) => entryOf('link_judgment', linkKey(topic.id, s.basiskonzept_id))).length
+  const judged = all.filter((s) => isJudged(s.basiskonzept_id)).length
 
   return (
     <div className="card" style={{ marginBottom: 14 }}>
@@ -333,7 +341,7 @@ function LernzielCard({
           </p>
           <h3 style={{ margin: '2px 0 4px' }}>{topic.title}</h3>
         </div>
-        <span className="muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>{judged} von {suggested.length} beurteilt</span>
+        <span className="muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>{judged} von {all.length} beurteilt</span>
       </div>
       {topic.description && <p className="muted" style={{ marginTop: 0 }}>{topic.description}</p>}
 
@@ -351,6 +359,12 @@ function LernzielCard({
           save={save}
         />
       ))}
+
+      {hiddenLow > 0 && (
+        <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setShowLow(true)}>
+          {hiddenLow} Verknüpfung{hiddenLow === 1 ? '' : 'en'} mit niedriger Relevanz anzeigen
+        </button>
+      )}
 
       {proposals.map((p) => (
         <div key={p.id} className="notice" style={{ marginTop: 8 }}>

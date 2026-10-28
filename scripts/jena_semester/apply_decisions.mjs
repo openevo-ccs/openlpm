@@ -94,6 +94,12 @@ async function applyOne(persona, projectId, groupName) {
     if (grp) must('share flag', await client.from('group_members').update({ share_favorites: d.share_with_group !== false }).eq('group_id', grp.id).eq('user_id', userId))
   }
 
+  // A student who drops out of the group leaves it (their own membership row).
+  if (d.leave_group && groupName) {
+    const { data: grp } = await client.from('project_groups').select('id').eq('project_id', projectId).eq('name', groupName).maybeSingle()
+    if (grp) must('leave group', await client.from('group_members').delete().eq('group_id', grp.id).eq('user_id', userId))
+  }
+
   // Reconstructed timeline
   const trace = (d.trace?.length ? d.trace : defaultTrace(d))
   const day = 10 + Math.floor(rng() * 5)

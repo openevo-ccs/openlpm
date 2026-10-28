@@ -48,6 +48,7 @@ for (const p of personas) {
         },
       }
     )
+    await page.reload({ waitUntil: 'networkidle' })
     await page.goto(`${base}#/dashboard/${SANDBOX_SLUG}/meine-arbeit`, { waitUntil: 'networkidle' })
     await page.getByRole('button', { name: /5 Abgabe/ }).click()
     await page.getByRole('button', { name: /Word-Datei herunterladen/ }).waitFor({ timeout: 20000 })

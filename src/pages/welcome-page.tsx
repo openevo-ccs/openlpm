@@ -133,18 +133,19 @@ export default function WelcomePage() {
             <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {mode === 'signup' && (
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label>Dein Name (so sehen dich die Mitglieder deiner Gruppe)</label>
-                  <input type="text" required minLength={2} value={name} onChange={(e) => setName(e.target.value)} placeholder="Vorname Nachname" autoComplete="name" />
+                  <label htmlFor="welcome-name">Dein Name (so sehen dich die Mitglieder deiner Gruppe)</label>
+                  <input id="welcome-name" type="text" required minLength={2} value={name} onChange={(e) => setName(e.target.value)} placeholder="Vorname Nachname" autoComplete="name" />
                 </div>
               )}
               <div className="field" style={{ marginBottom: 0 }}>
-                <label>E-Mail-Adresse der Universität</label>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={config.domainExample} autoComplete="email" />
+                <label htmlFor="welcome-email">E-Mail-Adresse der Universität</label>
+                <input id="welcome-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={config.domainExample} autoComplete="email" />
               </div>
               {mode !== 'forgot' && (
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label>Passwort (mindestens 8 Zeichen)</label>
+                  <label htmlFor="welcome-password">Passwort (mindestens 8 Zeichen)</label>
                   <input
+                    id="welcome-password"
                     type="password"
                     required
                     minLength={8}
