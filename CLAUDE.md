@@ -20,7 +20,7 @@ Rules:
 ## Before you open a pull request
 
 - Run `npm ci` first, then `npm run build`. A build in a worktree that shares an older `node_modules` fails on missing packages (`papaparse`, `exceljs`, `docx`) and looks like a broken build when it is a stale install.
-- Run the library tests: `npm run test:comparison`, `npm run test:review-state`, `npm run test:dashboard-views`, `npm run test:time`.
+- Run the library tests: `npm run test:comparison`, `npm run test:comparison-structure`, `npm run test:review-state`, `npm run test:dashboard-views`, `npm run test:time`.
 - Warning and draft text uses `--warning-text`, never `--warning`. The bright amber is 1.75 to 1 on the light page.
 - A status that says "accepted" does not say a person has reviewed the item. The review state chip (`src/components/review-state-chip.tsx`, rule in `src/lib/review-state.ts`) says that, and follows the recorded reviews.
 - The suggestion hit rate quoted on the Curate drawer is measured by `node scripts/eval_suggestions.mjs`. Re-run it when the corpus changes and update `drawerSuggestionsHint` in `src/pages/dashboard/comparison/strings.ts`.
