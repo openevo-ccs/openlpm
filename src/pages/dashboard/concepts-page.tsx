@@ -7,7 +7,8 @@ import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
-import { conceptDefinition, conceptSource } from '@/lib/concept-source'
+import { conceptDefinition, conceptExtension, conceptSource, fieldOf, isFieldMeaning } from '@/lib/concept-source'
+import { loadRegisteredConceptIds } from '@/lib/conceptbase-registry'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { ReviewQuestionsPanel } from '@/components/review-questions-panel'
 import {
@@ -1052,6 +1053,10 @@ function ManageConceptsTab() {
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [registered, setRegistered] = useState<Set<string> | null>(null)
+  useEffect(() => {
+    loadRegisteredConceptIds().then(setRegistered)
+  }, [])
 
   const reload = async () => {
     const projectIds = [project.id, project.parent_project_id].filter((id): id is string => !!id)
@@ -1199,6 +1204,7 @@ function ManageConceptsTab() {
                 kids={childrenOf(selected.id)}
                 onSelect={setSelectedId}
                 onViewInMap={() => navigate(`/dashboard/${project.slug}/concepts/${selected.id}`)}
+                registered={registered}
                 questions={<ReviewQuestionsPanel supabase={supabase} projectId={project.id} projectSlug={project.slug} linkedType="schema_element" linkedId={selected.id} />}
               />
             )}
@@ -1266,6 +1272,7 @@ function ManageConceptDetail({
   onSelect,
   onViewInMap,
   questions,
+  registered,
 }: {
   node: SchemaElement
   parent: SchemaElement | null
@@ -1273,9 +1280,15 @@ function ManageConceptDetail({
   onSelect: (id: string) => void
   onViewInMap: () => void
   questions?: React.ReactNode
+  registered?: ReadonlySet<string> | null
 }) {
   const definition = conceptDefinition(node)
-  const origin = conceptSource(node)
+  const origin = conceptSource(node, registered)
+  const ext = conceptExtension(node)
+  const meaning = isFieldMeaning(node)
+  const parentExt = parent ? conceptExtension(parent) : null
+  const fieldMeanings = kids.filter(isFieldMeaning)
+  const otherKids = kids.filter((k) => !isFieldMeaning(k))
 
   return (
     <div>
@@ -1284,17 +1297,30 @@ function ManageConceptDetail({
         <Chip status={node.status} />
       </div>
       <p className="muted capitalize" style={{ marginTop: -8, fontSize: 12 }}>{node.element_type}</p>
-      {parent && (
-        <p className="muted" style={{ fontSize: 12 }}>
-          Part of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>
-        </p>
+      {meaning && parent ? (
+        <div style={{ margin: '8px 0', padding: '6px 10px', borderLeft: '3px solid var(--border)', background: 'var(--surface-2)' }}>
+          <p style={{ margin: 0, fontSize: 13 }}>
+            This is the meaning of <strong>{parent.label}</strong> in {fieldOf(node.label) ?? 'one field'}. The general definition sits on the page of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>, together with what does not carry over between fields.
+          </p>
+          {parentExt?.excludes && <p style={{ margin: '6px 0 0', fontSize: 13 }}><strong>Does not carry over:</strong> {parentExt.excludes}</p>}
+        </div>
+      ) : (
+        parent && (
+          <p className="muted" style={{ fontSize: 12 }}>
+            Part of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>
+          </p>
+        )
       )}
       <p style={{ marginTop: 8, whiteSpace: 'pre-line' }}>{definition || 'No definition yet.'}</p>
       {origin.kind === 'conceptbase' ? (
         <p className="muted" style={{ fontSize: 12 }}>
-          Linked to ConceptBase{origin.vocabulary ? ` — ${origin.vocabulary}${origin.version ? ` v${origin.version}` : ''}` : ''}.{' '}
+          In ConceptBase.{' '}
           {definition ? 'The definition above comes from there. ' : ''}
-          <a href={origin.url} target="_blank" rel="noopener noreferrer">See the ConceptBase record ({origin.conceptbaseId})</a>
+          <a href={origin.url} target="_blank" rel="noopener noreferrer">See the ConceptBase record</a>
+        </p>
+      ) : origin.kind === 'proposed' ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Proposed in this space. ConceptBase holds no record for it, so nobody outside the lab has checked the wording.
         </p>
       ) : (
         <p className="muted" style={{ fontSize: 12 }}>
@@ -1302,11 +1328,47 @@ function ManageConceptDetail({
         </p>
       )}
 
-      {kids.length > 0 && (
+      {ext && (
+        <section style={{ marginTop: 12 }} aria-label="General meaning and what does not carry over">
+          {ext.general && ext.general !== definition && (
+            <p style={{ margin: '0 0 6px', fontSize: 13 }}><strong>Proposed wider wording (AI-drafted):</strong> {ext.general}</p>
+          )}
+          {ext.excludes && <p style={{ margin: '0 0 6px', fontSize: 13 }}><strong>Does not carry over between fields:</strong> {ext.excludes}</p>}
+          {ext.curriculumUse && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>Where curricula use it: {ext.curriculumUse}</p>}
+          {ext.confidence && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>Confidence the drafter gave: {ext.confidence}.</p>}
+          {ext.draftNote && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>{ext.draftNote}</p>}
+          {ext.sources.length > 0 && (
+            <details style={{ fontSize: 12 }}>
+              <summary>Sources named ({ext.sources.length})</summary>
+              <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{ext.sources.map((src) => <li key={src}>{src}</li>)}</ul>
+            </details>
+          )}
+        </section>
+      )}
+
+      {fieldMeanings.length > 0 && (
+        <section style={{ marginTop: 14 }} aria-label="Meanings by field">
+          <h4 style={{ marginBottom: 4 }}>Meaning in {fieldMeanings.length} field{fieldMeanings.length === 1 ? '' : 's'}</h4>
+          {!ext?.excludes && (
+            <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>Nobody has written yet what does not carry over between these fields. That note is the first thing an expert reader could add.</p>
+          )}
+          {fieldMeanings.map((k) => (
+            <div key={k.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <button className="btn-linklike" style={{ fontWeight: 600 }} onClick={() => onSelect(k.id)}>{fieldOf(k.label) ?? k.label}</button>
+                <Chip status={k.status} />
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: 13 }}>{conceptDefinition(k) ?? 'No definition yet.'}</p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {otherKids.length > 0 && (
         <div style={{ marginTop: 12 }}>
-          <h4 style={{ marginBottom: 4 }}>{kids.length} sub-concept{kids.length === 1 ? '' : 's'}</h4>
+          <h4 style={{ marginBottom: 4 }}>{otherKids.length} sub-concept{otherKids.length === 1 ? '' : 's'}</h4>
           <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
-            {kids.map((k) => (
+            {otherKids.map((k) => (
               <button key={k.id} className="btn btn-mini" onClick={() => onSelect(k.id)}>{k.label}</button>
             ))}
           </div>
