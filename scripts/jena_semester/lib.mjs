@@ -59,8 +59,22 @@ export async function authAdmin(method, subpath, body) {
   return text ? JSON.parse(text) : null
 }
 
-/** A session for an existing account, minted without ever touching its password. */
-export async function sessionFor(email) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+/** A session for an existing account, minted without ever touching its password. Waits and retries when the auth service rate-limits. */
+export async function sessionFor(email, attempt = 0) {
+  try {
+    return await mintSession(email)
+  } catch (e) {
+    if (/429|rate limit/i.test(String(e.message)) && attempt < 5) {
+      await sleep(60_000)
+      return sessionFor(email, attempt + 1)
+    }
+    throw e
+  }
+}
+
+async function mintSession(email) {
   const gen = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
     method: 'POST',
     headers: { apikey: serviceKey(), Authorization: `Bearer ${serviceKey()}`, 'Content-Type': 'application/json' },

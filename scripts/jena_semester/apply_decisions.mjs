@@ -84,8 +84,11 @@ async function applyOne(persona, projectId, groupName) {
   for (const b of d.topic_basiskonzepte ?? []) put('topic_basiskonzept', b.basiskonzept, { concrete_link: b.concrete_link ?? '' })
   for (const c of d.cross_cutting ?? []) put('cross_cutting', c.theme, { selected: true, note: c.note ?? '' })
   for (const [key, text] of Object.entries(d.reflections ?? {})) put('reflection', key, { text })
-  if (entries.length) {
-    must('work entries', await client.from('student_work_entries').upsert(entries, { onConflict: 'project_id,user_id,kind,entry_key' }))
+  // A student can rate the same link twice (p12 did); the app keeps the last answer per key,
+  // and one upsert cannot touch the same row twice, so keep the last entry per key here too.
+  const byKey = new Map(entries.map((e) => [`${e.kind}|${e.entry_key}`, e]))
+  if (byKey.size) {
+    must('work entries', await client.from('student_work_entries').upsert([...byKey.values()], { onConflict: 'project_id,user_id,kind,entry_key' }))
   }
 
   // Group sharing (the student's own choice, on their own membership row)

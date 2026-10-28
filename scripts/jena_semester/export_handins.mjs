@@ -29,6 +29,10 @@ for (const p of personas) {
   const email = SYNTH_EMAIL(p.email_local)
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true })
   const page = await context.newPage()
+  // The export must not add its own page views to the timeline it is about to download.
+  await page.route('**/rest/v1/student_activity_events**', (route) =>
+    route.request().method() === 'POST' ? route.fulfill({ status: 201, body: '' }) : route.continue()
+  )
   const pageErrors = []
   page.on('pageerror', (e) => pageErrors.push(e.message))
   try {
@@ -64,6 +68,7 @@ for (const p of personas) {
     await page.screenshot({ path: path.join(outDir, `${p.id}_FAILED.png`) }).catch(() => {})
   }
   await context.close()
+  await new Promise((r) => setTimeout(r, 8000)) // stay under the auth service's rate limit
 }
 await browser.close()
 console.log(failures ? `${failures} failed` : 'all exported', '->', outDir)
