@@ -13,6 +13,7 @@ import {
 } from '@/lib/supabase/curriculum'
 import { bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
+import { logStudentEvent } from '@/lib/supabase/student-work'
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
@@ -175,7 +176,7 @@ function exportLernzieleMarkdown(list: TopicListItem[], contentById: Map<string,
 }
 
 export default function StudentLernzielePage() {
-  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, defaultBranchId, supabase, role } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
   const navigate = useNavigate()
 
@@ -465,6 +466,7 @@ export default function StudentLernzielePage() {
       return next
     })
     await toggleFavorite(supabase, id, isFav)
+    if (role !== 'owner' && role !== 'maintainer') void logStudentEvent(supabase, project.id, 'favorite_toggled', { lernziel_id: id, now_starred: !isFav })
   }
 
   const onToggleFavoriteMethod = async (methodKey: string) => {
