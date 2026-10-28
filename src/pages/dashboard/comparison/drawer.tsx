@@ -34,6 +34,7 @@ export function RecordBlock({ record, lang }: { record: CmpRecord; lang: 'en' | 
         {y !== null ? ` · ${Math.floor(y)}` : ''}
       </div>
       {record.summary && <p className="muted" style={{ fontSize: 12, margin: '4px 0 0', lineHeight: 1.45 }}>{record.summary.length > 280 ? `${record.summary.slice(0, 279)}…` : record.summary}</p>}
+      {record.sourceUrl && <a href={record.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11 }}>{lang === 'de' ? 'Quelle' : 'Source'}</a>}
     </div>
   )
 }

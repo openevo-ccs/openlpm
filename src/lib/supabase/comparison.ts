@@ -37,11 +37,26 @@ function recordFromRow(r: any, fallbackJurisdiction: string | null): CmpRecord |
   const date = r.event_date ?? r.dateStart ?? r.adoptionDate ?? r.effective_from ?? null
   const dateEnd = r.dateEnd ?? r.targetDate ?? r.effective_until ?? null
   const text = [r.sum1, r.sum2, r.sum3].find((x: unknown) => typeof x === 'string' && x.trim()) ?? ''
+  const gf = Number(r.gradeFrom)
+  const unit = r.mandateType === 'curriculum-unit' && Number.isFinite(gf) && r.unitSubject
+    ? {
+        subject: String(r.unitSubject),
+        schoolType: r.unitSchool ?? null,
+        gradeFrom: gf,
+        gradeTo: Number.isFinite(Number(r.gradeTo)) && r.gradeTo !== null ? Number(r.gradeTo) : gf,
+        hours: r.unitHours !== null && r.unitHours !== undefined && Number.isFinite(Number(r.unitHours)) ? Number(r.unitHours) : null,
+        courseLevel: r.unitCourse ?? null,
+        tags: Array.isArray(r.unitTags) ? r.unitTags.map(String) : [],
+        titleDe: r.unitTitleDe ?? null,
+      }
+    : undefined
   return {
     id: r.id,
     title: r.title,
     type: r.record_type,
-    family: familyOf(r.record_type),
+    family: familyOf(r.record_type, r.mandateType),
+    ...(unit ? { unit } : {}),
+    ...(typeof r.sourceUrl === 'string' && /^https?:\/\//.test(r.sourceUrl) ? { sourceUrl: r.sourceUrl } : {}),
     jurisdictions,
     date: typeof date === 'string' ? date : null,
     dateEnd: typeof dateEnd === 'string' ? dateEnd : null,
@@ -119,7 +134,7 @@ export async function loadComparisonSource(
   if (repoIds.length) {
     const { data } = await db
       .from('curriculum_repository_records')
-      .select('id,project_id,title,record_type,jurisdiction,event_date,effective_from,effective_until,dateStart:content->>dateStart,dateEnd:content->>dateEnd,adoptionDate:content->>adoptionDate,targetDate:content->>targetDate,sum1:content->>summary,sum2:content->>description,sum3:content->>statementTextEn')
+      .select('id,project_id,title,record_type,jurisdiction,event_date,effective_from,effective_until,dateStart:content->>dateStart,dateEnd:content->>dateEnd,adoptionDate:content->>adoptionDate,targetDate:content->>targetDate,sum1:content->>summary,sum2:content->>description,sum3:content->>statementTextEn,sourceUrl:content->>sourceUrl,mandateType:content->>mandateType,unitSubject:content->>subject,unitSchool:content->>schoolType,gradeFrom:content->>gradeFrom,gradeTo:content->>gradeTo,unitHours:content->>hours,unitCourse:content->>courseLevel,unitTags:content->topicTags,unitTitleDe:content->>labelDe')
       .in('project_id', repoIds)
       .limit(5000)
     for (const row of data ?? []) {

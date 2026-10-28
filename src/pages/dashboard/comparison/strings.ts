@@ -71,6 +71,7 @@ const S = {
 
   // ---- record kinds
   familyMandate: ['Laws and standards', 'Gesetze und Standards'],
+  familyUnit: ['Curriculum units', 'Lehrplaneinheiten'],
   familyEvent: ['Dated events', 'Datierte Ereignisse'],
   familyActor: ['Institutions', 'Institutionen'],
   familyPrinciple: ['Principles and briefs', 'Grundsätze und Papiere'],
@@ -526,6 +527,61 @@ const S = {
   repLinksSection: ['Links', 'Verknüpfungen'],
   repDownloadMd: ['Download (Markdown)', 'Herunterladen (Markdown)'],
   repNoMatches: ['No link matches this keyword.', 'Keine Verknüpfung passt zu diesem Stichwort.'],
+
+  // ---- school years
+  navSchoolYears: ['School years', 'Schuljahre'],
+  syTitle: ['School years', 'Schuljahre'],
+  syHelp: [
+    'When each place teaches a topic: the units of its official curriculum, placed on the school years with the hours it gives them. Pick a subject and the topics to compare.',
+    'Wann welcher Ort ein Thema unterrichtet: die Einheiten seines offiziellen Lehrplans auf den Schuljahren, mit den Stunden, die er ihnen gibt. Wählen Sie ein Fach und die Themen zum Vergleichen.',
+  ],
+  syNoUnits: [
+    'No curriculum units are loaded for the places chosen yet. They exist for some German states only.',
+    'Für die gewählten Orte sind noch keine Lehrplaneinheiten geladen. Es gibt sie bisher nur für einige deutsche Länder.',
+  ],
+  sySubject: ['Subject', 'Fach'],
+  syTopics: ['Topics', 'Themen'],
+  syAllTopics: ['All topics', 'Alle Themen'],
+  syGrade: ['Grade', 'Klasse'],
+  syTotal: ['Units', 'Einheiten'],
+  syUnitsN: ['{n} units', '{n} Einheiten'],
+  syNoHoursNote: ['{n} state no hours', '{n} ohne Stundenangabe'],
+  syHoursGrid: ['Hours by school year', 'Stunden je Schuljahr'],
+  syHoursGridWhat: [
+    'Each cell is the number of hours the Lehrplan gives to the chosen topics in that school year. A unit that spans two years is split evenly. A number in brackets counts units where the Lehrplan states no hours. Click a cell to read the units.',
+    'Jede Zelle zeigt die Stunden, die der Lehrplan den gewählten Themen in diesem Schuljahr gibt. Eine Einheit über zwei Jahre wird gleichmäßig geteilt. Eine Zahl in Klammern zählt Einheiten, für die der Lehrplan keine Stunden nennt. Ein Klick auf eine Zelle zeigt die Einheiten.',
+  ],
+  syHoursGridHow: [
+    'Hours are the guide values (Zeitrichtwerte or Stundenrichtwerte) the Lehrplan gives each unit, taken from the official page. Places differ in how they set them: some leave part of the year free, so hours are comparable within a place more than between places.',
+    'Die Stunden sind die Richtwerte (Zeitrichtwerte oder Stundenrichtwerte), die der Lehrplan jeder Einheit gibt, von der offiziellen Seite übernommen. Orte setzen sie unterschiedlich an und lassen teils einen Teil des Jahres frei. Die Stunden sind daher innerhalb eines Ortes besser vergleichbar als zwischen Orten.',
+  ],
+  syFirst: ['First school year a topic appears', 'Erstes Schuljahr, in dem ein Thema vorkommt'],
+  syFirstWhat: [
+    'The earliest school year with a unit on the topic. The earliest place is in bold. A dash means no unit on the topic in the units loaded.',
+    'Das früheste Schuljahr mit einer Einheit zum Thema. Der früheste Ort ist fett. Ein Strich heißt: keine Einheit zum Thema unter den geladenen.',
+  ],
+  syFirstHow: [
+    'Taken from the lowest grade of any unit carrying the topic tag. The tags were set when each unit was recorded, from its title and text, and a person has not checked them. Only the units loaded count, which for a subject is a selection of the relevant ones.',
+    'Entnommen der niedrigsten Klasse einer Einheit mit dem Themen-Etikett. Die Etiketten wurden beim Erfassen jeder Einheit nach Titel und Text gesetzt, eine Person hat sie nicht geprüft. Es zählen nur die geladenen Einheiten, bei einem Fach also eine Auswahl der einschlägigen.',
+  ],
+  syShares: ['Where the hours fall: school stages', 'Wohin die Stunden fallen: Schulstufen'],
+  sySharesWhat: [
+    'The share of the chosen topics that falls in each stage of school. Hours are used where the Lehrplan states them, units otherwise.',
+    'Der Anteil der gewählten Themen, der auf jede Schulstufe fällt. Es zählen Stunden, wo der Lehrplan sie nennt, sonst Einheiten.',
+  ],
+  syBasisHours: ['share of hours', 'Anteil der Stunden'],
+  syBasisUnits: ['share of units (no hours stated)', 'Anteil der Einheiten (keine Stunden angegeben)'],
+  syDistance: ['How alike the places are', 'Wie ähnlich die Orte sind'],
+  syDistanceWhat: [
+    '0 means two places spread the chosen topics over the school years in the same way, 1 means they share no school year. A place with fewer than 5 units is faded: the number is a sketch.',
+    '0 heißt: Zwei Orte verteilen die gewählten Themen gleich auf die Schuljahre, 1 heißt: Sie teilen kein Schuljahr. Ein Ort mit weniger als 5 Einheiten ist blass dargestellt, die Zahl ist dann eine Skizze.',
+  ],
+  syDistanceHow: [
+    'Jensen-Shannon distance (square root of the divergence in bits) between the two places\' hours per school year, or unit counts where either place states no hours.',
+    'Jensen-Shannon-Distanz (Wurzel der Divergenz in Bit) zwischen den Stunden je Schuljahr zweier Orte, oder den Einheitenzahlen, wo einer der Orte keine Stunden nennt.',
+  ],
+  syNeedTwo: ['Two places with units are needed for a comparison.', 'Für einen Vergleich braucht es zwei Orte mit Einheiten.'],
+  syDrawerTitle: ['Grade {g}: {n} units', 'Klasse {g}: {n} Einheiten'],
   msMix: ['Kinds of record behind the links', 'Art der Einträge hinter den Verknüpfungen'],
   msMixWhat: [
     'A place can lean on laws and standards, on dated events, or on analyses. The mix shows what kind of evidence the progression is tied to there.',

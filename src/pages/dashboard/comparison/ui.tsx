@@ -6,6 +6,7 @@ import type { StringKey } from './strings'
 
 export const FAMILY_KEY: Record<RecordFamily, StringKey> = {
   mandate: 'familyMandate',
+  unit: 'familyUnit',
   event: 'familyEvent',
   actor: 'familyActor',
   principle: 'familyPrinciple',
