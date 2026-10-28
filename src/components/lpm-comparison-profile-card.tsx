@@ -17,8 +17,8 @@ const STRINGS = {
     strands: (n: number) => `${n} strand${n === 1 ? '' : 's'}`,
     domains: (n: number) => `${n} subject domain${n === 1 ? '' : 's'}`,
     grades: (n: number) => `${n} grade bands`,
-    perItem: (a: number, b: number) => `avg. ${a} performance indicators/item · avg. ${b} real-world links/item`,
-    groundingLine: (t: number, l: number, c: number) => `${t} theories · ${l} literature refs · ${c} real-world curriculum links`,
+    perItem: (a: number, b: number) => `avg. ${a} performance indicators/item · avg. ${b} curriculum links/item`,
+    groundingLine: (t: number, l: number, c: number) => `${t} theories · ${l} literature refs · ${c} links to curriculum policy records (confirmed and AI-proposed)`,
   },
   de: {
     note: 'Tiefe und Breite werden bewusst getrennt gezeigt — keine der beiden Achsen bedeutet, dass das andere Modell „weiter entwickelt" ist.',
@@ -28,8 +28,8 @@ const STRINGS = {
     strands: (n: number) => `${n} Strang${n === 1 ? '' : 'e'}`,
     domains: (n: number) => `${n} Fachbereich${n === 1 ? '' : 'e'}`,
     grades: (n: number) => `${n} Klassenstufen-Bänder`,
-    perItem: (a: number, b: number) => `Ø ${a} Lernindikatoren/Einheit · Ø ${b} Praxis-Verknüpfungen/Einheit`,
-    groundingLine: (t: number, l: number, c: number) => `${t} Theorien · ${l} Literaturverweise · ${c} reale Lehrplan-Verknüpfungen`,
+    perItem: (a: number, b: number) => `Ø ${a} Lernindikatoren/Einheit · Ø ${b} Lehrplan-Verknüpfungen/Einheit`,
+    groundingLine: (t: number, l: number, c: number) => `${t} Theorien · ${l} Literaturverweise · ${c} Verknüpfungen mit Lehrplanpolitik (bestätigt und KI-Entwurf)`,
   },
 } as const
 

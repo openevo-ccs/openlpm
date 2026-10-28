@@ -106,7 +106,7 @@ export default function ConceptsPage() {
       <h1 className="row"><Layers size={18} style={{ color: 'var(--text-muted)' }} />Concepts</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
         The concepts and concept-domain relations this LPM is organized around — browse how they
-        connect to real content, or manage the taxonomy itself.
+        connect to the parts of the progression, or manage the taxonomy itself.
       </p>
 
       <div className="row" style={{ gap: 8, marginBottom: 20 }}>
@@ -352,17 +352,27 @@ function ConceptMapTab() {
   const selectNode = (n: SchemaElement) => navigate(`/dashboard/${project.slug}/concepts/${n.id}`)
   const closeNode = () => navigate(`/dashboard/${project.slug}/concepts`)
 
+  // A synthetic space has no regional sub-projects: its sandbox sub-projects would show up as columns of dashes.
+  const isSyntheticSpace = project.epistemic_status === 'designed-thought-experiment'
+
   if (taxonomy === null) return <p className="muted">Loading…</p>
 
   return (
     <div>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        One concept structure, shared across every real regional curriculum in {hubName} — for
-        finding what a specific concept looks like across states, and for comparing how much weight
-        each state's curriculum actually gives it.
-      </p>
+      {isSyntheticSpace ? (
+        <p className="muted" style={{ marginBottom: 16 }}>
+          The concepts of {hubName}, with their definitions and how they relate. This space is a synthetic model: its vocabulary is an
+          AI-drafted design that no subject expert has reviewed yet. The coverage of official curricula is on the comparison pages.
+        </p>
+      ) : (
+        <p className="muted" style={{ marginBottom: 16 }}>
+          One concept structure, shared across every real regional curriculum in {hubName} — for
+          finding what a specific concept looks like across states, and for comparing how much weight
+          each state's curriculum actually gives it.
+        </p>
+      )}
 
-      {children.length > 1 && (
+      {children.length > 1 && !isSyntheticSpace && (
         <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
           <h3 style={{ marginTop: 0 }}>How much each state emphasizes each concept</h3>
           <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
@@ -551,7 +561,7 @@ function ConceptMapPanel({
               <>
                 <h2>Concept map</h2>
                 <p className="muted">
-                  Each circle is a concept, sized by how much real content touches it
+                  Each circle is a concept, sized by how much of the progression uses it
                   {hasHierarchy ? '' : ' and by how many relations it has'}. Click one to see what connects to
                   it. Scroll to zoom, drag to pan.
                 </p>
@@ -1179,7 +1189,7 @@ function ManageConceptsTab() {
             {!selected ? (
               <p className="muted">
                 Pick a concept on the left to see its full definition, where it came from, and how
-                it connects to real content.
+                it connects to the parts of the progression.
               </p>
             ) : (
               <ManageConceptDetail

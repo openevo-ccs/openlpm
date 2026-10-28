@@ -82,16 +82,16 @@ const S = {
   // ---- reliability and honesty
   relNone: ['No links yet in these places, so there is nothing to measure.', 'In diesen Orten gibt es noch keine Verknüpfungen, daher lässt sich nichts messen.'],
   relSmall: [
-    'Small sample: {n} links in {u} places. Treat differences as leads to check. They are not findings yet.',
-    'Kleine Stichprobe: {n} Verknüpfungen in {u} Orten. Unterschiede sind Hinweise zum Prüfen. Befunde sind es noch nicht.',
+    'Small sample: {n} {n|link|links} in {u} {u|place|places}. Treat differences as leads to check. They are not findings yet.',
+    'Kleine Stichprobe: {n} {n|Verknüpfung|Verknüpfungen} in {u} {u|Ort|Orten}. Unterschiede sind Hinweise zum Prüfen. Befunde sind es noch nicht.',
   ],
-  relFair: ['{n} links in {u} places.', '{n} Verknüpfungen in {u} Orten.'],
+  relFair: ['{n} {n|link|links} in {u} {u|place|places}.', '{n} {n|Verknüpfung|Verknüpfungen} in {u} {u|Ort|Orten}.'],
   draftBadge: ['AI-drafted, no expert review yet', 'KI-Entwurf, noch ohne fachliche Prüfung'],
 
   // ---- units
   unitNoLinks: ['No links yet', 'Noch keine Verknüpfungen'],
   unitRecordsN: ['{n} records', '{n} Einträge'],
-  unitLinksN: ['{n} links', '{n} Verknüpfungen'],
+  unitLinksN: ['{n} {n|link|links}', '{n} {n|Verknüpfung|Verknüpfungen}'],
 
   // ---- link drawer
   drawerNoLinks: ['No links here yet.', 'Hier gibt es noch keine Verknüpfungen.'],
@@ -107,8 +107,8 @@ const S = {
   drawerSuggest: ['Find records that might fit', 'Mögliche passende Einträge finden'],
   drawerSuggestions: ['Records that might fit', 'Einträge, die passen könnten'],
   drawerSuggestionsHint: [
-    'Ranked by shared words with this part of the progression, with a small lift for kinds of record people link more often. Tested on the 38 links people made earlier, the right record was in the top 10 for 53% of them (a random list gives 33%). Read a record before you link it.',
-    'Gereiht nach gemeinsamen Wörtern mit diesem Teil der Progression, mit leichtem Vorzug für Arten von Einträgen, die Menschen häufiger verknüpfen. An den 38 früher von Menschen gesetzten Verknüpfungen geprüft, stand der richtige Eintrag bei 53 % unter den ersten 10 (eine Zufallsliste ergibt 33 %). Lesen Sie einen Eintrag, bevor Sie ihn verknüpfen.',
+    'Ranked by shared words with this part of the progression, with a small lift for kinds of record people link more often. Tested on 38 earlier links (records of 2026-10-28), the right record was in the top 10 for 42% of them (a random list gives about 24%). Read a record before you link it.',
+    'Gereiht nach gemeinsamen Wörtern mit diesem Teil der Progression, mit leichtem Vorzug für Arten von Einträgen, die Menschen häufiger verknüpfen. An 38 früheren Verknüpfungen geprüft (Einträge vom 28.10.2026), stand der richtige Eintrag bei 42 % unter den ersten 10 (eine Zufallsliste ergibt etwa 24 %). Lesen Sie einen Eintrag, bevor Sie ihn verknüpfen.',
   ],
   drawerNoSuggestions: ['No record in this place shares enough words with this part.', 'Kein Eintrag in diesem Ort teilt genug Wörter mit diesem Teil.'],
   drawerSharedWords: ['Shared words', 'Gemeinsame Wörter'],
@@ -177,8 +177,8 @@ const S = {
     '{a} und {b} unterscheiden sich am stärksten darin, womit sie verknüpft sind (Abstand {d}), und mehr, als der Zufall bei solchen Stichproben erwarten lässt.',
   ],
   findNoneDistinct: [
-    'No two places differ by more than chance would give. With {n} links in the two most different places, that says as much about the sample size as about the places.',
-    'Kein Ortspaar unterscheidet sich stärker, als der Zufall erwarten lässt. Bei {n} Verknüpfungen in den beiden verschiedensten Orten sagt das ebenso viel über die Stichprobe wie über die Orte.',
+    'No two places differ by more than chance would give. With {n} {n|link|links} in the two most different places, that says as much about the sample size as about the places.',
+    'Kein Ortspaar unterscheidet sich stärker, als der Zufall erwarten lässt. Bei {n} {n|Verknüpfung|Verknüpfungen} in den beiden verschiedensten Orten sagt das ebenso viel über die Stichprobe wie über die Orte.',
   ],
   findBridge: [
     '"{title}" ties together {o} parts across {n} strands. Records like it tie the progression to curriculum policy in more than one place.',
@@ -356,7 +356,7 @@ const S = {
   ],
   msEvenness: ['Evenness (0 to 1)', 'Gleichmäßigkeit (0 bis 1)'],
   msConcentration: ['Concentration', 'Konzentration'],
-  msTooFew: ['only {n} links, too few to rate', 'nur {n} Verknüpfungen, zu wenig für eine Bewertung'],
+  msTooFew: ['only {n} {n|link|links}, too few to rate', 'nur {n} {n|Verknüpfung|Verknüpfungen}, zu wenig für eine Bewertung'],
   msDiff: ['How different the places are', 'Wie verschieden die Orte sind'],
   msDiffWhat: [
     'Two places are close when their links land on the same rows in the same proportions. 0 means identical patterns, 1 means no row in common. Places are ordered so similar ones sit together.',
@@ -384,8 +384,8 @@ const S = {
     'Welche Zeilen ein Ort stärker oder schwächer verknüpft, als alle Orte zusammen erwarten ließen. ▲ heißt deutlich mehr, ▼ deutlich weniger.',
   ],
   msEmphHow: [
-    'Each cell compares its count with what the row and column totals predict if places and rows were unrelated, using adjusted standardized residuals. Beyond ±2 a cell is marked. The summary above uses mutual information: how many bits the place tells you about the row, with the small-sample bias removed, scaled to 0 to 1 and compared with 400 shuffles.',
-    'Jede Zelle vergleicht ihre Zahl mit dem, was die Zeilen- und Spaltensummen erwarten ließen, wenn Orte und Zeilen unabhängig wären (angepasste standardisierte Residuen). Jenseits von ±2 wird die Zelle markiert. Die Zusammenfassung oben nutzt die Transinformation: wie viele Bit der Ort über die Zeile verrät, um die Verzerrung bei kleinen Stichproben bereinigt, auf 0 bis 1 skaliert und mit 400 Mischungen verglichen.',
+    'Each cell compares its count with what the row and column totals predict if places and rows were unrelated, using adjusted standardized residuals. Beyond ±2 a cell is marked. The summary above uses mutual information: how many bits the place tells you about the row, with the small-sample bias removed, scaled to 0 to 1 and compared with 300 shuffles.',
+    'Jede Zelle vergleicht ihre Zahl mit dem, was die Zeilen- und Spaltensummen erwarten ließen, wenn Orte und Zeilen unabhängig wären (angepasste standardisierte Residuen). Jenseits von ±2 wird die Zelle markiert. Die Zusammenfassung oben nutzt die Transinformation: wie viele Bit der Ort über die Zeile verrät, um die Verzerrung bei kleinen Stichproben bereinigt, auf 0 bis 1 skaliert und mit 300 Mischungen verglichen.',
   ],
   msMiNone: ['Not enough links to tell.', 'Zu wenige Verknüpfungen für eine Aussage.'],
   msMiSummary: [
@@ -597,7 +597,9 @@ export function makeT(lang: Lang): Translate {
   return (key, params) => {
     const raw = (S[key] as readonly [string, string])[i]
     if (!params) return raw
-    return raw.replace(/\{(\w+)\}/g, (_, k) => (params[k] !== undefined ? String(params[k]) : `{${k}}`))
+    // {n|link|links} picks the singular form when n is 1.
+    const withPlurals = raw.replace(/\{(\w+)\|([^|}]*)\|([^}]*)\}/g, (_, k, one, many) => (Number(params[k]) === 1 ? one : many))
+    return withPlurals.replace(/\{(\w+)\}/g, (_, k) => (params[k] !== undefined ? String(params[k]) : `{${k}}`))
   }
 }
 

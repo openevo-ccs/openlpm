@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { GitBranch, Plus, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { Chip } from '@/components/chip'
+import { ReviewStateChip, useReviewSummaries } from '@/components/review-state-chip'
 import { getFullThread, type FullThread, type ThreadRow } from '@/lib/supabase/curriculum'
 import { addParentStrand, listChildStrands, listParentStrands, removeParentStrand } from '@/lib/supabase/strands'
 import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
@@ -24,6 +25,7 @@ export default function StrandsPage() {
   const { strandId } = useParams<{ strandId?: string }>()
   const navigate = useNavigate()
   const [strands, setStrands] = useState<ThreadRow[] | null>(null)
+  const reviewOf = useReviewSummaries(supabase, project.id, 'lpm_thread')
 
   const reload = () => {
     supabase
@@ -79,7 +81,10 @@ export default function StrandsPage() {
               >
                 <span className="row" style={{ justifyContent: 'space-between' }}>
                   {s.title}
-                  <Chip status={s.status} />
+                  <span className="row" style={{ gap: 4 }}>
+                    <Chip status={s.status} />
+                    <ReviewStateChip summary={reviewOf(s.id)} />
+                  </span>
                 </span>
               </button>
             ))}

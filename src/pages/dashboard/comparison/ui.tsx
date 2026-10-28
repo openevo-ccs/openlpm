@@ -122,8 +122,9 @@ export function ScopeBar({ show = {} }: { show?: { countries?: boolean; level?: 
 
 /** Plain-language statement of how much data stands behind a number. */
 export function ReliabilityNote() {
-  const { measures, t, proposedShare } = useComparison()
-  const n = measures.nLinks
+  const { measures, t, proposedShare, links } = useComparison()
+  // Distinct links, the same number the Overview tile shows. A link counted under two places adds to measures.nLinks twice.
+  const n = links.length
   const u = measures.unitIds.length
   const text = measures.reliability === 'none' ? t('relNone') : measures.reliability === 'small' ? t('relSmall', { n, u }) : t('relFair', { n, u })
   return (

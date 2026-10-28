@@ -12,6 +12,8 @@
     "type-check": "tsc -b --noEmit",
     "test:time": "node scripts/test_time_model.mjs",
     "test:comparison": "node scripts/test_comparison_model.mjs",
+    "test:review-state": "node scripts/test_review_state.mjs",
+    "test:dashboard-views": "node scripts/test_dashboard_views.mjs",
     "read-feedback": "node scripts/read-feedback.mjs",
     "docs:check": "node scripts/check_docs_freshness.mjs",
     "self-model:check": "python ../lab_manager/scripts/self_model_check.py self-model/manifest.json --root . --render docs/architecture/self-model.generated.md"

@@ -29,6 +29,7 @@ export const DASHBOARD_PAGES: DashboardPageDescriptor[] = [
   // actual rendered label, so one static English name here is correct even
   // though the real sidebar sometimes shows German.
   { key: 'calendar', label: 'Calendar' },
+  { key: 'time', label: 'Time' },
   { key: 'literature', label: 'Literature' },
   { key: 'review', label: 'Review' },
   { key: 'discussions', label: 'Discussions' },

@@ -39,6 +39,8 @@
   --primary-rgb: 0 108 102;      /* brand-teal */
   --good-rgb: 12 163 12;
   --warning-rgb: 250 178 25;
+  /* Amber as TEXT: the bright amber above is 1.75:1 on the light page. This darker one is 5.8:1 on the page and 5.4:1 on the amber tint. */
+  --warning-text: #8a5700;
   --critical-rgb: 208 59 59;
 
   /* A small rotating palette for the Concepts map (concepts-page.tsx) --
@@ -96,6 +98,7 @@
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
     --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+    --warning-text: rgb(var(--warning-rgb));
     --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
     --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
   }
@@ -107,6 +110,7 @@
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
   --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+  --warning-text: rgb(var(--warning-rgb));
   --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
   --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
 }
@@ -287,7 +291,7 @@ code {
   background: var(--surface-1); color: var(--text-secondary);
 }
 .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.chip-draft, .chip-proposed { color: var(--warning); border-color: var(--warning); background: rgb(var(--warning-rgb) / 0.12); }
+.chip-draft, .chip-proposed { color: var(--warning-text); border-color: var(--warning); background: rgb(var(--warning-rgb) / 0.12); }
 .chip-progress, .chip-submitted, .chip-under_review, .chip-discussed, .chip-pending, .chip-active { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
 .chip-good, .chip-accepted, .chip-canonical, .chip-promoted, .chip-completed { color: var(--good); border-color: var(--good); background: rgb(var(--good-rgb) / 0.12); }
 .chip-muted, .chip-rejected, .chip-deprecated, .chip-archived, .chip-merged, .chip-discontinued, .chip-paused, .chip-planning { color: var(--text-muted); }

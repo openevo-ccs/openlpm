@@ -148,6 +148,8 @@ export interface ViewerContext {
   role: ProjectMemberRole
   joinedVia: string | null
   groupIds: string[]
+  /** The browser language (navigator.language). Used only to choose between views that are otherwise equal. */
+  language?: string
 }
 
 export interface ViewResolution {
@@ -168,6 +170,15 @@ const TARGET_SPECIFICITY: Record<ViewAssignmentTargetType, number> = {
   group: 1,
   role: 2,
   join_method: 3,
+}
+
+/**
+ * Chooses between equal comparison views by the browser language: a German browser gets the German view, anything else the
+ * English cross-national view. Returns undefined when the views are not the comparison templates.
+ */
+export function pickByBrowserLanguage(views: DashboardView[], language: string | undefined): DashboardView | undefined {
+  const wanted = (language ?? '').toLowerCase().startsWith('de') ? '-germany-de' : '-cross-national-en'
+  return views.find((v) => v.kind === 'template' && (v.template_id ?? '').endsWith(wanted))
 }
 
 export function resolveViewerViews(
@@ -194,7 +205,12 @@ export function resolveViewerViews(
     .sort((a, b) => a.specificity - b.specificity)
 
   if (matched.length > 0) {
-    const best = matched[0].view
+    // Views matched at the same specificity used to win by the order of the assignment rows, which gave Bio-Core a German first
+    // screen and Interdisciplinary an English one. Now: a forced view, then the project's default view, then the browser language,
+    // then the first.
+    const top = matched.filter((m) => m.specificity === matched[0].specificity).map((m) => m.view)
+    const best =
+      top.find((v) => v.is_forced) ?? top.find((v) => v.is_default) ?? pickByBrowserLanguage(top, viewer.language) ?? top[0]
     if (best.is_forced) return { forcedView: best, defaultViewId: best.id, eligibleViews: [] }
     const eligibleViews = Array.from(new Map(matched.map((m) => [m.view.id, m.view])).values())
     return { forcedView: null, defaultViewId: best.id, eligibleViews }
