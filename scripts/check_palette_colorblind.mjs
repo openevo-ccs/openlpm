@@ -3,7 +3,7 @@
 // then reports the smallest CIEDE2000 distance between any two of the six colors,
 // plus each color's contrast ratio against the page background (WCAG, 3:1 is the
 // minimum for non-text graphics).
-const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+export const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
 const toLin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)
 const toSrgb = (c) => (c <= 0.0031308 ? c * 12.92 : 1.055 * c ** (1 / 2.4) - 0.055)
 const MACHADO = {
@@ -14,11 +14,11 @@ const MACHADO = {
 }
 const mul = (m, v) => m.map((r) => r[0] * v[0] + r[1] * v[1] + r[2] * v[2])
 const clamp = (x) => Math.min(1, Math.max(0, x))
-function sim(h, kind) {
+export function sim(h, kind) {
   const lin = hex(h).map(toLin)
   return mul(MACHADO[kind], lin).map(clamp)
 }
-function lab(lin) {
+export function lab(lin) {
   const [r, g, b] = lin
   const x = (0.4124564 * r + 0.3575761 * g + 0.1804375 * b) / 0.95047
   const y = 0.2126729 * r + 0.7151522 * g + 0.072175 * b
@@ -27,7 +27,7 @@ function lab(lin) {
   const [fx, fy, fz] = [f(x), f(y), f(z)]
   return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)]
 }
-function de2000(l1, l2) {
+export function de2000(l1, l2) {
   const [L1, a1, b1] = l1, [L2, a2, b2] = l2
   const rad = Math.PI / 180
   const C1 = Math.hypot(a1, b1), C2 = Math.hypot(a2, b2), Cb = (C1 + C2) / 2
@@ -51,7 +51,7 @@ function de2000(l1, l2) {
   return Math.sqrt((dLp / Sl) ** 2 + (dCp / Sc) ** 2 + (dHp / Sh) ** 2 + Rt * (dCp / Sc) * (dHp / Sh))
 }
 const lumin = (h) => { const [r, g, b] = hex(h).map(toLin); return 0.2126 * r + 0.7152 * g + 0.0722 * b }
-const contrast = (a, b) => { const [x, y] = [lumin(a), lumin(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05) }
+export const contrast = (a, b) => { const [x, y] = [lumin(a), lumin(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05) }
 
 /** Prints one summary line and returns the single worst pair across all four vision types. */
 export function check(name, palette, bg) {
@@ -60,7 +60,7 @@ export function check(name, palette, bg) {
   for (const kind of Object.keys(MACHADO)) {
     const labs = palette.map((h) => lab(sim(h, kind)))
     let min = 999, pair = ''
-    for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+    for (let i = 0; i < palette.length; i++) for (let j = i + 1; j < palette.length; j++) {
       const d = de2000(labs[i], labs[j])
       if (d < min) { min = d; pair = `${i + 1}-${j + 1}` }
     }
@@ -97,6 +97,18 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   let failed = false
   for (const [name, colors, bg] of [['light', light, '#ffffff'], ['dark', dark, '#0d0d0d']]) {
     if (colors.some((c) => !c)) { console.error(`Could not read all six --map colors for ${name}`); process.exit(2) }
+    const worst = check(name, colors, bg)
+    const faintest = Math.min(...colors.map((c) => contrast(c, bg)))
+    if (faintest < MIN_CONTRAST - 0.005) { failed = true; console.error(`FAIL ${name}: faintest color has contrast ${faintest.toFixed(2)} against ${bg} (needs ${MIN_CONTRAST})`) }
+    if (worst.d < MIN_DISTANCE) { failed = true; console.error(`FAIL ${name}: ${worst.kind} distance ${worst.d.toFixed(1)} for colors ${worst.pair} (needs ${MIN_DISTANCE})`) }
+  }
+  // The place colors of the comparison views (Germany, United States, India, neutral).
+  const grabPlace = (from) => ['de', 'us', 'in', 'other'].map((k) => css2.slice(from).match(new RegExp('--place-' + k + ':\\s*(#[0-9a-fA-F]{6})'))?.[1])
+  const css2 = readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src', 'globals.css'), 'utf8')
+  const placeLight = grabPlace(css2.indexOf('--place-de:'))
+  const placeDark = grabPlace(css2.indexOf(':root[data-theme="dark"]'))
+  for (const [name, colors, bg] of [['place-light', placeLight, '#ffffff'], ['place-dark', placeDark, '#0d0d0d']]) {
+    if (colors.some((c) => !c)) { console.error(`Could not read all four --place colors for ${name}`); failed = true; continue }
     const worst = check(name, colors, bg)
     const faintest = Math.min(...colors.map((c) => contrast(c, bg)))
     if (faintest < MIN_CONTRAST - 0.005) { failed = true; console.error(`FAIL ${name}: faintest color has contrast ${faintest.toFixed(2)} against ${bg} (needs ${MIN_CONTRAST})`) }

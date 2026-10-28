@@ -10,6 +10,20 @@ export interface StudentViewTemplate {
   description: string
 }
 
+// The Jena pilot's own view plus, for each of the four synthetic spaces, three
+// comparison views: one per country (all of that country's states in one place)
+// and one cross-national view. Rebuilt 2026-10-28; before that the US was split
+// over two views (New York / California and Florida / Pennsylvania / Tennessee)
+// and Germany covered only Sachsen and Thüringen.
+export const COMPARISON_SPACES = [
+  { key: 'bio-core', label: 'Bio-Core' },
+  { key: 'social-core', label: 'Social-Core' },
+  { key: 'computational-core', label: 'Computational-Core' },
+  { key: 'interdisciplinary', label: 'Interdisciplinary' },
+] as const
+
+export type ComparisonSpaceKey = (typeof COMPARISON_SPACES)[number]['key']
+
 export const STUDENT_VIEW_TEMPLATES: StudentViewTemplate[] = [
   {
     id: 'jena-biologiedidaktik-de',
@@ -17,109 +31,103 @@ export const STUDENT_VIEW_TEMPLATES: StudentViewTemplate[] = [
     description:
       'German-language Lernziele/Basiskonzepte/KI-Prompt-Generator view modeled on EvoMentor DE v1.2, built for the Uni Jena Winter Semester 2026 pilot.',
   },
-  {
-    id: 'bio-core-sachsen-thueringen-de',
-    label: 'Sachsen/Thüringen (Deutsch)',
-    description:
-      'German-language view connecting Bio-Core LPM (Synthetic)’s strands to real Sachsen/Thüringen curriculum-policy content, with room to comment on each connection.',
-  },
-  {
-    id: 'bio-core-us-ny-ca-en',
-    label: 'New York / California (US)',
-    description:
-      'English-language view connecting Bio-Core LPM (Synthetic)’s strands to real New York/California curriculum-policy content, with room to comment on each connection.',
-  },
-  {
-    id: 'interdisciplinary-sachsen-thueringen-de',
-    label: 'Sachsen/Thüringen (Deutsch)',
-    description:
-      'German-language view connecting Interdisciplinary LPM (Synthetic)’s strands to real Sachsen/Thüringen curriculum-policy content, with room to comment on each connection.',
-  },
-  {
-    id: 'interdisciplinary-us-ny-ca-en',
-    label: 'New York / California (US)',
-    description:
-      'English-language view connecting Interdisciplinary LPM (Synthetic)’s strands to real New York/California curriculum-policy content, with room to comment on each connection.',
-  },
-  {
-    id: 'bio-core-us-fl-pa-tn-en',
-    label: 'Florida / Pennsylvania / Tennessee (US)',
-    description:
-      'English-language view connecting Bio-Core LPM (Synthetic)’s strands to real Florida/Pennsylvania/Tennessee curriculum-policy content, with room to comment on each connection.',
-  },
-  {
-    id: 'interdisciplinary-us-fl-pa-tn-en',
-    label: 'Florida / Pennsylvania / Tennessee (US)',
-    description:
-      'English-language view connecting Interdisciplinary LPM (Synthetic)’s strands to real Florida/Pennsylvania/Tennessee curriculum-policy content, with room to comment on each connection.',
-  },
+  ...COMPARISON_SPACES.flatMap(({ key, label }): StudentViewTemplate[] => [
+    {
+      id: `${key}-germany-de`,
+      label: 'Deutschland (Deutsch)',
+      description: `German-language view comparing ${label} LPM (Synthetic) with the curriculum policy of the German states: coverage map, network, timeline, flows, measures, side-by-side comparison and curation tools.`,
+    },
+    {
+      id: `${key}-united-states-en`,
+      label: 'United States (English)',
+      description: `English-language view comparing ${label} LPM (Synthetic) with the curriculum policy of the US states in one place: coverage map, network, timeline, flows, measures, side-by-side comparison and curation tools.`,
+    },
+    {
+      id: `${key}-cross-national-en`,
+      label: 'Cross-national comparison (English)',
+      description: `English-language view comparing ${label} LPM (Synthetic) across countries, Germany and the United States to start. More countries can be switched on once their records exist.`,
+    },
+  ]),
 ]
+
+// Older template ids that may still be stored on a view row or a project. They open the matching new view.
+const LEGACY_TEMPLATE_ALIASES: Record<string, string> = {
+  'bio-core-sachsen-thueringen-de': 'bio-core-germany-de',
+  'bio-core-us-ny-ca-en': 'bio-core-united-states-en',
+  'bio-core-us-fl-pa-tn-en': 'bio-core-united-states-en',
+  'interdisciplinary-sachsen-thueringen-de': 'interdisciplinary-germany-de',
+  'interdisciplinary-us-ny-ca-en': 'interdisciplinary-united-states-en',
+  'interdisciplinary-us-fl-pa-tn-en': 'interdisciplinary-united-states-en',
+}
 
 export function getStudentViewTemplate(id: string | null): StudentViewTemplate | null {
   if (!id) return null
-  return STUDENT_VIEW_TEMPLATES.find((t) => t.id === id) ?? null
+  return STUDENT_VIEW_TEMPLATES.find((t) => t.id === (LEGACY_TEMPLATE_ALIASES[id] ?? id)) ?? null
 }
 
-// The 4 new 2026-10-20 templates above are all the same kind of thing --
-// a Learning Goals explorer plus a Curriculum Connections workspace for
-// one project, scoped to one language and one set of real-world Curriculum
-// Repository projects -- so they share one config lookup rather than four
-// hand-forked page sets. The Jena template predates this and keeps its own
-// bespoke nav/pages (student-nav.tsx, student-lernziele-page.tsx etc).
+// ---- Comparison views: countries and their repositories ---------------------------
+
+/** Curriculum Repository project slugs per country. Adding a country is one line here and its records. */
+export const COUNTRY_REPOSITORIES: Record<string, string[]> = {
+  DE: [
+    'germany-curriculum-repository',
+    'saxony-curriculum-repository',
+    'thuringia-curriculum-repository',
+    'saxony-anhalt-curriculum-repository',
+  ],
+  US: [
+    'united-states-curriculum-repository',
+    'new-york-curriculum-repository',
+    'california-curriculum-repository',
+    'florida-curriculum-repository',
+    'pennsylvania-curriculum-repository',
+    'tennessee-curriculum-repository',
+    'us-evolution-education-curriculum-repository',
+  ],
+  IN: [
+    'india-curriculum-repository',
+    'kerala-curriculum-repository',
+    'karnataka-curriculum-repository',
+    'maharashtra-curriculum-repository',
+  ],
+}
+
 export interface CurriculumConnectionsViewConfig {
   language: 'de' | 'en'
-  // Curriculum Repository project slugs this view's "Add connection"
-  // picker searches, in display order.
+  /** One country (all its states side by side) or several (country against country, states on request). */
+  scope: 'country' | 'cross-national'
+  /** The countries switched on when the view opens. */
+  countries: string[]
+  /** Every country the view can offer. Extra ones appear as switches in the cross-national view. */
+  availableCountries: string[]
+  /** All repository slugs the view reads from. */
   regionSlugs: string[]
   regionLabel: string
+  space: ComparisonSpaceKey
 }
 
-export const CURRICULUM_CONNECTIONS_VIEWS: Record<string, CurriculumConnectionsViewConfig> = {
-  'bio-core-sachsen-thueringen-de': {
-    language: 'de',
-    regionSlugs: ['germany-curriculum-repository', 'saxony-curriculum-repository', 'thuringia-curriculum-repository'],
-    regionLabel: 'Sachsen/Thüringen',
-  },
-  'interdisciplinary-sachsen-thueringen-de': {
-    language: 'de',
-    regionSlugs: ['germany-curriculum-repository', 'saxony-curriculum-repository', 'thuringia-curriculum-repository'],
-    regionLabel: 'Sachsen/Thüringen',
-  },
-  'bio-core-us-ny-ca-en': {
-    language: 'en',
-    regionSlugs: ['united-states-curriculum-repository', 'new-york-curriculum-repository', 'california-curriculum-repository'],
-    regionLabel: 'New York / California',
-  },
-  'interdisciplinary-us-ny-ca-en': {
-    language: 'en',
-    regionSlugs: ['united-states-curriculum-repository', 'new-york-curriculum-repository', 'california-curriculum-repository'],
-    regionLabel: 'New York / California',
-  },
-  'bio-core-us-fl-pa-tn-en': {
-    language: 'en',
-    regionSlugs: [
-      'united-states-curriculum-repository',
-      'florida-curriculum-repository',
-      'pennsylvania-curriculum-repository',
-      'tennessee-curriculum-repository',
-      'us-evolution-education-curriculum-repository',
-    ],
-    regionLabel: 'Florida / Pennsylvania / Tennessee',
-  },
-  'interdisciplinary-us-fl-pa-tn-en': {
-    language: 'en',
-    regionSlugs: [
-      'united-states-curriculum-repository',
-      'florida-curriculum-repository',
-      'pennsylvania-curriculum-repository',
-      'tennessee-curriculum-repository',
-      'us-evolution-education-curriculum-repository',
-    ],
-    regionLabel: 'Florida / Pennsylvania / Tennessee',
-  },
+function configFor(space: ComparisonSpaceKey, scope: CurriculumConnectionsViewConfig['scope'], country?: string): CurriculumConnectionsViewConfig {
+  const available = scope === 'country' ? [country!] : ['DE', 'US', 'IN']
+  return {
+    language: scope === 'country' && country === 'DE' ? 'de' : 'en',
+    scope,
+    countries: scope === 'country' ? [country!] : ['DE', 'US'],
+    availableCountries: available,
+    regionSlugs: available.flatMap((c) => COUNTRY_REPOSITORIES[c] ?? []),
+    regionLabel: scope === 'country' ? (country === 'DE' ? 'Deutschland' : 'United States') : 'Germany and the United States',
+    space,
+  }
 }
+
+export const CURRICULUM_CONNECTIONS_VIEWS: Record<string, CurriculumConnectionsViewConfig> = Object.fromEntries(
+  COMPARISON_SPACES.flatMap(({ key }) => [
+    [`${key}-germany-de`, configFor(key, 'country', 'DE')],
+    [`${key}-united-states-en`, configFor(key, 'country', 'US')],
+    [`${key}-cross-national-en`, configFor(key, 'cross-national')],
+  ])
+)
 
 export function getCurriculumConnectionsViewConfig(templateId: string | null): CurriculumConnectionsViewConfig | null {
   if (!templateId) return null
-  return CURRICULUM_CONNECTIONS_VIEWS[templateId] ?? null
+  return CURRICULUM_CONNECTIONS_VIEWS[LEGACY_TEMPLATE_ALIASES[templateId] ?? templateId] ?? null
 }

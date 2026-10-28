@@ -43,11 +43,17 @@ import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
 import StudentPromptPage from '@/pages/dashboard/student/student-prompt-page'
-import CurriculumConnectionsPage from '@/pages/dashboard/student/curriculum-connections-page'
-import CurriculumNetworkPage from '@/pages/dashboard/student/curriculum-network-page'
-import CurriculumRegionsPage from '@/pages/dashboard/student/curriculum-regions-page'
-import CurriculumComparisonPage from '@/pages/dashboard/student/curriculum-comparison-page'
-import CurriculumReportPage from '@/pages/dashboard/student/curriculum-report-page'
+import { ComparisonOnly } from '@/pages/dashboard/comparison/context'
+import ComparisonOverviewPage from '@/pages/dashboard/comparison/overview-page'
+import ComparisonCoveragePage from '@/pages/dashboard/comparison/coverage-page'
+import ComparisonNetworkPage from '@/pages/dashboard/comparison/network-page'
+import ComparisonTimelinePage from '@/pages/dashboard/comparison/timeline-page'
+import ComparisonFlowsPage from '@/pages/dashboard/comparison/flows-page'
+import ComparisonMeasuresPage from '@/pages/dashboard/comparison/measures-page'
+import ComparisonSideBySidePage from '@/pages/dashboard/comparison/side-by-side-page'
+import ComparisonCuratePage from '@/pages/dashboard/comparison/curate-page'
+import ComparisonReportPage from '@/pages/dashboard/comparison/report-page'
+import ComparisonSpacesPage from '@/pages/dashboard/comparison/spaces-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -127,11 +133,21 @@ export default function App() {
             <Route path="basiskonzepte" element={<StudentBasiskonzeptePage />} />
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
-            <Route path="curriculum-connections" element={<CurriculumConnectionsPage />} />
-            <Route path="curriculum-network" element={<CurriculumNetworkPage />} />
-            <Route path="curriculum-regions" element={<CurriculumRegionsPage />} />
-            <Route path="curriculum-comparison" element={<CurriculumComparisonPage />} />
-            <Route path="curriculum-report" element={<CurriculumReportPage />} />
+            <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
+            <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
+            <Route path="timeline" element={<ComparisonOnly><ComparisonTimelinePage /></ComparisonOnly>} />
+            <Route path="flows" element={<ComparisonOnly><ComparisonFlowsPage /></ComparisonOnly>} />
+            <Route path="measures" element={<ComparisonOnly><ComparisonMeasuresPage /></ComparisonOnly>} />
+            <Route path="side-by-side" element={<ComparisonOnly><ComparisonSideBySidePage /></ComparisonOnly>} />
+            <Route path="spaces" element={<ComparisonOnly><ComparisonSpacesPage /></ComparisonOnly>} />
+            <Route path="curate" element={<ComparisonOnly><ComparisonCuratePage /></ComparisonOnly>} />
+            <Route path="report" element={<ComparisonOnly><ComparisonReportPage /></ComparisonOnly>} />
+            {/* Addresses the comparison views used before the 2026-10-28 rebuild. */}
+            <Route path="curriculum-connections" element={<ComparisonOnly><ComparisonOverviewPage /></ComparisonOnly>} />
+            <Route path="curriculum-network" element={<Navigate to="../network" replace />} />
+            <Route path="curriculum-regions" element={<Navigate to="../coverage" replace />} />
+            <Route path="curriculum-comparison" element={<Navigate to="../spaces" replace />} />
+            <Route path="curriculum-report" element={<Navigate to="../report" replace />} />
             <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />

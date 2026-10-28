@@ -547,7 +547,7 @@ function StrandPairPanel({
 // answered at the lpm_comparative_links RLS layer itself ("either side's
 // members can view/edit", migration 143). KNOWN_COMPARISON_PAIRS itself now lives in
 // comparative-analysis.ts, shared with the German/US custom views' own
-// "Vergleich" tab (curriculum-connections-page.tsx) -- added 2026-10-20 so
+// "Vergleich" tab (comparison/spaces-page.tsx) -- added 2026-10-20 so
 // both read one source of truth instead of two copies.
 
 

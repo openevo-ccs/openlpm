@@ -73,6 +73,20 @@
   --map-4: #755323;
   --map-5: #c68724;
   --map-6: #a96fc1;
+  /* Places in the comparison views (Germany, United States, India, anything else).
+     Chosen by a search over hues so every pair stays 24.9 apart under normal vision and under
+     simulated protanopia, deuteranopia and tritanopia (dark mode 21.8), with 3:1 contrast against
+     the background. Re-run scripts/check_palette_colorblind.mjs after editing: it checks these too. */
+  --place-de: #3c1c9c;
+  --place-us: #8e2929;
+  --place-in: #ae8f32;
+  --place-other: #6f7d8c;
+  /* Grade bands run light to dark with the school years. They are a sequence, so one hue changes in lightness. */
+  --band-1: #9bd3cc;
+  --band-2: #5fb8ae;
+  --band-3: #2f8f85;
+  --band-4: #14625b;
+  --band-span: #8b96a3;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -82,6 +96,8 @@
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
     --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+    --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
+    --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
   }
 }
 :root[data-theme="dark"] {
@@ -91,6 +107,8 @@
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
   --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+  --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
+  --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
 }
 
 * { box-sizing: border-box; }
