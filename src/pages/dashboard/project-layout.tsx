@@ -19,6 +19,7 @@ import { ProjectNav, type ProjectNavItem } from '@/components/project-nav'
 import { LpmSearchBar } from '@/components/lpm-search-bar'
 import { ProjectIntroBanner } from '@/components/project-intro-banner'
 import { StudentNav } from './student/student-nav'
+import { ComparisonProvider } from './comparison/context'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 
 export interface ProjectOutletContext {
@@ -41,11 +42,15 @@ export interface ProjectOutletContext {
   isStudentView: boolean
   // The active Dashboard View's own template_id when isStudentView is true,
   // else null -- lets a shared template page (e.g.
-  // curriculum-connections-page.tsx) know which of several templates it's
+  // comparison/context.tsx) know which of several templates it's
   // rendering for, and lets StudentNav/this shell pick the right language's
   // chrome strings instead of always assuming German (the Jena pilot's own
   // language, hardcoded here before any other template existed).
   templateId: string | null
+  // False until the project's views and their assignments have loaded. A page that
+  // only makes sense inside one view waits for this before deciding it is in the
+  // wrong view (comparison/context.tsx's ComparisonOnly does).
+  viewsReady: boolean
 }
 
 // Dashboard Custom Views (migration 109): real feedback 63321a17 replaced
@@ -87,6 +92,7 @@ export default function ProjectLayout() {
   const [userId, setUserId] = useState<string | null>(null)
   const [views, setViews] = useState<DashboardView[]>([])
   const [assignments, setAssignments] = useState<DashboardViewAssignment[]>([])
+  const [viewsReady, setViewsReady] = useState(false)
   const [myGroupIds, setMyGroupIds] = useState<string[]>([])
   const [previewChoice, setPreviewChoice] = useState<string | null>(null)
   // Not one of the fixed 10 sidebar items below -- only shown for a project
@@ -185,12 +191,18 @@ export default function ProjectLayout() {
   useEffect(() => {
     setViews([])
     setAssignments([])
+    setViewsReady(false)
     if (!state?.project?.id) return
-    listDashboardViews(supabase, state.project.id).then((vs) => {
+    let alive = true
+    listDashboardViews(supabase, state.project.id).then(async (vs) => {
+      if (!alive) return
       setViews(vs)
-      if (vs.length > 0) listDashboardViewAssignments(supabase, vs.map((v) => v.id)).then(setAssignments)
-      else setAssignments([])
+      const asg = vs.length > 0 ? await listDashboardViewAssignments(supabase, vs.map((v) => v.id)) : []
+      if (!alive) return
+      setAssignments(asg)
+      setViewsReady(true)
     })
+    return () => { alive = false }
   }, [supabase, state?.project?.id])
 
   useEffect(() => {
@@ -382,7 +394,7 @@ export default function ProjectLayout() {
     ? standardNavItems.filter((item) => item.key === 'dashboard' || standardViewPageKeys.has(item.key))
     : standardNavItems
 
-  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView, templateId }
+  const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView, templateId, viewsReady }
   const isSpace = !project.parent_project_id
 
   if (isStudentView) {
@@ -429,7 +441,13 @@ export default function ProjectLayout() {
               </button>
             </div>
           )}
-          <Outlet context={context} />
+          {getCurriculumConnectionsViewConfig(templateId) ? (
+            <ComparisonProvider context={context}>
+              <Outlet context={context} />
+            </ComparisonProvider>
+          ) : (
+            <Outlet context={context} />
+          )}
         </div>
       </div>
     )

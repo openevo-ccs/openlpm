@@ -2,7 +2,7 @@ import type { ProjectComparisonProfile } from '@/lib/supabase/comparative-analys
 
 // Shared by coherence-page.tsx's "Across curricula" tab (English, researcher
 // view) and the German/US custom views' own "Vergleich"/"Comparison" tab
-// (curriculum-connections-page.tsx) -- one real component instead of two
+// (comparison/spaces-page.tsx) -- one real component instead of two
 // near-duplicates. Depth and breadth are kept as two separate fields,
 // never combined into one score -- Dustin's own explicit 2026-10-20
 // decision. Bio-Core's narrower scope is a deliberate feature of what DCR
