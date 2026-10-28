@@ -71,8 +71,11 @@ function Inner() {
     const rec = recordsById.get(b.recordId)
     if (rec) findings.push({ text: t('findBridge', { title: rec.title.length > 90 ? `${rec.title.slice(0, 89)}…` : rec.title, n: b.strands, o: b.objects }), to: `${base}/network`, toLabel: t('navNetwork') })
   }
-  if (network.isolated.length > 0 && links.length > 0) {
-    findings.push({ text: t('findIsolated', { n: network.isolated.length, total: objects.length }), to: `${base}/network`, toLabel: t('navNetwork') })
+  // Count grade-band parts only, the same denominator as the tile above (strands are not parts).
+  const subPartIds = new Set(subParts.map((o) => o.id))
+  const isolatedParts = network.isolated.filter((id) => subPartIds.has(id))
+  if (isolatedParts.length > 0 && links.length > 0) {
+    findings.push({ text: t('findIsolated', { n: isolatedParts.length, total: subParts.length }), to: `${base}/network`, toLabel: t('navNetwork') })
   }
 
   return (
@@ -82,7 +85,7 @@ function Inner() {
       <ReliabilityNote />
 
       <div className="cmp-stats">
-        <Stat value={objects.length} label={t('statItems')} sub={t('statItemsSub', { n: strandRows.length })} />
+        <Stat value={subParts.length} label={t('statItems')} sub={t('statItemsSub', { n: strandRows.length })} />
         <Stat value={`${units.length - emptyUnits.length}/${units.length}`} label={t('statPlaces')} sub={t('statPlacesSub')} />
         <Stat value={scopeRecords.length} label={t('statRecords')} />
         <Stat value={links.length} label={t('statLinks')} sub={c.proposedShare > 0 ? t('statLinksSub', { p: Math.round(c.proposedShare * 100) }) : undefined} />

@@ -6,7 +6,7 @@
 .cmp-help { max-width: 720px; margin: 6px 0 0; line-height: 1.5; }
 .cmp-draft-badge {
   display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 1px 7px;
-  border: 1px solid var(--warning); color: var(--warning); border-radius: 10px; font-size: 10.5px;
+  border: 1px solid var(--warning); color: var(--warning-text); border-radius: 10px; font-size: 10.5px;
 }
 
 /* ---- scope bar ---- */
@@ -42,7 +42,7 @@
 
 .cmp-reliability { display: flex; gap: 6px; align-items: flex-start; font-size: 12px; margin: 0 0 12px; color: var(--text-secondary); }
 .cmp-reliability svg { flex: none; margin-top: 2px; }
-.cmp-reliability.small, .cmp-reliability.none { color: var(--warning); }
+.cmp-reliability.small, .cmp-reliability.none { color: var(--warning-text); }
 
 .cmp-explain { font-size: 12.5px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px; max-width: 760px; }
 .cmp-how { display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; font-size: 11.5px; text-decoration: none; }

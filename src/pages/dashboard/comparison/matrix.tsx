@@ -65,7 +65,7 @@ export function CoverageMatrix({ rows, units, selected, onSelect, matches, compa
             <th className="rowhead" />
             {units.map((u) => (
               <th key={u.id} className="colhead" title={`${u.label} · ${scopeRecordCountByUnit.get(u.id) ?? 0} ${t('records')}`}>
-                <span className="vlabel" style={{ color: unitHex(u, units) }}>{u.label}</span>
+                <span className="vlabel" style={{ color: `color-mix(in srgb, ${unitHex(u, units)} 55%, var(--text-primary))` }}>{u.label}</span>
               </th>
             ))}
           </tr>

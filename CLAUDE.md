@@ -16,3 +16,12 @@ Rules:
 - After editing the palette, run `node scripts/check_palette_colorblind.mjs`. It must exit 0.
 - Update the note's tracker and the registry row in the same piece of work as the change.
 - A screen that needs something the kit cannot do gets the kit extended, so the next screen benefits too.
+
+## Before you open a pull request
+
+- Run `npm ci` first, then `npm run build`. A build in a worktree that shares an older `node_modules` fails on missing packages (`papaparse`, `exceljs`, `docx`) and looks like a broken build when it is a stale install.
+- Run the library tests: `npm run test:comparison`, `npm run test:review-state`, `npm run test:dashboard-views`, `npm run test:time`.
+- Warning and draft text uses `--warning-text`, never `--warning`. The bright amber is 1.75 to 1 on the light page.
+- A status that says "accepted" does not say a person has reviewed the item. The review state chip (`src/components/review-state-chip.tsx`, rule in `src/lib/review-state.ts`) says that, and follows the recorded reviews.
+- The suggestion hit rate quoted on the Curate drawer is measured by `node scripts/eval_suggestions.mjs`. Re-run it when the corpus changes and update `drawerSuggestionsHint` in `src/pages/dashboard/comparison/strings.ts`.
+- Migrations: check the live list with `supabase migration list --linked` right before choosing a number. A branch can push a migration to the live database before it merges.

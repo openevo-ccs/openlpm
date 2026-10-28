@@ -312,7 +312,7 @@ export default function ProjectLayout() {
   // Repository space has its own, already-shorter nav and no UI to define
   // views on it, so this resolves to nothing there regardless.
   const resolution = userId
-    ? resolveViewerViews(views, assignments, { userId, role, joinedVia, groupIds: myGroupIds })
+    ? resolveViewerViews(views, assignments, { userId, role, joinedVia, groupIds: myGroupIds, language: typeof navigator !== 'undefined' ? navigator.language : undefined })
     : { forcedView: null, defaultViewId: null, eligibleViews: [] as DashboardView[] }
 
   const viewForced = !!resolution.forcedView

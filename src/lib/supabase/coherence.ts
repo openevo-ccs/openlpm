@@ -52,7 +52,9 @@ function sortPair(a: string, b: string): [string, string] {
  */
 export async function getGradeBandMatrix(supabase: Client, projectId: string, branchId: string): Promise<GradeBandMatrix> {
   const [{ data: objects }, { data: connections }, { data: threads }, { data: reviews }] = await Promise.all([
-    supabase.from('lpm_data_objects').select('id, grade_band').eq('project_id', projectId).eq('branch_id', branchId),
+    // Draft objects (for example the human examples and bridge cases of the synthetic spaces) are not yet part of the progression,
+    // so they stay out of the grade-band counts. Counting them made unattached drafts look like gaps in the curriculum.
+    supabase.from('lpm_data_objects').select('id, grade_band').eq('project_id', projectId).eq('branch_id', branchId).neq('status', 'draft'),
     supabase.from('lpm_connections').select('from_object_id, to_object_id, status').eq('project_id', projectId).eq('branch_id', branchId),
     // Only 'accepted' threads count toward the matrix -- a proposed thread
     // isn't real coherence yet from a teacher's point of view, same as a
