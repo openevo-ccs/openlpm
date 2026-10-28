@@ -194,8 +194,11 @@ BEGIN
     'created_at', 'NOW()',
     'updated_at', 'NOW()'));
 
+  -- A trigger on projects already creates the trunk branch; this only covers
+  -- a database where it does not.
   INSERT INTO branches (project_id, slug, label, is_trunk, created_by)
-  VALUES (v_dst, 'main', 'main', TRUE, v_owner);
+  VALUES (v_dst, 'main', 'main', TRUE, v_owner)
+  ON CONFLICT (project_id, slug) DO NOTHING;
 
   -- Owners and maintainers of the real space can run the sandbox too.
   INSERT INTO project_members (project_id, user_id, role)
