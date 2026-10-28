@@ -3,7 +3,10 @@ import { GitCompare } from 'lucide-react'
 import { KNOWN_COMPARISON_PAIRS, getProjectComparisonProfile, listComparativeLinksBetweenProjects, type ComparativeLinkWithTitles, type ProjectComparisonProfile } from '@/lib/supabase/comparative-analysis'
 import { LpmComparisonProfileCard } from '@/components/lpm-comparison-profile-card'
 import { cssVar } from '@/lib/comparison'
+import { getPartTags } from '@/lib/supabase/part-tags'
+import type { PartTags } from '@/lib/comparison/structure'
 import { useComparison } from './context'
+import { StructurePanel } from './structure-panel'
 import { Sankey, type SankeyLink, type SankeyNode } from './sankey'
 import { Explain, LoadGate, PageHeader } from './ui'
 
@@ -31,16 +34,20 @@ function Inner() {
   const [otherProfile, setOtherProfile] = useState<ProjectComparisonProfile | null>(null)
   const [otherName, setOtherName] = useState('')
   const [notes, setNotes] = useState<ComparativeLinkWithTitles[] | null>(null)
+  const [ownParts, setOwnParts] = useState<PartTags[] | null>(null)
+  const [otherParts, setOtherParts] = useState<PartTags[] | null>(null)
   const otherSlug = KNOWN_COMPARISON_PAIRS[project.slug]
 
   useEffect(() => {
     let alive = true
     getProjectComparisonProfile(supabase, project.id).then((p) => alive && setProfile(p))
+    getPartTags(supabase, project.id).then((p) => alive && setOwnParts(p))
     if (!otherSlug) return
     supabase.from('projects').select('id,name').eq('slug', otherSlug).maybeSingle().then(({ data }) => {
       if (!alive || !data) return
       setOtherName(data.name)
       getProjectComparisonProfile(supabase, data.id).then((p) => alive && setOtherProfile(p))
+      getPartTags(supabase, data.id).then((p) => alive && setOtherParts(p))
       listComparativeLinksBetweenProjects(supabase, project.id, data.id).then((l) => alive && setNotes(l))
     })
     return () => { alive = false }
@@ -73,6 +80,7 @@ function Inner() {
             <LpmComparisonProfileCard profile={profile} label={project.name} language={lang} />
             <LpmComparisonProfileCard profile={otherProfile} label={otherName} language={lang} />
           </div>
+          {ownParts && otherParts && <StructurePanel own={ownParts} other={otherParts} ownName={project.name} otherName={otherName} />}
           <div className="cmp-panel">
             <h2>{t('spacesSankeyTitle')}</h2>
             <Explain what={t('spacesSankeyHint')} />
