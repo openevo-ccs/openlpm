@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { GraduationCap, X } from 'lucide-react'
 import {
-  BANDS, bandShares, firstGrade, gradeRange, gradesOf, matchesTags, placementProfiles, profileDistance, recordUnitIds, unitHex,
+  BANDS, bandShares, firstGrade, gradeRange, gradesOf, matchesTags, placementProfiles, profileDistance, recordUnitIds, unitFromId, unitHex,
   type CmpRecord, type PlacedUnit, type Unit,
 } from '@/lib/comparison'
 import { useComparison } from './context'
@@ -37,7 +37,7 @@ export default function SchoolYearsPage() {
 
 function Inner() {
   const c = useComparison()
-  const { t, lang, allRecords, units, level, countries } = c
+  const { t, lang, allRecords, countries } = c
   const li = lang === 'de' ? 1 : 0
   const tagName = (tag: string) => TAG_LABEL[tag]?.[li] ?? tag
   const subjectName = (s: string) => SUBJECT_LABEL[s.toLowerCase()]?.[li] ?? s
@@ -47,10 +47,10 @@ function Inner() {
     const out: PlacedUnit[] = []
     for (const rec of allRecords) {
       if (!rec.unit) continue
-      for (const placeId of recordUnitIds(rec, level, countrySet)) out.push({ placeId, record: rec })
+      for (const placeId of recordUnitIds(rec, 'state', countrySet)) out.push({ placeId, record: rec })
     }
     return out
-  }, [allRecords, level, countries])
+  }, [allRecords, countries])
 
   const subjects = useMemo(() => Array.from(new Set(placed.map((p) => p.record.unit!.subject.toLowerCase()))).sort(), [placed])
   const [subjectChoice, setSubjectChoice] = useState<string | null>(null)
@@ -65,10 +65,15 @@ function Inner() {
   const activeTags = tags.size ? tags : null
   const toggleTag = (tag: string) => setTags((prev) => { const n = new Set(prev); if (n.has(tag)) n.delete(tag); else n.add(tag); return n })
 
+  // This page always compares by state: a country's states merged into one row would hide what it is for.
+  const units: Unit[] = useMemo(() => {
+    const ids = Array.from(new Set(placed.map((p) => p.placeId)))
+    return ids.map((id) => unitFromId(id, lang)).sort((a, b) => countries.indexOf(a.country) - countries.indexOf(b.country) || a.label.localeCompare(b.label, lang))
+  }, [placed, lang, countries])
   const unitById = useMemo(() => new Map(units.map((u) => [u.id, u])), [units])
   const placeIds = useMemo(() => {
-    const ids = Array.from(new Set(inSubject.map((p) => p.placeId)))
-    return ids.sort((a, b) => units.findIndex((u) => u.id === a) - units.findIndex((u) => u.id === b))
+    const present = new Set(inSubject.map((p) => p.placeId))
+    return units.filter((u) => present.has(u.id)).map((u) => u.id)
   }, [inSubject, units])
   const grades = useMemo(() => gradeRange(inSubject), [inSubject])
   const profiles = useMemo(() => placementProfiles(inSubject, subject, activeTags, grades, placeIds).map((pr) => ({ ...pr, unit: unitById.get(pr.placeId) as Unit | undefined })), [inSubject, subject, activeTags, grades, placeIds, unitById])
@@ -86,7 +91,7 @@ function Inner() {
   return (
     <div>
       <PageHeader icon={GraduationCap} title={t('syTitle')} help={t('syHelp')} />
-      <ScopeBar show={{ dim: false, kinds: false, proposed: false }} />
+      {c.config.scope === 'cross-national' && <ScopeBar show={{ dim: false, kinds: false, proposed: false, level: false }} />}
 
       {subjects.length === 0 ? <p className="muted">{t('syNoUnits')}</p> : (
         <>
@@ -200,7 +205,7 @@ function Inner() {
             <div className="cmp-panel">
               <h2>{t('syDistance')}</h2>
               <Explain what={t('syDistanceWhat')} how={t('syDistanceHow')} />
-              {profiles.length < 2 ? <p className="muted">{t('msNeedTwo')}</p> : (
+              {profiles.length < 2 ? <p className="muted">{t('syNeedTwo')}</p> : (
                 <table className="cmp-heat">
                   <thead><tr><th />{profiles.map((p) => <th key={p.placeId} className="top">{placeLabel(p.placeId)}</th>)}</tr></thead>
                   <tbody>

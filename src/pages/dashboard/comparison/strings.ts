@@ -580,6 +580,7 @@ const S = {
     'Jensen-Shannon distance (square root of the divergence in bits) between the two places\' hours per school year, or unit counts where either place states no hours.',
     'Jensen-Shannon-Distanz (Wurzel der Divergenz in Bit) zwischen den Stunden je Schuljahr zweier Orte, oder den Einheitenzahlen, wo einer der Orte keine Stunden nennt.',
   ],
+  syNeedTwo: ['Two places with units are needed for a comparison.', 'Für einen Vergleich braucht es zwei Orte mit Einheiten.'],
   syDrawerTitle: ['Grade {g}: {n} units', 'Klasse {g}: {n} Einheiten'],
   msMix: ['Kinds of record behind the links', 'Art der Einträge hinter den Verknüpfungen'],
   msMixWhat: [
