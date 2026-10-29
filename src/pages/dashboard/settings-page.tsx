@@ -3,7 +3,8 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom'
 import { AlertTriangle, Check, Copy, ExternalLink, GraduationCap, Globe, Layers, Library, Link2, Mail, MapPin, Plus, Scale, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
+import { countSubProjects, deleteProject, updateProjectMetadata, type ProjectRow } from '@/lib/supabase/projects'
+import { EPISTEMIC_STATUS_OPTIONS, EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { CUSTOM_VIEW_AUDIENCES, CUSTOM_VIEW_LANGUAGES } from '@/lib/custom-views'
 import { createCustomView, listCustomViews } from '@/lib/supabase/custom-views'
 import {
@@ -980,6 +981,7 @@ function ProjectDetailsSection({
         Geography, languages, subject area, grade-band framework, and sources — set once at
         creation, editable here any time.
       </p>
+      <CurationSubsection project={project} supabase={supabase} />
       <LanguagesSubsection project={project} supabase={supabase} />
       <GeographySubsection project={project} supabase={supabase} />
       <SubjectAreaSubsection project={project} supabase={supabase} />
@@ -1322,6 +1324,58 @@ const CONTENT_LICENSE_LABEL: Record<string, string> = {
   'cc0-1.0': 'Public domain (CC0) — no rights reserved',
   'all-rights-reserved': 'All rights reserved — not ready to share yet',
   'custom': 'Custom (see note)',
+}
+
+// Human-curated or synthetic-theoretical. The label states what the space is for. It says nothing about
+// whether the content has been reviewed: a human-curated space can be unreviewed, and that is
+// recorded in the project's own note. A nested sub-project inherits its parent's label, so only a
+// top-level space can change it here (the same rule the Admin projects card follows).
+function CurationSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [choice, setChoice] = useState(project.epistemic_status)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const isNested = !!project.parent_project_id
+
+  const save = async (next: typeof choice) => {
+    const previous = choice
+    setChoice(next)
+    setBusy(true)
+    setMessage(null)
+    const { error } = await updateProjectMetadata(supabase, project.id, { epistemic_status: next })
+    setBusy(false)
+    if (error) {
+      setChoice(previous)
+      setMessage(`Could not save: ${error.message}`)
+    } else {
+      setMessage('Saved. The label on project cards updates when the page is reloaded.')
+    }
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}>Curation label <EpistemicStatusBadge status={choice} /></h4>
+      <p className="muted" style={{ marginBottom: 10 }}>
+        Is this content made and curated by people for real use, or a designed comparison or research construct? The
+        label says what the space is for. It does not say whether the content has been reviewed.
+      </p>
+      {isNested ? (
+        <p className="muted" style={{ fontSize: 12 }}>This is a sub-project, so it uses the label of its parent project.</p>
+      ) : (
+        <div className="field">
+          <select value={choice} disabled={busy} onChange={(e) => save(e.target.value as typeof choice)}>
+            {EPISTEMIC_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          {message && <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>{message}</p>}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function LicenseSubsection({
