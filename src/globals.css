@@ -385,6 +385,8 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   transition: opacity 120ms ease 250ms;
 }
 .tip:hover::after, .tip:hover::before, .tip:focus-within::after, .tip:focus-within::before { opacity: 1; }
+/* For a tip sitting at the right edge of a clipped box: the bubble ends at the tip's right edge instead of being centered. */
+.tip-end::after { left: auto; right: 0; transform: none; }
 .help {
   display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px;
   border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 10px;

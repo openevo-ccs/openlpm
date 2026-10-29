@@ -175,7 +175,12 @@ function DashboardTab({
             available width evenly, so each bar (width: 100% below) gets more
             real room instead of sitting inside a fixed 76px box with blank
             space around it. */}
-        <div style={{ overflowX: 'auto' }}>
+        {/* Feedback 436f771b (Susan, 2026-10-26): the table always fits, but the
+            hover bubbles of the last column (invisible until hovered) stuck out
+            past the box and made it scroll sideways. overflow-x: clip removes
+            the scrollbar; the last column's bubble is right-aligned (tip-end)
+            so it stays inside the box. */}
+        <div style={{ overflowX: 'clip' }}>
           <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', fontSize: 12.5 }}>
             <thead>
               <tr>
@@ -220,7 +225,7 @@ function DashboardTab({
                           ) : (
                             <div style={{ width: '100%' }}>
                               <div
-                                className="tip"
+                                className={`tip${g === grades[grades.length - 1] ? ' tip-end' : ''}`}
                                 data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
                                 style={{ display: 'flex', height: 16, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
                               >
@@ -244,7 +249,7 @@ function DashboardTab({
                                 )}
                               </div>
                               {anchorCount > 0 && (
-                                <div className="row tip" data-tip={KONZEPTANKER_DEF} style={{ justifyContent: 'center', gap: 2, fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                                <div className={`row tip${g === grades[grades.length - 1] ? ' tip-end' : ''}`} data-tip={KONZEPTANKER_DEF} style={{ justifyContent: 'center', gap: 2, fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
                                   <Anchor size={9} />{anchorCount}
                                 </div>
                               )}

@@ -6,11 +6,8 @@ import { listTopics, listTopicContents, type TopicListItem } from '@/lib/supabas
 import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
 import { listGroupsWithMyMembership } from '@/lib/supabase/groups'
 import {
-  GRADE_BANDS,
   JUDGMENT_CRITERIA,
   JUDGMENT_SCALE,
-  LIEBLINGSTHEMEN,
-  QUERSCHNITTSTHEMEN,
   REFLECTION_PROMPTS,
   deleteWorkEntry,
   getOrCreateParticipantCode,
@@ -33,14 +30,15 @@ import { downloadBlob } from '@/lib/export-import'
 // tool suggests on three criteria). Everything saves as the student goes.
 // The last tab builds the two files that get uploaded to Moodle.
 
-type Tab = 'thema' | 'beurteilen' | 'basiskonzepte' | 'reflexion' | 'abgabe'
+// The Thema step and the Basiskonzepte/Querschnitt step were removed on
+// 2026-10-29 at Susan's request: the course handles them outside EvoMentor.
+// Their tab components are in git history (commit before this one).
+type Tab = 'beurteilen' | 'reflexion' | 'abgabe'
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'thema', label: '1 Thema' },
-  { key: 'beurteilen', label: '2 Verknüpfungen beurteilen' },
-  { key: 'basiskonzepte', label: '3 Basiskonzepte und Querschnitt' },
-  { key: 'reflexion', label: '4 Reflexion' },
-  { key: 'abgabe', label: '5 Abgabe' },
+  { key: 'beurteilen', label: '1 Verknüpfungen beurteilen' },
+  { key: 'reflexion', label: '2 Reflexion' },
+  { key: 'abgabe', label: '3 Abgabe' },
 ]
 
 const RELEVANCE_WORD: Record<number, string> = { 0: 'keine', 1: 'niedrig', 2: 'mittel', 3: 'hoch' }
@@ -53,7 +51,7 @@ export default function StudentWorkPage() {
   const { project, supabase, defaultBranchId } = useOutletContext<ProjectOutletContext>()
   const projectId = project.id
 
-  const [tab, setTab] = useState<Tab>('thema')
+  const [tab, setTab] = useState<Tab>('beurteilen')
   const [entries, setEntries] = useState<WorkEntry[] | null>(null)
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
   const [contentById, setContentById] = useState<Map<string, unknown>>(new Map())
@@ -143,7 +141,6 @@ export default function StudentWorkPage() {
         ))}
       </div>
 
-      {tab === 'thema' && <ThemaTab entryOf={entryOf} save={save} />}
       {tab === 'beurteilen' && (
         <BeurteilenTab
           starredTopics={starredTopics}
@@ -157,7 +154,6 @@ export default function StudentWorkPage() {
           slug={project.slug}
         />
       )}
-      {tab === 'basiskonzepte' && <BasiskonzepteTab rootConcepts={rootConcepts} entries={entries} entryOf={entryOf} save={save} remove={remove} />}
       {tab === 'reflexion' && <ReflexionTab entryOf={entryOf} save={save} />}
       {tab === 'abgabe' && (
         <AbgabeTab
@@ -178,66 +174,6 @@ export default function StudentWorkPage() {
 type EntryOf = (kind: WorkKind, key: string) => WorkEntry | null
 type Save = (kind: WorkKind, key: string, payload: Record<string, any>) => Promise<void>
 type Remove = (kind: WorkKind, key: string) => Promise<void>
-
-// ---------------------------------------------------------------- Thema
-
-function ThemaTab({ entryOf, save }: { entryOf: EntryOf; save: Save }) {
-  const topic = entryOf('topic', 'main')?.payload ?? {}
-  const bands = entryOf('grade_bands', 'main')?.payload ?? {}
-  const [ownTopic, setOwnTopic] = useState<string>(topic.own_topic ?? '')
-  const [reasoning, setReasoning] = useState<string>(topic.reasoning ?? '')
-  const [bandNote, setBandNote] = useState<string>(bands.note ?? '')
-  const themes: string[] = topic.favorite_themes ?? []
-  const chosenBands: string[] = bands.bands ?? []
-
-  const saveTopic = (patch: Record<string, any>) =>
-    save('topic', 'main', { favorite_themes: themes, own_topic: ownTopic, reasoning, ...patch })
-  const saveBands = (patch: Record<string, any>) => save('grade_bands', 'main', { bands: chosenBands, note: bandNote, ...patch })
-
-  const toggle = (list: string[], v: string) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v])
-
-  return (
-    <div className="card">
-      <h3>Dein Lieblingsthema</h3>
-      <p className="muted">Was hat dir im Biologieunterricht oder im Studium besonders Spaß gemacht? Was findest du für Gesellschaft und Zukunft wichtig? Wähle ein oder mehrere Gebiete.</p>
-      <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-        {LIEBLINGSTHEMEN.map((t) => (
-          <button key={t} className={`chip-btn${themes.includes(t) ? ' active' : ''}`} onClick={() => saveTopic({ favorite_themes: toggle(themes, t) })}>
-            {t}
-          </button>
-        ))}
-      </div>
-      <div className="field">
-        <label>Thema deiner Gruppe oder dein eigenes Thema</label>
-        <input
-          type="text"
-          value={ownTopic}
-          onChange={(e) => setOwnTopic(e.target.value)}
-          onBlur={() => saveTopic({ own_topic: ownTopic })}
-          placeholder="z. B. Anpassung von Tieren an Lebensräume"
-        />
-      </div>
-      <div className="field">
-        <label>Warum dieses Thema? (zwei bis drei Sätze)</label>
-        <textarea rows={3} value={reasoning} onChange={(e) => setReasoning(e.target.value)} onBlur={() => saveTopic({ reasoning })} />
-      </div>
-
-      <h3 style={{ marginTop: 20 }}>Klassenstufen</h3>
-      <p className="muted">Der Vorschlag aus dem Seminar: Jede Person in der Gruppe übernimmt ein bis zwei Klassenstufen.</p>
-      <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-        {GRADE_BANDS.map((b) => (
-          <button key={b} className={`chip-btn${chosenBands.includes(b) ? ' active' : ''}`} onClick={() => saveBands({ bands: toggle(chosenBands, b) })}>
-            Klasse {b}
-          </button>
-        ))}
-      </div>
-      <div className="field">
-        <label>Anmerkung (optional)</label>
-        <textarea rows={2} value={bandNote} onChange={(e) => setBandNote(e.target.value)} onBlur={() => saveBands({ note: bandNote })} />
-      </div>
-    </div>
-  )
-}
 
 // ---------------------------------------------------------- Beurteilen
 
@@ -363,6 +299,11 @@ function LernzielCard({
       {hiddenLow > 0 && (
         <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setShowLow(true)}>
           {hiddenLow} Verknüpfung{hiddenLow === 1 ? '' : 'en'} mit niedriger Relevanz anzeigen
+        </button>
+      )}
+      {showLow && low.length > 0 && (
+        <button className="btn btn-mini" style={{ marginTop: 8 }} onClick={() => setShowLow(false)}>
+          Verknüpfungen mit niedriger Relevanz wieder ausblenden
         </button>
       )}
 
@@ -503,97 +444,6 @@ function ProposalForm({ lernzielId, rootConcepts, save }: { lernzielId: string; 
   )
 }
 
-// ------------------------------------------------ Basiskonzepte, Querschnitt
-
-function BasiskonzepteTab({
-  rootConcepts,
-  entries,
-  entryOf,
-  save,
-  remove,
-}: {
-  rootConcepts: { id: string; label: string }[]
-  entries: WorkEntry[]
-  entryOf: EntryOf
-  save: Save
-  remove: Remove
-}) {
-  const chosen = entries.filter((e) => e.kind === 'topic_basiskonzept')
-  const cross = entries.filter((e) => e.kind === 'cross_cutting' && e.payload.selected !== false)
-
-  return (
-    <div>
-      <div className="card" style={{ marginBottom: 14 }}>
-        <h3>Basiskonzepte zu deinem Thema</h3>
-        <p className="muted">Wähle ein bis drei Basiskonzepte, die zu deinem Thema passen, und beschreibe die konkrete Verknüpfung.</p>
-        <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-          {rootConcepts.map((c) => {
-            const on = !!entryOf('topic_basiskonzept', c.label)
-            const blocked = !on && chosen.length >= 3
-            return (
-              <button
-                key={c.id}
-                className={`chip-btn${on ? ' active' : ''}`}
-                disabled={blocked}
-                title={blocked ? 'Du kannst höchstens drei Basiskonzepte wählen.' : undefined}
-                onClick={() => (on ? remove('topic_basiskonzept', c.label) : save('topic_basiskonzept', c.label, { concrete_link: '' }))}
-              >
-                {c.label}
-              </button>
-            )
-          })}
-        </div>
-        {chosen.map((e) => (
-          <ConcreteLink key={e.id} label={e.entry_key} initial={(e.payload.concrete_link as string) ?? ''} onSave={(v) => save('topic_basiskonzept', e.entry_key, { concrete_link: v })} />
-        ))}
-      </div>
-
-      <div className="card">
-        <h3>Querschnittsaufgaben und überfachliche Kompetenzen</h3>
-        <p className="muted">Zu welchen Querschnittsthemen und Kompetenzen kann deine Unterrichtseinheit beitragen?</p>
-        {QUERSCHNITTSTHEMEN.map((q) => {
-          const e = cross.find((x) => x.entry_key === q)
-          return (
-            <div key={q} style={{ marginBottom: 8 }}>
-              <label className="row" style={{ gap: 8 }}>
-                <input
-                  type="checkbox"
-                  checked={!!e}
-                  onChange={(ev) => (ev.target.checked ? save('cross_cutting', q, { selected: true, note: '' }) : remove('cross_cutting', q))}
-                />
-                {q}
-              </label>
-              {e && <ConcreteLink label={q} placeholder="Wie trägt dein Thema dazu bei? (optional)" initial={(e.payload.note as string) ?? ''} onSave={(v) => save('cross_cutting', q, { selected: true, note: v })} compact />}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function ConcreteLink({
-  label,
-  initial,
-  onSave,
-  placeholder,
-  compact,
-}: {
-  label: string
-  initial: string
-  onSave: (v: string) => void
-  placeholder?: string
-  compact?: boolean
-}) {
-  const [v, setV] = useState(initial)
-  return (
-    <div className="field" style={{ marginLeft: compact ? 24 : 0 }}>
-      {!compact && <label>{label}: konkrete Verknüpfung zum Thema</label>}
-      <textarea rows={compact ? 2 : 3} value={v} placeholder={placeholder} onChange={(e) => setV(e.target.value)} onBlur={() => onSave(v)} />
-    </div>
-  )
-}
-
 // ----------------------------------------------------------- Reflexion
 
 function ReflexionTab({ entryOf, save }: { entryOf: EntryOf; save: Save }) {
@@ -686,7 +536,14 @@ function AbgabeTab({
       downloadBlob(await buildHandInDocx(handIn), `${base}.docx`)
       void logStudentEvent(supabase, project.id, 'handin_downloaded', { format: 'docx' })
     } catch (e) {
-      setError(`Die Word-Datei konnte nicht erstellt werden: ${(e as Error).message}`)
+      const msg = (e as Error).message ?? ''
+      // After an update, a page that was already open still points at program
+      // files that no longer exist. Reloading fetches the new ones.
+      setError(
+        /dynamically imported module|Importing a module script failed|error loading dynamically/i.test(msg)
+          ? STALE_PAGE_MESSAGE
+          : `Die Word-Datei konnte nicht erstellt werden: ${msg}`
+      )
     }
     setBusy(false)
   }
@@ -725,7 +582,16 @@ function AbgabeTab({
         </ul>
       </details>
 
-      {error && <div className="notice notice-bad">{error}</div>}
+      {error && (
+        <div className="notice notice-bad">
+          {error}
+          {error === STALE_PAGE_MESSAGE && (
+            <div style={{ marginTop: 6 }}>
+              <button className="btn btn-mini" onClick={() => window.location.reload()}>Seite jetzt neu laden</button>
+            </div>
+          )}
+        </div>
+      )}
       <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
         <button className="btn btn-primary" onClick={downloadWord} disabled={busy}>
           <FileText size={14} /> Word-Datei herunterladen
@@ -742,6 +608,9 @@ function AbgabeTab({
     </div>
   )
 }
+
+const STALE_PAGE_MESSAGE =
+  'EvoMentor wurde gerade aktualisiert, und diese Seite ist noch die alte Fassung. Deine Antworten sind gespeichert. Bitte lade die Seite neu und klicke dann noch einmal auf „Word-Datei herunterladen“.'
 
 const EVENT_TEXT: Record<string, string> = {
   page_view: 'Seite geöffnet',
