@@ -44,20 +44,26 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   children.push(p(`Gruppe: ${h.groups.length ? h.groups.join(', ') : 'keine gewählt'}`))
   children.push(p(`Erstellt am ${formatDate(h.exported_at)}`))
 
-  children.push(h1('1. Thema'))
+  // The Thema and Basiskonzepte/Querschnitt steps were taken out of the
+  // student screens (2026-10-29). Their sections only appear when a student
+  // already filled them in, and the numbering follows what is printed.
+  let n = 0
+  const sec = (title: string) => h1(`${++n}. ${title}`)
+
   if (h.topic.favorite_themes.length || h.topic.own_topic || h.topic.reasoning) {
+    children.push(sec('Thema'))
     if (h.topic.favorite_themes.length) children.push(p(`Lieblingsthemen der Biologie: ${h.topic.favorite_themes.join(', ')}`))
     if (h.topic.own_topic) children.push(p(`Eigenes Thema: ${h.topic.own_topic}`))
     if (h.topic.reasoning) children.push(p(`Begründung: ${h.topic.reasoning}`))
-  } else children.push(empty())
+  }
 
-  children.push(h1('2. Klassenstufen'))
   if (h.grade_bands.bands.length) {
+    children.push(sec('Klassenstufen'))
     children.push(p(`Bearbeitete Klassenstufen: ${h.grade_bands.bands.join(', ')}`))
     if (h.grade_bands.note) children.push(p(h.grade_bands.note))
-  } else children.push(empty())
+  }
 
-  children.push(h1('3. Gemerkte Lernziele im Thüringer Lehrplan'))
+  children.push(sec('Gemerkte Lernziele im Thüringer Lehrplan'))
   if (h.starred_lernziele.length) {
     children.push(
       table(
@@ -68,7 +74,7 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
     )
   } else children.push(empty())
 
-  children.push(h1('4. Beurteilung der vorgeschlagenen Basiskonzept-Verknüpfungen'))
+  children.push(sec('Beurteilung der vorgeschlagenen Basiskonzept-Verknüpfungen'))
   children.push(p('Skala: 1 = trifft nicht zu, 2 = trifft eher nicht zu, 3 = trifft eher zu, 4 = trifft voll zu.', { italics: true }))
   if (h.link_judgments.length) {
     children.push(
@@ -89,7 +95,7 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   } else children.push(empty())
 
   if (h.link_proposals.length) {
-    children.push(h1('5. Ergänzte Verknüpfungen'))
+    children.push(sec('Ergänzte Verknüpfungen'))
     children.push(
       table(
         ['Lernziel', 'Basiskonzept', 'Begründung'],
@@ -99,20 +105,20 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
     )
   }
 
-  children.push(h1('6. Basiskonzepte zum Thema'))
   if (h.topic_basiskonzepte.length) {
+    children.push(sec('Basiskonzepte zum Thema'))
     for (const b of h.topic_basiskonzepte) {
       children.push(p(b.basiskonzept, { bold: true }))
       children.push(p(b.concrete_link || '(keine Beschreibung)'))
     }
-  } else children.push(empty())
+  }
 
-  children.push(h1('7. Querschnittsaufgaben und überfachliche Kompetenzen'))
   if (h.cross_cutting.length) {
+    children.push(sec('Querschnittsaufgaben und überfachliche Kompetenzen'))
     for (const c of h.cross_cutting) children.push(p(`${c.theme}${c.note ? `: ${c.note}` : ''}`))
-  } else children.push(empty())
+  }
 
-  children.push(h1('8. Reflexion'))
+  children.push(sec('Reflexion'))
   const written = h.reflections.filter((r) => r.text)
   if (written.length) {
     for (const r of written) {

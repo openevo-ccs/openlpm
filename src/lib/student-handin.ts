@@ -183,12 +183,14 @@ export function describeHandIn(h: HandIn): { label: string; value: string }[] {
   return [
     { label: 'Dein Teilnahme-Code (ersetzt deinen Namen)', value: h.participant_code },
     { label: 'Gruppe', value: h.groups.length ? h.groups.join(', ') : 'noch keine Gruppe gewählt' },
-    { label: 'Thema', value: h.topic.own_topic || (h.topic.favorite_themes.length ? h.topic.favorite_themes.join(', ') : 'noch leer') },
+    ...(h.topic.own_topic || h.topic.favorite_themes.length
+      ? [{ label: 'Thema', value: h.topic.own_topic || h.topic.favorite_themes.join(', ') }]
+      : []),
     { label: 'Gemerkte Lernziele', value: String(h.starred_lernziele.length) },
     { label: 'Beurteilte Verknüpfungen (alle drei Kriterien)', value: `${rated} von ${h.link_judgments.length}` },
     { label: 'Eigene ergänzte Verknüpfungen', value: String(h.link_proposals.length) },
-    { label: 'Basiskonzepte zum Thema', value: String(h.topic_basiskonzepte.length) },
-    { label: 'Querschnittsaufgaben', value: String(h.cross_cutting.length) },
+    ...(h.topic_basiskonzepte.length ? [{ label: 'Basiskonzepte zum Thema', value: String(h.topic_basiskonzepte.length) }] : []),
+    ...(h.cross_cutting.length ? [{ label: 'Querschnittsaufgaben', value: String(h.cross_cutting.length) }] : []),
     { label: 'Ausgefüllte Reflexionsfragen', value: `${h.counts.reflections} von ${REFLECTION_PROMPTS.length}` },
     { label: 'Einträge im Verlauf (was du wann geöffnet und bearbeitet hast)', value: String(h.activity_timeline.length) },
   ]
