@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, CheckCircle2, Clock, Filter, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -21,7 +23,6 @@ import {
   type GenericReviewItem,
 } from '@/lib/supabase/generic-review'
 import { createGlobalTopic, createPost, listGlobalTopicsForTarget, listPosts, type PostWithAuthor } from '@/lib/supabase/discussions'
-import { layoutTier } from '@/lib/graph-layout'
 
 // Base Repo Explorer (2026-10-21): a site-wide, admin-only area to browse,
 // review, and discuss real content from the OpenEvo CCS Foundational
@@ -542,17 +543,28 @@ function CardsView({
   )
 }
 
+// Follows the shared graph standards (feedback 2a3c04e3). Records start on the
+// fixed tiered layout (physics is an option), labels never overlap, each link's
+// field name shows when you point at a record, and the control panel is the
+// same as on every other graph. The seven repo colors stay outside the six
+// concept colors on purpose: each repo also has its own shape, so color is
+// never the only way to tell them apart.
 function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
+  const [gs, updateGs, resetGs] = useGraphSettings('base-repo-explorer')
+  const [physicsSkipped, setPhysicsSkipped] = useState(false)
 
   useEffect(() => {
     if (!containerRef.current) return
     const byId = new Map(rows.map((r) => [`${r.repoKey}:${r.row.id}`, r]))
-    const { positions } = layoutTier(
-      rows.map((r) => ({ id: `${r.repoKey}:${r.row.id}` })),
-      0, 0, 900, 90, 70
-    )
+    // Records sit in a grid shaped like the canvas (about 2.2 wide to 1 high),
+    // grouped by repo so each repo forms its own colored block. A fixed order
+    // (repo, then name) keeps the picture the same every time.
+    const ordered = [...rows].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || a.row.label.localeCompare(b.row.label))
+    const cols = Math.max(1, Math.ceil(Math.sqrt(ordered.length * 2.2)))
+    const positions = new Map<string, { x: number; y: number }>()
+    ordered.forEach((r, i) => positions.set(`${r.repoKey}:${r.row.id}`, { x: (i % cols) * 60, y: Math.floor(i / cols) * 60 }))
 
     const edges: { source: string; target: string; field: string }[] = []
     for (const r of rows) {
@@ -568,13 +580,15 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
       }
     }
 
+    const info = new Map<string, NodeLabelInfo>()
     const elements: ElementDefinition[] = [
       ...rows.map((r) => {
         const id = `${r.repoKey}:${r.row.id}`
         const pos = positions.get(id)
-        return { data: { id, label: r.row.label, repoKey: r.repoKey }, position: pos ? { x: pos.x, y: pos.y } : undefined }
+        info.set(id, { full: r.row.label, priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
+        return { data: { id, repoKey: r.repoKey, size: 24 }, position: pos ? { x: pos.x, y: pos.y } : undefined }
       }),
-      ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, label: e.field } })),
+      ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field } })),
     ]
 
     const cy = cytoscape({
@@ -582,13 +596,15 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
       elements,
       boxSelectionEnabled: false,
       layout: { name: 'preset' },
+      minZoom: 0.15,
+      maxZoom: 3,
       style: [
         {
           selector: 'node',
           style: {
-            label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '90px',
-            'text-valign': 'bottom', 'text-margin-y': 6, color: token('--text-primary', '#0b0b0b'),
-            width: 26, height: 26,
+            width: 'data(size)', height: 'data(size)', label: 'data(label)', 'font-size': 10, 'font-weight': 600,
+            'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 5,
+            color: token('--text-primary', '#0b0b0b'), 'border-width': 2, 'border-color': token('--surface-0', '#fff'),
           },
         },
         ...(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => ({
@@ -599,13 +615,20 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
         {
           selector: 'edge',
           style: {
-            width: 1, 'line-color': token('--baseline', '#c3c2b7'), 'target-arrow-color': token('--baseline', '#c3c2b7'),
-            'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'font-size': 8, color: token('--text-secondary', '#52514e'),
-            'opacity': 0.6,
+            width: 1.4, 'line-color': token('--place-other', '#6f7d8c'), 'target-arrow-color': token('--place-other', '#6f7d8c'),
+            'target-arrow-shape': 'triangle', 'arrow-scale': 0.8, 'curve-style': 'bezier', opacity: 'data(op)',
+            'font-size': 9, color: token('--text-primary', '#0b0b0b'),
           },
         },
-      ],
+        ...hoverStyles(),
+      ] as never,
     })
+
+    // Records with more links get a label first when space is short.
+    cy.nodes().forEach((n) => { const i = info.get(n.id()); if (i) i.priority += n.degree(false) * 10 })
+    setPhysicsSkipped(applyGraphSettings(cy, gs, { name: 'preset' }, info).physicsSkipped)
+    applyLineLooks(cy, gs.lineStrength, () => 2)
+    attachHover(cy)
 
     cy.on('tap', 'node', (evt) => {
       const id = evt.target.id() as string
@@ -614,12 +637,24 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
     })
 
     cyRef.current = cy
-    return () => { cy.destroy() }
+    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null }
+    // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows])
+  }, [rows, gs.layout, gs.labels, gs.spacing])
 
+  useEffect(() => {
+    if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
+  }, [gs.lineStrength])
+
+  const zoomBy = (f: number) => { const cy = cyRef.current; if (cy) cy.animate({ zoom: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * f)) }, { duration: 160 }) }
   return (
     <div>
+      <GraphControls
+        settings={gs} onChange={updateGs} onReset={resetGs} lang="en" showConnections={false} showLayout
+        wording={{ fixed: { label: 'Tiers', hint: 'Rows of records. Always the same.' } }}
+        onZoomIn={() => zoomBy(1.25)} onZoomOut={() => zoomBy(0.8)} onFit={() => cyRef.current?.fit(undefined, 30)}
+      />
+      {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Physics is off for more than 500 records, because it would freeze the page. Pick one repo above to use it.</p>}
       <div className="row" style={{ gap: 10, marginBottom: 8, flexWrap: 'wrap', fontSize: 12 }}>
         {(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => (
           <span key={key} className="row" style={{ gap: 4 }}>
@@ -632,6 +667,7 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
       <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
         Edges show relations already present in each record&apos;s own data (e.g. a question&apos;s
         <code> motivatedBy</code>, a method&apos;s <code>relatedQuestions</code>) where the target is also loaded here.
+        Point at a record to see its full name and what its links are called.
       </p>
     </div>
   )
