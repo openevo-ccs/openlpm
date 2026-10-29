@@ -1,21 +1,11 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { CalendarRange, Info, Minus, Plus } from 'lucide-react'
+import { CalendarRange, Info } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { listTimelineItems, sortLanes, type TimelineItem } from '@/lib/supabase/timeline'
 import { RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import { TimelineChart, type TimelineChartItem, type TimelineChartLane } from '@/components/timeline-chart'
 import { distinctLinkedProjects, listContentLinksForRecord, type RepositoryRecordRow } from '@/lib/supabase/curriculum-repository'
-
-const DAY_MS = 24 * 60 * 60 * 1000
-const LANE_HEIGHT = 40
-const HEADER_HEIGHT = 28
-// Below this span, ticks fall monthly rather than yearly -- chosen so a
-// single mandate's multi-year effective range still gets a readable month
-// grid, while a repository spanning decades of policy history stays
-// legible instead of crowding in a tick for every one of ~300 months.
-const MONTHLY_TICK_SPAN_DAYS = 450
-const MIN_ZOOM = 1
-const MAX_ZOOM = 40
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -26,40 +16,6 @@ function formatRange(item: TimelineItem): string {
   if (item.openStart) return `through ${fmtDate(item.end as Date)}`
   if (item.openEnded) return `${fmtDate(item.start)} – ongoing`
   return `${fmtDate(item.start)} – ${item.end ? fmtDate(item.end) : fmtDate(item.start)}`
-}
-
-// `tickSpanDays` decides monthly-vs-yearly ticks and can differ from the
-// real min/max span -- zooming in shows fewer effective days at once even
-// though the underlying date range hasn't changed, so it should get the
-// finer month grid a zoomed-out view of the same raw span wouldn't need.
-// Smallest label gap that still leaves room for a four-digit year.
-const MIN_TICK_GAP_PX = 56
-const YEAR_STEPS = [1, 2, 5, 10, 20, 50, 100]
-
-// `tickSpanDays` decides monthly-vs-yearly ticks and can differ from the
-// real min/max span -- zooming in shows fewer effective days at once even
-// though the underlying date range hasn't changed, so it should get the
-// finer month grid a zoomed-out view of the same raw span wouldn't need.
-// Yearly ticks skip years (every 2nd, 5th, 10th...) when the span is wide
-// enough that a label for every year would overlap its neighbours.
-function buildTicks(min: Date, max: Date, tickSpanDays: number, pxPerDay: number): { date: Date; label: string }[] {
-  const ticks: { date: Date; label: string }[] = []
-  if (tickSpanDays <= MONTHLY_TICK_SPAN_DAYS) {
-    const cursor = new Date(min.getFullYear(), min.getMonth(), 1)
-    while (cursor <= max) {
-      if (cursor >= min) ticks.push({ date: new Date(cursor), label: cursor.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) })
-      cursor.setMonth(cursor.getMonth() + 1)
-    }
-  } else {
-    const pxPerYear = pxPerDay * 365.25
-    const step = YEAR_STEPS.find((n) => n * pxPerYear >= MIN_TICK_GAP_PX) ?? YEAR_STEPS[YEAR_STEPS.length - 1]
-    const cursor = new Date(Math.floor(min.getFullYear() / step) * step, 0, 1)
-    while (cursor <= max) {
-      if (cursor >= min) ticks.push({ date: new Date(cursor), label: String(cursor.getFullYear()) })
-      cursor.setFullYear(cursor.getFullYear() + step)
-    }
-  }
-  return ticks
 }
 
 // Any `curriculum_repository_records` row with an `event_date` or an
@@ -77,32 +33,6 @@ export default function TimelinePage() {
   const [kind, setKind] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [selected, setSelected] = useState<TimelineItem | null>(null)
-  // Real feedback ea3a4c01 (2026-10-05): "zoomable with a default full
-  // zoom-out to show the full available timeline of data." The existing
-  // auto-fit-to-content width already WAS the full zoom-out view -- what was
-  // actually missing was any way to zoom in from there. zoom=1 is that
-  // baseline (the width this page always used to render at); zooming out
-  // further than that would just pad empty space around real content, so
-  // 1 is the floor, not a mid-point.
-  const [zoom, setZoom] = useState(1)
-  const zoomIn = () => setZoom((z) => Math.min(MAX_ZOOM, z * 1.6))
-  const zoomOut = () => setZoom((z) => Math.max(MIN_ZOOM, z / 1.6))
-  const resetZoom = () => setZoom(1)
-  // Without this, zooming in just widens the content to the right of
-  // whatever scrollLeft already was -- caught live: the default view starts
-  // scrolled to day 0, so one click of zoom-in showed an empty stretch of
-  // calendar instead of the real content that was on screen a moment ago.
-  // Keeps the same calendar date centered in the viewport across a zoom
-  // change, the way any normal map/image zoom control behaves.
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const prevPxPerDayRef = useRef<number | null>(null)
-  // Width of the scrolling area on screen, so "full range" can fit
-  // it. Before 2026-10-25 the full-range width was a fixed ~1400px target,
-  // wider than the space beside the details card -- on a 30-year span (the
-  // Florida repository, 1996 to today) only the first ~3 years were visible
-  // and the rest sat off-screen to the right with no cue that it was there.
-  const [viewportWidth, setViewportWidth] = useState(0)
-
   // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
   // so this resolves to the PARENT's id, same as curriculum-repository-page.tsx.
@@ -132,74 +62,32 @@ export default function TimelinePage() {
   )
   const lanes = useMemo(() => sortLanes(filtered), [filtered])
 
-  // A filter change can shift which dates are even in view -- staying
-  // zoomed into wherever the OLD filter's range happened to be would land
-  // on an arbitrary, possibly now-empty slice of the new one.
-  useEffect(() => {
-    setZoom(1)
-    // A new filtered range means the old scroll position/center-anchor are
-    // both meaningless -- start fresh rather than let the zoom-centering
-    // effect below try to "center" on content that's no longer there.
-    prevPxPerDayRef.current = null
-    if (scrollRef.current) scrollRef.current.scrollLeft = 0
-  }, [kind, jurisdiction])
-
-  const { minDate, maxDate } = useMemo(() => {
-    const now = new Date()
-    let min: Date | null = null
-    let max: Date | null = null
-    for (const i of filtered) {
-      if (!min || i.start < min) min = i.start
-      const end = i.end ?? (i.openEnded ? now : i.start)
-      if (!max || end > max) max = end
-    }
-    if (!min || !max) return { minDate: new Date(now.getFullYear(), 0, 1), maxDate: new Date(now.getFullYear(), 11, 31) }
-    const span = Math.max(max.getTime() - min.getTime(), DAY_MS)
-    const pad = Math.max(span * 0.04, 14 * DAY_MS)
-    return { minDate: new Date(min.getTime() - pad), maxDate: new Date(max.getTime() + pad) }
-  }, [filtered])
-
-  const totalDays = Math.max(1, Math.round((maxDate.getTime() - minDate.getTime()) / DAY_MS))
-  const hasItems = items !== null && filtered.length > 0
-  useLayoutEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-    const measure = () => setViewportWidth(el.clientWidth)
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [hasItems])
-  // Zoom 1 = the whole date range fits the visible width. Before the first
-  // measurement, fall back to a typical width rather than 0.
-  const basePxPerDay = Math.min(24, (viewportWidth > 0 ? viewportWidth : 800) / totalDays)
-  const pxPerDay = basePxPerDay * zoom
-  const width = Math.round(totalDays * pxPerDay)
-  const x = (d: Date) => Math.round(((d.getTime() - minDate.getTime()) / DAY_MS) * pxPerDay)
-
-  useLayoutEffect(() => {
-    const el = scrollRef.current
-    const prev = prevPxPerDayRef.current
-    if (el && prev !== null && prev !== pxPerDay) {
-      const centerDays = (el.scrollLeft + el.clientWidth / 2) / prev
-      el.scrollLeft = centerDays * pxPerDay - el.clientWidth / 2
-    }
-    prevPxPerDayRef.current = pxPerDay
-  }, [pxPerDay])
-
-  const ticks = useMemo(() => buildTicks(minDate, maxDate, totalDays / zoom, pxPerDay), [minDate, maxDate, totalDays, zoom, pxPerDay])
-  const today = new Date()
-  const showToday = today >= minDate && today <= maxDate
-
-  const itemsByLane = useMemo(() => {
-    const m = new Map<string, TimelineItem[]>()
-    for (const i of filtered) {
-      const arr = m.get(i.laneKey) ?? []
-      arr.push(i)
-      m.set(i.laneKey, arr)
-    }
-    return m
-  }, [filtered])
+  // Items and lanes in the shape the shared timeline chart takes. One color
+  // per kind of source, the same on every timeline: teal for repository
+  // records, green for standards document versions.
+  const chartLanes: TimelineChartLane[] = useMemo(
+    () => lanes.map((l) => ({
+      key: l.laneKey,
+      label: l.laneLabel,
+      icon: l.source === 'repository-record' ? <RecordKindIcon type={l.laneKey as RepositoryRecordRow['record_type']} /> : undefined,
+    })),
+    [lanes]
+  )
+  const chartItems: TimelineChartItem[] = useMemo(
+    () => filtered.map((i) => ({
+      id: i.id,
+      laneKey: i.laneKey,
+      title: i.title,
+      start: i.start,
+      end: i.end,
+      isPoint: i.isPoint,
+      openEnded: i.openEnded,
+      openStart: i.openStart,
+      color: i.source === 'repository-record' ? 'var(--series-a)' : 'var(--series-b)',
+      tooltip: `${i.title} — ${formatRange(i)}`,
+    })),
+    [filtered]
+  )
 
   return (
     <div>
@@ -262,48 +150,13 @@ export default function TimelinePage() {
         </div>
       ) : (
         <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
-          <div style={{ flex: '3 1 480px', minWidth: 0 }}>
-            <div className="row" style={{ justifyContent: 'flex-end', gap: 6, marginBottom: 6 }}>
-              <span className="muted" style={{ fontSize: 12, marginRight: 'auto' }}>
-                {zoom === 1 ? 'Showing the full range' : `Zoomed in (${zoom.toFixed(1)}×)`}
-              </span>
-              <button type="button" className="btn btn-mini" aria-label="Zoom out" onClick={zoomOut} disabled={zoom <= MIN_ZOOM}><Minus size={13} /></button>
-              <button type="button" className="btn btn-mini" aria-label="Zoom in" onClick={zoomIn} disabled={zoom >= MAX_ZOOM}><Plus size={13} /></button>
-              <button type="button" className="btn btn-mini" onClick={resetZoom} disabled={zoom === 1}>Fit all</button>
-            </div>
-            <div className="timeline-wrap">
-            <div className="timeline-labels">
-              <div style={{ height: HEADER_HEIGHT }} />
-              {lanes.map((l) => (
-                <div key={l.laneKey} className="timeline-lane-label row" style={{ height: LANE_HEIGHT, gap: 5, alignItems: 'center' }} title={l.laneLabel}>
-                  {l.source === 'repository-record' && <RecordKindIcon type={l.laneKey as RepositoryRecordRow['record_type']} />}
-                  {l.laneLabel}
-                </div>
-              ))}
-            </div>
-            <div className="timeline-scroll" ref={scrollRef}>
-              <div style={{ width, position: 'relative' }}>
-                <div className="timeline-axis" style={{ height: HEADER_HEIGHT }}>
-                  {ticks.map((t) => (
-                    <div key={t.date.toISOString()} className="timeline-tick" style={{ left: x(t.date) }}>
-                      <span>{t.label}</span>
-                    </div>
-                  ))}
-                </div>
-                {lanes.map((l) => (
-                  <div key={l.laneKey} className="timeline-lane-row" style={{ height: LANE_HEIGHT }}>
-                    {ticks.map((t) => <div key={t.date.toISOString()} className="timeline-gridline" style={{ left: x(t.date) }} />)}
-                    {(itemsByLane.get(l.laneKey) ?? []).map((item) => (
-                      <TimelineMark key={item.id} item={item} x={x} laneWidth={width} selected={selected?.id === item.id} onSelect={() => setSelected(item)} />
-                    ))}
-                  </div>
-                ))}
-                {showToday && (
-                  <div className="timeline-today" style={{ left: x(today), top: HEADER_HEIGHT, height: lanes.length * LANE_HEIGHT }} title="Today" />
-                )}
-              </div>
-            </div>
-            </div>
+          <div style={{ flex: '3 1 520px', minWidth: 0 }}>
+            <TimelineChart
+              lanes={chartLanes}
+              items={chartItems}
+              selectedId={selected?.id ?? null}
+              onSelect={(id) => setSelected(id ? filtered.find((i) => i.id === id) ?? null : null)}
+            />
           </div>
 
           <div className="card" style={{ flex: '1 1 280px', minHeight: 200 }}>
@@ -312,48 +165,6 @@ export default function TimelinePage() {
         </div>
       )}
     </div>
-  )
-}
-
-function TimelineMark({
-  item,
-  x,
-  laneWidth,
-  selected,
-  onSelect,
-}: {
-  item: TimelineItem
-  x: (d: Date) => number
-  laneWidth: number
-  selected: boolean
-  onSelect: () => void
-}) {
-  const color = item.source === 'repository-record' ? 'var(--series-a)' : 'var(--series-b)'
-  const title = `${item.title} — ${formatRange(item)}`
-  const outline = selected ? '2px solid var(--text-primary)' : 'none'
-
-  if (item.isPoint) {
-    return (
-      <button
-        type="button"
-        className="timeline-mark timeline-mark-point"
-        style={{ left: x(item.start), background: color, outline }}
-        title={title}
-        onClick={onSelect}
-      />
-    )
-  }
-
-  const startX = item.openStart ? 0 : x(item.start)
-  const endX = item.openEnded ? laneWidth : x(item.end ?? item.start)
-  return (
-    <button
-      type="button"
-      className="timeline-mark timeline-mark-bar"
-      style={{ left: startX, width: Math.max(4, endX - startX), background: color, outline }}
-      title={title}
-      onClick={onSelect}
-    />
   )
 }
 

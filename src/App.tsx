@@ -22,7 +22,7 @@ import CalendarPage from '@/pages/dashboard/calendar-page'
 import TimePage from '@/pages/dashboard/time-page'
 import MethodsPage from '@/pages/dashboard/methods-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
-import TimelinePage from '@/pages/dashboard/timeline-page'
+import TimelineSwitch from '@/pages/dashboard/timeline-switch'
 import ContextItemsPage from '@/pages/dashboard/context-items-page'
 import MapPage from '@/pages/dashboard/map-page'
 import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
@@ -49,7 +49,6 @@ import { ComparisonOnly } from '@/pages/dashboard/comparison/context'
 import ComparisonOverviewPage from '@/pages/dashboard/comparison/overview-page'
 import ComparisonCoveragePage from '@/pages/dashboard/comparison/coverage-page'
 import ComparisonNetworkPage from '@/pages/dashboard/comparison/network-page'
-import ComparisonTimelinePage from '@/pages/dashboard/comparison/timeline-page'
 import ComparisonFlowsPage from '@/pages/dashboard/comparison/flows-page'
 import ComparisonSchoolYearsPage from '@/pages/dashboard/comparison/school-years-page'
 import ComparisonMeasuresPage from '@/pages/dashboard/comparison/measures-page'
@@ -140,7 +139,7 @@ export default function App() {
             <Route path="meine-arbeit" element={<StudentWorkPage />} />
             <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
             <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
-            <Route path="timeline" element={<ComparisonOnly><ComparisonTimelinePage /></ComparisonOnly>} />
+            <Route path="timeline" element={<TimelineSwitch />} />
             <Route path="flows" element={<ComparisonOnly><ComparisonFlowsPage /></ComparisonOnly>} />
             <Route path="school-years" element={<ComparisonOnly><ComparisonSchoolYearsPage /></ComparisonOnly>} />
             <Route path="measures" element={<ComparisonOnly><ComparisonMeasuresPage /></ComparisonOnly>} />
@@ -168,7 +167,6 @@ export default function App() {
             <Route path="time" element={<TimePage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
-            <Route path="timeline" element={<TimelinePage />} />
             <Route path="context" element={<ContextItemsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
