@@ -224,7 +224,7 @@ function thread({ slug, title, type = 'vertical_horizontal', idea, narrative, te
   const tid = uid('thread', slug)
   rollbackIds.threads.push(slug)
   w('INSERT INTO lpm_threads (id, project_id, branch_id, slug, title, thread_type, connecting_idea, narrative, teaching_prompt, evidence_note, gaps, status)')
-  w(`VALUES (${q(tid)}, ${q(PID)}, ${q(BRANCH)}, ${q(slug)}, ${q(title)}, ${q(type)}, ${q(idea)}, ${q(narrative)}, ${teachingPrompt ? q(teachingPrompt) : 'NULL'}, ${evidenceNote ? q(evidenceNote) : 'NULL'}, ${arr(gaps)}, 'proposed')`)
+  w(`VALUES (${q(tid)}, ${q(PID)}, ${q(BRANCH)}, ${q(slug)}, ${q(title)}, ${q(type)}, ${q(idea)}, ${q(narrative)}, ${teachingPrompt ? q(teachingPrompt) : 'NULL'}, ${evidenceNote ? q(evidenceNote) : 'NULL'}, ${jq(gaps)}, 'proposed')`)
   w('ON CONFLICT (project_id, slug) DO NOTHING;')
   stats.threads++
   stations.forEach((s, i) => {
