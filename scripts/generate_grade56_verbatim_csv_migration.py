@@ -9,7 +9,7 @@ goals shown are the ones in the CSV, with the CSV's wording. Nothing else is sho
     keeps its Basiskonzept suggestions, favorites and links (PAIRS and CONFIRMED_FUZZY below, each
     pair read by hand on both sides).
   * Every other CSV goal becomes a new row (no Basiskonzept suggestions yet).
-  * Every live 5/6 row that is no CSV goal is set to status 'archived' (hidden, not deleted), so
+  * Every live 5/6 row that is no CSV goal is set to status 'archived' (hidden, and nothing is deleted), so
     judgments, favorites and links that point at it stay intact and the step can be undone.
 
 Only change to the CSV text: line-wrap hyphens ("Materia-lien") are closed up, as in
