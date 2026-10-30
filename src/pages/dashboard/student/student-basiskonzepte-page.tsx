@@ -1202,7 +1202,8 @@ function NetzTab({
         Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre Unterkonzepte'}.
         {showLz && ' Kleine Punkte = einzelne Lernziele. Jedes Lernziel hängt mit einer Linie an dem '}
         {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
-        {showLz && ', zu dem es am stärksten passt.'}
+        {showLz && ', zu dem es am stärksten passt: Diese Hauptlinie zeigt die höchste Bewertung des Lernziels. '}
+        {showLz && 'Weitere Verbindungen zu Konzepten mit mindestens mittlerer Bewertung erscheinen beim Zeigen auf das Lernziel oder bei „Alle“. Niedrig bewertete Verbindungen werden nicht gezeichnet. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
         {showLz && (lzOrder === 'grade' ? ' Unter jedem Konzept sind die Punkte nach Klassenstufe geordnet: oben 5/6, darunter 7/8, 9 und 10.' : ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.')}
         {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts.'}
         {showLz && gs.edges === 'bundled' && ' Viele Lernziele gehören zu mehreren Konzepten zugleich: Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl). Zeigt man auf ein Lernziel, erscheinen seine weiteren Verbindungen.'}
