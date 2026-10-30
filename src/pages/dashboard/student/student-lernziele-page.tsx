@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
+  descriptionBelowTitle,
   getFullThread,
   getThreadStationsForTopic,
   listTopicContents,
@@ -823,7 +824,7 @@ function LernzielCard({
         </button>
       </div>
       <strong style={{ display: 'block', marginTop: 6 }}>{topic.title}</strong>
-      {topic.description && <p className="muted" style={{ fontSize: 12.5 }}>{topic.description}</p>}
+      {descriptionBelowTitle(topic.title, topic.description) && <p className="muted" style={{ fontSize: 12.5, whiteSpace: 'pre-line' }}>{descriptionBelowTitle(topic.title, topic.description)}</p>}
       {entries.length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
           {entries.map((e) => {

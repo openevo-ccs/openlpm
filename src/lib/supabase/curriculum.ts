@@ -29,6 +29,16 @@ export type TopicListItem = Pick<DataObjectRow, 'id' | 'title' | 'description' |
  * (thema/unterthema) -- best-effort only, since a different project's
  * content shape won't have these and the UI treats their absence as normal.
  */
+/**
+ * The text to show under a goal's heading. A goal's heading is its own wording, so when the
+ * description says the same thing (line breaks aside) it is left out instead of printed twice.
+ */
+export function descriptionBelowTitle(title: string, description: string | null | undefined): string | null {
+  const d = (description ?? '').trim()
+  if (!d) return null
+  return d.replace(/\s+/g, ' ') === title.replace(/\s+/g, ' ').trim() ? null : d
+}
+
 export async function listTopics(supabase: Client, projectId: string, branchId: string): Promise<TopicListItem[]> {
   // Pulls just the two extra text fields out of each row's own `content`
   // JSONB via PostgREST's ->> operator, rather than downloading the full

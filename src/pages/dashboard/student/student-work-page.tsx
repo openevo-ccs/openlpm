@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { CheckCircle2, FileText, Plus, Star, Trash2 } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
-import { listTopics, listTopicContents, type TopicListItem } from '@/lib/supabase/curriculum'
+import { descriptionBelowTitle, listTopics, listTopicContents, type TopicListItem } from '@/lib/supabase/curriculum'
 import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
 import { listGroupsWithMyMembership } from '@/lib/supabase/groups'
 import {
@@ -280,7 +280,7 @@ function LernzielCard({
         </div>
         <span className="muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>{judged} von {all.length} beurteilt</span>
       </div>
-      {topic.description && <p className="muted" style={{ marginTop: 0 }}>{topic.description}</p>}
+      {descriptionBelowTitle(topic.title, topic.description) && <p className="muted" style={{ marginTop: 0, whiteSpace: 'pre-line' }}>{descriptionBelowTitle(topic.title, topic.description)}</p>}
 
       {suggested.length === 0 && <p className="muted">Für dieses Lernziel schlägt EvoMentor keine Verknüpfung vor.</p>}
       {suggested.map((s) => (
