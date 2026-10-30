@@ -101,7 +101,7 @@ const STATE_NAMES: Record<string, [string, string]> = {
   'DE-SL': ['Saarland', 'Saarland'], 'DE-SN': ['Saxony', 'Sachsen'], 'DE-ST': ['Saxony-Anhalt', 'Sachsen-Anhalt'], 'DE-SH': ['Schleswig-Holstein', 'Schleswig-Holstein'],
   'DE-TH': ['Thuringia', 'Thüringen'],
   'US-NY': ['New York', 'New York'], 'US-CA': ['California', 'Kalifornien'], 'US-FL': ['Florida', 'Florida'], 'US-PA': ['Pennsylvania', 'Pennsylvanien'], 'US-TN': ['Tennessee', 'Tennessee'],
-  'IN-KL': ['Kerala', 'Kerala'], 'IN-KA': ['Karnataka', 'Karnataka'], 'IN-MH': ['Maharashtra', 'Maharashtra'],
+  'IN-KL': ['Kerala', 'Kerala'], 'IN-KA': ['Karnataka', 'Karnataka'], 'IN-MH': ['Maharashtra', 'Maharashtra'], 'IN-UP': ['Uttar Pradesh', 'Uttar Pradesh'],
 }
 
 export function countryOf(jurisdiction: string): string {
