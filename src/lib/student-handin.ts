@@ -154,7 +154,7 @@ export function buildHandIn(input: HandInInput): HandIn {
     cross_cutting: byKind(entries, 'cross_cutting')
       .filter((e) => e.payload.selected !== false)
       .map((e) => ({ theme: e.entry_key, note: ((e.payload.note as string | undefined) ?? '').trim(), updated_at: e.updated_at })),
-    reflections: byKind(entries, 'reflection').map((e) => ({
+    reflections: byKind(entries, 'reflection').filter((e) => promptByKey.has(e.entry_key)).map((e) => ({
       prompt_key: e.entry_key,
       prompt: promptByKey.get(e.entry_key) ?? e.entry_key,
       text: ((e.payload.text as string | undefined) ?? '').trim(),
@@ -192,7 +192,6 @@ export function describeHandIn(h: HandIn): { label: string; value: string }[] {
     ...(h.topic_basiskonzepte.length ? [{ label: 'Basiskonzepte zum Thema', value: String(h.topic_basiskonzepte.length) }] : []),
     ...(h.cross_cutting.length ? [{ label: 'Querschnittsaufgaben', value: String(h.cross_cutting.length) }] : []),
     { label: 'Ausgefüllte Reflexionsfragen', value: `${h.counts.reflections} von ${REFLECTION_PROMPTS.length}` },
-    { label: 'Einträge im Verlauf (was du wann geöffnet und bearbeitet hast)', value: String(h.activity_timeline.length) },
   ]
 }
 

@@ -84,9 +84,8 @@ export const QUERSCHNITTSTHEMEN = [
 export const GRADE_BANDS = ['5/6', '7/8', '9/10'] as const
 
 export const REFLECTION_PROMPTS = [
-  { key: 'tool_help', label: 'Was hat dir EvoMentor bei der Auswahl und Beurteilung geholfen?' },
-  { key: 'tool_hindrance', label: 'Was war unklar, fehlte oder hat gestört?' },
-  { key: 'own_learning', label: 'Was hast du durch die Aufgabe über Lehrplan und Basiskonzepte gelernt?' },
+  { key: 'tool_usability', label: 'Beurteile die Nutzerfreundlichkeit von EvoMentor: Was ist positiv hervorzuheben? Was war unklar, fehlte oder hat gestört? Was sollte verbessert werden?' },
+  { key: 'own_learning', label: 'Was hast du durch die Aufgabe über den Lehrplan und die Basiskonzepte gelernt?' },
 ] as const
 
 export function linkKey(lernzielId: string, basiskonzeptId: string): string {
