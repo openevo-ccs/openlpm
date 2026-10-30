@@ -167,7 +167,7 @@ function SuggestionRow({ record, score, terms, dimKey, busy, onAdd }: {
   )
 }
 
-function LinkCard({ link, record, objectTitle, busy, run }: {
+export function LinkCard({ link, record, objectTitle, busy, run }: {
   link: CmpLink; record: CmpRecord | undefined; objectTitle?: string; busy: boolean; run: (fn: () => Promise<{ error: string | null }>) => Promise<boolean>
 }) {
   const { t, lang, reviewsByLink, canEdit, canCritique, supabase, project, source } = useComparison()

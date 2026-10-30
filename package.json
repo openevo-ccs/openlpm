@@ -12,6 +12,7 @@
     "type-check": "tsc -b --noEmit",
     "test:time": "node scripts/test_time_model.mjs",
     "test:comparison": "node scripts/test_comparison_model.mjs",
+    "test:draft-links": "node scripts/test_draft_links.mjs",
     "test:review-state": "node scripts/test_review_state.mjs",
     "test:concept-source": "node scripts/test_concept_source.mjs",
     "test:comparison-structure": "node scripts/test_comparison_structure.mjs",

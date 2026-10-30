@@ -54,6 +54,7 @@ import ComparisonSchoolYearsPage from '@/pages/dashboard/comparison/school-years
 import ComparisonMeasuresPage from '@/pages/dashboard/comparison/measures-page'
 import ComparisonSideBySidePage from '@/pages/dashboard/comparison/side-by-side-page'
 import ComparisonCuratePage from '@/pages/dashboard/comparison/curate-page'
+import ComparisonDraftLinksPage from '@/pages/dashboard/comparison/draft-links-page'
 import ComparisonReportPage from '@/pages/dashboard/comparison/report-page'
 import ComparisonSpacesPage from '@/pages/dashboard/comparison/spaces-page'
 
@@ -146,6 +147,7 @@ export default function App() {
             <Route path="side-by-side" element={<ComparisonOnly><ComparisonSideBySidePage /></ComparisonOnly>} />
             <Route path="spaces" element={<ComparisonOnly><ComparisonSpacesPage /></ComparisonOnly>} />
             <Route path="curate" element={<ComparisonOnly><ComparisonCuratePage /></ComparisonOnly>} />
+            <Route path="draft-links" element={<ComparisonOnly><ComparisonDraftLinksPage /></ComparisonOnly>} />
             <Route path="report" element={<ComparisonOnly><ComparisonReportPage /></ComparisonOnly>} />
             {/* Addresses the comparison views used before the 2026-10-28 rebuild. */}
             <Route path="curriculum-connections" element={<ComparisonOnly><ComparisonOverviewPage /></ComparisonOnly>} />
