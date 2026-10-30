@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import { ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
+  compareTopicsByCurriculumOrder,
   descriptionBelowTitle,
   getFullThread,
   getThreadStationsForTopic,
@@ -97,10 +98,12 @@ type ViewMode = 'cards' | 'list'
 // see that migration's own header for the full method. Items with no
 // sequence value (a different project, or content this project adds
 // outside the sourced curriculum) sort to the end rather than disappearing.
+//
+// Grade bands such as "5/6" and "7/8" are stored as one value, so one sequence
+// runs through the whole band (feedback 5488cd15, 69fd982f, 2026-10-30). The
+// comparison itself lives in curriculum.ts and is the same one listTopics uses.
 function sortByCurriculumOrder(items: TopicListItem[]): TopicListItem[] {
-  const grade = (t: TopicListItem) => parseInt(t.grade_band ?? '', 10) || 0
-  const seq = (t: TopicListItem) => t.curriculum_sequence ?? Infinity
-  return [...items].sort((a, b) => grade(a) - grade(b) || seq(a) - seq(b))
+  return [...items].sort(compareTopicsByCurriculumOrder)
 }
 
 // Real feedback 2026-10-01 (Susan): the space above the card grid was just

@@ -37,8 +37,20 @@ export interface GradeBandMatrix {
   orphanObjectIds: string[]
 }
 
+// grade_band is one grade ("9") or a band written with a slash ("5/6", "7/8").
+// Number("5/6") is NaN, and every comparison with NaN is false, which made
+// sortPair answer differently depending on the order of its two arguments and
+// left the grade list unordered. Ranking by the first number fixes both.
+function gradeRank(g: string): number {
+  return parseInt(g, 10) || 0
+}
+
+function compareGrades(a: string, b: string): number {
+  return gradeRank(a) - gradeRank(b) || (a < b ? -1 : a > b ? 1 : 0)
+}
+
 function sortPair(a: string, b: string): [string, string] {
-  return Number(a) <= Number(b) ? [a, b] : [b, a]
+  return compareGrades(a, b) <= 0 ? [a, b] : [b, a]
 }
 
 /**
@@ -65,7 +77,7 @@ export async function getGradeBandMatrix(supabase: Client, projectId: string, br
 
   const objs = objects ?? []
   const gradeOf = new Map(objs.map((o) => [o.id, o.grade_band]))
-  const grades = Array.from(new Set(objs.map((o) => o.grade_band).filter((g): g is string => !!g))).sort((a, b) => Number(a) - Number(b))
+  const grades = Array.from(new Set(objs.map((o) => o.grade_band).filter((g): g is string => !!g))).sort(compareGrades)
 
   const threadIds = (threads ?? []).map((t) => t.id)
   const { data: stations } = threadIds.length
@@ -207,7 +219,7 @@ export interface StrandMatrix {
 
 export async function listGradesWithObjects(supabase: Client, projectId: string, branchId: string): Promise<string[]> {
   const { data } = await supabase.from('lpm_data_objects').select('grade_band').eq('project_id', projectId).eq('branch_id', branchId)
-  return Array.from(new Set((data ?? []).map((o) => o.grade_band).filter((g): g is string => !!g))).sort((a, b) => Number(a) - Number(b))
+  return Array.from(new Set((data ?? []).map((o) => o.grade_band).filter((g): g is string => !!g))).sort(compareGrades)
 }
 
 export async function getSameGradeStrandMatrix(
