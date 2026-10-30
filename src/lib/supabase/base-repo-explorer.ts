@@ -295,11 +295,36 @@ function detectLanguages(data: Record<string, unknown>): string[] {
   return Array.from(found).sort()
 }
 
+/**
+ * Turns a stored label into the plain words a person reads. MethodsBase
+ * stores its label as a language-keyed object, and the snapshot table keeps
+ * that as JSON text, e.g. {"en":"ABC Method (ABC-Methode)"}. This returns
+ * just "ABC Method (ABC-Methode)": English first, then German, then whatever
+ * language is there. A label that is already plain text comes back as is
+ * (Susan Hanisch, 2026-10-30, feedback 6cffd929).
+ */
+export function plainLabel(value: unknown): string {
+  let v: unknown = value
+  if (typeof v === 'string' && v.trimStart().startsWith('{')) {
+    try {
+      v = JSON.parse(v)
+    } catch {
+      return v as string
+    }
+  }
+  if (v && typeof v === 'object' && !Array.isArray(v)) {
+    const obj = v as Record<string, unknown>
+    const pick = obj.en ?? obj.de ?? Object.values(obj).find((x) => typeof x === 'string' && x)
+    return typeof pick === 'string' ? pick : ''
+  }
+  return v == null ? '' : String(v)
+}
+
 function normalizeRow(cfg: BaseRepoConfig, raw: any): SnapshotRow {
   const data = raw.data ?? {}
   return {
     id: raw.id,
-    label: raw[cfg.labelColumn] ?? raw.id,
+    label: plainLabel(raw[cfg.labelColumn]) || raw.id,
     secondary: cfg.secondaryColumn ? raw[cfg.secondaryColumn] ?? null : null,
     filterValue: cfg.filterColumn ? raw[cfg.filterColumn] ?? null : null,
     review_status: raw.review_status ?? data?.provenance?.review_status ?? null,
@@ -350,7 +375,7 @@ async function enrichCompetencyHierarchy(supabase: Client, rows: SnapshotRow[]):
   for (const r of data ?? []) {
     const broaderRaw = (r.data as any)?.broader
     nodes.set(r.id, {
-      label: r.label ?? r.id,
+      label: plainLabel(r.label) || r.id,
       broader: Array.isArray(broaderRaw) ? broaderRaw : broaderRaw ? [broaderRaw] : [],
     })
   }
@@ -450,7 +475,7 @@ export async function resolveCrossRepoLabels(
       const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
       if (!cfg) return
       const { data } = await (supabase as any).from(cfg.table).select(`id, ${cfg.labelColumn}`).in('id', ids)
-      for (const row of data ?? []) out.set(`${repoKey}:${row.id}`, { label: row[cfg.labelColumn] ?? row.id })
+      for (const row of data ?? []) out.set(`${repoKey}:${row.id}`, { label: plainLabel(row[cfg.labelColumn]) || row.id })
     })
   )
   return out

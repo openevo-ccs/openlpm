@@ -54,8 +54,8 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
         <Dna size={14} /><span className="nav-label">Basiskonzepte</span>
       </NavLink>
       <p className="muted student-nav-group">MEINE ARBEIT</p>
-      <NavLink to={`${base}/meine-arbeit`} title="Meine Arbeit und Abgabe" className={({ isActive }) => (isActive ? 'active' : '')}>
-        <PenLine size={14} /><span className="nav-label">Meine Arbeit und Abgabe</span>
+      <NavLink to={`${base}/meine-arbeit`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <PenLine size={14} /><span className="nav-label">Aufgabe 1: Basiskonzepte</span>
       </NavLink>
       <p className="muted student-nav-group">PLANEN</p>
       <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>

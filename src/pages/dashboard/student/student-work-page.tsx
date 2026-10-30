@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { CheckCircle2, Download, FileText, Plus, Star, Trash2 } from 'lucide-react'
+import { CheckCircle2, FileText, Plus, Star, Trash2 } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import { listTopics, listTopicContents, type TopicListItem } from '@/lib/supabase/curriculum'
 import { bkEntries, buildBkLabelMap, getRootConcepts } from '@/lib/supabase/basiskonzepte'
@@ -21,14 +21,15 @@ import {
   type WorkEntry,
   type WorkKind,
 } from '@/lib/supabase/student-work'
-import { buildHandIn, describeHandIn, handInFileBase, handInJsonBlob, loadFavoriteTimes, type HandIn } from '@/lib/student-handin'
+import { buildHandIn, describeHandIn, handInFileBase, loadFavoriteTimes, type HandIn } from '@/lib/student-handin'
 import { downloadBlob } from '@/lib/export-import'
 
 // "Meine Arbeit": where a student keeps the answers to the seminar 2 task
 // (Themenfindung, Lernziele im Thüringer Lehrplan, Basiskonzepte,
 // Querschnittsaufgaben) and the homework (judge the Basiskonzept links the
 // tool suggests on three criteria). Everything saves as the student goes.
-// The last tab builds the two files that get uploaded to Moodle.
+// The last tab builds the Word file that gets uploaded to Moodle. The JSON
+// process file was dropped from the page on 2026-10-30 at Susan's request.
 
 // The Thema step and the Basiskonzepte/Querschnitt step were removed on
 // 2026-10-29 at Susan's request: the course handles them outside EvoMentor.
@@ -36,9 +37,9 @@ import { downloadBlob } from '@/lib/export-import'
 type Tab = 'beurteilen' | 'reflexion' | 'abgabe'
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'beurteilen', label: '1 Verknüpfungen beurteilen' },
-  { key: 'reflexion', label: '2 Reflexion' },
-  { key: 'abgabe', label: '3 Abgabe' },
+  { key: 'beurteilen', label: 'Basiskonzept-Verknüpfungen beurteilen' },
+  { key: 'reflexion', label: 'Reflexion' },
+  { key: 'abgabe', label: 'Abgabe' },
 ]
 
 const RELEVANCE_WORD: Record<number, string> = { 0: 'keine', 1: 'niedrig', 2: 'mittel', 3: 'hoch' }
@@ -120,10 +121,10 @@ export default function StudentWorkPage() {
     <div className="student-page">
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
         <div>
-          <h1 style={{ marginBottom: 4 }}>Meine Arbeit</h1>
+          <h1 style={{ marginBottom: 4 }}>Aufgabe 1: Basiskonzepte</h1>
           <p className="muted" style={{ marginTop: 0, maxWidth: 680 }}>
-            Hier hältst du fest, was du für Seminar 2 erarbeitest. Alles wird beim Schreiben automatisch gespeichert.
-            Am Ende lädst du zwei Dateien herunter und gibst sie in Moodle ab.
+            Hier hältst du fest, was du für die erste Aufgabe im Seminar erarbeitest. Alles wird beim Schreiben automatisch gespeichert.
+            Am Ende lädst du eine Word-Datei herunter und gibst sie in Moodle ab.
           </p>
         </div>
         <span className="muted" style={{ fontSize: 12 }} aria-live="polite">
@@ -526,7 +527,7 @@ function AbgabeTab({
     return () => { cancelled = true }
   }, [supabase, project.id, project.slug, entries, starred, topics, contentById, bkLabels, template])
 
-  if (!handIn) return <p className="muted">Bereitet deine Dateien vor…</p>
+  if (!handIn) return <p className="muted">Bereitet deine Datei vor…</p>
   const base = handInFileBase(handIn)
 
   const downloadWord = async () => {
@@ -547,22 +548,17 @@ function AbgabeTab({
     }
     setBusy(false)
   }
-  const downloadJson = (ext: 'json' | 'txt') => {
-    downloadBlob(handInJsonBlob(handIn), `${base}.${ext}`)
-    void logStudentEvent(supabase, project.id, 'handin_downloaded', { format: ext })
-  }
 
   return (
     <div className="card">
       <h3>Abgabe</h3>
       <p className="muted" style={{ maxWidth: 720 }}>
-        Du lädst zwei Dateien herunter und gibst beide in Moodle ab. Die Word-Datei ist zum Lesen, für dich, die Gruppe und die Dozentin.
-        Die Prozessdatei (JSON) enthält dieselben Antworten und dazu den Verlauf deiner Arbeit in EvoMentor, also was du wann geöffnet,
-        gemerkt und bearbeitet hast. Beide Dateien enthalten weder deinen Namen noch deine E-Mail-Adresse, nur deinen Teilnahme-Code.
+        Du lädst eine Word-Datei herunter und gibst sie in Moodle ab. Sie ist zum Lesen, für dich, die Gruppe und die Dozentin.
+        Die Datei enthält weder deinen Namen noch deine E-Mail-Adresse, nur deinen Teilnahme-Code.
       </p>
       {handIn.tool.sandbox && <div className="notice notice-bad">Sandbox: Dies ist ein Testkonto mit synthetischen Daten.</div>}
 
-      <h4>Das steht in deinen Dateien</h4>
+      <h4>Das steht in deiner Datei</h4>
       <table style={{ width: '100%', maxWidth: 720, marginBottom: 12 }}>
         <tbody>
           {describeHandIn(handIn).map((r) => (
@@ -596,15 +592,12 @@ function AbgabeTab({
         <button className="btn btn-primary" onClick={downloadWord} disabled={busy}>
           <FileText size={14} /> Word-Datei herunterladen
         </button>
-        <button className="btn btn-primary" onClick={() => downloadJson('json')}>
-          <Download size={14} /> Prozessdatei (JSON) herunterladen
-        </button>
       </div>
-      <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
-        Wenn Moodle die JSON-Datei ablehnt, lade sie{' '}
-        <button type="button" className="btn-linklike" onClick={() => downloadJson('txt')}>als Textdatei (.txt)</button> herunter. Der Inhalt ist derselbe.
-        {judgedCount === 0 && ' Du hast noch keine Verknüpfung beurteilt. Du kannst trotzdem schon herunterladen und später eine neue Fassung erstellen.'}
-      </p>
+      {judgedCount === 0 && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+          Du hast noch keine Verknüpfung beurteilt. Du kannst trotzdem schon herunterladen und später eine neue Fassung erstellen.
+        </p>
+      )}
     </div>
   )
 }
