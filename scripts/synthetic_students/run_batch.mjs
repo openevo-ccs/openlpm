@@ -98,6 +98,23 @@ async function selectPhase() {
       await page.goto(BASE, { waitUntil: 'networkidle' })
       await mintQaSession(page, BASE, persona.email)
 
+      // Having a matching project_join_rules row only makes a persona
+      // ELIGIBLE to join -- the actual project_members row is only created
+      // when the signed-in account itself visits the join link and clicks
+      // through, same as a real brand-new student would.
+      await page.goto(`${BASE}#/join/${SLUG}`, { waitUntil: 'networkidle' })
+      // join-page.tsx resolves in two SEQUENTIAL async steps (fetch the
+      // project, then check eligibility) -- networkidle can fire in the gap
+      // between them, so the button isn't necessarily there yet.
+      const joinButton = page.getByRole('button', { name: /^Join /, exact: false })
+      const appeared = await joinButton.waitFor({ timeout: 8000 }).then(() => true).catch(() => false)
+      if (appeared) {
+        await joinButton.click()
+        await page.waitForTimeout(1200)
+      } else {
+        qaLog.push({ persona: persona.persona_id, type: 'join-button-not-found', detail: await page.locator('.card').first().textContent().catch(() => '(no card found)') })
+      }
+
       await page.goto(`${BASE}#/dashboard/${SLUG}/notebooks`, { waitUntil: 'networkidle' })
       await page.fill('input[name="name"]', persona.notebook_label)
       await page.getByRole('button', { name: 'Create notebook' }).click()
