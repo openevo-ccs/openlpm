@@ -1,0 +1,17 @@
+{
+  "note": "Which LiteratureBase records support which part of the two new strands. A record is attached where the part's content draws on the record's topic, judged from the record's summary. No expert has confirmed any pairing.",
+  "strands": {
+    "schooling": ["lancy-2022", "rogoff-1990", "rogoff-2003", "paradise-rogoff-2009", "csibra-gergely-2009", "caro-hauser-1992", "kline-2015", "meyer-1977", "scribner-cole-1981", "bourdieu-passeron-1977", "freire-1970", "illich-1971"],
+    "language": ["haspelmath-2003", "haspelmath-2023", "rzymski-et-al-2020", "gray-atkinson-2003", "bouckaert-et-al-2012", "greenhill-et-al-2017", "dunn-et-al-2011", "evans-levinson-2009", "kirby-cornish-smith-2008", "senghas-kita-ozyurek-2004", "youn-et-al-2016", "wolff-holmes-2011", "roberts-winters-2013", "berlin-kay-1969"]
+  },
+  "parts": {
+    "schooling|k2": ["lancy-2022", "rogoff-1990", "paradise-rogoff-2009"],
+    "schooling|35": ["rogoff-1990", "rogoff-2003", "paradise-rogoff-2009", "csibra-gergely-2009", "caro-hauser-1992", "kline-2015"],
+    "schooling|68": ["meyer-1977", "bourdieu-passeron-1977", "scribner-cole-1981", "freire-1970", "illich-1971", "lancy-2022"],
+    "schooling|912": ["meyer-1977", "bourdieu-passeron-1977", "freire-1970", "illich-1971", "kline-2015", "scribner-cole-1981"],
+    "language|k2": ["senghas-kita-ozyurek-2004"],
+    "language|35": ["kirby-cornish-smith-2008", "haspelmath-2023"],
+    "language|68": ["gray-atkinson-2003", "bouckaert-et-al-2012", "greenhill-et-al-2017", "dunn-et-al-2011", "haspelmath-2003", "haspelmath-2023", "rzymski-et-al-2020", "kirby-cornish-smith-2008"],
+    "language|912": ["evans-levinson-2009", "wolff-holmes-2011", "roberts-winters-2013", "youn-et-al-2016", "berlin-kay-1969", "dunn-et-al-2011", "rzymski-et-al-2020", "haspelmath-2023"]
+  }
+}
