@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './database.types'
 import {
   familyOf, splitJurisdictions,
-  type CmpConcept, type CmpLink, type CmpObject, type CmpRecord, type CmpReview, type CmpThread,
+  type CmpConcept, type CmpDraftPart, type CmpLink, type CmpObject, type CmpRecord, type CmpReview, type CmpThread,
 } from '@/lib/comparison'
 
 type Client = SupabaseClient<Database>
@@ -15,6 +15,8 @@ type Client = SupabaseClient<Database>
 
 export interface ComparisonSource {
   objects: CmpObject[]
+  /** Parts nobody has accepted yet (draft, submitted, under review). They stay out of every count and are listed on the Draft links page only. */
+  draftParts: CmpDraftPart[]
   concepts: CmpConcept[]
   threads: CmpThread[]
   records: CmpRecord[]
@@ -81,13 +83,14 @@ export async function loadComparisonSource(
   const db = supabase as any
 
   // The progression itself.
-  const [{ data: objRows }, { data: conRows }, { data: elRows }, { data: tagRows }, { data: thrRows }, { data: proj }] = await Promise.all([
+  const [{ data: objRows }, { data: conRows }, { data: elRows }, { data: tagRows }, { data: thrRows }, { data: proj }, { data: draftRows }] = await Promise.all([
     db.from('lpm_data_objects').select('id,title,description,object_type,grade_band,created_at').eq('project_id', projectId).eq('branch_id', branchId).eq('status', 'accepted').order('created_at', { ascending: true }),
     db.from('lpm_connections').select('from_object_id,to_object_id,relation_type').eq('project_id', projectId).eq('relation_type', 'isChildOf'),
     db.from('lpm_schema_elements').select('id,label,parent_id,element_type').eq('project_id', projectId).eq('element_type', 'concept'),
     db.from('lpm_object_tags').select('data_object_id,schema_element_id').eq('project_id', projectId),
     db.from('lpm_threads').select('id,title').eq('project_id', projectId),
     db.from('projects').select('color').eq('id', projectId).maybeSingle(),
+    db.from('lpm_data_objects').select('id,title,object_type,grade_band,status,created_at').eq('project_id', projectId).eq('branch_id', branchId).in('status', ['draft', 'submitted', 'under_review']).order('created_at', { ascending: true }),
   ])
   const parentOf = new Map<string, string>((conRows ?? []).map((c: any) => [c.from_object_id, c.to_object_id]))
   const conceptsByObject = new Map<string, string[]>()
@@ -122,6 +125,11 @@ export async function loadComparisonSource(
     threadIds: threadsByObject.get(o.id) ?? [],
     order: i,
   }))
+  const titleOf = new Map<string, string>([...(objRows ?? []), ...(draftRows ?? [])].map((o: any) => [o.id, o.title]))
+  const draftParts: CmpDraftPart[] = (draftRows ?? []).filter((o: any) => o.object_type === 'substrand').map((o: any, i: number) => {
+    const strandId = parentOf.get(o.id) ?? null
+    return { id: o.id, title: o.title, gradeBand: o.grade_band ?? null, status: o.status, strandId, strandTitle: strandId ? titleOf.get(strandId) ?? null : null, order: i }
+  })
   const concepts: CmpConcept[] = (elRows ?? []).map((e: any) => ({ id: e.id, label: e.label, parentId: e.parent_id ?? null }))
 
   // The real-world records, from every repository this view can reach.
@@ -183,7 +191,7 @@ export async function loadComparisonSource(
     if (o && u) checkedNoMatch.add(`${o}|${u}`)
   }
 
-  return { objects, concepts, threads, records, links, reviews, checkedNoMatch, reviewsAvailable, projectColor: proj?.color ?? null }
+  return { objects, draftParts, concepts, threads, records, links, reviews, checkedNoMatch, reviewsAvailable, projectColor: proj?.color ?? null }
 }
 
 // ---- Writers ---------------------------------------------------------------------
