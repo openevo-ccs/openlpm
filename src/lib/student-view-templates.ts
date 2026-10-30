@@ -51,7 +51,7 @@ export const STUDENT_VIEW_TEMPLATES: StudentViewTemplate[] = [
     {
       id: `${key}-india-en`,
       label: 'India (English)',
-      description: `English-language view comparing ${label} LPM (Synthetic) with India's school curriculum goals and standards: the national frameworks and the states of Karnataka, Maharashtra and Uttar Pradesh. Every link is an AI-drafted proposal that a reader can confirm, correct or reject.`,
+      description: `English-language view comparing ${label} LPM (Synthetic) with India's school curriculum goals and standards: the national frameworks and the states of Karnataka, Kerala, Maharashtra and Uttar Pradesh. Every link is an AI-drafted proposal that a reader can confirm, correct or reject.`,
     },
     {
       id: `${key}-cross-national-en`,
@@ -114,6 +114,7 @@ export const COUNTRY_REPOSITORIES: Record<string, string[]> = {
     'karnataka-curriculum-repository',
     'maharashtra-curriculum-repository',
     'uttar-pradesh-curriculum-repository',
+    'kerala-school-curriculum-repository',
   ],
 }
 
