@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, GraduationCap, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
+import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileEdit, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, GraduationCap, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
 import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
 import { makeT, type StringKey } from '../comparison/strings'
 import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
@@ -8,6 +8,9 @@ import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
 // sidebar of four groups: explore the data, compare it, improve it, share it.
 // "Between spaces" appears only for a space that has a written comparison with
 // another space (today Bio-Core and Interdisciplinary).
+// Spaces that hold parts nobody has accepted yet and so have a "Draft links" page (src/pages/dashboard/comparison/draft-links-page.tsx).
+const DRAFT_LINK_SPACES = new Set(['interdisciplinary-lpm-synth'])
+
 function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 'de' | 'en' }) {
   const base = `/dashboard/${slug}`
   const t = (key: StringKey) => makeT(language)(key)
@@ -31,6 +34,7 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
       {KNOWN_COMPARISON_PAIRS[slug] && item(`${base}/spaces`, 'navSpaces', GitCompare)}
       <p className="muted student-nav-group">{t('groupImprove')}</p>
       {item(`${base}/curate`, 'navCurate', ListChecks)}
+      {DRAFT_LINK_SPACES.has(slug) && item(`${base}/draft-links`, 'navDraftLinks', FileEdit)}
       <p className="muted student-nav-group">{t('groupShare')}</p>
       {item(`${base}/report`, 'navReport', FileText)}
     </nav>

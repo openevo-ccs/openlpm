@@ -5,7 +5,7 @@ import { COUNTRY_REPOSITORIES, getCurriculumConnectionsViewConfig, type Curricul
 import { loadComparisonSource, type ComparisonSource } from '@/lib/supabase/comparison'
 import {
   RECORD_FAMILIES, buildGrid, buildIndex, computeMeasures, computeNetworkMeasures, listUnits, recordUnitIds,
-  type CmpConcept, type CmpLink, type CmpObject, type CmpRecord, type CmpReview, type DimId, type Grid, type Lang, type Level,
+  type CmpConcept, type CmpDraftPart, type CmpLink, type CmpObject, type CmpRecord, type CmpReview, type DimId, type Grid, type Lang, type Level,
   type Measures, type NetworkMeasures, type RecordFamily, type TextIndex, type Unit,
 } from '@/lib/comparison'
 import { makeT, type Translate } from './strings'
@@ -48,6 +48,9 @@ export interface ComparisonState {
   // derived
   objects: CmpObject[]
   objectsById: Map<string, CmpObject>
+  /** Parts nobody has accepted yet, and the links to them. Only the Draft links page reads these. */
+  draftParts: CmpDraftPart[]
+  draftLinks: CmpLink[]
   concepts: CmpConcept[]
   topConcepts: CmpConcept[]
   topConceptOf: Map<string, string>
@@ -178,6 +181,11 @@ function Loaded({ context, config, templateId, children }: { context: ProjectOut
   const scopeRecordIds = useMemo(() => new Set(scopeRecords.map((r) => r.id)), [scopeRecords])
 
   const links = useMemo(() => (source?.links ?? EMPTY_LINKS).filter((l) => scopeRecordIds.has(l.recordId) && objectsById.has(l.objectId) && (includeProposed || !l.proposed)), [source, scopeRecordIds, objectsById, includeProposed])
+  const draftParts = source?.draftParts ?? EMPTY_DRAFT_PARTS
+  const draftLinks = useMemo(() => {
+    const ids = new Set(draftParts.map((p) => p.id))
+    return (source?.links ?? EMPTY_LINKS).filter((l) => ids.has(l.objectId) && recordsById.has(l.recordId))
+  }, [source, draftParts, recordsById])
   const proposedShare = useMemo(() => (links.length ? links.filter((l) => l.proposed).length / links.length : 0), [links])
   const reviewsByLink = useMemo(() => {
     const m = new Map<string, CmpReview[]>()
@@ -218,13 +226,14 @@ function Loaded({ context, config, templateId, children }: { context: ProjectOut
     loading: !source && !error, error, source, refresh,
     level, setLevel: setLevelState, countries, toggleCountry, dim, setDim: setDimState, includeProposed, setIncludeProposed: setIncludeProposedState,
     families, toggleFamily, resetFamilies,
-    objects, objectsById, concepts, topConcepts, topConceptOf, allRecords, recordsById, scopeRecords, links, reviewsByLink,
+    objects, objectsById, draftParts, draftLinks, concepts, topConcepts, topConceptOf, allRecords, recordsById, scopeRecords, links, reviewsByLink,
     units, recordCountByUnit, activeUnitIds, grid, measures, network, recordIndex, recordWeight, proposedShare, pair, setPair,
   }
   return <Ctx.Provider value={state}>{children}</Ctx.Provider>
 }
 
 const EMPTY_OBJECTS: CmpObject[] = []
+const EMPTY_DRAFT_PARTS: CmpDraftPart[] = []
 const EMPTY_CONCEPTS: CmpConcept[] = []
 const EMPTY_RECORDS: CmpRecord[] = []
 const EMPTY_LINKS: CmpLink[] = []
