@@ -12,6 +12,10 @@ goals shown are the ones in the CSV, with the CSV's wording. Nothing else is sho
   * Every live 5/6 row that is no CSV goal is set to status 'archived' (hidden, and nothing is deleted), so
     judgments, favorites and links that point at it stay intact and the step can be undone.
 
+Every inserted row must carry the project's main branch (branch_id): the Lernziele list only shows
+rows on that branch. Migration 203 was generated before this was added and left branch_id empty;
+migration 204 repairs those rows.
+
 Only change to the CSV text: line-wrap hyphens ("Materia-lien") are closed up, as in
 migration 168. Typos in the CSV are left as written.
 
@@ -217,8 +221,8 @@ def emit(project_sql, project_id_sql, rows_of, tag):
             if c['unter']:
                 content['unterthema'] = c['unter']
             sql.append(
-                'INSERT INTO lpm_data_objects (project_id, object_type, title, description, grade_band, subject_area, content, schema_version, status) VALUES (\n'
-                f"  {project_id_sql}, 'performance_indicator',\n"
+                'INSERT INTO lpm_data_objects (project_id, branch_id, object_type, title, description, grade_band, subject_area, content, schema_version, status) VALUES (\n'
+                f"  {project_id_sql}, (SELECT id FROM branches WHERE project_id = {project_id_sql} AND is_trunk = true), 'performance_indicator',\n"
                 f"  {sq(title_of(c['text']))},\n  {sq(c['text'])},\n  '5/6', 'Biologie',\n"
                 f"  {sq(json.dumps(content, ensure_ascii=False))}::jsonb,\n  'evomentor_de_lernziel_v1.2', 'accepted'\n);")
     hide = [rows_of(r)['id'] for j, r in enumerate(L) if j not in used]
