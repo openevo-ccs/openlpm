@@ -11,7 +11,7 @@
 SET search_path = public, extensions;
 
 -- feedback 00bebea8: Informationsverarbeitung
-UPDATE lpm_schema_elements SET definition = 'Die Aufnahme, Weiterleitung und Verarbeitung von Signalen sowie die Reaktion auf Signale durch ein Lebewesen oder eine seiner Teilstrukturen.', updated_at = now()
+UPDATE lpm_schema_elements SET definition = 'Die Aufnahme, Weiterleitung und Verarbeitung von Signalen sowie die Reaktion darauf durch ein Lebewesen oder eine seiner Teilstrukturen.', updated_at = now()
 WHERE project_id IN (SELECT id FROM projects WHERE slug IN ('evomentor-thuringia', 'evomentor-thuringia-sandbox')) AND label = 'Informationsverarbeitung' AND definition = 'Die Aufnahme, Weiterleitung, Verarbeitung und Beantwortung von Signalen durch ein Lebewesen oder eine seiner Teilstrukturen.';
 
 -- feedback 19caa090: Kommunikation zwischen Organismen
@@ -23,7 +23,7 @@ UPDATE lpm_schema_elements SET definition = 'Systeme, die Stoffe und Energie mit
 WHERE project_id IN (SELECT id FROM projects WHERE slug IN ('evomentor-thuringia', 'evomentor-thuringia-sandbox')) AND label = 'Offene Systeme' AND definition = 'Systeme, die sowohl Stoffe als auch Energie mit ihrer Umgebung austauschen — im Gegensatz zu geschlossenen Systemen, die nur Energie, oder isolierten Systemen, die weder Stoffe noch Energie austauschen.';
 
 -- feedback 1fc022f5 4ea1e2dd: Evolutive Entwicklung
-UPDATE lpm_schema_elements SET common_misconceptions = jsonb_set(common_misconceptions, '{2,richtig}', to_jsonb('Evolution betrifft Populationen über Generationen, nicht einzelne Individuen. Körperliche Veränderungen, die ein Individuum im Lauf seines Lebens erwirbt, werden nicht genetisch vererbt. Erlernte Verhaltensweisen können dagegen durch soziales Lernen an die nächste Generation weitergegeben werden und sind damit ebenfalls ein Vererbungsprozess.'::text)), updated_at = now()
+UPDATE lpm_schema_elements SET common_misconceptions = jsonb_set(common_misconceptions, '{2,richtig}', to_jsonb('Evolution betrifft Populationen über Generationen, nicht einzelne Individuen. Körperliche Veränderungen, die ein Individuum im Lauf seines Lebens erwirbt, werden nicht genetisch vererbt. Erlernte Verhaltensweisen können dagegen durch soziales Lernen an die nächste Generation weitergegeben werden; auch das ist eine Form der Vererbung, die ohne die Gene auskommt.'::text)), updated_at = now()
 WHERE project_id IN (SELECT id FROM projects WHERE slug IN ('evomentor-thuringia', 'evomentor-thuringia-sandbox')) AND label = 'Evolutive Entwicklung' AND common_misconceptions -> 2 ->> 'falsch' = 'Ein Individuum kann sich im Laufe seines Lebens evolutiv anpassen (Lamarckismus)' AND common_misconceptions -> 2 ->> 'richtig' = 'Evolution betrifft Populationen über Generationen, nicht Individuen; erworbene Merkmale werden nicht vererbt';
 
 -- feedback 22613921: Koevolution
@@ -51,7 +51,7 @@ UPDATE lpm_schema_elements SET metadata = jsonb_set(metadata, '{beispiel}', to_j
 WHERE project_id IN (SELECT id FROM projects WHERE slug IN ('evomentor-thuringia', 'evomentor-thuringia-sandbox')) AND label = 'Flaschenhalseffekt' AND metadata ->> 'beispiel' = 'Geparden weisen aufgrund eines historischen Flaschenhalses eine außergewöhnlich geringe genetische Vielfalt auf.';
 
 -- feedback 8560116a: Evolutionäre Entwicklungsbiologie (Evo-Devo)
-UPDATE lpm_schema_elements SET definition = 'Forschungsrichtung, die erforscht, wie sich Prozesse der individuellen Entwicklung und evolutionäre Prozesse gegenseitig beeinflussen.', updated_at = now()
+UPDATE lpm_schema_elements SET definition = 'Forschungsrichtung, die untersucht, wie sich Prozesse der individuellen Entwicklung und evolutionäre Prozesse gegenseitig beeinflussen.', updated_at = now()
 WHERE project_id IN (SELECT id FROM projects WHERE slug IN ('evomentor-thuringia', 'evomentor-thuringia-sandbox')) AND label = 'Evolutionäre Entwicklungsbiologie (Evo-Devo)' AND definition = 'Forschungsrichtung, die untersucht, wie Veränderungen in den genetischen Steuerungsprogrammen der individuellen Entwicklung (Ontogenese) zu evolutionären Veränderungen von Körperbauplänen führen.';
 
 -- feedback 57d09669: Energieentwertung
