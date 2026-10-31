@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { Anchor, Info } from 'lucide-react'
@@ -186,6 +186,7 @@ function DashboardTab({
               <tr>
                 <th style={{ textAlign: 'left', padding: '4px 8px', width: '28%' }}>Basiskonzept</th>
                 {grades.map((g) => <th key={g} style={{ padding: '4px 4px' }}>Kl. {g}</th>)}
+                <th style={{ padding: '4px 4px' }}>Lernziele gesamt</th>
               </tr>
             </thead>
             <tbody>
@@ -258,13 +259,41 @@ function DashboardTab({
                         </td>
                       )
                     })}
+                    {(() => {
+                      // Total over all grade bands. Every goal is rated against every Basiskonzept, so the plain number of ratings is the
+                      // same for all six. The number that tells them apart is the goals rated medium or high (the same ones the Netz counts).
+                      const totals = [0, 0, 0]
+                      for (const t of topics ?? []) {
+                        for (const e of bkEntries(contentById.get(t.id))) {
+                          if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
+                          if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) totals[e.relevanz_beurteilung - 1]++
+                        }
+                      }
+                      const sum = totals[1] + totals[2]
+                      const color = `var(--map-${(i % 6) + 1})`
+                      return (
+                        <td key="total" style={{ padding: '4px 4px', textAlign: 'center' }}>
+                          {sum === 0 ? (
+                            '—'
+                          ) : (
+                            <div className="tip tip-end" style={{ display: 'block' }} data-tip={`Lernziele mit mittlerer oder hoher Relevanz: mittel ${totals[1]} · hoch ${totals[2]} (niedrig bewertet: ${totals[0]}, nicht mitgezählt)`}>
+                              <div style={{ fontWeight: 700, fontSize: 13 }}>{sum}</div>
+                              <div className="muted" style={{ fontSize: 10 }}>davon hoch {totals[2]}</div>
+                              <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)', marginTop: 2 }}>
+                                {([0, 1, 2] as const).map((lvl) => (totals[lvl] > 0 ? <div key={lvl} style={{ flex: totals[lvl], background: color, opacity: 0.35 + lvl * 0.3 }} /> : null))}
+                              </div>
+                            </div>
+                          )}
+                        </td>
+                      )
+                    })()}
                   </tr>
                 )
               })}
             </tbody>
           </table>
         </div>
-        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker.</p>
+        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker. Lernziele gesamt: Anzahl der Lernziele mit mittlerer oder hoher Relevanz für das Basiskonzept, über alle Klassenstufen. Niedrig bewertete sind nicht mitgezählt.</p>
       </div>
     </div>
   )
@@ -323,9 +352,8 @@ const UK_ROW_HEIGHT_BASE = 34
 const UK_CHILD_WIDTH_BASE = 96
 const LZ_ROW_HEIGHT_BASE = 38
 const LZ_GAP_ABOVE_BASE = 70
-const DENSITY_SCALE: Record<Density, number> = { kompakt: 1, weit: 1.55 }
-
-type Density = 'kompakt' | 'weit'
+const GRADE_BAND_ORDER = ['5/6', '7/8', '9', '10']
+type LzOrder = 'grade' | 'relevance'
 type SizeBy = 'count' | 'relevance'
 
 interface GraphNodeDatum {
@@ -347,6 +375,8 @@ interface GraphEdgeDatum {
   weight: number
   kind: 'hierarchy' | 'relevance' | 'relation' | 'cross' | 'bundle'
   tooltip?: string
+  /** Two colors, 'start end', for a line that fades from one concept's color to the other's. */
+  gradient?: string
 }
 interface NetzInsightUk { id: string; label: string; rootLabel: string; rootIdx: number; count: number }
 interface NetzInsightLz { id: string; title: string; rootCount: number; rootLabels: string[] }
@@ -383,7 +413,8 @@ function NetzTab({
   const [showRelations, setShowRelations] = useState(false)
   const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [sizeBy, setSizeBy] = useState<SizeBy>('count')
-  const [density, setDensity] = useState<Density>('kompakt')
+  // How the dots of the learning goals are ordered under a concept: by grade band (rows then mean something) or by relevance.
+  const [lzOrder, setLzOrder] = useState<LzOrder>('grade')
   // Shared graph standards (src/lib/graph-standards.ts): which connections to
   // draw, label overlap handling, layout, line strength. Remembered per browser.
   const [gs, updateGs, resetGs] = useGraphSettings('basiskonzepte-netz')
@@ -507,7 +538,7 @@ function NetzTab({
   } | null => {
     if (!topics || rootConcepts.length === 0) return null
     const width = containerWidth || containerRef.current?.clientWidth || 900
-    const scale = DENSITY_SCALE[density]
+    const scale = 1
     const BK_ROW_Y = gs.edges === 'tree' ? BK_ROW_Y_BASE : BK_ROW_Y_FOR_ARCS
     const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
     const rootColor = (rootId: string) => cssVar(MAP_PALETTE[(rootIndex.get(rootId) ?? 0) % 6], '#2a78d6')
@@ -707,14 +738,30 @@ function NetzTab({
         groupedByAnchor.set(p.targetId, arr)
       }
       for (const arr of groupedByAnchor.values()) arr.sort((a, b) => (primaryByTopic.get(b)?.totalWeight ?? 0) - (primaryByTopic.get(a)?.totalWeight ?? 0))
+      // Rows mean something when the dots are ordered by grade band: the first block under a concept is grade 5/6, then 7/8, 9, 10.
+      const bandOfTopic = (topicId: string) => bandKeyForGrade(topics.find((t) => t.id === topicId)?.grade_band ?? '')
+      const bandRank = (band: string) => { const i = GRADE_BAND_ORDER.indexOf(band); return i < 0 ? GRADE_BAND_ORDER.length : i }
       for (const [anchorId, topicIds] of groupedByAnchor) {
         const anchorPos = nodePositions.get(anchorId)
         if (!anchorPos) continue
         const isRootAnchor = rootIndex.has(anchorId)
         const maxWidth = isRootAnchor ? (colWidthByRoot.get(anchorId) ?? width / rootConcepts.length) - 16 : UK_CHILD_WIDTH_BASE * scale
-        const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, isRootAnchor ? 34 : 24)
-        for (const [id, pos] of positions) nodePositions.set(id, pos)
-        maxLzRows = Math.max(maxLzRows, rows)
+        const spacing = isRootAnchor ? 34 : 24
+        if (lzOrder === 'grade') {
+          let rowsUsed = 0
+          const bands = Array.from(new Set(topicIds.map(bandOfTopic))).sort((a, b) => bandRank(a) - bandRank(b))
+          for (const band of bands) {
+            const ids = topicIds.filter((id) => bandOfTopic(id) === band)
+            const { positions, rows } = layoutTier(ids.map((id) => ({ id })), anchorPos.x, lzStartY + rowsUsed * lzRowHeight, maxWidth, lzRowHeight, spacing)
+            for (const [id, pos] of positions) nodePositions.set(id, pos)
+            rowsUsed += rows
+          }
+          maxLzRows = Math.max(maxLzRows, rowsUsed)
+        } else {
+          const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, spacing)
+          for (const [id, pos] of positions) nodePositions.set(id, pos)
+          maxLzRows = Math.max(maxLzRows, rows)
+        }
       }
     }
 
@@ -722,19 +769,33 @@ function NetzTab({
 
     // ---- Nodes ----
     const nodes: GraphNodeDatum[] = []
-    rootConcepts.forEach((c) => {
+    const gradeLabelOfTopic = (topicId: string) => bandKeyForGrade(topics.find((t) => t.id === topicId)?.grade_band ?? '')
+    // Sizes are scaled from the smallest to the largest of the set. A fixed cap made every concept that holds more than about
+    // 100 goals come out the same size (feedback 049ff34c).
+    const relativeSize = (value: number, all: number[], lo: number, hi: number) => {
+      const roots = all.map((v) => Math.sqrt(v))
+      const mn = Math.min(...roots)
+      const mx = Math.max(...roots)
+      return mx === mn ? (lo + hi) / 2 : lo + ((Math.sqrt(value) - mn) / (mx - mn)) * (hi - lo)
+    }
+    const rootMetricOf = (c: (typeof rootConcepts)[number]) => {
       const count = lzCountByRoot.get(c.id) ?? 0
       const weight = Array.from(byTarget.entries()).filter(([id]) => id === c.id || ancestorAtDepth(id, 0, conceptElementsById)?.id === c.id).reduce((s, [, a]) => s + a.totalWeight, 0)
-      const metricVal = sizeBy === 'count' ? count : weight
+      return sizeBy === 'count' ? count : weight
+    }
+    const rootMetrics = rootConcepts.map(rootMetricOf)
+    rootConcepts.forEach((c) => {
+      const metricVal = rootMetricOf(c)
       const def = (c as any).didactic_definition as string | undefined
       nodes.push({
         id: c.id, label: c.label, kind: 'bk', color: rootColor(c.id),
-        size: Math.min(58, 34 + Math.sqrt(metricVal) * 3.2), opacity: 1,
+        size: relativeSize(metricVal, rootMetrics, 30, 64), opacity: 1,
         x: nodePositions.get(c.id)!.x, y: nodePositions.get(c.id)!.y,
         tooltip: def ? `${c.label}: ${def.length > 160 ? def.slice(0, 158) + '…' : def}` : c.label,
       })
     })
     if (showUk) {
+      const ukMetrics = usedUkIds.map((id) => { const a = byTarget.get(id) ?? EMPTY_AGG; return sizeBy === 'count' ? a.topicIds.size : a.totalWeight })
       for (const ukId of usedUkIds) {
         const el = conceptElementsById.get(ukId)
         const pos = nodePositions.get(ukId)
@@ -750,7 +811,7 @@ function NetzTab({
         const tooltipBase = el.definition ? `${el.label}: ${el.definition}` : el.label
         nodes.push({
           id: ukId, label: el.label.length > 22 ? el.label.slice(0, 20) + '…' : el.label, kind: 'uk',
-          color: root ? rootColor(root.id) : '#999', size: Math.min(20, 9 + Math.sqrt(metricVal) * 2.2), opacity: 0.92,
+          color: root ? rootColor(root.id) : '#999', size: relativeSize(metricVal, ukMetrics, 8, 22), opacity: 0.92,
           x: pos.x, y: pos.y,
           tooltip: (tooltipBase.length > 180 ? tooltipBase.slice(0, 178) + '…' : tooltipBase) + (beispiel ? ` (Beispiel: ${beispiel.length > 80 ? beispiel.slice(0, 78) + '…' : beispiel})` : ''),
         })
@@ -764,7 +825,7 @@ function NetzTab({
         nodes.push({
           id: topicId, label: '', kind: 'lz',
           color: rootColor(p.rootId), size: Math.min(13, 6 + Math.sqrt(p.totalWeight) * 2), opacity: Math.max(0.55, Math.min(0.9, p.totalWeight / 5)),
-          x: pos.x, y: pos.y, tooltip: title,
+          x: pos.x, y: pos.y, tooltip: gradeLabelOfTopic(topicId) ? `Kl. ${gradeLabelOfTopic(topicId)} · ${title}` : title,
         })
       }
     }
@@ -823,7 +884,7 @@ function NetzTab({
         const [a, b] = key.split('|')
         const labelA = rootConcepts.find((r) => r.id === a)?.label ?? '?'
         const labelB = rootConcepts.find((r) => r.id === b)?.label ?? '?'
-        edges.push({ id: `b-${key}`, source: a, target: b, color: '#6f7d8c', weight: count, kind: 'bundle', tooltip: `${count} Lernziele verbinden „${labelA}“ und „${labelB}“` })
+        edges.push({ id: `b-${key}`, source: a, target: b, color: '#6f7d8c', gradient: `${rootColor(a)} ${rootColor(b)}`, weight: count, kind: 'bundle', tooltip: `${count} Lernziele verbinden „${labelA}“ und „${labelB}“` })
       }
     }
     // Real feedback e7333af2 (Susan, 2026-10-02): named, directed links
@@ -877,7 +938,7 @@ function NetzTab({
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
     return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, density, containerWidth, gs.edges, gs.labels])
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, lzOrder, containerWidth, gs.edges, gs.labels])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
@@ -885,7 +946,7 @@ function NetzTab({
 
     const elements: ElementDefinition[] = [
       ...model.nodes.map((n) => ({ data: { id: n.id, label: n.label, color: n.color, size: n.size, opacity: n.opacity, kind: n.kind, tooltip: n.tooltip }, position: { x: n.x, y: n.y } })),
-      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '' } })),
+      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '', gradient: e.gradient ?? e.color } })),
     ]
 
     const cy = cytoscape({
@@ -956,7 +1017,8 @@ function NetzTab({
         {
           selector: 'edge[kind="bundle"]',
           style: {
-            width: 'mapData(weight, 1, 60, 1.5, 8)', 'line-color': '#8896a5', opacity: 0.3, 'curve-style': 'unbundled-bezier',
+            width: 'mapData(weight, 1, 60, 2, 9)', 'line-color': '#8896a5', opacity: 0.55, 'curve-style': 'unbundled-bezier',
+            'line-fill': 'linear-gradient', 'line-gradient-stop-colors': 'data(gradient)',
             'target-arrow-shape': 'none', 'z-index': 1,
           } as any,
         },
@@ -995,9 +1057,14 @@ function NetzTab({
       ],
     })
     cyRef.current = cy
+    // Arcs between concepts that are the same distance apart would lie on top of each other, so each gets its own height.
+    const arcsPerGap = new Map<number, number>()
     cy.edges('[kind="bundle"]').forEach((e) => {
       const gap = Math.abs(e.source().position('x') - e.target().position('x'))
-      e.style('control-point-distances', [-arcHeight(gap)])
+      const bucket = Math.round(gap / 20)
+      const k = arcsPerGap.get(bucket) ?? 0
+      arcsPerGap.set(bucket, k + 1)
+      e.style('control-point-distances', [-arcHeight(gap) * (1 + 0.16 * k)])
       e.style('control-point-weights', [0.5])
     })
     if (gs.layout === 'physics') {
@@ -1110,11 +1177,13 @@ function NetzTab({
           <button className={`chip-btn${sizeBy === 'count' ? ' active' : ''}`} onClick={() => setSizeBy('count')}>Anzahl Lernziele</button>
           <button className={`chip-btn${sizeBy === 'relevance' ? ' active' : ''}`} onClick={() => setSizeBy('relevance')}>Relevanz-Summe</button>
         </div>
-        <div className="netz-control-group">
-          <span className="muted" style={{ fontSize: 11 }}>Abstand:</span>
-          <button className={`chip-btn${density === 'kompakt' ? ' active' : ''}`} onClick={() => setDensity('kompakt')}>Kompakt</button>
-          <button className={`chip-btn${density === 'weit' ? ' active' : ''}`} onClick={() => setDensity('weit')}>Weit</button>
-        </div>
+        {showLz && (
+          <div className="netz-control-group">
+            <span className="muted" style={{ fontSize: 11 }}>Punkte der Lernziele ordnen nach:</span>
+            <button className={`chip-btn${lzOrder === 'grade' ? ' active' : ''}`} onClick={() => setLzOrder('grade')}>Klassenstufe</button>
+            <button className={`chip-btn${lzOrder === 'relevance' ? ' active' : ''}`} onClick={() => setLzOrder('relevance')}>Relevanz</button>
+          </div>
+        )}
       </div>
       <GraphControls
         settings={gs}
@@ -1133,7 +1202,10 @@ function NetzTab({
         Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre Unterkonzepte'}.
         {showLz && ' Kleine Punkte = einzelne Lernziele. Jedes Lernziel hängt mit einer Linie an dem '}
         {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
-        {showLz && ', zu dem es am stärksten passt.'}
+        {showLz && ', zu dem es am stärksten passt: Diese Hauptlinie zeigt die höchste Bewertung des Lernziels. '}
+        {showLz && 'Weitere Verbindungen zu Konzepten mit mindestens mittlerer Bewertung erscheinen beim Zeigen auf das Lernziel oder bei „Alle“. Niedrig bewertete Verbindungen werden nicht gezeichnet. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
+        {showLz && (lzOrder === 'grade' ? ' Unter jedem Konzept sind die Punkte nach Klassenstufe geordnet: oben 5/6, darunter 7/8, 9 und 10.' : ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.')}
+        {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts.'}
         {showLz && gs.edges === 'bundled' && ' Viele Lernziele gehören zu mehreren Konzepten zugleich: Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl). Zeigt man auf ein Lernziel, erscheinen seine weiteren Verbindungen.'}
         {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
         {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
@@ -1436,35 +1508,35 @@ function Subkonzepte({ rootId, conceptElementsById }: { rootId: string; conceptE
   if (children.length === 0) return null
   return (
     <div style={{ marginTop: 10 }}>
+      {/* The description opens on its own full-width line right after the chip that was clicked, so it sits directly
+          below that term and not at the bottom of the whole list (feedback 67c4c148, asked for twice). */}
       <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
         {children.map((el) => {
           const beispiel = (el.metadata as any)?.beispiel as string | undefined
           const hasDetail = !!(el.definition || beispiel)
           const isOpen = openId === el.id
           return (
-            <button
-              key={el.id}
-              className={`chip-btn${isOpen ? ' active' : ''}`}
-              style={{ cursor: hasDetail ? 'pointer' : 'default', opacity: hasDetail ? 1 : 0.5 }}
-              title={hasDetail ? undefined : 'Noch keine Beschreibung hinterlegt'}
-              onClick={() => hasDetail && setOpenId(isOpen ? null : el.id)}
-            >
-              {el.label}
-            </button>
+            <Fragment key={el.id}>
+              <button
+                className={`chip-btn${isOpen ? ' active' : ''}`}
+                style={{ cursor: hasDetail ? 'pointer' : 'default', opacity: hasDetail ? 1 : 0.5 }}
+                title={hasDetail ? undefined : 'Noch keine Beschreibung hinterlegt'}
+                onClick={() => hasDetail && setOpenId(isOpen ? null : el.id)}
+              >
+                {el.label}
+              </button>
+              {isOpen && (
+                <div style={{ flex: '0 0 100%' }}>
+                  <div style={{ fontSize: 13, margin: '0 0 4px', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
+                    {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
+                    {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
+                  </div>
+                </div>
+              )}
+            </Fragment>
           )
         })}
       </div>
-      {openId && (() => {
-        const el = children.find((c) => c.id === openId)
-        if (!el) return null
-        const beispiel = (el.metadata as any)?.beispiel as string | undefined
-        return (
-          <div style={{ fontSize: 13, margin: '6px 0 0', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
-            {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
-            {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
-          </div>
-        )
-      })()}
     </div>
   )
 }
