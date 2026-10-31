@@ -156,11 +156,21 @@ export function buildPrompt(
 // distinct grade_band values actually present in the current item set into
 // a compact display string -- a contiguous run reads "7–9", separate runs
 // join with ", " (e.g. "5–6, 9").
+//
+// A stored band such as "5/6" or "7/8" stands for both grades it spans, so it
+// reads "5–6" or "7–8" (before, Number("7/8") was NaN and the band dropped out
+// of the line). Free text such as "9-12" still drops out, as before.
 export function deriveKlassenstufe(items: { grade_band: string | null }[]): string {
-  const grades = Array.from(new Set(items.map((i) => i.grade_band).filter((g): g is string => !!g)))
-    .map(Number)
-    .filter((n) => !Number.isNaN(n))
-    .sort((a, b) => a - b)
+  const grades = Array.from(
+    new Set(
+      items
+        .map((i) => i.grade_band)
+        .filter((g): g is string => !!g)
+        .flatMap((g) => g.split('/'))
+        .map((part) => (part.trim() === '' ? NaN : Number(part)))
+        .filter((n) => !Number.isNaN(n))
+    )
+  ).sort((a, b) => a - b)
   if (grades.length === 0) return ''
   const runs: string[] = []
   let start = grades[0]

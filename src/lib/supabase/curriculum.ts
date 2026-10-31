@@ -86,8 +86,29 @@ export async function listTopics(supabase: Client, projectId: string, branchId: 
   // Sorting numerically here instead -- every consumer of this list (the
   // default view, the "Reihenfolge im Lehrplan" sort, everything else) was
   // silently inheriting that broken order, since nothing re-sorted it later.
-  items.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
+  // Within one grade band the list now follows curriculum_sequence, so the
+  // standard view shows the goals in the order of the Lehrplan (feedback
+  // 21d355f9, bf1cc2c6, 5488cd15, 2026-10-30). The query has no ORDER BY, so
+  // before this the order inside a band was whatever order the database
+  // happened to return, and a data update could reshuffle it. Rows without a
+  // sequence number keep the order the database gave them.
+  items.sort(compareTopicsByCurriculumOrder)
   return items
+}
+
+/**
+ * Orders goals by grade band first ("5/6" before "7/8" before "9" before "10"), then by their position
+ * in the curriculum. A goal without a position goes after those that have one and keeps its place among its peers.
+ */
+export function compareTopicsByCurriculumOrder(
+  a: Pick<TopicListItem, 'grade_band' | 'curriculum_sequence'>,
+  b: Pick<TopicListItem, 'grade_band' | 'curriculum_sequence'>
+): number {
+  const byBand = (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0)
+  if (byBand !== 0) return byBand
+  const seqA = a.curriculum_sequence == null ? Infinity : Number(a.curriculum_sequence)
+  const seqB = b.curriculum_sequence == null ? Infinity : Number(b.curriculum_sequence)
+  return seqA === seqB ? 0 : seqA < seqB ? -1 : 1
 }
 
 export async function getTopic(supabase: Client, id: string): Promise<DataObjectRow | null> {
