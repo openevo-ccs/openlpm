@@ -216,7 +216,9 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
   const facts = (node.facts ?? {}) as Record<string, unknown>
   const hours = typeof facts.hours === 'number' || typeof facts.hours === 'string' ? String(facts.hours) : null
   const unitNumber = typeof facts.unitNumber === 'string' || typeof facts.unitNumber === 'number' ? String(facts.unitNumber) : null
-  const coverage = typeof facts.coverage === 'string' && node.level === 'edition' && node.origin.startsWith('evomentor')
+  const ownCoverage = facts[`coverage_${lang}`]
+  const coverageText = typeof ownCoverage === 'string' ? ownCoverage : t.coverage
+  const coverage = node.level === 'edition' && (typeof ownCoverage === 'string' || (typeof facts.coverage === 'string' && node.origin.startsWith('evomentor')))
 
   return (
     <div className={depth === 0 ? 'card' : undefined} style={{ marginLeft: depth === 0 ? 0 : 18, marginBottom: depth === 0 ? 12 : 4, borderLeft: depth > 0 ? '2px solid var(--border, #ddd)' : undefined, paddingLeft: depth > 0 ? 10 : undefined }}>
@@ -244,7 +246,7 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
               {summary.fellBack && <span className="muted" style={{ fontSize: 11 }}> ({t.onlyOther})</span>}
             </p>
           )}
-          {coverage && <p className="muted" style={{ margin: '3px 0 0', fontSize: 12 }}>{t.coverage}</p>}
+          {coverage && <p className="muted" style={{ margin: '3px 0 0', fontSize: 12 }}>{coverageText}</p>}
           <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginTop: 3, fontSize: 11.5 }}>
             {depth === 0 && <span className="chip" style={{ fontSize: 10 }} title={t.status}>{status[lang]}</span>}
             {depth === 0 && <span className="chip" style={{ fontSize: 10 }}>{lang === 'de' ? TIER_DE[node.access_tier] : ACCESS_TIER_LABEL[node.access_tier]}</span>}
