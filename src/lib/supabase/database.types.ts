@@ -1796,8 +1796,6 @@ export type Database = {
           license_or_rights_note: string | null
           access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url: string | null
-          grade_bands: string[] | null
-          repository_record_id: string | null
           created_by: string | null
           created_at: string
         }
@@ -1809,8 +1807,6 @@ export type Database = {
           license_or_rights_note?: string | null
           access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url?: string | null
-          grade_bands?: string[] | null
-          repository_record_id?: string | null
           created_by?: string | null
           created_at?: string
         }
@@ -1822,8 +1818,6 @@ export type Database = {
           license_or_rights_note?: string | null
           access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only' | null
           url?: string | null
-          grade_bands?: string[] | null
-          repository_record_id?: string | null
           created_by?: string | null
           created_at?: string
         }
