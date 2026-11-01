@@ -1,10 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { ChevronDown, ChevronRight, ExternalLink, Info, ListTree, Search } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronRight, ExternalLink, Info, ListTree, Pencil, RotateCcw, Search } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
-  REVIEW_STATUS_LABEL,
+  REVIEWED,
   buildTree,
+  currentReviewerName,
+  reopenNode,
+  reviewCounts,
+  reviewFilter,
+  saveNodeTexts,
   listNodeGoalCounts,
   listStructureNodes,
   nodeLabel,
@@ -14,7 +19,7 @@ import {
   type StructureNode,
   type TreeNode,
 } from '@/lib/supabase/curriculum-structure'
-import { ACCESS_TIER_LABEL } from '@/lib/supabase/curriculum-repository'
+import { ACCESS_TIER_LABEL, DRAFT_LABEL } from '@/lib/supabase/curriculum-repository'
 
 // "Why can't a state's curriculum be browsed?" (Dustin, 2026-11-01). One tree per curriculum document: edition > grade band > topic >
 // subtopic or unit, in our own words with German and English labels (migration 216). Every node is an LLM synthesized draft until a person has checked
@@ -44,6 +49,24 @@ const T = {
     parts: 'Teile',
     coverage: 'Enthält die Themen, zu denen EvoMentor Thüringen Lernziele hat. Weitere Themen des Lehrplans fehlen noch.',
     status: 'Stand',
+    statusFilter: 'Prüfstand',
+    allStatus: 'Alle',
+    awaiting: 'Warten auf Prüfung',
+    reviewedOnly: 'Geprüft',
+    reviewedBy: 'Geprüft von',
+    markReviewed: 'Als geprüft markieren',
+    edit: 'Texte bearbeiten',
+    reopen: 'Prüfung zurücknehmen',
+    save: 'Speichern',
+    saveReviewed: 'Speichern und als geprüft markieren',
+    cancel: 'Abbrechen',
+    note: 'Anmerkung zur Prüfung',
+    labelDe: 'Titel (Deutsch)',
+    labelEn: 'Titel (Englisch)',
+    summaryDe: 'Zusammenfassung (Deutsch)',
+    summaryEn: 'Zusammenfassung (Englisch)',
+    progress: 'geprüft',
+    editedNote: 'Wer einen geprüften Text ändert und nicht erneut als geprüft markiert, setzt ihn wieder auf Entwurf.',
   },
   en: {
     title: 'Curriculum structure',
@@ -67,6 +90,24 @@ const T = {
     parts: 'parts',
     coverage: 'Covers the topics that EvoMentor Thüringen has goals for. Other topics of the curriculum are not in yet.',
     status: 'Status',
+    statusFilter: 'Review status',
+    allStatus: 'All',
+    awaiting: 'Awaiting review',
+    reviewedOnly: 'Reviewed',
+    reviewedBy: 'Reviewed by',
+    markReviewed: 'Mark as reviewed',
+    edit: 'Edit texts',
+    reopen: 'Withdraw review',
+    save: 'Save',
+    saveReviewed: 'Save and mark as reviewed',
+    cancel: 'Cancel',
+    note: 'Review note',
+    labelDe: 'Title (German)',
+    labelEn: 'Title (English)',
+    summaryDe: 'Summary (German)',
+    summaryEn: 'Summary (English)',
+    progress: 'reviewed',
+    editedNote: 'Changing a reviewed text without marking it reviewed again sets it back to draft.',
   },
 } as const
 
@@ -93,10 +134,12 @@ function defaultLanguage(slug: string): Lang {
 }
 
 export default function CurriculumStructurePage() {
-  const { project, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
   const [lang, setLang] = useState<Lang>(() => defaultLanguage(project.slug))
   const [search, setSearch] = useState('')
   const [subject, setSubject] = useState('')
+  const [statusFilter, setStatusFilter] = useState<'' | 'open' | 'reviewed'>('')
+  const [reviewer, setReviewer] = useState('')
   const [nodes, setNodes] = useState<StructureNode[] | null>(null)
   const [goalCounts, setGoalCounts] = useState<Awaited<ReturnType<typeof listNodeGoalCounts>>>(new Map())
   const [error, setError] = useState<string | null>(null)
@@ -105,6 +148,7 @@ export default function CurriculumStructurePage() {
 
   // A custom view of a repository holds no nodes of its own and reads its parent's (same rule as the record browser).
   const isCustomView = (project as { project_kind?: string }).project_kind === 'curriculum-repository-custom-view'
+  const canReview = !isCustomView && (role === 'owner' || role === 'maintainer')
   const repoProjectId = isCustomView ? ((project as { parent_project_id?: string | null }).parent_project_id ?? project.id) : project.id
 
   useEffect(() => {
@@ -123,10 +167,18 @@ export default function CurriculumStructurePage() {
     return () => { alive = false }
   }, [supabase, repoProjectId])
 
+  useEffect(() => { if (canReview) currentReviewerName(supabase).then(setReviewer) }, [supabase, canReview])
+  const onSaved = (updated: StructureNode) => setNodes((cur) => (cur ? cur.map((n) => (n.id === updated.id ? updated : n)) : cur))
+
   const roots = useMemo(() => (nodes ? buildTree(nodes, goalCounts) : []), [nodes, goalCounts])
   const subjects = useMemo(() => Array.from(new Set(roots.map((r) => r.node.subject).filter(Boolean) as string[])).sort(), [roots])
   const shownRoots = roots.filter((r) => !subject || r.node.subject === subject)
-  const keep = useMemo(() => searchMatches(shownRoots, search), [shownRoots, search])
+  const keep = useMemo(() => {
+    const bySearch = searchMatches(shownRoots, search)
+    const byStatus = statusFilter ? reviewFilter(shownRoots, statusFilter) : null
+    if (bySearch && byStatus) return new Set([...bySearch].filter((id) => byStatus.has(id)))
+    return bySearch ?? byStatus
+  }, [shownRoots, search, statusFilter])
 
   const allIds = useMemo(() => (nodes ?? []).map((n) => n.id), [nodes])
   const toggle = (id: string) => setOpen((cur) => { const next = new Set(cur); if (next.has(id)) next.delete(id); else next.add(id); return next })
@@ -178,6 +230,14 @@ export default function CurriculumStructurePage() {
                   {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
+              <div className="field">
+                <label>{t.statusFilter}</label>
+                <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as '' | 'open' | 'reviewed')}>
+                  <option value="">{t.allStatus}</option>
+                  <option value="open">{t.awaiting}</option>
+                  <option value="reviewed">{t.reviewedOnly}</option>
+                </select>
+              </div>
               <div className="field row" style={{ alignItems: 'flex-end', gap: 6 }}>
                 <button className="btn btn-mini" onClick={() => setOpen(new Set(allIds))}>{t.expandAll}</button>
                 <button className="btn btn-mini" onClick={() => setOpen(new Set())}>{t.collapseAll}</button>
@@ -187,7 +247,7 @@ export default function CurriculumStructurePage() {
 
           {shownRoots.filter((r) => !keep || keep.has(r.node.id)).length === 0 && <div className="muted">{t.nothing}</div>}
           {shownRoots.filter((r) => !keep || keep.has(r.node.id)).map((r) => (
-            <NodeView key={r.node.id} tree={r} lang={lang} t={t} depth={0} open={keep ? new Set(allIds) : open} onToggle={toggle} keep={keep} slug={project.slug} />
+            <NodeView key={r.node.id} tree={r} lang={lang} t={t} depth={0} open={keep ? new Set(allIds) : open} onToggle={toggle} keep={keep} slug={project.slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} />
           ))}
         </>
       )}
@@ -195,7 +255,7 @@ export default function CurriculumStructurePage() {
   )
 }
 
-function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
+function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, canReview, reviewer, onSaved }: {
   tree: TreeNode
   lang: Lang
   t: (typeof T)[Lang]
@@ -204,7 +264,12 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
   onToggle: (id: string) => void
   keep: Set<string> | null
   slug: string
+  supabase: ProjectOutletContext['supabase']
+  canReview: boolean
+  reviewer: string
+  onSaved: (n: StructureNode) => void
 }) {
+  const [editing, setEditing] = useState(false)
   const { node } = tree
   const label = nodeLabel(node, lang)
   const summary = nodeSummary(node, lang)
@@ -212,7 +277,19 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
   const isOpen = open.has(node.id)
   const hasKids = kids.length > 0
   const level = LEVEL_LABEL[node.level] ?? { de: node.level, en: node.level }
-  const status = REVIEW_STATUS_LABEL[node.review_status] ?? { de: node.review_status, en: node.review_status }
+  const isReviewed = node.review_status === REVIEWED
+  const countable = node.level !== 'edition' && node.level !== 'grade_band'
+  const progress = reviewCounts(tree)
+  const [busy, setBusy] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const run = async (fn: () => Promise<{ node: StructureNode | null; error: string | null }>) => {
+    setBusy(true)
+    setSaveError(null)
+    const res = await fn()
+    setBusy(false)
+    if (res.error || !res.node) setSaveError(res.error ?? 'error')
+    else { onSaved(res.node); setEditing(false) }
+  }
   const facts = (node.facts ?? {}) as Record<string, unknown>
   const hours = typeof facts.hours === 'number' || typeof facts.hours === 'string' ? String(facts.hours) : null
   const unitNumber = typeof facts.unitNumber === 'string' || typeof facts.unitNumber === 'number' ? String(facts.unitNumber) : null
@@ -246,9 +323,30 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
               {summary.fellBack && <span className="muted" style={{ fontSize: 11 }}> ({t.onlyOther})</span>}
             </p>
           )}
+          {editing && (
+            <NodeEditForm node={node} t={t} busy={busy} reviewer={reviewer}
+              onCancel={() => setEditing(false)}
+              onSave={(patch, markReviewed) => run(() => saveNodeTexts(supabase, node, patch, markReviewed, reviewer))} />
+          )}
           {coverage && <p className="muted" style={{ margin: '3px 0 0', fontSize: 12 }}>{coverageText}</p>}
           <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginTop: 3, fontSize: 11.5 }}>
-            {depth === 0 && <span className="chip" style={{ fontSize: 10 }} title={t.status}>{status[lang]}</span>}
+            {isReviewed ? (
+              <span className="chip" style={{ fontSize: 10, borderColor: 'var(--good, #2f855a)' }} title={node.review_note ?? undefined}>
+                <BadgeCheck size={10} style={{ verticalAlign: 'text-bottom' }} /> {t.reviewedBy} {node.reviewed_by ?? '?'}{node.reviewed_on ? `, ${node.reviewed_on}` : ''}
+              </span>
+            ) : (
+              (depth === 0 || countable) && <span className={depth === 0 ? 'chip' : 'muted'} style={{ fontSize: 10, ...(depth === 0 ? { borderColor: 'var(--warn, #b7791f)' } : {}) }} title={t.status}>{lang === 'de' ? DRAFT_LABEL.de : DRAFT_LABEL.en}</span>
+            )}
+            {node.level === 'edition' && progress.total > 0 && <span className="chip" style={{ fontSize: 10 }}>{progress.reviewed}/{progress.total} {t.progress}</span>}
+            {canReview && countable && !editing && (
+              <>
+                <button className="btn btn-mini" onClick={() => setEditing(true)}><Pencil size={11} />{t.edit}</button>
+                {isReviewed
+                  ? <button className="btn btn-mini" disabled={busy} onClick={() => run(() => reopenNode(supabase, node))}><RotateCcw size={11} />{t.reopen}</button>
+                  : <button className="btn btn-mini btn-primary" disabled={busy || !reviewer} onClick={() => run(() => saveNodeTexts(supabase, node, {}, true, reviewer))}><BadgeCheck size={11} />{t.markReviewed}</button>}
+              </>
+            )}
+            {saveError && <span style={{ color: 'var(--danger, #c53030)' }}>{saveError}</span>}
             {depth === 0 && <span className="chip" style={{ fontSize: 10 }}>{lang === 'de' ? TIER_DE[node.access_tier] : ACCESS_TIER_LABEL[node.access_tier]}</span>}
             {node.school_type && depth === 0 && <span className="chip" style={{ fontSize: 10 }}>{node.school_type}</span>}
             {hours && <span className="chip" style={{ fontSize: 10 }}>{hours} h</span>}
@@ -265,10 +363,50 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug }: {
       {hasKids && isOpen && (
         <div style={{ marginTop: 6 }}>
           {kids.map((c) => (
-            <NodeView key={c.node.id} tree={c} lang={lang} t={t} depth={depth + 1} open={open} onToggle={onToggle} keep={keep} slug={slug} />
+            <NodeView key={c.node.id} tree={c} lang={lang} t={t} depth={depth + 1} open={open} onToggle={onToggle} keep={keep} slug={slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} />
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function NodeEditForm({ node, t, busy, reviewer, onCancel, onSave }: {
+  node: StructureNode
+  t: (typeof T)[Lang]
+  busy: boolean
+  reviewer: string
+  onCancel: () => void
+  onSave: (patch: { label_de: string | null; label_en: string | null; summary_de: string | null; summary_en: string | null; review_note: string | null }, markReviewed: boolean) => void
+}) {
+  const [v, setV] = useState({
+    label_de: node.label_de ?? '', label_en: node.label_en ?? '', summary_de: node.summary_de ?? '', summary_en: node.summary_en ?? '', review_note: node.review_note ?? '',
+  })
+  const patch = () => ({
+    label_de: v.label_de.trim() || null, label_en: v.label_en.trim() || null, summary_de: v.summary_de.trim() || null,
+    summary_en: v.summary_en.trim() || null, review_note: v.review_note.trim() || null,
+  })
+  const field = (key: keyof typeof v, label: string, area: boolean) => (
+    <div className="field">
+      <label>{label}</label>
+      {area ? <textarea rows={3} value={v[key]} onChange={(e) => setV({ ...v, [key]: e.target.value })} /> : <input value={v[key]} onChange={(e) => setV({ ...v, [key]: e.target.value })} />}
+    </div>
+  )
+  return (
+    <div className="card" style={{ margin: '6px 0', padding: 10 }}>
+      <div className="grid grid-2">
+        {field('label_de', t.labelDe, false)}
+        {field('label_en', t.labelEn, false)}
+        {field('summary_de', t.summaryDe, true)}
+        {field('summary_en', t.summaryEn, true)}
+      </div>
+      {field('review_note', t.note, false)}
+      <p className="muted" style={{ fontSize: 11.5 }}>{t.editedNote}</p>
+      <div className="row" style={{ gap: 6 }}>
+        <button className="btn btn-mini" disabled={busy} onClick={() => onSave(patch(), false)}>{t.save}</button>
+        <button className="btn btn-mini btn-primary" disabled={busy || !reviewer} onClick={() => onSave(patch(), true)}>{t.saveReviewed}</button>
+        <button className="btn-linklike" disabled={busy} onClick={onCancel}>{t.cancel}</button>
+      </div>
     </div>
   )
 }
