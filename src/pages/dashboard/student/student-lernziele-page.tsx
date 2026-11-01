@@ -21,6 +21,7 @@ import type { Database } from '@/lib/supabase/database.types'
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 import { goalMethodKey, listFavoriteGoalMethods, listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteGoalMethod, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { listMethodLernzielLinks, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
+import { CurriculumSourceCard } from '@/components/curriculum-source-card'
 
 // The German, student-facing Lernziele explorer -- same real data as the
 // researcher Learning Goals page (same listTopics/getTopic/thread helpers),
@@ -511,6 +512,7 @@ export default function StudentLernzielePage() {
       <p className="muted" style={{ marginBottom: 12 }}>
         {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
       </p>
+      <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="de" />
 
       <div className="student-lernziele-layout">
         <aside className="student-filters">
