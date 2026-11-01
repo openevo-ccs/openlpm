@@ -3,9 +3,16 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { KeyRound, MailCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { REDIRECT_KEY } from '@/components/require-auth'
-import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { useSession } from '@/state/session'
 import { WELCOME_CONFIGS } from '@/lib/welcome-config'
+// Fonts are served from this site. Loading them from Google would send every
+// student's address to Google, which a university course page should avoid.
+import '@fontsource/roboto/300.css'
+import '@fontsource/roboto/400.css'
+import '@fontsource/roboto/500.css'
+import '@fontsource/source-serif-4/400.css'
+import '@fontsource/source-serif-4/400-italic.css'
+import './welcome-page.css'
 
 // The one link a seminar sends to students (…/#/willkommen/evomentor-thuringia).
 // Public: it must work for someone with no account. It does three things the
@@ -35,6 +42,7 @@ export default function WelcomePage() {
   const [sentTo, setSentTo] = useState<string | null>(null)
 
   const joinPath = `/join/${slug}?auto=1`
+  const logos = `${import.meta.env.BASE_URL}assets/logos`
 
   useEffect(() => {
     if (!loading && session && config) navigate(joinPath, { replace: true })
@@ -103,13 +111,34 @@ export default function WelcomePage() {
   ]
 
   return (
-    <div className="page page-narrow" style={{ maxWidth: 520, marginTop: 40, marginBottom: 40 }}>
-      <div className="card">
-        <div style={{ textAlign: 'center', marginBottom: 12 }}>
-          <OpenLpmLogo size={40} style={{ color: 'var(--series-a)' }} />
+    <div className="welcome">
+      <header className="welcome-top">
+        <p className="welcome-top-label">Ein Projekt der</p>
+        <div className="welcome-top-logos">
+          <span className="welcome-logo-tile">
+            <img src={`${logos}/unijena-logo.png`} alt="Friedrich-Schiller-Universität Jena" />
+          </span>
+          <span className="welcome-logo-tile">
+            <img src={`${logos}/bienenhaus-logo.png`} alt="Bienenhaus, AG Biologiedidaktik, Friedrich-Schiller-Universität Jena" />
+          </span>
         </div>
+      </header>
+
+      <main className="welcome-main">
+        <section className="welcome-hero">
+          <blockquote className="welcome-quote">
+            <p>„Nichts in der Biologie ergibt einen Sinn, außer im Licht der Evolution.“</p>
+            <footer>Theodosius Dobzhansky, 1973</footer>
+          </blockquote>
+          <p className="welcome-lead">
+            Das EvoMentor-Projekt unterstützt Lehrkräfte dabei, den Biologieunterricht zu stärken, indem Evolution
+            und verwandte Konzepte tiefer in den Unterricht eingebunden werden.
+          </p>
+        </section>
+
+      <div className="card welcome-card">
         {config.sandbox && <div className="notice notice-bad" style={{ marginBottom: 12 }}><strong>SANDBOX.</strong> Nur für synthetische Testpersonen.</div>}
-        <h1 style={{ textAlign: 'center', color: 'var(--brand-navy)', marginBottom: 6 }}>{config.heading}</h1>
+        <h1 className="welcome-card-title">{config.heading}</h1>
         <p className="muted" style={{ textAlign: 'center', marginTop: 0 }}>{config.intro}</p>
 
         {sentTo ? (
@@ -183,6 +212,16 @@ export default function WelcomePage() {
           Die Daten liegen auf einem Server in Frankfurt. Mehr steht in der <Link to="/privacy">Datenschutzerklärung</Link>.
         </div>
       </div>
+      </main>
+
+      <footer className="welcome-foot">
+        <p>EvoMentor ist Teil von OpenLPM und wird gemeinsam mit dem OpenEvo-Netzwerk entwickelt.</p>
+        <p>
+          <Link to="/impressum">Impressum</Link>
+          {' · '}
+          <Link to="/privacy">Datenschutzerklärung</Link>
+        </p>
+      </footer>
     </div>
   )
 }
