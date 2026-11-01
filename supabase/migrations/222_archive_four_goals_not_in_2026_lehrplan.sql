@@ -6,8 +6,8 @@
 --   GY-910-OKO-OSY-6  Ökosysteme einteilen                              (Kl. 9; 2026 says "anhand von Merkmalen charakterisieren")
 --   GY-78-HUM-BHK-6   Gesunderhaltung: Ernährung                       (Kl. 7/8; other wording and bullets in 2026)
 --   GY-78-ZEL-PTZ-7   Einzeller zu Vielzeller: Grünalgen               (Kl. 7/8; only in the Basiskonzept table of the document)
--- The goals are archived (status 'archived'), not deleted, so they stay in the database and can be restored. This happens in the live space and
--- in the sandbox copy. Then:
+-- The goals are archived (status 'archived'). Nothing is deleted, so they stay in the database and can be restored. This happens in the live
+-- space and in the sandbox copy. Then:
 --   - six other goals listed one of the four in ermoeglichende_lernziele, voraussetzende_lernziele or interleaving_empfehlung; those entries are
 --     removed so that nothing points at a goal that no longer shows,
 --   - the filing of the four goals under structure nodes (migration 216) and their edition links (a 2026 link they never had a right to) are
