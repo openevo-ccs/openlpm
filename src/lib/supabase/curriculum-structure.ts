@@ -153,3 +153,75 @@ export const REVIEW_STATUS_LABEL: Record<string, { de: string; en: string }> = {
   'checked-against-source': { de: 'Mit der Quelle abgeglichen', en: 'Checked against the source' },
   'expert-reviewed': { de: 'Von Fachleuten geprüft', en: 'Reviewed by an expert' },
 }
+
+// ---- Review in the app (Dustin, 2026-11-02: experts such as Susan review and curate here, not in a PDF or a chat) ----
+
+export const REVIEWED = 'expert-reviewed'
+
+export type NodeTextPatch = Partial<Pick<StructureNode, 'label_de' | 'label_en' | 'summary_de' | 'summary_en' | 'review_note'>>
+
+/** Name to record when someone marks a node reviewed: their profile name, else their email. */
+export async function currentReviewerName(supabase: Client): Promise<string> {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 'unknown'
+  const { data } = await supabase.from('users').select('name, email').eq('id', user.id).maybeSingle()
+  return data?.name || data?.email || user.email || 'unknown'
+}
+
+/** Saves edited texts. A node that was reviewed goes back to ai-draft when its text changes, because the review no longer covers the new text. */
+export async function saveNodeTexts(supabase: Client, node: StructureNode, patch: NodeTextPatch, markReviewed: boolean, reviewer: string): Promise<{ node: StructureNode | null; error: string | null }> {
+  const changed = (Object.keys(patch) as (keyof NodeTextPatch)[]).some((k) => k !== 'review_note' && (patch[k] ?? null) !== (node[k] ?? null))
+  const update: Database['public']['Tables']['curriculum_repository_structure_nodes']['Update'] = { ...patch }
+  if (markReviewed) {
+    update.review_status = REVIEWED
+    update.reviewed_by = reviewer
+    update.reviewed_on = new Date().toISOString().slice(0, 10)
+  } else if (changed && node.review_status === REVIEWED) {
+    update.review_status = 'ai-draft'
+    update.reviewed_by = null
+    update.reviewed_on = null
+  }
+  const { data, error } = await supabase.from('curriculum_repository_structure_nodes').update(update).eq('id', node.id).select('*').maybeSingle()
+  return { node: data ?? null, error: error?.message ?? (data ? null : 'Nothing was saved. Your role may not allow editing here.') }
+}
+
+export async function reopenNode(supabase: Client, node: StructureNode): Promise<{ node: StructureNode | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from('curriculum_repository_structure_nodes')
+    .update({ review_status: 'ai-draft', reviewed_by: null, reviewed_on: null })
+    .eq('id', node.id)
+    .select('*')
+    .maybeSingle()
+  return { node: data ?? null, error: error?.message ?? (data ? null : 'Nothing was saved.') }
+}
+
+/** Nodes that still await review (plus their ancestors), or that are reviewed (plus ancestors). Leaves editions and bands out of the count. */
+export function reviewFilter(roots: TreeNode[], wanted: 'open' | 'reviewed'): Set<string> {
+  const keep = new Set<string>()
+  const visit = (t: TreeNode, trail: TreeNode[]) => {
+    const countable = t.node.level !== 'edition' && t.node.level !== 'grade_band'
+    const reviewed = t.node.review_status === REVIEWED
+    if (countable && (wanted === 'reviewed' ? reviewed : !reviewed)) {
+      trail.forEach((a) => keep.add(a.node.id))
+      keep.add(t.node.id)
+    }
+    t.children.forEach((c) => visit(c, [...trail, t]))
+  }
+  roots.forEach((r) => visit(r, []))
+  return keep
+}
+
+/** Reviewed and total counts of the topics, subtopics and units at or below a node. */
+export function reviewCounts(t: TreeNode): { reviewed: number; total: number } {
+  let reviewed = 0
+  let total = 0
+  const walk = (x: TreeNode) => {
+    if (x.node.level !== 'edition' && x.node.level !== 'grade_band') {
+      total += 1
+      if (x.node.review_status === REVIEWED) reviewed += 1
+    }
+    x.children.forEach(walk)
+  }
+  walk(t)
+  return { reviewed, total }
+}

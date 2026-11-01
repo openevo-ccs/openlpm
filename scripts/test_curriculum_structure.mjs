@@ -65,3 +65,11 @@ test('search keeps matches, their ancestors and their descendants, in either lan
   assert.deepEqual([...S.searchMatches(roots, 'zellen plant')].sort(), []) // every word must be in one node
   assert.equal(S.searchMatches(roots, 'nothing like this').size, 0)
 })
+
+test('review filter and counts cover topics, subtopics and units only', () => {
+  const reviewed = nodes.map((n) => (n.id === 's1' ? { ...n, review_status: 'expert-reviewed' } : { ...n, review_status: 'ai-draft' }))
+  const roots = S.buildTree(reviewed, goals)
+  assert.deepEqual(S.reviewCounts(roots[0]), { reviewed: 1, total: 3 })
+  assert.deepEqual([...S.reviewFilter(roots, 'reviewed')].sort(), ['b', 'e', 's1', 't1'])
+  assert.deepEqual([...S.reviewFilter(roots, 'open')].sort(), ['b', 'e', 't1', 't2'])
+})
