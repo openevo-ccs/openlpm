@@ -257,25 +257,25 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      Sen. Ronda Storms (R-Valrico) introduced SB 2692 following Discovery
-      Institute's model "Academic Freedom Act" statute; Rep. Alan Hays
-      introduced the House companion HB 1483, narrowed to call for "thorough
-      presentation and critical analysis of the scientific theory of
-      evolution." John Stemberger (Florida Family Policy Council) was lead
-      public advocate. Hays hosted a closed March 2008 press event with a
-      Discovery Institute representative, for legislators only. The House
-      passed its substituted version (HB 1483 text swapped into SB 2692) 71-43
-      on April 28, 2008; the Senate rejected the substitution and restored its
-      own text, sending it back to the House, which left it untouched -- the
-      bill died at session's end without becoming law. This is the same
-      Discovery Institute template later enacted in Louisiana (June 2008) and
-      Tennessee (2012), but Florida's version did not pass.
+      Sen. Ronda Storms (R-Valrico) introduced SB 2692, modeled on the Discovery
+      Institute's template statute, the Academic Freedom Act. Rep. Alan Hays
+      introduced the House companion HB 1483, narrowed to call for evolutionary
+      theory to be presented thoroughly and analyzed critically. John Stemberger
+      (Florida Family Policy Council) was the lead public advocate. Hays hosted
+      a closed March 2008 press event with a Discovery Institute representative,
+      open to legislators only. The House passed its substituted version (HB
+      1483 text swapped into SB 2692) 71-43 on April 28, 2008. The Senate
+      rejected the substitution and restored its own text, sending it back to
+      the House, which left it untouched, so the bill died at the end of the
+      session without becoming law. The same Discovery Institute template was
+      later enacted in Louisiana (June 2008) and Tennessee (2012), but Florida's
+      version did not pass.
     involvedActors:
       - FLLP-ACTOR-florida-legislature
       - FLLP-ACTOR-discovery-institute
       - FLLP-ACTOR-florida-family-policy-council
     sourceUrl: https://www.discovery.org/a/4510/
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -458,16 +458,16 @@ events:
     temporalStatus: past-completed
     description: >
       In summer 2024, FLDOE asked publishers submitting science textbooks for
-      state adoption to reduce or remove climate-change content; publishers
-      complied. Teachers described a resulting "culture of caution"
-      discouraging classroom discussion of climate topics, with some citing
-      fear of professional retaliation. This operated through the ordinary
-      textbook-adoption review process (the same process HB 989 opened to
-      resident challenges in 2017) -- not a formal standards rewrite, and
-      reported publicly only in 2026 via a joint investigation.
+      state adoption to reduce or remove climate-change content, and the
+      publishers complied. Teachers said this created a climate of wariness that
+      discouraged classroom discussion of climate topics, and some cited fear of
+      professional retaliation. It ran through the ordinary textbook-adoption
+      review process (the same process HB 989 opened to resident challenges in
+      2017). It was not a formal standards rewrite, and it was reported publicly
+      only in 2026, through a joint investigation.
     involvedActors: [FLLP-ACTOR-fldoe, FLLP-ACTOR-ncse]
     sourceUrl: https://ncse.ngo/how-florida-quietly-removed-climate-change-content-textbooks
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -522,17 +522,17 @@ events:
     temporalStatus: past-completed
     description: >
       FLDOE released its draft K-12 science standards rewrite for public
-      comment. Reporting found the word "evolution" absent from the proposed
-      high-school life-science standards entirely, and "climate change"/
-      "global warming" absent from the draft anywhere (which retains "weather
-      and climate," "climate systems," "climate impacts on biodiversity").
-      The draft contains roughly 1,000 high-school science benchmarks and is
-      not built on the National Research Council's 2012 Framework for K-12
-      Science Education (the NGSS-aligned framework most other states now
-      use). Public comment accepted via fldoe.org/standardsreview/.
+      comment. Reporting found that the word evolution appears nowhere in the
+      proposed high-school life-science standards, and that the terms climate
+      change and global warming appear nowhere in the draft. The draft does keep
+      weather and climate, climate systems, and climate impacts on biodiversity.
+      It contains roughly 1,000 high-school science benchmarks and is not built
+      on the National Research Council's 2012 Framework for K-12 Science
+      Education, the NGSS-aligned framework most other states now use. Public
+      comment was accepted via fldoe.org/standardsreview/.
     involvedActors: [FLLP-ACTOR-fldoe]
     sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -564,14 +564,14 @@ events:
     description: >
       First in-person public listening session on the draft 2026 science
       standards, held at Armwood High School, Seffner (Hillsborough County).
-      Parents and teachers present were described by Florida Phoenix as
-      "gobsmacked." FLDOE Senior Education Manager Patricia Duncan told
-      attendees the omissions were "not intentional" and that the listening
-      tour was "the first of many steps."
+      Florida Phoenix described the parents and teachers present as stunned.
+      FLDOE Senior Education Manager Patricia Duncan told attendees that the
+      omissions were unintentional and that the listening tour was only the
+      opening stage of a longer process.
     involvedActors: [FLLP-ACTOR-fldoe]
     partOf: FLLP-EVENT-2026-draft-standards-released-for-comment
     sourceUrl: https://floridaphoenix.com/2026/10/14/new-k-12-science-curriculum-scrutinized-december-vote-by-board-of-ed-expected
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

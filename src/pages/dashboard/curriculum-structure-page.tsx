@@ -17,7 +17,7 @@ import {
 import { ACCESS_TIER_LABEL } from '@/lib/supabase/curriculum-repository'
 
 // "Why can't a state's curriculum be browsed?" (Dustin, 2026-11-01). One tree per curriculum document: edition > grade band > topic >
-// subtopic or unit, in our own words with German and English labels (migration 216). Every node is an AI draft until a person has checked
+// subtopic or unit, in our own words with German and English labels (migration 216). Every node is an LLM synthesized draft until a person has checked
 // it, and says so. Goal counts per project show only for projects the viewer belongs to. Design note:
 // lab_manager/docs/design-notes/state-curriculum-overview-browse-check-translate-2026-11-02.md.
 
@@ -25,7 +25,7 @@ const T = {
   de: {
     title: 'Aufbau des Lehrplans',
     intro: 'Wie die Lehrpläne dieses Verzeichnisses aufgebaut sind: Ausgabe, Klassenstufe, Thema, Unterthema. Die Texte sind von uns in eigenen Worten geschrieben.',
-    draft: 'KI-Entwurf. Noch hat keine Fachperson die Texte geprüft.',
+    draft: 'LLM-erzeugter Entwurf, Prüfung ausstehend.',
     search: 'Suchen',
     searchHint: 'Wort aus Titel oder Zusammenfassung',
     language: 'Sprache',
@@ -48,7 +48,7 @@ const T = {
   en: {
     title: 'Curriculum structure',
     intro: 'How the curriculum documents in this repository are organised: edition, grade band, topic, subtopic. The texts are our own words.',
-    draft: 'AI draft. No expert has checked the texts yet.',
+    draft: 'LLM synthesized draft, awaiting review.',
     search: 'Search',
     searchHint: 'A word from a title or summary',
     language: 'Language',

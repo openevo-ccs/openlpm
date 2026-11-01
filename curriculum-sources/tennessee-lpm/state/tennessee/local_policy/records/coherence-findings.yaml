@@ -13,15 +13,13 @@ findings:
       - jurisdiction: US-TN
         policyArea: Butler Act (1925)
         documentDate: "1925-03-21"
-        excerptText: "unlawful for any teacher... to teach any theory that denies the story of the Divine Creation of man as taught in the Bible, and to teach instead that man has descended from a lower order of animals"
         sourceDocument: Tennessee House Bill No. 185 (1925)
-        accessTier: excerpt-only
+        accessTier: summary-only
       - jurisdiction: US-TN
         policyArea: 1973 "equal time" law
         documentDate: "1973-04-30"
-        excerptText: "commensurate attention to, and an equal amount of emphasis on... the Genesis account in the Bible"
         sourceDocument: Chapter 377 of the 1973 Public Acts of Tennessee
-        accessTier: excerpt-only
+        accessTier: summary-only
     summary: >
       The 1925 Butler Act banned teaching evolution outright. The 1973 law
       took a structurally different approach: it did not ban evolution, but
@@ -67,15 +65,13 @@ findings:
       - jurisdiction: US-TN
         policyArea: 1973 "equal time" law
         documentDate: "1973-04-30"
-        excerptText: "the Genesis account in the Bible"
         sourceDocument: Chapter 377 of the 1973 Public Acts of Tennessee
-        accessTier: excerpt-only
+        accessTier: summary-only
       - jurisdiction: US-TN
         policyArea: 2012 Teacher Protection Act
         documentDate: "2012-04-10"
-        excerptText: "scientific strengths and scientific weaknesses of existing scientific theories"
         sourceDocument: Tennessee Code Annotated S49-6-1030
-        accessTier: excerpt-only
+        accessTier: summary-only
     summary: >
       Where the 1973 law named the Bible and Genesis explicitly, the 2012
       law uses entirely secular-sounding language ("scientific strengths and

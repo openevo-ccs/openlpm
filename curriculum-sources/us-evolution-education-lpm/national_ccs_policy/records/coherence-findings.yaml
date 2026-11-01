@@ -83,15 +83,13 @@ findings:
       - jurisdiction: US
         policyArea: "Edwards v. Aguillard (1987) holding"
         documentDate: "1987-06-19"
-        excerptText: "it is required that the statement of such purpose be sincere and not a sham"
         sourceDocument: "Edwards v. Aguillard, 482 U.S. 578 (1987)"
-        accessTier: excerpt-only
+        accessTier: summary-only
       - jurisdiction: US-TN
         policyArea: "2012 Teacher Protection Act, T.C.A. S49-6-1030"
         documentDate: "2012-04-10"
-        excerptText: "scientific strengths and scientific weaknesses of existing scientific theories"
         sourceDocument: "Tennessee Code Annotated S49-6-1030"
-        accessTier: excerpt-only
+        accessTier: summary-only
     summary: >
       Edwards struck down Louisiana's 1981 law specifically because its
       stated "academic freedom" purpose was found insincere -- a pretext for

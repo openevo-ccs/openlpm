@@ -5,6 +5,8 @@ import type { ProjectOutletContext } from './project-layout'
 import {
   ACCESS_TIER_LABEL,
   ACCESS_TIER_OPTIONS,
+  DRAFT_LABEL,
+  isUnreviewedDraft,
   RECORD_TYPE_LABEL,
   createContentLink,
   createRepositoryRecord,
@@ -151,6 +153,7 @@ export default function CurriculumRepositoryPage() {
                   {r.jurisdiction && <span className="muted" style={{ fontSize: 11 }}>· {r.jurisdiction}</span>}
                 </span>
                 <span style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block' }}>{r.title}</span>
+                {isUnreviewedDraft(r) && <span className="muted" style={{ fontSize: 10, display: 'block', marginTop: 2 }}>{DRAFT_LABEL.en}</span>}
               </button>
             ))}
           </div>
@@ -262,6 +265,7 @@ function RecordDetail({
           <div style={{ marginBottom: 6 }}><RecordKindLine type={record.record_type} withBlurb /></div>
           <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
             {record.jurisdiction && <span className="chip" style={{ fontSize: 10 }}>{record.jurisdiction}</span>}
+            {isUnreviewedDraft(record) && <span className="chip" style={{ fontSize: 10, borderColor: 'var(--warn, #b7791f)' }}>{DRAFT_LABEL.en}</span>}
             <span className="chip" style={{ fontSize: 10 }} title={record.license_or_rights_note ?? undefined}>{ACCESS_TIER_LABEL[record.access_tier]}</span>
             {record.event_date && <span className="chip" style={{ fontSize: 10 }}>{record.event_date}</span>}
             {(record.effective_from || record.effective_until) && (

@@ -299,9 +299,11 @@ def most_conservative_tier(tiers):
 # 'citation-only' -- that default only means an accessTier tag was never
 # found anywhere in the record. It says nothing about whether this specific
 # field is a licensing risk.
-GOVERNED_TOP_LEVEL_FIELD = {
-    "institutional-mandate-record": "statementText",
-    "policy-timeline-event": "description",
+# Found 2026-11-02 by the repository audit: the English translation of the official wording (statementTextEn) stayed on 9 cite-only rows
+# because only statementText was removed. A translation of quoted wording is governed by the same tier.
+GOVERNED_TOP_LEVEL_FIELDS = {
+    "institutional-mandate-record": ("statementText", "statementTextEn"),
+    "policy-timeline-event": ("description",),
 }
 NESTED_GROUNDING_OBJECT_KEYS = ("objects", "curriculumObject", "baselineCurriculumObject")
 
@@ -318,9 +320,9 @@ def redact_ungoverned_text(record_type, content, row_access_tier):
     across its own objects.
     """
     content = json.loads(json.dumps(content))  # cheap deep copy, no custom objects in here
-    top_level_field = GOVERNED_TOP_LEVEL_FIELD.get(record_type)
-    if top_level_field and row_access_tier == "citation-only" and content.get(top_level_field):
-        del content[top_level_field]
+    if row_access_tier == "citation-only":
+        for top_level_field in GOVERNED_TOP_LEVEL_FIELDS.get(record_type, ()):
+            content.pop(top_level_field, None)
     for key in NESTED_GROUNDING_OBJECT_KEYS:
         value = content.get(key)
         objects = value if isinstance(value, list) else [value] if isinstance(value, dict) else []
