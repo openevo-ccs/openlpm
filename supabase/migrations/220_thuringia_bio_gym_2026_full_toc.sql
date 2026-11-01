@@ -1,4 +1,4 @@
--- 219: The full table of contents of the Thueringen Lehrplan Biologie Gymnasium 2026 (Erprobungsfassung) in the structure overview.
+-- 220: The full table of contents of the Thueringen Lehrplan Biologie Gymnasium 2026 (Erprobungsfassung) in the structure overview.
 --
 -- Read on 2026-11-02 from the PDF a person had downloaded from the school portal. The portal's robots.txt forbids automated fetching, so no
 -- program fetched it. The original stays in a private folder outside every repository. Found by comparing the table of contents with the pilot
@@ -66,6 +66,6 @@ BEGIN
   SELECT count(*) INTO added FROM curriculum_repository_structure_nodes WHERE origin = 'lehrplan-toc-2026-11-02';
   SELECT count(*) INTO fixed FROM curriculum_repository_structure_nodes WHERE label_de = 'Stoff- und Energiewechselprozesse von Pilzen und grünen Pflanzen';
   IF added <> 16 OR fixed <> 0 THEN
-    RAISE EXCEPTION 'migration 219: % table-of-contents nodes (expected 16), % nodes still carry the old heading', added, fixed;
+    RAISE EXCEPTION 'migration 220: % table-of-contents nodes (expected 16), % nodes still carry the old heading', added, fixed;
   END IF;
 END $$;
