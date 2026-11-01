@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "type-check": "tsc -b --noEmit",
     "test:time": "node scripts/test_time_model.mjs",
+    "test:structure": "node scripts/test_curriculum_structure.mjs",
     "test:comparison": "node scripts/test_comparison_model.mjs",
     "test:draft-links": "node scripts/test_draft_links.mjs",
     "test:review-state": "node scripts/test_review_state.mjs",

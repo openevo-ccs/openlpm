@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
+import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
@@ -427,6 +427,7 @@ export default function ProjectLayout() {
     ? [
         { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
+        ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-structure`, icon: <ListTree size={14} />, label: 'Structure' }] : []),
         ...(hasRepo ? [{ href: `/dashboard/${slug}/timeline`, icon: <CalendarRange size={14} />, label: 'Timeline' }] : []),
         ...(hasRepo ? [{ href: `/dashboard/${slug}/context`, icon: <Newspaper size={14} />, label: 'News & Debates' }] : []),
         ...(hasRepo ? [{ href: `/dashboard/${slug}/map`, icon: <MapIcon size={14} />, label: 'Map', end: false }] : []),

@@ -1022,6 +1022,150 @@ export type Database = {
           }
         ]
       }
+      curriculum_repository_node_goals: {
+        Row: {
+          node_id: string
+          data_object_id: string
+          project_id: string
+          created_at: string | null
+        }
+        Insert: {
+          node_id: string
+          data_object_id: string
+          project_id: string
+          created_at?: string | null
+        }
+        Update: {
+          node_id?: string
+          data_object_id?: string
+          project_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_node_goals_node_id_fkey",
+            columns: ["node_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_structure_nodes",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_node_goals_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      curriculum_repository_structure_nodes: {
+        Row: {
+          id: string
+          project_id: string
+          node_key: string
+          parent_id: string | null
+          level: string
+          subject: string | null
+          school_type: string | null
+          grade_band: string | null
+          edition_record_id: string | null
+          record_id: string | null
+          sort_order: number
+          label_de: string | null
+          label_en: string | null
+          summary_de: string | null
+          summary_en: string | null
+          source_pages: string | null
+          source_url: string | null
+          retrieved_on: string | null
+          source_sha256: string | null
+          facts: Json
+          access_tier: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          review_status: string
+          reviewed_by: string | null
+          reviewed_on: string | null
+          review_note: string | null
+          origin: string
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          node_key: string
+          parent_id?: string | null
+          level: string
+          subject?: string | null
+          school_type?: string | null
+          grade_band?: string | null
+          edition_record_id?: string | null
+          record_id?: string | null
+          sort_order?: number
+          label_de?: string | null
+          label_en?: string | null
+          summary_de?: string | null
+          summary_en?: string | null
+          source_pages?: string | null
+          source_url?: string | null
+          retrieved_on?: string | null
+          source_sha256?: string | null
+          facts?: Json
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          review_status?: string
+          reviewed_by?: string | null
+          reviewed_on?: string | null
+          review_note?: string | null
+          origin: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          node_key?: string
+          parent_id?: string | null
+          level?: string
+          subject?: string | null
+          school_type?: string | null
+          grade_band?: string | null
+          edition_record_id?: string | null
+          record_id?: string | null
+          sort_order?: number
+          label_de?: string | null
+          label_en?: string | null
+          summary_de?: string | null
+          summary_en?: string | null
+          source_pages?: string | null
+          source_url?: string | null
+          retrieved_on?: string | null
+          source_sha256?: string | null
+          facts?: Json
+          access_tier?: 'full-text-stored' | 'excerpt-only' | 'summary-only' | 'citation-only'
+          review_status?: string
+          reviewed_by?: string | null
+          reviewed_on?: string | null
+          review_note?: string | null
+          origin?: string
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_structure_nodes_parent_id_fkey",
+            columns: ["parent_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_structure_nodes",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_structure_nodes_record_id_fkey",
+            columns: ["record_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_records",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       curriculum_repository_links: {
         Row: {
           id: string

@@ -22,6 +22,7 @@ import CalendarPage from '@/pages/dashboard/calendar-page'
 import TimePage from '@/pages/dashboard/time-page'
 import MethodsPage from '@/pages/dashboard/methods-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
+import CurriculumStructurePage from '@/pages/dashboard/curriculum-structure-page'
 import TimelineSwitch from '@/pages/dashboard/timeline-switch'
 import ContextItemsPage from '@/pages/dashboard/context-items-page'
 import MapPage from '@/pages/dashboard/map-page'
@@ -169,6 +170,7 @@ export default function App() {
             <Route path="time" element={<TimePage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
+            <Route path="curriculum-structure" element={<CurriculumStructurePage />} />
             <Route path="context" element={<ContextItemsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
