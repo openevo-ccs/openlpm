@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext, useSearchParams } from 'react-router-dom'
 import { BadgeCheck, ChevronDown, ChevronRight, ExternalLink, Info, ListTree, Pencil, RotateCcw, Search } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
@@ -126,6 +126,12 @@ const TIER_DE: Record<StructureNode['access_tier'], string> = {
   'citation-only': 'Nur Quellenangabe',
 }
 
+const RIGHTS_LABEL: Record<string, { de: string; en: string }> = {
+  'not-assessed': { de: 'noch nicht geprüft', en: 'not yet assessed' },
+  cleared: { de: 'geklärt', en: 'cleared' },
+  restricted: { de: 'eingeschränkt', en: 'restricted' },
+}
+
 const GERMAN_REPOSITORIES = new Set(['germany', 'saxony', 'saxony-anhalt', 'thuringia'])
 
 function defaultLanguage(slug: string): Lang {
@@ -138,7 +144,9 @@ export default function CurriculumStructurePage() {
   const [lang, setLang] = useState<Lang>(() => defaultLanguage(project.slug))
   const [search, setSearch] = useState('')
   const [subject, setSubject] = useState('')
-  const [statusFilter, setStatusFilter] = useState<'' | 'open' | 'reviewed'>('')
+  const [params] = useSearchParams()
+  const initialStatus = params.get('status')
+  const [statusFilter, setStatusFilter] = useState<'' | 'open' | 'reviewed'>(initialStatus === 'open' || initialStatus === 'reviewed' ? initialStatus : '')
   const [reviewer, setReviewer] = useState('')
   const [nodes, setNodes] = useState<StructureNode[] | null>(null)
   const [goalCounts, setGoalCounts] = useState<Awaited<ReturnType<typeof listNodeGoalCounts>>>(new Map())
@@ -348,6 +356,11 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, 
             )}
             {saveError && <span style={{ color: 'var(--danger, #c53030)' }}>{saveError}</span>}
             {depth === 0 && <span className="chip" style={{ fontSize: 10 }}>{lang === 'de' ? TIER_DE[node.access_tier] : ACCESS_TIER_LABEL[node.access_tier]}</span>}
+            {depth === 0 && (
+              <span className="chip" style={{ fontSize: 10 }} title={node.license_or_rights_note ?? undefined}>
+                {lang === 'de' ? 'Rechte' : 'Rights'}: {RIGHTS_LABEL[node.rights_status ?? 'not-assessed']?.[lang] ?? node.rights_status}{node.content_license ? ` · ${node.content_license}` : ''}
+              </span>
+            )}
             {node.school_type && depth === 0 && <span className="chip" style={{ fontSize: 10 }}>{node.school_type}</span>}
             {hours && <span className="chip" style={{ fontSize: 10 }}>{hours} h</span>}
             {node.source_pages && <span className="muted">{t.pages}: {node.source_pages.replace(/^p\. /, '')}</span>}
