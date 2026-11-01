@@ -72,6 +72,23 @@ def test_digest_reports_only_what_changed():
     assert "First run" in watch.digest(new, watch.compare(None, new), None, stats)
 
 
+def test_project_side_checks():
+    repo_rec = rec("m", "p1", "institutional-mandate-record", "Bands", {**PROV, "sourceUrl": "u", "gradeBands": ["5/6", "7/8"]})
+    data = dataset([repo_rec])
+    data["project_links"] = [{"project_id": "q1", "repository_project_id": "p1"}]
+    data["project_goals"] = [{"id": "g1", "project_id": "q1", "grade_band": "5/6", "curriculum_version": "2026"},
+                             {"id": "g2", "project_id": "q1", "grade_band": "9", "curriculum_version": None},
+                             {"id": "s1", "project_id": "syn", "grade_band": "K-2", "curriculum_version": None}]
+    data["project_links"].append({"project_id": "syn", "repository_project_id": "p1"})
+    data["record_links"] = [{"data_object_id": "g1", "repository_record_id": "m", "relation_type": "built_from", "project_id": "q1"}]
+    data["node_goals"] = [{"node_id": "n", "data_object_id": "g1", "project_id": "q1"}]
+    data["all_projects"] = [{"id": "q1", "slug": "evo"}, {"id": "syn", "slug": "synthetic"}]
+    rep = audit.analyse(data, today=date(2026, 11, 1))
+    found = {(i["check"], i["repo"]) for i in rep["issues"]}
+    assert ("C16", "project:evo") in found and ("C17", "project:evo") in found and ("C18", "project:evo") in found
+    assert not [i for i in rep["issues"] if i["repo"] == "project:synthetic"]
+
+
 def test_page_hash_ignores_layout_and_scripts():
     one = b"<html><head><script>var a=1</script></head><body><nav>menu</nav><p>Lehrplan 2026</p></body></html>"
     two = b"<html><head><script>var a=2</script></head><body><nav>other menu</nav>\n<p>Lehrplan   2026</p></body></html>"

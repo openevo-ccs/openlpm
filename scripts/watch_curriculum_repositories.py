@@ -48,6 +48,9 @@ PLAIN = {
     "C13": "source links that do not open",
     "C14": "source pages that changed since the last look",
     "C15": "records where the database and the source repository disagree",
+    "C16": "projects with goals that have no link to a curriculum edition",
+    "C17": "projects whose grade bands differ from the repository's",
+    "C18": "projects with goals filed under no structure node",
 }
 
 

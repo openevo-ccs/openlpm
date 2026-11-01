@@ -86,6 +86,16 @@ def _get(path_query: str, key: str, page: int = 1000) -> list:
         start += page
 
 
+def _project_goals(key: str) -> list:
+    """Accepted goals of every project that declares itself grounded in a repository (id, project, grade band, edition tag)."""
+    links = _get("project_repository_links?select=project_id", key)
+    ids = ",".join(sorted({l["project_id"] for l in links}))
+    if not ids:
+        return []
+    return _get("lpm_data_objects?select=id,project_id,grade_band,curriculum_version:content->>curriculum_version"
+                f"&status=eq.accepted&project_id=in.({ids})", key)
+
+
 def fetch_all() -> dict:
     key = load_service_role_key()
     projects = _get("projects?select=id,slug,name,parent_project_id,project_kind,focus_type,is_private,"
@@ -99,6 +109,9 @@ def fetch_all() -> dict:
         "record_links": _get("curriculum_repository_links?select=id,project_id,data_object_id,repository_record_id,"
                              "relation_type,created_at", key),
         "record_tags": _get("curriculum_repository_record_tags?select=*", key),
+        "node_goals": _get("curriculum_repository_node_goals?select=node_id,data_object_id,project_id", key),
+        "project_goals": _project_goals(key),
+        "all_projects": _get("projects?select=id,slug", key),
     }
 
 
@@ -111,6 +124,9 @@ def save_raw(data: dict, out: Path) -> None:
 def load_raw(src: Path) -> dict:
     names = ["projects", "records", "project_links", "record_links", "record_tags"]
     data = {n: json.loads((src / f"{n}.json").read_text(encoding="utf-8")) for n in names}
+    for optional in ("node_goals", "project_goals", "all_projects"):
+        f = src / f"{optional}.json"
+        data[optional] = json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
     meta = src / "fetched_at.json"
     data["fetched_at"] = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else "offline"
     return data
@@ -477,6 +493,9 @@ def analyse(data: dict, drift: dict | None = None, link_cache: dict | None = Non
                     issues.append({"check": "C15", "severity": "medium", "repo": f"source:{sr}", "source_repo": sr,
                                    "source_record_id": sid, "title": None, "detail": f"{sid} {why}"})
 
+    # C16 to C18: the project side of each project-to-repository link (the relation model of lab_manager PR 21)
+    proj_checks = project_side_checks(data, projects, pid, recs, issues)
+
     # records origin: not in any git source
     origin_untracked = Counter(r["source_repo"] for r in recs if r["source_repo"] in ("openlpm-starter-draft", "diagnostic-test"))
 
@@ -488,8 +507,56 @@ def analyse(data: dict, drift: dict | None = None, link_cache: dict | None = Non
         "reviewed_by_person": sum(m["reviewed_by_person"] for m in repos.values()),
         "records_only_in_database_not_in_any_git_source": dict(origin_untracked),
     }
+    totals["projects_checked"] = len(proj_checks)
     return {"generated": datetime.now(timezone.utc).isoformat(timespec="seconds"), "data_fetched_at": data.get("fetched_at"),
-            "today": str(today), "totals": totals, "repos": repos, "issues": issues, "drift": drift or {}}
+            "today": str(today), "totals": totals, "repos": repos, "project_side": proj_checks, "issues": issues, "drift": drift or {}}
+
+
+def project_side_checks(data: dict, projects: list, pid: dict, recs: list, issues: list) -> dict:
+    """For every project that is grounded in a repository: goals without an edition link (C16), grade bands that differ from the repository's
+    gradeBands (C17), goals without a structure node when the repository has structure for that project (C18). Needs project_goals in the data."""
+    goals = data.get("project_goals") or []
+    if not goals:
+        return {}
+    built_from = {l["data_object_id"] for l in data["record_links"] if l["relation_type"] == "built_from"}
+    nodes_of = {g["data_object_id"] for g in data.get("node_goals", [])}
+    projects_with_nodes = {g["project_id"] for g in data.get("node_goals", [])}
+    repo_bands: dict[str, set] = {}
+    for r in recs:
+        gb = (r["content"] or {}).get("gradeBands")
+        if isinstance(gb, list):
+            repo_bands.setdefault(r["project_id"], set()).update(str(b) for b in gb)
+    by_project: dict[str, list] = {}
+    for g in goals:
+        by_project.setdefault(g["project_id"], []).append(g)
+    names = {p["id"]: p["slug"] for p in data.get("all_projects", [])}
+    out = {}
+    for proj, gs in by_project.items():
+        if not any(g.get("curriculum_version") for g in gs):
+            continue  # a project with no edition tag on any goal is not built from one document (the synthetic comparison spaces)
+        repos = [l["repository_project_id"] for l in data["project_links"] if l["project_id"] == proj]
+        label = names.get(proj, proj[:8])
+        no_edition = [g for g in gs if g["id"] not in built_from]
+        entry = {"project": label, "goals": len(gs), "without_edition_link": len(no_edition),
+                 "bands": sorted({g["grade_band"] for g in gs if g["grade_band"]})}
+        issues.append({"check": "C16", "severity": "low", "repo": f"project:{label}", "source_repo": None, "source_record_id": None, "title": None,
+                       "detail": f"{len(no_edition)} of {len(gs)} goals have no link to a curriculum edition"}) if no_edition else None
+        lehrplan = set().union(*(repo_bands.get(r, set()) for r in repos)) if repos else set()
+        if lehrplan:
+            extra = sorted(set(entry["bands"]) - lehrplan)
+            missing = sorted(lehrplan - set(entry["bands"]))
+            entry["bands_not_in_repository"], entry["repository_bands_without_goals"] = extra, missing
+            if extra or missing:
+                issues.append({"check": "C17", "severity": "low", "repo": f"project:{label}", "source_repo": None, "source_record_id": None, "title": None,
+                               "detail": f"grade bands differ: only in project {extra}, only in repository {missing}"})
+        if proj in projects_with_nodes:
+            no_node = [g for g in gs if g["id"] not in nodes_of]
+            entry["without_structure_node"] = len(no_node)
+            if no_node:
+                issues.append({"check": "C18", "severity": "low", "repo": f"project:{label}", "source_repo": None, "source_record_id": None, "title": None,
+                               "detail": f"{len(no_node)} of {len(gs)} goals are filed under no structure node"})
+        out[label] = entry
+    return out
 
 
 # --------------------------------------------------------------------------
