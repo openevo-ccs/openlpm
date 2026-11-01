@@ -14,17 +14,15 @@ findings:
       - jurisdiction: US-PA
         policyArea: Proposed Standard 3.3.10.D (pre-final-form)
         documentDate: "2001-01-01"
-        excerptText: "analyze records/studies that support or do not support the theory of evolution"
         sourceDocument: Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9 (rulemaking preamble)
         sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
-        accessTier: excerpt-only
+        accessTier: summary-only
       - jurisdiction: US-PA
         policyArea: Final-form Standard 3.3.10.D (2002-01-05)
         documentDate: "2002-01-05"
-        excerptText: "analyze records/studies relevant to the theory of evolution"
         sourceDocument: 22 Pa. Code, Chapter 4, Appendix B
         sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
-        accessTier: excerpt-only
+        accessTier: summary-only
     summary: >
       Pennsylvania's own 2002 standards-rulemaking process changed the
       proposed evolution-standard wording after more than 120 public comments
@@ -62,15 +60,13 @@ findings:
       - jurisdiction: US-PA
         policyArea: PA state standard 3.3.10.D (2002, in force during the Dover dispute)
         documentDate: "2002-01-05"
-        excerptText: "analyze the theory of evolution"
         sourceDocument: 22 Pa. Code, Chapter 4, Appendix B
-        accessTier: excerpt-only
+        accessTier: summary-only
       - jurisdiction: US-PA
         policyArea: Dover Area School District's 2004 curriculum policy
         documentDate: "2004-10-18"
-        excerptText: "Students will be made aware of gaps/problems in Darwin's theory and of other theories of evolution including, but not limited to, intelligent design."
         sourceDocument: Dover Area School Board meeting minutes / Kitzmiller trial exhibit
-        accessTier: excerpt-only
+        accessTier: summary-only
     summary: >
       Pennsylvania's own state standard required analyzing the theory of
       evolution and said nothing about "gaps/problems" or alternative

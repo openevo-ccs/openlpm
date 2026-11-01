@@ -16,15 +16,14 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      Rep. John Washington Butler introduced House Bill No. 185, making it
-      unlawful for any teacher in a state-funded Tennessee school or
-      university to teach "any theory that denies the story of the Divine
-      Creation of man as taught in the Bible" in favor of descent "from a
-      lower order of animals," with a misdemeanor penalty of $100-$500 per
-      offense.
+      Rep. John Washington Butler introduced House Bill No. 185. It made it
+      unlawful for any teacher in a state-funded Tennessee school or university
+      to teach a theory that contradicted the Bible's account of how humans came
+      to exist and held instead that humans descended from lower animals. The
+      penalty was a misdemeanor fine of $100 to $500 per offense.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     sourceUrl: https://en.wikipedia.org/wiki/Butler_Act
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -43,15 +42,14 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      Following House passage 71-5 (Jan 28) and Senate passage 24-6 (Mar
-      13), Governor Austin Peay signed the Butler Act. Peay said "nothing of
-      consequence in the books now being taught in our schools" would run
-      afoul of it, that "the people must have the right to regulate what is
-      taught in their schools," and that he did not believe it would ever
-      actually be enforced.
+      After House passage 71-5 (Jan 28) and Senate passage 24-6 (Mar 13),
+      Governor Austin Peay signed the Butler Act. Peay said nothing important in
+      the books then used in Tennessee schools would conflict with it. He also
+      said the people had a right to control what their schools teach, and that
+      he did not expect the law ever to be enforced.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     sourceUrl: https://en.wikipedia.org/wiki/Austin_Peay
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -71,15 +69,14 @@ events:
     temporalStatus: past-completed
     description: >
       The ACLU's newspaper advertisement (reported in the Chattanooga Times)
-      offered to defend any Tennessee teacher willing to test the Butler
-      Act. George Rappleyea, a Dayton engineer and civic booster, convinced
-      a group of Dayton businessmen at Robinson's Drug Store to recruit John
-      T. Scopes, a local substitute teacher/football coach, as the test
-      defendant -- explicitly to generate publicity and business for the
-      town.
+      offered to defend any Tennessee teacher willing to test the Butler Act.
+      George Rappleyea, a Dayton engineer and civic booster, convinced a group
+      of Dayton businessmen at Robinson's Drug Store to recruit John T. Scopes,
+      a local substitute teacher and football coach, as the test defendant,
+      explicitly to generate publicity and business for the town.
     involvedActors: [TNLP-ACTOR-aclu]
     sourceUrl: https://en.wikipedia.org/wiki/George_Rappleyea
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -103,22 +100,21 @@ events:
     temporalStatus: past-completed
     description: >
       Rhea County Courthouse, Dayton, Tennessee. Judge John T. Raulston.
-      Prosecution: District Attorney Tom Stewart, Herbert E. Hicks, Sue K.
-      Hicks, Gordon McKenzie, joined by William Jennings Bryan. Defense:
-      Clarence Darrow (lead), Arthur Garfield Hays (ACLU), Dudley Field
-      Malone, John R. Neal, W.O. Thompson, F.B. McElwee. On day 7, with the
-      jury excused, Darrow called Bryan to the stand to question his literal
-      reading of the Bible -- asked where Cain found his wife, Bryan replied
-      he'd "leave the agnostics to hunt for her," an exchange generally
-      treated as having damaged Bryan's credibility even though Raulston
-      struck the testimony the next day. Scopes was found guilty and fined
-      $100 (set by the judge, not the jury -- the basis of the 1927
-      reversal). H.L. Mencken's Baltimore Sun coverage coined "Monkey
-      Trial"; this was the first American trial broadcast live nationally
-      by radio (Chicago's WGN).
+      Prosecution: District Attorney Tom Stewart, Herbert E. Hicks, Sue K. Hicks
+      and Gordon McKenzie, joined by William Jennings Bryan. Defense: Clarence
+      Darrow (lead), Arthur Garfield Hays (ACLU), Dudley Field Malone, John R.
+      Neal, W.O. Thompson and F.B. McElwee. On day 7, with the jury excused,
+      Darrow called Bryan to the stand to question his literal reading of the
+      Bible. Asked where Cain found his wife, Bryan replied that finding her was
+      a job for the agnostics. The exchange is generally seen as having damaged
+      Bryan's credibility, even though Raulston struck the testimony the next
+      day. Scopes was found guilty and fined $100. The judge set the fine rather
+      than the jury, which became the basis of the 1927 reversal. H.L. Mencken's
+      Baltimore Sun coverage coined the label Monkey Trial, and this was the
+      first American trial broadcast live nationally by radio (Chicago's WGN).
     involvedActors: [TNLP-ACTOR-aclu]
     sourceUrl: https://en.wikipedia.org/wiki/Scopes_trial
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -140,13 +136,13 @@ events:
     temporalStatus: past-completed
     description: >
       Bryan died in his sleep (reported stroke) in Dayton, Tennessee, after
-      church and an afternoon nap. H.L. Mencken privately remarked "We
-      killed the son-of-a-bitch!" and his published obituary (Baltimore
-      Evening Sun, July 27) was openly hostile, calling Bryan "a vulgar and
-      common man."
+      church and an afternoon nap. H.L. Mencken privately remarked, in coarse
+      terms, that he and others had killed Bryan. Mencken's published obituary
+      (Baltimore Evening Sun, July 27) was openly hostile and called Bryan
+      vulgar and common.
     involvedActors: []
     sourceUrl: https://en.wikipedia.org/wiki/William_Jennings_Bryan
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -234,16 +230,15 @@ events:
     temporalStatus: past-completed
     description: >
       Within three days of Gary Scott's lawsuit being filed, a repeal bill
-      (House Bill No. 48, Chapter No. 237) passed both chambers of the
-      Tennessee legislature on May 13, 1967. Governor Buford Ellington
-      signed it (exact day disputed between May 17 and 18 across sources).
-      Effective September 1, 1967 -- roughly 18 months before the US Supreme
-      Court's Epperson v. Arkansas (decided Nov 12, 1968) struck down a
-      near-identical Arkansas law; Tennessee's repeal was driven
-      independently by the Scott controversy, not a response to Epperson.
+      (House Bill No. 48, Chapter No. 237) passed both chambers of the Tennessee
+      legislature on May 13, 1967. Governor Buford Ellington signed it (sources
+      disagree on the exact day, May 17 or 18). The repeal took effect September
+      1, 1967, roughly 18 months before the US Supreme Court decided Epperson v.
+      Arkansas (Nov 12, 1968) and struck down a near-identical Arkansas law. The
+      Scott controversy drove the Tennessee repeal independently of Epperson.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     sourceUrl: https://en.wikipedia.org/wiki/Butler_Act
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -334,21 +329,20 @@ events:
     temporalStatus: past-completed
     description: >
       Senate Bill 394 / House Bill 597, enacted as Chapter 377 of the 1973
-      Public Acts. Sponsored by Sen. Milton H. Hamilton with House backing
-      from Speaker Ned McWherter and Rep. Tommy Bennett; championed by Rep.
-      Bill Carter of Rhea County (home of the original Scopes trial), who
-      said: "Since I unsuccessfully opposed the repeal of the 'Evolution
-      Law'... I have been duty bound to do all I can to see that this bill
-      is passed." Required biology textbooks discussing "origins or
-      creation of man" to give "commensurate attention to, and an equal
-      amount of emphasis on" other theories "including, but not limited to,
-      the Genesis account in the Bible," and required evolution be
-      presented as "not represented to be scientific fact" -- a disclaimer
-      not applied to the Bible, which the statute defined as a "reference
-      work." Signed by Governor Winfield Dunn.
+      Public Acts. It was sponsored by Sen. Milton H. Hamilton, with House
+      backing from Speaker Ned McWherter and Rep. Tommy Bennett, and championed
+      by Rep. Bill Carter of Rhea County (home of the original Scopes trial).
+      Carter said that because he had unsuccessfully opposed repeal of the
+      Evolution Law, he felt duty bound to do everything in his power to get
+      this bill passed. The act required biology textbooks that treat human
+      origins to give other theories, the biblical Genesis account among them,
+      equal space and emphasis. It also required that evolution carry a
+      disclaimer that it was not to be taken as scientific fact. The statute
+      applied no such disclaimer to the Bible, which it defined as a reference
+      work. Governor Winfield Dunn signed it.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     sourceUrl: https://jsreligion.org/issues/vol16/edwards.html
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -408,15 +402,15 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      HB 368 (Rep. Bill Dunn) passed the House 70-23 on April 7, 2011. SB
-      893 (Sen. Bo Watson) stalled in Senate committee through 2011, was
-      revived March 7, 2012, cleared the Senate Education Committee 7-1 on
-      March 14 (amended to "may cause debate and disputation"), and passed
-      the full Senate 24-8 on March 20, 2012. Transmitted to Governor Bill
-      Haslam March 29, 2012.
+      HB 368 (Rep. Bill Dunn) passed the House 70-23 on April 7, 2011. SB 893
+      (Sen. Bo Watson) stalled in Senate committee through 2011 and was revived
+      March 7, 2012. It cleared the Senate Education Committee 7-1 on March 14,
+      after an amendment that referred to subjects that may provoke debate and
+      dispute, and passed the full Senate 24-8 on March 20, 2012. It was
+      transmitted to Governor Bill Haslam March 29, 2012.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     sourceUrl: https://www.timesfreepress.com/news/news/story/2012/mar/20/tn-senate-passes-watsons-bill-on-evolution-debate/73438/
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -438,16 +432,16 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      The first bill of his term Haslam handled this way. His stated
-      reasoning: he did not believe the law changed the science curriculum
-      or taught anything not already allowed, but "good legislation should
-      bring clarity and not confusion. My concern is that this bill has not
-      met this objective." Tennessee was the second state (after Louisiana,
-      2008) to pass this type of law. Codified at T.C.A. S49-6-1030.
+      It was the first bill of his term that Haslam handled this way. He said he
+      did not believe the law changed the science curriculum or allowed anything
+      not already allowed. He judged, however, that the bill fell short of the
+      clarity good legislation should provide, and that this was his concern.
+      Tennessee was the second state (after Louisiana, 2008) to pass this type
+      of law. Codified at T.C.A. S49-6-1030.
     involvedActors: [TNLP-ACTOR-tennessee-general-assembly]
     partOf: TNLP-EVENT-tn-2011-2012-teacher-protection-act-legislative-process
     sourceUrl: https://www.huffingtonpost.com/2012/04/10/tennessee-evolution-bill-haslam_n_1416015.html
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

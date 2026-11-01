@@ -88,14 +88,13 @@ events:
     dateGranularity: month
     temporalStatus: past-completed
     description: >
-      Dover Area School Board curriculum committee, chaired by William
-      Buckingham, began pushing to balance evolution teaching with
-      "creationism" during discussions of adopting Kenneth Miller & Joseph
-      Levine's textbook "Biology." Buckingham objected the book was "laced
-      with Darwinism."
+      The Dover Area School Board curriculum committee, chaired by William
+      Buckingham, began pushing to balance evolution teaching with creationism
+      during discussions of adopting Kenneth Miller and Joseph Levine's textbook
+      Biology. Buckingham objected that the book promoted Darwinism too heavily.
     involvedActors: [PALP-ACTOR-dover-area-school-district]
     sourceUrl: https://ncse.ngo/design-trial-dover-pennsylvania
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -138,20 +137,19 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      The Dover Area School Board voted 6-3 to amend the biology curriculum:
-      "Students will be made aware of gaps/problems in Darwin's theory and of
-      other theories of evolution including, but not limited to, intelligent
-      design." FOR: Alan Bonsell, William Buckingham, Jane Cleaver, Heather
-      Geesey, Sheila Harkins, Angie Ziegler-Yingling. AGAINST: Jeffrey Brown,
-      Carol "Casey" Brown, Noel Wenrich. Jeff and Casey Brown (a married
-      couple, board members 5 and 10 years respectively) resigned in protest
-      at the end of the same meeting; Casey Brown's statement: "it has become
-      increasingly evident that in the direction the board has now chosen to
-      go, holding a certain religious belief is of paramount importance... I
-      can no longer effectively function as a member of this board."
+      The Dover Area School Board voted 6-3 to amend the biology curriculum so
+      that students would learn about weaknesses in Darwin's theory and about
+      alternative accounts of evolution, intelligent design among them. FOR:
+      Alan Bonsell, William Buckingham, Jane Cleaver, Heather Geesey, Sheila
+      Harkins, Angie Ziegler-Yingling. AGAINST: Jeffrey Brown, Carol (Casey)
+      Brown, Noel Wenrich. Jeff and Casey Brown, a married couple who had served
+      on the board for 5 and 10 years respectively, resigned in protest at the
+      end of the same meeting. Casey Brown said it had become clear that the
+      board's new direction made holding a particular religious belief the top
+      priority, and that she could no longer serve effectively as a member.
     involvedActors: [PALP-ACTOR-dover-area-school-district]
     sourceUrl: https://ncse.ngo/kitzmiller-v-dover-timeline
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -175,17 +173,17 @@ events:
     temporalStatus: past-completed
     description: >
       All eight Dover High School science teachers sent the superintendent a
-      letter stating intelligent design "is not science" and "not an
-      accepted scientific theory," asking to be excused from reading the
-      disclaimer since doing so would make them "violate the ethics code of
-      [their] profession." They formally refused on Jan 6, 2005; the
-      administration agreed (Jan 7) administrators would read it instead. The
-      disclaimer was first read on Jan 18, 2005, by the assistant
-      superintendent, in each 9th-grade biology classroom; roughly 15
-      students walked out during the reading.
+      letter stating that intelligent design is neither science nor a theory
+      accepted by scientists. They asked to be excused from reading the
+      disclaimer because reading it would conflict with their professional
+      ethics. They formally refused on Jan 6, 2005, and the administration
+      agreed on Jan 7 that administrators would read it instead. The assistant
+      superintendent first read the disclaimer on Jan 18, 2005, in each 9th-
+      grade biology classroom, and roughly 15 students walked out during the
+      reading.
     involvedActors: [PALP-ACTOR-dover-area-school-district]
     sourceUrl: https://ncse.com/news/2005/01/dover-teachers-refuse-to-read-antievolution-disclaimer-00664
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -246,23 +244,22 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      Six weeks of testimony in Harrisburg, PA, before Judge John E. Jones
-      III (US District Court, Middle District of Pennsylvania; a George W.
-      Bush appointee). Plaintiffs' expert witnesses included Kenneth R.
-      Miller (Brown University), Barbara Forrest (SE Louisiana University --
-      testified on the "cdesign proponentsists" find-and-replace artifact in
-      draft manuscripts of "Of Pandas and People"), Kevin Padian, Robert
-      Pennock, John Haught, Brian Alters. Defense expert witnesses Michael
-      Behe (Lehigh University) and Scott Minnich (University of Idaho)
-      testified on "irreducible complexity" (the bacterial flagellum
-      argument); three other Discovery-Institute-affiliated experts (William
-      Dembski, Stephen Meyer, John Angus Campbell) had withdrawn before
-      depositions.
+      Six weeks of testimony in Harrisburg, PA, before Judge John E. Jones III
+      (US District Court, Middle District of Pennsylvania; a George W. Bush
+      appointee). Plaintiffs' expert witnesses included Kenneth R. Miller (Brown
+      University), Barbara Forrest (SE Louisiana University, who testified on
+      the cdesign proponentsists find-and-replace artifact in draft manuscripts
+      of Of Pandas and People), Kevin Padian, Robert Pennock, John Haught and
+      Brian Alters. Defense expert witnesses Michael Behe (Lehigh University)
+      and Scott Minnich (University of Idaho) testified on irreducible
+      complexity, the bacterial flagellum argument. Three other Discovery-
+      Institute-affiliated experts (William Dembski, Stephen Meyer, John Angus
+      Campbell) had withdrawn before depositions.
     involvedActors:
       - PALP-ACTOR-dover-area-school-district
       - PALP-ACTOR-discovery-institute
     sourceUrl: https://ncse.ngo/kitzmiller-trial-transcripts
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -285,16 +282,15 @@ events:
     temporalStatus: past-completed
     description: >
       All eight Republican incumbents who had supported the intelligent-design
-      policy were defeated by the "Dover CARES" slate: Bernadette Reinking,
-      Terry Emig, Bryan Rehm (also a named plaintiff in the lawsuit), Herbert
-      "Rob" McIlvaine, Judy McIlvaine, Larry Gurreri, Patricia Dapp, Phil
-      Herman. Ousted incumbents included board president Sheila Harkins and
-      former board president Alan Bonsell. The new board's stated position
-      was that it would drop the policy regardless of the pending court
-      ruling.
+      policy were defeated by the Dover CARES slate: Bernadette Reinking, Terry
+      Emig, Bryan Rehm (also a named plaintiff in the lawsuit), Herbert (Rob)
+      McIlvaine, Judy McIlvaine, Larry Gurreri, Patricia Dapp and Phil Herman.
+      The ousted incumbents included board president Sheila Harkins and former
+      board president Alan Bonsell. The new board said it would drop the policy
+      whatever the pending court ruling turned out to be.
     involvedActors: [PALP-ACTOR-dover-area-school-district]
     sourceUrl: https://ncse.ngo/dover-voters-choose-good-science-polls
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -354,13 +350,12 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      The newly elected "Dover CARES" board voted unanimously (voice vote, no
-      discussion) to formally rescind the intelligent-design policy. New
-      board president Bernadette Reinking: "This is it."
+      The newly elected Dover CARES board voted unanimously, by voice vote and
+      with no discussion, to formally rescind the intelligent-design policy.
     involvedActors: [PALP-ACTOR-dover-area-school-district]
     partOf: PALP-EVENT-kitzmiller-ruling
     sourceUrl: https://www.nbcnews.com/id/wbna10698535
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm
@@ -382,17 +377,17 @@ events:
     dateGranularity: day
     temporalStatus: past-completed
     description: >
-      The $11 reflects a $1 nominal-damages award to each of the 11
-      plaintiffs, plus $1,000,000 toward fees/costs. Plaintiffs' actual
-      documented fees/expenses totaled $2,067,226; Pepper Hamilton (which
-      handled the case pro bono) billed only its roughly $267,000 in hard
-      costs, not attorney time, with the remainder split between Americans
-      United and the ACLU of Pennsylvania as their own cost reimbursement.
+      The $11 reflects a $1 nominal-damages award to each of the 11 plaintiffs,
+      plus $1,000,000 toward fees and costs. The plaintiffs' documented fees and
+      expenses totaled $2,067,226. Pepper Hamilton, which handled the case pro
+      bono, billed only about $267,000 in hard costs and no attorney time. The
+      remainder was split between Americans United and the ACLU of Pennsylvania
+      as reimbursement of their own costs.
     involvedActors:
       - PALP-ACTOR-dover-area-school-district
       - PALP-ACTOR-pepper-hamilton
     sourceUrl: https://ncse.ngo/intelligent-design-costs-dover-over-1000000
-    accessTier: excerpt-only
+    accessTier: summary-only
     verificationStatus: primary-source-confirmed
     provenance:
       extracted_by: llm

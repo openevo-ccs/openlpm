@@ -20,6 +20,16 @@ export const RECORD_TYPE_LABEL: Record<RepositoryRecordRow['record_type'], strin
   'policy-controversy-record': 'Public controversy',
 }
 
+/** The wording Dustin set (2026-11-02) for anything a model wrote that no person has reviewed yet. Use exactly this text. */
+export const DRAFT_LABEL = { en: 'LLM synthesized draft, awaiting review', de: 'LLM-erzeugter Entwurf, Prüfung ausstehend' } as const
+
+/** True while the record's own provenance still says author-draft (or has no review status): nobody has reviewed it. */
+export function isUnreviewedDraft(record: Pick<RepositoryRecordRow, 'content'>): boolean {
+  const prov = (record.content as { provenance?: { review_status?: string } } | null)?.provenance
+  const status = prov?.review_status
+  return !status || status === 'author-draft'
+}
+
 export const ACCESS_TIER_LABEL: Record<RepositoryRecordRow['access_tier'], string> = {
   'full-text-stored': 'Full text available',
   'excerpt-only': 'Short excerpts only',

@@ -149,7 +149,7 @@ export function searchMatches(roots: TreeNode[], query: string): Set<string> | n
 }
 
 export const REVIEW_STATUS_LABEL: Record<string, { de: string; en: string }> = {
-  'ai-draft': { de: 'KI-Entwurf, noch nicht von Fachleuten geprüft', en: 'AI draft, no expert has checked it yet' },
+  'ai-draft': { de: 'LLM-erzeugter Entwurf, Prüfung ausstehend', en: 'LLM synthesized draft, awaiting review' },
   'checked-against-source': { de: 'Mit der Quelle abgeglichen', en: 'Checked against the source' },
   'expert-reviewed': { de: 'Von Fachleuten geprüft', en: 'Reviewed by an expert' },
 }
