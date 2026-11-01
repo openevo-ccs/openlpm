@@ -1,0 +1,118 @@
+/* Look of the German welcome page (welcome-page.tsx). The colors come from the
+   shared tokens, so dark mode follows the rest of the app. */
+
+.welcome {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in srgb, var(--series-a) 14%, transparent), transparent 70%),
+    var(--page-plane);
+  font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text-primary);
+}
+
+/* The partner logos sit on light tiles so the artwork stays readable in dark mode. */
+.welcome-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 16px 0;
+}
+.welcome-top-label {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.welcome-top-logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+.welcome-logo-tile {
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 22px;
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.06);
+}
+.welcome-logo-tile img { height: 66px; width: auto; display: block; }
+
+.welcome-main {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(24px, 7vh, 80px) 20px 40px;
+  box-sizing: border-box;
+}
+
+/* The quote and the short text beneath it fill the upper third of the screen.
+   The sign-up card follows below. */
+.welcome-hero { text-align: center; margin-bottom: clamp(28px, 5vh, 52px); }
+.welcome-quote { margin: 0; }
+.welcome-quote p {
+  margin: 0;
+  font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 5.6vw, 3.7rem);
+  line-height: 1.16;
+  letter-spacing: -0.01em;
+  color: var(--brand-navy);
+  text-wrap: balance;
+}
+.welcome-quote footer {
+  margin-top: 14px;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+}
+.welcome-lead {
+  max-width: 34rem;
+  margin: clamp(18px, 3vh, 28px) auto 0;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: balance;
+}
+
+.welcome .welcome-card {
+  max-width: 520px;
+  margin: 0 auto;
+  border-top: 4px solid var(--series-a);
+  border-radius: 14px;
+  padding: 26px 26px 20px;
+  box-shadow: 0 6px 28px rgb(0 0 0 / 0.07);
+}
+.welcome-card-title {
+  text-align: center;
+  margin: 0 0 6px;
+  font-family: 'Roboto', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+.welcome .welcome-card .muted { font-size: 0.95rem; font-weight: 400; line-height: 1.5; color: var(--text-secondary); }
+.welcome .welcome-card ol { font-size: 0.95rem; line-height: 1.6; }
+
+.welcome-foot {
+  padding: 18px 16px 26px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.welcome-foot p { margin: 4px 0; }
+.welcome-foot a { color: var(--text-muted); }
+
+@media (max-width: 520px) {
+  .welcome-logo-tile img { height: 46px; }
+  .welcome .welcome-card { padding: 20px 18px 16px; }
+}
