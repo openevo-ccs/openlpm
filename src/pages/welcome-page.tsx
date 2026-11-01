@@ -142,13 +142,17 @@ export default function WelcomePage() {
         <p className="muted" style={{ textAlign: 'center', marginTop: 0 }}>{config.intro}</p>
 
         {sentTo ? (
-          <div className="notice notice-ok" style={{ marginTop: 16 }}>
-            <MailCheck size={18} />{' '}
-            <strong>Fast geschafft.</strong> Wir haben eine E-Mail an <strong>{sentTo}</strong> geschickt. Öffne sie und klicke auf den Link darin. Danach kommst du direkt in EvoMentor.
-            <p style={{ margin: '8px 0 0', fontSize: 13 }}>
-              Die E-Mail kann einige Minuten brauchen. Schau auch im Spam-Ordner nach. Wenn nach einer halben Stunde nichts da ist, melde dich bei der Dozentin.
-              Wenn du den Link auf einem anderen Gerät öffnest, melde dich dort an, und du bekommst einen Knopf zum Beitreten.
-            </p>
+          <div className="welcome-sent" role="status">
+            <MailCheck size={40} className="welcome-sent-icon" aria-hidden="true" />
+            <h2>Fast geschafft</h2>
+            <p>Wir haben eine E-Mail an diese Adresse geschickt:</p>
+            <p className="welcome-sent-address">{sentTo}</p>
+            <p>Öffne die E-Mail und klicke auf den Link darin. Danach kommst du direkt in EvoMentor.</p>
+            <ul className="welcome-sent-help">
+              <li>Die E-Mail kann einige Minuten brauchen. Schau auch im Spam-Ordner nach.</li>
+              <li>Wenn nach einer halben Stunde nichts da ist, melde dich bei der Dozentin.</li>
+              <li>Öffnest du den Link auf einem anderen Gerät, melde dich dort an. Du bekommst dann einen Knopf zum Beitreten.</li>
+            </ul>
           </div>
         ) : (
           <>
