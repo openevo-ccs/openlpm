@@ -1,0 +1,668 @@
+[
+ {
+  "band": "5/6",
+  "topic_de": "2.2.1 Naturwissenschaftliche Denk- und Arbeitsmethoden",
+  "label_en": "2.2.1 Scientific thinking and working methods",
+  "summary_de": "Lernende üben grundlegende Denkweisen der Naturwissenschaften, zum Beispiel genau hinsehen, vergleichen, sortieren und Aussagen begründen.",
+  "summary_en": "Pupils practise basic ways of thinking in science, such as observing closely, comparing, sorting and giving reasons for statements.",
+  "subtopics": [
+   {
+    "label_de": "2.2.1 Naturwissenschaftliche Denk- und Arbeitsmethoden",
+    "label_en": "2.2.1 Scientific thinking and working methods",
+    "summary_de": "Lernende betrachten und beschreiben Sachverhalte, vergleichen sie, ordnen sie in Gruppen und begründen ihre Aussagen.",
+    "summary_en": "Pupils look at and describe phenomena, compare them, sort them into groups and give reasons for their statements."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.2 Mensch – Natur – Technik",
+  "label_en": "2.2.2 Humans, nature and technology",
+  "summary_de": "Lernende überlegen, wie Menschen, Natur und Technik im Alltag zusammenhängen, wenden eine Versuchsmethode an und trennen ein Stoffgemisch.",
+  "summary_en": "Pupils consider how people, nature and technology connect in everyday life, apply an experimental method and separate a mixture of substances.",
+  "subtopics": [
+   {
+    "label_de": "Beziehungen zwischen Mensch, Natur und Technik",
+    "label_en": "Relations between humans, nature and technology",
+    "summary_de": "Lernende nennen Alltagsbeispiele dafür, wie Menschen, Natur und Technik miteinander verbunden sind.",
+    "summary_en": "Pupils name everyday examples of how people, nature and technology are connected."
+   },
+   {
+    "label_de": "Naturwissenschaftliches Arbeiten",
+    "label_en": "Working scientifically",
+    "summary_de": "Lernende wenden die Methode des Experimentierens an.",
+    "summary_en": "Pupils apply the method of experimenting."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende trennen in einem praktischen Versuch ein Gemisch, das Eisenspäne, Sand und Kies enthält.",
+    "summary_en": "In a hands-on task pupils separate a mixture that contains iron filings, sand and gravel."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.3 Körper – Stoffe – Eigenschaften",
+  "label_en": "2.2.3 Objects, substances and properties",
+  "summary_de": "Lernende unterscheiden Gegenstände und die Stoffe, aus denen sie bestehen, bestimmen Volumen und Masse und beschreiben und vergleichen Stoffeigenschaften.",
+  "summary_en": "Pupils distinguish objects from the substances they are made of, determine volume and mass, and describe and compare the properties of substances.",
+  "subtopics": [
+   {
+    "label_de": "Körper",
+    "label_en": "Objects",
+    "summary_de": "Lernende teilen Körper in Gruppen ein und erklären, wie man Volumen und Masse bestimmt.",
+    "summary_en": "Pupils sort objects into groups and explain how volume and mass are determined."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Körper)",
+    "label_en": "Practical work (objects)",
+    "summary_de": "Lernende messen Flüssigkeitsmengen ab, bestimmen Volumen über eine Differenzmessung und wiegen Gegenstände.",
+    "summary_en": "Pupils measure out amounts of liquid, find volumes by difference measurement and weigh objects."
+   },
+   {
+    "label_de": "Stoffe und ihre Eigenschaften",
+    "label_en": "Substances and their properties",
+    "summary_de": "Lernende benennen die Stoffe, aus denen Körper bestehen, beschreiben und vergleichen Eigenschaften von Stoffen und erläutern, wofür Reinstoffe genutzt werden.",
+    "summary_en": "Pupils name the substances objects are made of, describe and compare properties of substances and explain what pure substances are used for."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Stoffe)",
+    "label_en": "Practical work (substances)",
+    "summary_de": "Lernende ermitteln Stoffeigenschaften, untersuchen die Bewegung von Teilchen, lassen Wasserdampf kondensieren und trennen Stoffgemische durch Versuche.",
+    "summary_en": "Pupils find out properties of substances, investigate how particles move, condense water vapour and separate mixtures of substances in experiments."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.4 Chemische Reaktionen",
+  "label_en": "2.2.4 Chemical reactions",
+  "summary_de": "Lernende lernen chemische Reaktionen kennen, bei denen neue Stoffe entstehen und Wärme genutzt wird, zum Beispiel die Verbrennung.",
+  "summary_en": "Pupils meet chemical reactions in which new substances form and heat is used, with combustion as an example.",
+  "subtopics": [
+   {
+    "label_de": "Chemische Reaktionen",
+    "label_en": "Chemical reactions",
+    "summary_de": "Lernende betrachten Reaktionen, mit denen Stoffe hergestellt oder Wärme genutzt wird, und untersuchen bei der Verbrennung neue Stoffe und Energieumwandlung.",
+    "summary_en": "Pupils look at reactions used to make substances or to use heat, and study how combustion forms new substances and converts energy."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende führen praktische Versuche durch, bei denen sich Stoffe umwandeln.",
+    "summary_en": "Pupils carry out hands-on experiments in which substances are transformed."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.5 Kohäsion, Adhäsion, Kapillarität",
+  "label_en": "2.2.5 Cohesion, adhesion, capillarity",
+  "summary_de": "Lernende untersuchen, wie Wasser an sich selbst und an anderen Stoffen haftet und wie Flüssigkeiten in dünnen Röhrchen aufsteigen.",
+  "summary_en": "Pupils study how water sticks to itself and to other materials and how liquids rise in thin tubes.",
+  "subtopics": [
+   {
+    "label_de": "Kohäsion, Adhäsion",
+    "label_en": "Cohesion, adhesion",
+    "summary_de": "Lernende erklären mit Kohäsion, Adhäsion und Oberflächenspannung, warum Wassertropfen rund sind, Oberflächen benetzen oder abperlen.",
+    "summary_en": "Pupils use cohesion, adhesion and surface tension to explain why water drops are round and why they wet a surface or bead off it."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten (Kohäsion, Adhäsion)",
+    "label_en": "Practical work (cohesion, adhesion)",
+    "summary_de": "Lernende beobachten, wie sich Wassertropfen auf Oberflächen verhalten, und prüfen den Einfluss von Spülmittel auf die Oberflächenspannung.",
+    "summary_en": "Pupils observe how water drops behave on surfaces and test how washing-up liquid affects surface tension."
+   },
+   {
+    "label_de": "Kapillarität",
+    "label_en": "Capillarity",
+    "summary_de": "Lernende beschreiben, wie Flüssigkeiten in engen Röhrchen aufsteigen, und befassen sich damit, wie Kapillarität genutzt oder verhindert wird.",
+    "summary_en": "Pupils describe how liquids rise in narrow tubes and look at how capillarity is used or prevented."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten (Kapillarität)",
+    "label_en": "Practical work (capillarity)",
+    "summary_de": "Lernende untersuchen im Versuch, wie hoch Flüssigkeit in Kapillarröhrchen steigt und welche Rolle der Durchmesser spielt.",
+    "summary_en": "In an experiment pupils investigate how high a liquid rises in capillary tubes and what role the tube diameter plays."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.6 Die Vielfalt der Lebewesen",
+  "label_en": "2.2.6 The diversity of living things",
+  "summary_de": "Lernende sortieren Lebewesen in vorgegebene Gruppen und unterscheiden sie von nichtlebenden Dingen.",
+  "summary_en": "Pupils sort living things into given groups and tell them apart from non-living things.",
+  "subtopics": [
+   {
+    "label_de": "2.2.6 Die Vielfalt der Lebewesen",
+    "label_en": "2.2.6 The diversity of living things",
+    "summary_de": "Lernende sortieren Lebewesen in vorgegebene Gruppen und grenzen sie von nichtlebenden Dingen ab.",
+    "summary_en": "Pupils sort living things into given groups and set them apart from non-living things."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.7 Samenpflanzen",
+  "label_en": "2.2.7 Seed plants",
+  "summary_de": "Lernende untersuchen Bau, Ernährung, Fortpflanzung und Ordnung der Samenpflanzen sowie ihre Bedeutung für den Menschen.",
+  "summary_en": "Pupils study the structure, nutrition, reproduction and classification of seed plants and their importance for people.",
+  "subtopics": [
+   {
+    "label_de": "Vielfalt – gleicher Grundaufbau",
+    "label_en": "Diversity with the same basic structure",
+    "summary_de": "Lernende beschreiben den Bau einer Samenpflanze, vergleichen Samenpflanzen und ordnen sie nach ihrer Wuchsform.",
+    "summary_en": "Pupils describe how a seed plant is built, compare seed plants and sort them by growth form."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Aufbau Samenpflanzen)",
+    "label_en": "Practical work (structure of seed plants)",
+    "summary_de": "Lernende schauen sich in einer praktischen Arbeit an, wie Samenpflanzen gestaltet sind.",
+    "summary_en": "In a practical task pupils look at how seed plants are shaped."
+   },
+   {
+    "label_de": "Ernährung der Samenpflanzen",
+    "label_en": "Nutrition of seed plants",
+    "summary_de": "Lernende verfolgen, wie Wasser über Wurzel und Sprossachse transportiert wird und wie Laubblätter Kohlenstoffdioxid aufnehmen und zu Traubenzucker und Sauerstoff umwandeln.",
+    "summary_en": "Pupils follow how water moves through root and stem and how leaves take in carbon dioxide and turn it into glucose and oxygen."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Ernährung Samenpflanzen)",
+    "label_en": "Practical work (nutrition of seed plants)",
+    "summary_de": "Lernende untersuchen in Versuchen den Querschnitt der Sprossachse, das Aufsteigen gefärbten Wassers, die Wasserabgabe der Blätter und die Wasseraufnahme der Wurzeln.",
+    "summary_en": "In experiments pupils examine the cross-section of the stem, watch coloured water rise, and study water loss through leaves and water uptake by roots."
+   },
+   {
+    "label_de": "Fortpflanzung und Entwicklung der Samenpflanzen",
+    "label_en": "Reproduction and development of seed plants",
+    "summary_de": "Lernende beschreiben und vergleichen Blüten, erklären Bestäubung, Befruchtung und Fruchtbildung und beschreiben den Bau eines Samens.",
+    "summary_en": "Pupils describe and compare flowers, explain pollination, fertilisation and fruit formation, and describe how a seed is built."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Fortpflanzung, Entwicklung Samenpflanzen)",
+    "label_en": "Practical work (reproduction and development of seed plants)",
+    "summary_de": "Lernende zerlegen Blüten und zeichnen ein Blütendiagramm, weisen Stärke und Fett in Samen nach, untersuchen Keimungsbedingungen und ziehen Jungpflanzen heran.",
+    "summary_en": "Pupils take flowers apart and draw a floral diagram, test seeds for starch and fat, investigate conditions for germination and grow young plants."
+   },
+   {
+    "label_de": "Ordnen von Samenpflanzen",
+    "label_en": "Classifying seed plants",
+    "summary_de": "Lernende vergleichen Vertreter einer Pflanzenfamilie, grenzen die Familie ab und erläutern, nach welchen Kriterien man Samenpflanzen einteilt.",
+    "summary_en": "Pupils compare members of a plant family, set the family apart and explain the criteria used to divide seed plants into groups."
+   },
+   {
+    "label_de": "Bedeutung von Samenpflanzen und Nutzung durch den Menschen",
+    "label_en": "Importance and human use of seed plants",
+    "summary_de": "Lernende überlegen, welche Rolle wild wachsende Samenpflanzen für die Natur spielen und wie Menschen sie nutzen.",
+    "summary_en": "Pupils consider what role wild seed plants play in nature and how people use seed plants."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.8 Wirbeltiere",
+  "label_en": "2.2.8 Vertebrates",
+  "summary_de": "Lernende lernen die Wirbeltierklassen kennen, vergleichen Körperbau und Lebensweise der Tiergruppen, stellen die Klassen einander gegenüber und befassen sich mit dem Schutz von Wirbeltieren.",
+  "summary_en": "Pupils get to know the vertebrate classes, compare body structure and way of life of the animal groups, set the classes side by side and look at the protection of vertebrates.",
+  "subtopics": [
+   {
+    "label_de": "Die Vielfalt der Wirbeltiere und ihre Einteilung in Wirbeltierklassen",
+    "label_en": "Diversity of vertebrates and their classes",
+    "summary_de": "Lernende ordnen Wirbeltierarten den passenden Klassen zu.",
+    "summary_en": "Pupils assign vertebrate species to the matching classes."
+   },
+   {
+    "label_de": "Körpergliederung und Körperbau",
+    "label_en": "Body organisation and body structure",
+    "summary_de": "Lernende vergleichen Körpergliederung und Skelett von Wirbeltieren und definieren den Begriff Wirbeltier.",
+    "summary_en": "Pupils compare body organisation and skeleton of vertebrates and define the term vertebrate."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Körperbau)",
+    "label_en": "Practical work (body structure)",
+    "summary_de": "Lernende stellen ein Modell des Beins von Wirbeltieren her.",
+    "summary_en": "Pupils build a model of a vertebrate leg."
+   },
+   {
+    "label_de": "Angepasstheit an Lebensweise und Lebensräume (Säugetiere)",
+    "label_en": "Adaptation to way of life and habitat (mammals)",
+    "summary_de": "Lernende erläutern am Beispiel der Säugetiere, wie Gliedmaßen, Fortbewegung, Ernährung, Atmung und Stofftransport zur Lebensweise passen.",
+    "summary_en": "Using mammals as the example, pupils explain how limbs, movement, feeding, breathing and transport of substances suit the animal's way of life."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Ernährung, Atmung)",
+    "label_en": "Practical work (nutrition, breathing)",
+    "summary_de": "Lernende prüfen, wie gut sich Stärke und Traubenzucker lösen, stellen Blutkreislauf oder Lunge in einem Modell dar und zeigen das Prinzip der Oberflächenvergrößerung.",
+    "summary_en": "Pupils test how well starch and glucose dissolve, show the blood circulation or a lung in a model and demonstrate the principle of enlarging a surface."
+   },
+   {
+    "label_de": "Angepasstheit an Lebensweise und Lebensräume (Fische)",
+    "label_en": "Adaptation to way of life and habitat (fish)",
+    "summary_de": "Lernende erläutern am Beispiel der Fische, wie Fortbewegung und Atmung im Wasser funktionieren.",
+    "summary_en": "Using fish as the example, pupils explain how movement and breathing work in water."
+   },
+   {
+    "label_de": "Angepasstheit an Lebensweise und Lebensräume (Lurche)",
+    "label_en": "Adaptation to way of life and habitat (amphibians)",
+    "summary_de": "Lernende erläutern am Beispiel der Lurche die äußere Befruchtung und wie sich aus dem Laich eine Larve entwickelt.",
+    "summary_en": "Using amphibians as the example, pupils explain external fertilisation and how a larva develops from the spawn."
+   },
+   {
+    "label_de": "Angepasstheit an Lebensweise und Lebensräume (Kriechtiere)",
+    "label_en": "Adaptation to way of life and habitat (reptiles)",
+    "summary_de": "Lernende erläutern am Beispiel der Kriechtiere, wie sich die Ringelnatter an Land fortbewegt und wie Hornschuppen den Körper bedecken.",
+    "summary_en": "Using reptiles as the example, pupils explain how the grass snake moves on land and how horny scales cover the body."
+   },
+   {
+    "label_de": "Angepasstheit an Lebensweise und Lebensräume (Vögel)",
+    "label_en": "Adaptation to way of life and habitat (birds)",
+    "summary_de": "Lernende erläutern am Beispiel der Vögel, wie sie fliegen und wie sie schwimmen.",
+    "summary_en": "Using birds as the example, pupils explain how they fly and how they swim."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Angepasstheit)",
+    "label_en": "Practical work (adaptation)",
+    "summary_de": "Lernende untersuchen Körpermodelle in der Strömung, die Funktion von Flossen und den Aufbau von Federn samt ihren Eigenschaften.",
+    "summary_en": "Pupils investigate body models in a current of water, how fins work, and how feathers are built and what properties they have."
+   },
+   {
+    "label_de": "Gegenüberstellung und Ordnen der Wirbeltierklassen",
+    "label_en": "Comparing and ordering the vertebrate classes",
+    "summary_de": "Lernende stellen die fünf Wirbeltierklassen nach Skelett, Atmung, Körperbedeckung und Körpertemperatur einander gegenüber.",
+    "summary_en": "Pupils set the five vertebrate classes side by side in terms of skeleton, breathing, body covering and body temperature."
+   },
+   {
+    "label_de": "Schutz von Wirbeltieren",
+    "label_en": "Protection of vertebrates",
+    "summary_de": "Lernende leiten Auswirkungen auf Lebensräume ab und begründen und bewerten Maßnahmen, die Lebensräume schützen.",
+    "summary_en": "Pupils work out effects on habitats and give reasons for and evaluate measures that protect habitats."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.9 Der Mensch – Gesunderhaltung",
+  "label_en": "2.2.9 Humans: staying healthy",
+  "summary_de": "Lernende befassen sich mit Bewegung und Körperhaltung, Ernährung und Verdauung sowie Sexualität und Fortpflanzung des Menschen.",
+  "summary_en": "Pupils work on movement and posture, nutrition and digestion, and sexuality and reproduction in humans.",
+  "subtopics": [
+   {
+    "label_de": "Bewegung/Körperhaltung",
+    "label_en": "Movement and posture",
+    "summary_de": "Lernende beschreiben Skelett, Knochen und Gelenke und erläutern, wie Muskeln und Skelett zusammen Bewegung ermöglichen.",
+    "summary_en": "Pupils describe the skeleton, bones and joints and explain how muscles and skeleton work together to make movement possible."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Bewegung/Körperhaltung)",
+    "label_en": "Practical work (movement and posture)",
+    "summary_de": "Lernende gestalten ein Skelettmodell und untersuchen, wie ein Gelenk und die Hand funktionieren.",
+    "summary_en": "Pupils make a skeleton model and investigate how a joint and the hand work."
+   },
+   {
+    "label_de": "Ernährung",
+    "label_en": "Nutrition",
+    "summary_de": "Lernende nennen Nahrungsbestandteile und ihre Bedeutung und verfolgen den Weg der Nährstoffe von der Aufnahme über die Verdauung bis zum Transport im Blut.",
+    "summary_en": "Pupils name food components and their importance and follow nutrients from intake through digestion to transport in the blood."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Ernährung)",
+    "label_en": "Practical work (nutrition)",
+    "summary_de": "Lernende weisen in Lebensmitteln Stärke und Fett nach und erläutern ein Modell zur Verdauung von Stärke.",
+    "summary_en": "Pupils test foods for starch and fat and explain a model of how starch is digested."
+   },
+   {
+    "label_de": "Sexualität und Fortpflanzung",
+    "label_en": "Sexuality and reproduction",
+    "summary_de": "Lernende nennen Bau und Aufgaben der Geschlechtsorgane und besprechen die Veränderungen in der Pubertät, auch zu Menstruation, Pollution und sexueller Orientierung.",
+    "summary_en": "Pupils name the structure and tasks of the sex organs and discuss the changes of puberty, including menstruation, nocturnal emissions and sexual orientation."
+   }
+  ]
+ },
+ {
+  "band": "5/6",
+  "topic_de": "2.2.10 Bionik - vom Entdecken zum Erfinden",
+  "label_en": "2.2.10 Bionics: from discovering to inventing",
+  "summary_de": "An vier Beispielen untersuchen Lernende Vorbilder in der Natur, bauen Funktionsmodelle und übertragen die Erkenntnisse auf technische Anwendungen.",
+  "summary_en": "Using four examples, pupils study models from nature, build working models and carry the findings over to technical applications.",
+  "subtopics": [
+   {
+    "label_de": "10.1 Der Klettverschluss",
+    "label_en": "10.1 The hook-and-loop fastener",
+    "summary_de": "Lernende erkunden die Klettfrucht mit ihren Widerhaken als Vorbild, entwickeln ein Funktionsmodell und vergleichen Vorbild und Klettverschluss.",
+    "summary_en": "Pupils explore the burr fruit with its hooks as a model from nature, build a working model and compare the natural model with the fastener."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Klettverschluss)",
+    "label_en": "Practical work (hook-and-loop fastener)",
+    "summary_de": "Lernende betrachten mit der Lupe Klettfrüchte und die beiden Bänder eines Klettverschlusses.",
+    "summary_en": "Pupils look at burr fruits and the two strips of a hook-and-loop fastener through a magnifying glass."
+   },
+   {
+    "label_de": "10.2 Die Leichtbauweise",
+    "label_en": "10.2 Lightweight construction",
+    "summary_de": "Lernende untersuchen Bienenwaben, Knochen und Palmenblätter als Vorbilder, entwickeln ein Funktionsmodell und übertragen das Prinzip auf Brücken, Dächer und Verpackungen.",
+    "summary_en": "Pupils study honeycombs, bones and palm leaves as models from nature, build a working model and apply the principle to bridges, roofs and packaging."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Brückenmodell)",
+    "label_en": "Practical work (bridge model)",
+    "summary_de": "Lernende gehen an einem Brückenmodell forschend vor.",
+    "summary_en": "Pupils investigate with a bridge model in an inquiry-based way."
+   },
+   {
+    "label_de": "10.3 Vom Nebeltrinkerkäfer zur Trinkwassergewinnung",
+    "label_en": "10.3 From the fog-drinking beetle to drinking water",
+    "summary_de": "Lernende untersuchen, wie der Nebeltrinkerkäfer Wasser gewinnt, entwickeln Funktionsmodelle und übertragen das Prinzip auf Nebelkollektoren.",
+    "summary_en": "Pupils study how the fog-drinking beetle collects water, build working models and apply the principle to fog collectors."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Nebelfang)",
+    "label_en": "Practical work (fog catching)",
+    "summary_de": "Lernende gestalten das Modell einer Nebelfangeinrichtung, verändern es und prüfen, wie wirksam es ist.",
+    "summary_en": "Pupils design a model of a fog-catching device, vary it and test how effective it is."
+   },
+   {
+    "label_de": "10.4 Der Lotuseffekt",
+    "label_en": "10.4 The lotus effect",
+    "summary_de": "Lernende untersuchen Laubblätter mit ihren Wachsnoppen als Vorbild, entwickeln ein Funktionsmodell und übertragen das Prinzip auf Autolacke und Textilien.",
+    "summary_en": "Pupils study leaves with their wax bumps as a model from nature, build a working model and apply the principle to car paints and textiles."
+   },
+   {
+    "label_de": "Fachpraktische Arbeiten (Lotuseffekt)",
+    "label_en": "Practical work (lotus effect)",
+    "summary_de": "Lernende beobachten Wassertropfen auf Laubblättern mit verschiedenen Oberflächen und testen dies in Modellversuchen.",
+    "summary_en": "Pupils observe water drops on leaves with different surfaces and test this in model experiments."
+   }
+  ]
+ },
+ {
+  "band": "7/8",
+  "topic_de": "Wirbellose in ihren Lebensräumen",
+  "label_en": "Invertebrates in their habitats",
+  "summary_de": "Lernende lernen Gruppen wirbelloser Tiere kennen, untersuchen Insekten genauer und beobachten Wirbellose mit Lupe und Mikroskop.",
+  "summary_en": "Pupils get to know groups of invertebrate animals, study insects in more detail and observe invertebrates with a magnifying glass and a microscope.",
+  "subtopics": [
+   {
+    "label_de": "Wirbellose als vielfältige Tiergruppe",
+    "label_en": "Invertebrates as a diverse animal group",
+    "summary_de": "Lernende grenzen Wirbellose von Wirbeltieren ab und nennen Merkmale von Weichtieren, Ringelwürmern und Gliederfüßern.",
+    "summary_en": "Pupils set invertebrates apart from vertebrates and name features of molluscs, annelid worms and arthropods."
+   },
+   {
+    "label_de": "Insekten",
+    "label_en": "Insects",
+    "summary_de": "Lernende beschreiben Körpergliederung, Chitin-Außenskelett, Tracheensystem und Nervensystem der Insekten.",
+    "summary_en": "Pupils describe the body segmentation, chitin outer skeleton, tracheal system and nervous system of insects."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende beobachten Wirbellose mit Lupe oder Mikroskop und mikroskopieren Insektenteile.",
+    "summary_en": "Pupils observe invertebrates with a magnifying glass or microscope and look at insect parts under the microscope."
+   }
+  ]
+ },
+ {
+  "band": "7/8",
+  "topic_de": "Zellen als Lebensbausteine",
+  "label_en": "Cells as building blocks of life",
+  "summary_de": "Lernende untersuchen, wie Zellen aufgebaut sind, vergleichen pflanzliche und tierische Zellen, lernen Bakterien kennen und üben das Mikroskopieren.",
+  "summary_en": "Pupils study how cells are built, compare plant and animal cells, get to know bacteria and practise microscopy.",
+  "subtopics": [
+   {
+    "label_de": "Pflanzliche und tierische Zellen",
+    "label_en": "Plant and animal cells",
+    "summary_de": "Lernende nennen Merkmale des Lebens, beschreiben Zellaufbau und Aufgaben der Organellen, vergleichen Pflanzen- und Tierzellen und verknüpfen Zellbau mit der Ernährungsweise.",
+    "summary_en": "Pupils name characteristics of life, describe cell structure and the tasks of organelles, compare plant and animal cells and link cell structure to the way of feeding."
+   },
+   {
+    "label_de": "Bakterien",
+    "label_en": "Bacteria",
+    "summary_de": "Lernende grenzen die Bakterienzelle von anderen Zellen ab und erläutern, welche Bedeutung Bakterien haben.",
+    "summary_en": "Pupils set the bacterial cell apart from other cells and explain why bacteria matter."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende handhaben das Mikroskop sachgerecht, stellen Frischpräparate her, werten mikroskopische Bilder aus und fertigen Zeichnungen an.",
+    "summary_en": "Pupils handle the microscope correctly, prepare fresh specimens, interpret microscope images and make drawings."
+   }
+  ]
+ },
+ {
+  "band": "7/8",
+  "topic_de": "Biologie des Menschen",
+  "label_en": "Human biology",
+  "summary_de": "Lernende untersuchen die Organsysteme des Menschen, etwa Nerven, Verdauung, Atmung, Ausscheidung und Kreislauf, sowie Fortpflanzung und Abwehr von Krankheiten.",
+  "summary_en": "Pupils study the organ systems of humans, such as nerves, digestion, breathing, excretion and circulation, as well as reproduction and defence against disease.",
+  "subtopics": [
+   {
+    "label_de": "Fortpflanzung, Entwicklung und Sexualität",
+    "label_en": "Reproduction, development and sexuality",
+    "summary_de": "Lernende beschreiben das Hormonsystem als System der Informationsübertragung, die Pubertät, den Menstruationszyklus und die Entwicklung vor der Geburt.",
+    "summary_en": "Pupils describe the hormone system as a system for passing on information, puberty, the menstrual cycle and development before birth."
+   },
+   {
+    "label_de": "Nervensystem",
+    "label_en": "Nervous system",
+    "summary_de": "Lernende ordnen Sinneszellen passende Reize zu, erklären Sinnesorgane und befassen sich mit der Reiz-Reaktions-Kette, unter anderem mit Sinneszellen und sensorischen Nerven.",
+    "summary_en": "Pupils match sensory cells with suitable stimuli, explain sense organs and work on the stimulus-response chain, including sensory cells and sensory nerves."
+   },
+   {
+    "label_de": "Verdauungssystem",
+    "label_en": "Digestive system",
+    "summary_de": "Lernende erläutern die Zusammensetzung der Nahrung, die enzymatische Verdauung, die Aufnahme der Nährstoffe in den Körper und die Regelung des Blutzuckers.",
+    "summary_en": "Pupils explain what food is made of, enzymatic digestion, how nutrients are taken up into the body and how blood sugar is regulated."
+   },
+   {
+    "label_de": "Atmungssystem",
+    "label_en": "Respiratory system",
+    "summary_de": "Lernende beschreiben Atmungsorgane, Atembewegungen und den Austausch der Gase in der Lunge und formulieren die Gleichung der Zellatmung.",
+    "summary_en": "Pupils describe the breathing organs, breathing movements and the exchange of gases in the lung, and write the equation of cell respiration."
+   },
+   {
+    "label_de": "Ausscheidungssystem",
+    "label_en": "Excretory system",
+    "summary_de": "Lernende charakterisieren die Ausscheidungsorgane, beschreiben Bau und Funktion der Niere und die Ableitung des Harns.",
+    "summary_en": "Pupils characterise the excretory organs and describe how the kidney is built and works and how urine is drained."
+   },
+   {
+    "label_de": "Blut und Herz-Kreislauf-System",
+    "label_en": "Blood and the cardiovascular system",
+    "summary_de": "Lernende beschreiben Blutkreislauf, Herz und Blut mit seinen Bestandteilen und Aufgaben und erläutern Blutgruppen.",
+    "summary_en": "Pupils describe the blood circulation, the heart and blood with its components and tasks, and explain blood groups."
+   },
+   {
+    "label_de": "Zusammenwirken der Systeme",
+    "label_en": "Interplay of the systems",
+    "summary_de": "Lernende beschreiben den Menschen als Lebewesen und erläutern, wie die Organsysteme zusammenarbeiten, auch bei Ernährung und Zellatmung.",
+    "summary_en": "Pupils describe humans as living beings and explain how the organ systems work together, including in nutrition and cell respiration."
+   },
+   {
+    "label_de": "Abwehrsystem",
+    "label_en": "Immune system",
+    "summary_de": "Lernende kennzeichnen Krankheitserreger und ihre Übertragungswege, erfahren, wo weiße Blutzellen vorkommen, und erläutern die unspezifische Abwehr.",
+    "summary_en": "Pupils characterise pathogens and how they spread, learn where white blood cells are found and explain the non-specific defence."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende weisen Glucose, Proteine, Stärkespaltung und Kohlenstoffdioxid in der Ausatemluft nach und zeigen im Modellexperiment die Oberflächenvergrößerung.",
+    "summary_en": "Pupils test for glucose, proteins, starch breakdown and carbon dioxide in exhaled air, and show surface enlargement in a model experiment."
+   }
+  ]
+ },
+ {
+  "band": "9",
+  "topic_de": "Stoff- und Energiewechselprozesse von Pilzen und grünen Pflanzen",
+  "label_en": "Matter and energy exchange in fungi and plants",
+  "summary_de": "Lernende untersuchen, wie grüne Pflanzen und Pilze Stoffe aufbauen und abbauen und Energie umwandeln, zum Beispiel bei Fotosynthese, Zellatmung und Gärung.",
+  "summary_en": "Pupils study how green plants and fungi build up and break down substances and convert energy, for example in photosynthesis, cell respiration and fermentation.",
+  "subtopics": [
+   {
+    "label_de": "Grüne Pflanzen: Pflanzenphysiologie",
+    "label_en": "Green plants: plant physiology",
+    "summary_de": "Lernende beschreiben die Organe der Sprosspflanze, erklären Wasseraufnahme und Stofftransport und den Bau des Laubblattes.",
+    "summary_en": "Pupils describe the organs of a shoot plant, explain water uptake and transport of substances, and describe how the leaf is built."
+   },
+   {
+    "label_de": "Grüne Pflanzen: Fotosynthese",
+    "label_en": "Green plants: photosynthesis",
+    "summary_de": "Lernende erklären, dass die Fotosynthese im Chloroplasten abläuft, wie Energie umgewandelt und Stoff aufgebaut wird, und formulieren Wort- und Summengleichung.",
+    "summary_en": "Pupils explain that photosynthesis takes place in the chloroplast and how energy is converted and substance is built up, and write the word and summary equations."
+   },
+   {
+    "label_de": "Grüne Pflanzen: Zellatmung",
+    "label_en": "Green plants: cell respiration",
+    "summary_de": "Lernende erklären, dass die Zellatmung im Mitochondrium abläuft, wie Energie umgewandelt wird und welche Rolle ATP spielt, formulieren die Gleichung und deuten den Temperatureinfluss.",
+    "summary_en": "Pupils explain that cell respiration takes place in the mitochondrion, how energy is converted and what role ATP plays, write the equation and interpret the effect of temperature."
+   },
+   {
+    "label_de": "Pilze",
+    "label_en": "Fungi",
+    "summary_de": "Lernende teilen Pilze nach Formen ein, vergleichen Hefezellen mit Tier- und Pflanzenzellen, beschreiben Pilze als heterotrophe Organismen und untersuchen Zellatmung und Gärung bei Bäckerhefe.",
+    "summary_en": "Pupils sort fungi by form, compare yeast cells with animal and plant cells, describe fungi as heterotrophic organisms and study cell respiration and fermentation in baker's yeast."
+   },
+   {
+    "label_de": "Systematisierung",
+    "label_en": "Systematisation",
+    "summary_de": "Lernende ordnen Assimilation, Dissimilation, Autotrophie, Heterotrophie, Zellatmung und Gärung ein und erklären, wie Assimilation und Dissimilation zusammenhängen.",
+    "summary_en": "Pupils classify assimilation, dissimilation, autotrophy, heterotrophy, cell respiration and fermentation and explain how assimilation and dissimilation are connected."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende mikroskopieren einen Laubblattquerschnitt und weisen pflanzliche Inhaltsstoffe sowie Kohlenstoffdioxid bei Pflanzenatmung und Gärung nach.",
+    "summary_en": "Pupils look at a leaf cross-section under the microscope and test for plant substances and for carbon dioxide in plant respiration and fermentation."
+   }
+  ]
+ },
+ {
+  "band": "9",
+  "topic_de": "Weitere Lernziele",
+  "label_en": "Further goals",
+  "summary_de": "Sammelgruppe für zwei Lernziele ohne eigene Überschrift. Es geht um die optimale Temperatur für den Ertrag und um Konkurrenz zwischen Lebewesen.",
+  "summary_en": "A group for two goals that have no heading of their own. They cover the best temperature for crop yield and competition between organisms.",
+  "subtopics": [
+   {
+    "label_de": "Weitere Lernziele",
+    "label_en": "Further goals",
+    "summary_de": "Lernende begründen eine optimale Temperatur zur Ertragssteigerung und betrachten Konkurrenz als Wechselbeziehung zwischen Lebewesen.",
+    "summary_en": "Pupils give reasons for an optimal temperature to raise yield and look at competition as an interaction between organisms."
+   }
+  ]
+ },
+ {
+  "band": "9",
+  "topic_de": "Ökologie",
+  "label_en": "Ecology",
+  "summary_de": "Lernende untersuchen, wie Organismen und Umwelt sich gegenseitig beeinflussen, wie ein Ökosystem aufgebaut ist und wie menschliche Einflüsse auf Ökosysteme wirken.",
+  "summary_en": "Pupils study how organisms and their environment affect each other, how an ecosystem is built and how human influences act on ecosystems.",
+  "subtopics": [
+   {
+    "label_de": "Wechselwirkungen zwischen Organismen und ihrer Umwelt",
+    "label_en": "Interactions between organisms and their environment",
+    "summary_de": "Lernende definieren abiotische und biotische Umweltfaktoren, erklären ökologische Potenz und Angepasstheit (Licht- und Schattenblätter) und betrachten die Räuber-Beute-Beziehung.",
+    "summary_en": "Pupils define abiotic and biotic environmental factors, explain ecological potency and adaptation (sun and shade leaves) and look at predator-prey relationships."
+   },
+   {
+    "label_de": "Ökosystem",
+    "label_en": "Ecosystem",
+    "summary_de": "Lernende beschreiben das Ökosystem als Einheit aus Biotop und Biozönose, als offenes System mit räumlicher und zeitlicher Struktur sowie Stoffkreislauf und Energiefluss.",
+    "summary_en": "Pupils describe the ecosystem as a unit of biotope and biocoenosis, as an open system with spatial and temporal structure, and as a place of matter cycling and energy flow."
+   },
+   {
+    "label_de": "Anthropogene Einflüsse auf Ökosysteme und deren Folgen",
+    "label_en": "Human influences on ecosystems and their consequences",
+    "summary_de": "Lernende begründen, warum Struktur- und Artenvielfalt Ökosysteme stabil halten, erläutern ökologische Nachhaltigkeit und vergleichen naturnahe mit intensiv genutzten Ökosystemen.",
+    "summary_en": "Pupils explain why structural and species diversity keep ecosystems stable, explain ecological sustainability and compare near-natural with intensively used ecosystems."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende mikroskopieren Licht- und Schattenblätter und untersuchen auf einer Exkursion die Struktur eines Ökosystems.",
+    "summary_en": "Pupils look at sun and shade leaves under the microscope and, on a field trip, study the structure of an ecosystem."
+   }
+  ]
+ },
+ {
+  "band": "10",
+  "topic_de": "Genetik",
+  "label_en": "Genetics",
+  "summary_de": "Lernende befassen sich damit, wie Erbinformation gespeichert, weitergegeben und umgesetzt wird, woher Variabilität stammt und wie Humangenetik und Gentechnik angewendet werden.",
+  "summary_en": "Pupils work on how genetic information is stored, passed on and put into effect, where variability comes from and how human genetics and genetic engineering are applied.",
+  "subtopics": [
+   {
+    "label_de": "Speicherung genetischer Information",
+    "label_en": "Storage of genetic information",
+    "summary_de": "Lernende beschreiben Zellkern, Chromatin und den Chromosomensatz des Menschen und erklären die Bedeutung der Versuche von Griffith und Avery.",
+    "summary_en": "Pupils describe the cell nucleus, chromatin and the human chromosome set and explain the significance of the experiments by Griffith and Avery."
+   },
+   {
+    "label_de": "Weitergabe genetischer Information",
+    "label_en": "Passing on genetic information",
+    "summary_de": "Lernende erklären die semikonservative Replikation samt Fehlerkontrolle und Reparatur, den Zellzyklus mit Mitose sowie Meiose und die Bildung von Keimzellen.",
+    "summary_en": "Pupils explain semi-conservative replication with error checking and repair, the cell cycle with mitosis, and meiosis and the formation of germ cells."
+   },
+   {
+    "label_de": "Realisierung genetischer Information",
+    "label_en": "Expression of genetic information",
+    "summary_de": "Lernende erklären den genetischen Code, die Proteinbiosynthese mit Transkription und Translation und den Zusammenhang von Proteinen und Merkmalen.",
+    "summary_en": "Pupils explain the genetic code, protein biosynthesis with transcription and translation, and how proteins and traits are linked."
+   },
+   {
+    "label_de": "Variabilität von Merkmalen",
+    "label_en": "Variability of traits",
+    "summary_de": "Lernende erläutern Rekombination, Mutation und Modifikation als Ursachen dafür, dass Merkmale variieren.",
+    "summary_en": "Pupils explain recombination, mutation and modification as causes of variation in traits."
+   },
+   {
+    "label_de": "Humangenetik (Anwendung genetischer Erkenntnisse)",
+    "label_en": "Human genetics (applying genetic knowledge)",
+    "summary_de": "Lernende betrachten Erbgänge beim Menschen, etwa bei Mukoviszidose und Rot-Grün-Sehschwäche, die Trisomie 21 und die Möglichkeiten der Pränataldiagnostik.",
+    "summary_en": "Pupils look at inheritance patterns in humans, for example in cystic fibrosis and red-green colour blindness, at trisomy 21 and at the possibilities of prenatal diagnosis."
+   },
+   {
+    "label_de": "Gentechnik (Anwendung genetischer Erkenntnisse)",
+    "label_en": "Genetic engineering (applying genetic knowledge)",
+    "summary_de": "Lernende lernen Modellorganismen kennen, betrachten gentechnische Verfahren wie die Herstellung von Humaninsulin und transgenem Mais und bewerten Anwendungen der Gentechnik.",
+    "summary_en": "Pupils get to know model organisms, look at genetic engineering methods such as producing human insulin and transgenic maize, and evaluate uses of genetic engineering."
+   },
+   {
+    "label_de": "Fachpraktisches Arbeiten",
+    "label_en": "Practical work",
+    "summary_de": "Lernende mikroskopieren Riesenchromosomen und Mitosestadien an Präparaten.",
+    "summary_en": "Pupils look at giant chromosomes and stages of mitosis in prepared specimens under the microscope."
+   }
+  ]
+ },
+ {
+  "band": "10",
+  "topic_de": "Evolution",
+  "label_en": "Evolution",
+  "summary_de": "Lernende befassen sich mit Mechanismen und Belegen der Evolution und mit der Evolution des Menschen.",
+  "summary_en": "Pupils work on the mechanisms of evolution, the evidence for it and the evolution of humans.",
+  "subtopics": [
+   {
+    "label_de": "Evolutionsbiologische Zusammenhänge",
+    "label_en": "Connections in evolutionary biology",
+    "summary_de": "Lernende erklären Mechanismen der Synthetischen Evolutionstheorie und Artbildung, begründen Angepasstheit mit Evolution und befassen sich mit der Bedeutung von Darwins Theorie.",
+    "summary_en": "Pupils explain mechanisms of the synthetic theory of evolution and speciation, account for adaptation through evolution and look at the significance of Darwin's theory."
+   },
+   {
+    "label_de": "Belege für die Evolution",
+    "label_en": "Evidence for evolution",
+    "summary_de": "Lernende betrachten Fossilien, Mosaikformen, den DNA-Vergleich fossiler und heutiger Organismen sowie Homologien und Konvergenzen als Belege für Evolution.",
+    "summary_en": "Pupils look at fossils, mosaic forms, DNA comparison of fossil and present-day organisms, and homologies and convergences as evidence for evolution."
+   },
+   {
+    "label_de": "Evolution des Menschen",
+    "label_en": "Human evolution",
+    "summary_de": "Lernende arbeiten mit einem Kladogramm der Hominiden, mit Belegen zur Menschwerdung und mit der kulturellen und sozialen Evolution und erklären, warum das Rassenkonzept biologisch widerlegt ist.",
+    "summary_en": "Pupils work with a cladogram of the hominids, with evidence for human origins and with cultural and social evolution, and explain why the race concept is refuted in biology."
+   }
+  ]
+ }
+]
