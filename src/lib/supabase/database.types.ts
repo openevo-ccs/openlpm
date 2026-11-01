@@ -1086,6 +1086,10 @@ export type Database = {
           reviewed_on: string | null
           review_note: string | null
           origin: string
+          content_license: string | null
+          rights_holder: string | null
+          license_or_rights_note: string | null
+          rights_status: string
           created_at: string | null
           updated_at: string | null
         }
@@ -1116,6 +1120,10 @@ export type Database = {
           reviewed_on?: string | null
           review_note?: string | null
           origin: string
+          content_license?: string | null
+          rights_holder?: string | null
+          license_or_rights_note?: string | null
+          rights_status?: string
           created_at?: string | null
           updated_at?: string | null
         }
@@ -1146,6 +1154,10 @@ export type Database = {
           reviewed_on?: string | null
           review_note?: string | null
           origin?: string
+          content_license?: string | null
+          rights_holder?: string | null
+          license_or_rights_note?: string | null
+          rights_status?: string
           created_at?: string | null
           updated_at?: string | null
         }

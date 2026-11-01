@@ -1,3 +1,4 @@
+import { StructureReviewCard } from '@/components/structure-review-card'
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, MessageSquare, Plus } from 'lucide-react'
@@ -198,6 +199,8 @@ export default function DashboardPage() {
           introduction shows its short description here, since the page-top banner no
           longer repeats it on this page. */}
       <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? project.description ?? null} />
+
+      {isCurriculumRepository && <StructureReviewCard supabase={supabase} projectId={project.id} slug={project.slug} canReview={canManage} />}
 
       <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="en" />
 
