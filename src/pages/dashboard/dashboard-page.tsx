@@ -7,6 +7,7 @@ import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
+import { CurriculumSourceCard } from '@/components/curriculum-source-card'
 
 // 2026-09-13 restructure: renamed from "Overview," folding in the former
 // standalone Projects and Members tabs (per Dustin's explicit instruction)
@@ -197,6 +198,8 @@ export default function DashboardPage() {
           introduction shows its short description here, since the page-top banner no
           longer repeats it on this page. */}
       <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? project.description ?? null} />
+
+      <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="en" />
 
       <ProjectsSection project={project} canManage={canManage} supabase={supabase} />
 
