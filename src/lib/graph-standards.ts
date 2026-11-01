@@ -103,10 +103,12 @@ export function lineWidth(weight: number): number {
  * How far above the row of groups an arc between two of them bows out, in px.
  * Wider gaps bow more, up to a cap. A graph much wider than the Netz (a deep
  * hierarchy laid out by dagre can run to several thousand px) passes a higher
- * cap so its arcs do not flatten into straight lines.
+ * cap so its arcs do not flatten into straight lines. A screen whose arcs
+ * nest over each other (the Basiskonzepte Netz) passes a steeper slope so the
+ * levels sit further apart.
  */
-export function arcHeight(horizontalGap: number, cap = 95): number {
-  return Math.min(cap, 22 + horizontalGap * 0.09)
+export function arcHeight(horizontalGap: number, cap = 95, slope = 0.09): number {
+  return Math.min(cap, 22 + horizontalGap * slope)
 }
 
 // ---- Rule 4: labels never overlap -------------------------------------------

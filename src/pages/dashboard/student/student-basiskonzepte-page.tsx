@@ -273,15 +273,22 @@ function DashboardTab({
                       const color = `var(--map-${(i % 6) + 1})`
                       return (
                         <td key="total" style={{ padding: '4px 4px', textAlign: 'center' }}>
-                          {sum === 0 ? (
+                          {totals[0] + totals[1] + totals[2] === 0 ? (
                             '—'
                           ) : (
-                            <div className="tip tip-end" style={{ display: 'block' }} data-tip={`Lernziele mit mittlerer oder hoher Relevanz: mittel ${totals[1]} · hoch ${totals[2]} (niedrig bewertet: ${totals[0]}, nicht mitgezählt)`}>
-                              <div style={{ fontWeight: 700, fontSize: 13 }}>{sum}</div>
-                              <div className="muted" style={{ fontSize: 10 }}>davon hoch {totals[2]}</div>
-                              <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)', marginTop: 2 }}>
-                                {([0, 1, 2] as const).map((lvl) => (totals[lvl] > 0 ? <div key={lvl} style={{ flex: totals[lvl], background: color, opacity: 0.35 + lvl * 0.3 }} /> : null))}
+                            <div className="tip tip-end" style={{ display: 'flex', alignItems: 'center', gap: 6 }} data-tip={`niedrig ${totals[0]} · mittel ${totals[1]} · hoch ${totals[2]}. Die Zahl rechts zählt die Lernziele mit mittlerer oder hoher Relevanz.`}>
+                              <div style={{ display: 'flex', flex: 1, height: 16, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}>
+                                {([0, 1, 2] as const).map((lvl) =>
+                                  totals[lvl] > 0 ? (
+                                    // A narrow segment gets a minimum share so its number stays readable next to its neighbour's.
+                                    <div key={lvl} style={{ flex: Math.max(totals[lvl], 0.15 * (totals[0] + totals[1] + totals[2])), position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <div style={{ position: 'absolute', inset: 0, background: color, opacity: 0.35 + lvl * 0.3 }} />
+                                      <span style={{ position: 'relative', fontSize: 9.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>{totals[lvl]}</span>
+                                    </div>
+                                  ) : null
+                                )}
                               </div>
+                              <span style={{ fontWeight: 700, fontSize: 13, minWidth: 28, textAlign: 'right' }}>{sum}</span>
                             </div>
                           )}
                         </td>
@@ -290,10 +297,19 @@ function DashboardTab({
                   </tr>
                 )
               })}
+              <tr style={{ borderTop: '2px solid var(--border)' }}>
+                <td style={{ padding: '6px 8px', fontWeight: 700 }}>Lernziele</td>
+                {grades.map((g) => (
+                  <td key={g} style={{ padding: '6px 4px', textAlign: 'center', fontWeight: 700, fontSize: 13 }}>
+                    {(topics ?? []).filter((t) => t.grade_band && bandKeyForGrade(t.grade_band) === g).length}
+                  </td>
+                ))}
+                <td style={{ padding: '6px 4px', textAlign: 'center', fontWeight: 700, fontSize: 13 }}>{topics?.length ?? '—'}</td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker. Lernziele gesamt: Anzahl der Lernziele mit mittlerer oder hoher Relevanz für das Basiskonzept, über alle Klassenstufen. Niedrig bewertete sind nicht mitgezählt.</p>
+        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker. Lernziele gesamt: derselbe Balken über alle Klassenstufen. Die Zahl daneben zählt die Lernziele mit mittlerer oder hoher Relevanz für das Basiskonzept. Unterste Zeile: Anzahl der Lernziele je Klassenstufe und insgesamt.</p>
       </div>
     </div>
   )
@@ -346,7 +362,7 @@ const RELEVANCE_EDGE_THRESHOLD = 2
 // Top-level row's height above the first row of sub-concepts. The counted arcs
 // between concepts (bundled view) bow out above it, so it gets extra room then.
 const BK_ROW_Y_BASE = 50
-const BK_ROW_Y_FOR_ARCS = 80
+const BK_ROW_Y_FOR_ARCS = 170
 const UK_ROW_GAP = 60
 const UK_ROW_HEIGHT_BASE = 34
 const UK_CHILD_WIDTH_BASE = 96
@@ -1064,7 +1080,9 @@ function NetzTab({
       const bucket = Math.round(gap / 20)
       const k = arcsPerGap.get(bucket) ?? 0
       arcsPerGap.set(bucket, k + 1)
-      e.style('control-point-distances', [-arcHeight(gap) * (1 + 0.16 * k)])
+      // The side an arc bows to depends on which end is its source, so arcs that run right to left are flipped to bow upward too.
+      const upward = e.source().position('x') <= e.target().position('x') ? -1 : 1
+      e.style('control-point-distances', [upward * (arcHeight(gap, 330, 0.24) + 14 * k)])
       e.style('control-point-weights', [0.5])
     })
     if (gs.layout === 'physics') {
