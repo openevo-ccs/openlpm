@@ -19,11 +19,21 @@ import {
   type StructureNode,
   type TreeNode,
 } from '@/lib/supabase/curriculum-structure'
+import {
+  EMPTY_NODE_LINKS,
+  buildNodeLinkData,
+  listNodeLinks,
+  listOtherSpaceLinkCounts,
+  type NodeLink,
+  type NodeLinkData,
+} from '@/lib/supabase/curriculum-node-links'
+import { NodeLinkChip, NodeLinksSection } from '@/components/node-links'
 import { ACCESS_TIER_LABEL, DRAFT_LABEL } from '@/lib/supabase/curriculum-repository'
 
 // "Why can't a state's curriculum be browsed?" (Dustin, 2026-11-01). One tree per curriculum document: edition > grade band > topic >
 // subtopic or unit, in our own words with German and English labels (migration 216). Every node is an LLM synthesized draft until a person has checked
-// it, and says so. Goal counts per project show only for projects the viewer belongs to. Design note:
+// it, and says so. Goal counts per project show only for projects the viewer belongs to. Stage-to-topic links (migration 225) work the
+// same way: details for the spaces the viewer belongs to, a bare count for the others. Design note:
 // lab_manager/docs/design-notes/state-curriculum-overview-browse-check-translate-2026-11-02.md.
 
 const T = {
@@ -150,6 +160,8 @@ export default function CurriculumStructurePage() {
   const [reviewer, setReviewer] = useState('')
   const [nodes, setNodes] = useState<StructureNode[] | null>(null)
   const [goalCounts, setGoalCounts] = useState<Awaited<ReturnType<typeof listNodeGoalCounts>>>(new Map())
+  const [rawLinks, setRawLinks] = useState<NodeLink[]>([])
+  const [otherLinkCounts, setOtherLinkCounts] = useState<Map<string, number>>(new Map())
   const [error, setError] = useState<string | null>(null)
   const [open, setOpen] = useState<Set<string>>(new Set())
   const t = T[lang]
@@ -162,11 +174,18 @@ export default function CurriculumStructurePage() {
   useEffect(() => {
     let alive = true
     setNodes(null)
+    // Stage links never block the page: both calls come back empty while the table or the counting function does not exist yet.
+    const linksLoaded = Promise.all([listNodeLinks(supabase, repoProjectId), listOtherSpaceLinkCounts(supabase, repoProjectId)])
     listStructureNodes(supabase, repoProjectId)
       .then(async (rows) => {
-        const counts = await listNodeGoalCounts(supabase, rows.filter((n) => n.level !== 'edition' && n.level !== 'grade_band').map((n) => n.id))
+        const [counts, [links, others]] = await Promise.all([
+          listNodeGoalCounts(supabase, rows.filter((n) => n.level !== 'edition' && n.level !== 'grade_band').map((n) => n.id)),
+          linksLoaded,
+        ])
         if (!alive) return
         setGoalCounts(counts)
+        setRawLinks(links)
+        setOtherLinkCounts(others)
         setNodes(rows)
         // editions open by default; the rest closed
         setOpen(new Set(rows.filter((n) => n.level === 'edition').map((n) => n.id)))
@@ -179,6 +198,7 @@ export default function CurriculumStructurePage() {
   const onSaved = (updated: StructureNode) => setNodes((cur) => (cur ? cur.map((n) => (n.id === updated.id ? updated : n)) : cur))
 
   const roots = useMemo(() => (nodes ? buildTree(nodes, goalCounts) : []), [nodes, goalCounts])
+  const nodeLinks = useMemo(() => (nodes ? buildNodeLinkData(roots, rawLinks, otherLinkCounts) : EMPTY_NODE_LINKS), [nodes, roots, rawLinks, otherLinkCounts])
   const subjects = useMemo(() => Array.from(new Set(roots.map((r) => r.node.subject).filter(Boolean) as string[])).sort(), [roots])
   const shownRoots = roots.filter((r) => !subject || r.node.subject === subject)
   const keep = useMemo(() => {
@@ -255,7 +275,7 @@ export default function CurriculumStructurePage() {
 
           {shownRoots.filter((r) => !keep || keep.has(r.node.id)).length === 0 && <div className="muted">{t.nothing}</div>}
           {shownRoots.filter((r) => !keep || keep.has(r.node.id)).map((r) => (
-            <NodeView key={r.node.id} tree={r} lang={lang} t={t} depth={0} open={keep ? new Set(allIds) : open} onToggle={toggle} keep={keep} slug={project.slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} />
+            <NodeView key={r.node.id} tree={r} lang={lang} t={t} depth={0} open={keep ? new Set(allIds) : open} onToggle={toggle} keep={keep} slug={project.slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} nodeLinks={nodeLinks} />
           ))}
         </>
       )}
@@ -263,7 +283,7 @@ export default function CurriculumStructurePage() {
   )
 }
 
-function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, canReview, reviewer, onSaved }: {
+function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, canReview, reviewer, onSaved, nodeLinks }: {
   tree: TreeNode
   lang: Lang
   t: (typeof T)[Lang]
@@ -276,8 +296,10 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, 
   canReview: boolean
   reviewer: string
   onSaved: (n: StructureNode) => void
+  nodeLinks: NodeLinkData
 }) {
   const [editing, setEditing] = useState(false)
+  const [showLinks, setShowLinks] = useState(false)
   const { node } = tree
   const label = nodeLabel(node, lang)
   const summary = nodeSummary(node, lang)
@@ -298,6 +320,7 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, 
     if (res.error || !res.node) setSaveError(res.error ?? 'error')
     else { onSaved(res.node); setEditing(false) }
   }
+  const linkTotals = nodeLinks.totals.get(node.id)
   const facts = (node.facts ?? {}) as Record<string, unknown>
   const hours = typeof facts.hours === 'number' || typeof facts.hours === 'string' ? String(facts.hours) : null
   const unitNumber = typeof facts.unitNumber === 'string' || typeof facts.unitNumber === 'number' ? String(facts.unitNumber) : null
@@ -324,12 +347,16 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, 
                 {g.projectName.length > 26 ? g.projectName.slice(0, 25) + '…' : g.projectName}: {g.goals} {t.goals}
               </span>
             ))}
+            {linkTotals && <NodeLinkChip totals={linkTotals} lang={lang} expanded={showLinks} controls={`links-${node.id}`} onToggle={() => setShowLinks((v) => !v)} />}
           </div>
           {summary.text && (
             <p style={{ margin: '3px 0 0', fontSize: 13 }}>
               {summary.text}
               {summary.fellBack && <span className="muted" style={{ fontSize: 11 }}> ({t.onlyOther})</span>}
             </p>
+          )}
+          {showLinks && linkTotals && (
+            <NodeLinksSection id={`links-${node.id}`} lang={lang} links={nodeLinks.mine.get(node.id) ?? []} totals={linkTotals} />
           )}
           {editing && (
             <NodeEditForm node={node} t={t} busy={busy} reviewer={reviewer}
@@ -376,7 +403,7 @@ function NodeView({ tree, lang, t, depth, open, onToggle, keep, slug, supabase, 
       {hasKids && isOpen && (
         <div style={{ marginTop: 6 }}>
           {kids.map((c) => (
-            <NodeView key={c.node.id} tree={c} lang={lang} t={t} depth={depth + 1} open={open} onToggle={onToggle} keep={keep} slug={slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} />
+            <NodeView key={c.node.id} tree={c} lang={lang} t={t} depth={depth + 1} open={open} onToggle={onToggle} keep={keep} slug={slug} supabase={supabase} canReview={canReview} reviewer={reviewer} onSaved={onSaved} nodeLinks={nodeLinks} />
           ))}
         </div>
       )}

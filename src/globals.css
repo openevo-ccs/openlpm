@@ -291,6 +291,9 @@ code {
   background: var(--surface-1); color: var(--text-secondary);
 }
 .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+/* A chip that opens something (the stage-link count on the Structure page). Gets a phone-sized tap target on touch screens, like .btn. */
+.chip-button { cursor: pointer; font-family: inherit; }
+@media (pointer: coarse) { .chip-button { min-height: 40px; padding: 8px 12px; } }
 .chip-draft, .chip-proposed { color: var(--warning-text); border-color: var(--warning); background: rgb(var(--warning-rgb) / 0.12); }
 .chip-progress, .chip-submitted, .chip-under_review, .chip-discussed, .chip-pending, .chip-active { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
 .chip-good, .chip-accepted, .chip-canonical, .chip-promoted, .chip-completed { color: var(--good); border-color: var(--good); background: rgb(var(--good-rgb) / 0.12); }

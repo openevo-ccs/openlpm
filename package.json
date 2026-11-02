@@ -18,6 +18,7 @@
     "test:concept-source": "node scripts/test_concept_source.mjs",
     "test:comparison-structure": "node scripts/test_comparison_structure.mjs",
     "test:dashboard-views": "node scripts/test_dashboard_views.mjs",
+    "test:node-links": "node scripts/test_node_links.mjs && python scripts/test_generate_node_links_migration.py",
     "read-feedback": "node scripts/read-feedback.mjs",
     "docs:check": "node scripts/check_docs_freshness.mjs",
     "self-model:check": "python ../lab_manager/scripts/self_model_check.py self-model/manifest.json --root . --render docs/architecture/self-model.generated.md"
