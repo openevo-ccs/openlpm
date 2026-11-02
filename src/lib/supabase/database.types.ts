@@ -1058,6 +1058,73 @@ export type Database = {
           }
         ]
       }
+      curriculum_repository_node_links: {
+        Row: {
+          id: string
+          project_id: string
+          data_object_id: string
+          node_id: string
+          relation_type: string
+          share: number | null
+          shared_concepts: Json
+          method: string | null
+          review_status: string
+          rationale: string | null
+          created_at: string | null
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          data_object_id: string
+          node_id: string
+          relation_type?: string
+          share?: number | null
+          shared_concepts?: Json
+          method?: string | null
+          review_status?: string
+          rationale?: string | null
+          created_at?: string | null
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          data_object_id?: string
+          node_id?: string
+          relation_type?: string
+          share?: number | null
+          shared_concepts?: Json
+          method?: string | null
+          review_status?: string
+          rationale?: string | null
+          created_at?: string | null
+          created_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curriculum_repository_node_links_project_id_fkey",
+            columns: ["project_id"],
+            isOneToOne: false,
+            referencedRelation: "projects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_node_links_data_object_id_fkey",
+            columns: ["data_object_id"],
+            isOneToOne: false,
+            referencedRelation: "lpm_data_objects",
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "curriculum_repository_node_links_node_id_fkey",
+            columns: ["node_id"],
+            isOneToOne: false,
+            referencedRelation: "curriculum_repository_structure_nodes",
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       curriculum_repository_structure_nodes: {
         Row: {
           id: string
