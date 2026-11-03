@@ -1,0 +1,97 @@
+{
+  "project_slug": "interdisciplinary-lpm-synth",
+  "thread": {
+    "slug": "stone-tools-to-ai-technology-arc",
+    "title": "From stone tools to AI: a tool changes as people copy it",
+    "thread_type": "vertical_horizontal",
+    "connectingIdea": "A tool changes as people copy it, and the people change as they use it. The same pattern of variation, copying and selection can be followed from the first stone tools through electronics to language models, with the limits of the analogy named at every step.",
+    "narrative": "Five steps, each carried by stages this space already has. Step 1, tools shape the maker and get copied: stone tools across species and across hominin species. Step 2, a tool changes as people copy it: designs drift, improve and split as they pass between makers, and most of this history is borrowing and recombination, so descent is one rare kind of link and a plain family tree teaches the wrong picture. Step 3, tools build science and science builds tools: electronics and sensors, from crystals and transistors to the chip in a classroom device, followed in the oSci project. Step 4, people and tools change together: niche construction and shared thinking, where tools reshape what people can do and learn. Step 5, machines join the loop: language models are products of cultural evolution that form families, can be placed in trees by different methods, and take part in the copying and selecting of what people meet. The thread describes machines by their rules, data and ranking. It does not say that a machine wants, understands or intends anything. Every claim in the thread says whether it was observed, inferred or proposed.",
+    "teachingPrompt": "Pick one tool you can hold or one language model you have used. Write down what it was copied from, what changed, who chose what stayed, and one way the picture of a branching tree would mislead. Mark each answer as checked in a source, believed, or unknown.",
+    "evidenceNote": "AI-drafted on 2026-11-03 from the Interdisciplinary stages listed, the oSci project (strands S5 and S6 and the proposed bridges held in its file lpm/cross-space-bridges.yaml), the Teacher's Guide chapter on computer models, and the LiteratureBase records cited here. The Guide's tree of language models comes from Yang et al., which was not opened beyond its abstract page. No historian of technology, engineer, evolutionary anthropologist or teacher has reviewed any of it.",
+    "gaps": [
+      "No stage yet covers sensors in devices as a topic of its own.",
+      "Step 1 has no counterpart in oSci, which starts at electricity.",
+      "The sources on language model trees were read at abstract level only.",
+      "Lineage and borrowing is a candidate concept here. oSci has a draft concept of that name. Compare the two definitions before treating them as one."
+    ],
+    "stations": [
+      {
+        "stage": "2f6dd553-7732-5ebf-8810-e756d39587ee",
+        "step": 1,
+        "label": "Step 1, tools shape the maker and get copied",
+        "role": "Stone tools across species and hominin species: what a tool asks of its maker, how toolmaking is taught and copied, and how small changes build up over generations. Records that carry it: SpeciesBase feature stone-tool-technology, three TeachingBase resources on early stone tools, and Shott (2011).",
+        "concept": "Transmission",
+        "next": "Leads into the question of how a design drifts and splits once many makers copy it."
+      },
+      {
+        "stage": "c561b517-c4e9-58df-a2d0-e04cc1b85443",
+        "step": 2,
+        "label": "Step 2, a tool changes as people copy it",
+        "role": "How a design changes as it passes between makers: improvements, mistakes, borrowing from other tools, replacement. Students find where a family tree fits and where a network of borrowing fits better. In oSci this is the draft concept lineage and borrowing in sub-strand osci-s5-68. Sources: Basalla (1988), Arthur (2009).",
+        "concept": "Innovation",
+        "next": "Leads into tools that depend on science, and science that depends on tools."
+      },
+      {
+        "stage": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+        "step": 3,
+        "label": "Step 3, tools build science and science builds tools (early)",
+        "role": "Grades 3 to 5: comparing communities and the tools they use, and how a tool changes over time. oSci builds on this stage from sub-strand osci-s5-35, Measuring With New Tools.",
+        "concept": "Technology",
+        "next": "Leads into the older-student treatment of technology and niche construction."
+      },
+      {
+        "stage": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+        "step": 3,
+        "label": "Step 3, tools build science and science builds tools (older students)",
+        "role": "Grades 9 to 12, elective: biological and technological niche construction side by side. The oSci strand Tools That Change What We Can Know relates to it from sub-strand osci-s5-912, The Science-Technology Loop, which follows crystals, transistors, chips and sensors and the two-way loop between science and technology. Source: Moore (1965) and the technology-history sources added on 28 Oct 2026.",
+        "concept": "Niche Construction",
+        "next": "Leads into shared thinking and tools that change what groups can do."
+      },
+      {
+        "stage": "e820dc2d-9317-57d1-8475-22a701fc486a",
+        "step": 4,
+        "label": "Step 4, people and tools change together",
+        "role": "Grades 9 to 12, required: collective intelligence, distributed cognition and technology that coevolves with the people who use it. This is the stage a student on the required track reaches. oSci relates to it from sub-strand osci-s6-912.",
+        "concept": "Collective Intelligence",
+        "next": "Leads into the general pattern of selection across biology, culture, education and AI."
+      },
+      {
+        "stage": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
+        "step": 5,
+        "label": "Step 5, machines join the loop (selection)",
+        "role": "Grades 9 to 12: selection compared across biology, culture, education and AI. The oSci machine culture sub-strand osci-s6-912 contrasts with it on purpose, because it describes machines by rules, data and ranking.",
+        "concept": "Selection",
+        "next": "Leads into the machine culture bridge case."
+      },
+      {
+        "stage": "9d77ef6f-8eea-5427-84e4-72ded6b1bba5",
+        "step": 5,
+        "label": "Step 5, machines join the loop (machine culture)",
+        "role": "Optional bridge case. AI systems are shaped by human-made data and goals and in turn shape what people learn and copy. Three ways to place language models in a family tree are compared: by name (Gao and Gao 2023), by outputs (Yax et al. 2025) and by hand as in the survey tree the Teacher's Guide reproduces (Yang et al. 2024). Perez et al. (2024) simulate cultural change in groups of language-model agents. The framework behind it is Brinkmann et al. (2023), and Rahwan et al. (2019) set out the study of machine behaviour. oSci sub-strand osci-s6-912 refines it, and the nested Machine Culture capstone project continues it.",
+        "concept": "Technology",
+        "next": "Leads into what AI tools change in schools."
+      },
+      {
+        "stage": "a9c1777a-a159-534d-b927-ad30da661ce6",
+        "step": 5,
+        "label": "Step 5, machines join the loop (education)",
+        "role": "What an AI writing or translation tool changes about what must be taught, what can be copied and who decides, with one benefit and one risk named. It closes the thread where it began, with tools that shape the people who use them.",
+        "concept": "Innovation",
+        "next": null
+      }
+    ]
+  },
+  "introduction": "Technology thread. One thread, From stone tools to AI, follows a tool that changes as people copy it through eight existing stages, from stone tools to language models. It is linked to the oSci project, whose strands on electronics and on machine culture hold the detail for steps 3 and 5. The thread is a draft written by an AI. No expert has reviewed it.",
+  "sources": [
+    { "id": "OE-LITERATURE-shott-2011", "supports": "Stone tools analysed with the tools of evolutionary biology." },
+    { "id": "OE-LITERATURE-basalla-1988", "supports": "The history of technology as variation and selection of artifacts." },
+    { "id": "OE-LITERATURE-arthur-2009-nature-of-technology", "supports": "Technologies as combinations of earlier technologies." },
+    { "id": "OE-LITERATURE-moore-1965-cramming-components", "supports": "The rate of change in integrated circuits." },
+    { "id": "OE-LITERATURE-brinkmann-2023", "supports": "Machine culture: how machines change variation, transmission and selection." },
+    { "id": "OE-LITERATURE-rahwan-2019-machine-behaviour", "supports": "Studying machine behaviour as a scientific object." },
+    { "id": "OE-LITERATURE-yang-et-al-2024", "supports": "The survey whose tree of language models the Teacher's Guide reproduces." },
+    { "id": "OE-LITERATURE-gao-gao-2023", "supports": "A tree of nearly 16,000 language models built from model names." },
+    { "id": "OE-LITERATURE-yax-oudeyer-palminteri-2025", "supports": "Trees of language models inferred from their outputs." },
+    { "id": "OE-LITERATURE-perez-et-al-2024", "supports": "Simulating cultural evolution among language-model agents." }
+  ]
+}
