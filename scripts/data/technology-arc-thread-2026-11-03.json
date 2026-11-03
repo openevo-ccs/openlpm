@@ -1,97 +1,337 @@
 {
   "project_slug": "interdisciplinary-lpm-synth",
-  "thread": {
-    "slug": "stone-tools-to-ai-technology-arc",
-    "title": "From stone tools to AI: a tool changes as people copy it",
-    "thread_type": "vertical_horizontal",
-    "connectingIdea": "A tool changes as people copy it, and the people change as they use it. The same pattern of variation, copying and selection can be followed from the first stone tools through electronics to language models, with the limits of the analogy named at every step.",
-    "narrative": "Five steps, each carried by stages this space already has. Step 1, tools shape the maker and get copied: stone tools across species and across hominin species. Step 2, a tool changes as people copy it: designs drift, improve and split as they pass between makers, and most of this history is borrowing and recombination, so descent is one rare kind of link and a plain family tree teaches the wrong picture. Step 3, tools build science and science builds tools: electronics and sensors, from crystals and transistors to the chip in a classroom device, followed in the oSci project. Step 4, people and tools change together: niche construction and shared thinking, where tools reshape what people can do and learn. Step 5, machines join the loop: language models are products of cultural evolution that form families, can be placed in trees by different methods, and take part in the copying and selecting of what people meet. The thread describes machines by their rules, data and ranking. It does not say that a machine wants, understands or intends anything. Every claim in the thread says whether it was observed, inferred or proposed.",
-    "teachingPrompt": "Pick one tool you can hold or one language model you have used. Write down what it was copied from, what changed, who chose what stayed, and one way the picture of a branching tree would mislead. Mark each answer as checked in a source, believed, or unknown.",
-    "evidenceNote": "AI-drafted on 2026-11-03 from the Interdisciplinary stages listed, the oSci project (strands S5 and S6 and the proposed bridges held in its file lpm/cross-space-bridges.yaml), the Teacher's Guide chapter on computer models, and the LiteratureBase records cited here. The Guide's tree of language models comes from Yang et al., which was not opened beyond its abstract page. No historian of technology, engineer, evolutionary anthropologist or teacher has reviewed any of it.",
-    "gaps": [
-      "No stage yet covers sensors in devices as a topic of its own.",
-      "Step 1 has no counterpart in oSci, which starts at electricity.",
-      "The sources on language model trees were read at abstract level only.",
-      "Lineage and borrowing is a candidate concept here. oSci has a draft concept of that name. Compare the two definitions before treating them as one."
-    ],
-    "stations": [
-      {
-        "stage": "2f6dd553-7732-5ebf-8810-e756d39587ee",
-        "step": 1,
-        "label": "Step 1, tools shape the maker and get copied",
-        "role": "Stone tools across species and hominin species: what a tool asks of its maker, how toolmaking is taught and copied, and how small changes build up over generations. Records that carry it: SpeciesBase feature stone-tool-technology, three TeachingBase resources on early stone tools, and Shott (2011).",
-        "concept": "Transmission",
-        "next": "Leads into the question of how a design drifts and splits once many makers copy it."
-      },
-      {
-        "stage": "c561b517-c4e9-58df-a2d0-e04cc1b85443",
-        "step": 2,
-        "label": "Step 2, a tool changes as people copy it",
-        "role": "How a design changes as it passes between makers: improvements, mistakes, borrowing from other tools, replacement. Students find where a family tree fits and where a network of borrowing fits better. In oSci this is the draft concept lineage and borrowing in sub-strand osci-s5-68. Sources: Basalla (1988), Arthur (2009).",
-        "concept": "Innovation",
-        "next": "Leads into tools that depend on science, and science that depends on tools."
-      },
-      {
-        "stage": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
-        "step": 3,
-        "label": "Step 3, tools build science and science builds tools (early)",
-        "role": "Grades 3 to 5: comparing communities and the tools they use, and how a tool changes over time. oSci builds on this stage from sub-strand osci-s5-35, Measuring With New Tools.",
-        "concept": "Technology",
-        "next": "Leads into the older-student treatment of technology and niche construction."
-      },
-      {
-        "stage": "5d938d91-e81b-516c-ba58-a234b6d5559f",
-        "step": 3,
-        "label": "Step 3, tools build science and science builds tools (older students)",
-        "role": "Grades 9 to 12, elective: biological and technological niche construction side by side. The oSci strand Tools That Change What We Can Know relates to it from sub-strand osci-s5-912, The Science-Technology Loop, which follows crystals, transistors, chips and sensors and the two-way loop between science and technology. Source: Moore (1965) and the technology-history sources added on 28 Oct 2026.",
-        "concept": "Niche Construction",
-        "next": "Leads into shared thinking and tools that change what groups can do."
-      },
-      {
-        "stage": "e820dc2d-9317-57d1-8475-22a701fc486a",
-        "step": 4,
-        "label": "Step 4, people and tools change together",
-        "role": "Grades 9 to 12, required: collective intelligence, distributed cognition and technology that coevolves with the people who use it. This is the stage a student on the required track reaches. oSci relates to it from sub-strand osci-s6-912.",
-        "concept": "Collective Intelligence",
-        "next": "Leads into the general pattern of selection across biology, culture, education and AI."
-      },
-      {
-        "stage": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
-        "step": 5,
-        "label": "Step 5, machines join the loop (selection)",
-        "role": "Grades 9 to 12: selection compared across biology, culture, education and AI. The oSci machine culture sub-strand osci-s6-912 contrasts with it on purpose, because it describes machines by rules, data and ranking.",
-        "concept": "Selection",
-        "next": "Leads into the machine culture bridge case."
-      },
-      {
-        "stage": "9d77ef6f-8eea-5427-84e4-72ded6b1bba5",
-        "step": 5,
-        "label": "Step 5, machines join the loop (machine culture)",
-        "role": "Optional bridge case. AI systems are shaped by human-made data and goals and in turn shape what people learn and copy. Three ways to place language models in a family tree are compared: by name (Gao and Gao 2023), by outputs (Yax et al. 2025) and by hand as in the survey tree the Teacher's Guide reproduces (Yang et al. 2024). Perez et al. (2024) simulate cultural change in groups of language-model agents. The framework behind it is Brinkmann et al. (2023), and Rahwan et al. (2019) set out the study of machine behaviour. oSci sub-strand osci-s6-912 refines it, and the nested Machine Culture capstone project continues it.",
-        "concept": "Technology",
-        "next": "Leads into what AI tools change in schools."
-      },
-      {
-        "stage": "a9c1777a-a159-534d-b927-ad30da661ce6",
-        "step": 5,
-        "label": "Step 5, machines join the loop (education)",
-        "role": "What an AI writing or translation tool changes about what must be taught, what can be copied and who decides, with one benefit and one risk named. It closes the thread where it began, with tools that shape the people who use them.",
-        "concept": "Innovation",
-        "next": null
-      }
-    ]
-  },
-  "introduction": "Technology thread. One thread, From stone tools to AI, follows a tool that changes as people copy it through eight existing stages, from stone tools to language models. It is linked to the oSci project, whose strands on electronics and on machine culture hold the detail for steps 3 and 5. The thread is a draft written by an AI. No expert has reviewed it.",
+  "threads": [
+    {
+      "slug": "stone-tools-to-ai-technology-arc",
+      "title": "From stone tools to AI: a tool changes as people copy it",
+      "thread_type": "vertical_horizontal",
+      "connectingIdea": "A tool changes as people copy it, and the people change as they use it. The same pattern of variation, copying and selection can be followed from the first stone tools through electronics to language models. It is an analogy with limits, and each station ends with its limit.",
+      "narrative": "Five steps, each carried by stages this space already has. Every claim is tagged. [Observed] means a source reports a measurement or an experiment. [Inferred] means the thread draws it from sources. [Proposed] means a framework offers it as a conjecture. Step 1, tools shape the maker and get copied: stone tools across species and across hominin species. Researchers disagree about how early teaching of toolmaking began. Morgan et al. (2015) report an experiment in which teaching and spoken language improved the transmission of Oldowan toolmaking [observed]. Tennie et al. (2017) argue that the earliest stone tools may have been reinvented one by one [proposed]. Students weigh both. Step 2, a tool changes as people copy it: designs drift, improve and split as they pass between makers. Basalla (1988) and Arthur (2009) describe technologies as built from earlier ones, so borrowing and recombination matter as much as descent, and a plain family tree can mislead [inferred]. Step 3, tools build science and science builds tools: electronics and sensors, from crystals and transistors to the chip in a classroom device, followed in the oSci project. Step 4, people and tools change together: niche construction and shared thinking, where tools reshape what people can do and learn. Step 5, machines join the loop. The machine culture framework (Brinkmann et al. 2023) proposes that machines change what varies, what spreads and what is chosen [proposed; the paper labels its own table tentative conjectures]. Three methods place language models in a family tree: by name (Gao and Gao 2023), by how similar their answers are (Yax et al. 2025) and by hand in a survey (Yang et al. 2024). A name tree shows resemblance of names. It does not show who was trained from whom. An output tree shows resemblance of answers. None of the three shows by itself that models descend from each other as organisms do [inferred]. The thread uses variation, transmission and selection as an analogy with named break points. It does not treat them as one shared mathematical model. It describes machines by their rules, data and ranking. It does not say that a machine wants, understands or intends anything.",
+      "teachingPrompt": "Pick one tool you can hold or one language model you have used. Write down what it was copied from, what changed, who chose what stayed, and one way the picture of a branching tree would mislead. Mark each answer as checked in a source, believed, or unknown, and as observed, inferred or proposed.",
+      "evidenceNote": "AI-drafted on 2026-11-03 from the Interdisciplinary stages listed, the oSci project (strands S5 and S6 and the pointers held in its file lpm/cross-space-bridges.yaml), the Teacher's Guide chapter on computer models, and the LiteratureBase records cited here. Every source record was read at abstract level only. The Guide's tree of language models comes from Yang et al., whose figure was not opened. No historian of technology, engineer, evolutionary anthropologist or teacher has reviewed any of it.",
+      "gaps": [
+        "No stage yet covers sensors in devices as a topic of its own. oSci sub-strand osci-s5-35 uses instruments and measurement.",
+        "Step 1 has no counterpart in oSci, which starts at electricity.",
+        "oSci's 13 to 16 band (osci-s5-1316, osci-s6-1316) has no matching stage in the Interdisciplinary model, which stops at 9 to 12.",
+        "All source records were read at abstract level only. The record for Muthukrishna and Henrich (2016) says in its notes that a machine pipeline drafted it and that it is unreviewed.",
+        "oSci has a draft concept lineage and borrowing. The Interdisciplinary space has no concept of that name, so there is nothing to compare yet. If one is added, compare the two definitions first."
+      ],
+      "introduction": "Technology thread. One thread, From stone tools to AI, follows a tool that changes as people copy it through eight existing stages, from stone tools to language models. It is linked to the oSci project, whose strands on electronics and on machine culture hold the detail for steps 3 and 5. Every claim in it is tagged observed, inferred or proposed. The thread is a draft written by an AI. No expert has reviewed it.",
+      "stations": [
+        {
+          "stage": "2f6dd553-7732-5ebf-8810-e756d39587ee",
+          "step": 1,
+          "label": "Step 1, tools shape the maker and get copied",
+          "concept": "Transmission",
+          "role": "Stone tools across species and hominin species: what a tool asks of its maker, how toolmaking is taught and copied, and how small changes build up over generations. Two sources disagree on how early teaching began, and students weigh them: Morgan et al. (2015) [observed, an experiment with adults] and Tennie et al. (2017) [proposed]. Records that carry it: SpeciesBase feature stone-tool-technology, four TeachingBase resources and Shott (2011). Limit of the analogy: a tool is copied by watching and teaching with many errors, and a gene is copied by a molecular process with a low error rate. Intention plays a part in one and none in the other.",
+          "next": "Leads into the question of how a design drifts and splits once many makers copy it."
+        },
+        {
+          "stage": "c561b517-c4e9-58df-a2d0-e04cc1b85443",
+          "step": 2,
+          "label": "Step 2, a tool changes as people copy it",
+          "concept": "Innovation",
+          "role": "How a design changes as it passes between makers: improvements, mistakes, borrowing from other tools, replacement. Students find where a family tree fits and where a network of borrowing fits better [inferred from Basalla (1988) and Arthur (2009)]. In oSci this is the draft concept lineage and borrowing in sub-strand osci-s5-68. Limit of the analogy: designs are copied with intent and can be borrowed sideways between lines, so ancestry is a network.",
+          "next": "Leads into tools that depend on science, and science that depends on tools."
+        },
+        {
+          "stage": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+          "step": 3,
+          "label": "Step 3, tools build science and science builds tools (early)",
+          "concept": "Technology",
+          "role": "Grades 3 to 5: comparing communities and the tools they use, and how a tool changes over time. oSci builds on this stage from sub-strand osci-s5-35, Measuring With New Tools, which uses instruments and measurement. Limit of the analogy: a measuring tool reads a pattern and does not choose what is worth measuring.",
+          "next": "Leads into the older-student treatment of technology and niche construction."
+        },
+        {
+          "stage": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+          "step": 3,
+          "label": "Step 3, tools build science and science builds tools (older students)",
+          "concept": "Niche Construction",
+          "role": "Grades 9 to 12, elective: biological and technological niche construction side by side. The oSci strand Tools That Change What We Can Know relates to it from sub-strand osci-s5-912, The Science-Technology Loop, where students trace a device such as a transistor or a camera sensor chip back to the science it applied and forward to the science it made possible. Sources: Moore (1965), Farmer and Lafond (2016) on rates of cost change, and Bloom et al. (2020) on the rising effort needed to keep Moore's law going. Limit of the analogy: patents and standards shape what is copied, which has no counterpart in biological inheritance.",
+          "next": "Leads into shared thinking and tools that change what groups can do."
+        },
+        {
+          "stage": "e820dc2d-9317-57d1-8475-22a701fc486a",
+          "step": 4,
+          "label": "Step 4, people and tools change together",
+          "concept": "Collective Intelligence",
+          "role": "Grades 9 to 12, required: collective intelligence, distributed cognition and technology that coevolves with the people who use it. A student on the required track reaches this stage. Derex et al. (2013) report that larger groups kept more complex skills in a laboratory game [observed]. oSci relates to it from sub-strand osci-s6-912. Limit of the analogy: tools and people change together, but only people hold goals.",
+          "next": "Leads into the general pattern of selection across biology, culture, education and AI."
+        },
+        {
+          "stage": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
+          "step": 5,
+          "label": "Step 5, machines join the loop (selection)",
+          "concept": "Selection",
+          "role": "Grades 9 to 12: selection compared across biology, culture, education and AI. The oSci machine culture sub-strand osci-s6-912 contrasts with it on purpose, because it describes machines by rules, data and ranking. Limit of the analogy: selection in culture can work by choice, by a ranking rule or by chance, and the stage names where the sameness ends.",
+          "next": "Leads into the machine culture bridge case."
+        },
+        {
+          "stage": "9d77ef6f-8eea-5427-84e4-72ded6b1bba5",
+          "step": 5,
+          "label": "Step 5, machines join the loop (machine culture)",
+          "concept": "Technology",
+          "role": "Optional bridge case. AI systems are shaped by human-made data and goals and in turn shape what people learn and copy [proposed by Brinkmann et al. (2023), whose table is labelled tentative conjectures]. Three ways to place language models in a family tree are compared: by name (Gao and Gao 2023), by outputs (Yax et al. 2025) and by hand as in the survey tree the Teacher's Guide reproduces (Yang et al. 2024). None shows by itself who was trained from whom [inferred]. Perez et al. (2024) simulate cultural change in groups of language-model agents. Ren et al. (2024) examine how small biases grow when models learn from model-made text, and Acerbi and Stubbersfield (2023) report that a chat model favoured the same content types that people favour in retelling chains [observed]. oSci sub-strand osci-s6-912 refines it and the nested Machine Culture capstone project continues it. Limit of the analogy: a model can be merged from several parents or trained on text that other models wrote, so a branching tree can mislead.",
+          "next": "Leads into what AI tools change in schools."
+        },
+        {
+          "stage": "a9c1777a-a159-534d-b927-ad30da661ce6",
+          "step": 5,
+          "label": "Step 5, machines join the loop (education)",
+          "concept": "Innovation",
+          "role": "What an AI writing or translation tool changes about what must be taught, what can be copied and who decides, with one benefit and one risk named. It closes the thread where it began, with tools that shape the people who use them. Doshi and Hauser (2024) report that writers given AI story ideas wrote stories judged more creative that were also more alike [observed, one experiment]. Limit of the analogy: a school decides what to teach on purpose, and no biological process does.",
+          "next": null
+        }
+      ]
+    },
+    {
+      "slug": "information-processing-systems-evolution",
+      "title": "How information-processing systems evolve: from cells to cultures to computers",
+      "thread_type": "vertical_horizontal",
+      "connectingIdea": "Systems that take in, store and use information come in three forms: natural systems such as cells, nervous systems and animal signals; the human mind with its limits and the cultural systems built around it, such as language and schools; and cultural and computational systems such as networks and language models. Each form has its own sense of information, and the thread names where the senses differ.",
+      "narrative": "Three forms in one thread, each carried by stages this space already has. Claims are tagged. [Observed] means a source reports an experiment or a simulation. [Inferred] means the thread or a review draws it from studies. [Proposed] means an author offers it as an argument or a framework. Natural systems. Animals pick up and use patterns, and living things pass on information by genes and by learning. Szathmáry and Maynard Smith (1995) argue that major evolutionary transitions changed how information is stored and transmitted [proposed]. Walker and Davies (2013) propose that life began when information gained causal power over the matter that carries it [proposed]. Human information architecture. John Sweller's cognitive load theory starts from the finding that working memory is limited and that novices learn less from open problem solving than from tasks that leave room to build schemas (Sweller 1988) [observed in experiments]. Castro-Alonso, Hidalgo and Sweller (2024) argue that biological evolution and human cognition follow the same five principles of natural information-processing systems: randomness as genesis, borrowing and reorganizing, narrow limits of change, an information store, and environmental organizing and linking [proposed]. For biologically secondary knowledge, the kind taught in schools, they say instructional prescriptions follow [proposed]. Geary (2008) separates what children pick up easily from what needs deliberate teaching, which bears on how methods fit age. Csibra and Gergely (2009) describe human communication as adapted to pass on general knowledge, with infants responding to signals that show they are being addressed [proposed]. Kirschner, Sweller and Clark (2006) argue that guided instruction fits this architecture better than minimal guidance. That argument is contested in the field. Cultural and computational systems. Agüera y Arcas (2025) argues that life is computation and that prediction is basic to intelligence [proposed, the author's argument]. Agüera y Arcas and colleagues (2024) report that self-replicating programs tend to emerge when random programs interact in simple simulated worlds [observed in simulations, a preprint]. Skulmowski (2023) reviews how offloading memory to digital tools can harm learning [inferred from studies]. Qian and colleagues (2026) review 39 studies of generative AI and cognitive load and find mostly university samples, so the evidence cannot yet guide school-age methods [inferred]. Each form keeps its own sense of information. Computational-Core counts bits against a stated set of messages, Bio-Core keeps the narrow view without meaning, Social-Core follows records and trust, and this space bridges them (Eirdosh and Hanisch 2026). The thread never says information works the same in every system. It describes machines by their rules, data and ranking and gives them no wishes.",
+      "teachingPrompt": "Choose one system that takes in information: a cell, an animal, a child, a school, a network or a language model. Say what it takes in, what it keeps, what limits how much it can handle at once, and who or what shaped those limits. Mark each answer observed, inferred or proposed, and say which sense of information you used.",
+      "evidenceNote": "AI-drafted on 2026-11-03 from the Interdisciplinary stages listed, the LiteratureBase records cited here, and the information design of the four synthetic spaces (Eirdosh and Hanisch 2026). Every source record was read at abstract level only, and the 2003 chapter by Sweller was not seen at all (it is described secondhand through later papers). No expert in cognitive load theory, evolutionary biology, computer science or teaching has reviewed any of it.",
+      "gaps": [
+        "The abstract of Sweller (2003), the chapter that set out the evolutionary account, was not seen. The five principles come from Castro-Alonso et al. (2024) and Kalyuga (2023).",
+        "No source on culturally relevant teaching with a cultural-evolution frame has been found yet. The search returned Samuelsson (2023) and Caldwell and colleagues (2017) only.",
+        "What Is Life? and What Is Intelligence? are the author's argument. The publisher pages were not seen.",
+        "The evidence on generative AI and cognitive load is mostly from university students.",
+        "Bio-Core, Social-Core and Computational-Core each have their own thread on information. This thread belongs to the Interdisciplinary space and keeps their senses of the word apart."
+      ],
+      "introduction": "Information-processing thread. A second thread, How information-processing systems evolve, follows natural systems, the human mind with its limits and the cultures built around it, and computers and language models through ten existing stages. It uses cognitive load theory and work on life as computation, with each claim tagged observed, inferred or proposed. It is a draft written by an AI. No expert has reviewed it.",
+      "stations": [
+        {
+          "stage": "bffa8eae-478f-52ae-a5fd-b7ff43840af0",
+          "step": 1,
+          "label": "Human architecture, K-2: showing and being shown",
+          "concept": "Teaching",
+          "role": "Young children watch how people show them things. Csibra and Gergely (2009) describe human communication as adapted to pass on general knowledge, with infants responding to signals that show they are being addressed [proposed]. Method point: direct showing and naming matches how very young children are described as learning. Limit: one account built from infant studies. Teaching cues differ between communities, so a teacher checks the fit with the children's own community.",
+          "next": "Leads into how other living things pick up and use information."
+        },
+        {
+          "stage": "31b2be29-7a8c-5f98-a447-55ecf57f1ff9",
+          "step": 2,
+          "label": "Natural systems, grades 3 to 5: what a living thing can take in",
+          "concept": "Information",
+          "role": "Students compare what a bee, a dog, an insect-eating bat, a child and a camera can pick up. Each takes in some patterns and not others. Limit: a camera records a pattern and does not use it the way a receiver that responds does, so the senses of the word differ and the stage names where.",
+          "next": "Leads into how people learn in many settings."
+        },
+        {
+          "stage": "495058e6-87bd-59ae-a20d-bc2d291fff41",
+          "step": 3,
+          "label": "Human architecture, grades 3 to 5: many places to learn",
+          "concept": "Learning",
+          "role": "Learning at home, at work and in school, with apprenticeship and guided participation. Geary (2008) separates what children pick up easily from what needs deliberate teaching [proposed]. Samuelsson (2023) synthesizes work on children's learning biases in play and exploration and argues early education should use them [proposed, a single-author synthesis]. Method point: for the youngest grades, play and exploration. Later, deliberate teaching of school knowledge. Limit: the sources are mostly about children's evolved biases and say less about how communities differ.",
+          "next": "Leads into two ways of keeping and passing on information."
+        },
+        {
+          "stage": "db1fca08-0dcf-5910-a3df-2de902e8630a",
+          "step": 4,
+          "label": "Natural and cultural stores, grades 3 to 5: genes and shared rules",
+          "concept": "Transmission",
+          "role": "Eye colour passed from parent to child and the rules of a game passed from player to player are set side by side. Szathmáry and Maynard Smith (1995) argue that major evolutionary transitions changed how information is stored and transmitted [proposed]. Limit: genes are copied with a low error rate by a molecular process, and rules are copied with many changes by people who can choose.",
+          "next": "Leads into information as an answer to questions."
+        },
+        {
+          "stage": "6315aad7-35b7-52dc-9dd2-1b82d707a768",
+          "step": 5,
+          "label": "Information as a count, grades 6 to 8",
+          "concept": "Information",
+          "role": "Students find a hidden pick among 2, 4 and 8 equally likely options with yes-or-no questions and see that each question halves the options. This is the Computational-Core sense: bits count against a stated set of messages (Shannon 1948). Limit: the count says nothing about meaning or truth, and the Bio-Core and Social-Core senses differ.",
+          "next": "Leads into the limits on how much a system can change at once."
+        },
+        {
+          "stage": "d2dc3119-7af8-55d8-8bfe-b63a4ec56acb",
+          "step": 6,
+          "label": "Narrow limits of change, grades 6 to 8",
+          "concept": "Metacognition",
+          "role": "How minds and cultures search for better ideas by small steps. Castro-Alonso et al. (2024) list narrow limits of change among five principles shared by biological evolution and human cognition [proposed]. Limit: the five principles are an analogy argued by cognitive load researchers. They are not one tested model of both systems.",
+          "next": "Leads into schools as built information systems."
+        },
+        {
+          "stage": "712e4748-73c1-5809-8cbe-8fa0528b138b",
+          "step": 7,
+          "label": "Human architecture, grades 6 to 8: why societies build schools",
+          "concept": "Institutions",
+          "role": "Schools as cultural systems that carry knowledge a child would not pick up alone. Sweller (1988) found in experiments that open problem solving uses up the working memory that novices need to build schemas [observed]. Kirschner, Sweller and Clark (2006) argue from this for guided instruction [proposed, contested]. Method point: teachers weigh guidance against exploration by age and by topic. Limit: the experiments are mostly with adults and short tasks, and communities differ in what they ask schools to do.",
+          "next": "Leads into decentralized information processing."
+        },
+        {
+          "stage": "e820dc2d-9317-57d1-8475-22a701fc486a",
+          "step": 8,
+          "label": "Cultural and computational systems, grades 9 to 12: decentralized dynamics",
+          "concept": "Collective Intelligence",
+          "role": "Group results with no one steering. Agüera y Arcas and colleagues (2024) report that self-replicating programs tend to emerge when random programs interact in simple simulated worlds [observed in simulations, a preprint]. Evans, Bratton and Agüera y Arcas (2026) argue that intelligence is plural and social [proposed, a preprint]. Limit: a simulation of programs is an analogy for life and for culture, and the authors' framing is an argument.",
+          "next": "Leads into machines as part of the loop."
+        },
+        {
+          "stage": "9d77ef6f-8eea-5427-84e4-72ded6b1bba5",
+          "step": 9,
+          "label": "Cultural and computational systems, grades 9 to 12: machines in the loop",
+          "concept": "Technology",
+          "role": "Optional bridge case. Agüera y Arcas (2025) argues in What Is Life? that life is computation and in What Is Intelligence? that prediction is basic to intelligence [proposed, the author's argument]. Brinkmann et al. (2023) propose how machines change what varies, spreads and is chosen [proposed]. Students keep each source's claim apart from observed results. Limit: a book argument is not an experiment, and the thread describes machines by rules, data and ranking.",
+          "next": "Leads into what AI tools change for learners."
+        },
+        {
+          "stage": "a9c1777a-a159-534d-b927-ad30da661ce6",
+          "step": 10,
+          "label": "Human architecture meets computation, grades 9 to 12: tools and cognitive load",
+          "concept": "Innovation",
+          "role": "What an AI tool changes about what a learner must keep in mind. Skulmowski (2023) reviews how offloading memory to digital tools can harm learning when it replaces storing knowledge [inferred from studies]. Qian and colleagues (2026) review 39 studies of generative AI and cognitive load, mostly with university students, and find mixed results [inferred]. Method point: say what must be stored in the student's own memory. Limit: the evidence base cannot yet guide school-age choices.",
+          "next": null
+        }
+      ]
+    }
+  ],
   "sources": [
-    { "id": "OE-LITERATURE-shott-2011", "supports": "Stone tools analysed with the tools of evolutionary biology." },
-    { "id": "OE-LITERATURE-basalla-1988", "supports": "The history of technology as variation and selection of artifacts." },
-    { "id": "OE-LITERATURE-arthur-2009-nature-of-technology", "supports": "Technologies as combinations of earlier technologies." },
-    { "id": "OE-LITERATURE-moore-1965-cramming-components", "supports": "The rate of change in integrated circuits." },
-    { "id": "OE-LITERATURE-brinkmann-2023", "supports": "Machine culture: how machines change variation, transmission and selection." },
-    { "id": "OE-LITERATURE-rahwan-2019-machine-behaviour", "supports": "Studying machine behaviour as a scientific object." },
-    { "id": "OE-LITERATURE-yang-et-al-2024", "supports": "The survey whose tree of language models the Teacher's Guide reproduces." },
-    { "id": "OE-LITERATURE-gao-gao-2023", "supports": "A tree of nearly 16,000 language models built from model names." },
-    { "id": "OE-LITERATURE-yax-oudeyer-palminteri-2025", "supports": "Trees of language models inferred from their outputs." },
-    { "id": "OE-LITERATURE-perez-et-al-2024", "supports": "Simulating cultural evolution among language-model agents." }
+    {
+      "id": "OE-LITERATURE-shott-2011",
+      "supports": "Stone tools analysed with the tools of evolutionary biology."
+    },
+    {
+      "id": "OE-LITERATURE-basalla-1988",
+      "supports": "The history of technology as variation and selection of artifacts."
+    },
+    {
+      "id": "OE-LITERATURE-arthur-2009-nature-of-technology",
+      "supports": "Technologies as combinations of earlier technologies."
+    },
+    {
+      "id": "OE-LITERATURE-moore-1965-cramming-components",
+      "supports": "The rate of change in integrated circuits."
+    },
+    {
+      "id": "OE-LITERATURE-brinkmann-2023",
+      "supports": "Machine culture: how machines change variation, transmission and selection."
+    },
+    {
+      "id": "OE-LITERATURE-rahwan-2019-machine-behaviour",
+      "supports": "Studying machine behaviour as a scientific object."
+    },
+    {
+      "id": "OE-LITERATURE-yang-et-al-2024",
+      "supports": "The survey whose tree of language models the Teacher's Guide reproduces."
+    },
+    {
+      "id": "OE-LITERATURE-gao-gao-2023",
+      "supports": "A tree of nearly 16,000 language models built from model names."
+    },
+    {
+      "id": "OE-LITERATURE-yax-oudeyer-palminteri-2025",
+      "supports": "Trees of language models inferred from their outputs."
+    },
+    {
+      "id": "OE-LITERATURE-perez-et-al-2024",
+      "supports": "Simulating cultural evolution among language-model agents."
+    },
+    {
+      "id": "OE-LITERATURE-morgan-et-al-2015",
+      "supports": "An experiment on teaching, language and the transmission of stone toolmaking."
+    },
+    {
+      "id": "OE-LITERATURE-tennie-et-al-2017",
+      "supports": "The case that early stone tools may have been reinvented one by one."
+    },
+    {
+      "id": "OE-LITERATURE-derex-et-al-2013",
+      "supports": "An experiment on group size and the complexity of skills kept."
+    },
+    {
+      "id": "OE-LITERATURE-farmer-lafond-2016",
+      "supports": "Rates of fall in the cost of technologies."
+    },
+    {
+      "id": "OE-LITERATURE-bloom-et-al-2020",
+      "supports": "The rising research effort behind Moore's law."
+    },
+    {
+      "id": "OE-LITERATURE-acerbi-stubbersfield-2023",
+      "supports": "A chat model shows the content biases people show in retelling chains."
+    },
+    {
+      "id": "OE-LITERATURE-ren-et-al-2024",
+      "supports": "Bias growth when models learn from model-made text."
+    },
+    {
+      "id": "OE-LITERATURE-doshi-hauser-2024",
+      "supports": "AI story ideas raised creativity of single stories and lowered variety."
+    },
+    {
+      "id": "OE-LITERATURE-muthukrishna-2016",
+      "supports": "Innovation in the collective brain."
+    },
+    {
+      "id": "OE-LITERATURE-sweller-1988",
+      "supports": "Cognitive load during problem solving."
+    },
+    {
+      "id": "OE-LITERATURE-sweller-2003",
+      "supports": "Evolution of human cognitive architecture (abstract not seen)."
+    },
+    {
+      "id": "OE-LITERATURE-sweller-et-al-2011",
+      "supports": "The book-length statement of cognitive load theory."
+    },
+    {
+      "id": "OE-LITERATURE-castro-alonso-et-al-2024",
+      "supports": "Biological evolution and human cognition as analogous information-processing systems."
+    },
+    {
+      "id": "OE-LITERATURE-kalyuga-2023",
+      "supports": "Evolutionary perspective on human cognitive architecture."
+    },
+    {
+      "id": "OE-LITERATURE-geary-2008",
+      "supports": "Biologically primary and secondary knowledge and school learning."
+    },
+    {
+      "id": "OE-LITERATURE-aguera-y-arcas-2025a",
+      "supports": "What Is Life? Evolution as Computation."
+    },
+    {
+      "id": "OE-LITERATURE-aguera-y-arcas-2025b",
+      "supports": "What Is Intelligence?"
+    },
+    {
+      "id": "OE-LITERATURE-aguera-y-arcas-et-al-2024",
+      "supports": "Self-replicating programs emerging from simple interaction (preprint)."
+    },
+    {
+      "id": "OE-LITERATURE-evans-et-al-2026",
+      "supports": "Intelligence as plural and social (preprint)."
+    },
+    {
+      "id": "OE-LITERATURE-szathmary-maynard-smith-1995",
+      "supports": "Major evolutionary transitions and the storage of information."
+    },
+    {
+      "id": "OE-LITERATURE-walker-davies-2013",
+      "supports": "The algorithmic origins of life."
+    },
+    {
+      "id": "OE-LITERATURE-samuelsson-2023",
+      "supports": "Play, learning and cultural-evolutionary insights for early education."
+    },
+    {
+      "id": "OE-LITERATURE-skulmowski-2023",
+      "supports": "Digital externalization and learning."
+    },
+    {
+      "id": "OE-LITERATURE-qian-et-al-2026",
+      "supports": "Generative AI and cognitive load: a review of 39 studies."
+    },
+    {
+      "id": "OE-LITERATURE-kirschner-et-al-2006",
+      "supports": "Guidance during instruction (contested)."
+    },
+    {
+      "id": "OE-LITERATURE-csibra-gergely-2009",
+      "supports": "Natural pedagogy."
+    },
+    {
+      "id": "OE-LITERATURE-eirdosh-hanisch-2026",
+      "supports": "Information as an interdisciplinary concept."
+    }
   ]
 }
