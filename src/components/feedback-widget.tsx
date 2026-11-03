@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { matchPath, useLocation } from 'react-router-dom'
-import html2canvas from 'html2canvas'
+// html2canvas-pro is the maintained fork of html2canvas: same API, but it
+// reads color(), oklch(), lab() and color-mix() values. The original library
+// stops with 'Attempting to parse an unsupported color function "color"' as
+// soon as one element on the page has such a color, which is what Susan's
+// browser hit on 2026-11-01 (feedback row 1fb1bb44).
+import html2canvas from 'html2canvas-pro'
 import { MessageSquareText, X, Camera, RotateCcw, Trash2, Mic, MicOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -12,7 +17,7 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 // twice-verified implementation rather than designed from scratch, but
 // adapted where OpenLPM's own architecture genuinely differs:
 //
-// - Screenshot capture now uses html2canvas (a DOM rasterizer), not the
+// - Screenshot capture now uses html2canvas (a DOM rasterizer) instead of the
 //   Screen Capture API (getDisplayMedia) Me-Mo/Ask Eva use -- REVERSED
 //   2026-09-30 after Dustin reported it erroring for real, repeatedly.
 //   getDisplayMedia was the right call for THEM because of a live WebGL
@@ -27,11 +32,11 @@ import { getProjectBySlug } from '@/lib/supabase/projects'
 //   on mobile browsers (no reliable tab/window capture on iOS Safari, only
 //   experimental/inconsistent support on Android Chrome) -- a real,
 //   structural problem for an app real students will open on their
-//   phones, not a one-off glitch. html2canvas needs no browser permission
+//   phones. That is a structural problem. html2canvas needs no browser permission
 //   dialog at all and works identically on mobile and desktop.
 // - There is no local per-session server/transcript to append into here --
 //   OpenLPM is a hosted multi-tenant app, so feedback is a real Postgres
-//   table (supabase/migrations/026_feedback.sql) with its own RLS, not a
+//   table (supabase/migrations/026_feedback.sql) with its own RLS. There is no
 //   JSONL file on disk.
 // - The image itself never touches that table. It's resized and
 //   re-encoded as JPEG client-side, then uploaded to a private Supabase
@@ -47,7 +52,7 @@ const TAGS: Tag[] = ['Problem', 'Request', 'Other']
 // multilingual voice to speech on feedback form." The Web Speech API's
 // SpeechRecognition isn't in TypeScript's own DOM lib (it's still a
 // non-standard API, Chrome/Edge/Safari only -- no real Firefox support),
-// so these are the handful of fields this file actually touches, not a
+// so these are the handful of fields this file actually touches. It is no
 // full spec. Scoped with Dustin (2026-10-01): auto-detect which language
 // is being spoken from the browser's own locale (navigator.language) --
 // one click, no extra picker -- rather than a manual language switch.
@@ -176,7 +181,7 @@ export function FeedbackWidget() {
       }
       // Rewrites the whole value each time so the box always shows exactly
       // what's been heard so far, interim words included -- Dustin asked
-      // to see live text while speaking, not just the committed phrases.
+      // to see live text while speaking, including the interim words.
       setComment(prefix + finalTranscript + interimTranscript)
     }
     recognition.onerror = () => setListening(false)
@@ -246,7 +251,7 @@ export function FeedbackWidget() {
         // is. Resolving the real computed background color here (body's
         // own `background: var(--page-plane)`, correct in both light and
         // dark mode) instead of `null` means the flatten has a real color
-        // to fall back to, not black.
+        // to fall back to. Black is no longer the fallback.
         backgroundColor: getComputedStyle(document.body).backgroundColor || '#ffffff',
         // The "Capturing…" indicator shown below replaces the panel for
         // the real multi-second duration of this call -- never let it end
@@ -258,18 +263,18 @@ export function FeedbackWidget() {
         scale: Math.min(window.devicePixelRatio || 1, 2),
         // Real bug found live 2026-09-30: capturing the full scrollable
         // page (html2canvas's default against `document.body`) rasterizes
-        // its ENTIRE height, not just what's on screen -- on a long page
+        // its ENTIRE height, which is more than what is on screen -- on a long page
         // (305 Lernziele cards) that's tens of thousands of pixels tall,
         // past the browser's own hard canvas-size ceiling, which is exactly
         // what "The object exceeded the maximum allowed size" is: the
-        // browser's own error for an over-limit canvas, not a bug in this
+        // browser's own error for an over-limit canvas. It is no bug in this
         // code's own retry/compression logic (that only runs afterward).
         // Clipping to the current viewport avoids the oversized canvas
         // entirely, and also matches what a reporter actually means by
         // "screenshot this" far better than the full page ever did.
         // Real bug found live 2026-10-01 (Dustin: "the screenshot is not
         // exactly where I am in the screen"): `windowWidth`/`windowHeight`
-        // were set to the FULL scrollable document size, not the real
+        // were set to the FULL scrollable document size instead of the real
         // browser viewport -- these two options tell html2canvas how big
         // the outer *browsing context* is (for responsive CSS/fixed-element
         // layout), a completely different thing from the document's own
@@ -388,7 +393,7 @@ export function FeedbackWidget() {
     // panel opened -- would miss whatever the reporter is describing, so
     // this deliberately reads document.body as-is, panel included; the
     // panel's own form labels ("What's going on?" etc.) are a small,
-    // harmless prefix, not worth special-casing out.
+    // harmless prefix, so it stays in.
     const visibleText = document.body.innerText.replace(/\s+/g, ' ').trim().slice(0, VISIBLE_TEXT_MAX)
     return {
       path: location.pathname,
@@ -474,8 +479,8 @@ export function FeedbackWidget() {
   // production data, Playwright capture compared pixel-for-pixel against
   // a ground-truth screenshot) that the capture itself is correct once it
   // actually finishes; the real gap was having no way to tell it hadn't
-  // yet. This small indicator renders as a SIBLING of the panel, not in
-  // place of it -- the panel (and the canvas inside it) must stay mounted
+  // yet. This small indicator renders as a SIBLING of the panel and does not
+  // replace it -- the panel (and the canvas inside it) must stay mounted
   // throughout capture, same reasoning as the canvas's own "always
   // mounted" comment below: an early return here would unmount canvasRef
   // right as captureScreenshot needs to draw into it. Excluded from the
@@ -551,7 +556,7 @@ export function FeedbackWidget() {
             something to show -- the real bug this replaces: it used to
             only exist in the DOM once hasScreenshot was already true, so
             captureScreenshot's very first run always found canvasRef.current
-            null (every attempt, every browser, not a mobile-only issue) --
+            null (every attempt, every browser, so it was no mobile-only issue) --
             confirmed live, this is what "couldn't capture the screenshot"
             actually was. */}
         <div style={{ marginTop: 8, display: hasScreenshot ? 'block' : 'none' }}>

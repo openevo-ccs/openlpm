@@ -33,7 +33,7 @@
     "cytoscape-dagre": "^4.0.1",
     "docx": "9.5.1",
     "exceljs": "^4.4.0",
-    "html2canvas": "^1.4.1",
+    "html2canvas-pro": "2.5.2",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.303.0",
     "papaparse": "^5.7.0",
