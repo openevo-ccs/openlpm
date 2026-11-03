@@ -80,5 +80,9 @@ thread2 = {
         ("eirdosh2026", "Information as an interdisciplinary concept."),
     ],
 }
+# name the dimension of information (after Eirdosh and Hanisch 2026) that each station uses: 1 a pattern without a sender, 2 systems that use information, 3 decentralized dynamics
+_DIM = {1: "2", 2: "1 and 2", 3: "2", 4: "1 and 2", 5: "1", 6: "2", 7: "2", 8: "3", 9: "2 and 3", 10: "2"}
+for _st in thread2["stations"]:
+    _st["role"] = _st["role"].replace(" Limit:", f" Information: dimension {_DIM[_st['step']]}. Limit:", 1)
 # resolve the source keys to LiteratureBase slugs
 thread2["sources"] = [(B3[k], v) for k, v in thread2["sources"] if k in B3]
