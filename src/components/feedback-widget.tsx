@@ -257,6 +257,21 @@ export function FeedbackWidget() {
         // the real multi-second duration of this call -- never let it end
         // up in its own screenshot.
         ignoreElements: (el) => el.classList?.contains('feedback-capturing-indicator'),
+        // html2canvas draws from a copy of the page, and that copy loads
+        // the stylesheet again. On a slow connection or computer the copy
+        // used to be drawn before the stylesheet arrived, and Susan got a
+        // bare page with no styling (row dea237cb, 2026-11-03). Wait here
+        // until every stylesheet in the copy has loaded, for at most 20 seconds.
+        onclone: async (clonedDoc) => {
+          const waiting = Array.from(clonedDoc.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'))
+            .filter((link) => !link.sheet)
+            .map((link) => new Promise<void>((resolve) => {
+              link.addEventListener('load', () => resolve())
+              link.addEventListener('error', () => resolve())
+            }))
+          if (waiting.length === 0) return
+          await Promise.race([Promise.all(waiting), new Promise<void>((resolve) => setTimeout(resolve, 20000))])
+        },
         // Real screens run well past 1600px logical width on a 2x/3x
         // display -- capture at native pixel density, downscale happens
         // separately at upload time (compressForUpload).
