@@ -10,6 +10,7 @@
 //
 // Usage: [TOUR_VIEWPORT=390x844] node layout_check/tour_check.mjs [base] [outDir] [--no-try]
 //   base   default http://localhost:5174/
+//   --live    use the real guided_tours table instead of the stand-in (migration 227 pushed 2026-11-04)
 //   --no-try  only press Weiter, never perform the "Probiere es aus" actions
 
 import { chromium } from 'playwright'
@@ -54,7 +55,7 @@ const projectId = await page.evaluate(async () => {
   return (await r.json())[0].id
 })
 
-await page.route('**/rest/v1/guided_tours*', (route) =>
+if (!process.argv.includes('--live')) await page.route('**/rest/v1/guided_tours*', (route) =>
   route.fulfill({
     status: 200,
     contentType: 'application/json',
