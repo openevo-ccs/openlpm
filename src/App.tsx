@@ -13,6 +13,7 @@ import ProfilePage from '@/pages/dashboard/profile-page'
 import ProjectLayout from '@/pages/dashboard/project-layout'
 import DashboardPage from '@/pages/dashboard/dashboard-page'
 import SettingsPage from '@/pages/dashboard/settings-page'
+import TourEditorPage from '@/pages/dashboard/tour-editor-page'
 import NewProjectWizard from '@/pages/dashboard/new-project-wizard'
 import LiteraturePage from '@/pages/dashboard/literature-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
@@ -183,6 +184,7 @@ export default function App() {
             <Route path="groups/:groupId" element={<GroupDetailPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="tours" element={<TourEditorPage />} />
           </Route>
         </Route>
 

@@ -60,6 +60,7 @@ export default function StudentBasiskonzeptePage() {
 
   return (
     <div className="student-page">
+      <div data-tour="basiskonzepte.kopf" style={{ display: 'inline-block', maxWidth: '100%' }}>
       <h1>
         Basiskonzepte{' '}
         <span title={BASISKONZEPTE_RATIONALE} style={{ cursor: 'help' }}>
@@ -78,6 +79,7 @@ export default function StudentBasiskonzeptePage() {
             {TAB_LABEL[t]}
           </button>
         ))}
+      </div>
       </div>
 
       {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
@@ -147,7 +149,7 @@ function DashboardTab({
   }
 
   return (
-    <div>
+    <div data-tour="basiskonzepte.dashboard">
       <div className="bk-stat-tiles">
         <div className="card bk-stat-tile"><div className="n">{topics?.length ?? '—'}</div><div className="l">Lernziele gesamt</div></div>
         <div className="card bk-stat-tile"><div className="n">{rootConcepts.length}</div><div className="l">Basiskonzepte</div></div>

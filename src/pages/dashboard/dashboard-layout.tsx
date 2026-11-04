@@ -6,6 +6,7 @@ import { OpenLpmLogo } from '@/components/openlpm-logo'
 // import { MemoChatWidget } from '@/components/memo-chat-widget' -- see note below, not mounted yet
 import { FeedbackWidget } from '@/components/feedback-widget'
 import { HelpWidget } from '@/components/help-widget'
+import { TourProvider } from '@/state/tours'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -21,6 +22,7 @@ export default function DashboardLayout() {
   }
 
   return (
+    <TourProvider>
     <div className="app">
       <header className="topbar">
         <Link to="/dashboard" className="brand">
@@ -89,5 +91,6 @@ export default function DashboardLayout() {
       {/* <MemoChatWidget /> */}
       <FeedbackWidget />
     </div>
+    </TourProvider>
   )
 }

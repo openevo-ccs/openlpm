@@ -508,15 +508,17 @@ export default function StudentLernzielePage() {
 
   return (
     <div className="student-page">
-      <h1>Lernziele</h1>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
-      </p>
+      <div data-tour="lernziele.kopf" style={{ display: 'inline-block' }}>
+        <h1>Lernziele</h1>
+        <p className="muted" style={{ marginBottom: 12 }}>
+          {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
+        </p>
+      </div>
       <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="de" />
 
       <div className="student-lernziele-layout">
         <aside className="student-filters">
-          <div className="field">
+          <div className="field" data-tour="lernziele.suche">
             <div className="row"><Search size={14} style={{ color: 'var(--text-muted)' }} /><input type="search" placeholder="Suchen…" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
           </div>
 
@@ -530,6 +532,7 @@ export default function StudentLernzielePage() {
             <Star size={13} />nur Favoriten
           </label>
 
+          <div data-tour="lernziele.klassenstufe">
           <p className="muted student-filter-label">KLASSENSTUFE</p>
           <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
             <button className={`chip-btn${gradeFilter.size === 0 ? ' active' : ''}`} onClick={() => { setGradeFilter(new Set()); setThemaFilter(''); setUnterthemaFilter('') }}>Alle</button>
@@ -537,9 +540,10 @@ export default function StudentLernzielePage() {
               <button key={b.key} className={`chip-btn${gradeFilter.has(b.key) ? ' active' : ''}`} onClick={() => toggleGradeBand(b.key)}>{gradeChipLabel(b.key)}</button>
             ))}
           </div>
+          </div>
 
           {themen.length > 0 && (
-            <div className="field" style={{ marginTop: 10 }}>
+            <div className="field" style={{ marginTop: 10 }} data-tour="lernziele.thema">
               <label style={{ fontSize: 11 }}>Thema</label>
               <select value={themaFilter} onChange={(e) => { setThemaFilter(e.target.value); setUnterthemaFilter('') }}>
                 <option value="">Alle Themen</option>
@@ -548,7 +552,7 @@ export default function StudentLernzielePage() {
             </div>
           )}
           {themaFilter && unterthemen.length > 0 && (
-            <div className="field">
+            <div className="field" data-tour="lernziele.unterthema">
               <label style={{ fontSize: 11 }}>Unterthema</label>
               <select value={unterthemaFilter} onChange={(e) => setUnterthemaFilter(e.target.value)}>
                 <option value="">Alle Unterthemen</option>
@@ -557,6 +561,7 @@ export default function StudentLernzielePage() {
             </div>
           )}
 
+          <div data-tour="lernziele.basiskonzepte">
           <p className="muted student-filter-label">BASISKONZEPTE &amp; RELEVANZ</p>
           <div className="student-concept-filter">
             {bkGroups.map((g) => {
@@ -631,6 +636,7 @@ export default function StudentLernzielePage() {
               )
             })}
           </div>
+          </div>
 
           <p className="muted student-filter-label">DIDAKTISCHE METHODEN</p>
           <div className="student-concept-filter">
@@ -653,7 +659,7 @@ export default function StudentLernzielePage() {
           </div>
         </aside>
 
-        <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>
+        <div className="student-lernziele-main" style={{ flexDirection: 'column' }} data-tour="lernziele.ansicht">
           {objectId && (
             <button
               className="btn btn-mini"
@@ -783,12 +789,14 @@ function LernzielCard({
         id={`lz-card-${topic.id}`}
         key={topic.id}
         className="card topic-card topic-row-compact"
+        data-tour="lernziele.karte"
         onClick={() => onToggleExpand(topic.id)}
       >
         <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
         <strong style={{ flex: 1, minWidth: 0 }}>{topic.title}</strong>
         <button
           className="btn-linklike"
+          data-tour="lernziele.favorit"
           aria-label="Favorit"
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(topic.id) }}
         >
@@ -803,6 +811,7 @@ function LernzielCard({
       id={`lz-card-${topic.id}`}
       key={topic.id}
       className={`card topic-card${isExpanded ? ' active' : ''}`}
+      data-tour="lernziele.karte"
       style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined }}
       onClick={() => onToggleExpand(topic.id)}
     >
@@ -822,6 +831,7 @@ function LernzielCard({
         </div>
         <button
           className="btn-linklike"
+          data-tour="lernziele.favorit"
           aria-label="Favorit"
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(topic.id) }}
         >
@@ -983,7 +993,7 @@ function DidaktischeStrategienSection({
     // above it needed clearer visual separation -- a line like the one
     // above the whole expanded block, and bigger section headers.
     <section style={{ marginBottom: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+      <button className="btn btn-mini" data-tour="lernziele.strategien" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
         {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Didaktische Strategien ausblenden' : 'Didaktische Strategien anzeigen'}
       </button>
@@ -1070,7 +1080,7 @@ function BkRelevanceSection({
   if (entries.length === 0) return null
   return (
     <section style={{ marginBottom: 18 }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+      <button className="btn btn-mini" data-tour="lernziele.bezuege" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
         {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Basiskonzept-Bezüge ausblenden' : 'Basiskonzept-Bezüge anzeigen'}
       </button>

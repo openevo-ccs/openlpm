@@ -22,6 +22,8 @@ import { StudentNav } from './student/student-nav'
 import { ComparisonProvider } from './comparison/context'
 import { getCurriculumConnectionsViewConfig, isJenaTemplate, isSandboxTemplate } from '@/lib/student-view-templates'
 import { logStudentEvent } from '@/lib/supabase/student-work'
+import { useTours } from '@/state/tours'
+import type { TourContext } from '@/lib/supabase/guided-tours'
 
 export interface ProjectOutletContext {
   project: ProjectRow
@@ -120,6 +122,20 @@ function JenaStudentGate({
 
   if (locked && !allowed) return <Navigate to={`/dashboard/${slug}`} replace />
   return <>{children}</>
+}
+
+// Tells the Help menu which space and view the reader is in, so it can list
+// the guided tours that belong here (state/tours.tsx). Rendered by both shells.
+function TourSpacePublisher({ space }: { space: TourContext | null }) {
+  const { setSpace } = useTours()
+  const key = space ? `${space.projectId}|${space.slug}|${space.viewId}|${space.templateId}|${space.language}|${space.canManage}` : ''
+  useEffect(() => {
+    setSpace(space)
+    return () => setSpace(null)
+    // The key covers every field of space.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, setSpace])
+  return null
 }
 
 export default function ProjectLayout() {
@@ -439,11 +455,25 @@ export default function ProjectLayout() {
 
   const context: ProjectOutletContext = { project, role, slug, supabase, defaultBranchId, isStudentView, templateId, viewsReady }
   const isSpace = !project.parent_project_id
+  // Tours that belong to a template view are matched on the template, tours
+  // for a standard view on that view's own id.
+  const tourSpace: TourContext | null = viewsReady
+    ? {
+        projectId: project.id,
+        slug,
+        projectName: project.name,
+        viewId: activeView?.id ?? null,
+        templateId,
+        language: isStudentView ? templateLanguage : isGermanOnly ? 'de' : 'en',
+        canManage,
+      }
+    : null
 
   if (isStudentView) {
     return (
       <div className="project-shell student-shell">
-        <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`}>
+        <TourSpacePublisher space={tourSpace} />
+        <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`} data-tour="sidebar">
           <div className="project-side-top">
             <Link to="/dashboard" className="row muted" title={templateLanguage === 'de' ? 'Alle Bereiche' : 'All project spaces'}>
               <ArrowLeft size={14} />
@@ -452,6 +482,7 @@ export default function ProjectLayout() {
             <button
               type="button"
               className="sidebar-toggle"
+              data-tour="sidebar.toggle"
               onClick={toggleSidebar}
               title={
                 templateLanguage === 'de'
@@ -507,13 +538,14 @@ export default function ProjectLayout() {
 
   return (
     <div className="project-shell">
-      <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`}>
+      <TourSpacePublisher space={tourSpace} />
+      <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`} data-tour="sidebar">
         <div className="project-side-top">
           <Link to="/dashboard" className="row muted" title="All project spaces">
             <ArrowLeft size={14} />
             <span className="nav-label">All project spaces</span>
           </Link>
-          <button type="button" className="sidebar-toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+          <button type="button" className="sidebar-toggle" data-tour="sidebar.toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
             {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
         </div>
