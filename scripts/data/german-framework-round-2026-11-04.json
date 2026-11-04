@@ -1,5 +1,5 @@
 {
-  "note": "German framework and policy records linked to the four synthetic spaces on 4 Nov 2026. First reading drafted 37 links. A second reading by the same working session, checking each link against the record text or the tagged Lehrplan wording, dropped 12 and kept 25. It is a weaker check than an independent reader. Every link is an AI proposal that no person has reviewed. Strength is kept here and is not stored in the table.",
+  "note": "German framework and policy records linked to the four synthetic spaces on 4 Nov 2026. The first reading drafted 37 links. A second reading, done by the same working session, checked each link against the record text or the tagged Lehrplan wording, dropped 12 and kept 25. The 17 links to the Thüringen Biologie edition and the 1 link to the Mensch-Natur-Technik edition rest on two tagging passes of 2 Nov that saw the Lehrplan wording. The other 7 rest on the record title, summary and notes. No link is confirmed by a person. Strength is kept here and is not stored in the table.",
   "links": [
     {
       "space": "interdisciplinary-lpm-synth",
@@ -11,7 +11,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Variability of traits\", \"Human genetics (applying genetic knowledge)\" and others (grade 10/11) cover the concepts of this part (Inheritance, Variation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Variability of traits\", \"Human genetics (applying genetic knowledge)\" and others (grade 10/11) cover the concepts of this part (Inheritance, Variation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "5 covers, 0 partly",
       "secondReading": "kept"
@@ -26,7 +26,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Genetics\", \"Evolution\", \"Passing on genetic information\" and others (grade 10/11/11/12) touch the concepts of this part (Evolutionary Process, Inheritance, Selection, Transmission, Variation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12). No person has checked it. The part compares four disciplines, and the Lehrplan topics hold the biological one only.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Genetics\", \"Evolution\", \"Passing on genetic information\" and others (grade 10/11/11/12) touch the concepts of this part (Evolutionary Process, Inheritance, Selection, Transmission, Variation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12). The part compares four disciplines, and the Lehrplan topics hold the biological one only.",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 9 partly",
       "secondReading": "kept"
@@ -41,7 +41,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Development of life\", \"Connections in evolutionary biology\", \"Evolution\", \"Content area: Diversity of life\" and others (grade 10/11/11/12) cover the concepts of this part (Drift, Fitness, Gene, Mutation, Natural Selection). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Development of life\", \"Connections in evolutionary biology\", \"Evolution\", \"Content area: Diversity of life\" and others (grade 10/11/11/12) cover the concepts of this part (Drift, Fitness, Gene, Mutation, Natural Selection). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "1 covers, 4 partly",
       "secondReading": "kept"
@@ -56,7 +56,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Evolution\", \"Human evolution\" (grade 10/11) touch the concepts of this part (Drift, Mutation, Phylogeny). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Evolution\", \"Human evolution\" (grade 10/11) touch the concepts of this part (Drift, Mutation, Phylogeny). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 3 partly",
       "secondReading": "kept"
@@ -71,7 +71,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\", \"Genetics\" and others (grade 10/11/11/12) cover the concepts of this part (Evolutionary Process, Information, Selection, Transmission, Variation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\", \"Genetics\" and others (grade 10/11/11/12) cover the concepts of this part (Evolutionary Process, Information, Selection, Transmission, Variation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "4 covers, 6 partly",
       "secondReading": "kept"
@@ -86,7 +86,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Genetics\" (grade 10/11) touch the concepts of this part (Allele, Drift, Gene, Mutation, Population). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Genetics\" (grade 10/11) touch the concepts of this part (Allele, Drift, Gene, Mutation, Population). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 3 partly",
       "secondReading": "kept"
@@ -101,7 +101,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Reproduction, development and sexuality\", \"Human biology\" (grade 7/8) touch the concepts of this part (Development). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it. The part is about growth and change with age, and the topics are about reproduction and development in biology, so the match is loose.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Reproduction, development and sexuality\", \"Human biology\" (grade 7/8) touch the concepts of this part (Development). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). The part is about growth and change with age, and the topics are about reproduction and development in biology, so the match is loose.",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 2 partly",
       "secondReading": "kept"
@@ -116,7 +116,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Storage of genetic information\" and others (grade 10/11) cover the concepts of this part (Inheritance). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Storage of genetic information\" and others (grade 10/11) cover the concepts of this part (Inheritance). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "4 covers, 1 partly",
       "secondReading": "kept"
@@ -131,7 +131,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Expression of genetic information\", \"Variability of traits\", \"Molecular genetic basis of life\" and others (grade 10/11/11/12) cover the concepts of this part (Allele, Gene, Mutation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Expression of genetic information\", \"Variability of traits\", \"Molecular genetic basis of life\" and others (grade 10/11/11/12) cover the concepts of this part (Allele, Gene, Mutation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "2 covers, 3 partly",
       "secondReading": "kept"
@@ -146,7 +146,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Storage of genetic information\" and others (grade 10/11) cover the concepts of this part (Inheritance). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Storage of genetic information\" and others (grade 10/11) cover the concepts of this part (Inheritance). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "4 covers, 1 partly",
       "secondReading": "kept"
@@ -161,7 +161,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\" (grade 10/11/11/12) cover the concepts of this part (Adaptation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\" (grade 10/11/11/12) cover the concepts of this part (Adaptation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "1 covers, 3 partly",
       "secondReading": "kept"
@@ -176,7 +176,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\", \"Content area: Diversity of life\" and others (grade 10/11/11/12) cover the concepts of this part (Adaptation, Inheritance, Natural Selection). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\", \"Content area: Diversity of life\" and others (grade 10/11/11/12) cover the concepts of this part (Adaptation, Inheritance, Natural Selection). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "5 covers, 0 partly",
       "secondReading": "kept"
@@ -191,7 +191,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\" (grade 10/11/11/12) cover the concepts of this part (Adaptation, Drift, Fitness, Mutation, Population). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Development of life\" (grade 10/11/11/12) cover the concepts of this part (Adaptation, Drift, Fitness, Mutation, Population). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics in grades 10 to 12, which is inside this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "1 covers, 3 partly",
       "secondReading": "kept"
@@ -206,7 +206,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Human evolution\", \"Development of life\" and others (grade 10/11/11/12) cover the concepts of this part (Natural Selection, Phylogeny, Population, Speciation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Connections in evolutionary biology\", \"Evolution\", \"Human evolution\", \"Development of life\" and others (grade 10/11/11/12) cover the concepts of this part (Natural Selection, Phylogeny, Population, Speciation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "3 covers, 2 partly",
       "secondReading": "kept"
@@ -221,7 +221,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "moderate",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Molecular genetic basis of life\" and others (grade 10/11/11/12) cover the concepts of this part (Inheritance, Transmission, Variation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Genetics\", \"Passing on genetic information\", \"Human genetics (applying genetic knowledge)\", \"Molecular genetic basis of life\" and others (grade 10/11/11/12) cover the concepts of this part (Inheritance, Transmission, Variation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "3 covers, 3 partly",
       "secondReading": "kept"
@@ -236,7 +236,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Human evolution\", \"Evolution\" (grade 10/11) cover the concepts of this part (Culture, Social Change). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it. The topic is in Biologie. Whether its text deals with social change, or only the biological side of human evolution, has not been checked.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Human evolution\", \"Evolution\" (grade 10/11) cover the concepts of this part (Culture, Social Change). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). The topic is in Biologie. Whether its text deals with social change, or only the biological side of human evolution, has not been checked.",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "1 covers, 2 partly",
       "secondReading": "kept"
@@ -251,7 +251,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Human evolution\", \"Evolution\" (grade 10/11) cover the concepts of this part (Culture, Social Change). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it. The topic is in Biologie. Whether its text deals with social change, or only the biological side of human evolution, has not been checked.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Human evolution\", \"Evolution\" (grade 10/11) cover the concepts of this part (Culture, Social Change). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). The topic is in Biologie. Whether its text deals with social change, or only the biological side of human evolution, has not been checked.",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "1 covers, 2 partly",
       "secondReading": "kept"
@@ -266,7 +266,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-mnt-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Mensch-Natur-Technik at the Gymnasium, the topics \"10.1 The hook-and-loop fastener\", \"Relations between humans, nature and technology\", \"10.2 Lightweight construction\", \"10.3 From the fog-drinking beetle to drinking water\" and others (grade 5/6) touch the concepts of this part (Technology). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it. The bionics topics are about copying technical ideas from nature, while the part asks for a tool and what it helps people do, so the match is loose.",
+      "rationale": "In the 2026 trial Lehrplan for Mensch-Natur-Technik at the Gymnasium, the topics \"10.1 The hook-and-loop fastener\", \"Relations between humans, nature and technology\", \"10.2 Lightweight construction\", \"10.3 From the fog-drinking beetle to drinking water\" and others (grade 5/6) touch the concepts of this part (Technology). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). The bionics topics are about copying technical ideas from nature, while the part asks for a tool and what it helps people do, so the match is loose.",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 7 partly",
       "secondReading": "kept"
@@ -388,7 +388,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Content area: Information processing in organisms\" (grade 11/12) touch the concepts of this part (Information). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Content area: Information processing in organisms\" (grade 11/12) touch the concepts of this part (Information). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 1 partly",
       "droppedBecause": "Single partly match, and the Information concept fits only in a wider sense."
@@ -403,7 +403,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human influences on ecosystems and their consequences\" (grade 9) touch the concepts of this part (Niche Construction). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human influences on ecosystems and their consequences\" (grade 9) touch the concepts of this part (Niche Construction). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (6-8).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 1 partly",
       "droppedBecause": "Single partly match with a narrower fit."
@@ -418,7 +418,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human evolution\" (grade 10) touch the concepts of this part (Social Change). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human evolution\" (grade 10) touch the concepts of this part (Social Change). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 1 partly",
       "droppedBecause": "Single partly match to the human evolution topic."
@@ -433,7 +433,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human influences on ecosystems and their consequences\" (grade 9) touch the concepts of this part (Niche Construction). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topic \"Human influences on ecosystems and their consequences\" (grade 9) touch the concepts of this part (Niche Construction). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (9-12).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 1 partly",
       "droppedBecause": "Single partly match with a narrower fit."
@@ -448,7 +448,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-biologie-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Interactions between organisms and their environment\", \"Ecology\", \"Content area: Organisms in their environment\" (grade 11/11/12/9) touch the concepts of this part (Conflict, Cooperation). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Biologie at the Gymnasium, the topics \"Interactions between organisms and their environment\", \"Ecology\", \"Content area: Organisms in their environment\" (grade 11/11/12/9) touch the concepts of this part (Conflict, Cooperation). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (3-5).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 4 partly",
       "droppedBecause": "Cooperation and Conflict meet here as ecological interactions between organisms. The part is about human communities."
@@ -463,7 +463,7 @@
       "sourceRecordId": "DELP-EVENT-thueringen-mnt-gymnasium-2026-erprobungsfassung",
       "relation": "proposed_relates_to",
       "strength": "weak",
-      "rationale": "In the 2026 trial Lehrplan for Mensch-Natur-Technik at the Gymnasium, the topics \"Reproduction and development of seed plants\", \"Sexuality and reproduction\", \"Practical work (reproduction and development of seed plants)\", \"2.2.7 Seed plants\" and others (grade 5/6) touch the concepts of this part (Development). Two AI tagging passes of 2 November agreed on the match and it rests on the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2). No person has checked it.",
+      "rationale": "In the 2026 trial Lehrplan for Mensch-Natur-Technik at the Gymnasium, the topics \"Reproduction and development of seed plants\", \"Sexuality and reproduction\", \"Practical work (reproduction and development of seed plants)\", \"2.2.7 Seed plants\" and others (grade 5/6) touch the concepts of this part (Development). Two tagging passes by an AI model on 2 November agreed on this match, working from the Lehrplan wording. Thüringen meets these topics later than this part's band (K-2).",
       "evidence": "two-pass tagging of Lehrplan wording",
       "note": "0 covers, 6 partly",
       "droppedBecause": "Seed plant reproduction topics are a loose match for growth with age. The other MNT link is stronger."

@@ -6,8 +6,7 @@
 //   links     AI-drafted proposals from a part of one of the four synthetic spaces to a German record already in the database.
 //   dropped   links the second reading removed, kept in the data file for the record and not written to the migration.
 //
-// Everything is AI-drafted and has not been reviewed by a person. Links carry a relation type that starts with proposed_, so the views show
-// them as unconfirmed. The migration adds links only: no records, no views, no roles.
+// The links are proposals: the relation type starts with proposed_, so the views show them as unconfirmed. The migration adds links only: no records, no views, no roles.
 
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -26,7 +25,7 @@ const records = new Set(data.links.map((l) => l.sourceRecordId))
 w('-- German framework round: proposed links from the four synthetic spaces to German framework and policy records that few spaces reached.')
 w(`-- ${data.links.length} proposed links (${Object.entries(bySpace).map(([k, v]) => `${v.length} ${k.replace('-lpm-synth', '')}`).join(', ')}) onto ${records.size} existing German records:`)
 w('-- the 2026 trial Lehrplan editions for Biologie and Mensch-Natur-Technik in Thüringen (from the two-pass concept tagging of 2 Nov), KMK strategy and Abitur texts, and state records on subjects and cross-subject work.')
-w('-- All of it is AI-drafted and has not been reviewed by a person. The relation type starts with proposed_, which the views show as "AI-drafted, unconfirmed".')
+w('-- The first reading drafted 37 links and a second reading, done by the same working session, dropped 12. The relation type starts with proposed_, which the views show as unconfirmed.')
 w('-- A person confirms, edits or removes each one. No record, view, role or repository link is created or changed here.')
 w('--')
 w('-- To undo: delete the rows with these (part, record) pairs from curriculum_repository_links (only rows whose relation_type starts with proposed_):')
