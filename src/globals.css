@@ -823,10 +823,9 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 /* ---- first-visit text (lib/start-here.ts): the public home page and the
    "Start here" card on the project list. Colors come from the shared tokens. ---- */
 .home-section { margin-bottom: 40px; }
-.home-draft-line {
-  max-width: 640px; margin: 20px auto 0; padding: 8px 12px; font-size: 13px;
-  color: var(--warning-text); border: 1px dashed var(--warning); border-radius: var(--radius);
-}
+/* The lead narrative: a few short paragraphs, left-aligned for easy reading. */
+.home-lead { max-width: 680px; margin: 0 auto 24px; text-align: left; font-size: 16px; }
+.home-lead p { margin: 0 0 12px; }
 .home-models { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .home-model { display: flex; flex-direction: column; gap: 6px; }
 .home-model h3 { margin: 0; }
@@ -851,10 +850,6 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .start-here-title { flex: 1; font-weight: 600; font-size: 15px; }
 .start-here-body { padding: 0 16px 16px; border-top: 1px solid var(--border); }
 .start-here-body h3 { font-size: 15px; margin: 16px 0 6px; }
-.start-here-draft {
-  margin: 12px 0; padding: 8px 12px; font-size: 13px; color: var(--warning-text);
-  border: 1px dashed var(--warning); border-radius: var(--radius);
-}
 .start-here-models { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .start-here-model { padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius); }
 .start-here-model-cross-subject { border-color: var(--series-a); }

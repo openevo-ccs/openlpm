@@ -14,13 +14,14 @@ import { useSession } from '@/state/session'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { OpenEvoAttribution } from '@/components/openevo-mark'
 import {
-  AI_DRAFT_DETAIL,
-  AI_DRAFT_LINE,
   FOUR_MODELS,
+  HOME_HEADLINE,
+  LEAD_PARAGRAPHS,
+  MODELS_INTRO,
+  MODELS_TITLE,
+  PROGRESSION_GLOSS,
   STARTING_POINTS,
-  WHAT_IT_IS,
-  WHY_MADE_UP,
-  WHY_MADE_UP_TITLE,
+  TOOLKIT_LINE,
 } from '@/lib/start-here'
 
 const AUDIENCES = [
@@ -108,28 +109,25 @@ export default function HomePage() {
       <section className="home-hero">
         <div className="page page-narrow" style={{ textAlign: 'center', padding: '56px 24px' }}>
           <span className="chip" style={{ marginBottom: 16 }}>Open source · Free to use</span>
-          <h1 style={{ fontSize: 34, marginTop: 14 }}>Learning progressions you can build, compare and test</h1>
-          <p className="muted" style={{ fontSize: 16, maxWidth: 640, margin: '0 auto 20px' }}>
-            {WHAT_IT_IS}
-          </p>
+          <h1 style={{ fontSize: 34, marginTop: 14 }}>{HOME_HEADLINE}</h1>
+          <div className="home-lead">
+            {LEAD_PARAGRAPHS.map((text) => <p key={text}>{text}</p>)}
+            <p><strong>{TOOLKIT_LINE}</strong></p>
+          </div>
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login?mode=signup'}>
               {session ? 'Go to dashboard' : 'Create an account'}
             </Link>
             {!session && <Link className="btn" to="/auth/login">Sign in</Link>}
           </div>
-          <p className="home-draft-line" role="note">
-            <strong>{AI_DRAFT_LINE}.</strong> {AI_DRAFT_DETAIL}
-          </p>
         </div>
       </section>
 
       <main className="page page-narrow">
         <section className="home-section" aria-labelledby="home-models">
-          <h2 id="home-models" style={{ textAlign: 'center', marginBottom: 4 }}>Four models to compare</h2>
-          <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>
-            Three models follow one school subject each. The fourth follows the same big ideas across subjects.
-          </p>
+          <h2 id="home-models" style={{ textAlign: 'center', marginBottom: 4 }}>{MODELS_TITLE}</h2>
+          <p className="muted" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 8px' }}>{PROGRESSION_GLOSS}</p>
+          <p className="muted" style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto 20px' }}>{MODELS_INTRO}</p>
           <div className="home-models">
             {FOUR_MODELS.map((m) => (
               <div className={`card home-model home-model-${m.kind}`} key={m.slug}>
@@ -139,11 +137,6 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className="home-section" aria-labelledby="home-why">
-          <h2 id="home-why" style={{ textAlign: 'center', marginBottom: 12 }}>{WHY_MADE_UP_TITLE}</h2>
-          <p style={{ maxWidth: 680, margin: '0 auto' }}>{WHY_MADE_UP}</p>
         </section>
 
         <section className="home-section" aria-labelledby="home-first">

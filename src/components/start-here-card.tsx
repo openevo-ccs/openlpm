@@ -2,12 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronRight, Compass } from 'lucide-react'
 import {
-  AI_DRAFT_DETAIL,
-  AI_DRAFT_LINE,
   FOUR_MODELS,
-  WHAT_IT_IS,
-  WHY_MADE_UP,
-  WHY_MADE_UP_TITLE,
+  MODELS_INTRO,
+  MODELS_TITLE,
+  PROGRESSION_GLOSS,
+  TOOLKIT_LINE,
   resolveStartingPoints,
 } from '@/lib/start-here'
 
@@ -61,12 +60,10 @@ export function StartHereCard({ slugs }: { slugs: ReadonlySet<string> }) {
 
       {!collapsed && (
         <div id="start-here-body" className="start-here-body">
-          <p className="start-here-draft" role="note">
-            <strong>{AI_DRAFT_LINE}.</strong> {AI_DRAFT_DETAIL}
-          </p>
-          <p>{WHAT_IT_IS}</p>
+          <p>{TOOLKIT_LINE} {PROGRESSION_GLOSS}</p>
 
-          <h3>The four models</h3>
+          <h3>{MODELS_TITLE}</h3>
+          <p className="muted">{MODELS_INTRO}</p>
           <div className="start-here-models">
             {FOUR_MODELS.map((m) => (
               <div key={m.slug} className={`start-here-model start-here-model-${m.kind}`}>
@@ -75,9 +72,6 @@ export function StartHereCard({ slugs }: { slugs: ReadonlySet<string> }) {
               </div>
             ))}
           </div>
-
-          <h3>{WHY_MADE_UP_TITLE}</h3>
-          <p>{WHY_MADE_UP}</p>
 
           <h3>Three places to look first</h3>
           <ol className="start-here-points">

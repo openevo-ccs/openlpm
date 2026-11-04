@@ -4,12 +4,23 @@
 // Words here are for people who have never seen OpenLPM, so they avoid
 // internal vocabulary.
 
-export const AI_DRAFT_LINE = 'AI-drafted, awaiting expert review'
-export const AI_DRAFT_DETAIL =
-  'An AI drafted the four models and their links to sources and curricula. No subject expert has checked them yet. Treat every statement as a proposal.'
+export const HOME_HEADLINE = 'Curricula are cultural models of human learning'
 
-export const WHAT_IT_IS =
-  'OpenLPM is a free, open workspace for building learning progressions. A learning progression describes how a person’s understanding of an idea can grow step by step, from the first school years to the end of school. Researchers, teachers and curriculum planners can write progressions down, link each step to the research behind it, compare them with official curricula, and improve them as classroom experience comes in.'
+// The lead narrative of the public home page, one paragraph per entry.
+export const LEAD_PARAGRAPHS: string[] = [
+  'A curriculum is a model of how people learn. Ministries, textbook authors and teachers built it over generations, inside the limits of the classroom: a fixed number of hours, one teacher, a class of about 30, assessments, and boundaries between subjects. It was built to be teachable and testable. It was never meant to hold everything research knows about how people learn.',
+  'Research and computational methods can help us find new directions for this work. Those directions may help education navigate the changes it faces across the world, across diverse communities and for individual learners.',
+]
+
+export const TOOLKIT_LINE =
+  'OpenLPM is an open toolkit where teachers, researchers and AI collaborators build, compare and improve learning progression models and curriculum records together.'
+
+export const PROGRESSION_GLOSS =
+  'A learning progression model describes how understanding of an idea can grow step by step, from the first school years to the end of school.'
+
+export const MODELS_TITLE = 'Four models for controlled comparison'
+export const MODELS_INTRO =
+  'The four models share one drafting method and one format. They differ in a design assumption, so a difference you find can be traced back to that choice. Three follow one school subject each, and the fourth follows shared ideas across subjects.'
 
 export interface ModelBlurb {
   slug: string
@@ -23,31 +34,27 @@ export const FOUR_MODELS: ModelBlurb[] = [
     slug: 'bio-core-lpm-synth',
     name: 'Bio-Core',
     kind: 'one-subject',
-    text: 'Follows biology as a school subject of its own. It shows how ideas about life, inheritance and evolution build on each other when biology is taught by itself.',
+    text: 'Treats biology as a subject of its own and explains evolution in population-level words only, leaving out what individual organisms do. It shows how a curriculum looks when that single assumption shapes every step.',
   },
   {
     slug: 'social-core-lpm-synth',
     name: 'Social-Core',
     kind: 'one-subject',
-    text: 'Follows the social sciences as one subject. It shows how ideas about groups, norms and institutions build up when they are taught by themselves.',
+    text: 'Treats the social sciences as a subject of its own, with words for groups, norms, cooperation and conflict and nothing borrowed from biology or computing. It shows what that vocabulary does to the order and connections of ideas.',
   },
   {
     slug: 'computational-core-lpm-synth',
     name: 'Computational-Core',
     kind: 'one-subject',
-    text: 'Follows computing and computational thinking as one subject. It shows how ideas about models, data and algorithms build up when they are taught by themselves.',
+    text: 'Treats computing as a subject of its own, with words for data, algorithms, systems and models, and no intentions credited to machines. It shows what that vocabulary does to the order and connections of ideas.',
   },
   {
     slug: 'interdisciplinary-lpm-synth',
     name: 'Interdisciplinary',
     kind: 'cross-subject',
-    text: 'Follows the same big ideas across several subjects at once, for example information, cooperation and change in biology, social studies and computing. It shows what changes when ideas are designed to connect.',
+    text: 'Defines shared ideas such as information, adaptation and selection across several fields at once, with a note on what does not carry over from field to field. It shows what changes when a curriculum is designed to connect subjects.',
   },
 ]
-
-export const WHY_MADE_UP_TITLE = 'Why these models are made up'
-export const WHY_MADE_UP =
-  'The four models are thought experiments. An AI drafted them to make one question visible: what changes for learners when a curriculum is designed around single subjects, compared with one designed across subjects? They are meant for comparison. Nobody should read them as a proposal for what schools must teach. Their value comes from setting them next to the official curriculum documents of Germany, India and the United States, and seeing where each model fits and where it leaves gaps.'
 
 export interface StartingPoint {
   key: string

@@ -16,12 +16,23 @@ await build({ entryPoints: [path.join(root, 'src/lib/start-here.ts')], bundle: t
 const S = await import(pathToFileURL(out).href)
 process.on('exit', () => rmSync(dir, { recursive: true, force: true }))
 
-const allText = () => [S.AI_DRAFT_LINE, S.AI_DRAFT_DETAIL, S.WHAT_IT_IS, S.WHY_MADE_UP_TITLE, S.WHY_MADE_UP,
+const allText = () => [S.HOME_HEADLINE, ...S.LEAD_PARAGRAPHS, S.TOOLKIT_LINE, S.PROGRESSION_GLOSS, S.MODELS_TITLE, S.MODELS_INTRO,
   ...S.FOUR_MODELS.flatMap((m) => [m.name, m.text]),
-  ...S.STARTING_POINTS.flatMap((p) => [p.title, p.text, p.spaceName])].join('\n')
+  ...S.STARTING_POINTS.flatMap((p) => [p.title, p.text, p.spaceName])].join(' ')
 
-test('the standing line says the content is AI-drafted and awaiting expert review', () => {
-  assert.equal(S.AI_DRAFT_LINE, 'AI-drafted, awaiting expert review')
+test('the lead narrative names the classroom limits and the toolkit', () => {
+  const lead = S.LEAD_PARAGRAPHS.join(' ')
+  for (const word of ['ministries', 'textbook authors', 'teachers', 'hours', 'one teacher', 'about 30', 'assessments', 'subjects', 'teachable and testable']) {
+    assert.ok(new RegExp(word, 'i').test(lead), `lead narrative lacks "${word}"`)
+  }
+  assert.match(S.TOOLKIT_LINE, /teachers, researchers and AI collaborators/)
+})
+
+test('no blanket statement about AI drafting or missing review (status is shown per record by the app)', () => {
+  const text = allText()
+  for (const bad of [/AI-drafted/i, /awaiting expert/i, /no (subject )?expert/i, /not (yet )?(been )?reviewed/i, /thought experiment/i, /made up/i]) {
+    assert.ok(!bad.test(text), `matches ${bad}`)
+  }
 })
 
 test('three one-subject models and one cross-subject model, in the comparison set order', () => {
