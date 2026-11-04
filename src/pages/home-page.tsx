@@ -13,6 +13,15 @@ import {
 import { useSession } from '@/state/session'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { OpenEvoAttribution } from '@/components/openevo-mark'
+import {
+  AI_DRAFT_DETAIL,
+  AI_DRAFT_LINE,
+  FOUR_MODELS,
+  STARTING_POINTS,
+  WHAT_IT_IS,
+  WHY_MADE_UP,
+  WHY_MADE_UP_TITLE,
+} from '@/lib/start-here'
 
 const AUDIENCES = [
   {
@@ -98,23 +107,62 @@ export default function HomePage() {
 
       <section className="home-hero">
         <div className="page page-narrow" style={{ textAlign: 'center', padding: '56px 24px' }}>
-          <span className="chip" style={{ marginBottom: 16 }}>Open source · Free for schools, universities, and ministries</span>
-          <h1 style={{ fontSize: 34, marginTop: 14 }}>Collaborative Learning Progression Management</h1>
-          <p className="muted" style={{ fontSize: 16, maxWidth: 600, margin: '0 auto 24px' }}>
-            A free, open platform for researchers, teachers, and curriculum policy makers to build learning
-            progressions together, and keep improving them as classroom experience comes in.
+          <span className="chip" style={{ marginBottom: 16 }}>Open source · Free to use</span>
+          <h1 style={{ fontSize: 34, marginTop: 14 }}>Learning progressions you can build, compare and test</h1>
+          <p className="muted" style={{ fontSize: 16, maxWidth: 640, margin: '0 auto 20px' }}>
+            {WHAT_IT_IS}
           </p>
           <div className="row" style={{ justifyContent: 'center' }}>
             <Link className="btn btn-primary" to={session ? '/dashboard' : '/auth/login?mode=signup'}>
-              {session ? 'Go to dashboard' : 'Start collaborating'}
+              {session ? 'Go to dashboard' : 'Create an account'}
             </Link>
+            {!session && <Link className="btn" to="/auth/login">Sign in</Link>}
           </div>
+          <p className="home-draft-line" role="note">
+            <strong>{AI_DRAFT_LINE}.</strong> {AI_DRAFT_DETAIL}
+          </p>
         </div>
       </section>
 
       <main className="page page-narrow">
-        <section style={{ marginBottom: 36 }}>
-          <h2 style={{ textAlign: 'center', marginBottom: 4 }}>Built for research, teaching, and policy together</h2>
+        <section className="home-section" aria-labelledby="home-models">
+          <h2 id="home-models" style={{ textAlign: 'center', marginBottom: 4 }}>Four models to compare</h2>
+          <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>
+            Three models follow one school subject each. The fourth follows the same big ideas across subjects.
+          </p>
+          <div className="home-models">
+            {FOUR_MODELS.map((m) => (
+              <div className={`card home-model home-model-${m.kind}`} key={m.slug}>
+                <span className="chip">{m.kind === 'one-subject' ? 'One subject' : 'Across subjects'}</span>
+                <h3>{m.name}</h3>
+                <p className="muted">{m.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-section" aria-labelledby="home-why">
+          <h2 id="home-why" style={{ textAlign: 'center', marginBottom: 12 }}>{WHY_MADE_UP_TITLE}</h2>
+          <p style={{ maxWidth: 680, margin: '0 auto' }}>{WHY_MADE_UP}</p>
+        </section>
+
+        <section className="home-section" aria-labelledby="home-first">
+          <h2 id="home-first" style={{ textAlign: 'center', marginBottom: 4 }}>Three places to look first</h2>
+          <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>
+            After you sign in, your project list opens with a short guide and a link to each of these.
+          </p>
+          <ol className="home-points">
+            {STARTING_POINTS.map((p) => (
+              <li className="card" key={p.key}>
+                <h3>{p.title}</h3>
+                <p className="muted">{p.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="home-section" aria-labelledby="home-built-for">
+          <h2 id="home-built-for" style={{ textAlign: 'center', marginBottom: 4 }}>Built for research, teaching, and policy together</h2>
           <p className="muted" style={{ textAlign: 'center', marginBottom: 20 }}>
             Each group gets what it needs from the same shared learning progression.
           </p>
@@ -131,6 +179,7 @@ export default function HomePage() {
           </div>
         </section>
 
+        <h2 style={{ textAlign: 'center', marginBottom: 16 }}>What else the platform does</h2>
         <section className="grid grid-2" style={{ marginBottom: 24 }}>
           {FEATURES.map(({ icon: Icon, color, title, text }) => (
             <div className="card home-feature-card" key={title}>
@@ -145,7 +194,7 @@ export default function HomePage() {
       </main>
 
       <footer className="page page-narrow muted" style={{ textAlign: 'center', paddingTop: 0 }}>
-        <p style={{ marginBottom: 10 }}>© 2026 OpenLPM · Open source, self-hostable, free</p>
+        <p style={{ marginBottom: 10 }}>© 2026 OpenLPM · Open source and free to use</p>
         <OpenEvoAttribution />
       </footer>
     </div>
