@@ -216,7 +216,7 @@ function BeurteilenTab({
     <div>
       <p className="muted" style={{ maxWidth: 720 }}>
         Zu jedem gemerkten Lernziel schlägt EvoMentor Verknüpfungen zu Basiskonzepten vor. Beurteile jede Verknüpfung, die du dir ansiehst,
-        nach drei Kriterien. Du musst nicht alle beurteilen. Beurteile die, für die du eine begründete Meinung hast.
+        nach vier Kriterien. Du musst nicht alle beurteilen. Beurteile die, für die du eine begründete Meinung hast.
       </p>
       {starredTopics.map((t) => (
         <LernzielCard
@@ -355,6 +355,7 @@ function LinkJudgmentRow({
       basiskonzept_id: basiskonzeptId,
       correctness: p.correctness ?? null,
       own_knowledge: p.own_knowledge ?? null,
+      relevance_level: p.relevance_level ?? null,
       didactic_relevance: p.didactic_relevance ?? null,
       note: noteRef.current,
       ...patch,

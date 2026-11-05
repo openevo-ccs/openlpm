@@ -54,6 +54,22 @@ export function bkEntries(content: unknown): BkbEntry[] {
   return ((content as any)?.basiskonzeptbezug ?? []) as BkbEntry[]
 }
 
+// The Konzeptanker definition from EvoMentor DE v1.2's own tooltip text
+// (apps/evomentor_de_v1_2.html's KONZEPTANKER_DEF constant), word for word.
+export const KONZEPTANKER_DEF = 'ein Lernziel, das einen besonders konkreten, anschaulichen Einstiegspunkt in ein Basiskonzept bildet.'
+
+/**
+ * The Basiskonzept entries for which this goal is a Konzeptanker: the goal is
+ * flagged ist_konzeptanker and the entry is rated hoch (3/3). Every goal carries
+ * an entry for all six concepts, so the flag alone does not say which concept
+ * the goal anchors (feedback 2026-10-01, the Konzeptanker table showing one
+ * number everywhere). Empty when the goal is not a Konzeptanker.
+ */
+export function konzeptankerEntries(content: unknown): BkbEntry[] {
+  if (!(content as any)?.ist_konzeptanker) return []
+  return bkEntries(content).filter((e) => e.relevanz_beurteilung === 3)
+}
+
 // Shared with prompt-generator-page.tsx's own original fix (2026-09-30):
 // the six-Basiskonzept ids inside content.basiskonzeptbezug are EvoMentor
 // DE's own original identifiers baked into the imported curriculum data --

@@ -40,6 +40,9 @@ export interface ActivityEvent {
 export const JUDGMENT_CRITERIA = [
   { key: 'correctness', label: 'Fachliche Korrektheit', hint: 'Stimmt die Verknüpfung fachlich?' },
   { key: 'own_knowledge', label: 'Beitrag zum eigenen Fachwissen', hint: 'Habe ich dadurch etwas Neues oder Genaueres verstanden?' },
+  // Feedback 2a531174 (Susan, 2026-11-04): the relevance level the tool suggests
+  // (niedrig, mittel, hoch) had no question of its own. This one asks about that level.
+  { key: 'relevance_level', label: 'Relevanzstufe', hint: 'Passt die vorgeschlagene Einstufung (niedrig, mittel oder hoch) für dieses Basiskonzept?' },
   { key: 'didactic_relevance', label: 'Didaktische Relevanz', hint: 'Hilft die Verknüpfung, den Unterricht zu planen?' },
 ] as const
 
