@@ -62,7 +62,7 @@ export interface HandIn {
     basiskonzept: string
     curriculum_relevance: number | null
     curriculum_rationale: string | null
-    ratings: { correctness: number | null; own_knowledge: number | null; didactic_relevance: number | null }
+    ratings: { correctness: number | null; own_knowledge: number | null; relevance_level: number | null; didactic_relevance: number | null }
     note: string
     updated_at: string
   }[]
@@ -98,6 +98,7 @@ export function buildHandIn(input: HandInInput): HandIn {
       ratings: {
         correctness: (p.correctness as number | undefined) ?? null,
         own_knowledge: (p.own_knowledge as number | undefined) ?? null,
+        relevance_level: (p.relevance_level as number | undefined) ?? null,
         didactic_relevance: (p.didactic_relevance as number | undefined) ?? null,
       },
       note: ((p.note as string | undefined) ?? '').trim(),
@@ -178,7 +179,7 @@ export function buildHandIn(input: HandInInput): HandIn {
 /** Participant-facing summary of what will be in the files, shown before the download. */
 export function describeHandIn(h: HandIn): { label: string; value: string }[] {
   const rated = h.link_judgments.filter(
-    (j) => j.ratings.correctness != null && j.ratings.own_knowledge != null && j.ratings.didactic_relevance != null
+    (j) => j.ratings.correctness != null && j.ratings.own_knowledge != null && j.ratings.relevance_level != null && j.ratings.didactic_relevance != null
   ).length
   return [
     { label: 'Dein Teilnahme-Code (ersetzt deinen Namen)', value: h.participant_code },
@@ -187,7 +188,7 @@ export function describeHandIn(h: HandIn): { label: string; value: string }[] {
       ? [{ label: 'Thema', value: h.topic.own_topic || h.topic.favorite_themes.join(', ') }]
       : []),
     { label: 'Gemerkte Lernziele', value: String(h.starred_lernziele.length) },
-    { label: 'Beurteilte Verknüpfungen (alle drei Kriterien)', value: `${rated} von ${h.link_judgments.length}` },
+    { label: 'Beurteilte Verknüpfungen (alle vier Kriterien)', value: `${rated} von ${h.link_judgments.length}` },
     { label: 'Eigene ergänzte Verknüpfungen', value: String(h.link_proposals.length) },
     ...(h.topic_basiskonzepte.length ? [{ label: 'Basiskonzepte zum Thema', value: String(h.topic_basiskonzepte.length) }] : []),
     ...(h.cross_cutting.length ? [{ label: 'Querschnittsaufgaben', value: String(h.cross_cutting.length) }] : []),
