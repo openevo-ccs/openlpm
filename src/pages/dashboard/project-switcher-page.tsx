@@ -7,6 +7,7 @@ import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectW
 import { listAllProjects } from '@/lib/supabase/admin-users'
 import { listMyPendingRequests, respondToMemberRequest, type PendingRequestForUser } from '@/lib/supabase/members'
 import { listMyJoinableProjects } from '@/lib/supabase/join'
+import { StartHereCard } from '@/components/start-here-card'
 
 // Admin-only: a project the admin can see exists (migration 049's directory
 // reach) but isn't personally a member of -- role is null rather than one
@@ -184,6 +185,8 @@ export default function ProjectSwitcherPage() {
           <Plus size={14} />Start new project
         </Link>
       </div>
+
+      <StartHereCard slugs={new Set(entries.map((m) => m.project.slug))} />
 
       {pendingRequests.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
