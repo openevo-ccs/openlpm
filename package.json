@@ -19,6 +19,7 @@
     "test:concept-meanings": "node scripts/test_concept_meanings.mjs",
     "test:comparison-structure": "node scripts/test_comparison_structure.mjs",
     "test:dashboard-views": "node scripts/test_dashboard_views.mjs",
+    "test:start-here": "node scripts/test_start_here.mjs",
     "test:node-links": "node scripts/test_node_links.mjs && python scripts/test_generate_node_links_migration.py",
     "read-feedback": "node scripts/read-feedback.mjs",
     "docs:check": "node scripts/check_docs_freshness.mjs",
