@@ -17,6 +17,7 @@ import TourEditorPage from '@/pages/dashboard/tour-editor-page'
 import NewProjectWizard from '@/pages/dashboard/new-project-wizard'
 import LiteraturePage from '@/pages/dashboard/literature-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
+import ConceptMeaningsPage from '@/pages/dashboard/concept-meanings-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
 import CalendarPage from '@/pages/dashboard/calendar-page'
@@ -129,6 +130,8 @@ export default function App() {
           <Route index element={<ProjectSwitcherPage />} />
           <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="concept-meanings" element={<ConceptMeaningsPage />} />
+          <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsPage />} />
           <Route path="admin/feedback" element={<AdminFeedbackPage />} />
           <Route path="admin/users" element={<AdminUsersPage />} />
           <Route path="admin/explore" element={<AdminBaseRepoExplorerPage />} />

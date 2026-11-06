@@ -16,6 +16,7 @@
     "test:draft-links": "node scripts/test_draft_links.mjs",
     "test:review-state": "node scripts/test_review_state.mjs",
     "test:concept-source": "node scripts/test_concept_source.mjs",
+    "test:concept-meanings": "node scripts/test_concept_meanings.mjs",
     "test:comparison-structure": "node scripts/test_comparison_structure.mjs",
     "test:dashboard-views": "node scripts/test_dashboard_views.mjs",
     "test:start-here": "node scripts/test_start_here.mjs",

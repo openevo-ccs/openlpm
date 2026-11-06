@@ -4,7 +4,7 @@ import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { Anchor, Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, KONZEPTANKER_DEF, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
@@ -20,10 +20,8 @@ function cssVar(name: string, fallback: string) {
 }
 const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--map-6']
 
-// The real, field-verified Konzeptanker definition, from EvoMentor DE
-// v1.2's own tooltip text (apps/evomentor_de_v1_2.html's KONZEPTANKER_DEF
-// constant) -- not paraphrased.
-const KONZEPTANKER_DEF = 'ein Lernziel, das einen besonders konkreten, anschaulichen Einstiegspunkt in ein Basiskonzept bildet.'
+// The Konzeptanker definition (EvoMentor DE v1.2's own tooltip text) now lives
+// in the shared lib so the Lernziele page shows the same words.
 
 // Added 2026-09-30: this page had no explanation anywhere of why teaching is
 // organized around Basiskonzepte at all. Short, plain-language rationale +
