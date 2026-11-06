@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
+import { Anchor, ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
+  compareTopicsByCurriculumOrder,
+  descriptionBelowTitle,
   getFullThread,
   getThreadStationsForTopic,
   listTopicContents,
@@ -11,12 +13,15 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
-import { bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, KONZEPTANKER_DEF, konzeptankerEntries, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
+import { logStudentEvent } from '@/lib/supabase/student-work'
 import type { Database } from '@/lib/supabase/database.types'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
-import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
+import { goalMethodKey, listFavoriteGoalMethods, listFavoriteIds, listFavoriteMethodKeys, toggleFavorite, toggleFavoriteGoalMethod, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listMethodLernzielLinks, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
+import { CurriculumSourceCard } from '@/components/curriculum-source-card'
 
 // The German, student-facing Lernziele explorer -- same real data as the
 // researcher Learning Goals page (same listTopics/getTopic/thread helpers),
@@ -28,16 +33,6 @@ import { listFavoriteIds, toggleFavorite } from '@/lib/supabase/favorites'
 
 function gradeChipLabel(g: string): string {
   return `Kl. ${g}`
-}
-
-// Real Thuringia curriculum structure, named directly by Susan Hanisch
-// (feedback 2026-10-01): grades 5/6 and 7/8 are taught as one combined band,
-// not as six separate single-grade steps -- Kl.9 and Kl.10 stay their own
-// band. Grouping happens purely in this filter UI; `grade_band` itself still
-// stores a single real grade per Lernziel, so no data migration is needed.
-const GRADE_BAND_KEY: Record<string, string> = { '5': '5/6', '6': '5/6', '7': '7/8', '8': '7/8' }
-function bandKeyForGrade(g: string): string {
-  return GRADE_BAND_KEY[g] ?? g
 }
 
 const RELEVANCE_LEVELS = [1, 2, 3] as const
@@ -59,7 +54,9 @@ const RELEVANCE_LEVEL_LABEL: Record<number, string> = { 1: 'niedrig', 2: 'mittel
 // present in the real data if no library resolves for this project (same
 // "never offer an option that matches nothing real" spirit as the original
 // hardcoded list's own comment).
-const METHOD_ICON: Record<string, string> = {
+// Exported for learning-goals-page.tsx's researcher-facing Methods tab, so
+// the two don't drift into separate icon sets for the same vocabulary.
+export const METHOD_ICON: Record<string, string> = {
   'Forschendes Lernen': '🔬', 'Analogien und Vergleiche': '🔗', 'Konzeptuelles Lernen': '🧩',
   '(bioethische) Diskussion': '💬', 'Narrativer Zugang': '📖', 'Modelle und Simulationen': '🧪',
   'Erfahrungs-/handlungsorientiertes Lernen': '🖐️', 'Digitale Medien': '💻', 'Recherche': '📚',
@@ -102,10 +99,12 @@ type ViewMode = 'cards' | 'list'
 // see that migration's own header for the full method. Items with no
 // sequence value (a different project, or content this project adds
 // outside the sourced curriculum) sort to the end rather than disappearing.
+//
+// Grade bands such as "5/6" and "7/8" are stored as one value, so one sequence
+// runs through the whole band (feedback 5488cd15, 69fd982f, 2026-10-30). The
+// comparison itself lives in curriculum.ts and is the same one listTopics uses.
 function sortByCurriculumOrder(items: TopicListItem[]): TopicListItem[] {
-  const grade = (t: TopicListItem) => parseInt(t.grade_band ?? '', 10) || 0
-  const seq = (t: TopicListItem) => t.curriculum_sequence ?? Infinity
-  return [...items].sort((a, b) => grade(a) - grade(b) || seq(a) - seq(b))
+  return [...items].sort(compareTopicsByCurriculumOrder)
 }
 
 // Real feedback 2026-10-01 (Susan): the space above the card grid was just
@@ -182,7 +181,7 @@ function exportLernzieleMarkdown(list: TopicListItem[], contentById: Map<string,
 }
 
 export default function StudentLernzielePage() {
-  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, defaultBranchId, supabase, role } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
   const navigate = useNavigate()
 
@@ -196,6 +195,10 @@ export default function StudentLernzielePage() {
   // entry here doesn't constrain the result at all -- same as the old
   // presence-only checkbox being unchecked.
   const [conceptLevels, setConceptLevels] = useState<Map<string, Set<number>>>(new Map())
+  // Feedback 7b1de182 (Susan, 2026-11-04): show only the Konzeptanker of a
+  // Basiskonzept. Root ids that are narrowed to their Konzeptanker. Only
+  // meaningful while the concept itself is ticked in conceptLevels.
+  const [anchorOnly, setAnchorOnly] = useState<Set<string>>(new Set())
   // Real feedback 2026-10-01 (Susan): "add option to filter by/select-
   // deselect didactic methods (which should be coded in the knowledge
   // graph)" -- they already are (content.didaktische_strategien.
@@ -205,6 +208,18 @@ export default function StudentLernzielePage() {
   const [methodFilter, setMethodFilter] = useState<Set<string>>(new Set())
   const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  // Real feedback 910b0c18 (Susan, repeat ask): favoriting a method already
+  // existed for the AI Prompt Generator's own checklist (user_favorite_methods,
+  // migration 077) but was never wired into this page's method filter or the
+  // inline per-goal "Didaktische Strategien" list -- same data, just missing
+  // from these two render sites.
+  const [favoriteMethods, setFavoriteMethods] = useState<Set<string>>(new Set())
+  // Real feedback 3f22dcd5 (Susan): the per-goal method SUGGESTION star
+  // (inside Didaktische Strategien) needed its own, learning-goal-scoped
+  // favorite instead of reusing favoriteMethods above (which stays exactly
+  // what it was -- the sidebar filter's general, not-tied-to-one-goal
+  // favorite). Composite `${objectId}::${method}` keys, see favorites.ts.
+  const [favoriteGoalMethods, setFavoriteGoalMethods] = useState<Set<string>>(new Set())
   const [rootConcepts, setRootConcepts] = useState<{ id: string; label: string }[]>([])
   // Every schema element (root Basiskonzepte AND their real sub-concepts),
   // keyed by id -- resolves relevante_unterkonzepte_taxonomie[].
@@ -222,15 +237,38 @@ export default function StudentLernzielePage() {
   // Empty until the project's prompt library resolves; the filter falls
   // back to whatever methods are actually tagged in the real data below.
   const [libraryMethods, setLibraryMethods] = useState<string[]>([])
+  // Real feedback ee644d5d (Susan): the researcher-facing Methods tab
+  // (learning-goals-page.tsx) could confirm a MethodsBase-backed method as
+  // applying to a Lernziel, but that confirmation never reached this page's
+  // own method filter or per-goal "Didaktische Strategien" list -- those
+  // still only ever read the original, static top3_methoden[] import.
+  // Fetched project-wide once, same convention as the other favorite/
+  // vocabulary lookups above; only 'confirmed' links are ever shown to a
+  // student, same rule the Methods tab itself follows.
+  const [methodLernzielLinks, setMethodLernzielLinks] = useState<MethodLernzielLink[]>([])
 
   useEffect(() => {
     setTopics(null)
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
     listFavoriteIds(supabase).then(setFavorites)
+    listFavoriteMethodKeys(supabase).then(setFavoriteMethods)
+    listFavoriteGoalMethods(supabase).then(setFavoriteGoalMethods)
     getRootConcepts(supabase, project).then(setRootConcepts)
     getConceptElementsById(supabase, project).then(setConceptElementsById)
     getLibraryForProject(supabase, project).then((lib) => setLibraryMethods(lib ? resolveOptionLists(lib.option_lists).methods : []))
+    listMethodLernzielLinks(supabase, project.id).then(setMethodLernzielLinks)
   }, [supabase, project.id, defaultBranchId])
+
+  const confirmedMethodsByLernziel = useMemo(() => {
+    const m = new Map<string, MethodLernzielLink[]>()
+    for (const l of methodLernzielLinks) {
+      if (l.status !== 'confirmed') continue
+      const arr = m.get(l.lernziel_id) ?? []
+      arr.push(l)
+      m.set(l.lernziel_id, arr)
+    }
+    return m
+  }, [methodLernzielLinks])
 
   // The list view deliberately doesn't carry `content` (300+ rows), but
   // per-concept relevance dots need it -- one bulk query for every topic's
@@ -247,11 +285,38 @@ export default function StudentLernzielePage() {
   useEffect(() => {
     if (!objectId || !topics) return
     setExpandedIds((prev) => (prev.has(objectId) ? prev : new Set(prev).add(objectId)))
-    const raf = requestAnimationFrame(() => {
-      document.getElementById(`lz-card-${objectId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    })
-    return () => cancelAnimationFrame(raf)
   }, [objectId, topics])
+
+  // Feedback 6dc15b4c (Susan, 2026-11-04): after tapping a goal in the Netz the
+  // card opened but the page did not show it. Cause (reproduced live): the
+  // single smooth scroll ran before the other cards had their final height
+  // (the relevance dots and expanded detail arrive afterwards), so it stopped
+  // far above the target. Now the page scrolls once the goal contents have
+  // loaded, jumps instead of gliding, and re-checks twice while the layout
+  // settles. Any wheel, touch or key press by the student cancels the re-checks.
+  useEffect(() => {
+    if (!objectId || !topics || contentById.size === 0) return
+    let cancelled = false
+    const timers: number[] = []
+    const scrollToCard = () => {
+      if (cancelled) return
+      document.getElementById(`lz-card-${objectId}`)?.scrollIntoView({ behavior: 'auto', block: 'start' })
+    }
+    const cancel = () => { cancelled = true }
+    window.addEventListener('wheel', cancel, { once: true, passive: true })
+    window.addEventListener('touchstart', cancel, { once: true, passive: true })
+    window.addEventListener('keydown', cancel, { once: true })
+    const raf = requestAnimationFrame(scrollToCard)
+    for (const ms of [250, 900]) timers.push(window.setTimeout(scrollToCard, ms))
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+      timers.forEach((t) => window.clearTimeout(t))
+      window.removeEventListener('wheel', cancel)
+      window.removeEventListener('touchstart', cancel)
+      window.removeEventListener('keydown', cancel)
+    }
+  }, [objectId, topics, contentById.size > 0])
 
   const allBkIds = useMemo(() => {
     const ids = new Set<string>()
@@ -353,21 +418,29 @@ export default function StudentLernzielePage() {
       if (favoritesOnly && !favorites.has(t.id)) return false
       if (conceptLevels.size > 0) {
         const entries = bkEntries(contentById.get(t.id))
+        const anchorIds = new Set(konzeptankerEntries(contentById.get(t.id)).map((e) => e.basiskonzept_id))
         const passes = entries.some((e) => {
           const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
           const levels = conceptLevels.get(rootKey)
-          return levels && levels.has(e.relevanz_beurteilung)
+          if (!levels) return false
+          // "nur Konzeptanker" for this concept: the goal must anchor exactly this concept.
+          if (anchorOnly.has(rootKey)) return anchorIds.has(e.basiskonzept_id)
+          return levels.has(e.relevanz_beurteilung)
         })
         if (!passes) return false
       }
       if (methodFilter.size > 0) {
         const methoden: string[] = ((contentById.get(t.id) as any)?.didaktische_strategien?.top3_methoden ?? []).map((m: any) => m?.methode)
-        if (!methoden.some((m) => methodFilter.has(m))) return false
+        // Real feedback ee644d5d (Susan): a method confirmed via the
+        // researcher Methods tab (not originally part of top3_methoden)
+        // still needs to match this filter, not just the static import.
+        const confirmedKeys = (confirmedMethodsByLernziel.get(t.id) ?? []).map((l) => l.method_key)
+        if (!methoden.some((m) => methodFilter.has(m)) && !confirmedKeys.some((m) => methodFilter.has(m))) return false
       }
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, methodFilter, contentById, rawIdToGroupKey])
+  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, anchorOnly, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
 
   // A deep link (Davor/Danach, or a Netz-tab tap) can point at a Lernziel
   // the current filters would otherwise hide (different grade, excluded
@@ -394,7 +467,23 @@ export default function StudentLernzielePage() {
   const allExpanded = sortedDisplayed.length > 0 && sortedDisplayed.every((t) => expandedIds.has(t.id))
   const toggleExpandAll = () => setExpandedIds(allExpanded ? new Set() : new Set(sortedDisplayed.map((t) => t.id)))
 
+  const toggleAnchorOnly = (rootId: string) => {
+    setAnchorOnly((prev) => {
+      const next = new Set(prev)
+      if (next.has(rootId)) next.delete(rootId)
+      else next.add(rootId)
+      return next
+    })
+  }
+
   const toggleConceptAll = (rootId: string) => {
+    // Unticking a concept also drops its "nur Konzeptanker" setting.
+    setAnchorOnly((prev) => {
+      if (!prev.has(rootId)) return prev
+      const next = new Set(prev)
+      next.delete(rootId)
+      return next
+    })
     setConceptLevels((prev) => {
       const next = new Map(prev)
       if (next.has(rootId)) next.delete(rootId)
@@ -433,6 +522,30 @@ export default function StudentLernzielePage() {
       return next
     })
     await toggleFavorite(supabase, id, isFav)
+    if (role !== 'owner' && role !== 'maintainer') void logStudentEvent(supabase, project.id, 'favorite_toggled', { lernziel_id: id, now_starred: !isFav })
+  }
+
+  const onToggleFavoriteMethod = async (methodKey: string) => {
+    const isFav = favoriteMethods.has(methodKey)
+    setFavoriteMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(methodKey)
+      else next.add(methodKey)
+      return next
+    })
+    await toggleFavoriteMethod(supabase, methodKey, isFav)
+  }
+
+  const onToggleFavoriteGoalMethod = async (dataObjectId: string, methodKey: string) => {
+    const key = goalMethodKey(dataObjectId, methodKey)
+    const isFav = favoriteGoalMethods.has(key)
+    setFavoriteGoalMethods((prev) => {
+      const next = new Set(prev)
+      if (isFav) next.delete(key)
+      else next.add(key)
+      return next
+    })
+    await toggleFavoriteGoalMethod(supabase, dataObjectId, methodKey, isFav)
   }
 
   const onToggleExpand = (id: string) => {
@@ -446,17 +559,31 @@ export default function StudentLernzielePage() {
 
   return (
     <div className="student-page">
-      <h1>Lernziele</h1>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
-      </p>
+      <div data-tour="lernziele.kopf" style={{ display: 'inline-block' }}>
+        <h1>Lernziele</h1>
+        <p className="muted" style={{ marginBottom: 12 }}>
+          {topics === null ? 'Lädt…' : `${filtered.length} von ${topics.length} Lernzielen`}
+        </p>
+      </div>
+      <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="de" />
 
       <div className="student-lernziele-layout">
         <aside className="student-filters">
-          <div className="field">
+          <div className="field" data-tour="lernziele.suche">
             <div className="row"><Search size={14} style={{ color: 'var(--text-muted)' }} /><input type="search" placeholder="Suchen…" value={query} onChange={(e) => setQuery(e.target.value)} /></div>
           </div>
 
+          {/* Real feedback 9a49a60f (Susan): this used to sit at the very
+              bottom of the sidebar, below 6 Basiskonzept checkboxes AND 15
+              method checkboxes -- easy to miss, and far from the rest of the
+              "which learning goals am I looking at" controls. Moved next to
+              the search box, the first real filter a visitor sees. */}
+          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
+            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
+            <Star size={13} />nur Favoriten
+          </label>
+
+          <div data-tour="lernziele.klassenstufe">
           <p className="muted student-filter-label">KLASSENSTUFE</p>
           <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
             <button className={`chip-btn${gradeFilter.size === 0 ? ' active' : ''}`} onClick={() => { setGradeFilter(new Set()); setThemaFilter(''); setUnterthemaFilter('') }}>Alle</button>
@@ -464,9 +591,10 @@ export default function StudentLernzielePage() {
               <button key={b.key} className={`chip-btn${gradeFilter.has(b.key) ? ' active' : ''}`} onClick={() => toggleGradeBand(b.key)}>{gradeChipLabel(b.key)}</button>
             ))}
           </div>
+          </div>
 
           {themen.length > 0 && (
-            <div className="field" style={{ marginTop: 10 }}>
+            <div className="field" style={{ marginTop: 10 }} data-tour="lernziele.thema">
               <label style={{ fontSize: 11 }}>Thema</label>
               <select value={themaFilter} onChange={(e) => { setThemaFilter(e.target.value); setUnterthemaFilter('') }}>
                 <option value="">Alle Themen</option>
@@ -475,7 +603,7 @@ export default function StudentLernzielePage() {
             </div>
           )}
           {themaFilter && unterthemen.length > 0 && (
-            <div className="field">
+            <div className="field" data-tour="lernziele.unterthema">
               <label style={{ fontSize: 11 }}>Unterthema</label>
               <select value={unterthemaFilter} onChange={(e) => setUnterthemaFilter(e.target.value)}>
                 <option value="">Alle Unterthemen</option>
@@ -484,6 +612,7 @@ export default function StudentLernzielePage() {
             </div>
           )}
 
+          <div data-tour="lernziele.basiskonzepte">
           <p className="muted student-filter-label">BASISKONZEPTE &amp; RELEVANZ</p>
           <div className="student-concept-filter">
             {bkGroups.map((g) => {
@@ -521,24 +650,54 @@ export default function StudentLernzielePage() {
                       levels; these let a level be excluded without dropping
                       the concept entirely. */}
                   {activeLevels && (
+                    <label
+                      className="row"
+                      style={{ gap: 5, marginLeft: 21, marginTop: 3, fontSize: 11.5, cursor: 'pointer', flexWrap: 'nowrap', alignItems: 'center' }}
+                      title={KONZEPTANKER_DEF}
+                    >
+                      <input type="checkbox" checked={anchorOnly.has(g.rootId)} onChange={() => toggleAnchorOnly(g.rootId)} />
+                      <Anchor size={11} aria-hidden="true" />
+                      <span>nur Konzeptanker</span>
+                    </label>
+                  )}
+                  {activeLevels && !anchorOnly.has(g.rootId) && (
                     <div className="row" style={{ gap: 5, marginLeft: 21, marginTop: 3, alignItems: 'center' }}>
                       <span className="muted" style={{ fontSize: 10 }}>Relevanz:</span>
-                      {RELEVANCE_LEVELS.map((lvl) => (
-                        <button
-                          key={lvl}
-                          className={`chip-btn${activeLevels.has(lvl) ? ' active' : ''}`}
-                          style={{ padding: '1px 7px', fontSize: 10.5 }}
-                          title={RELEVANCE_LEVEL_LABEL[lvl]}
-                          onClick={() => toggleConceptLevel(g.rootId, lvl)}
-                        >
-                          <RelevanceDots level={lvl} />
-                        </button>
-                      ))}
+                      {/* Real feedback 769c5b85 (Susan): these should just
+                          show dots in the Basiskonzept's own color, without
+                          the chip-btn.active turquoise pill background. */}
+                      {RELEVANCE_LEVELS.map((lvl) => {
+                        const levelColor = rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : 'var(--text-secondary)'
+                        const isSelected = activeLevels.has(lvl)
+                        return (
+                          <button
+                            key={lvl}
+                            className="chip-btn"
+                            style={{
+                              padding: '1px 7px',
+                              fontSize: 10.5,
+                              background: isSelected ? 'color-mix(in srgb, ' + levelColor + ' 16%, transparent)' : 'none',
+                              // Real feedback 4050304d (Susan): a selected relevance
+                              // level was barely distinguishable from an unselected
+                              // one -- 1px either way, same near-invisible border
+                              // color. Selected now gets a thicker, concept-colored
+                              // outline plus a faint fill, instead of relying on a
+                              // 1px color-vs-transparent difference alone.
+                              border: isSelected ? `2px solid ${levelColor}` : '1px solid var(--border)',
+                            }}
+                            title={RELEVANCE_LEVEL_LABEL[lvl]}
+                            onClick={() => toggleConceptLevel(g.rootId, lvl)}
+                          >
+                            <RelevanceDots level={lvl} color={rootIdx >= 0 ? `var(--map-${rootIdx % 6 + 1})` : undefined} />
+                          </button>
+                        )
+                      })}
                     </div>
                   )}
                 </div>
               )
             })}
+          </div>
           </div>
 
           <p className="muted student-filter-label">DIDAKTISCHE METHODEN</p>
@@ -548,17 +707,21 @@ export default function StudentLernzielePage() {
                 <input type="checkbox" checked={methodFilter.has(m)} onChange={() => toggleMethod(m)} />
                 <span aria-hidden="true">{METHOD_ICON[m] ?? DEFAULT_METHOD_ICON}</span>
                 <span>{m}</span>
+                <button
+                  type="button"
+                  className="btn-linklike"
+                  aria-label="Methode favorisieren"
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteMethod(m) }}
+                  style={{ padding: 0, display: 'inline-flex' }}
+                >
+                  <Star size={11} fill={favoriteMethods.has(m) ? 'var(--series-a, gold)' : 'none'} />
+                </button>
               </label>
             ))}
           </div>
-
-          <label className="row" style={{ gap: 6, fontSize: 12.5, marginTop: 10, cursor: 'pointer' }}>
-            <input type="checkbox" checked={favoritesOnly} onChange={(e) => setFavoritesOnly(e.target.checked)} />
-            <Star size={13} />nur Favoriten
-          </label>
         </aside>
 
-        <div className="student-lernziele-main" style={{ flexDirection: 'column' }}>
+        <div className="student-lernziele-main" style={{ flexDirection: 'column' }} data-tour="lernziele.ansicht">
           {objectId && (
             <button
               className="btn btn-mini"
@@ -615,7 +778,13 @@ export default function StudentLernzielePage() {
                   conceptElementsById={conceptElementsById}
                   isFavorite={favorites.has(t.id)}
                   onToggleFavorite={onToggleFavorite}
+                  favoriteMethods={favoriteMethods}
+                  onToggleFavoriteMethod={onToggleFavoriteMethod}
+                  favoriteGoalMethods={favoriteGoalMethods}
+                  onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
+                  confirmedMethods={confirmedMethodsByLernziel.get(t.id) ?? []}
                   isExpanded={expandedIds.has(t.id)}
+                  isLinkedTo={t.id === objectId}
                   onToggleExpand={onToggleExpand}
                   supabase={supabase}
                   compact={viewMode === 'list'}
@@ -639,7 +808,13 @@ function LernzielCard({
   conceptElementsById,
   isFavorite,
   onToggleFavorite,
+  favoriteMethods,
+  onToggleFavoriteMethod,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
+  confirmedMethods,
   isExpanded,
+  isLinkedTo,
   onToggleExpand,
   supabase,
   compact,
@@ -653,7 +828,14 @@ function LernzielCard({
   conceptElementsById: Map<string, SchemaElement>
   isFavorite: boolean
   onToggleFavorite: (id: string) => void
+  favoriteMethods: Set<string>
+  onToggleFavoriteMethod: (methodKey: string) => void
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
   isExpanded: boolean
+  /** True for the one goal the student arrived at through a link (for example from the Netz). */
+  isLinkedTo: boolean
   onToggleExpand: (id: string) => void
   supabase: ProjectOutletContext['supabase']
   compact: boolean
@@ -667,18 +849,22 @@ function LernzielCard({
   // single line (grade chip, title, favorite star) -- an EXPANDED card
   // still shows full detail either way, since the detail itself isn't
   // something "list mode" should hide.
+  const anchorEntries = konzeptankerEntries(content)
   if (compact && !isExpanded) {
     return (
       <div
         id={`lz-card-${topic.id}`}
         key={topic.id}
         className="card topic-card topic-row-compact"
+        data-tour="lernziele.karte"
         onClick={() => onToggleExpand(topic.id)}
       >
         <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
         <strong style={{ flex: 1, minWidth: 0 }}>{topic.title}</strong>
+        {anchorEntries.length > 0 && <span title={`Konzeptanker: ${KONZEPTANKER_DEF}`} style={{ display: 'inline-flex' }}><Anchor size={14} aria-label="Konzeptanker" /></span>}
         <button
           className="btn-linklike"
+          data-tour="lernziele.favorit"
           aria-label="Favorit"
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(topic.id) }}
         >
@@ -692,8 +878,9 @@ function LernzielCard({
     <div
       id={`lz-card-${topic.id}`}
       key={topic.id}
-      className={`card topic-card${isExpanded ? ' active' : ''}`}
-      style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined }}
+      className={`card topic-card${isExpanded ? ' active' : ''}${isLinkedTo ? ' linked-to' : ''}`}
+      data-tour="lernziele.karte"
+      style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined, scrollMarginTop: 72 }}
       onClick={() => onToggleExpand(topic.id)}
     >
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
@@ -709,9 +896,24 @@ function LernzielCard({
               {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
             </span>
           )}
+          {anchorEntries.map((e) => {
+            const rootIdx = rootIdxById.get(rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id)
+            return (
+              <span
+                key={e.basiskonzept_id}
+                className="chip chip-anchor"
+                title={`Konzeptanker: ${KONZEPTANKER_DEF}`}
+                style={rootIdx !== undefined ? { borderColor: `var(--map-${(rootIdx % 6) + 1})` } : undefined}
+              >
+                <Anchor size={11} aria-hidden="true" />
+                Konzeptanker{bkLabels[e.basiskonzept_id] ? `: ${bkLabels[e.basiskonzept_id]}` : ''}
+              </span>
+            )
+          })}
         </div>
         <button
           className="btn-linklike"
+          data-tour="lernziele.favorit"
           aria-label="Favorit"
           onClick={(e) => { e.stopPropagation(); onToggleFavorite(topic.id) }}
         >
@@ -719,15 +921,20 @@ function LernzielCard({
         </button>
       </div>
       <strong style={{ display: 'block', marginTop: 6 }}>{topic.title}</strong>
-      {topic.description && <p className="muted" style={{ fontSize: 12.5 }}>{topic.description}</p>}
+      {descriptionBelowTitle(topic.title, topic.description) && <p className="muted" style={{ fontSize: 12.5, whiteSpace: 'pre-line' }}>{descriptionBelowTitle(topic.title, topic.description)}</p>}
       {entries.length > 0 && (
         <div className="row" style={{ flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
           {entries.map((e) => {
             const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
             const rootIdx = rootIdxById.get(rootKey)
             return (
-              <span key={e.basiskonzept_id} className="row" style={{ gap: 3, fontSize: 11 }} title={bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}>
-                {bkAbbreviation(bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id)}
+              <span
+                key={e.basiskonzept_id}
+                className="row"
+                style={{ gap: 3, fontSize: 11 }}
+                title={bkLabels[e.basiskonzept_id] ?? `Konnte keinem Basiskonzept zugeordnet werden (interne Kennung: ${e.basiskonzept_id})`}
+              >
+                {bkLabels[e.basiskonzept_id] ? bkAbbreviation(bkLabels[e.basiskonzept_id]) : '?'}
                 <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
               </span>
             )
@@ -737,7 +944,7 @@ function LernzielCard({
 
       {isExpanded && (
         <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
+          <LernzielCardDetail objectId={topic.id} content={content} supabase={supabase} entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} favoriteGoalMethods={favoriteGoalMethods} onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod} confirmedMethods={confirmedMethods} />
         </div>
       )}
     </div>
@@ -753,6 +960,9 @@ function LernzielCardDetail({
   rootIdxById,
   rawIdToGroupKey,
   conceptElementsById,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
+  confirmedMethods,
 }: {
   objectId: string
   content: unknown
@@ -762,6 +972,9 @@ function LernzielCardDetail({
   rootIdxById: Map<string, number>
   rawIdToGroupKey: Map<string, string>
   conceptElementsById: Map<string, SchemaElement>
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
 }) {
   const [stations, setStations] = useState<ThreadStationWithThread[] | null>(null)
 
@@ -772,13 +985,31 @@ function LernzielCardDetail({
     getThreadStationsForTopic(supabase, objectId).then(setStations)
   }, [supabase, objectId])
 
+  // Real feedback 2b2277fc (Susan, 2026-10-21): the "Originalwortlaut (Lehrplan)"
+  // box this page used to show here was removed -- `description` (rendered in
+  // the card above this detail panel, topic.description) already holds the
+  // same verbatim curriculum text as content.originaltext, so the box was a
+  // literal duplicate of what she could already see. Lesson for next time:
+  // before adding a "show the raw/verbatim source text" field, check whether
+  // the field already used as the display text is already that same text.
+
   return (
     <div>
       <BkRelevanceSection entries={entries} bkLabels={bkLabels} rootIdxById={rootIdxById} rawIdToGroupKey={rawIdToGroupKey} conceptElementsById={conceptElementsById} />
 
-      <DidaktischeStrategienSection content={content} />
-
-      {stations && stations.length > 0 && stations.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+      {/* Real feedback 75fd5be9 (Susan): "Vernetztes Lernen" used to always
+          show below here, even when this section was collapsed -- she
+          wanted it folded in as a subsection instead, so collapsing
+          Didaktische Strategien hides it too. */}
+      <DidaktischeStrategienSection
+        objectId={objectId}
+        content={content}
+        favoriteGoalMethods={favoriteGoalMethods}
+        onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
+        confirmedMethods={confirmedMethods}
+        stations={stations}
+        supabase={supabase}
+      />
 
       {stations?.length === 0 && entries.length === 0 && (
         <p className="muted">Noch keine erfassten Verbindungen für dieses Lernziel.</p>
@@ -796,10 +1027,27 @@ function LernzielCardDetail({
 // same real content here. Read defensively: not every imported Lernziel
 // has this field populated, same discipline as prompt-builder.tsx's own
 // comment about didaktische_strategien/originaltext.
-function DidaktischeStrategienSection({ content }: { content: unknown }) {
+function DidaktischeStrategienSection({
+  objectId,
+  content,
+  favoriteGoalMethods,
+  onToggleFavoriteGoalMethod,
+  confirmedMethods,
+  stations,
+  supabase,
+}: {
+  objectId: string
+  content: unknown
+  favoriteGoalMethods: Set<string>
+  onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
+  confirmedMethods: MethodLernzielLink[]
+  stations: ThreadStationWithThread[] | null
+  supabase: ProjectOutletContext['supabase']
+}) {
   const [open, setOpen] = useState(false)
   const ds = (content as any)?.didaktische_strategien
-  if (!ds) return null
+  const hasStations = !!stations && stations.length > 0
+  if (!ds && confirmedMethods.length === 0 && !hasStations) return null
   // Real feedback 2026-10-01 (Susan), 2nd pass: "you should expand on each
   // method... each method should be highlighted on a different line,
   // possibly with an icon" -- this was previously dropping the real
@@ -809,33 +1057,81 @@ function DidaktischeStrategienSection({ content }: { content: unknown }) {
   // data this view was throwing away). Matches v1.2's own real layout:
   // icon + bold method name + em dash + its topic-specific description,
   // one per line.
-  const methoden = (ds.top3_methoden ?? []).filter((m: any) => m?.methode)
+  const staticMethoden: { methode: string; beschreibung: string | null }[] =
+    (ds?.top3_methoden ?? []).filter((m: any) => m?.methode)
+  // Real feedback fbd27cda (Susan): "consider if [methods] could be
+  // expanded for any learning goal... up to 6 per learning goal" -- adds
+  // whatever the researcher Methods tab has confirmed for this Lernziel
+  // (method_lernziel_links, migration 123) beyond the original static
+  // three, deduped by method name, capped at 6 total so this doesn't turn
+  // into information overload (her own stated concern).
+  const staticNames = new Set(staticMethoden.map((m) => m.methode))
+  const extraMethoden = confirmedMethods
+    .filter((l) => !staticNames.has(l.method_key))
+    .map((l) => ({ methode: l.method_key, beschreibung: l.rationale }))
+  const methoden = [...staticMethoden, ...extraMethoden].slice(0, 6)
   return (
-    <section style={{ marginBottom: 18 }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
-        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+    // Real feedback 70d0770a (Susan): this section and BkRelevanceSection
+    // above it needed clearer visual separation -- a line like the one
+    // above the whole expanded block, and bigger section headers.
+    <section style={{ marginBottom: 18, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
+      <button className="btn btn-mini" data-tour="lernziele.strategien" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Didaktische Strategien ausblenden' : 'Didaktische Strategien anzeigen'}
       </button>
       {open && (
         <div style={{ marginTop: 10 }}>
-          {ds.evolutionsdidaktischer_impuls && (
+          {ds?.evolutionsdidaktischer_impuls && (
             <p style={{ margin: '0 0 8px' }}><strong>Leitfrage:</strong> {ds.evolutionsdidaktischer_impuls}</p>
           )}
           {methoden.length > 0 && (
             <div style={{ margin: '0 0 8px' }}>
               <strong>Methoden:</strong>
               <ul style={{ margin: '4px 0 0', paddingLeft: 0, listStyle: 'none' }}>
-                {methoden.map((m: any, i: number) => (
+                {methoden.map((m, i: number) => (
                   <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, marginBottom: 5 }}>
                     <span aria-hidden="true">{METHOD_ICON[m.methode] ?? '•'}</span>
                     <span><strong>{m.methode}</strong>{m.beschreibung ? <> — {m.beschreibung}</> : null}</span>
+                    {/* Real feedback 910b0c18 (Susan, repeat ask): favoriting
+                        a method already existed in the Prompt Generator's own
+                        checklist -- just never shown here. Real feedback
+                        3f22dcd5 (Susan, follow-up): this star favorites THIS
+                        suggestion on THIS learning goal, not the method in
+                        general -- goalMethodKey-scoped, a separate favorite
+                        from the sidebar filter's general method star. */}
+                    <button
+                      type="button"
+                      className="btn-linklike"
+                      aria-label="Diese Methodenempfehlung favorisieren"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavoriteGoalMethod(objectId, m.methode) }}
+                      style={{ padding: 0, display: 'inline-flex', marginLeft: 2 }}
+                    >
+                      <Star size={11} fill={favoriteGoalMethods.has(goalMethodKey(objectId, m.methode)) ? 'var(--series-a, gold)' : 'none'} />
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-          {ds.moegliche_fehlvorstellungen && (
+          {ds?.moegliche_fehlvorstellungen && (
             <p style={{ margin: 0 }}><strong>Mögliche Fehlvorstellungen:</strong> {ds.moegliche_fehlvorstellungen}</p>
+          )}
+          {/* Real feedback 75fd5be9 (Susan): this used to render always-
+              visible, below Didaktische Strategien regardless of whether
+              that section was collapsed -- now it's a subsection here, so
+              it folds away with everything else. Real feedback 95972f01
+              (Susan): still needs its own header and explanation of what it
+              is and how common it is -- these are hand-curated cross-topic
+              connections ("Threads"), authored live by researchers; most
+              Lernziele don't have one yet, so its absence is expected. */}
+          {hasStations && (
+            <div style={{ marginTop: ds || methoden.length > 0 ? 14 : 0, paddingTop: ds || methoden.length > 0 ? 12 : 0, borderTop: ds || methoden.length > 0 ? '1px solid var(--border)' : 'none' }}>
+              <p style={{ fontSize: 12.5, fontWeight: 600, margin: '0 0 4px' }}>Vernetztes Lernen</p>
+              <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>
+                Hand ausgewählte Verbindungen zu anderen Themen, die über dieselbe Grundidee zusammenhängen. Nicht jedes Lernziel hat eine.
+              </p>
+              {stations!.map((s) => <StudentThreadCard key={s.id} station={s} supabase={supabase} />)}
+            </div>
           )}
         </div>
       )}
@@ -866,8 +1162,8 @@ function BkRelevanceSection({
   if (entries.length === 0) return null
   return (
     <section style={{ marginBottom: 18 }}>
-      <button className="btn btn-mini" onClick={() => setOpen((v) => !v)}>
-        {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+      <button className="btn btn-mini" data-tour="lernziele.bezuege" onClick={() => setOpen((v) => !v)} style={{ fontSize: 13, fontWeight: 600 }}>
+        {open ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         {open ? 'Basiskonzept-Bezüge ausblenden' : 'Basiskonzept-Bezüge anzeigen'}
       </button>
       {open && (
@@ -892,7 +1188,23 @@ function BkRelevanceSection({
               <div key={e.basiskonzept_id} style={{ marginBottom: 10 }}>
                 <div className="row" style={{ gap: 6 }}>
                   <span className="bk-dot" style={{ background: rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined }} />
-                  <strong style={{ fontSize: 13 }}>{bkLabels[e.basiskonzept_id] ?? e.basiskonzept_id}</strong>
+                  {/* Real feedback fc94c627 (Susan, 2026-10-10): a raw internal
+                      id (e.g. "bk_stoff_energie_umwandlung") used to render
+                      here bare whenever buildBkLabelMap's token-match failed
+                      -- no visible sign it wasn't a real label, and no
+                      explanation anywhere in the app of what that id even
+                      was. It was never meant to be shown; it's a match
+                      failure, not a cross-reference. Now it shows an honest
+                      "not yet matched" placeholder with the raw id kept only
+                      as a hover title, so it's reportable instead of
+                      confusing. */}
+                  {bkLabels[e.basiskonzept_id] ? (
+                    <strong style={{ fontSize: 13 }}>{bkLabels[e.basiskonzept_id]}</strong>
+                  ) : (
+                    <strong className="muted" style={{ fontSize: 13, fontWeight: 400, fontStyle: 'italic' }} title={`Konnte keinem Basiskonzept zugeordnet werden (interne Kennung: ${e.basiskonzept_id})`}>
+                      Basiskonzept noch nicht zugeordnet
+                    </strong>
+                  )}
                   <RelevanceDots level={e.relevanz_beurteilung} color={rootIdx !== undefined ? `var(--map-${(rootIdx % 6) + 1})` : undefined} />
                 </div>
                 {e.begruendung && <p className="muted" style={{ fontSize: 12.5, margin: '4px 0 0' }}>{e.begruendung}</p>}

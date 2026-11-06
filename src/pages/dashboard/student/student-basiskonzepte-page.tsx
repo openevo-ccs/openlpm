@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { Anchor, Info, Maximize2, ZoomIn, ZoomOut } from 'lucide-react'
+import { Anchor, Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { ancestorAtDepth, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, KONZEPTANKER_DEF, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { arcHeight, lineOpacity, lineWidth, physicsLayoutOptions, pickVisibleLabels, truncateLabel, type LabelCandidate } from '@/lib/graph-standards'
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 
@@ -18,10 +20,8 @@ function cssVar(name: string, fallback: string) {
 }
 const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--map-6']
 
-// The real, field-verified Konzeptanker definition, from EvoMentor DE
-// v1.2's own tooltip text (apps/evomentor_de_v1_2.html's KONZEPTANKER_DEF
-// constant) -- not paraphrased.
-const KONZEPTANKER_DEF = 'ein Lernziel, das einen besonders konkreten, anschaulichen Einstiegspunkt in ein Basiskonzept bildet.'
+// The Konzeptanker definition (EvoMentor DE v1.2's own tooltip text) now lives
+// in the shared lib so the Lernziele page shows the same words.
 
 // Added 2026-09-30: this page had no explanation anywhere of why teaching is
 // organized around Basiskonzepte at all. Short, plain-language rationale +
@@ -58,6 +58,7 @@ export default function StudentBasiskonzeptePage() {
 
   return (
     <div className="student-page">
+      <div data-tour="basiskonzepte.kopf" style={{ display: 'inline-block', maxWidth: '100%' }}>
       <h1>
         Basiskonzepte{' '}
         <span title={BASISKONZEPTE_RATIONALE} style={{ cursor: 'help' }}>
@@ -77,10 +78,11 @@ export default function StudentBasiskonzeptePage() {
           </button>
         ))}
       </div>
+      </div>
 
       {activeTab === 'dashboard' && <DashboardTab rootConcepts={rootConcepts} topics={topics} contentById={contentById} />}
       {activeTab === 'netz' && <NetzTab project={project} supabase={supabase} rootConcepts={rootConcepts} contentById={contentById} topics={topics} conceptElementsById={conceptElementsById} />}
-      {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} />}
+      {activeTab === 'detail' && <DetailTab rootConcepts={rootConcepts} conceptElementsById={conceptElementsById} />}
     </div>
   )
 }
@@ -110,8 +112,14 @@ function DashboardTab({
   const stundenGesamt = stundenValues.reduce((a, b) => a + b, 0)
   const hasStunden = stundenValues.length > 0
 
+  // Real feedback b0323f40 (Susan): this used to group on each topic's raw
+  // grade_band value directly, which showed separate "Kl. 5"/"Kl. 6" columns
+  // next to an all-dash "Kl. 5/6" column (some MNT content genuinely carries
+  // the combined band as its literal value, migration 104) -- same real
+  // curriculum structure the Lernziele page's own filter already buckets
+  // correctly (bandKeyForGrade), just never applied here.
   const grades = useMemo(() => {
-    const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean) as string[])
+    const set = new Set((topics ?? []).map((t) => t.grade_band).filter(Boolean).map((g) => bandKeyForGrade(g as string)))
     const leadingNumber = (s: string) => parseInt(s, 10) || 0
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
@@ -130,7 +138,7 @@ function DashboardTab({
   const konzeptankerByRootAndGrade = (rootLabel: string, grade: string) => {
     let count = 0
     for (const t of topics ?? []) {
-      if (t.grade_band !== grade) continue
+      if (!t.grade_band || bandKeyForGrade(t.grade_band) !== grade) continue
       const tc = contentById.get(t.id) as any
       if (!tc?.ist_konzeptanker) continue
       if (bkEntries(tc).some((e) => e.relevanz_beurteilung === 3 && looksLikeBk(e.basiskonzept_id, rootLabel))) count++
@@ -139,7 +147,7 @@ function DashboardTab({
   }
 
   return (
-    <div>
+    <div data-tour="basiskonzepte.dashboard">
       <div className="bk-stat-tiles">
         <div className="card bk-stat-tile"><div className="n">{topics?.length ?? '—'}</div><div className="l">Lernziele gesamt</div></div>
         <div className="card bk-stat-tile"><div className="n">{rootConcepts.length}</div><div className="l">Basiskonzepte</div></div>
@@ -160,12 +168,25 @@ function DashboardTab({
         <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
           Je Zelle: Relevanzverteilung (niedrig / mittel / hoch) der Lernziele dieser Klassenstufe, plus Konzeptanker darunter.
         </p>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+        {/* Real feedback bb8b075b/b9df99c1 (Susan): table-layout: fixed stops
+            the browser's own auto column sizing from leaving unnecessary gaps
+            around narrow grade columns and triggering a horizontal scrollbar
+            that wasn't actually needed -- columns now split the real
+            available width evenly, so each bar (width: 100% below) gets more
+            real room instead of sitting inside a fixed 76px box with blank
+            space around it. */}
+        {/* Feedback 436f771b (Susan, 2026-10-26): the table always fits, but the
+            hover bubbles of the last column (invisible until hovered) stuck out
+            past the box and made it scroll sideways. overflow-x: clip removes
+            the scrollbar; the last column's bubble is right-aligned (tip-end)
+            so it stays inside the box. */}
+        <div style={{ overflowX: 'clip' }}>
+          <table style={{ width: '100%', tableLayout: 'fixed', borderCollapse: 'collapse', fontSize: 12.5 }}>
             <thead>
               <tr>
-                <th style={{ textAlign: 'left', padding: '4px 8px' }}>Basiskonzept</th>
-                {grades.map((g) => <th key={g} style={{ padding: '4px 8px' }}>Kl. {g}</th>)}
+                <th style={{ textAlign: 'left', padding: '4px 8px', width: '28%' }}>Basiskonzept</th>
+                {grades.map((g) => <th key={g} style={{ padding: '4px 4px' }}>Kl. {g}</th>)}
+                <th style={{ padding: '4px 4px' }}>Lernziele gesamt</th>
               </tr>
             </thead>
             <tbody>
@@ -189,7 +210,7 @@ function DashboardTab({
                       // the top of it -- is visible per concept x grade cell.
                       const counts = [0, 0, 0]
                       for (const t of topics ?? []) {
-                        if (t.grade_band !== g) continue
+                        if (!t.grade_band || bandKeyForGrade(t.grade_band) !== g) continue
                         for (const e of bkEntries(contentById.get(t.id))) {
                           if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
                           if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) counts[e.relevanz_beurteilung - 1]++
@@ -199,33 +220,37 @@ function DashboardTab({
                       const anchorCount = konzeptankerByRootAndGrade(c.label, g)
                       const color = `var(--map-${(i % 6) + 1})`
                       return (
-                        <td key={g} style={{ padding: '4px 8px', textAlign: 'center' }}>
+                        <td key={g} style={{ padding: '4px 4px', textAlign: 'center' }}>
                           {total === 0 ? (
                             '—'
                           ) : (
-                            <div style={{ display: 'inline-block', width: '100%', maxWidth: 76 }}>
+                            <div style={{ width: '100%' }}>
                               <div
-                                className="tip"
+                                className={`tip${g === grades[grades.length - 1] ? ' tip-end' : ''}`}
                                 data-tip={`niedrig ${counts[0]} · mittel ${counts[1]} · hoch ${counts[2]}`}
-                                style={{ display: 'flex', height: 15, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
+                                style={{ display: 'flex', height: 16, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}
                               >
+                                {/* Real feedback bb8b075b (Susan): "the grey
+                                    numbers in the bars are hard to see, make
+                                    the font black" -- applying opacity to the
+                                    same div that held the number faded the
+                                    text along with the background tint. The
+                                    tint (which bar level = niedrig/mittel/
+                                    hoch) now lives on its own absolutely-
+                                    positioned layer behind the number, so the
+                                    number itself always renders at full
+                                    opacity, in the page's real text color. */}
                                 {([0, 1, 2] as const).map((lvl) =>
                                   counts[lvl] > 0 ? (
-                                    <div
-                                      key={lvl}
-                                      style={{
-                                        flex: counts[lvl], background: color, opacity: 0.35 + lvl * 0.3,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 9.5, color: lvl === 2 ? '#fff' : 'var(--text-primary)', lineHeight: 1,
-                                      }}
-                                    >
-                                      {counts[lvl]}
+                                    <div key={lvl} style={{ flex: counts[lvl], position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <div style={{ position: 'absolute', inset: 0, background: color, opacity: 0.35 + lvl * 0.3 }} />
+                                      <span style={{ position: 'relative', fontSize: 9.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>{counts[lvl]}</span>
                                     </div>
                                   ) : null
                                 )}
                               </div>
                               {anchorCount > 0 && (
-                                <div className="row tip" data-tip={KONZEPTANKER_DEF} style={{ justifyContent: 'center', gap: 2, fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+                                <div className={`row tip${g === grades[grades.length - 1] ? ' tip-end' : ''}`} data-tip={KONZEPTANKER_DEF} style={{ justifyContent: 'center', gap: 2, fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
                                   <Anchor size={9} />{anchorCount}
                                 </div>
                               )}
@@ -234,13 +259,57 @@ function DashboardTab({
                         </td>
                       )
                     })}
+                    {(() => {
+                      // Total over all grade bands. Every goal is rated against every Basiskonzept, so the plain number of ratings is the
+                      // same for all six. The number that tells them apart is the goals rated medium or high (the same ones the Netz counts).
+                      const totals = [0, 0, 0]
+                      for (const t of topics ?? []) {
+                        for (const e of bkEntries(contentById.get(t.id))) {
+                          if (!looksLikeBk(e.basiskonzept_id, c.label)) continue
+                          if (e.relevanz_beurteilung >= 1 && e.relevanz_beurteilung <= 3) totals[e.relevanz_beurteilung - 1]++
+                        }
+                      }
+                      const sum = totals[1] + totals[2]
+                      const color = `var(--map-${(i % 6) + 1})`
+                      return (
+                        <td key="total" style={{ padding: '4px 4px', textAlign: 'center' }}>
+                          {totals[0] + totals[1] + totals[2] === 0 ? (
+                            '—'
+                          ) : (
+                            <div className="tip tip-end" style={{ display: 'flex', alignItems: 'center', gap: 6 }} data-tip={`niedrig ${totals[0]} · mittel ${totals[1]} · hoch ${totals[2]}. Die Zahl rechts zählt die Lernziele mit mittlerer oder hoher Relevanz.`}>
+                              <div style={{ display: 'flex', flex: 1, height: 16, borderRadius: 3, overflow: 'hidden', background: 'var(--surface-2)' }}>
+                                {([0, 1, 2] as const).map((lvl) =>
+                                  totals[lvl] > 0 ? (
+                                    // A narrow segment gets a minimum share so its number stays readable next to its neighbour's.
+                                    <div key={lvl} style={{ flex: Math.max(totals[lvl], 0.15 * (totals[0] + totals[1] + totals[2])), position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <div style={{ position: 'absolute', inset: 0, background: color, opacity: 0.35 + lvl * 0.3 }} />
+                                      <span style={{ position: 'relative', fontSize: 9.5, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1 }}>{totals[lvl]}</span>
+                                    </div>
+                                  ) : null
+                                )}
+                              </div>
+                              <span style={{ fontWeight: 700, fontSize: 13, minWidth: 28, textAlign: 'right' }}>{sum}</span>
+                            </div>
+                          )}
+                        </td>
+                      )
+                    })()}
                   </tr>
                 )
               })}
+              <tr style={{ borderTop: '2px solid var(--border)' }}>
+                <td style={{ padding: '6px 8px', fontWeight: 700 }}>Lernziele</td>
+                {grades.map((g) => (
+                  <td key={g} style={{ padding: '6px 4px', textAlign: 'center', fontWeight: 700, fontSize: 13 }}>
+                    {(topics ?? []).filter((t) => t.grade_band && bandKeyForGrade(t.grade_band) === g).length}
+                  </td>
+                ))}
+                <td style={{ padding: '6px 4px', textAlign: 'center', fontWeight: 700, fontSize: 13 }}>{topics?.length ?? '—'}</td>
+              </tr>
             </tbody>
           </table>
         </div>
-        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker.</p>
+        <p className="muted" style={{ fontSize: 11, marginTop: 8 }}>Balken: niedrig / mittel / hoch (Zahlen im Balken). <Anchor size={10} style={{ verticalAlign: 'middle' }} /> darunter: Konzeptanker. Lernziele gesamt: derselbe Balken über alle Klassenstufen. Die Zahl daneben zählt die Lernziele mit mittlerer oder hoher Relevanz für das Basiskonzept. Unterste Zeile: Anzahl der Lernziele je Klassenstufe und insgesamt.</p>
       </div>
     </div>
   )
@@ -290,15 +359,17 @@ function looksLikeBk(bkId: string, label: string): boolean {
 // indicators would read as "yes, this genuinely relates."
 const RELEVANCE_EDGE_THRESHOLD = 2
 
-const BK_ROW_Y = 50
+// Top-level row's height above the first row of sub-concepts. The counted arcs
+// between concepts (bundled view) bow out above it, so it gets extra room then.
+const BK_ROW_Y_BASE = 50
+const BK_ROW_Y_FOR_ARCS = 170
 const UK_ROW_GAP = 60
 const UK_ROW_HEIGHT_BASE = 34
 const UK_CHILD_WIDTH_BASE = 96
 const LZ_ROW_HEIGHT_BASE = 38
 const LZ_GAP_ABOVE_BASE = 70
-const DENSITY_SCALE: Record<Density, number> = { kompakt: 1, weit: 1.55 }
-
-type Density = 'kompakt' | 'weit'
+const GRADE_BAND_ORDER = ['5/6', '7/8', '9', '10']
+type LzOrder = 'grade' | 'relevance'
 type SizeBy = 'count' | 'relevance'
 
 interface GraphNodeDatum {
@@ -318,8 +389,10 @@ interface GraphEdgeDatum {
   target: string
   color: string
   weight: number
-  kind: 'hierarchy' | 'relevance' | 'relation'
+  kind: 'hierarchy' | 'relevance' | 'relation' | 'cross' | 'bundle'
   tooltip?: string
+  /** Two colors, 'start end', for a line that fades from one concept's color to the other's. */
+  gradient?: string
 }
 interface NetzInsightUk { id: string; label: string; rootLabel: string; rootIdx: number; count: number }
 interface NetzInsightLz { id: string; title: string; rootCount: number; rootLabels: string[] }
@@ -356,7 +429,18 @@ function NetzTab({
   const [showRelations, setShowRelations] = useState(false)
   const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [sizeBy, setSizeBy] = useState<SizeBy>('count')
-  const [density, setDensity] = useState<Density>('kompakt')
+  // How the dots of the learning goals are ordered under a concept: by grade band (rows then mean something) or by relevance.
+  const [lzOrder, setLzOrder] = useState<LzOrder>('grade')
+  // Shared graph standards (src/lib/graph-standards.ts): which connections to
+  // draw, label overlap handling, layout, line strength. Remembered per browser.
+  const [gs, updateGs, resetGs] = useGraphSettings('basiskonzepte-netz')
+  // The physics spacing slider fires on every pixel of a drag; the layout is only
+  // recomputed once the value has held still for a moment.
+  const [physicsSpacing, setPhysicsSpacing] = useState(gs.spacing)
+  useEffect(() => {
+    const t = window.setTimeout(() => setPhysicsSpacing(gs.spacing), 250)
+    return () => window.clearTimeout(t)
+  }, [gs.spacing])
   const [highlightId, setHighlightId] = useState<string | null>(null)
   // Tracks the real rendered width so column sizing actually adapts when
   // the window/pane is resized, not just once at first mount -- the real
@@ -470,7 +554,8 @@ function NetzTab({
   } | null => {
     if (!topics || rootConcepts.length === 0) return null
     const width = containerWidth || containerRef.current?.clientWidth || 900
-    const scale = DENSITY_SCALE[density]
+    const scale = 1
+    const BK_ROW_Y = gs.edges === 'tree' ? BK_ROW_Y_BASE : BK_ROW_Y_FOR_ARCS
     const rootIndex = new Map(rootConcepts.map((r, i) => [r.id, i]))
     const rootColor = (rootId: string) => cssVar(MAP_PALETTE[(rootIndex.get(rootId) ?? 0) % 6], '#2a78d6')
 
@@ -669,14 +754,30 @@ function NetzTab({
         groupedByAnchor.set(p.targetId, arr)
       }
       for (const arr of groupedByAnchor.values()) arr.sort((a, b) => (primaryByTopic.get(b)?.totalWeight ?? 0) - (primaryByTopic.get(a)?.totalWeight ?? 0))
+      // Rows mean something when the dots are ordered by grade band: the first block under a concept is grade 5/6, then 7/8, 9, 10.
+      const bandOfTopic = (topicId: string) => bandKeyForGrade(topics.find((t) => t.id === topicId)?.grade_band ?? '')
+      const bandRank = (band: string) => { const i = GRADE_BAND_ORDER.indexOf(band); return i < 0 ? GRADE_BAND_ORDER.length : i }
       for (const [anchorId, topicIds] of groupedByAnchor) {
         const anchorPos = nodePositions.get(anchorId)
         if (!anchorPos) continue
         const isRootAnchor = rootIndex.has(anchorId)
         const maxWidth = isRootAnchor ? (colWidthByRoot.get(anchorId) ?? width / rootConcepts.length) - 16 : UK_CHILD_WIDTH_BASE * scale
-        const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, isRootAnchor ? 34 : 24)
-        for (const [id, pos] of positions) nodePositions.set(id, pos)
-        maxLzRows = Math.max(maxLzRows, rows)
+        const spacing = isRootAnchor ? 34 : 24
+        if (lzOrder === 'grade') {
+          let rowsUsed = 0
+          const bands = Array.from(new Set(topicIds.map(bandOfTopic))).sort((a, b) => bandRank(a) - bandRank(b))
+          for (const band of bands) {
+            const ids = topicIds.filter((id) => bandOfTopic(id) === band)
+            const { positions, rows } = layoutTier(ids.map((id) => ({ id })), anchorPos.x, lzStartY + rowsUsed * lzRowHeight, maxWidth, lzRowHeight, spacing)
+            for (const [id, pos] of positions) nodePositions.set(id, pos)
+            rowsUsed += rows
+          }
+          maxLzRows = Math.max(maxLzRows, rowsUsed)
+        } else {
+          const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, spacing)
+          for (const [id, pos] of positions) nodePositions.set(id, pos)
+          maxLzRows = Math.max(maxLzRows, rows)
+        }
       }
     }
 
@@ -684,19 +785,33 @@ function NetzTab({
 
     // ---- Nodes ----
     const nodes: GraphNodeDatum[] = []
-    rootConcepts.forEach((c) => {
+    const gradeLabelOfTopic = (topicId: string) => bandKeyForGrade(topics.find((t) => t.id === topicId)?.grade_band ?? '')
+    // Sizes are scaled from the smallest to the largest of the set. A fixed cap made every concept that holds more than about
+    // 100 goals come out the same size (feedback 049ff34c).
+    const relativeSize = (value: number, all: number[], lo: number, hi: number) => {
+      const roots = all.map((v) => Math.sqrt(v))
+      const mn = Math.min(...roots)
+      const mx = Math.max(...roots)
+      return mx === mn ? (lo + hi) / 2 : lo + ((Math.sqrt(value) - mn) / (mx - mn)) * (hi - lo)
+    }
+    const rootMetricOf = (c: (typeof rootConcepts)[number]) => {
       const count = lzCountByRoot.get(c.id) ?? 0
       const weight = Array.from(byTarget.entries()).filter(([id]) => id === c.id || ancestorAtDepth(id, 0, conceptElementsById)?.id === c.id).reduce((s, [, a]) => s + a.totalWeight, 0)
-      const metricVal = sizeBy === 'count' ? count : weight
+      return sizeBy === 'count' ? count : weight
+    }
+    const rootMetrics = rootConcepts.map(rootMetricOf)
+    rootConcepts.forEach((c) => {
+      const metricVal = rootMetricOf(c)
       const def = (c as any).didactic_definition as string | undefined
       nodes.push({
         id: c.id, label: c.label, kind: 'bk', color: rootColor(c.id),
-        size: Math.min(58, 34 + Math.sqrt(metricVal) * 3.2), opacity: 1,
+        size: relativeSize(metricVal, rootMetrics, 30, 64), opacity: 1,
         x: nodePositions.get(c.id)!.x, y: nodePositions.get(c.id)!.y,
         tooltip: def ? `${c.label}: ${def.length > 160 ? def.slice(0, 158) + '…' : def}` : c.label,
       })
     })
     if (showUk) {
+      const ukMetrics = usedUkIds.map((id) => { const a = byTarget.get(id) ?? EMPTY_AGG; return sizeBy === 'count' ? a.topicIds.size : a.totalWeight })
       for (const ukId of usedUkIds) {
         const el = conceptElementsById.get(ukId)
         const pos = nodePositions.get(ukId)
@@ -712,7 +827,7 @@ function NetzTab({
         const tooltipBase = el.definition ? `${el.label}: ${el.definition}` : el.label
         nodes.push({
           id: ukId, label: el.label.length > 22 ? el.label.slice(0, 20) + '…' : el.label, kind: 'uk',
-          color: root ? rootColor(root.id) : '#999', size: Math.min(26, 11 + Math.sqrt(metricVal) * 3), opacity: 0.88,
+          color: root ? rootColor(root.id) : '#999', size: relativeSize(metricVal, ukMetrics, 8, 22), opacity: 0.92,
           x: pos.x, y: pos.y,
           tooltip: (tooltipBase.length > 180 ? tooltipBase.slice(0, 178) + '…' : tooltipBase) + (beispiel ? ` (Beispiel: ${beispiel.length > 80 ? beispiel.slice(0, 78) + '…' : beispiel})` : ''),
         })
@@ -725,9 +840,28 @@ function NetzTab({
         if (!pos) continue
         nodes.push({
           id: topicId, label: '', kind: 'lz',
-          color: rootColor(p.rootId), size: Math.min(26, 9 + Math.sqrt(p.totalWeight) * 5), opacity: Math.max(0.4, p.totalWeight / 6),
-          x: pos.x, y: pos.y, tooltip: title,
+          color: rootColor(p.rootId), size: Math.min(13, 6 + Math.sqrt(p.totalWeight) * 2), opacity: Math.max(0.55, Math.min(0.9, p.totalWeight / 5)),
+          x: pos.x, y: pos.y, tooltip: gradeLabelOfTopic(topicId) ? `Kl. ${gradeLabelOfTopic(topicId)} · ${title}` : title,
         })
+      }
+    }
+
+    // ---- Labels (graph standards rule 4): none overlap ----
+    // Top-level concepts always keep their label. Sub-concepts compete for
+    // space by size; one that would collide stays blank until hovered (the
+    // full text is in its tooltip).
+    {
+      const candidates: LabelCandidate[] = nodes
+        .filter((n) => n.kind === 'bk' || n.kind === 'uk')
+        .map((n) => ({
+          id: n.id, label: n.label, x: n.x, y: n.y, size: n.size, priority: n.size,
+          alwaysShow: n.kind === 'bk', fontPx: n.kind === 'bk' ? 11 : 8.5, maxWidthPx: n.kind === 'bk' ? 100 : 80,
+        }))
+      const visible = gs.labels === 'few' ? pickVisibleLabels(candidates) : null
+      for (const n of nodes) {
+        if (n.kind !== 'bk' && n.kind !== 'uk') continue
+        if (visible && !visible.has(n.id)) n.label = ''
+        else if (n.kind === 'uk') n.label = truncateLabel(n.label, gs.labels === 'few' ? 18 : 22)
       }
     }
 
@@ -744,9 +878,30 @@ function NetzTab({
       }
     }
     if (showLz) {
+      // Rule 1: each Lernziel's strongest link is its main link ('relevance');
+      // the rest are 'cross' links, hidden until asked for (see the edge mode).
       rawEdges.forEach((e, i) => {
-        edges.push({ id: `r-${i}`, source: e.targetId, target: e.topicId, color: rootColor(e.rootId), weight: e.weight, kind: 'relevance' })
+        const isMain = primaryByTopic.get(e.topicId)?.targetId === e.targetId
+        edges.push({ id: `r-${i}`, source: e.targetId, target: e.topicId, color: rootColor(e.rootId), weight: e.weight, kind: isMain ? 'relevance' : 'cross' })
       })
+    }
+    // Rule 2: one counted arc per pair of top-level concepts, in place of the
+    // many separate lines their shared Lernziele would otherwise draw.
+    if (gs.edges !== 'tree') {
+      const pairCount = new Map<string, number>()
+      for (const roots of crossCuttingByTopic.values()) {
+        const ids = Array.from(roots).sort()
+        for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
+          const key = `${ids[i]}|${ids[j]}`
+          pairCount.set(key, (pairCount.get(key) ?? 0) + 1)
+        }
+      }
+      for (const [key, count] of pairCount) {
+        const [a, b] = key.split('|')
+        const labelA = rootConcepts.find((r) => r.id === a)?.label ?? '?'
+        const labelB = rootConcepts.find((r) => r.id === b)?.label ?? '?'
+        edges.push({ id: `b-${key}`, source: a, target: b, color: '#6f7d8c', gradient: `${rootColor(a)} ${rootColor(b)}`, weight: count, kind: 'bundle', tooltip: `${count} Lernziele verbinden „${labelA}“ und „${labelB}“` })
+      }
     }
     // Real feedback e7333af2 (Susan, 2026-10-02): named, directed links
     // between any two concepts. Only rendered when BOTH endpoints are
@@ -799,7 +954,7 @@ function NetzTab({
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
     return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, density, containerWidth])
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, lzOrder, containerWidth, gs.edges, gs.labels])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
@@ -807,7 +962,7 @@ function NetzTab({
 
     const elements: ElementDefinition[] = [
       ...model.nodes.map((n) => ({ data: { id: n.id, label: n.label, color: n.color, size: n.size, opacity: n.opacity, kind: n.kind, tooltip: n.tooltip }, position: { x: n.x, y: n.y } })),
-      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '' } })),
+      ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '', gradient: e.gradient ?? e.color } })),
     ]
 
     const cy = cytoscape({
@@ -821,6 +976,7 @@ function NetzTab({
         {
           selector: 'node',
           style: {
+            'border-width': 1.5, 'border-color': cssVar('--surface-0', '#ffffff'),
             'background-color': 'data(color)', 'background-opacity': 'data(opacity)',
             width: 'data(size)', height: 'data(size)',
             label: 'data(label)', 'font-size': 8, 'text-wrap': 'wrap', 'text-max-width': '60px',
@@ -863,8 +1019,30 @@ function NetzTab({
           // into a near-solid block of color. Real 2026-10-01 feedback.
           selector: 'edge[kind="relevance"]',
           style: {
-            width: 'mapData(weight, 0, 3, 1, 4)', 'line-color': 'data(color)', 'curve-style': 'bezier',
-            'target-arrow-shape': 'none', opacity: 'mapData(weight, 0, 3, 0.12, 0.5)', 'transition-property': 'opacity', 'transition-duration': 180,
+            width: 'mapData(weight, 0, 3, 0.8, 2.2)', 'line-color': 'data(color)', 'curve-style': 'bezier',
+            'target-arrow-shape': 'none', opacity: 'data(op)', 'transition-property': 'opacity', 'transition-duration': 180,
+          } as any,
+        },
+        {
+          // A Lernziel's other (non-strongest) links: hidden unless the edge
+          // mode is "all", and shown on hover (.reveal) otherwise.
+          selector: 'edge[kind="cross"]',
+          style: { width: 0.8, 'line-color': 'data(color)', 'curve-style': 'bezier', 'target-arrow-shape': 'none', opacity: 'data(op)', display: gs.edges === 'all' ? 'element' : 'none' } as any,
+        },
+        { selector: 'edge[kind="cross"].reveal', style: { display: 'element', opacity: 0.7, width: 1.6, 'z-index': 50 } as any },
+        {
+          selector: 'edge[kind="bundle"]',
+          style: {
+            width: 'mapData(weight, 1, 60, 2, 9)', 'line-color': '#8896a5', opacity: 0.55, 'curve-style': 'unbundled-bezier',
+            'line-fill': 'linear-gradient', 'line-gradient-stop-colors': 'data(gradient)',
+            'target-arrow-shape': 'none', 'z-index': 1,
+          } as any,
+        },
+        {
+          selector: 'edge[kind="bundle"].hover-label',
+          style: {
+            opacity: 0.7, label: 'data(tooltip)', 'font-size': 10, 'font-weight': 600, 'text-wrap': 'wrap', 'text-max-width': '180px', 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1, 'text-background-padding': '4px',
           } as any,
         },
         {
@@ -895,6 +1073,33 @@ function NetzTab({
       ],
     })
     cyRef.current = cy
+    // Arcs between concepts that are the same distance apart would lie on top of each other, so each gets its own height.
+    const arcsPerGap = new Map<number, number>()
+    cy.edges('[kind="bundle"]').forEach((e) => {
+      const gap = Math.abs(e.source().position('x') - e.target().position('x'))
+      const bucket = Math.round(gap / 20)
+      const k = arcsPerGap.get(bucket) ?? 0
+      arcsPerGap.set(bucket, k + 1)
+      // The side an arc bows to depends on which end is its source, so arcs that run right to left are flipped to bow upward too.
+      const upward = e.source().position('x') <= e.target().position('x') ? -1 : 1
+      e.style('control-point-distances', [upward * (arcHeight(gap, 330, 0.24) + 14 * k)])
+      e.style('control-point-weights', [0.5])
+    })
+    if (gs.layout === 'physics') {
+      // Top-level concepts stay where they are; only the smaller nodes move.
+      cy.edges('[kind="bundle"]').style('curve-style', 'bezier')
+      const pinned = cy.nodes('[kind="bk"]')
+      pinned.lock()
+      cy.elements().not('[kind="cross"]').not('[kind="bundle"]').layout(physicsLayoutOptions(physicsSpacing) as any).run()
+      pinned.unlock()
+      cy.fit(undefined, 30)
+    }
+    cy.on('mouseover', 'node[kind="lz"]', (evt) => evt.target.connectedEdges('[kind="cross"]').addClass('reveal'))
+    cy.on('mouseout', 'node[kind="lz"]', (evt) => evt.target.connectedEdges('[kind="cross"]').removeClass('reveal'))
+    // The pointer can leave the whole graph without a per-node mouseout firing.
+    cy.on('mouseout', (evt) => { if (evt.target === cy) cy.edges('.reveal').removeClass('reveal') })
+    cy.on('mouseover', 'edge[kind="bundle"]', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'edge[kind="bundle"]', (evt) => evt.target.removeClass('hover-label'))
 
     cy.on('tap', 'node[kind="lz"]', (evt) => navigate(`/dashboard/${project.slug}/${evt.target.id()}`))
     cy.on('tap', 'node[kind="bk"], node[kind="uk"]', (evt) => setHighlightId((prev) => (prev === evt.target.id() ? null : evt.target.id())))
@@ -910,7 +1115,19 @@ function NetzTab({
     cy.on('mouseover', 'edge[kind="relation"]', (evt) => evt.target.addClass('hover-label'))
     cy.on('mouseout', 'edge[kind="relation"]', (evt) => evt.target.removeClass('hover-label'))
     return () => { cy.destroy(); cyRef.current = null }
-  }, [model, project.slug, navigate])
+  }, [model, project.slug, navigate, gs.layout, gs.edges, physicsSpacing])
+
+  // Line strength (graph standards rule 3). Restyles the existing lines in
+  // place when the slider moves, so zoom and pan are kept.
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    // Opacity goes through data(op), not a direct style, so the hover style
+    // (.reveal) can still bring a hidden link forward at full strength.
+    cy.edges('[kind="relevance"]').forEach((e) => { e.data('op', lineOpacity(e.data('weight'), gs.lineStrength)) })
+    cy.edges('[kind="cross"]').forEach((e) => { e.data('op', lineOpacity(e.data('weight'), gs.lineStrength) * 0.45) })
+    cy.edges('[kind="relevance"]').forEach((e) => { e.style('width', lineWidth(e.data('weight'))) })
+  }, [model, gs.lineStrength, gs.layout, gs.edges, physicsSpacing])
 
   // Click-to-highlight: applies/clears the .dimmed class on the ALREADY
   // rendered graph (no rebuild, no lost zoom/pan) -- expands outward up to
@@ -926,6 +1143,8 @@ function NetzTab({
       const next: string[] = []
       for (const id of frontier) {
         cy.getElementById(id).connectedEdges().forEach((edge) => {
+          const kind = edge.data('kind')
+          if (kind === 'bundle' || (kind === 'cross' && gs.edges !== 'all')) return // arcs and hidden links would light up the whole graph
           const other = edge.source().id() === id ? edge.target().id() : edge.source().id()
           if (!visited.has(other)) { visited.add(other); next.push(other) }
         })
@@ -934,7 +1153,7 @@ function NetzTab({
     }
     cy.nodes().forEach((n) => { n.toggleClass('dimmed', !visited.has(n.id())) })
     cy.edges().forEach((e) => { e.toggleClass('dimmed', !(visited.has(e.source().id()) && visited.has(e.target().id()))) })
-  }, [highlightId])
+  }, [highlightId, gs.edges])
 
   const zoomBy = (factor: number) => {
     const cy = cyRef.current
@@ -976,27 +1195,39 @@ function NetzTab({
           <button className={`chip-btn${sizeBy === 'count' ? ' active' : ''}`} onClick={() => setSizeBy('count')}>Anzahl Lernziele</button>
           <button className={`chip-btn${sizeBy === 'relevance' ? ' active' : ''}`} onClick={() => setSizeBy('relevance')}>Relevanz-Summe</button>
         </div>
-        <div className="netz-control-group">
-          <span className="muted" style={{ fontSize: 11 }}>Abstand:</span>
-          <button className={`chip-btn${density === 'kompakt' ? ' active' : ''}`} onClick={() => setDensity('kompakt')}>Kompakt</button>
-          <button className={`chip-btn${density === 'weit' ? ' active' : ''}`} onClick={() => setDensity('weit')}>Weit</button>
-        </div>
-        <div className="netz-control-group">
-          <button className="btn btn-mini" aria-label="Verkleinern" onClick={() => zoomBy(0.8)}><ZoomOut size={13} /></button>
-          <button className="btn btn-mini" aria-label="Einpassen" onClick={fitView}><Maximize2 size={13} /></button>
-          <button className="btn btn-mini" aria-label="Vergrößern" onClick={() => zoomBy(1.25)}><ZoomIn size={13} /></button>
-        </div>
+        {showLz && (
+          <div className="netz-control-group">
+            <span className="muted" style={{ fontSize: 11 }}>Punkte der Lernziele ordnen nach:</span>
+            <button className={`chip-btn${lzOrder === 'grade' ? ' active' : ''}`} onClick={() => setLzOrder('grade')}>Klassenstufe</button>
+            <button className={`chip-btn${lzOrder === 'relevance' ? ' active' : ''}`} onClick={() => setLzOrder('relevance')}>Relevanz</button>
+          </div>
+        )}
       </div>
+      <GraphControls
+        settings={gs}
+        onChange={updateGs}
+        onReset={resetGs}
+        lang="de"
+        onZoomIn={() => zoomBy(1.25)}
+        onZoomOut={() => zoomBy(0.8)}
+        onFit={fitView}
+      />
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div ref={containerRef} style={{ height: 480, minHeight: 480 }} />
       </div>
       <p className="muted" style={{ fontSize: 12 }}>
-        Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre echten Unterkonzepte'}.
-        {showLz && ' Kleine Punkte = einzelne Lernziele, mit einer echten, bewerteten Linie zu '}
-        {showLz && (showUk ? 'dem Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'jedem Basiskonzept')}
-        {showLz && ', dem sie wirklich zugeordnet sind — viele Lernziele gehören zu mehreren Konzepten zugleich, deshalb kreuzen manche Linien.'}
-        {' '}Dickere, kräftigere Linien = höhere bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
+        Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre Unterkonzepte'}.
+        {showLz && ' Kleine Punkte = einzelne Lernziele. Jedes Lernziel hängt mit einer Linie an dem '}
+        {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
+        {showLz && ', zu dem es am stärksten passt: Diese Hauptlinie zeigt die höchste Bewertung des Lernziels. '}
+        {showLz && 'Weitere Verbindungen zu Konzepten mit mindestens mittlerer Bewertung erscheinen beim Zeigen auf das Lernziel oder bei „Alle“. Niedrig bewertete Verbindungen werden nicht gezeichnet. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
+        {showLz && (lzOrder === 'grade' ? ' Unter jedem Konzept sind die Punkte nach Klassenstufe geordnet: oben 5/6, darunter 7/8, 9 und 10.' : ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.')}
+        {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts.'}
+        {showLz && gs.edges === 'bundled' && ' Viele Lernziele gehören zu mehreren Konzepten zugleich: Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl). Zeigt man auf ein Lernziel, erscheinen seine weiteren Verbindungen.'}
+        {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
+        {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
+        {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
       </p>
 
       {showRelations && (
@@ -1229,7 +1460,7 @@ function RelationPanel({
 // Detailinhalte") for a project that hasn't had this content imported.
 // ============================================================================
 
-function DetailTab({ rootConcepts }: { rootConcepts: SchemaElement[] }) {
+function DetailTab({ rootConcepts, conceptElementsById }: { rootConcepts: SchemaElement[]; conceptElementsById: Map<string, SchemaElement> }) {
   const [selectedId, setSelectedId] = useState<string | null>(rootConcepts[0]?.id ?? null)
   useEffect(() => {
     if (!selectedId && rootConcepts[0]) setSelectedId(rootConcepts[0].id)
@@ -1256,18 +1487,82 @@ function DetailTab({ rootConcepts }: { rootConcepts: SchemaElement[] }) {
         {!selected ? (
           <p className="muted">Kein Basiskonzept ausgewählt.</p>
         ) : (
-          <StudentBkDetail concept={selected} abbr={bkAbbreviation(selected.label)} />
+          <StudentBkDetail concept={selected} abbr={bkAbbreviation(selected.label)} conceptElementsById={conceptElementsById} />
         )}
       </div>
     </div>
   )
 }
 
-function StudentBkDetail({ concept }: { concept: SchemaElement; abbr: string }) {
+// Real feedback 87b2bb99 + 7fb73846 (Susan): add every Basiskonzept's real
+// Unterkonzepte here, each with the same short explanation already shown on
+// the Lernziele page's sub-concept chips (element.definition +
+// metadata.beispiel, migration 059) -- same data, not new content.
+//
+// Real feedback (Susan, 2026-10-09/10, rows b4b1aade/0182976c/6a9b7103/
+// 29e5eb06): this used to render BELOW a second, separately-curated
+// "core_principles" chip row (migration 041/042 static content) that
+// listed near-identical sub-concept names with slightly different
+// wording -- e.g. "Biologisches System als offenes System" here vs.
+// "Offene Systeme" in core_principles for the same real concept. Two
+// never-reconciled data sources describing the same thing, shown twice,
+// inconsistently. Fixed by deleting that redundant static row entirely
+// (StudentBkDetail no longer reads core_principles) and keeping only this
+// one real, taxonomy-backed list -- restyled as inline tags near the top
+// of the page (Susan's own suggested pattern: "the subconcepts should
+// just show up once, ideally at the top as tags, and when one clicks on
+// the tabs, a window opens with the description... similar to how it is
+// implemented in the learning goals cards"). A tag with no real
+// definition or example yet (hasDetail = false) still renders -- it's
+// real taxonomy, not nothing -- but visibly muted and non-interactive,
+// instead of silently doing nothing on click (the "no explanation given"
+// complaint: previously a tag you could click with no visible sign it had
+// nothing to show).
+function Subkonzepte({ rootId, conceptElementsById }: { rootId: string; conceptElementsById: Map<string, SchemaElement> }) {
+  const [openId, setOpenId] = useState<string | null>(null)
+  const children = Array.from(conceptElementsById.values())
+    .filter((el) => el.parent_id === rootId)
+    .sort((a, b) => a.label.localeCompare(b.label, 'de'))
+  if (children.length === 0) return null
+  return (
+    <div style={{ marginTop: 10 }}>
+      {/* The description opens on its own full-width line right after the chip that was clicked, so it sits directly
+          below that term and not at the bottom of the whole list (feedback 67c4c148, asked for twice). */}
+      <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+        {children.map((el) => {
+          const beispiel = (el.metadata as any)?.beispiel as string | undefined
+          const hasDetail = !!(el.definition || beispiel)
+          const isOpen = openId === el.id
+          return (
+            <Fragment key={el.id}>
+              <button
+                className={`chip-btn${isOpen ? ' active' : ''}`}
+                style={{ cursor: hasDetail ? 'pointer' : 'default', opacity: hasDetail ? 1 : 0.5 }}
+                title={hasDetail ? undefined : 'Noch keine Beschreibung hinterlegt'}
+                onClick={() => hasDetail && setOpenId(isOpen ? null : el.id)}
+              >
+                {el.label}
+              </button>
+              {isOpen && (
+                <div style={{ flex: '0 0 100%' }}>
+                  <div style={{ fontSize: 13, margin: '0 0 4px', padding: '6px 10px', background: 'var(--surface-2)', borderRadius: 6, maxWidth: 560 }}>
+                    {el.definition && <p style={{ margin: 0 }}>{el.definition}</p>}
+                    {beispiel && <p className="muted" style={{ margin: '4px 0 0' }}><em>Beispiel:</em> {beispiel}</p>}
+                  </div>
+                </div>
+              )}
+            </Fragment>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function StudentBkDetail({ concept, conceptElementsById }: { concept: SchemaElement; abbr: string; conceptElementsById: Map<string, SchemaElement> }) {
   const definition = (concept as any).didactic_definition as string | null
   const misconceptions = ((concept as any).common_misconceptions ?? []) as { falsch: string; richtig: string; hinweis?: string }[]
   const anchors = ((concept as any).everyday_anchors ?? []) as string[]
-  const principles = ((concept as any).core_principles ?? []) as string[]
 
   return (
     <div>
@@ -1275,15 +1570,13 @@ function StudentBkDetail({ concept }: { concept: SchemaElement; abbr: string }) 
       {!definition ? (
         <p className="muted">Noch keine Detailinhalte für dieses Basiskonzept hinterlegt.</p>
       ) : (
+        <p>{definition}</p>
+      )}
+
+      <Subkonzepte rootId={concept.id} conceptElementsById={conceptElementsById} />
+
+      {definition && (
         <>
-          <p>{definition}</p>
-
-          {principles.length > 0 && (
-            <div className="row" style={{ flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-              {principles.map((p) => <span key={p} className="chip">{p}</span>)}
-            </div>
-          )}
-
           {misconceptions.length > 0 && (
             <section style={{ marginTop: 18 }}>
               <h3>Häufige Schülervorstellungen</h3>

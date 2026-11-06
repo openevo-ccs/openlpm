@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/florida-lpm/schema/coherence-finding-record.schema.json",
+  "title": "florida-lpm Coherence-Analysis Finding Record",
+  "description": "One empirical finding from directly reading official Florida science-standards documents across editions (1996 Sunshine State Standards, 2008 NGSSS, 2020 B.E.S.T. Standards, a 2026 proposed rewrite): a gap, a working cross-reference, a wording change between editions, or a naming-explicitness shift. The computable unit underneath prose in docs/source-notes/ -- lets a query ask 'which adopted mandates (institutional-mandate-record) have a supporting or contradicting finding' and 'exactly how did the required wording on evolution change between 2008 and 2026'. Modeled on deutsche_lp's/nys_lp's/india-lpm's coherence-finding-record.schema.json; findingType is adapted since Florida's defining pattern is the SAME standard set being re-adopted and re-worded across decades (not a 16-Land comparison like Germany, nor a single-document-lineage reform like NY's Portrait of a Graduate, nor a national-vs-state split like India).",
+  "type": "object",
+  "required": ["id", "slug", "label", "findingType", "objects", "summary", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^FLLP-FINDING-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "findingType": {
+      "type": "string",
+      "enum": [
+        "uncrossreferenced-gap", "working-crossreference",
+        "standard-wording-change-across-editions", "standard-naming-explicitness-gap",
+        "benchmark-removed-or-added-across-editions",
+        "convergent-coverage-pattern", "cross-state-standards-divergence"
+      ],
+      "description": "'uncrossreferenced-gap' = no link found between related content in two policy objects that would benefit from one. 'working-crossreference' = a real cross-reference was found and confirmed. 'standard-wording-change-across-editions' = a finding about how a specific benchmark's own wording changed between two named editions of Florida's science standards (e.g. the qualifying phrase 'scientific theory of' added before 'evolution' between the 1996 and 2008 standards) -- a fact about the policy text's own evolution, not about external curriculum. 'standard-naming-explicitness-gap' = whether a given edition names a contested concept (e.g. 'evolution', 'natural selection', 'climate change') explicitly at all, versus using vaguer or substitute language, versus omitting it entirely. 'benchmark-removed-or-added-across-editions' = a specific benchmark code present in one edition and absent (or newly present) in another, distinct from a wording change to a benchmark that persists across both. 'convergent-coverage-pattern' = 2+ independent sources (official text, a textbook, a CPALMS resource page) converge on the same content emphasis. 'cross-state-standards-divergence' = comparison with another state's (NY via nys_lp, or any state covered in national_ccs_policy/) equivalent standard, e.g. how Florida's 2026 proposed wording compares to NGSS's or another state's treatment of the same concept."
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The policy object(s) this finding is about. One object alone is valid for a single-source placement fact that a later finding might compare against; most findings compare 2+ (e.g. the same benchmark across two editions).",
+      "items": {
+        "type": "object",
+        "required": ["jurisdiction", "sourceDocument"],
+        "additionalProperties": false,
+        "properties": {
+          "jurisdiction": { "type": "string", "pattern": "^US-[A-Z]{2}$|^US$" },
+          "policyArea": { "type": "string", "description": "e.g. 'SC.912.L.15 Natural Selection and Evolution', 'B.E.S.T. Standards life-science strand', '2026 proposed high-school life-science standards'." },
+          "documentDate": { "type": "string", "format": "date" },
+          "excerptText": { "type": "string", "description": "A short verbatim excerpt grounding the object, where one exists in the source doc." },
+          "sourceDocument": { "type": "string" },
+          "sourcePage": { "type": "string" },
+          "sourceUrl": { "type": "string", "format": "uri" },
+          "accessTier": {
+            "type": "string",
+            "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+            "description": "How much of this object's source document this record actually keeps in excerptText, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Identical field to deutsche_lp's/nys_lp's/india-lpm's coherence-finding-record.schema.json."
+          },
+          "licenseOrRightsNote": {
+            "type": "string",
+            "description": "The legal basis for storing excerptText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences stating the finding in plain language -- what was found, not why it matters (see policyRelevance for that)."
+    },
+    "policyRelevance": {
+      "type": "string",
+      "description": "Optional: why this finding matters for curriculum policy or for OpenEvo's own strategy, if not already obvious from summary."
+    },
+    "testsMandateIds": {
+      "type": "array",
+      "description": "Institutional-mandate-record ids this finding provides evidence for, against, or relevant to.",
+      "items": { "type": "string", "pattern": "^FLLP-MANDATE-[a-z0-9-]+$" }
+    },
+    "relatedControversyIds": {
+      "type": "array",
+      "description": "policy-controversy-record ids this finding provides direct textual evidence for -- e.g. a wording-change finding that documents exactly what a controversy's contestedObjects fight was actually about.",
+      "items": { "type": "string", "pattern": "^FLLP-CONTROVERSY-[a-z0-9-]+$" }
+    },
+    "themes": {
+      "type": "array",
+      "description": "Which content theme(s) this finding is evidentially about -- kept as an open, non-enum string list since this repo's theme taxonomy has not yet stabilized.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "exhaustivenessCaveat": {
+      "type": "string",
+      "description": "Explicit statement of how exhaustive the underlying search was, e.g. 'based on the specific editions and benchmark codes fetched this session, not a systematic benchmark-by-benchmark diff of every life-science standard across all four editions' -- required honesty; omit only when a search genuinely was exhaustive (rare)."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

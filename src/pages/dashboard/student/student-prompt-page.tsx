@@ -7,7 +7,7 @@ import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type Pr
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
 import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
-import { listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
+import { listFavoriteGoalMethodsFor, listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { listMethodConceptLinks, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
 import { createPromptExperiment, listProjectPromptExperiments, type PromptExperimentRow } from '@/lib/supabase/prompt-experiments'
 import { ExperimentCard } from '../portfolios/prompt-generator-page'
@@ -51,6 +51,12 @@ export default function StudentPromptPage() {
   // Lernziele from within that already-narrowed range, not just accept the
   // whole set or switch to the separate "Direkt auswählen" scope.
   const [deselectedInRange, setDeselectedInRange] = useState<Set<string>>(new Set())
+  // Real feedback d58954d3 (Susan): "the specific favorite learning goals
+  // should be listed here with the option to select/deselect all" -- the
+  // "Meine Favoriten" scope only ever showed a count, never which ones,
+  // and gave no way to exclude one without un-favoriting it elsewhere.
+  // Same deselect-within-the-set pattern as deselectedInRange above.
+  const [deselectedFavorites, setDeselectedFavorites] = useState<Set<string>>(new Set())
   const [manualSelection, setManualSelection] = useState<Set<string>>(new Set())
   const [auswahlQuery, setAuswahlQuery] = useState('')
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
@@ -157,6 +163,8 @@ export default function StudentPromptPage() {
       .filter((t) => !unterthemaFilter || t.unterthema === unterthemaFilter)
   }, [topics, gradeFilter, themaFilter, unterthemaFilter])
 
+  const favoriteMatches = useMemo(() => (topics ?? []).filter((t) => favorites.has(t.id)), [topics, favorites])
+
   // A range match that gets excluded drops out when the range itself
   // changes underneath it (new grade/thema/unterthema) -- an id excluded
   // from one range shouldn't silently stay excluded from an unrelated one.
@@ -168,6 +176,17 @@ export default function StudentPromptPage() {
     })
   }, [rangeMatches])
 
+  // Same pruning as rangeMatches above: un-favoriting a Lernziel elsewhere
+  // (e.g. on the Lernziele page) should drop it from here too, not leave a
+  // stale deselected entry nothing ever re-adds.
+  useEffect(() => {
+    setDeselectedFavorites((prev) => {
+      const validIds = new Set(favoriteMatches.map((t) => t.id))
+      const next = new Set(Array.from(prev).filter((id) => validIds.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [favoriteMatches])
+
   const toggleDeselected = (id: string) => {
     setDeselectedInRange((prev) => {
       const next = new Set(prev)
@@ -177,13 +196,22 @@ export default function StudentPromptPage() {
     })
   }
 
+  const toggleDeselectedFavorite = (id: string) => {
+    setDeselectedFavorites((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   const scopedIds = useMemo(() => {
     if (!topics) return []
-    if (scope === 'favoriten') return topics.filter((t) => favorites.has(t.id)).map((t) => t.id)
+    if (scope === 'favoriten') return favoriteMatches.filter((t) => !deselectedFavorites.has(t.id)).map((t) => t.id)
     if (scope === 'auswahl') return topics.filter((t) => manualSelection.has(t.id)).map((t) => t.id)
     if (scope === 'klassenstufe') return rangeMatches.filter((t) => !deselectedInRange.has(t.id)).map((t) => t.id)
     return topics.map((t) => t.id)
-  }, [topics, scope, favorites, manualSelection, rangeMatches, deselectedInRange])
+  }, [topics, scope, favoriteMatches, deselectedFavorites, manualSelection, rangeMatches, deselectedInRange])
 
   useEffect(() => {
     const missing = scopedIds.filter((id) => !fullById.has(id))
@@ -199,6 +227,20 @@ export default function StudentPromptPage() {
   }, [scopedIds])
 
   const items = useMemo(() => scopedIds.map((id) => fullById.get(id)).filter((o): o is DataObject => !!o), [scopedIds, fullById])
+
+  // Real feedback 3f22dcd5 (Susan): "in the KI Prompt-Generator, there needs
+  // to be an option to select favorite methods (if there are any relevant
+  // to the selected learning goals)" -- the per-goal favorites (migration
+  // 119) among whichever Lernziele are currently in scope, re-checked
+  // whenever the selection changes.
+  const [favoriteGoalMethodPairs, setFavoriteGoalMethodPairs] = useState<{ data_object_id: string; method_key: string }[]>([])
+  useEffect(() => {
+    listFavoriteGoalMethodsFor(supabase, scopedIds).then(setFavoriteGoalMethodPairs)
+  }, [supabase, scopedIds])
+  const relevantFavoriteMethods = useMemo(
+    () => Array.from(new Set(favoriteGoalMethodPairs.map((p) => p.method_key))),
+    [favoriteGoalMethodPairs]
+  )
 
   useEffect(() => {
     if (!cfg) return
@@ -276,6 +318,42 @@ export default function StudentPromptPage() {
               <option value="auswahl">Direkt auswählen</option>
             </select>
           </div>
+          {/* Real feedback d58954d3 (Susan): "the specific favorite learning
+              goals should be listed here with the option to select/deselect
+              all" -- same checklist + select/deselect-all pattern as
+              "Nach Klassenstufe" and "Direkt auswählen" below, applied to
+              the favorites themselves. */}
+          {scope === 'favoriten' && favoriteMatches.length > 0 && (
+            <div className="field">
+              <label>Favoriten ({favoriteMatches.length - deselectedFavorites.size} von {favoriteMatches.length} ausgewählt)</label>
+              <div style={{ maxHeight: 220, overflowY: 'auto', border: '1px solid var(--border)', borderRadius: 8, padding: 6 }}>
+                {favoriteMatches.map((t) => (
+                  <label key={t.id} className="row" style={{ gap: 6, fontSize: 12.5, padding: '3px 2px', cursor: 'pointer', alignItems: 'flex-start' }}>
+                    <input type="checkbox" checked={!deselectedFavorites.has(t.id)} onChange={() => toggleDeselectedFavorite(t.id)} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ minWidth: 0 }}>{t.title}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="row" style={{ gap: 10, marginTop: 6 }}>
+                <button
+                  className="btn-linklike"
+                  style={{ fontSize: 12 }}
+                  disabled={deselectedFavorites.size === 0}
+                  onClick={() => setDeselectedFavorites(new Set())}
+                >
+                  Alle auswählen
+                </button>
+                <button
+                  className="btn-linklike"
+                  style={{ fontSize: 12 }}
+                  disabled={deselectedFavorites.size === favoriteMatches.length}
+                  onClick={() => setDeselectedFavorites(new Set(favoriteMatches.map((t) => t.id)))}
+                >
+                  Alle abwählen
+                </button>
+              </div>
+            </div>
+          )}
           {scope === 'klassenstufe' && (
             <>
               <div className="field">
@@ -314,11 +392,26 @@ export default function StudentPromptPage() {
                       </label>
                     ))}
                   </div>
-                  {deselectedInRange.size > 0 && (
-                    <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setDeselectedInRange(new Set())}>
-                      Alle wieder auswählen
+                  {/* Real feedback d398a23f (Susan): there should be an
+                      option here to select/deselect all. */}
+                  <div className="row" style={{ gap: 10, marginTop: 6 }}>
+                    <button
+                      className="btn-linklike"
+                      style={{ fontSize: 12 }}
+                      disabled={deselectedInRange.size === 0}
+                      onClick={() => setDeselectedInRange(new Set())}
+                    >
+                      Alle auswählen
                     </button>
-                  )}
+                    <button
+                      className="btn-linklike"
+                      style={{ fontSize: 12 }}
+                      disabled={deselectedInRange.size === rangeMatches.length}
+                      onClick={() => setDeselectedInRange(new Set(rangeMatches.map((t) => t.id)))}
+                    >
+                      Alle abwählen
+                    </button>
+                  </div>
                 </div>
               )}
             </>
@@ -356,11 +449,23 @@ export default function StudentPromptPage() {
                   ))
                 )}
               </div>
-              {manualSelection.size > 0 && (
-                <button className="btn-linklike" style={{ marginTop: 6, fontSize: 12 }} onClick={() => setManualSelection(new Set())}>
-                  Auswahl zurücksetzen ({manualSelection.size})
+              {/* Real feedback d398a23f (Susan): select/deselect all, same
+                  as the "Nach Klassenstufe" scope above. */}
+              <div className="row" style={{ gap: 10, marginTop: 6 }}>
+                <button
+                  className="btn-linklike"
+                  style={{ fontSize: 12 }}
+                  disabled={auswahlResults.length === 0 || manualSelection.size === auswahlResults.length}
+                  onClick={() => setManualSelection(new Set(auswahlResults.map((t) => t.id)))}
+                >
+                  Alle auswählen
                 </button>
-              )}
+                {manualSelection.size > 0 && (
+                  <button className="btn-linklike" style={{ fontSize: 12 }} onClick={() => setManualSelection(new Set())}>
+                    Auswahl zurücksetzen ({manualSelection.size})
+                  </button>
+                )}
+              </div>
             </div>
           )}
           <p className="muted" style={{ fontSize: 12.5 }}>
@@ -445,6 +550,25 @@ export default function StudentPromptPage() {
 
         <div className="card student-prompt-card">
           <h3><span className="num">5</span>Didaktische Methoden</h3>
+          {relevantFavoriteMethods.length > 0 && (
+            <div style={{ marginBottom: 10 }}>
+              <p className="muted" style={{ fontSize: 12, margin: '0 0 4px' }}>
+                Favorisierte Methoden für die ausgewählten Lernziele:
+              </p>
+              <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+                {relevantFavoriteMethods.map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`chip-btn${cfg.methoden.includes(m) ? ' active' : ''}`}
+                    onClick={() => setCfg({ ...cfg, methoden: toggleInList(cfg.methoden, m) })}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <CheckGroup
             options={options.methods}
             selected={cfg.methoden}
@@ -466,7 +590,11 @@ export default function StudentPromptPage() {
         </div>
 
         <div className="card student-prompt-card">
-          <h3><span className="num">7</span>Gesellschaftliche Bezüge</h3>
+          {/* Real feedback e893bc17 (Susan): renamed to name the two
+              Querschnittsaufgaben (cross-cutting education mandates) this
+              section's new options cover, alongside the original societal
+              connections. */}
+          <h3><span className="num">7</span>Gesellschaftliche Bezüge und Querschnittsaufgaben</h3>
           <CheckGroup options={options.societal_context} selected={cfg.kontext} onToggle={(v) => setCfg({ ...cfg, kontext: toggleInList(cfg.kontext, v) })} />
           <div className="field" style={{ marginTop: 8 }}>
             <label>Weitere Hinweise (z. B. andere Bezüge)</label>

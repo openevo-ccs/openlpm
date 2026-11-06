@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/us-evolution-education-lpm/schema/curriculum-crosswalk-record.schema.json",
+  "title": "us-evolution-education-lpm Curriculum Crosswalk Record",
+  "description": "Inherited for structural parity; not expected to be used in this repo, since this repo's own content (Supreme Court rulings, a cross-state comparison) has no single state's own machine-readable standards document to crosswalk against -- that work belongs in florida-lpm/pennsylvania-lpm/tennessee-lpm's own identical schema instead. Modeled on deutsche_lp's/nys_lp's/florida-lpm's/pennsylvania-lpm's/tennessee-lpm's curriculum-crosswalk-record.schema.json.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "sourceSystem", "coverageStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^USLP-CROSSWALK-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^US-[A-Z]{2}$"
+    },
+    "standardOrAttribute": {
+      "type": "string",
+      "description": "What this crosswalk covers, e.g. 'the national Academic Standards for Science and Technology, Biological Sciences -- Evolution benchmarks'. A crosswalk record is scoped to one standard set or benchmark cluster."
+    },
+    "gradeRange": { "type": "string" },
+    "sourceSystem": {
+      "type": "string",
+      "enum": ["openevo-conceptbase-competencybase-informal-refs", "ngss-nyssls-published-standards-doc", "case-network-conformant-publisher", "common-standards-project-api", "openevo-graph-case-format-local-file", "not-yet-available"],
+      "description": "'openevo-conceptbase-competencybase-informal-refs' = this ecosystem's own ConceptBase/CompetencyBase records, loosely referenced (informal fields, not yet validated cross-repo links -- see CONTRIBUTING.md). 'ngss-nyssls-published-standards-doc' = the official published standards document itself (PDF/web page), not a live queryable API -- reused here for the relevant federal body's own PDF/web-published standards. 'case-network-conformant-publisher' = a real, externally-hosted 1EdTech CASE Network API endpoint for this standard set. 'common-standards-project-api' = the free, public Common Standards Project REST API (api.commonstandardsproject.com) -- confirmed live for florida-lpm's standards; see docs/source-notes/ for whether it also covers Tennessee. 'openevo-graph-case-format-local-file' = this repo's own CASE-format (openevo-graph/schema/case_schema.json) CFDocument/CFItem JSON file under case/. 'not-yet-available' = no machine-readable crosswalk exists yet for this standard/attribute."
+    },
+    "sourceRepoPath": {
+      "type": "string",
+      "description": "Relative path to the actual data file in a sibling repo (e.g. '../../../bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml' or '../../../competencybase/records/...'). This repo references that file; it does not copy its contents in."
+    },
+    "coverageStatus": {
+      "type": "string",
+      "enum": [
+        "document-registry-only", "fine-grained-content-staged-untagged",
+        "canonical-items-concept-tagged", "not-yet-attempted"
+      ],
+      "description": "How far the referenced data has progressed, mirroring deutsche_lp's own three-tier progression convention."
+    },
+    "notes": { "type": "string" },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal/rights status of the referenced external dataset itself (not this record, which stores no source text). Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency. accessTier does not apply to this schema since it deliberately stores no excerpt/full text -- see this schema's own description."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { StructureReviewCard } from '@/components/structure-review-card'
 import { useEffect, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import { ArrowRight, BookOpen, Clock, FileText, FolderKanban, MessageSquare, Plus } from 'lucide-react'
@@ -7,6 +8,7 @@ import { describeActivity, listRecentActivity, type ActivityEntry } from '@/lib/
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
+import { CurriculumSourceCard } from '@/components/curriculum-source-card'
 
 // 2026-09-13 restructure: renamed from "Overview," folding in the former
 // standalone Projects and Members tabs (per Dustin's explicit instruction)
@@ -22,6 +24,35 @@ import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 // status/stats/navigation: the maturity badge, the stat tiles, this
 // project's own sub-projects, and recent activity.
 
+// Introduction text (migration 173). Paragraphs are separated by blank lines.
+// A first paragraph that starts with "Status:" is shown as a notice so the
+// space's standing (synthetic, unreviewed, and so on) is the first thing read.
+// The column does not exist until migration 173 is applied; a project without
+// text renders nothing.
+function capitalizeFirst(text: string) {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text
+}
+
+function ProjectIntroduction({ text }: { text: string | null }) {
+  if (!text || !text.trim()) return null
+  const paragraphs = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+  return (
+    <div style={{ marginBottom: 20, maxWidth: 760 }}>
+      {paragraphs.map((para, i) =>
+        i === 0 && para.startsWith('Status:') ? (
+          <div key={i} className="notice" style={{ alignItems: 'flex-start' }}>
+            <span>
+              <strong>Status:</strong> {capitalizeFirst(para.slice('Status:'.length).trim())}
+            </span>
+          </div>
+        ) : (
+          <p key={i} style={{ marginTop: 0, lineHeight: 1.55 }}>{para}</p>
+        ),
+      )}
+    </div>
+  )
+}
+
 type CountTable = 'literature_references' | 'lpm_schema_elements' | 'lpm_data_objects' | 'discussion_topics'
 type Project = Database['public']['Tables']['projects']['Row']
 
@@ -30,9 +61,39 @@ async function countFor(supabase: ProjectOutletContext['supabase'], table: Count
   return count ?? 0
 }
 
+// Real feedback, 2026-10-21: a Curriculum Repository project (Florida,
+// Germany, etc.) "doesn't seem to have data" -- the four generic LPM-project
+// tiles below (literature_references/lpm_schema_elements/lpm_data_objects/
+// discussion_topics) are all genuinely, correctly empty for this project
+// kind, since its real content lives entirely in curriculum_repository_records
+// instead. Showing four zeroes next to a repo that actually holds 49 real
+// records is the wrong four numbers being shown, a display problem rather
+// than a real absence of data. Four facts about its own real content
+// instead: how many records, how many
+// distinct kinds of record, how many jurisdictions it covers, and how many of
+// its records are an actual sub-space of this nation (vs. living flat on the
+// nation itself) -- the same regional/thematic split project-switcher-page.tsx
+// now surfaces in the parent's own card.
+async function curriculumRepositoryStats(supabase: ProjectOutletContext['supabase'], projectId: string) {
+  const { data, count } = await supabase
+    .from('curriculum_repository_records')
+    .select('record_type, jurisdiction', { count: 'exact' })
+    .eq('project_id', projectId)
+  const rows = data ?? []
+  const recordTypes = new Set(rows.map((r) => r.record_type)).size
+  const jurisdictions = new Set(rows.map((r) => r.jurisdiction).filter((j): j is string => !!j)).size
+  const { count: subSpaceCount } = await supabase
+    .from('projects')
+    .select('*', { count: 'exact', head: true })
+    .eq('parent_project_id', projectId)
+  return { total: count ?? 0, recordTypes, jurisdictions, subSpaceCount: subSpaceCount ?? 0 }
+}
+
 export default function DashboardPage() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const isCurriculumRepository = (project as any).project_kind === 'curriculum-repository'
   const [counts, setCounts] = useState<[number, number, number, number] | null>(null)
+  const [repoStats, setRepoStats] = useState<Awaited<ReturnType<typeof curriculumRepositoryStats>> | null>(null)
   const [pendingReviews, setPendingReviews] = useState<number | null>(null)
   const [activity, setActivity] = useState<ActivityEntry[] | null>(null)
   const [maturity, setMaturity] = useState(project.maturity)
@@ -41,6 +102,11 @@ export default function DashboardPage() {
   const canManage = role === 'owner' || role === 'maintainer'
 
   useEffect(() => {
+    if (isCurriculumRepository) {
+      setRepoStats(null)
+      curriculumRepositoryStats(supabase, project.id).then(setRepoStats)
+      return
+    }
     setCounts(null)
     Promise.all([
       countFor(supabase, 'literature_references', project.id),
@@ -48,7 +114,7 @@ export default function DashboardPage() {
       countFor(supabase, 'lpm_data_objects', project.id),
       countFor(supabase, 'discussion_topics', project.id),
     ]).then((c) => setCounts(c as [number, number, number, number]))
-  }, [supabase, project.id])
+  }, [supabase, project.id, isCurriculumRepository])
 
   useEffect(() => {
     setPendingReviews(null)
@@ -79,17 +145,23 @@ export default function DashboardPage() {
     if (!error) setMaturity(next)
   }
 
-  const stats = [
-    { label: 'Papers and sources', count: counts?.[0] ?? 0, icon: BookOpen },
-    { label: 'Concepts', count: counts?.[1] ?? 0, icon: FileText },
-    { label: 'Learning goals', count: counts?.[2] ?? 0, icon: FileText },
-    { label: 'Discussion topics', count: counts?.[3] ?? 0, icon: MessageSquare },
-  ]
+  const stats = isCurriculumRepository
+    ? [
+        { label: 'Curriculum Repository records', count: repoStats?.total ?? 0, icon: FileText },
+        { label: 'Kinds of record', count: repoStats?.recordTypes ?? 0, icon: FolderKanban },
+        { label: 'Jurisdictions covered', count: repoStats?.jurisdictions ?? 0, icon: BookOpen },
+        { label: 'Sub-spaces inside', count: repoStats?.subSpaceCount ?? 0, icon: MessageSquare },
+      ]
+    : [
+        { label: 'Papers and sources', count: counts?.[0] ?? 0, icon: BookOpen },
+        { label: 'Concepts', count: counts?.[1] ?? 0, icon: FileText },
+        { label: 'Learning goals', count: counts?.[2] ?? 0, icon: FileText },
+        { label: 'Discussion topics', count: counts?.[3] ?? 0, icon: MessageSquare },
+      ]
 
   return (
     <div>
       <h1>{project.name}</h1>
-      <p className="muted" style={{ marginBottom: 8 }}>{project.description}</p>
 
       {canManage && (
         <div className="row" style={{ marginBottom: 20, alignItems: 'center' }}>
@@ -118,10 +190,19 @@ export default function DashboardPage() {
               <span className="muted">{label}</span>
               <Icon size={14} style={{ color: 'var(--text-muted)' }} />
             </div>
-            <div style={{ fontSize: 24, fontWeight: 700 }}>{counts === null ? '—' : count}</div>
+            <div style={{ fontSize: 24, fontWeight: 700 }}>{(isCurriculumRepository ? repoStats === null : counts === null) ? '—' : count}</div>
           </div>
         ))}
       </div>
+
+      {/* Introduction under the stat tiles (feedback 0fba8647). A space with no written
+          introduction shows its short description here, since the page-top banner no
+          longer repeats it on this page. */}
+      <ProjectIntroduction text={(project as { introduction?: string | null }).introduction ?? project.description ?? null} />
+
+      {isCurriculumRepository && <StructureReviewCard supabase={supabase} projectId={project.id} slug={project.slug} canReview={canManage} />}
+
+      <CurriculumSourceCard supabase={supabase} projectId={project.id} lang="en" />
 
       <ProjectsSection project={project} canManage={canManage} supabase={supabase} />
 
@@ -177,8 +258,13 @@ function ProjectsSection({
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 8 }}>
         <div>
           <h2 className="row"><FolderKanban size={16} style={{ color: 'var(--text-muted)' }} />Projects in this Space</h2>
+          {/* Real feedback f316c6a2 (Susan): "/style-check all text on this
+              page, specifically get rid of any mention of 'echt'" -- this
+              opened with "Real efforts," a reflexive self-vouching "real"
+              Dustin's own writing-style rule already bans. State the fact,
+              skip the qualifier. */}
           <p className="muted" style={{ marginBottom: 12 }}>
-            Real efforts inside {project.name} — some fully proven, some still early drafts.
+            Efforts inside {project.name} — some fully proven, some still early drafts.
           </p>
         </div>
         {canManage && (

@@ -1,0 +1,89 @@
+# india_lp -- Karnataka coherence-analysis finding records.
+#
+# Deliberately filed under state/karnataka/local_policy/ rather than
+# national_ccs_policy/ (where deutsche_lp centralizes its own
+# coherence-findings.yaml) -- deutsche_lp's findings are mostly genuine
+# cross-Land comparisons, so a national home makes sense there. This
+# finding is single-jurisdiction (Karnataka only), so it lives with the
+# rest of Karnataka's own record set instead.
+$schema: ../../../../schema/coherence-finding-record.schema.json
+
+findings:
+
+  - id: "INLP-FINDING-karnataka-heredity-open-license-vs-ncert-default"
+    slug: "karnataka-heredity-open-license-vs-ncert-default"
+    label: "Karnataka's own Class 10 Science 'Heredity' chapter is openly licensed; the national default is not"
+    findingType: "licensing-terms-divergence"
+    themes: ["licensing-and-redistribution-rights", "human-origins-nature"]
+    objects:
+      - jurisdiction: "IN-KA"
+        subject: "Science"
+        gradeLevel: "Class 10 (English medium)"
+        excerptText: "Hybridisation is the process of combining different varieties of an organism to create a hybrid."
+        sourceDocument: "KOER Class 10 Science, Chapter 21 'Heredity'"
+        sourceUrl: "https://koer-en.karnatakaeducation.org.in/index.php/Heredity"
+        accessTier: "excerpt-only"
+        licenseOrRightsNote: >
+          KOER states directly, on its own "Brief note on KOER" page, that
+          its content is licensed under Creative Commons
+          Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) --
+          confirmed by two independent direct fetches (this repo's founding
+          session, 2026-09-30, and again 2026-10-02). Safe to quote
+          verbatim on that basis.
+    summary: >
+      Karnataka's own Class 10 Science textbook, as mirrored on KOER, covers
+      heredity at Chapter 21 -- a different number from NCERT's own
+      similarly-named national chapter, which this repo has not directly
+      re-confirmed this session (see exhaustivenessCaveat) -- and does so
+      under an explicit, checkable open license. NCERT's own curriculum
+      text, by contrast, defaults to all-rights-reserved across the board
+      (see national_ccs_policy/records/institutional-actors.yaml,
+      INLP-ACTOR-ncert, and docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#3).
+      The same underlying school-science topic therefore sits at two
+      genuinely different redistribution-rights tiers depending on which
+      jurisdiction's own version of it is in hand -- a concrete, specific
+      instance of the state-to-state (and state-to-national) licensing
+      variation this repo's founding research already found in the
+      abstract, now anchored to one real, named chapter rather than stated
+      only as a general pattern.
+    policyRelevance: >
+      Demonstrates the accessTier/licenseOrRightsNote model doing real
+      work: the same curriculum topic can be stored at a materially higher
+      tier in one jurisdiction's records than another, for a stated, real,
+      checkable reason, with neither tier being an accident of effort
+      rather than law.
+    exhaustivenessCaveat: >
+      Two honest limits, so this finding isn't overclaimed. First: this
+      repo has not directly re-confirmed NCERT's own current Class 10
+      Science chapter numbering/title this session (its all-rights-reserved
+      default is independently well-sourced elsewhere in this repo, but the
+      specific "different chapter number" comparison rests on general
+      background knowledge, not a fresh primary-source check) -- treat the
+      NCERT side of this comparison as plausible, not verified, until
+      someone reads NCERT's current textbook directly. Second, and more
+      important: KOER's own CC BY-SA licensing is real and confirmed, but
+      the wiki page behind this specific chapter is, as of 2026-10-02, a
+      thin structural stub -- a short definition plus outbound links, not
+      a fully-authored treatment -- and a same-session check of the
+      most likely adjacent human-origins page (Class 8 Social Science,
+      "Geographical Features And Pre-Historic India") found the same
+      thing. Open licensing and content maturity are different axes; this
+      finding is about the first, not a claim about the second.
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        excerptText and the license claim were both read directly from
+        koer-en.karnatakaeducation.org.in's own live pages this session,
+        independent of (and consistent with) the founding session's
+        2026-09-30 licensing research. The NCERT-side chapter-numbering
+        comparison is this record's one unverified claim -- see
+        exhaustivenessCaveat -- and should be checked directly before this
+        finding is cited in anything leaving this repo (a brief, outreach,
+        or an exported public example repo).
+      sourceProvenance: "https://koer-en.karnatakaeducation.org.in/index.php/Heredity"

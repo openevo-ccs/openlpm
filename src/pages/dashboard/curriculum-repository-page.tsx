@@ -1,28 +1,38 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { Info, Library, Link2, Plus, Search, X } from 'lucide-react'
+import { ArrowLeftRight, Info, Library, Link2, Pencil, Plus, Save, Search, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
   ACCESS_TIER_LABEL,
+  ACCESS_TIER_OPTIONS,
+  DRAFT_LABEL,
+  isUnreviewedDraft,
   RECORD_TYPE_LABEL,
   createContentLink,
+  createRepositoryRecord,
   getRepositoryRecord,
+  getSupersessionInfo,
   listContentLinksForRecord,
   listJurisdictions,
   listRepositoryRecords,
   splitContentFields,
+  updateRepositoryRecord,
+  type RepositoryRecordDraft,
   type RepositoryRecordRow,
+  type SupersessionInfo,
 } from '@/lib/supabase/curriculum-repository'
+import { RECORD_TYPE_BLURB, RECORD_TYPE_COLOR, RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
 
 // "Browse + connect" -- real sourced national/regional curriculum-policy
-// material (deutsche-lpm/nys-lpm today), invite-only, read-only here by
-// design: a viewer can look at a record and link it to something in their
-// OWN project with a short rationale, but never edit the repository's own
-// content from this screen (that's an owner/maintainer-only action, not
-// built in this pass). Every record is shown only as much as its own
-// access_tier allows -- see splitContentFields.
+// material (deutsche-lpm/nys-lpm today), invite-only. Any member can look at
+// a record and link it to something in their OWN project with a short
+// rationale; creating or editing a repository record itself is an
+// owner/maintainer-only action (RLS-enforced, same as canManage elsewhere).
+// Every record is shown only as much as its own access_tier allows -- see
+// splitContentFields.
 export default function CurriculumRepositoryPage() {
-  const { project, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
   const { recordId } = useParams<{ recordId?: string }>()
   const navigate = useNavigate()
 
@@ -31,18 +41,26 @@ export default function CurriculumRepositoryPage() {
   const [recordType, setRecordType] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [search, setSearch] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [refreshToken, setRefreshToken] = useState(0)
+  const refresh = () => setRefreshToken((t) => t + 1)
 
   // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
   // so browsing here resolves to the PARENT's id instead.
-  const repoProjectId =
-    (project as any).project_kind === 'curriculum-repository-custom-view'
-      ? ((project as any).parent_project_id ?? project.id)
-      : project.id
+  const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
+  const repoProjectId = isCustomView ? ((project as any).parent_project_id ?? project.id) : project.id
+
+  // Creating/editing records is only offered from the real repository itself,
+  // not from one of its custom views -- a view's own member list is
+  // deliberately separate from (often much wider than) its parent
+  // repository's, so a view maintainer's role says nothing about whether
+  // they're trusted to write the underlying repository's own content.
+  const canManage = !isCustomView && (role === 'owner' || role === 'maintainer')
 
   useEffect(() => {
     listJurisdictions(supabase, repoProjectId).then(setJurisdictions)
-  }, [supabase, repoProjectId])
+  }, [supabase, repoProjectId, refreshToken])
 
   useEffect(() => {
     setRecords(null)
@@ -54,7 +72,7 @@ export default function CurriculumRepositoryPage() {
       }).then(setRecords)
     }, search ? 250 : 0)
     return () => clearTimeout(timer)
-  }, [supabase, repoProjectId, recordType, jurisdiction, search])
+  }, [supabase, repoProjectId, recordType, jurisdiction, search, refreshToken])
 
   const countsByType = useMemo(() => {
     const m = new Map<string, number>()
@@ -67,12 +85,18 @@ export default function CurriculumRepositoryPage() {
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h1 className="row"><Library size={18} style={{ color: 'var(--text-muted)' }} />Curriculum Repository</h1>
-          <p className="muted" style={{ marginBottom: 12, maxWidth: 640 }}>
-            Real, sourced curriculum-policy material for this jurisdiction. Each item is shown only as
-            much as its own source allows — some are full excerpts, most today are citation only (a
-            pointer to the source rather than the text itself) until someone reviews them for more.
+          <p className="muted row" style={{ marginBottom: 12, maxWidth: 640, gap: 5, alignItems: 'flex-start' }}>
+            Sourced curriculum-policy material for this jurisdiction.
+            <span title="Each record is shown as fully as its own source allows. Most today are citation-only -- a pointer to the source rather than the full text -- until someone reviews them for more." style={{ cursor: 'help' }}>
+              <Info size={13} style={{ verticalAlign: 'text-bottom' }} />
+            </span>
           </p>
         </div>
+        {canManage && (
+          <button className="btn btn-mini" onClick={() => { setCreating(true); navigate(`/dashboard/${project.slug}/curriculum-repository`) }}>
+            <Plus size={12} />New record
+          </button>
+        )}
       </div>
 
       <div className="card" style={{ marginBottom: 12 }}>
@@ -103,7 +127,7 @@ export default function CurriculumRepositoryPage() {
 
       {records === null ? (
         <p className="muted">Loading…</p>
-      ) : records.length === 0 ? (
+      ) : records.length === 0 && !creating ? (
         <div className="card empty">
           <Library size={32} />
           <p>No records match.</p>
@@ -116,19 +140,50 @@ export default function CurriculumRepositoryPage() {
               <button
                 key={r.id}
                 className="btn-linklike"
-                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '6px 0', fontWeight: r.id === recordId ? 600 : 400 }}
-                onClick={() => navigate(`/dashboard/${project.slug}/curriculum-repository/${r.id}`)}
+                style={{
+                  display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', marginBottom: 6,
+                  borderLeft: `3px solid ${RECORD_TYPE_COLOR[r.record_type]}`, borderRadius: 4, textDecoration: 'none',
+                  background: r.id === recordId && !creating ? 'var(--surface-2)' : 'var(--surface-1)',
+                }}
+                onClick={() => { setCreating(false); navigate(`/dashboard/${project.slug}/curriculum-repository/${r.id}`) }}
               >
-                {r.title}
-                <span className="muted" style={{ fontSize: 11, marginLeft: 8 }}>{RECORD_TYPE_LABEL[r.record_type]}{r.jurisdiction ? ` · ${r.jurisdiction}` : ''}</span>
+                <span className="row" style={{ gap: 5, alignItems: 'center', marginBottom: 2 }}>
+                  <RecordKindIcon type={r.record_type} size={12} />
+                  <span style={{ fontSize: 11, fontWeight: 600, color: RECORD_TYPE_COLOR[r.record_type] }}>{RECORD_TYPE_LABEL[r.record_type]}</span>
+                  {r.jurisdiction && <span className="muted" style={{ fontSize: 11 }}>· {r.jurisdiction}</span>}
+                </span>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)', display: 'block' }}>{r.title}</span>
+                {isUnreviewedDraft(r) && <span className="muted" style={{ fontSize: 10, display: 'block', marginTop: 2 }}>{DRAFT_LABEL.en}</span>}
               </button>
             ))}
           </div>
           <div className="card" style={{ minHeight: 200 }}>
-            {recordId ? (
-              <RecordDetail recordId={recordId} supabase={supabase} currentProject={project} />
+            {creating ? (
+              <RecordForm
+                projectId={repoProjectId}
+                supabase={supabase}
+                initial={null}
+                onSaved={(newId) => { setCreating(false); refresh(); navigate(`/dashboard/${project.slug}/curriculum-repository/${newId}`) }}
+                onCancel={() => setCreating(false)}
+              />
+            ) : recordId ? (
+              <RecordDetail recordId={recordId} supabase={supabase} currentProject={project} repoProjectId={repoProjectId} canManage={canManage} onChanged={refresh} />
             ) : (
-              <p className="muted">Pick a record on the left. ({Array.from(countsByType.entries()).map(([t, n]) => `${RECORD_TYPE_LABEL[t as RepositoryRecordRow['record_type']]}: ${n}`).join(', ')})</p>
+              <div>
+                <p className="muted" style={{ marginTop: 0 }}>Pick a record on the left. Here&apos;s what kinds of things are in this repository:</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {Array.from(countsByType.entries()).map(([t, n]) => (
+                    <div key={t} className="row" style={{ gap: 8, alignItems: 'flex-start' }}>
+                      <span style={{ marginTop: 2 }}><RecordKindIcon type={t as RepositoryRecordRow['record_type']} size={15} /></span>
+                      <div>
+                        <strong style={{ fontSize: 13 }}>{RECORD_TYPE_LABEL[t as RepositoryRecordRow['record_type']]}</strong>
+                        <span className="muted" style={{ fontSize: 12 }}> ({n})</span>
+                        <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{RECORD_TYPE_BLURB[t as RepositoryRecordRow['record_type']]}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
@@ -141,44 +196,113 @@ function RecordDetail({
   recordId,
   supabase,
   currentProject,
+  repoProjectId,
+  canManage,
+  onChanged,
 }: {
   recordId: string
   supabase: ProjectOutletContext['supabase']
   currentProject: ProjectOutletContext['project']
+  repoProjectId: string
+  canManage: boolean
+  onChanged: () => void
 }) {
   const [record, setRecord] = useState<RepositoryRecordRow | null>(null)
   const [links, setLinks] = useState<Awaited<ReturnType<typeof listContentLinksForRecord>>>([])
+  const [supersession, setSupersession] = useState<SupersessionInfo>({ predecessor: null, successor: null })
   const [showConnect, setShowConnect] = useState(false)
+  const [editing, setEditing] = useState(false)
+  // Real bug (this is what "clicking a record opens to nowhere" actually
+  // was, 2026-10-05 feedback): this hook used to sit below the `!record`
+  // early return, so the loading render called one fewer hook than every
+  // render after the record arrived -- a Rules-of-Hooks violation that
+  // throws and blanks the whole page the instant a record finishes
+  // loading, with no error boundary to catch it. Every hook has to run on
+  // every render regardless of what's returned, so it has to live above
+  // any conditional return.
+  const navigate = useNavigate()
 
   const reload = async () => {
-    const [rec, l] = await Promise.all([getRepositoryRecord(supabase, recordId), listContentLinksForRecord(supabase, recordId)])
+    const rec = await getRepositoryRecord(supabase, recordId)
     setRecord(rec)
+    if (!rec) return
+    const [l, s] = await Promise.all([listContentLinksForRecord(supabase, recordId), getSupersessionInfo(supabase, rec)])
     setLinks(l)
+    setSupersession(s)
   }
 
   useEffect(() => {
     setRecord(null)
+    setSupersession({ predecessor: null, successor: null })
+    setEditing(false)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, recordId])
 
   if (!record) return <p className="muted">Loading…</p>
 
+  if (editing) {
+    return (
+      <RecordForm
+        projectId={repoProjectId}
+        supabase={supabase}
+        initial={record}
+        onSaved={() => { setEditing(false); reload(); onChanged() }}
+        onCancel={() => setEditing(false)}
+      />
+    )
+  }
+
   const { visible, gated } = splitContentFields(record)
   const sourceUrl = (record.content as Record<string, unknown> | null)?.sourceUrl ?? (record.content as Record<string, unknown> | null)?.url
+  const goTo = (id: string) => navigate(`/dashboard/${currentProject.slug}/curriculum-repository/${id}`)
 
   return (
     <div>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <h3 style={{ marginTop: 0, marginBottom: 4 }}>{record.title}</h3>
-          <div className="row" style={{ gap: 6 }}>
-            <span className="chip" style={{ fontSize: 10 }}>{RECORD_TYPE_LABEL[record.record_type]}</span>
+          <div style={{ marginBottom: 6 }}><RecordKindLine type={record.record_type} withBlurb /></div>
+          <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
             {record.jurisdiction && <span className="chip" style={{ fontSize: 10 }}>{record.jurisdiction}</span>}
+            {isUnreviewedDraft(record) && <span className="chip" style={{ fontSize: 10, borderColor: 'var(--warn, #b7791f)' }}>{DRAFT_LABEL.en}</span>}
             <span className="chip" style={{ fontSize: 10 }} title={record.license_or_rights_note ?? undefined}>{ACCESS_TIER_LABEL[record.access_tier]}</span>
+            {record.event_date && <span className="chip" style={{ fontSize: 10 }}>{record.event_date}</span>}
+            {(record.effective_from || record.effective_until) && (
+              <span className="chip" style={{ fontSize: 10 }}>
+                In effect {record.effective_from ?? '…'} – {record.effective_until ?? 'ongoing'}
+              </span>
+            )}
           </div>
         </div>
+        {canManage && (
+          <button className="btn btn-mini" onClick={() => setEditing(true)}><Pencil size={12} />Edit</button>
+        )}
       </div>
+
+      {(supersession.predecessor || supersession.successor) && (
+        <div className="card" style={{ marginTop: 10, marginBottom: 10, padding: '8px 10px' }}>
+          <div className="row" style={{ gap: 6, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 2 }}>
+            <ArrowLeftRight size={13} />Part of an edition history
+          </div>
+          {supersession.predecessor && (
+            <p style={{ fontSize: 13, margin: '2px 0' }}>
+              Replaced{' '}
+              <button type="button" className="btn-linklike" onClick={() => goTo(supersession.predecessor!.id)}>
+                {supersession.predecessor.title}
+              </button>
+            </p>
+          )}
+          {supersession.successor && (
+            <p style={{ fontSize: 13, margin: '2px 0' }}>
+              Later replaced by{' '}
+              <button type="button" className="btn-linklike" onClick={() => goTo(supersession.successor!.id)}>
+                {supersession.successor.title}
+              </button>
+            </p>
+          )}
+        </div>
+      )}
 
       {visible.length === 0 && gated.length === 0 && (
         <p className="muted" style={{ fontSize: 13 }}>No further details recorded for this item yet.</p>
@@ -210,6 +334,7 @@ function RecordDetail({
           links.map((l) => (
             <div key={l.id} style={{ padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
               <span style={{ fontSize: 13 }}>{l.data_object.title}</span>
+              {l.project && <span className="muted" style={{ fontSize: 11, marginLeft: 6 }}>in {l.project.name}</span>}
               {l.rationale && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0' }}>{l.rationale}</p>}
             </div>
           ))
@@ -226,6 +351,152 @@ function RecordDetail({
           />
         )}
       </section>
+
+      <LiteratureCollectionsPanel
+        projectId={currentProject.id}
+        scope={{ curriculumRepositoryRecordId: recordId }}
+        canManage={canManage}
+        supabase={supabase}
+      />
+    </div>
+  )
+}
+
+type DateMode = 'none' | 'point' | 'range'
+
+// Shared by both "New record" (initial: null) and "Edit" (initial: the
+// record being changed). Only covers the fields a maintainer actually needs
+// to set by hand -- kind, title, jurisdiction, access tier, rights note, and
+// the point-in-time-vs-standing-range dates. The free-form `content` JSONB
+// (actorType, statementText, etc.) that a real import populates is left
+// alone here; a hand-created record starts with none of that and shows "No
+// further details recorded for this item yet" until it's filled in, same as
+// any other record would before import-time enrichment.
+function RecordForm({
+  projectId,
+  supabase,
+  initial,
+  onSaved,
+  onCancel,
+}: {
+  projectId: string
+  supabase: ProjectOutletContext['supabase']
+  initial: RepositoryRecordRow | null
+  onSaved: (id: string) => void
+  onCancel: () => void
+}) {
+  const [recordType, setRecordType] = useState<RepositoryRecordRow['record_type']>(initial?.record_type ?? 'institutional-actor-record')
+  const [title, setTitle] = useState(initial?.title ?? '')
+  const [jurisdiction, setJurisdiction] = useState(initial?.jurisdiction ?? '')
+  const [accessTier, setAccessTier] = useState<RepositoryRecordRow['access_tier']>(initial?.access_tier ?? 'citation-only')
+  const [licenseNote, setLicenseNote] = useState(initial?.license_or_rights_note ?? '')
+  const [dateMode, setDateMode] = useState<DateMode>(
+    initial?.effective_from || initial?.effective_until ? 'range' : initial?.event_date ? 'point' : 'none'
+  )
+  const [eventDate, setEventDate] = useState(initial?.event_date ?? '')
+  const [effectiveFrom, setEffectiveFrom] = useState(initial?.effective_from ?? '')
+  const [effectiveUntil, setEffectiveUntil] = useState(initial?.effective_until ?? '')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const save = async () => {
+    if (!title.trim()) { setError('Title is required.'); return }
+    setBusy(true)
+    setError(null)
+    const draft: RepositoryRecordDraft = {
+      recordType,
+      title,
+      jurisdiction: jurisdiction || null,
+      accessTier,
+      licenseOrRightsNote: licenseNote || null,
+      eventDate: dateMode === 'point' ? (eventDate || null) : null,
+      effectiveFrom: dateMode === 'range' ? (effectiveFrom || null) : null,
+      effectiveUntil: dateMode === 'range' ? (effectiveUntil || null) : null,
+    }
+    if (initial) {
+      const { error: err } = await updateRepositoryRecord(supabase, initial.id, draft)
+      setBusy(false)
+      if (err) { setError(err); return }
+      onSaved(initial.id)
+    } else {
+      const { id, error: err } = await createRepositoryRecord(supabase, projectId, draft)
+      setBusy(false)
+      if (err || !id) { setError(err ?? 'Something went wrong creating the record.'); return }
+      onSaved(id)
+    }
+  }
+
+  return (
+    <div>
+      <h4 style={{ marginTop: 0 }}>{initial ? 'Edit record' : 'New record'}</h4>
+      <div className="field">
+        <label>Title</label>
+        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Thuringia Ministry of Education" />
+      </div>
+      <div className="grid grid-2">
+        <div className="field">
+          <label>Kind</label>
+          <select value={recordType} onChange={(e) => setRecordType(e.target.value as RepositoryRecordRow['record_type'])}>
+            {Object.entries(RECORD_TYPE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+          </select>
+        </div>
+        <div className="field">
+          <label>Jurisdiction (optional)</label>
+          <input value={jurisdiction ?? ''} onChange={(e) => setJurisdiction(e.target.value)} placeholder="e.g. DE-TH" />
+        </div>
+      </div>
+
+      <div className="field">
+        <label>How much of the source text can we actually keep?</label>
+        <select value={accessTier} onChange={(e) => setAccessTier(e.target.value as RepositoryRecordRow['access_tier'])}>
+          {ACCESS_TIER_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+        </select>
+      </div>
+      <div className="field">
+        <label>Rights / license note (optional)</label>
+        <input value={licenseNote ?? ''} onChange={(e) => setLicenseNote(e.target.value)} placeholder="e.g. Public domain government document" />
+      </div>
+
+      <div className="field">
+        <label>When does this apply?</label>
+        <select value={dateMode} onChange={(e) => setDateMode(e.target.value as DateMode)}>
+          <option value="none">No specific date</option>
+          <option value="point">A single date — this is a one-time event or finding</option>
+          <option value="range">A standing period — in effect from one date until another (or ongoing)</option>
+        </select>
+        <p className="muted" style={{ marginTop: 4, marginBottom: 0, fontSize: '0.85em' }}>
+          A record is either a point-in-time thing (an event, a finding) or a standing one (a mandate in
+          force for a period) — rarely both, so pick whichever actually applies here.
+        </p>
+      </div>
+
+      {dateMode === 'point' && (
+        <div className="field">
+          <label>Date</label>
+          <input type="date" value={eventDate ?? ''} onChange={(e) => setEventDate(e.target.value)} />
+        </div>
+      )}
+      {dateMode === 'range' && (
+        <div className="grid grid-2">
+          <div className="field">
+            <label>In effect from</label>
+            <input type="date" value={effectiveFrom ?? ''} onChange={(e) => setEffectiveFrom(e.target.value)} />
+          </div>
+          <div className="field">
+            <label>In effect until (leave blank if still ongoing)</label>
+            <input type="date" value={effectiveUntil ?? ''} onChange={(e) => setEffectiveUntil(e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {error && <div className="notice notice-bad" style={{ marginTop: 8 }}>{error}</div>}
+
+      <div className="row" style={{ marginTop: 10 }}>
+        <button className="btn btn-primary" disabled={busy || !title.trim()} onClick={save}>
+          <Save size={12} />{busy ? 'Saving…' : 'Save'}
+        </button>
+        <button className="btn btn-mini" disabled={busy} onClick={onCancel}>Cancel</button>
+      </div>
     </div>
   )
 }
@@ -299,7 +570,7 @@ function ConnectForm({
   useEffect(() => {
     if (query.trim().length < 2) { setResults([]); return }
     const timer = setTimeout(async () => {
-      const { data } = await supabase.from('lpm_data_objects').select('id, title').eq('project_id', currentProjectId).ilike('title', `%${query.trim()}%`).limit(8)
+      const { data } = await supabase.from('lpm_data_objects').select('id, title').eq('project_id', currentProjectId).eq('status', 'accepted').ilike('title', `%${query.trim()}%`).limit(8)
       setResults(data ?? [])
     }, 250)
     return () => clearTimeout(timer)

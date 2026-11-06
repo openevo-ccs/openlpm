@@ -1,0 +1,487 @@
+{
+  "$schema": "https://opensalt.net/api/v1/case/CFDocument",
+  "$generator": "OpenEvo tennessee-lpm founding research session, 2026-10-20",
+  "$generated": "2026-10-20T00:00:00Z",
+  "$fileDescription": "CASE-format (openevo-graph/schema/case_schema.json) representation of Tennessee's current (2022) Academic Standards for Science, Life Science strands 'Heredity: Inheritance and Variation of Traits' (Biology I only) and 'Biological Change: Unity and Diversity' (grade 8 and Biology I). Transformed from real, directly-fetched data: the Common Standards Project API (api.commonstandardsproject.com/api/v1/standard_sets/E068CD122CE146DFBCED7A17EE6E130A for Biology I, .../D19049B7586D4FD2B5E1CE17D2694B94 for grade 8), confirmed live 2026-10-20. Unlike pennsylvania-lpm's equivalent file (no confirmed license) and matching florida-lpm's (CC BY 3.0 US), this dataset IS independently licensed: CC BY 4.0 US, rightsHolder 'Common Curriculum, Inc.'",
+  "CFDocument": {
+    "identifier": "tn-2022-science",
+    "uri": "oe://case/framework/tn-2022-science",
+    "title": "Tennessee Academic Standards for Science",
+    "creator": "Tennessee State Board of Education",
+    "publisher": "Tennessee Department of Education",
+    "description": "Tennessee's current K-12 science standards, published as a PDF dated 2022-10-28 (filename 'New 10-28-22 Science Standards.pdf' on the Department's own site) and tagged 'Science (2022-)' in the Common Standards Project's catalog. This file covers only the Life Science strands directly relevant to evolution/heredity at grade 8 and in the Biology I course (grades 9-12) -- not the full standard set (Biology II, Chemistry, Physics, Earth/Space Science, Environmental Science, and the rest of K-12 Life Science are out of scope for this repo).",
+    "subject": [
+      "Science"
+    ],
+    "language": "en",
+    "version": "2022",
+    "adoptionStatus": "Active",
+    "statusStart": "2022-10-28",
+    "lastChangeDateTime": "2026-10-20T00:00:00Z",
+    "gradeLevels": [
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+    ],
+    "gradeBand": "9-12",
+    "openEvoAnchors": [],
+    "notes": "This is Tennessee's current standards document -- it postdates all three of this repo's central legislative episodes (the 1925 Butler Act, the 1973 equal-time law struck down in 1975, and the 2012 Teacher Protection Act) and reflects none of their restrictive framing: evolution and natural selection are named explicitly and without qualification throughout. See state/tennessee/local_policy/records/coherence-findings.yaml for the direct comparison between this modern standards language and the recurring statutory pattern."
+  },
+  "CFItems": [
+    {
+      "identifier": "tn-2022-life-science",
+      "uri": "oe://case/item/tn-2022-life-science",
+      "fullStatement": "Life Science",
+      "CFItemType": "Domain",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": [],
+      "note": "Shared parent node for this file's two Life Science strands (Heredity, Biological Change), spanning grade 8 and Biology I (grades 9-12)."
+    },
+    {
+      "identifier": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "uri": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "fullStatement": "Heredity: Inheritance and Variation of Traits",
+      "humanCodingScheme": "BIO1.LS3",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-1",
+      "uri": "oe://case/item/tn-2022-bio1-ls3-1",
+      "fullStatement": "Engage in an argument from evidence that the process of cellular division (mitosis) creates diploid daughter cells that are genetically identical to the diploid parent cells.",
+      "humanCodingScheme": "BIO1.LS3.1",
+      "listEnumeration": "BIO1.LS3.1",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-2",
+      "uri": "oe://case/item/tn-2022-bio1-ls3-2",
+      "fullStatement": "Engage in an argument from evidence that the process of meiosis exists to create genetic variation in a population from the creation of new combinations of genetic material in each of the haploid gametes.",
+      "humanCodingScheme": "BIO1.LS3.2",
+      "listEnumeration": "BIO1.LS3.2",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-3",
+      "uri": "oe://case/item/tn-2022-bio1-ls3-3",
+      "fullStatement": "Ask questions to clarify that variation of traits arises from differences in genes (alleles) and how cells regulate gene expression.",
+      "humanCodingScheme": "BIO1.LS3.3",
+      "listEnumeration": "BIO1.LS3.3",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-4",
+      "uri": "oe://case/item/tn-2022-bio1-ls3-4",
+      "fullStatement": "Construct an explanation based on evidence that genetic variations may result from (a) new genetic combinations via the processes of crossing over and random segregation of chromosomes during meiosis, (b) mutations that occur during replication, and/or (c) mutations caused by environmental factors. Evidence should include that mutations that occur in gametes can be passed to offspring.",
+      "humanCodingScheme": "BIO1.LS3.4",
+      "listEnumeration": "BIO1.LS3.4",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-strand-biological-change-unity-and-diversity",
+      "uri": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "fullStatement": "Biological Change: Unity and Diversity",
+      "humanCodingScheme": "BIO1.LS4",
+      "CFItemType": "Strand",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8",
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-1",
+      "uri": "oe://case/item/tn-2022-bio1-ls4-1",
+      "fullStatement": "Analyze and interpret scientific data that common ancestry and biological evolution are supported by multiple lines of empirical evidence (e.g. DNA sequences, amino acid sequences, anatomical structures, the fossil record, biogeography, or order of appearance of structures during embryological development).",
+      "humanCodingScheme": "BIO1.LS4.1",
+      "listEnumeration": "BIO1.LS4.1",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-2",
+      "uri": "oe://case/item/tn-2022-bio1-ls4-2",
+      "fullStatement": "Apply concepts of statistics (i.e. probability) to support explanations that organisms in a population with an advantageous heritable trait tend to increase in proportion to organisms lacking this trait.",
+      "humanCodingScheme": "BIO1.LS4.2",
+      "listEnumeration": "BIO1.LS4.2",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-3",
+      "uri": "oe://case/item/tn-2022-bio1-ls4-3",
+      "fullStatement": "Analyze and interpret data that natural selection is influenced by (1) the potential for a species to increase in number, (2) the heritable genetic variation of individuals in a species due to mutation and sexual reproduction, (3) competition for limited resources, and (4) the proliferation of those organisms that are better able to survive and reproduce in the environment.",
+      "humanCodingScheme": "BIO1.LS4.3",
+      "listEnumeration": "BIO1.LS4.3",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-4",
+      "uri": "oe://case/item/tn-2022-bio1-ls4-4",
+      "fullStatement": "Construct an explanation based on evidence for how natural selection leads to adaptation in populations.",
+      "humanCodingScheme": "BIO1.LS4.4",
+      "listEnumeration": "BIO1.LS4.4",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-5",
+      "uri": "oe://case/item/tn-2022-bio1-ls4-5",
+      "fullStatement": "Obtain, evaluate, and communicate information about how changes in environmental conditions may result in (1) increases in the number of individuals of some species, (2) the emergence of new species over time, and (3) the extinction of other species.",
+      "humanCodingScheme": "BIO1.LS4.5",
+      "listEnumeration": "BIO1.LS4.5",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-8-ls4-1",
+      "uri": "oe://case/item/tn-2022-8-ls4-1",
+      "fullStatement": "Using evidence from the geologic timescale, analyze and interpret data for patterns in the fossil record that document the existence, diversity, extinction, and change in life forms throughout Earth's history.",
+      "humanCodingScheme": "8.LS4.1",
+      "listEnumeration": "8.LS4.1",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-8-ls4-2",
+      "uri": "oe://case/item/tn-2022-8-ls4-2",
+      "fullStatement": "Construct an explanation addressing similarities and differences of the anatomical structures and genetic information between extinct and extant organisms using evidence of common ancestry and patterns between taxa.",
+      "humanCodingScheme": "8.LS4.2",
+      "listEnumeration": "8.LS4.2",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-8-ls4-3",
+      "uri": "oe://case/item/tn-2022-8-ls4-3",
+      "fullStatement": "Construct an explanation based on evidence that explains how genetic variations of traits in a population increase some individuals' probability of surviving and reproducing.",
+      "humanCodingScheme": "8.LS4.3",
+      "listEnumeration": "8.LS4.3",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-8-ls4-4",
+      "uri": "oe://case/item/tn-2022-8-ls4-4",
+      "fullStatement": "Develop a scientific explanation of how natural selection plays a role in determining the survival and reproduction of a species in a changing environment.",
+      "humanCodingScheme": "8.LS4.4",
+      "listEnumeration": "8.LS4.4",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8"
+      ],
+      "openEvoLinks": []
+    },
+    {
+      "identifier": "tn-2022-8-ls4-5",
+      "uri": "oe://case/item/tn-2022-8-ls4-5",
+      "fullStatement": "Obtain, evaluate, and communicate information about the technologies that have changed the way humans use artificial selection to influence the inheritance of desired traits in other organisms.",
+      "humanCodingScheme": "8.LS4.5",
+      "listEnumeration": "8.LS4.5",
+      "CFItemType": "Benchmark",
+      "language": "en",
+      "statusStart": "2022-10-28",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z",
+      "gradeLevels": [
+        "8"
+      ],
+      "openEvoLinks": []
+    }
+  ],
+  "CFAssociations": [
+    {
+      "identifier": "tn-2022-strand-heredity-inheritance-and-variation-of-traits-ischildof-life-science",
+      "originNodeURI": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "originNodeId": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "destinationNodeURI": "oe://case/item/tn-2022-life-science",
+      "destinationNodeId": "tn-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-1-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls3-1",
+      "originNodeId": "tn-2022-bio1-ls3-1",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "destinationNodeId": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-2-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls3-2",
+      "originNodeId": "tn-2022-bio1-ls3-2",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "destinationNodeId": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-3-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls3-3",
+      "originNodeId": "tn-2022-bio1-ls3-3",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "destinationNodeId": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls3-4-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls3-4",
+      "originNodeId": "tn-2022-bio1-ls3-4",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "destinationNodeId": "tn-2022-strand-heredity-inheritance-and-variation-of-traits",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-strand-biological-change-unity-and-diversity-ischildof-life-science",
+      "originNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "originNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeURI": "oe://case/item/tn-2022-life-science",
+      "destinationNodeId": "tn-2022-life-science",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-1-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls4-1",
+      "originNodeId": "tn-2022-bio1-ls4-1",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-2-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls4-2",
+      "originNodeId": "tn-2022-bio1-ls4-2",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-3-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls4-3",
+      "originNodeId": "tn-2022-bio1-ls4-3",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-4-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls4-4",
+      "originNodeId": "tn-2022-bio1-ls4-4",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-bio1-ls4-5-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-bio1-ls4-5",
+      "originNodeId": "tn-2022-bio1-ls4-5",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-8-ls4-1-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-8-ls4-1",
+      "originNodeId": "tn-2022-8-ls4-1",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-8-ls4-2-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-8-ls4-2",
+      "originNodeId": "tn-2022-8-ls4-2",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-8-ls4-3-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-8-ls4-3",
+      "originNodeId": "tn-2022-8-ls4-3",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-8-ls4-4-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-8-ls4-4",
+      "originNodeId": "tn-2022-8-ls4-4",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    },
+    {
+      "identifier": "tn-2022-8-ls4-5-ischildof-strand",
+      "originNodeURI": "oe://case/item/tn-2022-8-ls4-5",
+      "originNodeId": "tn-2022-8-ls4-5",
+      "destinationNodeURI": "oe://case/item/tn-2022-strand-biological-change-unity-and-diversity",
+      "destinationNodeId": "tn-2022-strand-biological-change-unity-and-diversity",
+      "associationType": "isChildOf",
+      "CFDocumentURI": "oe://case/framework/tn-2022-science",
+      "lastChangeDateTime": "2026-10-20T00:00:00Z"
+    }
+  ]
+}

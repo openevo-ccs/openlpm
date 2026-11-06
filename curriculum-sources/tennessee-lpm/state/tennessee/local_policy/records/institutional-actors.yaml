@@ -1,0 +1,108 @@
+$schema: ../../../../schema/institutional-actor-record.schema.json
+$description: >
+  Tennessee-specific institutional actors across a full century: the
+  legislature that passed all three central statutes, the modern State
+  Board/Department that adopts standards, and the professional association
+  that opposed the 2012 law. Unlike pennsylvania-lpm, no school-district-level
+  actor appears here -- Tennessee's own central mandates are all state
+  statutes, and the Scopes case was a criminal prosecution under state law,
+  not a district policy dispute.
+
+actors:
+  - id: TNLP-ACTOR-tennessee-general-assembly
+    slug: tennessee-general-assembly
+    label: Tennessee General Assembly
+    actorType: governing-board
+    jurisdiction: US-TN
+    role: >
+      Tennessee's state legislature. Passed all three of this repo's central
+      statutes: the 1925 Butler Act (criminalizing the teaching of
+      evolution), the 1967 repeal, the 1973 "equal time" law (struck down
+      1975), and the 2012 Teacher Protection Act (still in force).
+    url: https://www.capitol.tn.gov
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Butler Act and Daniel v. Waters Wikipedia summaries, cross-checked
+        against NCSE's and Journal of Southern Religion's own accounts --
+        fetched and read directly.
+
+  - id: TNLP-ACTOR-tn-state-board-of-education
+    slug: tn-state-board-of-education
+    label: Tennessee State Board of Education
+    actorType: governing-board
+    jurisdiction: US-TN
+    role: >
+      Sets Tennessee's academic standards under statutory authority (T.C.A.
+      S49-1-302(a)(8)), with a mandated review cycle of at least every 8
+      years for science (T.C.A. SS49-1-311 to 313 / Board Policy 3.209):
+      educator review teams draft, a public-comment period runs (over 10,000
+      comments in the 2022 cycle), teams revise, and the Board casts a final
+      adoption vote. Adopted the current Tennessee Academic Standards for
+      Science on 2022-10-28.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Tennessee State Board of Education's own public announcement (Jan
+        2022) and the 2022-10-28 adoption PDF (tn.gov), fetched and read
+        directly.
+
+  - id: TNLP-ACTOR-tdoe
+    slug: tdoe
+    label: Tennessee Department of Education (TDOE)
+    actorType: state-education-department
+    jurisdiction: US-TN
+    role: >
+      Administers K-12 standards implementation for Tennessee public
+      schools, under the State Board of Education's authority. Its own
+      standards hub (tn.gov/education) hosts standards documents as
+      PDF/Word downloads only -- no API or machine-readable export
+      confirmed this session, and direct automated fetches of the site
+      returned HTTP 403 (apparent bot-blocking).
+    url: https://www.tn.gov/education
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The department's own standards site could not be fetched directly
+        (HTTP 403) -- its hosting of standards-as-PDFs-only is confirmed via
+        a search-engine result describing the page, not a page this session
+        read directly.
+      sourceProvenance: Search-result characterization of tn.gov/education's standards hub, not independently fetched.
+
+  - id: TNLP-ACTOR-tennessee-science-teachers-association
+    slug: tennessee-science-teachers-association
+    label: Tennessee Science Teachers Association (TSTA)
+    actorType: professional-association
+    jurisdiction: US-TN
+    role: >
+      Tennessee's own professional association for science educators.
+      Publicly opposed the 2012 Teacher Protection Act; its then-president
+      Becky Ashe called it "unnecessary, anti-scientific, and very likely
+      unconstitutional" and warned it would let teachers "teach a Sunday
+      school class" in science class.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE, "Background on Tennessee's 21st Century Monkey Law" and
+        "Tennessee 'monkey bill' passes legislature," fetched and read
+        directly.

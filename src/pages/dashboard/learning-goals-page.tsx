@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Search } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, Compass, Link2, Rows3, Search, Shapes } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { TabPanels } from '@/components/tab-panels'
+import { CURATION } from '@/components/epistemic-status-badge'
 import {
   getAssertedConnections,
   getFullThread,
   getThreadStationsForTopic,
   getTopic,
+  listTopicContents,
   listTopics,
   type DataObjectRow,
   type FullThread,
@@ -15,11 +17,55 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
+
+// Real feedback b3d9116e (2026-10-03): "We need much better ways of
+// visualizing the learning goals in terms of grade bands, concepts,
+// provenance... different views available... just like most data spaces
+// here!" The data was already there -- content.concepts[] (real ConceptBase
+// ids with an emphasis level) and content._source (the real source repo and
+// file path) on every real bio-core-lpm-synth row -- just never surfaced.
+// Concept ids are real OpenEvo registry ids (OE-CONCEPT-<namespace>-<slug>);
+// stripping only the universal "OE-CONCEPT-" prefix and title-casing the
+// rest stays correct for ANY project's concept vocabulary rather than
+// hardcoding this one dataset's "bio-core-" namespace specifically.
+function humanizeConceptId(id: string): string {
+  return id
+    .replace(/^OE-CONCEPT-/, '')
+    .split('-')
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(' ')
+}
+
+interface TopicProvenance {
+  concepts: { id: string; emphasis: string | null }[]
+  sourceRepo: string | null
+  sourcePath: string | null
+  sourceId: string | null
+}
+
+function readProvenance(content: unknown): TopicProvenance {
+  const c = (content ?? {}) as Record<string, unknown>
+  const concepts = Array.isArray(c.concepts)
+    ? (c.concepts as any[]).filter((x) => x?.id).map((x) => ({ id: String(x.id), emphasis: x.emphasis ? String(x.emphasis) : null }))
+    : []
+  const source = (c._source ?? {}) as Record<string, unknown>
+  return {
+    concepts,
+    sourceRepo: typeof source.repo === 'string' ? source.repo : null,
+    sourcePath: typeof source.path === 'string' ? source.path : null,
+    sourceId: typeof c.source_id === 'string' ? c.source_id : null,
+  }
+}
 import { CaseImportPanel, DirectCaseImportPanel, FwuImportPanel, UploadImportPanel, ExportPanel } from './importers-panels'
+import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
+import { listMethodsBaseByVocabulary, listMethodLernzielLinks, reviewMethodLernzielLink, type MethodsBaseRecord, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
+import { METHOD_ICON } from './student/student-lernziele-page'
+import { Check, Info, Sparkle, X } from 'lucide-react'
+import { ReviewQuestionsPanel } from '@/components/review-questions-panel'
 
 // 2026-09-13 restructure: renamed from "Standards" (RFC-0003 stub) and
 // merged with the standalone "Explore" tab (which is removed -- Dustin's
-// instruction is for "explore" to become a search bar, not a page) and the
+// instruction is for "explore" to become a search bar instead of a page) and the
 // standalone "Import / export" tab (every one of whose panels writes to
 // `lpm_data_objects`, i.e. this page's own content, so import/export
 // belongs here as tabs rather than as its own sidebar item). This is the
@@ -53,7 +99,43 @@ function gradeLabel(grade: string | null): string {
   return grade ? `Grade ${grade}` : 'Grade —'
 }
 
+// A combined band like "5/6" (MNT's real Doppeljahrgangsstufe structure --
+// the Thuringia curriculum itself leaves sequencing within the two years to
+// the teacher, per LP Thueringen MNT 2026's own "ueber die Anordnung der
+// Lerninhalte innerhalb der... Doppelklassenstufe entscheidet die
+// Lehrkraft") should show up when a teacher picks EITHER single grade it
+// spans, in addition to its own separate "Grade 5/6" filter option -- a
+// real gap confirmed live: 37 grade-5/6 items were invisible to anyone
+// filtering to "Grade 5" or "Grade 6" specifically, which is how a teacher
+// actually browses.
+function matchesGrade(band: string | null, filter: string): boolean {
+  if (!band) return false
+  if (band === filter) return true
+  return band.split('/').map((s) => s.trim()).includes(filter)
+}
+
 export default function LearningGoalsPage() {
+  const { project } = useOutletContext<ProjectOutletContext>()
+  // Real feedback 2026-10-10 (Dustin, Biologiedidaktik I): the two US-specific import
+  // panels (CASE Network's direct state API and its browse-by-state picker) are dead
+  // weight on a project that will only ever import German Lehrplan documents. Rather
+  // than removing them globally -- plenty of real projects (EvoMentor, the US/India
+  // curriculum repositories) genuinely need them -- a project whose working_languages
+  // is German-only has no legitimate use for a US-standards importer, so those two
+  // tabs are hidden for it specifically. Any project that also declares English (or
+  // any other language) keeps the full set unchanged.
+  const germanOnly = project.working_languages?.length === 1 && project.working_languages[0] === 'de'
+  const tabs = [
+    { label: 'Browse', content: <BrowseTab /> },
+    { label: 'Methods', content: <MethodsTab /> },
+    ...(germanOnly ? [] : [
+      { label: 'Import: Direct state API', content: <DirectCaseImportPanel /> },
+      { label: 'Import: Browse US states', content: <CaseImportPanel /> },
+    ]),
+    { label: 'Import: German Lehrplan', content: <FwuImportPanel /> },
+    { label: 'Import: Upload a file', content: <UploadImportPanel /> },
+    { label: 'Export', content: <ExportPanel /> },
+  ]
   return (
     <div>
       <h1>Learning goals</h1>
@@ -62,19 +144,12 @@ export default function LearningGoalsPage() {
         frameworks, mandated or optionally chosen within a given jurisdiction.
       </p>
 
-      <TabPanels
-        tabs={[
-          { label: 'Browse', content: <BrowseTab /> },
-          { label: 'Import: Direct state API', content: <DirectCaseImportPanel /> },
-          { label: 'Import: Browse US states', content: <CaseImportPanel /> },
-          { label: 'Import: German Lehrplan', content: <FwuImportPanel /> },
-          { label: 'Import: Upload a file', content: <UploadImportPanel /> },
-          { label: 'Export', content: <ExportPanel /> },
-        ]}
-      />
+      <TabPanels tabs={tabs} />
     </div>
   )
 }
+
+type GroupBy = 'grade' | 'concept'
 
 function BrowseTab() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
@@ -82,12 +157,20 @@ function BrowseTab() {
   const navigate = useNavigate()
 
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
+  const [provenanceByTopic, setProvenanceByTopic] = useState<Map<string, TopicProvenance>>(new Map())
   const [query, setQuery] = useState('')
   const [gradeFilter, setGradeFilter] = useState<string>('all')
+  const [conceptFilter, setConceptFilter] = useState<string>('all')
+  const [groupBy, setGroupBy] = useState<GroupBy>('grade')
 
   useEffect(() => {
     setTopics(null)
     listTopics(supabase, project.id, defaultBranchId).then(setTopics)
+    listTopicContents(supabase, project.id).then((contents) => {
+      const m = new Map<string, TopicProvenance>()
+      for (const [id, content] of contents) m.set(id, readProvenance(content))
+      setProvenanceByTopic(m)
+    })
   }, [supabase, project.id, defaultBranchId])
 
   const grades = useMemo(() => {
@@ -99,11 +182,18 @@ function BrowseTab() {
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
 
+  const concepts = useMemo(() => {
+    const set = new Set<string>()
+    for (const p of provenanceByTopic.values()) for (const c of p.concepts) set.add(c.id)
+    return Array.from(set).sort((a, b) => humanizeConceptId(a).localeCompare(humanizeConceptId(b)))
+  }, [provenanceByTopic])
+
   const filtered = useMemo(() => {
     if (!topics) return []
     const q = query.trim().toLowerCase()
     return topics.filter((t) => {
-      if (gradeFilter !== 'all' && t.grade_band !== gradeFilter) return false
+      if (gradeFilter !== 'all' && !matchesGrade(t.grade_band, gradeFilter)) return false
+      if (conceptFilter !== 'all' && !(provenanceByTopic.get(t.id)?.concepts ?? []).some((c) => c.id === conceptFilter)) return false
       if (!q) return true
       return (
         t.title.toLowerCase().includes(q) ||
@@ -111,7 +201,47 @@ function BrowseTab() {
         (t.unterthema ?? '').toLowerCase().includes(q)
       )
     })
-  }, [topics, query, gradeFilter])
+  }, [topics, query, gradeFilter, conceptFilter, provenanceByTopic])
+
+  // "just like most data spaces here" (b3d9116e) -- grouped sections instead
+  // of one flat grid, the same structural idea as the Timeline's lanes or
+  // the Concepts page's taxonomy tree. A topic tagged with more than one
+  // concept genuinely belongs under each of them, so the concept grouping
+  // can show the same card more than once -- expected behavior for a
+  // many-to-many tag.
+  const groups = useMemo(() => {
+    if (groupBy === 'grade') {
+      const byGrade = new Map<string, TopicListItem[]>()
+      for (const t of filtered) {
+        const key = t.grade_band ?? 'Ungraded'
+        const arr = byGrade.get(key) ?? []
+        arr.push(t)
+        byGrade.set(key, arr)
+      }
+      const leadingNumber = (s: string) => parseInt(s, 10) || 0
+      return Array.from(byGrade.entries())
+        .sort((a, b) => leadingNumber(a[0]) - leadingNumber(b[0]))
+        .map(([key, items]) => ({ key, label: key === 'Ungraded' ? 'Ungraded' : gradeLabel(key), items }))
+    }
+    const byConcept = new Map<string, TopicListItem[]>()
+    for (const t of filtered) {
+      const topicConcepts = provenanceByTopic.get(t.id)?.concepts ?? []
+      if (topicConcepts.length === 0) {
+        const arr = byConcept.get('__none') ?? []
+        arr.push(t)
+        byConcept.set('__none', arr)
+        continue
+      }
+      for (const c of topicConcepts) {
+        const arr = byConcept.get(c.id) ?? []
+        arr.push(t)
+        byConcept.set(c.id, arr)
+      }
+    }
+    return Array.from(byConcept.entries())
+      .sort((a, b) => (a[0] === '__none' ? 1 : b[0] === '__none' ? -1 : humanizeConceptId(a[0]).localeCompare(humanizeConceptId(b[0]))))
+      .map(([key, items]) => ({ key, label: key === '__none' ? 'No concept tagged yet' : humanizeConceptId(key), items }))
+  }, [filtered, groupBy, provenanceByTopic])
 
   return (
     <div className="explorer">
@@ -137,7 +267,27 @@ function BrowseTab() {
             <option key={g} value={g}>{gradeLabel(g)}</option>
           ))}
         </select>
+        {concepts.length > 0 && (
+          <select value={conceptFilter} onChange={(e) => setConceptFilter(e.target.value)} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid var(--border)' }}>
+            <option value="all">All concepts</option>
+            {concepts.map((c) => (
+              <option key={c} value={c}>{humanizeConceptId(c)}</option>
+            ))}
+          </select>
+        )}
         <span className="muted">{topics === null ? 'Loading…' : `${filtered.length} of ${topics.length} learning goals`}</span>
+      </div>
+
+      <div className="row" style={{ marginBottom: 10, gap: 6 }}>
+        <span className="muted" style={{ fontSize: 12 }}>Group by:</span>
+        <button type="button" className={`btn btn-mini${groupBy === 'grade' ? ' btn-primary' : ''}`} onClick={() => setGroupBy('grade')}>
+          <Rows3 size={12} />Grade band
+        </button>
+        {concepts.length > 0 && (
+          <button type="button" className={`btn btn-mini${groupBy === 'concept' ? ' btn-primary' : ''}`} onClick={() => setGroupBy('concept')}>
+            <Shapes size={12} />Concept
+          </button>
+        )}
       </div>
 
       <div className="explorer-body">
@@ -159,31 +309,51 @@ function BrowseTab() {
             // card in the app already uses. The rich detail (required order,
             // suggested connections, import/export) stays exactly where it was,
             // in the drawer -- this only replaces the plain list on the left.
-            <div className="topic-card-grid">
-              {filtered.map((t) => (
-                <div
-                  key={t.id}
-                  className={`card topic-card${t.id === objectId ? ' active' : ''}`}
-                  onClick={() => navigate(`/dashboard/${project.slug}/learning-goals/${t.id}`)}
-                >
-                  <span className="chip">{gradeLabel(t.grade_band)}</span>
-                  <strong style={{ display: 'block', marginTop: 6 }}>{t.title}</strong>
-                  {(t.thema || t.unterthema) && (
-                    <span className="muted" style={{ display: 'block', fontSize: 12.5 }}>
-                      {[t.thema, t.unterthema].filter(Boolean).join(' › ')}
-                    </span>
-                  )}
-                  {t.description && <p className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{t.description}</p>}
+            // Grouped into sections (b3d9116e) rather than one flat grid --
+            // a card can legitimately appear under more than one section when
+            // grouped by concept, so the key includes the group.
+            groups.map((group) => (
+              <div key={group.key} style={{ marginBottom: 18 }}>
+                <h4 className="row" style={{ gap: 6, marginBottom: 8, color: 'var(--text-secondary)' }}>
+                  {groupBy === 'concept' && <Shapes size={13} />}
+                  {group.label}
+                  <span className="muted" style={{ fontWeight: 400 }}>({group.items.length})</span>
+                </h4>
+                <div className="topic-card-grid">
+                  {group.items.map((t) => {
+                    const prov = provenanceByTopic.get(t.id)
+                    return (
+                      <div
+                        key={`${group.key}-${t.id}`}
+                        className={`card topic-card${t.id === objectId ? ' active' : ''}`}
+                        onClick={() => navigate(`/dashboard/${project.slug}/learning-goals/${t.id}`)}
+                      >
+                        <div className="row" style={{ gap: 4, flexWrap: 'wrap' }}>
+                          <span className="chip">{gradeLabel(t.grade_band)}</span>
+                          {prov?.concepts.map((c) => (
+                            <span key={c.id} className="chip" style={{ fontSize: 10 }}>{humanizeConceptId(c.id)}</span>
+                          ))}
+                        </div>
+                        <strong style={{ display: 'block', marginTop: 6 }}>{t.title}</strong>
+                        {(t.thema || t.unterthema) && (
+                          <span className="muted" style={{ display: 'block', fontSize: 12.5 }}>
+                            {[t.thema, t.unterthema].filter(Boolean).join(' › ')}
+                          </span>
+                        )}
+                        {t.description && <p className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{t.description}</p>}
+                      </div>
+                    )
+                  })}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
         </div>
 
         <div className="drawer-shell wide">
           <div className="drawer">
             {objectId ? (
-              <TopicDetail objectId={objectId} projectSlug={project.slug} supabase={supabase} />
+              <TopicDetail objectId={objectId} projectId={project.id} projectSlug={project.slug} supabase={supabase} />
             ) : (
               <div className="empty" style={{ paddingTop: 60 }}>
                 <Compass size={32} />
@@ -200,10 +370,12 @@ function BrowseTab() {
 
 function TopicDetail({
   objectId,
+  projectId,
   projectSlug,
   supabase,
 }: {
   objectId: string
+  projectId: string
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
 }) {
@@ -225,6 +397,7 @@ function TopicDetail({
 
   const requiredBefore = (connections ?? []).filter((c) => c.direction === 'incoming')
   const leadsTo = (connections ?? []).filter((c) => c.direction === 'outgoing')
+  const prov = readProvenance(topic.content)
 
   return (
     <div>
@@ -232,10 +405,24 @@ function TopicDetail({
         <h2 style={{ marginBottom: 2 }}>{topic.title}</h2>
         <span className="chip">{gradeLabel(topic.grade_band)}</span>
       </div>
+      {prov.concepts.length > 0 && (
+        <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+          {prov.concepts.map((c) => (
+            <span key={c.id} className="chip" style={{ fontSize: 10 }} title={c.emphasis ? `${c.emphasis} emphasis` : undefined}>{humanizeConceptId(c.id)}</span>
+          ))}
+        </div>
+      )}
       {topic.description && (
         <blockquote style={{ margin: '8px 0 16px', paddingLeft: 10, borderLeft: '3px solid var(--border)', color: 'var(--text-secondary)', fontSize: 13 }}>
           &ldquo;{topic.description}&rdquo;
         </blockquote>
+      )}
+      {(prov.sourceRepo || prov.sourceId) && (
+        <p className="muted" style={{ fontSize: 12, marginTop: -8, marginBottom: 16 }}>
+          Where this comes from: {prov.sourceRepo && <code>{prov.sourceRepo}</code>}
+          {prov.sourcePath && <> — <code>{prov.sourcePath}</code></>}
+          {prov.sourceId && <> (<code>{prov.sourceId}</code>)</>}
+        </p>
       )}
 
       {(requiredBefore.length > 0 || leadsTo.length > 0) && (
@@ -262,6 +449,8 @@ function TopicDetail({
       {connections?.length === 0 && stations?.length === 0 && (
         <p className="muted">No recorded connections for this learning goal yet.</p>
       )}
+
+      <ReviewQuestionsPanel supabase={supabase} projectId={projectId} projectSlug={projectSlug} linkedType="data_object" linkedId={objectId} />
     </div>
   )
 }
@@ -292,6 +481,18 @@ function ConnLine({
   )
 }
 
+// What kind of path a thread is, in plain words (lpm_threads.thread_type).
+const THREAD_KIND: Record<string, string> = {
+  vertical: 'A path across grade levels',
+  horizontal: 'A link across subjects',
+  vertical_horizontal: 'A path across grade levels and subjects',
+}
+
+// Dustin, feedback 43c9b51b (2026-10-25): "Suggested connection" was not
+// explained, and for a learning goal inside a strand its first line was the
+// goal's own entry, so it looked like the goal suggesting itself. The card now
+// says what kind of path it is, shows where this goal sits on it, and carries a
+// short explanation of what it is, where it comes from and how to use it.
 function ThreadCard({
   station,
   currentObjectId,
@@ -303,18 +504,25 @@ function ThreadCard({
   projectSlug: string
   supabase: ProjectOutletContext['supabase']
 }) {
+  const { project } = useOutletContext<ProjectOutletContext>()
   const [expanded, setExpanded] = useState(false)
   const [full, setFull] = useState<FullThread | null>(null)
 
-  const toggle = async () => {
-    if (!expanded && !full) {
-      const f = await getFullThread(supabase, station.thread_id)
-      setFull(f)
-    }
-    setExpanded((v) => !v)
-  }
+  // Loaded up front (one small query per path) so the card can show the steps
+  // and this goal's place among them without a click.
+  useEffect(() => {
+    let active = true
+    getFullThread(supabase, station.thread_id).then((f) => { if (active) setFull(f) })
+    return () => { active = false }
+  }, [supabase, station.thread_id])
+
+  const toggle = () => setExpanded((v) => !v)
 
   const hubLabel = station.thread.explained_by?.label ?? null
+  const steps = full?.stations ?? []
+  const stepIndex = steps.findIndex((st) => st.data_object_id === currentObjectId)
+  const kind = THREAD_KIND[station.thread.thread_type] ?? 'A learning path'
+  const isSynthetic = CURATION[project.epistemic_status] === 'synthetic-theoretical'
 
   return (
     <div className="card conn-suggested" style={{ marginBottom: 10 }}>
@@ -322,12 +530,69 @@ function ThreadCard({
         <span className="chip chip-draft">Suggested connection</span>
         {hubLabel && <span className="muted" style={{ fontSize: 12 }}>tied together by: {hubLabel}</span>}
       </div>
-      <h3 style={{ marginTop: 8, marginBottom: 4 }}>{station.thread.title}</h3>
-      <p style={{ marginBottom: 8 }}>{station.role_note}</p>
+      <h3 style={{ marginTop: 8, marginBottom: 2 }}>{station.thread.title}</h3>
+      <p className="muted" style={{ marginTop: 0, marginBottom: 8, fontSize: 12 }}>
+        {kind}{steps.length > 0 ? `, ${steps.length} steps` : ''}
+      </p>
+
+      {steps.length > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+            {stepIndex >= 0 ? `This goal is step ${stepIndex + 1} of ${steps.length}:` : 'Steps on this path:'}
+          </div>
+          <div className="row" style={{ gap: 4, flexWrap: 'wrap', alignItems: 'center' }}>
+            {steps.map((st, i) => (
+              <span key={st.id} className="row" style={{ gap: 4, alignItems: 'center' }}>
+                {i > 0 && <span className="muted" aria-hidden="true">→</span>}
+                {st.data_object_id === currentObjectId ? (
+                  <span className="chip" aria-current="step" style={{ fontWeight: 700, borderColor: 'var(--series-a)', color: 'var(--series-a)' }}>
+                    {gradeLabel(st.object.grade_band)} (this goal)
+                  </span>
+                ) : (
+                  <Link to={`/dashboard/${projectSlug}/learning-goals/${st.object.id}`} className="chip" title={st.object.title} style={{ textDecoration: 'none' }}>
+                    {gradeLabel(st.object.grade_band)}
+                  </Link>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <p style={{ marginBottom: 8 }}>
+        <span className="muted" style={{ fontSize: 12 }}>What this goal adds to the path: </span>
+        {station.role_note}
+      </p>
+
+      <details style={{ marginBottom: 8, fontSize: 13 }}>
+        <summary style={{ cursor: 'pointer' }}>What is a suggested connection?</summary>
+        <div style={{ marginTop: 6 }}>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>What it is.</strong> A learning path that runs through this goal. It lists goals in teaching
+            order, usually one per grade level, so you can see what builds on what.
+          </p>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>Where it comes from.</strong> Someone proposed this path (the people or the AI tool that built
+            this space, or a project member) and it was accepted into the space. When it is recorded, the note
+            &ldquo;How this was identified&rdquo; under the full explanation says how it was found.
+            {isSynthetic && ' In this space the paths were drafted by AI from published research, and no subject-matter expert has reviewed them yet.'}
+          </p>
+          <p style={{ margin: '0 0 6px' }}>
+            <strong>How it differs from &ldquo;Required order&rdquo;.</strong> Required order comes from the
+            curriculum&rsquo;s own structure. A suggested connection is a recommendation. You can follow it, adapt
+            it or ignore it.
+          </p>
+          <p style={{ margin: 0 }}>
+            <strong>How to use it.</strong> Open the full explanation to read why the goals belong together and
+            see every step. Click a grade level above to open that goal. Use the &ldquo;Try this in class&rdquo; idea
+            when one is given. If a path looks wrong or has a gap, raise it in this space&rsquo;s Discussions.
+          </p>
+        </div>
+      </details>
 
       <button className="btn btn-mini" onClick={toggle}>
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        {expanded ? 'Hide the full explanation' : 'Why does this connect? See the full thread'}
+        {expanded ? 'Hide the full explanation' : 'Why does this connect? See the full explanation'}
       </button>
 
       {expanded && (
@@ -373,6 +638,175 @@ function ThreadCard({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+// Methods tab: Dustin's 2026-10-10 ask -- EvoMentor Thuringia's didactic
+// methods weren't "linked well to the Lernziele," so advance the whole
+// chain from a real MethodsBase description through to a researcher view
+// that can show, and help build, those links. Deliberately a TAB inside
+// this existing page rather than a new sidebar item -- the sidebar's nav
+// is Dustin's own explicit, final 10-item spec (2026-09-13 restructure,
+// see project-layout.tsx's own comment), and this page is already the
+// real "browsing/importing/connecting" home for this exact content.
+//
+// Reads methodsbase_snapshot/method_vocabulary_links/method_lernziel_links
+// (migrations 121-123). A link only ever shows as applying to a Lernziel
+// once it's 'confirmed' -- either backfilled from real existing content,
+// or an AI suggestion (scripts/suggest_method_lernziel_links.mjs) a
+// project member has actually reviewed here. Nothing here auto-promotes a
+// suggestion; that would repeat exactly the mistake migrations 078/079/089
+// deliberately avoided (guessing at Susan's own subject-matter judgment).
+function MethodsTab() {
+  const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+
+  const [methodOptions, setMethodOptions] = useState<string[]>([])
+  const [methodsBaseByKey, setMethodsBaseByKey] = useState<Map<string, MethodsBaseRecord>>(new Map())
+  const [links, setLinks] = useState<MethodLernzielLink[]>([])
+  const [topics, setTopics] = useState<TopicListItem[] | null>(null)
+  const [selected, setSelected] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [busyLinkId, setBusyLinkId] = useState<string | null>(null)
+
+  useEffect(() => {
+    getLibraryForProject(supabase, project).then((lib) => setMethodOptions(lib ? resolveOptionLists(lib.option_lists).methods : []))
+    listMethodsBaseByVocabulary(supabase).then(setMethodsBaseByKey)
+    listMethodLernzielLinks(supabase, project.id).then(setLinks)
+    listTopics(supabase, project.id, defaultBranchId).then(setTopics)
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
+  }, [supabase, project.id, defaultBranchId])
+
+  const topicById = useMemo(() => {
+    const m = new Map<string, TopicListItem>()
+    for (const t of topics ?? []) m.set(t.id, t)
+    return m
+  }, [topics])
+
+  const linksByMethod = useMemo(() => {
+    const m = new Map<string, MethodLernzielLink[]>()
+    for (const l of links) {
+      const arr = m.get(l.method_key) ?? []
+      arr.push(l)
+      m.set(l.method_key, arr)
+    }
+    return m
+  }, [links])
+
+  useEffect(() => {
+    if (!selected && methodOptions.length > 0) setSelected(methodOptions[0])
+  }, [methodOptions, selected])
+
+  async function decide(linkId: string, decision: 'confirmed' | 'rejected') {
+    if (!userId) return
+    setBusyLinkId(linkId)
+    await reviewMethodLernzielLink(supabase, linkId, decision, userId)
+    setLinks((prev) => prev.map((l) => (l.id === linkId ? { ...l, status: decision, reviewed_by: userId, reviewed_at: new Date().toISOString() } : l)))
+    setBusyLinkId(null)
+  }
+
+  if (methodOptions.length === 0) {
+    return <p className="muted">This project's prompt library has no didactic-method vocabulary set, so there's nothing to show here yet.</p>
+  }
+
+  const selectedLinks = selected ? linksByMethod.get(selected) ?? [] : []
+  const confirmedLinks = selectedLinks.filter((l) => l.status === 'confirmed')
+  const suggestedLinks = selectedLinks.filter((l) => l.status === 'suggested')
+  const methodsBase = selected ? methodsBaseByKey.get(selected) : undefined
+
+  return (
+    <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
+      <div style={{ minWidth: 240, flexShrink: 0 }}>
+        <p className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
+          {methodOptions.length} didactic methods in this project's vocabulary
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {methodOptions.map((m) => {
+            const confirmedCount = (linksByMethod.get(m) ?? []).filter((l) => l.status === 'confirmed').length
+            const suggestedCount = (linksByMethod.get(m) ?? []).filter((l) => l.status === 'suggested').length
+            return (
+              <button
+                key={m}
+                type="button"
+                className={`btn btn-mini${selected === m ? ' btn-primary' : ''}`}
+                style={{ justifyContent: 'flex-start', textAlign: 'left' }}
+                onClick={() => setSelected(m)}
+              >
+                <span aria-hidden="true">{METHOD_ICON[m] ?? '•'}</span>
+                <span style={{ flex: 1 }}>{m}</span>
+                {!methodsBaseByKey.get(m) && <Info size={12} style={{ color: 'var(--text-muted)' }} />}
+                <span className="muted" style={{ fontSize: 11 }}>{confirmedCount}</span>
+                {suggestedCount > 0 && <span className="badge" style={{ fontSize: 10 }}>{suggestedCount} new</span>}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {!methodsBase && (
+          <div className="notice">
+            No MethodsBase record is mapped for "{selected}" yet -- nothing to show beyond the label itself.
+          </div>
+        )}
+        {methodsBase && (
+          <div className="card" style={{ marginBottom: 12 }}>
+            <h3 style={{ marginTop: 0 }}>{methodsBase.label}</h3>
+            {methodsBase.discipline && <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>{methodsBase.discipline}</p>}
+            <p>{methodsBase.description}</p>
+            {methodsBase.when_to_use && (
+              <>
+                <p style={{ fontWeight: 600, marginBottom: 2 }}>When to use it</p>
+                <p className="muted">{methodsBase.when_to_use}</p>
+              </>
+            )}
+            <p className="muted" style={{ fontSize: 11 }}>
+              Canonical description from MethodsBase ({methodsBase.id}), review status: {methodsBase.review_status ?? 'unknown'}.
+              {methodsBase.review_status === 'author-draft' && ' Not yet reviewed by anyone with Biologiedidaktik expertise -- treat it as a draft, not an authority.'}
+            </p>
+          </div>
+        )}
+
+        <h4>Lernziele this method applies to ({confirmedLinks.length})</h4>
+        {confirmedLinks.length === 0 && <p className="muted">No confirmed links yet.</p>}
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
+          {confirmedLinks.map((l) => (
+            <li key={l.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <Link to={`/dashboard/${project.slug}/learning-goals/${l.lernziel_id}`}>{topicById.get(l.lernziel_id)?.title ?? l.lernziel_id}</Link>
+              {l.rationale && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0 0' }}>{l.rationale}</p>}
+            </li>
+          ))}
+        </ul>
+
+        {suggestedLinks.length > 0 && (
+          <>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Sparkle size={14} />AI-suggested, awaiting review ({suggestedLinks.length})
+            </h4>
+            <p className="muted" style={{ fontSize: 12 }}>
+              Proposed by scripts/suggest_method_lernziel_links.mjs from this method's MethodsBase description.
+              Not shown to students and not treated as a real link anywhere else in the app until a project member
+              confirms it here.
+            </p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {suggestedLinks.map((l) => (
+                <li key={l.id} className="row" style={{ padding: '8px 0', borderBottom: '1px solid var(--border)', alignItems: 'flex-start', gap: 8 }}>
+                  <div style={{ flex: 1 }}>
+                    <Link to={`/dashboard/${project.slug}/learning-goals/${l.lernziel_id}`}>{topicById.get(l.lernziel_id)?.title ?? l.lernziel_id}</Link>
+                    {l.rationale && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0 0' }}>{l.rationale}</p>}
+                  </div>
+                  <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'confirmed')} title="Confirm this link">
+                    <Check size={12} />
+                  </button>
+                  <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'rejected')} title="Reject this link">
+                    <X size={12} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </div>
     </div>
   )
 }

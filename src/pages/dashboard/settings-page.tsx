@@ -1,31 +1,61 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useOutletContext } from 'react-router-dom'
-import { AlertTriangle, Check, Copy, ExternalLink, Globe, Layers, Link2, Mail, Plus, Trash2, UserPlus, Users, X } from 'lucide-react'
+import { AlertTriangle, Check, Copy, ExternalLink, GraduationCap, Globe, Layers, Library, Link2, Mail, MapPin, Plus, Scale, Trash2, UserPlus, Users, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { countSubProjects, deleteProject, type ProjectRow } from '@/lib/supabase/projects'
+import { countSubProjects, deleteProject, updateProjectMetadata, type ProjectRow } from '@/lib/supabase/projects'
+import { EPISTEMIC_STATUS_OPTIONS, EpistemicStatusBadge } from '@/components/epistemic-status-badge'
 import { CUSTOM_VIEW_AUDIENCES, CUSTOM_VIEW_LANGUAGES } from '@/lib/custom-views'
 import { createCustomView, listCustomViews } from '@/lib/supabase/custom-views'
 import {
+  listProjectRepositoryLinks,
+  listRepositoryLinkSummaryForProject,
+  type ProjectRepositoryLinkSummary,
+  type ProjectRepositoryLinkRow,
+} from '@/lib/supabase/curriculum-repository'
+import {
   addJoinRule,
+  cancelMemberRequest,
+  createMemberRequest,
   inviteMembers,
   listJoinRules,
   listMembers,
   listPendingInvites,
+  listPendingRequestsSent,
   removeJoinRule,
   removeMember,
   revokeInvite,
+  searchUsersToInvite,
   updateMemberRole,
   type InviteResult,
   type InviteRow,
   type JoinRule,
   type JoinRuleType,
+  type MemberRequestRow,
   type MemberWithUser,
   type ProjectMemberRole,
+  type UserSearchResult,
 } from '@/lib/supabase/members'
-import { STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
+import { getStudentViewTemplate, STUDENT_VIEW_TEMPLATES } from '@/lib/student-view-templates'
+import { ALWAYS_VISIBLE_PAGE_KEY, DASHBOARD_PAGES, defaultPageKeys } from '@/lib/dashboard-view-pages'
+import {
+  addDashboardViewAssignment,
+  createDashboardView,
+  deleteDashboardView,
+  listDashboardViewAssignments,
+  listDashboardViews,
+  removeDashboardViewAssignment,
+  setDashboardViewForced,
+  setDefaultDashboardView,
+  type DashboardView,
+  type DashboardViewAssignment,
+  type DashboardViewKind,
+  type ViewAssignmentTargetType,
+} from '@/lib/supabase/dashboard-views'
 import { PROJECT_COLORS } from '@/lib/project-colors'
-import { groupsSettings, setGroupCreatorRoles, setGroupsEnabled } from '@/lib/supabase/groups'
+import { listAvailableFrameworks, listFrameworkTags, type FrameworkRow, type FrameworkTagRow } from '@/lib/supabase/frameworks'
+import { ACCESS_TIER_OPTIONS, type AccessTier } from './new-project-wizard'
+import { groupsSettings, listGroups, setGroupCreatorRoles, setGroupSharingRoles, setGroupsEnabled, type ProjectGroup } from '@/lib/supabase/groups'
 import {
   acceptFederation,
   federationCounterparty,
@@ -57,6 +87,7 @@ export default function SettingsPage() {
   const canManage = role === 'owner' || role === 'maintainer'
   // project_kind (migration 072) isn't in the generated types yet.
   const isRepository = (project as any).project_kind === 'curriculum-repository'
+  const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
 
   return (
     <div>
@@ -64,8 +95,10 @@ export default function SettingsPage() {
       <p className="muted" style={{ marginBottom: 20 }}>Manage {project.name} — color, members, who can join, and more.</p>
 
       {canManage && <ProjectColorSection project={project} supabase={supabase} />}
-      <MembersSection project={project} role={role} supabase={supabase} />
+      {canManage && !isRepository && !isCustomView && <ProjectDetailsSection project={project} supabase={supabase} />}
+      <MembersSection project={project} role={role} supabase={supabase} isRepository={isRepository} isCustomView={isCustomView} />
       {canManage && isRepository && <CustomViewsSection project={project} supabase={supabase} />}
+      {!isRepository && !isCustomView && <CurriculumSourcesSection project={project} supabase={supabase} />}
       {canManage && <GroupsSettingsSection project={project} supabase={supabase} />}
       {canManage && <FederationSection project={project} supabase={supabase} />}
       {role === 'owner' && <DangerZoneSection project={project} supabase={supabase} />}
@@ -229,6 +262,105 @@ function NewCustomViewForm({
 }
 
 // ============================================================================
+// Curriculum sources (migration 105, 2026-10-04) -- the content side of
+// migration 066's "browse + connect" feature. Shows which Curriculum
+// Repository document(s) this project's own content was built from, and
+// flags it directly when the Repository already has a newer edition --
+// built after a real incident where EvoMentor Thuringia and the Germany
+// Curriculum Repository drifted out of sync with nothing to flag it. See
+// lab_manager's germany-curriculum-repository-vs-evomentor-thuringia-
+// relation-2026-10-04.md for the full story. Read-only here deliberately --
+// creating a new connection already has a home on the Repository's own
+// record-detail page (the existing "Connect" button); this just makes the
+// result of that visible from the content side too, which previously had
+// no way to see it at all.
+// ============================================================================
+
+function CurriculumSourcesSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [projectLinks, setProjectLinks] = useState<(ProjectRepositoryLinkRow & { repository: { id: string; name: string; slug: string } })[] | null>(null)
+  const [recordLinks, setRecordLinks] = useState<ProjectRepositoryLinkSummary[] | null>(null)
+
+  useEffect(() => {
+    setProjectLinks(null)
+    setRecordLinks(null)
+    listProjectRepositoryLinks(supabase, project.id).then(setProjectLinks)
+    listRepositoryLinkSummaryForProject(supabase, project.id).then(setRecordLinks)
+  }, [supabase, project.id])
+
+  const loading = projectLinks === null || recordLinks === null
+  const nothingYet = !loading && projectLinks!.length === 0 && recordLinks!.length === 0
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Library size={16} style={{ color: 'var(--text-muted)' }} />Curriculum Repository sources</h3>
+      <p className="muted">
+        Which official curriculum document(s) {project.name}&apos;s content is grounded in, and whether the
+        Repository already has a newer edition than what it was built from.
+      </p>
+
+      {loading ? (
+        <p className="muted">Loading…</p>
+      ) : nothingYet ? (
+        <p className="muted">
+          No Curriculum Repository connections yet. These are made from a repository record&apos;s own page
+          (the &quot;Connect&quot; button there), not from here.
+        </p>
+      ) : (
+        <>
+          {projectLinks!.length > 0 && (
+            <div style={{ marginBottom: recordLinks!.length > 0 ? 14 : 0 }}>
+              <p className="muted" style={{ marginBottom: 4, fontSize: 12.5 }}>Grounded in, project-wide:</p>
+              {projectLinks!.map((l) => (
+                <div key={l.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+                  <span>
+                    <strong>{l.repository.name}</strong>
+                    {l.jurisdiction && <span className="chip" style={{ marginLeft: 6 }}>{l.jurisdiction}</span>}
+                  </span>
+                  <Link to={`/dashboard/${l.repository.slug}`} className="btn btn-mini">
+                    <ExternalLink size={11} />Open
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {recordLinks!.length > 0 && (
+            <div>
+              <p className="muted" style={{ marginBottom: 4, fontSize: 12.5 }}>Specific content connected to a Repository record:</p>
+              {recordLinks!.map(({ record, linkedContentCount, supersession }) => (
+                <div key={record.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                  <div className="row" style={{ justifyContent: 'space-between' }}>
+                    <span>
+                      <strong>{record.title}</strong>
+                      <span className="muted" style={{ marginLeft: 6 }}>
+                        {linkedContentCount} linked item{linkedContentCount === 1 ? '' : 's'}
+                      </span>
+                    </span>
+                  </div>
+                  {supersession.successor && (
+                    <p className="notice notice-bad" style={{ marginTop: 6, marginBottom: 0, fontSize: 12.5 }}>
+                      <AlertTriangle size={11} style={{ marginRight: 4, verticalAlign: 'text-bottom' }} />
+                      The Repository shows a newer edition — <strong>{supersession.successor.title}</strong> — worth
+                      checking whether this content still matches.
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
 // Members section -- formerly the standalone Members tab, unchanged
 // internally.
 // ============================================================================
@@ -237,13 +369,18 @@ function MembersSection({
   project,
   role,
   supabase,
+  isRepository,
+  isCustomView,
 }: {
   project: Database['public']['Tables']['projects']['Row']
   role: ProjectOutletContext['role']
   supabase: ProjectOutletContext['supabase']
+  isRepository: boolean
+  isCustomView: boolean
 }) {
   const [members, setMembers] = useState<MemberWithUser[] | null>(null)
   const [invites, setInvites] = useState<InviteRow[] | null>(null)
+  const [requests, setRequests] = useState<(MemberRequestRow & { user: UserSearchResult })[] | null>(null)
   const [federationLabels, setFederationLabels] = useState<Record<string, string>>({})
   const canManage = role === 'owner' || role === 'maintainer'
 
@@ -261,12 +398,16 @@ function MembersSection({
         })
       })
     })
-    if (canManage) listPendingInvites(supabase, project.id).then(setInvites)
+    if (canManage) {
+      listPendingInvites(supabase, project.id).then(setInvites)
+      listPendingRequestsSent(supabase, project.id).then(setRequests)
+    }
   }
 
   useEffect(() => {
     setMembers(null)
     setInvites(null)
+    setRequests(null)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id])
@@ -276,9 +417,29 @@ function MembersSection({
       <h2 className="row" style={{ marginTop: 8 }}><Users size={16} style={{ color: 'var(--text-muted)' }} />Members</h2>
       <p className="muted" style={{ marginBottom: 12 }}>Who can see and work on {project.name}.</p>
 
+      {canManage && <RequestToJoinForm projectId={project.id} supabase={supabase} onRequested={reload} />}
       {canManage && <InviteForm projectId={project.id} supabase={supabase} onInvited={reload} />}
       {canManage && <JoinRulesSection project={project} supabase={supabase} />}
-      {canManage && <StudentViewSection project={project} supabase={supabase} />}
+      {canManage && !isRepository && !isCustomView && <DashboardViewsSection project={project} supabase={supabase} />}
+
+      {requests !== null && requests.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3>Pending requests</h3>
+          <p className="muted">Waiting for them to accept or decline -- nothing happens until they respond.</p>
+          {requests.map((r) => (
+            <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{r.user.name}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>{r.user.email}</span>
+              </span>
+              <span className="row">
+                <span className="chip">{r.role}</span>
+                <button className="btn btn-mini" onClick={() => cancelMemberRequest(supabase, r.id).then(reload)}><Trash2 size={11} />Cancel</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {invites !== null && invites.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>
@@ -411,6 +572,91 @@ function DangerZoneSection({
           {error && <p style={{ marginTop: 6, color: 'var(--critical)' }}>{error}</p>}
         </div>
       )}
+    </div>
+  )
+}
+
+// Real feedback 092405e2 (2026-10-04): "easier to add members who have
+// accounts on OpenLPM, type to search by name, then that sends their
+// account a request and they can accept to join or not" -- a separate path
+// from InviteForm below, which adds anyone who already has an account
+// immediately with no consent step (fine for a known class roster, not fine
+// for approaching one specific person). A debounced name/email search
+// against every real account, excluding anyone already a member or already
+// asked (searchUsersToInvite handles both exclusions).
+function RequestToJoinForm({ projectId, supabase, onRequested }: { projectId: string; supabase: ProjectOutletContext['supabase']; onRequested: () => void }) {
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<UserSearchResult[]>([])
+  const [role, setRole] = useState<ProjectMemberRole>('viewer')
+  const [busy, setBusy] = useState<string | null>(null)
+  const [sent, setSent] = useState<string | null>(null)
+  const [sendError, setSendError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setResults([])
+      return
+    }
+    const timer = setTimeout(() => {
+      searchUsersToInvite(supabase, projectId, query).then(setResults)
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [query, supabase, projectId])
+
+  const send = async (user: UserSearchResult) => {
+    setBusy(user.id)
+    setSendError(null)
+    const { error } = await createMemberRequest(supabase, projectId, user.id, role)
+    setBusy(null)
+    if (error) {
+      setSendError("Couldn't send that request right now -- try again in a moment.")
+    } else {
+      setSent(user.name)
+      setResults((prev) => prev.filter((u) => u.id !== user.id))
+      setQuery('')
+      onRequested()
+    }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><UserPlus size={16} />Request someone to join</h3>
+      <p className="muted">
+        Find someone who already has an OpenLPM account by name or email. They get a request and
+        choose whether to accept -- nothing happens until they do.
+      </p>
+      <div className="row" style={{ alignItems: 'flex-end', flexWrap: 'wrap', gap: 10 }}>
+        <div className="field" style={{ flex: '1 1 220px', marginBottom: 0 }}>
+          <label>Name or email</label>
+          <input type="text" value={query} onChange={(e) => { setQuery(e.target.value); setSent(null) }} placeholder="Type at least 2 characters…" />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Role</label>
+          <select value={role} onChange={(e) => setRole(e.target.value as ProjectMemberRole)}>
+            {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+      </div>
+      {results.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          {results.map((u) => (
+            <div key={u.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{u.name}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>{u.email}</span>
+              </span>
+              <button className="btn btn-mini" disabled={busy === u.id} onClick={() => send(u)}>
+                {busy === u.id ? 'Sending…' : 'Send request'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {query.trim().length >= 2 && results.length === 0 && (
+        <p className="muted" style={{ marginTop: 10, fontSize: 13 }}>No matching account (or they&apos;re already a member or already asked).</p>
+      )}
+      {sent && <div className="notice notice-ok" style={{ marginTop: 10 }}>Request sent to {sent}.</div>}
+      {sendError && <div className="notice notice-bad" style={{ marginTop: 10 }}>{sendError}</div>}
     </div>
   )
 }
@@ -692,66 +938,859 @@ function ProjectColorSection({
 }
 
 // ============================================================================
-// Student view template (migration 045) -- a real, separate setting from
-// self-join above. Real bug found live 2026-09-30: "Preview as student"
-// used to appear on every project any owner manages and always rendered
-// the same German Jena-pilot UI, because the student view was gated purely
-// on the VIEWER's role, never on whether THIS project actually opted into
-// one. An owner now explicitly turns this on here and picks which
-// template -- "none" is the correct default for every project that isn't
-// the Jena pilot.
+// Project Details: geography, working languages, subject area(s), grade-band
+// framework, and sources & rights -- real feedback 55779d95 (Dustin,
+// 2026-10-10): "generally lets make starting a project much easier - give
+// it a name and then let's just enable the settings and dashboard within
+// the project space be where the user can add / update all the other
+// project meta-data." Before this, these five fields could ONLY ever be set
+// during the creation wizard (new-project-wizard.tsx) -- once a project
+// existed, there was no way to add or change any of them. Same field
+// layouts as that wizard's old steps 1-5, now editing the real row/table
+// directly instead of building up local draft state before one final
+// insert. Each sub-section saves independently (no shared "save all"
+// button) -- a change to Geography shouldn't be held hostage by an
+// in-progress edit to Sources.
 // ============================================================================
 
-function StudentViewSection({
+const PROJECT_DETAILS_LANGUAGES: { code: string; label: string }[] = [
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'German' },
+  { code: 'fr', label: 'French' },
+  { code: 'es', label: 'Spanish' },
+  { code: 'pt', label: 'Portuguese' },
+  { code: 'zh', label: 'Chinese' },
+  { code: 'ja', label: 'Japanese' },
+  { code: 'ar', label: 'Arabic' },
+]
+
+type JurisdictionRow = Database['public']['Tables']['project_jurisdictions']['Row']
+type SourceDeclarationRow = Database['public']['Tables']['project_source_declarations']['Row']
+
+function ProjectDetailsSection({
   project,
   supabase,
 }: {
   project: Database['public']['Tables']['projects']['Row']
   supabase: ProjectOutletContext['supabase']
 }) {
-  // student_view_template (migration 045) isn't in the generated types yet.
-  const [value, setValue] = useState<string>((project as any).student_view_template ?? '')
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row"><Globe size={16} />Project details</h3>
+      <p className="muted" style={{ marginBottom: 16 }}>
+        Geography, languages, subject area, grade-band framework, and sources — set once at
+        creation, editable here any time.
+      </p>
+      <CurationSubsection project={project} supabase={supabase} />
+      <LanguagesSubsection project={project} supabase={supabase} />
+      <GeographySubsection project={project} supabase={supabase} />
+      <SubjectAreaSubsection project={project} supabase={supabase} />
+      <GradeBandSubsection project={project} supabase={supabase} />
+      <SourceDeclarationsSubsection project={project} supabase={supabase} />
+      <LicenseSubsection project={project} supabase={supabase} />
+    </div>
+  )
+}
+
+function LanguagesSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [languages, setLanguages] = useState<Set<string>>(new Set(project.working_languages ?? []))
+  const [customLanguage, setCustomLanguage] = useState('')
   const [busy, setBusy] = useState(false)
-  const [saved, setSaved] = useState(false)
+
+  const save = async (next: Set<string>) => {
+    setLanguages(next)
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ working_languages: Array.from(next) }).eq('id', project.id)
+    setBusy(false)
+    if (error) setLanguages(new Set(project.working_languages ?? []))
+  }
+
+  const toggle = (code: string) => {
+    const next = new Set(languages)
+    if (next.has(code)) next.delete(code)
+    else next.add(code)
+    save(next)
+  }
+
+  const extras = Array.from(languages).filter((c) => !PROJECT_DETAILS_LANGUAGES.some((l) => l.code === c))
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 style={{ marginBottom: 6 }}>Working language(s)</h4>
+      <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
+        {PROJECT_DETAILS_LANGUAGES.map((l) => (
+          <label key={l.code} className="row" style={{ gap: 4 }}>
+            <input type="checkbox" checked={languages.has(l.code)} disabled={busy} onChange={() => toggle(l.code)} />
+            {l.label}
+          </label>
+        ))}
+      </div>
+      <div className="row" style={{ marginTop: 10, gap: 8 }}>
+        <input value={customLanguage} onChange={(e) => setCustomLanguage(e.target.value)} placeholder="Other language code, e.g. sw, hi" style={{ width: 200 }} />
+        <button
+          className="btn btn-mini"
+          disabled={busy || !customLanguage.trim()}
+          onClick={() => { const c = customLanguage.trim(); setCustomLanguage(''); save(new Set([...languages, c])) }}
+        >
+          <Plus size={12} />Add
+        </button>
+      </div>
+      {extras.length > 0 && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 8 }}>
+          Also added: {extras.map((code) => (
+            <span key={code} style={{ marginRight: 8 }}>
+              {code} <button className="btn-linklike" style={{ fontSize: 11 }} onClick={() => toggle(code)}>remove</button>
+            </span>
+          ))}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function GeographySubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [jurisdictions, setJurisdictions] = useState<JurisdictionRow[] | null>(null)
+  const [countryCode, setCountryCode] = useState('')
+  const [regionCode, setRegionCode] = useState('')
+  const [label, setLabel] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const reload = () => {
+    supabase.from('project_jurisdictions').select('*').eq('project_id', project.id).order('created_at').then(({ data }) => setJurisdictions(data ?? []))
+  }
+  useEffect(reload, [supabase, project.id])
+
+  const add = async () => {
+    if (!countryCode.trim() || !label.trim()) return
+    setBusy(true)
+    await supabase.from('project_jurisdictions').insert({
+      project_id: project.id,
+      country_code: countryCode.trim().toUpperCase(),
+      region_code: regionCode.trim() || null,
+      label: label.trim(),
+    })
+    setCountryCode(''); setRegionCode(''); setLabel('')
+    reload()
+    setBusy(false)
+  }
+
+  const remove = async (id: string) => {
+    setBusy(true)
+    await supabase.from('project_jurisdictions').delete().eq('id', id)
+    reload()
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><MapPin size={14} />Geography</h4>
+      <p className="muted" style={{ fontSize: 12.5, marginTop: 0 }}>One or more states/regions within one or more countries — leave empty for a project with no fixed geographic scope.</p>
+      {jurisdictions === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        jurisdictions.map((j) => (
+          <div key={j.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+            <span>{j.label} <span className="muted" style={{ fontSize: 12 }}>({j.country_code}{j.region_code ? `, ${j.region_code}` : ''})</span></span>
+            <button className="btn btn-mini" disabled={busy} onClick={() => remove(j.id)}><Trash2 size={12} /></button>
+          </div>
+        ))
+      )}
+      <div className="row" style={{ gap: 8, marginTop: 10, alignItems: 'flex-end' }}>
+        <div className="field" style={{ marginBottom: 0, width: 70 }}>
+          <label>Country</label>
+          <input value={countryCode} onChange={(e) => setCountryCode(e.target.value)} placeholder="DE" maxLength={2} />
+        </div>
+        <div className="field" style={{ marginBottom: 0, width: 90 }}>
+          <label>Region (optional)</label>
+          <input value={regionCode} onChange={(e) => setRegionCode(e.target.value)} placeholder="DE-BY" />
+        </div>
+        <div className="field" style={{ marginBottom: 0, flex: 1 }}>
+          <label>Plain-language name</label>
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="e.g. Bavaria, Germany" />
+        </div>
+        <button className="btn btn-mini" disabled={busy || !countryCode.trim() || !label.trim()} onClick={add}><Plus size={12} />Add</button>
+      </div>
+    </div>
+  )
+}
+
+function SubjectAreaSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [framework, setFramework] = useState<FrameworkRow | null>(null)
+  const [tags, setTags] = useState<FrameworkTagRow[]>([])
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    listAvailableFrameworks(supabase, 'subject-area').then(async (fws) => {
+      const shared = fws.find((f) => f.project_id === null) ?? fws[0] ?? null
+      setFramework(shared)
+      if (shared) setTags(await listFrameworkTags(supabase, shared.id))
+    })
+    supabase.from('project_subject_area_tags').select('framework_tag_id').eq('project_id', project.id)
+      .then(({ data }) => setSelectedIds(new Set((data ?? []).map((r) => r.framework_tag_id))))
+  }, [supabase, project.id])
+
+  const toggle = async (tagId: string) => {
+    const has = selectedIds.has(tagId)
+    const next = new Set(selectedIds)
+    if (has) next.delete(tagId); else next.add(tagId)
+    setSelectedIds(next)
+    setBusy(true)
+    if (has) await supabase.from('project_subject_area_tags').delete().eq('project_id', project.id).eq('framework_tag_id', tagId)
+    else await supabase.from('project_subject_area_tags').insert({ project_id: project.id, framework_tag_id: tagId })
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Layers size={14} />Subject area(s)</h4>
+      {tags.length === 0 ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        tags.map((t) => (
+          <label key={t.id} className="row" style={{ marginLeft: t.parent_tag_id ? 16 : 0, padding: '2px 0' }}>
+            <input type="checkbox" checked={selectedIds.has(t.id)} disabled={busy} onChange={() => toggle(t.id)} />
+            {t.label}
+          </label>
+        ))
+      )}
+      <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
+        Only {framework?.label ?? 'the starter taxonomy'}'s current entries are selectable here. Propose a new
+        subject area or a crosswalk to another project's terms from the Concepts page.
+      </p>
+    </div>
+  )
+}
+
+function GradeBandSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [frameworks, setFrameworks] = useState<FrameworkRow[] | null>(null)
+  const [choice, setChoice] = useState<string>(project.grade_framework_id ?? '')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => { listAvailableFrameworks(supabase, 'grade-band').then(setFrameworks) }, [supabase])
 
   const save = async (next: string) => {
-    setValue(next)
+    setChoice(next)
     setBusy(true)
-    setSaved(false)
-    const { error } = await (supabase as any)
-      .from('projects')
-      .update({ student_view_template: next || null })
-      .eq('id', project.id)
+    const { error } = await supabase.from('projects').update({ grade_framework_id: next || null }).eq('id', project.id)
     setBusy(false)
-    if (!error) {
-      setSaved(true)
-      setTimeout(() => setSaved(false), 1500)
+    if (error) setChoice(project.grade_framework_id ?? '')
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><GraduationCap size={14} />Grade-band framework</h4>
+      {frameworks === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        <div className="field">
+          <select value={choice} disabled={busy} onChange={(e) => save(e.target.value)}>
+            <option value="">None set — define a custom grade-band scheme later</option>
+            {frameworks.map((f) => (
+              <option key={f.id} value={f.id}>{f.label}{f.project_id === null ? ' (ecosystem reference)' : ''}</option>
+            ))}
+          </select>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SourceDeclarationsSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [sources, setSources] = useState<SourceDeclarationRow[] | null>(null)
+  const [draft, setDraft] = useState({ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' as AccessTier | '' })
+  const [busy, setBusy] = useState(false)
+
+  const reload = () => {
+    supabase.from('project_source_declarations').select('*').eq('project_id', project.id).order('created_at').then(({ data }) => setSources(data ?? []))
+  }
+  useEffect(reload, [supabase, project.id])
+
+  const add = async () => {
+    if (!draft.sourceName.trim()) return
+    setBusy(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    await supabase.from('project_source_declarations').insert({
+      project_id: project.id,
+      source_name: draft.sourceName.trim(),
+      format: draft.format.trim() || null,
+      license_or_rights_note: draft.licenseNote.trim() || null,
+      url: draft.url.trim() || null,
+      access_tier: draft.accessTier || null,
+      created_by: user?.id ?? null,
+    })
+    setDraft({ sourceName: '', format: '', licenseNote: '', url: '', accessTier: '' })
+    reload()
+    setBusy(false)
+  }
+
+  const remove = async (id: string) => {
+    setBusy(true)
+    await supabase.from('project_source_declarations').delete().eq('id', id)
+    reload()
+    setBusy(false)
+  }
+
+  return (
+    <div>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Library size={14} />Sources & rights</h4>
+      <p className="muted" style={{ fontSize: 12.5, marginTop: 0 }}>What curriculum policies or competency frameworks this project brings in, and the rights to use them.</p>
+      {sources === null ? (
+        <p className="muted">Loading…</p>
+      ) : (
+        sources.map((s) => {
+          const tier = ACCESS_TIER_OPTIONS.find((opt) => opt.value === s.access_tier)
+          return (
+            <div key={s.id} className="row" style={{ justifyContent: 'space-between', padding: '4px 0' }}>
+              <span>
+                {s.source_name}
+                {s.format && <span className="muted" style={{ fontSize: 12 }}> · {s.format}</span>}
+                {tier?.value && <span className="muted" style={{ fontSize: 12 }}> · {ACCESS_TIER_LABEL_SHORT[tier.value]}</span>}
+              </span>
+              <button className="btn btn-mini" disabled={busy} onClick={() => remove(s.id)}><Trash2 size={12} /></button>
+            </div>
+          )
+        })
+      )}
+      <div style={{ marginTop: 10 }}>
+        <div className="grid grid-2">
+          <div className="field">
+            <label>Source name</label>
+            <input value={draft.sourceName} onChange={(e) => setDraft({ ...draft, sourceName: e.target.value })} placeholder="e.g. Bavaria Biologie Lehrplan" />
+          </div>
+          <div className="field">
+            <label>Format</label>
+            <input value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value })} placeholder="e.g. PDF, CASE, SPARQL" />
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>Rights / license note</label>
+            <input value={draft.licenseNote} onChange={(e) => setDraft({ ...draft, licenseNote: e.target.value })} placeholder="e.g. Public domain government document" />
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>How much of this source can we actually keep?</label>
+            <select value={draft.accessTier} onChange={(e) => setDraft({ ...draft, accessTier: e.target.value as AccessTier | '' })}>
+              {ACCESS_TIER_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+            </select>
+          </div>
+          <div className="field" style={{ gridColumn: '1 / -1' }}>
+            <label>URL (optional)</label>
+            <input value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value })} placeholder="https://…" />
+          </div>
+        </div>
+        <button className="btn btn-mini" disabled={busy || !draft.sourceName.trim()} onClick={add}><Plus size={12} />Add source</button>
+      </div>
+    </div>
+  )
+}
+
+// License for this project's OWN original work (strands, Lernziele, data
+// objects) -- RFC-0007 / migration 165 (originally numbered 163, renumbered
+// to resolve a migration-number collision, PR #93). Distinct from a curriculum
+// repository record's own access_tier/license_or_rights_note, which governs
+// third-party source material this project quotes, never what it authors
+// itself -- see SourceDeclarationsSubsection above for that.
+const CONTENT_LICENSE_LABEL: Record<string, string> = {
+  'cc-by-4.0': 'Creative Commons Attribution 4.0 — credit required, commercial use allowed',
+  'cc0-1.0': 'Public domain (CC0) — no rights reserved',
+  'all-rights-reserved': 'All rights reserved — not ready to share yet',
+  'custom': 'Custom (see note)',
+}
+
+// Human-curated or synthetic-theoretical. The label states what the space is for. It says nothing about
+// whether the content has been reviewed: a human-curated space can be unreviewed, and that is
+// recorded in the project's own note. A nested sub-project inherits its parent's label, so only a
+// top-level space can change it here (the same rule the Admin projects card follows).
+function CurationSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [choice, setChoice] = useState(project.epistemic_status)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const isNested = !!project.parent_project_id
+
+  const save = async (next: typeof choice) => {
+    const previous = choice
+    setChoice(next)
+    setBusy(true)
+    setMessage(null)
+    const { error } = await updateProjectMetadata(supabase, project.id, { epistemic_status: next })
+    setBusy(false)
+    if (error) {
+      setChoice(previous)
+      setMessage(`Could not save: ${error.message}`)
+    } else {
+      setMessage('Saved. The label on project cards updates when the page is reloaded.')
     }
   }
 
   return (
-    <div className="card" style={{ marginBottom: 16 }}>
-      <h3>Student view</h3>
-      <p className="muted">
-        A simplified, language-adapted view for people who join this specific project space themselves.
-        Off by default — turning it on doesn&apos;t change who can join, only what they see once they&apos;re in.
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}>Curation label <EpistemicStatusBadge status={choice} /></h4>
+      <p className="muted" style={{ marginBottom: 10 }}>
+        Is this content made and curated by people for real use, or a designed comparison or research construct? The
+        label says what the space is for. It does not say whether the content has been reviewed.
       </p>
-      <div className="field" style={{ marginBottom: 0 }}>
-        <label>Template</label>
-        <select value={value} disabled={busy} onChange={(e) => save(e.target.value)}>
-          <option value="">None — everyone sees the full researcher view</option>
-          {STUDENT_VIEW_TEMPLATES.map((t) => (
-            <option key={t.id} value={t.id}>{t.label}</option>
+      {isNested ? (
+        <p className="muted" style={{ fontSize: 12 }}>This is a sub-project, so it uses the label of its parent project.</p>
+      ) : (
+        <div className="field">
+          <select value={choice} disabled={busy} onChange={(e) => save(e.target.value as typeof choice)}>
+            {EPISTEMIC_STATUS_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          {message && <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>{message}</p>}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function LicenseSubsection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [choice, setChoice] = useState<string>(project.content_license ?? '')
+  const [note, setNote] = useState(project.content_license_note ?? '')
+  const [busy, setBusy] = useState(false)
+  const [parentLabel, setParentLabel] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!project.parent_project_id) return
+    supabase
+      .from('projects')
+      .select('name, content_license')
+      .eq('id', project.parent_project_id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return
+        const resolved = data.content_license ? CONTENT_LICENSE_LABEL[data.content_license] : 'the ecosystem default (CC BY-NC-SA 4.0)'
+        setParentLabel(`${data.name} (${resolved})`)
+      })
+  }, [supabase, project.parent_project_id])
+
+  const save = async (next: string) => {
+    const previous = choice
+    setChoice(next)
+    setBusy(true)
+    const { error } = await supabase
+      .from('projects')
+      .update({ content_license: (next || null) as any, content_license_note: next === 'custom' ? (note || null) : null })
+      .eq('id', project.id)
+    setBusy(false)
+    if (error) setChoice(previous)
+  }
+
+  const saveNote = async () => {
+    setBusy(true)
+    const { error } = await supabase.from('projects').update({ content_license_note: note || null }).eq('id', project.id)
+    setBusy(false)
+    if (error) setNote(project.content_license_note ?? '')
+  }
+
+  return (
+    <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
+      <h4 className="row" style={{ marginBottom: 6, gap: 6 }}><Scale size={14} />License for this project's own content</h4>
+      <p className="muted" style={{ marginBottom: 10 }}>
+        Covers {project.name}'s own strands, Lernziele, and data objects — not material quoted from
+        outside sources, which always keeps its own terms (set per record under Curriculum Sources).
+      </p>
+      <div className="field">
+        <select value={choice} disabled={busy} onChange={(e) => save(e.target.value)}>
+          <option value="">
+            {project.parent_project_id
+              ? `Inherit from parent project${parentLabel ? ` — ${parentLabel}` : ''}`
+              : 'Ecosystem default — CC BY-NC-SA 4.0 (credit required, non-commercial, share-alike)'}
+          </option>
+          {Object.entries(CONTENT_LICENSE_LABEL).map(([value, label]) => (
+            <option key={value} value={value}>{label}</option>
           ))}
         </select>
       </div>
-      {value && (
-        <p className="muted" style={{ fontSize: 12, marginTop: 6 }}>
-          {STUDENT_VIEW_TEMPLATES.find((t) => t.id === value)?.description}
+      {choice === 'custom' && (
+        <div className="field">
+          <label>Describe the terms</label>
+          <input
+            type="text"
+            value={note}
+            disabled={busy}
+            onChange={(e) => setNote(e.target.value)}
+            onBlur={saveNote}
+            placeholder="e.g. available for non-commercial classroom use, contact the project owner for anything else"
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
+const ACCESS_TIER_LABEL_SHORT: Record<AccessTier, string> = {
+  'full-text-stored': 'full text',
+  'excerpt-only': 'excerpts only',
+  'summary-only': 'summary only',
+  'citation-only': 'citation only',
+}
+
+// ============================================================================
+// Dashboard views (migration 109) -- replaces the single, all-or-nothing
+// "Preview as student" toggle (migration 045) this section used to be.
+// Real feedback 63321a17: an owner builds any number of named views --
+// each either a checklist of the normal sidebar pages, or one of the
+// hand-built special templates below (today just the Jena pilot) -- and
+// assigns each one to a specific person, a Group (if Groups is on), a
+// project role, or how someone joined. One view can be the project's
+// default (whoever matches nothing more specific falls back to it); any
+// view can be forced (no switcher for whoever it applies to) or left
+// optional (switchable -- the same spirit the old preview toggle had, now
+// available to more than just an owner/maintainer previewing). Hidden for
+// Curriculum Repository projects (gated at the call site) -- their nav
+// isn't built from the shared page registry this reads, so a view created
+// here would have no visible effect there.
+// ============================================================================
+
+function DashboardViewsSection({
+  project,
+  supabase,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [views, setViews] = useState<DashboardView[] | null>(null)
+  const [assignments, setAssignments] = useState<DashboardViewAssignment[]>([])
+  const [members, setMembers] = useState<MemberWithUser[]>([])
+  const [groups, setGroups] = useState<ProjectGroup[]>([])
+  const groupsEnabled = groupsSettings(project).enabled
+
+  const reload = async () => {
+    const vs = await listDashboardViews(supabase, project.id)
+    setViews(vs)
+    setAssignments(vs.length > 0 ? await listDashboardViewAssignments(supabase, vs.map((v) => v.id)) : [])
+  }
+
+  useEffect(() => {
+    reload()
+    listMembers(supabase, project.id).then(setMembers)
+    if (groupsEnabled) listGroups(supabase, project.id).then(setGroups)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supabase, project.id, groupsEnabled])
+
+  const makeDefault = async (viewId: string) => {
+    await setDefaultDashboardView(supabase, project.id, viewId)
+    reload()
+  }
+  const clearDefault = async () => {
+    await setDefaultDashboardView(supabase, project.id, null)
+    reload()
+  }
+  const toggleForced = async (view: DashboardView) => {
+    await setDashboardViewForced(supabase, view.id, !view.is_forced)
+    reload()
+  }
+  const remove = async (viewId: string) => {
+    if (!window.confirm('Delete this view? Anyone assigned to it falls back to the project default, or the full view.')) return
+    await deleteDashboardView(supabase, viewId)
+    reload()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3>Dashboard views</h3>
+      <p className="muted">
+        Build named views for different people, then decide who sees which one. Nobody sees anything
+        here until you assign it to them — a brand-new view is invisible to everyone until it has at
+        least one assignment, or is made the project default.
+      </p>
+
+      {views === null ? (
+        <p className="muted">Loading…</p>
+      ) : views.length === 0 ? (
+        <p className="muted" style={{ marginBottom: 12 }}>No views yet — everyone sees the full researcher view.</p>
+      ) : (
+        <div style={{ marginBottom: 12 }}>
+          {views.map((v) => (
+            <DashboardViewRow
+              key={v.id}
+              view={v}
+              assignments={assignments.filter((a) => a.view_id === v.id)}
+              members={members}
+              groups={groups}
+              groupsEnabled={groupsEnabled}
+              supabase={supabase}
+              onMakeDefault={() => makeDefault(v.id)}
+              onClearDefault={clearDefault}
+              onToggleForced={() => toggleForced(v)}
+              onDelete={() => remove(v.id)}
+              onChanged={reload}
+            />
+          ))}
+        </div>
+      )}
+
+      <NewDashboardViewForm project={project} supabase={supabase} onCreated={reload} />
+    </div>
+  )
+}
+
+function DashboardViewRow({
+  view,
+  assignments,
+  members,
+  groups,
+  groupsEnabled,
+  supabase,
+  onMakeDefault,
+  onClearDefault,
+  onToggleForced,
+  onDelete,
+  onChanged,
+}: {
+  view: DashboardView
+  assignments: DashboardViewAssignment[]
+  members: MemberWithUser[]
+  groups: ProjectGroup[]
+  groupsEnabled: boolean
+  supabase: ProjectOutletContext['supabase']
+  onMakeDefault: () => void
+  onClearDefault: () => void
+  onToggleForced: () => void
+  onDelete: () => void
+  onChanged: () => void
+}) {
+  const [targetType, setTargetType] = useState<ViewAssignmentTargetType>('user')
+  const [targetValue, setTargetValue] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  useEffect(() => {
+    setTargetValue('')
+  }, [targetType])
+
+  const describeAssignment = (a: DashboardViewAssignment) => {
+    if (a.target_type === 'user') return members.find((m) => m.user.id === a.target_value)?.user.name ?? 'Unknown person'
+    if (a.target_type === 'group') return groups.find((g) => g.id === a.target_value)?.name ?? 'Unknown group'
+    if (a.target_type === 'role') return `Role: ${a.target_value}`
+    return a.target_value === 'self_join_rule' ? 'Signed themselves up' : 'Added or invited directly'
+  }
+
+  const targetOptions: { value: string; label: string }[] =
+    targetType === 'user'
+      ? members.map((m) => ({ value: m.user.id, label: m.user.name }))
+      : targetType === 'group'
+      ? groups.map((g) => ({ value: g.id, label: g.name }))
+      : targetType === 'role'
+      ? ROLES.map((r) => ({ value: r, label: r }))
+      : [
+          { value: 'self_join_rule', label: 'Signed themselves up' },
+          { value: 'direct', label: 'Added or invited directly' },
+        ]
+
+  const addAssignment = async () => {
+    if (!targetValue) return
+    setBusy(true)
+    await addDashboardViewAssignment(supabase, view.id, targetType, targetValue)
+    setBusy(false)
+    setTargetValue('')
+    onChanged()
+  }
+
+  const removeAssignment = async (assignmentId: string) => {
+    await removeDashboardViewAssignment(supabase, assignmentId)
+    onChanged()
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 10, background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <div className="row" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <span className="row" style={{ flexWrap: 'wrap' }}>
+          <strong>{view.name}</strong>
+          <span className="chip">{view.kind === 'template' ? 'Template' : 'Standard pages'}</span>
+          {view.is_default && <span className="chip chip-progress">Default</span>}
+          <span className={`chip${view.is_forced ? ' chip-progress' : ''}`}>{view.is_forced ? 'Forced' : 'Optional'}</span>
+        </span>
+        <span className="row">
+          {view.is_default ? (
+            <button className="btn btn-mini" onClick={onClearDefault}>Unset default</button>
+          ) : (
+            <button className="btn btn-mini" onClick={onMakeDefault}>Make default</button>
+          )}
+          <button className="btn btn-mini" onClick={onToggleForced}>{view.is_forced ? 'Make optional' : 'Make forced'}</button>
+          <button className="btn btn-mini btn-danger" onClick={onDelete}><Trash2 size={11} />Delete</button>
+        </span>
+      </div>
+
+      {view.kind === 'standard' ? (
+        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+          Pages: {view.page_keys.length === 0
+            ? 'Dashboard only'
+            : view.page_keys.map((k) => DASHBOARD_PAGES.find((p) => p.key === k)?.label ?? k).join(', ')}
+        </p>
+      ) : (
+        <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+          {getStudentViewTemplate(view.template_id)?.description ?? view.template_id}
         </p>
       )}
-      {saved && <p className="muted" style={{ fontSize: 12, marginTop: 4, color: 'var(--good)' }}>Saved.</p>}
+
+      <div style={{ marginTop: 8 }}>
+        {assignments.length === 0 ? (
+          <p className="muted" style={{ fontSize: 12 }}>Not assigned to anyone yet.</p>
+        ) : (
+          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+            {assignments.map((a) => (
+              <span key={a.id} className="chip row" style={{ gap: 4 }}>
+                {describeAssignment(a)}
+                <button type="button" className="btn-linklike" onClick={() => removeAssignment(a.id)} title="Remove" style={{ padding: 0 }}>
+                  <X size={11} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="row" style={{ marginTop: 6, gap: 6, flexWrap: 'wrap' }}>
+          <select value={targetType} onChange={(e) => setTargetType(e.target.value as ViewAssignmentTargetType)}>
+            <option value="user">Specific person</option>
+            {groupsEnabled && <option value="group">Group</option>}
+            <option value="role">Project role</option>
+            <option value="join_method">How they joined</option>
+          </select>
+          <select value={targetValue} onChange={(e) => setTargetValue(e.target.value)}>
+            <option value="">Choose…</option>
+            {targetOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <button className="btn btn-mini" disabled={busy || !targetValue} onClick={addAssignment}>
+            <Plus size={11} />Assign
+          </button>
+        </div>
+      </div>
     </div>
+  )
+}
+
+function NewDashboardViewForm({
+  project,
+  supabase,
+  onCreated,
+}: {
+  project: Database['public']['Tables']['projects']['Row']
+  supabase: ProjectOutletContext['supabase']
+  onCreated: () => void
+}) {
+  const [name, setName] = useState('')
+  const [kind, setKind] = useState<DashboardViewKind>('standard')
+  const [pageKeys, setPageKeys] = useState<string[]>(defaultPageKeys())
+  const [templateId, setTemplateId] = useState(STUDENT_VIEW_TEMPLATES[0]?.id ?? '')
+  const [busy, setBusy] = useState(false)
+
+  const togglePage = (key: string) => {
+    if (key === ALWAYS_VISIBLE_PAGE_KEY) return
+    setPageKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]))
+  }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim()) return
+    setBusy(true)
+    await createDashboardView(supabase, project.id, {
+      name: name.trim(),
+      kind,
+      pageKeys: kind === 'standard' ? pageKeys : undefined,
+      templateId: kind === 'template' ? templateId : undefined,
+    })
+    setBusy(false)
+    setName('')
+    setPageKeys(defaultPageKeys())
+    onCreated()
+  }
+
+  return (
+    <form onSubmit={submit} className="card" style={{ background: 'var(--bg-subtle, #f5f5f5)' }}>
+      <h4 style={{ marginTop: 0 }}>New view</h4>
+      <div className="row" style={{ flexWrap: 'wrap' }}>
+        <div className="field" style={{ marginBottom: 0, flex: 1, minWidth: 160 }}>
+          <label>Name</label>
+          <input type="text" placeholder="e.g. Reviewer-only" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="field" style={{ marginBottom: 0 }}>
+          <label>Built from</label>
+          <select value={kind} onChange={(e) => setKind(e.target.value as DashboardViewKind)}>
+            <option value="standard">A checklist of the normal pages</option>
+            <option value="template">A specially-built template</option>
+          </select>
+        </div>
+      </div>
+
+      {kind === 'standard' ? (
+        <div style={{ marginTop: 8 }}>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+            Which pages this view shows. Dashboard is always included. (Groups and Curriculum Repository
+            only actually appear if this project has those turned on.)
+          </p>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+            {DASHBOARD_PAGES.map((p) => (
+              <label key={p.key} className="row" style={{ gap: 4, fontSize: 13 }}>
+                <input
+                  type="checkbox"
+                  checked={p.key === ALWAYS_VISIBLE_PAGE_KEY || pageKeys.includes(p.key)}
+                  disabled={p.key === ALWAYS_VISIBLE_PAGE_KEY}
+                  onChange={() => togglePage(p.key)}
+                />
+                {p.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="field" style={{ marginTop: 8, marginBottom: 0 }}>
+          <label>Template</label>
+          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)}>
+            {STUDENT_VIEW_TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
+          {templateId && (
+            <p className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              {STUDENT_VIEW_TEMPLATES.find((t) => t.id === templateId)?.description}
+            </p>
+          )}
+        </div>
+      )}
+
+      <button className="btn btn-primary" type="submit" disabled={busy || !name.trim()} style={{ marginTop: 10 }}>
+        {busy ? 'Creating…' : 'Create view'}
+      </button>
+    </form>
   )
 }
 
@@ -776,6 +1815,9 @@ function GroupsSettingsSection({
   const initial = groupsSettings(project)
   const [enabled, setEnabled] = useState(initial.enabled)
   const [creatorRoles, setCreatorRoles] = useState<ProjectMemberRole[]>(initial.creatorRoles)
+  // null = unrestricted (every member may share -- today's real behavior);
+  // a real array = only these roles (plus owner/maintainer, always) may.
+  const [sharingRoles, setSharingRoles] = useState<ProjectMemberRole[] | null>(initial.sharingRoles)
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -801,6 +1843,34 @@ function GroupsSettingsSection({
     const { error } = await setGroupCreatorRoles(supabase, project.id, next)
     setBusy(false)
     if (error) setCreatorRoles(creatorRoles)
+    else flashSaved()
+  }
+
+  // Real feedback 771f5fa2 (Dustin): "selected roles to determine the
+  // functions ... of users within groups" -- restricting who may actually
+  // share a Notebook or Favorites into a group, separate from who may
+  // create one (toggleRole above). Flipping the checkbox on starts at an
+  // empty role list (owner/maintainer only, the same restrictive floor
+  // canManageGroups already uses) rather than guessing a starting set.
+  const restrictSharing = sharingRoles !== null
+  const toggleRestrictSharing = async () => {
+    const next = restrictSharing ? null : []
+    const prev = sharingRoles
+    setSharingRoles(next)
+    setBusy(true)
+    const { error } = await setGroupSharingRoles(supabase, project.id, next)
+    setBusy(false)
+    if (error) setSharingRoles(prev)
+    else flashSaved()
+  }
+  const toggleSharingRole = async (r: ProjectMemberRole) => {
+    const current = sharingRoles ?? []
+    const next = current.includes(r) ? current.filter((x) => x !== r) : [...current, r]
+    setSharingRoles(next)
+    setBusy(true)
+    const { error } = await setGroupSharingRoles(supabase, project.id, next)
+    setBusy(false)
+    if (error) setSharingRoles(sharingRoles)
     else flashSaved()
   }
 
@@ -832,6 +1902,28 @@ function GroupsSettingsSection({
             Any member, any role, can join a group once it exists — this only controls who may create or
             delete one.
           </p>
+
+          <div style={{ marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+            <label className="row" style={{ gap: 6, cursor: 'pointer' }}>
+              <input type="checkbox" checked={restrictSharing} disabled={busy} onChange={toggleRestrictSharing} />
+              Restrict who can share a Notebook or Favorites into a group
+            </label>
+            <p className="muted" style={{ fontSize: 12, marginTop: 4, marginBottom: restrictSharing ? 8 : 0 }}>
+              {restrictSharing
+                ? 'Owners and maintainers can always share. Who else may?'
+                : 'Off by default: any group member can share their own Notebook or Favorites with the group — this just restricts that.'}
+            </p>
+            {restrictSharing && (
+              <div className="row" style={{ flexWrap: 'wrap', gap: 10 }}>
+                {EXTRA_CREATOR_ROLES.map((r) => (
+                  <label key={r} className="row" style={{ gap: 4, fontSize: 12.5, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={(sharingRoles ?? []).includes(r)} disabled={busy} onChange={() => toggleSharingRole(r)} />
+                    <span className="capitalize">{r}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
       {saved && <p className="muted" style={{ fontSize: 12, marginTop: 6, color: 'var(--good)' }}>Saved.</p>}

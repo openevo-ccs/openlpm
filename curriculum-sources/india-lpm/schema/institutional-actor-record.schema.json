@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/institutional-actor-record.schema.json",
+  "title": "india_lp Institutional Actor Record",
+  "description": "An institution, agency, office, board, or role relevant to India's curriculum-policy process -- a ministry, an autonomous statutory body, a state education board, a state textbook board, a research institute. Not a person-tracking record: named individuals may appear in `currentHolder` but the record is anchored to the institutional role, which outlives any one office-holder. Modeled directly on deutsche_lp's/nys_lp's institutional-actor-record.schema.json -- same shape, actorType vocabulary adapted to India's own institutional landscape, which does not map cleanly onto either Germany's ministry-centric or New York's single-board model: India's two central curriculum bodies (NCERT, CBSE) are legally autonomous societies registered under the Societies Registration Act 1860, not government departments themselves, and states run their own textbook/curriculum boards with real, documented variation in how they license their output (see docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md) -- actorType distinguishes 'autonomous-statutory-body' and 'state-textbook-board' from 'ministry' specifically so that legal-form distinction, which matters for the copyright questions this repo exists to track, stays visible rather than flattened.",
+  "type": "object",
+  "required": ["id", "slug", "label", "actorType", "jurisdiction", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-ACTOR-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md -- not an ecosystem-permanent identifier."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "actorType": {
+      "type": "string",
+      "enum": [
+        "ministry", "autonomous-statutory-body", "state-education-board",
+        "state-textbook-board", "school-authority", "university-department",
+        "research-institute", "advocacy-body", "professional-association",
+        "school", "parliamentary-body", "other"
+      ],
+      "description": "'ministry' = a literal Government of India or state government department (e.g. Ministry of Education). 'autonomous-statutory-body' = a body registered under the Societies Registration Act 1860 or a similar act, government-funded/controlled but not itself a government department -- NCERT and CBSE are both this, a distinction that matters directly for whether Copyright Act 1957 Section 2(k)'s 'government work' definition applies to their output (open legal question, see the source-notes doc). 'state-education-board' = a state's curriculum-setting authority generally. 'state-textbook-board' = a state's specific textbook-publishing corporation/bureau (e.g. Maharashtra's Balbharati, Tamil Nadu's TNTBESC), called out separately from state-education-board because licensing terms have been found to vary at exactly this level (Karnataka's DSERT/KOER is CC BY-SA 4.0; Maharashtra's Balbharati is fee-gated and restrictive)."
+    },
+    "jurisdiction": {
+      "type": "string",
+      "description": "ISO-3166-2 style state code (e.g. IN-KA for Karnataka, IN-MH for Maharashtra) or 'IN' for national/central-government scope.",
+      "pattern": "^IN(-[A-Z]{2})?$"
+    },
+    "parentActor": {
+      "type": "string",
+      "pattern": "^INLP-ACTOR-[a-z0-9-]+$",
+      "description": "Id of the actor this one reports into, is a division of, or was constituted by, if any."
+    },
+    "role": {
+      "type": "string",
+      "description": "What this actor does with respect to curriculum policy specifically -- not a general institutional mission statement."
+    },
+    "legalForm": {
+      "type": "string",
+      "description": "Free text, kept separate from actorType's coarser category, for the specific legal basis when known and relevant to a rights/licensing question -- e.g. 'registered society under the Societies Registration Act, 1860 (Act XXI)', 'body corporate established under a State Act'. Optional; fill in only when this repo has an actual citable source for it, not a guess."
+    },
+    "currentHolder": {
+      "type": "object",
+      "description": "Named individual currently in this role, if applicable and known. Titles/incumbents change -- always check verificationStatus before treating this as current.",
+      "properties": {
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "asOf": { "type": "string", "format": "date" }
+      }
+    },
+    "url": { "type": "string", "format": "uri" },
+    "relatedActors": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^INLP-ACTOR-[a-z0-9-]+$" }
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

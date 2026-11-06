@@ -6,6 +6,7 @@
 [![Code License: MIT](https://img.shields.io/badge/Code%20License-MIT-yellow.svg)](LICENSE-CODE)
 [![Status](https://img.shields.io/badge/Status-Early%20%2F%20Pre--Launch-orange)](#status--roadmap)
 [![AI Ethics](https://img.shields.io/badge/AI%20Use-Tiered%20%26%20Documented-blueviolet)](ethics/ai-ethics-framework.md)
+[![Data Rights](https://img.shields.io/badge/Data%20Rights-Licensing%20%26%20Citation-blueviolet)](ethics/data-rights-and-licensing-framework.md)
 
 ## What is OpenLPM?
 
@@ -22,9 +23,13 @@ OpenLPM is a single, free tool built for that workflow specifically:
 
 It's free to run (a static Vite/React frontend + Supabase's free tier — deployable straight to GitHub Pages, no server to operate), open source, and designed so a research group with no dedicated engineering support can stand up their own instance.
 
-## Built-in AI ethics, not an afterthought
+## Built-in AI ethics from the start
 
 Generative AI is genuinely useful for this kind of work — and genuinely risky if it's allowed to quietly make decisions that should stay human. OpenLPM ships with a **tiered AI Ethics Framework** baked into how the platform is designed to be used: AI is welcome for search, drafting, and synthesis assistance, and explicitly excluded from evidence evaluation, peer review decisions, and schema authority. See [`ethics/ai-ethics-framework.md`](ethics/ai-ethics-framework.md) for the full framework — we think it's useful on its own, independent of this specific tool, and we'd genuinely like feedback on it from other research groups thinking about the same problem.
+
+## Data rights, licensing, and citation
+
+Content stored in OpenLPM falls into three kinds, each with its own rules: OpenLPM's own content, a project's own original work (each project can set its own license), and quoted or summarized third-party material like a government curriculum document (which keeps its own rights regardless of the project around it). See [`ethics/data-rights-and-licensing-framework.md`](ethics/data-rights-and-licensing-framework.md) for how to cite OpenLPM, what it does and doesn't warrant about stored content, and how to handle institutional source material responsibly.
 
 ## Where this comes from
 
@@ -32,7 +37,7 @@ OpenLPM is an [OpenEvo](http://openevo.eva.mpg.de) project, initiated and mainta
 
 ## Status & roadmap
 
-OpenLPM is early — pre-launch, actively developed, not yet feature-complete. A draft phased plan:
+OpenLPM is early: pre-launch, actively developed, still short of feature-complete. A draft phased plan:
 
 - **Phase 0 — Foundation** *(now)*: open-source the core platform; solidify schema co-design and literature workflows end to end.
 - **Phase 1 — Pilot partners**: work directly with a small number of LPM research groups using real working-group content, and let their needs shape the next round of features.
@@ -58,3 +63,5 @@ See [`QUICKSTART.md`](QUICKSTART.md) for a 10-minute setup, or [`SETUP_GUIDE.md`
 
 - **Content** (documentation, governance, the AI Ethics Framework): [CC BY-NC-SA 4.0](LICENSE)
 - **Code** (the application): [MIT](LICENSE-CODE)
+
+See the [Data Rights & Licensing Framework](ethics/data-rights-and-licensing-framework.md) for how this applies to a specific project's own content and to third-party source material.

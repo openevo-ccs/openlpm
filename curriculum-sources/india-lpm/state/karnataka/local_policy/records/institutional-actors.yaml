@@ -1,0 +1,79 @@
+# india_lp -- Karnataka institutional actors.
+$schema: ../../../../schema/institutional-actor-record.schema.json
+
+actors:
+
+  - id: "INLP-ACTOR-dsert-karnataka"
+    slug: "dsert-karnataka"
+    label: "Department of State Educational Research and Training (DSERT), Karnataka"
+    actorType: "state-education-board"
+    jurisdiction: "IN-KA"
+    role: >
+      Karnataka's state curriculum-research body. Runs Karnataka Open
+      Educational Resources (KOER), which licenses the state's own
+      textbooks and curriculum materials under Creative Commons CC BY-SA
+      4.0 -- a real, checkable, already-open license, in direct contrast to
+      NCERT's own all-rights-reserved default (see
+      national_ccs_policy/records/institutional-actors.yaml,
+      INLP-ACTOR-ncert) and to Maharashtra's fee-gated approach (see
+      state/maharashtra/local_policy/records/institutional-actors.yaml,
+      INLP-ACTOR-balbharati-maharashtra). Karnataka's DSERT has also set up
+      its own curriculum-design expert bodies partly independent of
+      national NCF/NEP 2020 content, reflecting India's constitutional
+      "Concurrent List" status for education, which lets states diverge
+      both in curriculum content and in licensing posture.
+    url: "https://karnatakaeducation.org.in/KOER/en/index.php/Text_Books"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-09-30"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The CC BY-SA 4.0 licensing claim and the "hosted in full, unlike
+        NROER" comparison both come from a SpicyIP legal-scholarship piece
+        (Dhonchak, 2021), corroborated by the KOER portal itself, which
+        this repo's founding session viewed directly. The "own curriculum
+        design expert bodies" / NEP-divergence claim comes from an ORF
+        policy-analysis piece, a secondary source -- flagged as somewhat
+        less certain than the licensing claim itself.
+      sourceProvenance: "docs/source-notes/2026-09-30-india-curriculum-licensing-landscape-research.md#4"
+
+  - id: "INLP-ACTOR-it-for-change"
+    slug: "it-for-change"
+    label: "IT for Change"
+    actorType: "advocacy-body"
+    jurisdiction: "IN-KA"
+    role: >
+      Bangalore-based NGO that served as DSERT's resource/implementation
+      partner in building Karnataka Open Educational Resources (KOER) under
+      the national RMSA Karnataka (Rashtriya Madhyamik Shiksha Abhiyan)
+      scheme, 2013-14 -- designed the cascading teacher-training model that
+      produced KOER's own content (see
+      state/karnataka/local_policy/records/timeline.yaml,
+      INLP-EVENT-koer-rmsa-pilot-launch). Recorded here as its own actor,
+      distinct from DSERT itself (INLP-ACTOR-dsert-karnataka), because the
+      content-creation mechanism -- a civil-society partner training a
+      cascading chain of teachers, rather than the state board authoring
+      material centrally -- is a structurally different model from how
+      Maharashtra's Balbharati or NCERT itself produce curriculum content,
+      and that difference is part of what makes KOER's open-license posture
+      possible in practice, not just on paper.
+    url: "https://koer-en.karnatakaeducation.org.in/index.php/Brief_note_on_KOER"
+    verificationStatus: "primary-source-confirmed"
+
+    provenance:
+      extracted_by: llm
+      added_by: dustin-eirdosh
+      date: "2026-10-02"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Confirmed by a direct fetch of KOER's own "Brief note on KOER" page,
+        which names IT for Change as the resource institution and describes
+        the RMSA Karnataka-funded cascading training model (30 core teachers
+        per subject across 19 districts, training roughly 30 more each, who
+        then trained teachers at roughly 1,000 high schools) directly.
+      sourceProvenance: "state/karnataka/local_policy/records/timeline.yaml#INLP-EVENT-koer-rmsa-pilot-launch"

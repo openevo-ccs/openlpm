@@ -1,0 +1,3935 @@
+{
+ "records": {
+  "OE-COMPETENCY-ai4k12-bi1": {
+   "code": "BI1",
+   "statement": "Perception",
+   "kind": "bigidea",
+   "band": null,
+   "broader": null
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i": {
+   "code": "1-A-i",
+   "statement": "Sensing (Living Things)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-k-2-lo": {
+   "code": "1-A-i.K-2.LO",
+   "statement": "Identify human senses and sensory organs.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-k-2-eu": {
+   "code": "1-A-i.K-2.EU",
+   "statement": "People experience the world through sight, hearing, touch, taste, and smell.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-3-5-lo": {
+   "code": "1-A-i.3-5.LO",
+   "statement": "Compare human and animal perception.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-3-5-eu": {
+   "code": "1-A-i.3-5.EU",
+   "statement": "Some animals experience the world differently than people do.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-6-8-lo": {
+   "code": "1-A-i.6-8.LO",
+   "statement": "Give examples of how humans combine information from multiple modalities.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-6-8-eu": {
+   "code": "1-A-i.6-8.EU",
+   "statement": "People can exploit correlations between senses, such as sight and sound, to make sense of ambiguous signals.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-9-12-lo": {
+   "code": "1-A-i.9-12.LO",
+   "statement": "N/A for AI purposes at this band.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-i-9-12-eu": {
+   "code": "1-A-i.9-12.EU",
+   "statement": "This topic has already been adequately addressed in the lower grade bands.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii": {
+   "code": "1-A-ii",
+   "statement": "Sensing (Computer Sensors)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-k-2-lo": {
+   "code": "1-A-ii.K-2.LO",
+   "statement": "Locate and identify sensors (camera, microphone) on computers, phones, robots, and other devices.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-k-2-eu": {
+   "code": "1-A-ii.K-2.EU",
+   "statement": "Computers \"see\" through video cameras and \"hear\" through microphones.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-3-5-lo": {
+   "code": "1-A-ii.3-5.LO",
+   "statement": "Illustrate how computer sensing differs from human sensing.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-3-5-eu": {
+   "code": "1-A-ii.3-5.EU",
+   "statement": "Most computers have no sense of taste, smell, or touch, but they can sense some things that humans can't, such as infrared emissions, extremely low or high frequency sounds, or magnetism.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-6-8-lo": {
+   "code": "1-A-ii.6-8.LO",
+   "statement": "Give examples of how intelligent agents combine information from multiple sensors.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-6-8-eu": {
+   "code": "1-A-ii.6-8.EU",
+   "statement": "Self driving cars combine computer vision with radar or lidar imaging, GPS measurement, and accelerometer data to form a detailed representation of the environment and their motion through it.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-9-12-lo": {
+   "code": "1-A-ii.9-12.LO",
+   "statement": "Describe the limitations and advantages of various types of computer sensors.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-ii-9-12-eu": {
+   "code": "1-A-ii.9-12.EU",
+   "statement": "Sensors are devices that measure physical phenomena such as light, sound, temperature, or pressure.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii": {
+   "code": "1-A-iii",
+   "statement": "Sensing (Digital Encoding)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-3-5-lo": {
+   "code": "1-A-iii.3-5.LO",
+   "statement": "Explain how images are represented digitally in a computer.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-3-5-eu": {
+   "code": "1-A-iii.3-5.EU",
+   "statement": "Images are encoded as 2D arrays of pixels, where each pixel is a number indicating the brightness of that piece of the image, or an RGB value indicating the brightness of the red, green, and blue components of that piece.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-6-8-lo": {
+   "code": "1-A-iii.6-8.LO",
+   "statement": "Explain how sounds are represented digitally in a computer.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-6-8-eu": {
+   "code": "1-A-iii.6-8.EU",
+   "statement": "Sounds are digitally encoded by sampling the waveform at discrete points (typically several thousand samples per second), yielding a series of numbers.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-9-12-lo": {
+   "code": "1-A-iii.9-12.LO",
+   "statement": "Explain how radar, lidar, GPS, and accelerometer data are represented.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-a-iii-9-12-eu": {
+   "code": "1-A-iii.9-12.EU",
+   "statement": "Radar and lidar do depth imaging: each pixel is a depth value. GPS triangulates position using satellite signals and gives a location as longitude and latitude. Accelerometers measure acceleration in 3 orthogonal dimensions.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i": {
+   "code": "1-B-i",
+   "statement": "Processing (Sensing vs. Perception)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-k-2-lo": {
+   "code": "1-B-i.K-2.LO",
+   "statement": "Give examples of intelligent vs. nonintelligent machines and discuss what makes a machine intelligent.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-k-2-eu": {
+   "code": "1-B-i.K-2.EU",
+   "statement": "Many machines use sensors, but not all use them intelligently. Non-intelligent machines are limited to simple sensing. Intelligent machines demonstrate perception.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-3-5-lo": {
+   "code": "1-B-i.3-5.LO",
+   "statement": "Use a software tool such as a speech transcription or visual object recognition demo to demonstrate machine perception, and explain why this is perception rather than mere sensing.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-3-5-eu": {
+   "code": "1-B-i.3-5.EU",
+   "statement": "Perception is the extraction of meaning from sensory signals.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-6-8-lo": {
+   "code": "1-B-i.6-8.LO",
+   "statement": "Give examples of different types of computer perception that can extract meaning from sensory signals.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-6-8-eu": {
+   "code": "1-B-i.6-8.EU",
+   "statement": "There are many specialized algorithms for perceptual tasks, such as face detection, facial expression recognition, object recognition, obstacle detection, speech recognition, vocal stress measurement, music recognition, etc.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-9-12-lo": {
+   "code": "1-B-i.9-12.LO",
+   "statement": "Explain perception algorithms and how they are used in real-world applications.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-i-9-12-eu": {
+   "code": "1-B-i.9-12.EU",
+   "statement": "Many devices and services rely on specialized perception algorithms, e.g., license plate readers, zip code readers, face-based phone unlocking, tagging people in Facebook posts, object identification (e.g., Google Lens), or voice-based customer service.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii": {
+   "code": "1-B-ii",
+   "statement": "Processing (Feature Extraction)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-k-2-lo": {
+   "code": "1-B-ii.K-2.LO",
+   "statement": "Give examples of features one would look for if one wanted to recognize a certain class of objects (e.g., cats) in an image.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-k-2-eu": {
+   "code": "1-B-ii.K-2.EU",
+   "statement": "The visual features of an object include its subparts, textures, and colors.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-3-5-lo": {
+   "code": "1-B-ii.3-5.LO",
+   "statement": "Illustrate how face detection works by extracting facial features.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-3-5-eu": {
+   "code": "1-B-ii.3-5.EU",
+   "statement": "Face detectors use special algorithms to look for eyes, noses, mouths, and jaw lines.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-6-8-lo": {
+   "code": "1-B-ii.6-8.LO",
+   "statement": "Illustrate the concept of feature extraction from images by simulating an edge detector.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-6-8-eu": {
+   "code": "1-B-ii.6-8.EU",
+   "statement": "Locations and orientations of edges in an image are features that can be detected by looking for specific arrangements of light and dark pixels in a small (local) area.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-9-12-lo": {
+   "code": "1-B-ii.9-12.LO",
+   "statement": "Explain how features are extracted from waveforms and images.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-ii-9-12-eu": {
+   "code": "1-B-ii.9-12.EU",
+   "statement": "A speech spectrogram shows the energy present in a waveform in various frequency bands. Formants are auditory features defined as regions of concentrated energy in the spectrogram. Feature extraction from images begins with detecting edges in the image, or intensity gradients at multiple scales.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii": {
+   "code": "1-B-iii",
+   "statement": "Processing (Abstraction Pipeline: Language)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-k-2-lo": {
+   "code": "1-B-iii.K-2.LO",
+   "statement": "Describe the different sounds that make up one's spoken language, and for every vowel sound, give a word containing that sound.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-k-2-eu": {
+   "code": "1-B-iii.K-2.EU",
+   "statement": "In order for a computer to understand speech, it has to be able to recognize the sounds from which words are constructed.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-3-5-lo": {
+   "code": "1-B-iii.3-5.LO",
+   "statement": "Illustrate how sequences of sounds can be recognized as candidate words, even if some sounds are unclear.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-3-5-eu": {
+   "code": "1-B-iii.3-5.EU",
+   "statement": "Going from sounds to words is one step in the abstraction pipeline for speech understanding.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-6-8-lo": {
+   "code": "1-B-iii.6-8.LO",
+   "statement": "Illustrate how sequences of words can be recognized as phrases, even if some of the words are unclear, by looking at how the words fit together.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-6-8-eu": {
+   "code": "1-B-iii.6-8.EU",
+   "statement": "Information at higher levels of representation can be used to resolve ambiguities in lower levels of the language abstraction pipeline.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-9-12-lo": {
+   "code": "1-B-iii.9-12.LO",
+   "statement": "Illustrate the abstraction hierarchy for speech understanding, from waveforms to sentences, showing how knowledge at each level is used to resolve ambiguities in the levels below.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iii-9-12-eu": {
+   "code": "1-B-iii.9-12.EU",
+   "statement": "The spoken language hierarchy is: waveforms -> articulatory gestures -> sounds -> morphemes -> words -> phrases -> sentences.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iii"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv": {
+   "code": "1-B-iv",
+   "statement": "Processing (Abstraction Pipeline: Vision)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-k-2-lo": {
+   "code": "1-B-iv.K-2.LO",
+   "statement": "Demonstrate figure/ground segmentation by identifying the foreground figures and the background in an image.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-k-2-eu": {
+   "code": "1-B-iv.K-2.EU",
+   "statement": "Visual scenes have a structure that includes a background and a foreground, with foreground objects partially occluding (blocking) the background.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-3-5-lo": {
+   "code": "1-B-iv.3-5.LO",
+   "statement": "Illustrate how the outlines of partially occluded (blocked) objects in an image differ from the real shapes of the objects.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-3-5-eu": {
+   "code": "1-B-iv.3-5.EU",
+   "statement": "Understanding complex scenes requires taking into account the effects of occlusion when attempting to recognize objects.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-6-8-lo": {
+   "code": "1-B-iv.6-8.LO",
+   "statement": "Describe how edge detectors can be composed to form more complex feature detectors, e.g., for letters or shapes.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-6-8-eu": {
+   "code": "1-B-iv.6-8.EU",
+   "statement": "The progression from signal to meaning takes place in stages, with increasingly complex features extracted at each stage.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-9-12-lo": {
+   "code": "1-B-iv.9-12.LO",
+   "statement": "Demonstrate how perceptual reasoning at a higher level of abstraction draws upon earlier, lower levels of abstraction.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-b-iv-9-12-eu": {
+   "code": "1-B-iv.9-12.EU",
+   "statement": "Scenes are composed of objects, which are composed of surfaces and boundaries. Boundaries are marked by contours, which are composed of edges, which are made up of pixels.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-b-iv"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i": {
+   "code": "1-C-i",
+   "statement": "Domain Knowledge (Types of Domain Knowledge)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-k-2-lo": {
+   "code": "1-C-i.K-2.LO",
+   "statement": "Describe some things an intelligent agent must \"know\" in order to make sense of a question.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-k-2-eu": {
+   "code": "1-C-i.K-2.EU",
+   "statement": "To understand spoken requests, computers must know our vocabulary and pronunciation conventions, and they must be able to distinguish a question from a command.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-3-5-lo": {
+   "code": "1-C-i.3-5.LO",
+   "statement": "Demonstrate how a text to speech system can resolve ambiguity based on context, and how its error rate goes up when given ungrammatical or meaningless inputs.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-3-5-eu": {
+   "code": "1-C-i.3-5.EU",
+   "statement": "Speech recognition systems are trained on millions of utterances, allowing them to distinguish common from uncommon sequences of words, which helps them select the most likely interpretation of the signal.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-6-8-lo": {
+   "code": "1-C-i.6-8.LO",
+   "statement": "Classify a given image (e.g., \"traffic scene\", \"nature scene\", \"social gathering\", etc.) and then describe the kinds of knowledge a computer would need in order to understand scenes of this type.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-6-8-eu": {
+   "code": "1-C-i.6-8.EU",
+   "statement": "Domain knowledge for vision includes knowing what kinds of objects are likely to appear in a scene, where they are likely to appear in relation to other objects, and how occlusions and shadows can alter object appearances.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-9-12-lo": {
+   "code": "1-C-i.9-12.LO",
+   "statement": "Analyze one or more online image datasets and describe the information the datasets provide and how this can be used to extract domain knowledge for a computer vision system.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-i-9-12-eu": {
+   "code": "1-C-i.9-12.EU",
+   "statement": "Domain knowledge in AI systems is often derived from statistics collected from millions of sentences or images.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii": {
+   "code": "1-C-ii",
+   "statement": "Domain Knowledge (Inclusivity)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi1"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-k-2-lo": {
+   "code": "1-C-ii.K-2.LO",
+   "statement": "Discuss why intelligent agents need to be able to understand languages other than English.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-k-2-eu": {
+   "code": "1-C-ii.K-2.EU",
+   "statement": "Speech recognition systems need to accommodate different languages because many different types of people will use them.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-3-5-lo": {
+   "code": "1-C-ii.3-5.LO",
+   "statement": "Discuss how domain knowledge needs to be broad enough to encompass all the groups an application is intended to serve.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-3-5-eu": {
+   "code": "1-C-ii.3-5.EU",
+   "statement": "Speech recognition systems need to accommodate different types of accents and alternative pronunciations. Music recognition systems must know about different musical genres.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-6-8-lo": {
+   "code": "1-C-ii.6-8.LO",
+   "statement": "Describe how a vision system might exhibit cultural bias if it lacked knowledge of objects not found in the culture of the people who created it.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-6-8-eu": {
+   "code": "1-C-ii.6-8.EU",
+   "statement": "Domain knowledge must take multiple cultures into account if an AI application is to serve diverse groups.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-9-12-lo": {
+   "code": "1-C-ii.9-12.LO",
+   "statement": "Describe some of the technical difficulties in making computer perception systems function well for diverse groups.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-1-c-ii-9-12-eu": {
+   "code": "1-C-ii.9-12.EU",
+   "statement": "Dark or low contrast facial features are harder to recognize than bright, high contrast features. Children's speech is in a higher register and less clearly articulated than adult speech.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-1-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-bi2": {
+   "code": "BI2",
+   "statement": "Representation & Reasoning",
+   "kind": "bigidea",
+   "band": null,
+   "broader": null
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i": {
+   "code": "2-A-i",
+   "statement": "Representation (Abstraction)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-k-2-lo": {
+   "code": "2-A-i.K-2.LO",
+   "statement": "Construct a map of a home, school, or neighborhood.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-k-2-eu": {
+   "code": "2-A-i.K-2.EU",
+   "statement": "The map is not the territory. A map is a representation of a territory.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-3-5-lo": {
+   "code": "2-A-i.3-5.LO",
+   "statement": "Demonstrate how different styles of map capture different aspects of the world.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-3-5-eu": {
+   "code": "2-A-i.3-5.EU",
+   "statement": "Maps can be geometrically accurate or just show which places are reachable from which other places (topology). They can contain many types of information, such as the names and sizes of cities and towns, or the types of roads connecting them.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-6-8-lo": {
+   "code": "2-A-i.6-8.LO",
+   "statement": "Show how a game board (e.g., tic-tac-toe, Chutes and Ladders, Monopoly, chess) can be represented by a description in plain language.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-6-8-eu": {
+   "code": "2-A-i.6-8.EU",
+   "statement": "The essential information in a game board is the set of squares that make up the board, the relationships among those squares, and the positions of the pieces.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-9-12-lo": {
+   "code": "2-A-i.9-12.LO",
+   "statement": "Describe how to represent a concept as a schema.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-i-9-12-eu": {
+   "code": "2-A-i.9-12.EU",
+   "statement": "A schema describes a concept by listing its superconcepts and defining its properties, some of which may be inherited from superconcepts.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii": {
+   "code": "2-A-ii",
+   "statement": "Representation (Symbolic representations)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-k-2-lo": {
+   "code": "2-A-ii.K-2.LO",
+   "statement": "Give examples of symbols you encounter in daily life.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-k-2-eu": {
+   "code": "2-A-ii.K-2.EU",
+   "statement": "Concepts can be represented using symbols in place of words.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-3-5-lo": {
+   "code": "2-A-ii.3-5.LO",
+   "statement": "Give examples of tree structures commonly used by people and explain the relationships among the components.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-3-5-eu": {
+   "code": "2-A-ii.3-5.EU",
+   "statement": "Many types of information have a hierarchical structure, which can be visualized as a tree.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-6-8-lo": {
+   "code": "2-A-ii.6-8.LO",
+   "statement": "Illustrate translation of a structure such as a game board, road map, or mind map into a labeled graph and explain the contributions of the components.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-6-8-eu": {
+   "code": "2-A-ii.6-8.EU",
+   "statement": "The nodes of a graph represent things, and the links represent relationships between those things. Labels supply additional information about what the nodes and links represent.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-9-12-lo": {
+   "code": "2-A-ii.9-12.LO",
+   "statement": "Translate the premises of a syllogism expressed in English into logical notation and complete the syllogism correctly.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-ii-9-12-eu": {
+   "code": "2-A-ii.9-12.EU",
+   "statement": "Syllogisms represent statements about categories and instances in a way that allows computers to derive new knowledge from existing knowledge by following simple inference rules.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii": {
+   "code": "2-A-iii",
+   "statement": "Representation (Data structures)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-k-2-lo": {
+   "code": "2-A-iii.K-2.LO",
+   "statement": "Draw a tree by repeatedly splitting each branch into sub-branches multiple times, and putting a piece of data at each branch.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-k-2-eu": {
+   "code": "2-A-iii.K-2.EU",
+   "statement": "A tree is a way of organizing information.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-3-5-lo": {
+   "code": "2-A-iii.3-5.LO",
+   "statement": "Describe the parts of a tree and how those parts are related.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-3-5-eu": {
+   "code": "2-A-iii.3-5.EU",
+   "statement": "A tree is a collection of labeled nodes, each of which (save the root) has a link to a parent node above it in the hierarchy. Childless nodes are called leaves or terminal nodes; those with children are non-terminal nodes.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-6-8-lo": {
+   "code": "2-A-iii.6-8.LO",
+   "statement": "Describe the parts of a graph and how those parts are related.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-6-8-eu": {
+   "code": "2-A-iii.6-8.EU",
+   "statement": "A graph is a collection of labeled nodes connected by labeled links. Every link has a source node and a target node; every node has a set of incoming links and a set of outgoing links. Trees are a special case of graphs.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-9-12-lo": {
+   "code": "2-A-iii.9-12.LO",
+   "statement": "Describe how schemas are used to structure information about people, places, or things in knowledge graphs.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iii-9-12-eu": {
+   "code": "2-A-iii.9-12.EU",
+   "statement": "A schema specifies the attributes of the concept being described, and its relationships to other concepts, e.g., the Restaurant schema inherits properties from the FoodEstablishment schema.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv": {
+   "code": "2-A-iv",
+   "statement": "Representation (Feature vectors)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-k-2-lo": {
+   "code": "2-A-iv.K-2.LO",
+   "statement": "Identify the features that make each object in a collection unique, and create a table of features to organize the objects.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-k-2-eu": {
+   "code": "2-A-iv.K-2.EU",
+   "statement": "Objects can be described in terms of the features they possess.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-3-5-lo": {
+   "code": "2-A-iv.3-5.LO",
+   "statement": "Construct a feature vector representation for a set of objects and show how similar objects are close together in feature space.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-3-5-eu": {
+   "code": "2-A-iv.3-5.EU",
+   "statement": "Recommender systems represent things like movies, books, consumer products, or social media posts using feature vectors.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-6-8-lo": {
+   "code": "2-A-iv.6-8.LO",
+   "statement": "Explain how word embeddings (which are feature vectors) represent words as sequences of numbers.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-6-8-eu": {
+   "code": "2-A-iv.6-8.EU",
+   "statement": "Word embeddings are a key part of neural natural language processing, including machine translation (e.g., Google Translate) and text generation systems (BERT, GPT3, etc.)",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-9-12-lo": {
+   "code": "2-A-iv.9-12.LO",
+   "statement": "Describe how a transformer network operates.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-a-iv-9-12-eu": {
+   "code": "2-A-iv.9-12.EU",
+   "statement": "Transformer networks map sequences of input words to sequences of output words, where words are represented as feature vectors.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i": {
+   "code": "2-B-i",
+   "statement": "Search (State spaces and operators)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-k-2-lo": {
+   "code": "2-B-i.K-2.LO",
+   "statement": "Illustrate a next possible state in the game of tic-tac-toe given a starting state.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-k-2-eu": {
+   "code": "2-B-i.K-2.EU",
+   "statement": "A game such as tic-tac-toe can be described as a sequence of states, where each move transitions from a state to a successor state.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-3-5-lo": {
+   "code": "2-B-i.3-5.LO",
+   "statement": "Illustrate how a computer can represent the playing of a game such as tic-tac-toe or nim by drawing the linear sequence of board positions produced by the players' moves.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-3-5-eu": {
+   "code": "2-B-i.3-5.EU",
+   "statement": "Computers play games and solve puzzles by creating a sequence of states (board positions) connected by legal moves, using an algorithm to choose their next move at each step.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-6-8-lo": {
+   "code": "2-B-i.6-8.LO",
+   "statement": "Illustrate how a computer can solve a maze, find a route on a map, or reason about concepts in a knowledge graph by drawing a search tree.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-6-8-eu": {
+   "code": "2-B-i.6-8.EU",
+   "statement": "Computers solve mazes, find driving routes, and reason about concepts in knowledge graphs using graph search algorithms, which construct search trees.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-9-12-lo": {
+   "code": "2-B-i.9-12.LO",
+   "statement": "Identify types of real-world problems that are search problems and describe their states and operators.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-i-9-12-eu": {
+   "code": "2-B-i.9-12.EU",
+   "statement": "Computers can solve many types of problems using search techniques if the problem can be described in terms of finding a path from a start state to a goal state.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii": {
+   "code": "2-B-ii",
+   "statement": "Search (Combinatorial search)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-k-2-lo": {
+   "code": "2-B-ii.K-2.LO",
+   "statement": "Draw a simple search tree to illustrate two possible choices of moves by drawing two different successor states to a given tic-tac-toe game board state, forming a tree.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-k-2-eu": {
+   "code": "2-B-ii.K-2.EU",
+   "statement": "A computer must make choices when playing games, in the same way that humans do.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-3-5-lo": {
+   "code": "2-B-ii.3-5.LO",
+   "statement": "Given a state of a game such as tic-tac-toe or nim, draw a search tree showing all possible next moves and their resulting states, and pick the best next move.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-3-5-eu": {
+   "code": "2-B-ii.3-5.EU",
+   "statement": "Computer game playing programs may construct search trees to decide on their next move.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-6-8-lo": {
+   "code": "2-B-ii.6-8.LO",
+   "statement": "Model the process of solving a graph search problem using breadth-first search to draw a search tree.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-6-8-eu": {
+   "code": "2-B-ii.6-8.EU",
+   "statement": "Breadth-first search can be used to solve problems that involve reasoning about graphs.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-9-12-lo": {
+   "code": "2-B-ii.9-12.LO",
+   "statement": "Illustrate breadth-first, depth-first, and best-first search algorithms to grow a search tree for a graph search problem.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-b-ii-9-12-eu": {
+   "code": "2-B-ii.9-12.EU",
+   "statement": "There are multiple algorithms for generating a search tree, each with its own advantages.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i": {
+   "code": "2-C-i",
+   "statement": "Reasoning (Types of reasoning problems)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-k-2-lo": {
+   "code": "2-C-i.K-2.LO",
+   "statement": "Identify problems as either classification problems or search problems.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-k-2-eu": {
+   "code": "2-C-i.K-2.EU",
+   "statement": "In classification problems we decide what kind of thing we have based on its features. In search problems we find a path from a start to a goal, such as finding a route on a map or exploring possible moves in a game.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-3-5-lo": {
+   "code": "2-C-i.3-5.LO",
+   "statement": "Categorize problems as either classification problems or search problems.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-3-5-eu": {
+   "code": "2-C-i.3-5.EU",
+   "statement": "Classification problems assign each input to one of a predetermined set of classes. Search problems construct answers by applying operators to states to generate new states.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-6-8-lo": {
+   "code": "2-C-i.6-8.LO",
+   "statement": "Categorize problems as classification, prediction, combinatorial search, or sequential decision problems.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-6-8-eu": {
+   "code": "2-C-i.6-8.EU",
+   "statement": "Prediction problems are similar to classification problems except they estimate a continuous value, such as height or daily temperature. Sequential decision problems choose the next move for any given state in order to maximize overall reward.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-9-12-lo": {
+   "code": "2-C-i.9-12.LO",
+   "statement": "Categorize real-world problems as classification, prediction, sequential decision problems, combinatorial search, heuristic search, adversarial search, logical deduction, or statistical inference.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-i-9-12-eu": {
+   "code": "2-C-i.9-12.EU",
+   "statement": "Reasoning problems can be categorized based on the types of inputs supplied, the types of outputs to be produced, and the characteristics of the search space, if applicable.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii": {
+   "code": "2-C-ii",
+   "statement": "Reasoning (Reasoning algorithms)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi2"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-k-2-lo": {
+   "code": "2-C-ii.K-2.LO",
+   "statement": "Model the use of a classification or search algorithm to solve a problem.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-k-2-eu": {
+   "code": "2-C-ii.K-2.EU",
+   "statement": "Reasoning algorithms are ways to solve reasoning problems.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-3-5-lo": {
+   "code": "2-C-ii.3-5.LO",
+   "statement": "Describe the differences between two algorithms for classifying things: decision trees, or neural networks like Teachable Machine.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-3-5-eu": {
+   "code": "2-C-ii.3-5.EU",
+   "statement": "Multiple algorithms can be used to solve a reasoning problem.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-6-8-lo": {
+   "code": "2-C-ii.6-8.LO",
+   "statement": "Compare several algorithms that could be used to solve a specific type of reasoning problem.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-6-8-eu": {
+   "code": "2-C-ii.6-8.EU",
+   "statement": "The choice of reasoning algorithm depends on the characteristics of the input data and the types of decisions to be made.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-9-12-lo": {
+   "code": "2-C-ii.9-12.LO",
+   "statement": "For each of these types of reasoning problems (classification, prediction, sequential decision making, combinatorial search, heuristic search, adversarial search, logical deduction, and statistical inference), list an algorithm that could be used to solve that problem.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-2-c-ii-9-12-eu": {
+   "code": "2-C-ii.9-12.EU",
+   "statement": "AI includes a wide variety of reasoning algorithms for solving different types of reasoning problems. Some use symbolic representations (e.g., search trees) while others are numerical in nature (e.g., neural nets operating on feature vectors).",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-2-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-bi3": {
+   "code": "BI3",
+   "statement": "Learning",
+   "kind": "bigidea",
+   "band": null,
+   "broader": null
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i": {
+   "code": "3-A-i",
+   "statement": "Nature of Learning (Humans vs. machines)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-k-2-lo": {
+   "code": "3-A-i.K-2.LO",
+   "statement": "Describe and provide examples of how people learn and how computers learn.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-k-2-eu": {
+   "code": "3-A-i.K-2.EU",
+   "statement": "Computers learn differently than people.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-3-5-lo": {
+   "code": "3-A-i.3-5.LO",
+   "statement": "Differentiate between how people learn and how computers learn.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-3-5-eu": {
+   "code": "3-A-i.3-5.EU",
+   "statement": "Both people and computers can learn by finding patterns in data, or by trial and error. But people are flexible learners who can adapt to unfamiliar situations and learn in other ways, such as by observing others, by asking questions, or by making connections to prior learning.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-6-8-lo": {
+   "code": "3-A-i.6-8.LO",
+   "statement": "Contrast the unique characteristics of human learning with the ways machine learning systems operate.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-6-8-eu": {
+   "code": "3-A-i.6-8.EU",
+   "statement": "People learn by observation, by being told, by asking questions, by experimentation, by practice, and by making connections to past experience. Computers learn by applying specialized algorithms to large amounts of training data, or by thousands or even millions of trial and error experiences, to solve narrowly defined problems.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-9-12-lo": {
+   "code": "3-A-i.9-12.LO",
+   "statement": "Define supervised, unsupervised, and reinforcement learning algorithms, and give examples of human learning that are similar to each algorithm.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-i-9-12-eu": {
+   "code": "3-A-i.9-12.EU",
+   "statement": "Both supervised and unsupervised learning algorithms find patterns in data. Supervised learning uses features to predict the class label supplied by a teacher; unsupervised learning groups similar instances together, creating its own classes. Reinforcement learning uses trial and error to find a policy for choosing actions that maximizes the reinforcement signal.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii": {
+   "code": "3-A-ii",
+   "statement": "Nature of Learning (Finding patterns in data)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-k-2-lo": {
+   "code": "3-A-ii.K-2.LO",
+   "statement": "Identify patterns in labeled data and determine the features that predict labels.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-k-2-eu": {
+   "code": "3-A-ii.K-2.EU",
+   "statement": "Classes can be defined in terms of feature values. The relevant features can be inferred by examining labeled examples.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-3-5-lo": {
+   "code": "3-A-ii.3-5.LO",
+   "statement": "Model how supervised learning identifies patterns in labeled data.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-3-5-eu": {
+   "code": "3-A-ii.3-5.EU",
+   "statement": "When learning to classify labeled data, the patterns (or rules) that are discovered can be expressed as weights in a neural network or nodes in a decision tree.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-6-8-lo": {
+   "code": "3-A-ii.6-8.LO",
+   "statement": "Model how unsupervised learning finds patterns in unlabeled data.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-6-8-eu": {
+   "code": "3-A-ii.6-8.EU",
+   "statement": "Unsupervised learning is useful when we don't know in advance what classes exist. It discovers patterns (or classes) in data by grouping nearby points into clusters.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-9-12-lo": {
+   "code": "3-A-ii.9-12.LO",
+   "statement": "Model how machine learning constructs a reasoner for classification or prediction by adjusting the reasoner's parameters (its internal representations).",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-ii-9-12-eu": {
+   "code": "3-A-ii.9-12.EU",
+   "statement": "Supervised learning adjusts the parameters of a mathematical model (selected in advance by a human) to generate correct classifications or predictions.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii": {
+   "code": "3-A-iii",
+   "statement": "Nature of Learning (Training a model)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-k-2-lo": {
+   "code": "3-A-iii.K-2.LO",
+   "statement": "Demonstrate how to train a computer to recognize something.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-k-2-eu": {
+   "code": "3-A-iii.K-2.EU",
+   "statement": "Computers can learn from examples.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-3-5-lo": {
+   "code": "3-A-iii.3-5.LO",
+   "statement": "Train a classification model using machine learning, and then examine the accuracy of the model on new inputs.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-3-5-eu": {
+   "code": "3-A-iii.3-5.EU",
+   "statement": "Computers can learn to classify instances or predict values by being shown labeled examples. If the results on new inputs are unsatisfactory, additional training may be required to improve the accuracy.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-6-8-lo": {
+   "code": "3-A-iii.6-8.LO",
+   "statement": "Train and evaluate a classification or prediction model using machine learning on a tabular dataset.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-6-8-eu": {
+   "code": "3-A-iii.6-8.EU",
+   "statement": "Computers can learn to classify instances or predict values by examining feature values. If the results on new inputs are unsatisfactory, additional training may be required to improve the accuracy.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-9-12-lo": {
+   "code": "3-A-iii.9-12.LO",
+   "statement": "Use either a supervised or unsupervised learning algorithm to train a model on real world data, then evaluate the results.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iii-9-12-eu": {
+   "code": "3-A-iii.9-12.EU",
+   "statement": "In supervised learning the model is trained on a training set to produce the correct labels for labeled data. In unsupervised learning, the model is trained to assign each input to a cluster of similar inputs.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv": {
+   "code": "3-A-iv",
+   "statement": "Nature of Learning (Constructing vs. using a reasoner)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-3-5-lo": {
+   "code": "3-A-iv.3-5.LO",
+   "statement": "Demonstrate how training data are labeled when using a machine learning tool.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-3-5-eu": {
+   "code": "3-A-iv.3-5.EU",
+   "statement": "In preparation for training a model, training data can be labeled by first defining the classes (the labels) and then adding examples for each class separately.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-6-8-lo": {
+   "code": "3-A-iv.6-8.LO",
+   "statement": "Explain the difference between training and using a reasoning model.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-6-8-eu": {
+   "code": "3-A-iv.6-8.EU",
+   "statement": "Machine learning algorithms use labeled training data to construct reasoning models that do classification or prediction. Once training is complete, the reasoning model can be applied to new data to solve problems or make decisions.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-9-12-lo": {
+   "code": "3-A-iv.9-12.LO",
+   "statement": "Illustrate what happens during each of the steps required when using machine learning to construct a classifier or predictor.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-iv-9-12-eu": {
+   "code": "3-A-iv.9-12.EU",
+   "statement": "The steps are: deciding what problem you want to solve, figuring out where you will obtain the training data, choosing a feature set, figuring out how to label the data, running the learning algorithm, use of a cross-validation set to decide when training should stop, and using a test set to measure performance.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v": {
+   "code": "3-A-v",
+   "statement": "Nature of Learning (Adjusting internal representations)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-3-5-lo": {
+   "code": "3-A-v.3-5.LO",
+   "statement": "Analyze a game where one constructs a decision tree, describing the organization of the tree and the learning algorithm used to add nodes.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-3-5-eu": {
+   "code": "3-A-v.3-5.EU",
+   "statement": "In a decision tree learning game, the tree's branch nodes are questions and the leaf nodes are classes.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-6-8-lo": {
+   "code": "3-A-v.6-8.LO",
+   "statement": "Compare how a decision tree learning algorithm works vs. how a neural network learning algorithm works.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-6-8-eu": {
+   "code": "3-A-v.6-8.EU",
+   "statement": "In decision tree learning, each step adds a new node, which tests a single feature value. In neural network learning, each step makes a small change to every weight in the network.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-9-12-lo": {
+   "code": "3-A-v.9-12.LO",
+   "statement": "Describe how various types of machine learning algorithms learn by adjusting their internal representations.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-v-9-12-eu": {
+   "code": "3-A-v.9-12.EU",
+   "statement": "Decision tree learners build decision trees by adding nodes one at a time. Neural net learning algorithms adjust weights. Regression algorithms adjust equation parameters. Reinforcement learners update value predictions or policies.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-v"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi": {
+   "code": "3-A-vi",
+   "statement": "Nature of Learning (Learning from experience)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-3-5-lo": {
+   "code": "3-A-vi.3-5.LO",
+   "statement": "Explain how reinforcement learning allows a computer to learn from experience (i.e., trial and error).",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-3-5-eu": {
+   "code": "3-A-vi.3-5.EU",
+   "statement": "Computers can learn from experience if there is a \"reinforcement\" signal indicating whether the computer's actions are leading to good or bad outcomes.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-6-8-lo": {
+   "code": "3-A-vi.6-8.LO",
+   "statement": "Explain the differences between supervised learning and reinforcement learning.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-6-8-eu": {
+   "code": "3-A-vi.6-8.EU",
+   "statement": "Supervised learning tells the agent what output it should produce for each input; reinforcement learning only tells the agent how well it's doing as it chooses actions to take.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-9-12-lo": {
+   "code": "3-A-vi.9-12.LO",
+   "statement": "Select the appropriate type of machine learning algorithm (supervised, unsupervised, or reinforcement learning) to solve a reasoning problem.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-a-vi-9-12-eu": {
+   "code": "3-A-vi.9-12.EU",
+   "statement": "Major types of learning algorithms and the kinds of reasoning problems they are used to solve are: supervised learning, used for classification and prediction; unsupervised learning, used for clustering; and reinforcement learning, used for sequential decision making.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-a-vi"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i": {
+   "code": "3-B-i",
+   "statement": "Neural Networks (Structure of a neural network)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-3-5-lo": {
+   "code": "3-B-i.3-5.LO",
+   "statement": "Illustrate how a neural network of 1 to 3 neurons is a function that computes an output.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-3-5-eu": {
+   "code": "3-B-i.3-5.EU",
+   "statement": "A neural network uses one or more neurons working together to form a function. Each neuron takes a set of numbers as input and produces a single number as its output.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-6-8-lo": {
+   "code": "3-B-i.6-8.LO",
+   "statement": "Illustrate the structure of a neural network and describe how its parts form a set of functions that compute an output.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-6-8-eu": {
+   "code": "3-B-i.6-8.EU",
+   "statement": "Neural networks are organized as layers of units (input, hidden, and output layers), with weighted connections between units in successive layers.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-9-12-lo": {
+   "code": "3-B-i.9-12.LO",
+   "statement": "Describe the following neural network architectures and their uses: feed-forward network, 2D convolutional network, recurrent network, generative adversarial network.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-i-9-12-eu": {
+   "code": "3-B-i.9-12.EU",
+   "statement": "Feed-forward networks can learn arbitrary functions and are used for both classification and regression. 2D convolutional networks are used for image analysis. Recurrent networks are used for language processing. Generative adversarial networks are used to create deepfakes.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii": {
+   "code": "3-B-ii",
+   "statement": "Neural Networks (Weight adjustment)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-3-5-lo": {
+   "code": "3-B-ii.3-5.LO",
+   "statement": "Demonstrate how weights are assigned in a neural network to produce a desired input/output behavior.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-3-5-eu": {
+   "code": "3-B-ii.3-5.EU",
+   "statement": "The behavior of a neural network can be altered by adjusting its weights.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-6-8-lo": {
+   "code": "3-B-ii.6-8.LO",
+   "statement": "Demonstrate how a learning rule can be used to adjust the weights in a one-layer neural network.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-6-8-eu": {
+   "code": "3-B-ii.6-8.EU",
+   "statement": "During training, weights are adjusted in response to errors in the network's output, so that an error will be less likely when the input is seen again.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-9-12-lo": {
+   "code": "3-B-ii.9-12.LO",
+   "statement": "Train a multilayer neural network using the backpropagation learning algorithm and describe how the weights of the neurons and the outputs of the hidden units change as a result of learning.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-b-ii-9-12-eu": {
+   "code": "3-B-ii.9-12.EU",
+   "statement": "A neuron's weights start out as small random values and evolve to a more precise pattern through learning. The changes in the neuron's weights are computed by a learning rule driven by a back-propagated error signal.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i": {
+   "code": "3-C-i",
+   "statement": "Datasets (Feature sets)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-k-2-lo": {
+   "code": "3-C-i.K-2.LO",
+   "statement": "Create a labeled dataset with explicit features to illustrate how computers can learn to classify things like foods, movies, or toys.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-k-2-eu": {
+   "code": "3-C-i.K-2.EU",
+   "statement": "We can get a computer to classify things by describing them in terms of feature values the computer can reason about. People choose the features.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-3-5-lo": {
+   "code": "3-C-i.3-5.LO",
+   "statement": "Create a labeled dataset with explicit features of several types and use a machine learning tool to train a classifier on this data.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-3-5-eu": {
+   "code": "3-C-i.3-5.EU",
+   "statement": "Feature types include discrete values (e.g., \"New York\", \"Pennsylvania\", \"Iowa\"), binary values (yes/no), and continuous values (age, height).",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-6-8-lo": {
+   "code": "3-C-i.6-8.LO",
+   "statement": "Create a dataset for training a decision tree classifier or predictor and explore the impact that different feature encodings have on the decision tree.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-6-8-eu": {
+   "code": "3-C-i.6-8.EU",
+   "statement": "The choice of features to include, and the best encoding to use for these features, depends on the particular reasoning problem we are trying to solve.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-9-12-lo": {
+   "code": "3-C-i.9-12.LO",
+   "statement": "Compare two real world datasets in terms of the features they comprise and how those features are encoded.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-i-9-12-eu": {
+   "code": "3-C-i.9-12.EU",
+   "statement": "Humans decide which features to include in a dataset and how to encode them. This can have consequences for machine learning algorithms trained on these datasets.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii": {
+   "code": "3-C-ii",
+   "statement": "Datasets (Large datasets)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-3-5-lo": {
+   "code": "3-C-ii.3-5.LO",
+   "statement": "Illustrate how training a classifier for a broad concept such as \"dog\" requires a large amount of data to capture the diversity of the domain.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-3-5-eu": {
+   "code": "3-C-ii.3-5.EU",
+   "statement": "Machine learning requires large amounts of data to be effective. To recognize dogs in images one must have not only many types of dogs, but also many different viewing angles and contexts.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-6-8-lo": {
+   "code": "3-C-ii.6-8.LO",
+   "statement": "Illustrate how objects in an image can be segmented and labeled to construct a training set for object recognition.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-6-8-eu": {
+   "code": "3-C-ii.6-8.EU",
+   "statement": "Machine learning requires large amounts of data to be effective. Human expertise is usually required to label the data, which could be labor intensive.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-9-12-lo": {
+   "code": "3-C-ii.9-12.LO",
+   "statement": "Evaluate a dataset used to train a real AI system by considering the size of the dataset, the way that the data were acquired and labeled, the storage required, and the estimated time to produce the dataset.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-ii-9-12-eu": {
+   "code": "3-C-ii.9-12.EU",
+   "statement": "A large dataset is typically required to capture the diversity of a complex domain and narrow down the range of possible reasoner behaviors. Labeling training data is labor-intensive and may require specialized expertise. Bias can be introduced during each step of dataset creation.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii": {
+   "code": "3-C-iii",
+   "statement": "Datasets (Bias)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi3"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-k-2-lo": {
+   "code": "3-C-iii.K-2.LO",
+   "statement": "Examine a labeled dataset and identify problems in the data that could lead a computer to make incorrect predictions.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-k-2-eu": {
+   "code": "3-C-iii.K-2.EU",
+   "statement": "How well a computer learns to classify depends on the data used to train it.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-3-5-lo": {
+   "code": "3-C-iii.3-5.LO",
+   "statement": "Examine features and labels of training data to detect potential sources of bias.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-3-5-eu": {
+   "code": "3-C-iii.3-5.EU",
+   "statement": "Machine learning algorithms require a representative collection of data in order to build an accurate model. Training datasets drawn from historical data may reflect pre-existing human and societal biases.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-6-8-lo": {
+   "code": "3-C-iii.6-8.LO",
+   "statement": "Explain how the choice of training data shapes the behavior of the classifier, and how bias can be introduced if the training set is not properly balanced.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-6-8-eu": {
+   "code": "3-C-iii.6-8.EU",
+   "statement": "Bias can result if the model is asked to classify inputs that don't resemble the training data, or if the training data contains irrelevant correlations we don't want the classifier to rely on.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-9-12-lo": {
+   "code": "3-C-iii.9-12.LO",
+   "statement": "Investigate imbalances in training data in terms of gender, age, ethnicity, or other demographic variables that could result in a biased model, by using a data visualization tool.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-3-c-iii-9-12-eu": {
+   "code": "3-C-iii.9-12.EU",
+   "statement": "Machine learning algorithms will take advantage of any imbalances or correlations in the training set that help lower the error rate. If the dataset is not representative, those correlations can be misleading.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-3-c-iii"
+  },
+  "OE-COMPETENCY-ai4k12-bi4": {
+   "code": "BI4",
+   "statement": "Natural Interaction",
+   "kind": "bigidea",
+   "band": null,
+   "broader": null
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i": {
+   "code": "4-A-i",
+   "statement": "Natural Language (Structure of language)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-k-2-lo": {
+   "code": "4-A-i.K-2.LO",
+   "statement": "Demonstrate knowledge of the structure of language through tasks such as generating plausible and implausible novel words, or reordering the words in a scrambled sentence so that it makes sense.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-k-2-eu": {
+   "code": "4-A-i.K-2.EU",
+   "statement": "Human languages have rules for how words and sentences are constructed, and computers can use these rules to help them figure out what people are saying.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-3-5-lo": {
+   "code": "4-A-i.3-5.LO",
+   "statement": "Demonstrate that human language is infinite by showing how any sentence can be repeatedly extended to form a more complex sentence.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-3-5-eu": {
+   "code": "4-A-i.3-5.EU",
+   "statement": "Human language can express an infinite number of ideas and form an infinite number of sentences. This property makes it impossible to pre-program a computer with a response to every sentence.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-6-8-lo": {
+   "code": "4-A-i.6-8.LO",
+   "statement": "Demonstrate a computer's grasp of grammar by using a parser program to display the syntactic structure of a sentence, and explain what the nodes represent.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-6-8-eu": {
+   "code": "4-A-i.6-8.EU",
+   "statement": "Parse trees are a way of representing the syntactic structure of a sentence, showing the relationships between words. Computers can use syntax trees to both analyze and generate sentences.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-9-12-lo": {
+   "code": "4-A-i.9-12.LO",
+   "statement": "Identify portions of a text that would be difficult for a computer to understand, and explain why.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-i-9-12-eu": {
+   "code": "4-A-i.9-12.EU",
+   "statement": "Computers have difficulty understanding text that makes use of metaphor, imagery, hyperbole, sarcasm, or humor, or word play.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii": {
+   "code": "4-A-ii",
+   "statement": "Natural Language (Ambiguity of language)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-k-2-lo": {
+   "code": "4-A-ii.K-2.LO",
+   "statement": "Illustrate the ambiguity of language by giving examples of homophones and homonyms and showing how the correct word can be determined using context.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-k-2-eu": {
+   "code": "4-A-ii.K-2.EU",
+   "statement": "Different words may sound the same, but people and computers can use the surrounding words to determine the correct one.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-3-5-lo": {
+   "code": "4-A-ii.3-5.LO",
+   "statement": "Illustrate how understanding a sentence could be challenging for a computer by giving sentences where a pronoun could refer to either of two nouns.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-3-5-eu": {
+   "code": "4-A-ii.3-5.EU",
+   "statement": "Sentences can have multiple meanings depending on which noun a pronoun is thought to be referencing. People and (to a lesser extent) computers can use context and world knowledge to select the most likely meaning.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-6-8-lo": {
+   "code": "4-A-ii.6-8.LO",
+   "statement": "Illustrate how understanding a sentence could be challenging for a computer by giving sentences where a prepositional phrase could attach in either of two places, and show how this ambiguity can sometimes be resolved based on meaning.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-6-8-eu": {
+   "code": "4-A-ii.6-8.EU",
+   "statement": "Language is often ambiguous, but some possible meanings can be ruled out if they don't make sense. Computers are not yet as good as people at using context and world knowledge to make these judgments.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-9-12-lo": {
+   "code": "4-A-ii.9-12.LO",
+   "statement": "Illustrate how understanding a sentence could be challenging for a computer by describing multiple senses of a given word.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-ii-9-12-eu": {
+   "code": "4-A-ii.9-12.EU",
+   "statement": "A single word can have multiple senses. People use context and world knowledge to determine the correct sense, but computers don't typically represent meaning with this degree of subtlety.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii": {
+   "code": "4-A-iii",
+   "statement": "Natural Language (Reasoning about text)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-k-2-lo": {
+   "code": "4-A-iii.K-2.LO",
+   "statement": "Demonstrate how a computer can produce different forms of a verb, such as present or past tense.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-k-2-eu": {
+   "code": "4-A-iii.K-2.EU",
+   "statement": "In order for a computer to speak naturally with humans it must be able to understand how words are constructed and put words in the proper form.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-3-5-lo": {
+   "code": "4-A-iii.3-5.LO",
+   "statement": "Experiment with a speech to text system to see if it resolves alternative word choices correctly based on context.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-3-5-eu": {
+   "code": "4-A-iii.3-5.EU",
+   "statement": "Speech recognition systems can use grammar and context to resolve ambiguous words but they don't always get it right.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-6-8-lo": {
+   "code": "4-A-iii.6-8.LO",
+   "statement": "Illustrate how word embeddings can be used to reason about the meaning of words.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-6-8-eu": {
+   "code": "4-A-iii.6-8.EU",
+   "statement": "Word embeddings represent words with similar meanings as nearby points in a semantic feature space, and allow us to reason about words by doing arithmetic.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-9-12-lo": {
+   "code": "4-A-iii.9-12.LO",
+   "statement": "Demonstrate how a small context-free grammar can be used to parse or generate simple sentences.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iii-9-12-eu": {
+   "code": "4-A-iii.9-12.EU",
+   "statement": "Context-free grammars describe how words are combined into phrases and clauses, and can represent much of the syntactic structure of natural language, but don't handle things like subject-verb agreement well.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv": {
+   "code": "4-A-iv",
+   "statement": "Natural Language (Applications)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-k-2-lo": {
+   "code": "4-A-iv.K-2.LO",
+   "statement": "Demonstrate the kinds of tasks an intelligent assistant can and cannot perform.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-k-2-eu": {
+   "code": "4-A-iv.K-2.EU",
+   "statement": "Intelligent assistants (e.g., Siri, Alexa) are computers designed to respond to a limited set of requests. They cannot engage in a conversation like a human.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-3-5-lo": {
+   "code": "4-A-iv.3-5.LO",
+   "statement": "Demonstrate some types of questions that a search engine or intelligent assistant can answer, and some types that it cannot answer.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-3-5-eu": {
+   "code": "4-A-iv.3-5.EU",
+   "statement": "Search engines (e.g., Google) and intelligent assistants (e.g., Siri, Alexa) have a collection of specialized and general purpose modules they draw upon to answer different types of questions.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-6-8-lo": {
+   "code": "4-A-iv.6-8.LO",
+   "statement": "Describe some NLP (Natural Language Processing) tasks computers can perform, and explain how they work.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-6-8-eu": {
+   "code": "4-A-iv.6-8.EU",
+   "statement": "NLP tasks include text summarization, text generation, sentiment analysis, question answering, machine translation, and conversational interaction.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-9-12-lo": {
+   "code": "4-A-iv.9-12.LO",
+   "statement": "Describe several approaches to Natural Language Processing, ranging from simple to more sophisticated.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-a-iv-9-12-eu": {
+   "code": "4-A-iv.9-12.EU",
+   "statement": "Simple NLP approaches include keyword matching, dictionary lookup, and template matching, while newer, more sophisticated but less transparent approaches use deep neural networks and machine learning.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-a-iv"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i": {
+   "code": "4-B-i",
+   "statement": "Commonsense Reasoning",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-k-2-lo": {
+   "code": "4-B-i.K-2.LO",
+   "statement": "Give commonsense explanations of human behavior or events that might be useful for a robot to know.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-k-2-eu": {
+   "code": "4-B-i.K-2.EU",
+   "statement": "Choosing the most likely ending for a story is an example of commonsense reasoning, which requires knowledge about people and things, and how they behave, that computers may not have.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-3-5-lo": {
+   "code": "4-B-i.3-5.LO",
+   "statement": "Explain what knowledge would be required for a computer to understand a story.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-3-5-eu": {
+   "code": "4-B-i.3-5.EU",
+   "statement": "AI has trouble understanding stories because it doesn't have the knowledge that humans have about everyday life.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-6-8-lo": {
+   "code": "4-B-i.6-8.LO",
+   "statement": "Explain the knowledge a computer would need to solve a naive physics reasoning problem.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-6-8-eu": {
+   "code": "4-B-i.6-8.EU",
+   "statement": "Computers can reason about physical phenomena using naive physics inference rules, which formalize our intuitive understanding of concepts such as mass, volume, forces, and motion. At present, computers are not very good at this.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-9-12-lo": {
+   "code": "4-B-i.9-12.LO",
+   "statement": "Explain the cultural and naive physics knowledge required for a computer to correctly interpret a fable or fairytale.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-b-i-9-12-eu": {
+   "code": "4-B-i.9-12.EU",
+   "statement": "For humans or computers to infer the meaning of a story requires understanding of cultural knowledge, naive physics, and folk psychology. This is still difficult for computers.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i": {
+   "code": "4-C-i",
+   "statement": "Understanding Emotion",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-k-2-lo": {
+   "code": "4-C-i.K-2.LO",
+   "statement": "Demonstrate how computers recognize emotions in faces.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-k-2-eu": {
+   "code": "4-C-i.K-2.EU",
+   "statement": "Computers recognize emotions in faces by looking at the shapes of the mouth, eyes, and eyebrows.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-3-5-lo": {
+   "code": "4-C-i.3-5.LO",
+   "statement": "Illustrate how computers can judge the emotional tone of text.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-3-5-eu": {
+   "code": "4-C-i.3-5.EU",
+   "statement": "Computers can recognize positive and negative statements about a topic using natural language processing techniques known as \"sentiment analysis\".",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-6-8-lo": {
+   "code": "4-C-i.6-8.LO",
+   "statement": "Describe how computers use different types of cues to recognize human emotional states.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-6-8-eu": {
+   "code": "4-C-i.6-8.EU",
+   "statement": "Computers can recognize human emotional states by looking at facial expressions, gaze, gestures, body language, tone of voice, and choice of words.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-9-12-lo": {
+   "code": "4-C-i.9-12.LO",
+   "statement": "Identify ways AI applications can modify their behavior to respond to people's emotional states.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-c-i-9-12-eu": {
+   "code": "4-C-i.9-12.EU",
+   "statement": "Computers can respond appropriately to human emotions by acknowledging what the human is feeling and responding in a way that the human finds supportive and socially appropriate.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i": {
+   "code": "4-D-i",
+   "statement": "Philosophy of Mind",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi4"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-k-2-lo": {
+   "code": "4-D-i.K-2.LO",
+   "statement": "Demonstrate some ways that intelligent agents don't understand things the way people do.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-k-2-eu": {
+   "code": "4-D-i.K-2.EU",
+   "statement": "Artificial Intelligence devices are not people, they are computer programs designed by people.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-3-5-lo": {
+   "code": "4-D-i.3-5.LO",
+   "statement": "Demonstrate what a broad AI system could do that current narrow AI systems cannot do.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-3-5-eu": {
+   "code": "4-D-i.3-5.EU",
+   "statement": "\"Narrow AI\" has given us a collection of algorithms that are good at specific things. \"Broad AI\" or \"General AI\" promises to give us general reasoning ability comparable to a human.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-6-8-lo": {
+   "code": "4-D-i.6-8.LO",
+   "statement": "Define criteria for consciousness and evaluate AI systems or fictional AI characters according to those criteria.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-6-8-eu": {
+   "code": "4-D-i.6-8.EU",
+   "statement": "The nature of consciousness is an unsolved problem, but two important criteria seem to be self-awareness and personal history.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-9-12-lo": {
+   "code": "4-D-i.9-12.LO",
+   "statement": "Debate alternative perspectives on human vs. artificial intelligence.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-4-d-i-9-12-eu": {
+   "code": "4-D-i.9-12.EU",
+   "statement": "Some AI experts and philosophers have argued that computers can never achieve fully human-like intelligence, while others believe that AI will eventually exceed human intelligence.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-4-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-bi5": {
+   "code": "BI5",
+   "statement": "Societal Impact",
+   "kind": "bigidea",
+   "band": null,
+   "broader": null
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i": {
+   "code": "5-A-i",
+   "statement": "Ethical AI (Diversity of Interests and Disparate Impacts)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-k-2-lo": {
+   "code": "5-A-i.K-2.LO",
+   "statement": "Evaluate the ways a decision impacts people differently.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-k-2-eu": {
+   "code": "5-A-i.K-2.EU",
+   "statement": "Computers can sometimes make a decision that works for most people but harms or disadvantages other people.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-3-5-lo": {
+   "code": "5-A-i.3-5.LO",
+   "statement": "Evaluate how an AI technology can have different effects on different groups of people.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-3-5-eu": {
+   "code": "5-A-i.3-5.EU",
+   "statement": "The decisions made when developing an AI system can impact different people and communities in different ways.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-6-8-lo": {
+   "code": "5-A-i.6-8.LO",
+   "statement": "Evaluate the ways various stakeholders' goals and values influence the design of AI systems.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-6-8-eu": {
+   "code": "5-A-i.6-8.EU",
+   "statement": "The behavior of AI systems is determined by the choices of the designers, which may involve tradeoffs between conflicting goals and values.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-9-12-lo": {
+   "code": "5-A-i.9-12.LO",
+   "statement": "Explain how use of AI systems has led to disparate impacts on different groups.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-i-9-12-eu": {
+   "code": "5-A-i.9-12.EU",
+   "statement": "Different groups of people may be affected differently by AI systems.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii": {
+   "code": "5-A-ii",
+   "statement": "Ethical AI (Ethical Design Criteria)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-k-2-lo": {
+   "code": "5-A-ii.K-2.LO",
+   "statement": "Discuss the characteristics of systems that are fair and unfair and the impact on people when a system is not fair.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-k-2-eu": {
+   "code": "5-A-ii.K-2.EU",
+   "statement": "AI systems should be designed to benefit people. Creators of these systems should make sure that their systems treat everyone fairly.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-3-5-lo": {
+   "code": "5-A-ii.3-5.LO",
+   "statement": "Evaluate how an AI system meets the design criteria of transparency and explainability.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-3-5-eu": {
+   "code": "5-A-ii.3-5.EU",
+   "statement": "An AI system is transparent if we know what data and decision making criteria it uses. Part of transparency is having the system provide explanations for its decisions.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-6-8-lo": {
+   "code": "5-A-ii.6-8.LO",
+   "statement": "Evaluate how an AI system meets the design criteria of accountability and respect for privacy.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-6-8-eu": {
+   "code": "5-A-ii.6-8.EU",
+   "statement": "Accountability in AI systems means designers and decision makers take responsibility for the system's actions. Respect for privacy means the system does not act in ways that violate people's privacy rights.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-9-12-lo": {
+   "code": "5-A-ii.9-12.LO",
+   "statement": "Analyze an AI system to determine whether it satisfies ethical design criteria.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-ii-9-12-eu": {
+   "code": "5-A-ii.9-12.EU",
+   "statement": "To ensure that AI systems are helpful and not harmful, ethical design criteria include: fairness, transparency, explainability, accountability, respect for privacy, and adherence to societal values.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii": {
+   "code": "5-A-iii",
+   "statement": "Ethical AI (Practicing Ethical Design)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-3-5-lo": {
+   "code": "5-A-iii.3-5.LO",
+   "statement": "Create a model card for a classification or prediction model.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-3-5-eu": {
+   "code": "5-A-iii.3-5.EU",
+   "statement": "Model cards support transparency by explaining the intended use, training dataset, accuracy, and limitations of the model.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-6-8-lo": {
+   "code": "5-A-iii.6-8.LO",
+   "statement": "Evaluate ways that AI system designers can learn about and incorporate the values of their stakeholders into the design process.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-6-8-eu": {
+   "code": "5-A-iii.6-8.EU",
+   "statement": "AI systems need to align with the norms and values of the groups they aim to serve. Developers of AI systems need to understand that values vary across cultures.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-9-12-lo": {
+   "code": "5-A-iii.9-12.LO",
+   "statement": "Design an AI System using an ethical design process.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-a-iii-9-12-eu": {
+   "code": "5-A-iii.9-12.EU",
+   "statement": "Ethical design, at all stages of the design process, considers the values of all stakeholders and upholds the principles of fairness, transparency, explainability, accountability, respect for privacy, and adherence to societal values.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-a-iii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i": {
+   "code": "5-B-i",
+   "statement": "AI & Culture (AI in Daily Life)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-k-2-lo": {
+   "code": "5-B-i.K-2.LO",
+   "statement": "Identify devices in daily life that use AI technologies.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-k-2-eu": {
+   "code": "5-B-i.K-2.EU",
+   "statement": "AI technologies are part of any device that includes speech recognition or computer vision, such as smart phones, intelligent home assistants, and modern automobiles.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-3-5-lo": {
+   "code": "5-B-i.3-5.LO",
+   "statement": "Describe how AI-powered services are used in daily life.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-3-5-eu": {
+   "code": "5-B-i.3-5.EU",
+   "statement": "AI-powered services are used to look up information, to provide voice interfaces to many kinds of apps, to make recommendations based on a person's interests, and to make cars safer.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-6-8-lo": {
+   "code": "5-B-i.6-8.LO",
+   "statement": "Examine an aspect of daily life that is predicted to change due to the introduction of AI technologies.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-6-8-eu": {
+   "code": "5-B-i.6-8.EU",
+   "statement": "AI technologies are changing daily life as intelligent machines find new roles in society.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-9-12-lo": {
+   "code": "5-B-i.9-12.LO",
+   "statement": "Explain the kinds of debates that might arise as AI technology continues to evolve and is further woven into our culture.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-i-9-12-eu": {
+   "code": "5-B-i.9-12.EU",
+   "statement": "Some new AI technologies will pose challenges for cultural norms and expectations that society must identify and wrestle with.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii": {
+   "code": "5-B-ii",
+   "statement": "AI & Culture (Trust and Responsibility)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-3-5-lo": {
+   "code": "5-B-ii.3-5.LO",
+   "statement": "Analyze deepfake images or videos and identify the flaws that reveal them as deepfakes.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-3-5-eu": {
+   "code": "5-B-ii.3-5.EU",
+   "statement": "Current deepfakes have detectable flaws, but as the technology improves it will undermine our trust in digital media.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-6-8-lo": {
+   "code": "5-B-ii.6-8.LO",
+   "statement": "Critique uses of AI technology that can be used to surveil people or violate their privacy.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-6-8-eu": {
+   "code": "5-B-ii.6-8.EU",
+   "statement": "AI technologies endanger privacy by reducing the cost of implementing widespread surveillance and enabling new types of surveillance.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-9-12-lo": {
+   "code": "5-B-ii.9-12.LO",
+   "statement": "Identify areas where it is appropriate to regulate use of AI technologies and evaluate regulations that have been proposed.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-b-ii-9-12-eu": {
+   "code": "5-B-ii.9-12.EU",
+   "statement": "Legal regulation of AI technologies is appropriate in areas where there are societal values that require protection.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-b-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i": {
+   "code": "5-C-i",
+   "statement": "AI & the Economy (Impacts of AI on Sectors of Society)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-k-2-lo": {
+   "code": "5-C-i.K-2.LO",
+   "statement": "Identify current uses of AI and how they have impacted society.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-k-2-eu": {
+   "code": "5-C-i.K-2.EU",
+   "statement": "Society has undergone changes because of AI and this will continue in the future.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-3-5-lo": {
+   "code": "5-C-i.3-5.LO",
+   "statement": "Identify changes in how sectors of society operate due to the introduction of AI.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-3-5-eu": {
+   "code": "5-C-i.3-5.EU",
+   "statement": "Every sector of society is changing (or will change) as a result of the introduction of AI.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-6-8-lo": {
+   "code": "5-C-i.6-8.LO",
+   "statement": "Compare the changes AI is bringing to society with those of previous industrial revolutions.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-6-8-eu": {
+   "code": "5-C-i.6-8.EU",
+   "statement": "AI is causing societal advances and disruptions comparable to earlier industrial revolutions.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-9-12-lo": {
+   "code": "5-C-i.9-12.LO",
+   "statement": "Predict how a sector of society is likely to change in the short and intermediate term as a result of AI technology.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-i-9-12-eu": {
+   "code": "5-C-i.9-12.EU",
+   "statement": "Anticipating and planning for the changes new technology brings is important for the healthy advancement of society.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii": {
+   "code": "5-C-ii",
+   "statement": "AI & The Economy (Effects on Employment)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-k-2-lo": {
+   "code": "5-C-ii.K-2.LO",
+   "statement": "Describe some jobs that no longer exist due to advances in technology.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-k-2-eu": {
+   "code": "5-C-ii.K-2.EU",
+   "statement": "New technology changes the types of jobs that are available for people.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-3-5-lo": {
+   "code": "5-C-ii.3-5.LO",
+   "statement": "Describe how a job will change due to the introduction of AI or robotic technologies.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-3-5-eu": {
+   "code": "5-C-ii.3-5.EU",
+   "statement": "As AI and robotic technologies are adopted in the workplace, the ways people perform their jobs will change.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-6-8-lo": {
+   "code": "5-C-ii.6-8.LO",
+   "statement": "Predict a new type of job that might arise, or how an existing type of job might change or go away, as a result of the adoption of AI technologies.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-6-8-eu": {
+   "code": "5-C-ii.6-8.EU",
+   "statement": "Cultures change as new technologies are adopted, and as a result some types of jobs are reduced and new types of jobs appear.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-9-12-lo": {
+   "code": "5-C-ii.9-12.LO",
+   "statement": "Investigate the skills needed for AI-enabled careers.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-c-ii-9-12-eu": {
+   "code": "5-C-ii.9-12.EU",
+   "statement": "AI-aligned skills will be relevant throughout the workforce, not just for programmers. Most types of work will involve some interaction with AI technologies.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-c-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i": {
+   "code": "5-D-i",
+   "statement": "AI for Social Good (Democratization of AI Technology)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-3-5-lo": {
+   "code": "5-D-i.3-5.LO",
+   "statement": "Describe and use some of the AI extensions or plugins available in a programming framework familiar to you.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-3-5-eu": {
+   "code": "5-D-i.3-5.EU",
+   "statement": "AI is becoming part of everyone's toolbox through extensions or plugins that support development of AI applications serving the needs of many different communities.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-6-8-lo": {
+   "code": "5-D-i.6-8.LO",
+   "statement": "Create a novel application using some of the AI extensions or plugins available in the programming framework of your choice.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-6-8-eu": {
+   "code": "5-D-i.6-8.EU",
+   "statement": "AI is becoming part of everyone's toolbox through extensions or plugins that support development of AI applications serving the needs of many different communities.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-9-12-lo": {
+   "code": "5-D-i.9-12.LO",
+   "statement": "Create a novel application using some of the AI tools available in the programming framework of your choice.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-i-9-12-eu": {
+   "code": "5-D-i.9-12.EU",
+   "statement": "AI tools are becoming commonplace and freely available, and can be used by people without advanced degrees or expensive equipment.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-i"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii": {
+   "code": "5-D-ii",
+   "statement": "AI for Social Good (Using AI to Solve Societal Problems)",
+   "kind": "concept",
+   "band": null,
+   "broader": "OE-COMPETENCY-ai4k12-bi5"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-k-2-lo": {
+   "code": "5-D-ii.K-2.LO",
+   "statement": "Describe how AI can be used to solve a societal problem.",
+   "kind": "LO",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-k-2-eu": {
+   "code": "5-D-ii.K-2.EU",
+   "statement": "AI can be used to create a classifier that solves a problem important to society.",
+   "kind": "EU",
+   "band": "K-2",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-3-5-lo": {
+   "code": "5-D-ii.3-5.LO",
+   "statement": "Design a solution to a societal problem that makes use of AI technology.",
+   "kind": "LO",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-3-5-eu": {
+   "code": "5-D-ii.3-5.EU",
+   "statement": "AI is being used to solve societal problems such as environmental protection, energy conservation, and improved public health.",
+   "kind": "EU",
+   "band": "3-5",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-6-8-lo": {
+   "code": "5-D-ii.6-8.LO",
+   "statement": "Research a societal problem and describe how AI technologies can be used to address that problem.",
+   "kind": "LO",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-6-8-eu": {
+   "code": "5-D-ii.6-8.EU",
+   "statement": "AI technologies for perception, reasoning, and machine learning can be applied to many types of societal problems.",
+   "kind": "EU",
+   "band": "6-8",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-9-12-lo": {
+   "code": "5-D-ii.9-12.LO",
+   "statement": "Evaluate an AI for Social Good project in terms of the problem it is addressing and the project's actual or potential impact.",
+   "kind": "LO",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  },
+  "OE-COMPETENCY-ai4k12-5-d-ii-9-12-eu": {
+   "code": "5-D-ii.9-12.EU",
+   "statement": "\"AI for social good\" is the use of AI technologies to solve societal problems.",
+   "kind": "EU",
+   "band": "9-12",
+   "broader": "OE-COMPETENCY-ai4k12-5-d-ii"
+  }
+ },
+ "stageRefs": {
+  "bio|B1:K-2": {
+   "id": "8e62e70a-437d-540d-83f6-90a0fe54783a",
+   "title": "Noticing Variation and Family Resemblance",
+   "band": "K-2"
+  },
+  "bio|B1:3-5": {
+   "id": "70cf40f5-cb5d-508a-95dc-d18eaa465e94",
+   "title": "Heritable Traits and Simple Population Description",
+   "band": "3-5"
+  },
+  "bio|B1:6-8": {
+   "id": "8a1c0b8f-8e98-526f-bd7a-8cb2795daa85",
+   "title": "Genes, Alleles, and the Origin of Variation",
+   "band": "6-8"
+  },
+  "bio|B1:9-12": {
+   "id": "6c0b740a-cb12-5c3d-8a32-75fc01624ddf",
+   "title": "Population-Level Genetics and Allele Frequency",
+   "band": "9-12"
+  },
+  "bio|B2:K-2": {
+   "id": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "title": "Organisms and Their Habitats",
+   "band": "K-2"
+  },
+  "bio|B2:3-5": {
+   "id": "ae85f5be-aead-5819-99df-8b3d431f79d1",
+   "title": "Trait Advantage and Simple Selection Scenarios",
+   "band": "3-5"
+  },
+  "bio|B2:6-8": {
+   "id": "4f1b4d5d-6232-5ef5-b44c-a850224b58a5",
+   "title": "The Four-Component Natural Selection Mechanism",
+   "band": "6-8"
+  },
+  "bio|B2:9-12": {
+   "id": "b8bf5ec4-fe31-593a-8177-15b8109517b4",
+   "title": "Evaluating Adaptationist Claims",
+   "band": "9-12"
+  },
+  "bio|B3:K-2": {
+   "id": "76c205d2-33d4-5532-ba5a-cab715380b5e",
+   "title": "Many Different Kinds of Living Things",
+   "band": "K-2"
+  },
+  "bio|B3:3-5": {
+   "id": "a4cd9b9e-d3a1-52bd-b76f-eb6173ab7259",
+   "title": "Species, Relatedness, and Extinction",
+   "band": "3-5"
+  },
+  "bio|B3:6-8": {
+   "id": "ca152c60-d9a5-509f-afdb-e2e7bdf983b4",
+   "title": "How Populations Become New Species",
+   "band": "6-8"
+  },
+  "bio|B3:9-12": {
+   "id": "60df174a-b374-5cd1-9d06-9d76ecc4af9f",
+   "title": "Evidence, Deep Time, and Patterns of Extinction",
+   "band": "9-12"
+  },
+  "soc|S1:K-2": {
+   "id": "c4836b7e-c2ac-5eda-9368-08e410453278",
+   "title": "Groups We Belong To and Their Rules",
+   "band": "K-2"
+  },
+  "soc|S1:3-5": {
+   "id": "f21b382b-ed4a-5e4e-b69b-d603834fbbe9",
+   "title": "Roles and Why Rules Differ",
+   "band": "3-5"
+  },
+  "soc|S1:6-8": {
+   "id": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "title": "How Norms Are Enforced",
+   "band": "6-8"
+  },
+  "soc|S1:9-12": {
+   "id": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "title": "Formal Institutions and Informal Norms",
+   "band": "9-12"
+  },
+  "soc|S2:K-2": {
+   "id": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "title": "Sharing and Taking Turns",
+   "band": "K-2"
+  },
+  "soc|S2:3-5": {
+   "id": "3d964122-338c-548e-882b-d833d2ec4209",
+   "title": "Why People Cooperate or Hold Back",
+   "band": "3-5"
+  },
+  "soc|S2:6-8": {
+   "id": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "title": "Shared-Resource Problems",
+   "band": "6-8"
+  },
+  "soc|S2:9-12": {
+   "id": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "title": "Governing Shared Resources: Power and Conflict",
+   "band": "9-12"
+  },
+  "soc|S3:K-2": {
+   "id": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "title": "Communities Then and Now",
+   "band": "K-2"
+  },
+  "soc|S3:3-5": {
+   "id": "aae0bca6-2dfa-5fb1-a2bd-4e8d4381b87c",
+   "title": "How a Practice Spreads",
+   "band": "3-5"
+  },
+  "soc|S3:6-8": {
+   "id": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "title": "Why Societies Differ",
+   "band": "6-8"
+  },
+  "soc|S3:9-12": {
+   "id": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "title": "Explaining Large-Scale Change",
+   "band": "9-12"
+  },
+  "comp|C1:K-2": {
+   "id": "528aba11-45e9-5ec4-b5da-4ddf071ff6a2",
+   "title": "Sorting, Labelling and Symbols",
+   "band": "K-2"
+  },
+  "comp|C1:3-5": {
+   "id": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+   "title": "Recording and Charting Data",
+   "band": "3-5"
+  },
+  "comp|C1:6-8": {
+   "id": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+   "title": "Encoding Text, Images and Numbers",
+   "band": "6-8"
+  },
+  "comp|C1:9-12": {
+   "id": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+   "title": "Information, Compression and the Limits of Representation",
+   "band": "9-12"
+  },
+  "comp|C2:K-2": {
+   "id": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+   "title": "Following and Writing Steps",
+   "band": "K-2"
+  },
+  "comp|C2:3-5": {
+   "id": "8c7bc083-021f-5891-b502-de2f708a1e09",
+   "title": "Sequences, Loops and Conditions",
+   "band": "3-5"
+  },
+  "comp|C2:6-8": {
+   "id": "31f4c2e2-f909-5cf1-ae61-ca82e22bda0e",
+   "title": "Decomposition, Functions and Testing",
+   "band": "6-8"
+  },
+  "comp|C2:9-12": {
+   "id": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+   "title": "Correctness and Efficiency",
+   "band": "9-12"
+  },
+  "comp|C3:K-2": {
+   "id": "04edbe9b-292d-5101-a009-fc46ead81427",
+   "title": "Machines Follow Rules People Write",
+   "band": "K-2"
+  },
+  "comp|C3:3-5": {
+   "id": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+   "title": "Models and Simulations of Everyday Systems",
+   "band": "3-5"
+  },
+  "comp|C3:6-8": {
+   "id": "45c484c9-e753-5bb3-86af-086bc28fce31",
+   "title": "Agent-Based and Feedback Models",
+   "band": "6-8"
+  },
+  "comp|C3:9-12": {
+   "id": "e6374470-9533-570e-8d98-0e5b24060f4d",
+   "title": "Machine Learning, Search and Distributed Systems Compared",
+   "band": "9-12"
+  },
+  "int|I1:K-2": {
+   "id": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "title": "Groups, Rules, and Tools",
+   "band": "K-2"
+  },
+  "int|I1:3-5": {
+   "id": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "title": "Comparing Communities and Changing Tools Over Time",
+   "band": "3-5"
+  },
+  "int|I1:6-8": {
+   "id": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "title": "Culture as Transmitted, Institutions as Stabilizing Structures",
+   "band": "6-8"
+  },
+  "int|I1:9-12": {
+   "id": "e820dc2d-9317-57d1-8475-22a701fc486a",
+   "title": "Collective Intelligence, Distributed Cognition, and Coevolving Technology",
+   "band": "9-12"
+  },
+  "int|I2:K-2": {
+   "id": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "title": "Living Things Act to Meet Their Needs",
+   "band": "K-2"
+  },
+  "int|I2:3-5": {
+   "id": "31b2be29-7a8c-5f98-a447-55ecf57f1ff9",
+   "title": "Comparing How Different Living Things Act, Learn, and Teach",
+   "band": "3-5"
+  },
+  "int|I2:6-8": {
+   "id": "3a112595-4435-5db0-950d-ca7c6da5160d",
+   "title": "Agency, Niche Construction, and Selection",
+   "band": "6-8"
+  },
+  "int|I2:9-12": {
+   "id": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+   "title": "Agency and Niche Construction Across Biological and Technological Systems",
+   "band": "9-12"
+  },
+  "int|I3:K-2": {
+   "id": "8363df74-ecd8-54e9-82f1-e93623f9995c",
+   "title": "Ideas That Are Like Other Ideas",
+   "band": "K-2"
+  },
+  "int|I3:3-5": {
+   "id": "a64224d1-ac36-5b1c-b475-3c5af3aa4656",
+   "title": "Good Guesses, Better Guesses: Testing Ideas",
+   "band": "3-5"
+  },
+  "int|I3:6-8": {
+   "id": "d2dc3119-7af8-55d8-8bfe-b63a4ec56acb",
+   "title": "How Minds and Cultures Search for Better Ideas",
+   "band": "6-8"
+  },
+  "int|I3:9-12": {
+   "id": "ba60a3be-0135-5b53-b88f-a7aecfe0ed96",
+   "title": "The Shared Structure of Discovery: Darwin's Notebooks and the History of Science",
+   "band": "9-12"
+  },
+  "int|I4:K-2": {
+   "id": "04d57493-ac2f-5ec6-a1ba-0596eae3158a",
+   "title": "Things That Get Passed On",
+   "band": "K-2"
+  },
+  "int|I4:3-5": {
+   "id": "db1fca08-0dcf-5910-a3df-2de902e8630a",
+   "title": "Comparing Biological and Cultural Transmission",
+   "band": "3-5"
+  },
+  "int|I4:6-8": {
+   "id": "6315aad7-35b7-52dc-9dd2-1b82d707a768",
+   "title": "The General Pattern: Variation, Selection, Transmission",
+   "band": "6-8"
+  },
+  "int|I4:9-12": {
+   "id": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
+   "title": "Selection Across Biology, Culture, Education, and AI",
+   "band": "9-12"
+  }
+ },
+ "alignments": {
+  "comp": {
+   "space": "comp",
+   "focusRule": "Aligned only where a stage's technical content (representation, data, search, models, training, datasets, program behaviour) meets an AI4K12 item a teacher could defend. Weak matches are marked weak. Societal, ethical and cognitive items were left to the Interdisciplinary space. Where an item has a technical core, I aligned on that core and said so in senseDiffers. Stages with no counterpart got none.",
+   "stageAlignments": [
+    {
+     "stage": "C1:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-ii-k-2-lo",
+       "relation": "broader",
+       "strength": "strong",
+       "why": "The stage has children say what an arrow, icon or letter stands for. The item asks for examples of symbols met in daily life. Both treat a symbol as something that stands for an idea.",
+       "senseDiffers": null,
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-iv-k-2-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage sorts objects by one property and names it. The item asks children to find what makes each object unique and to tabulate it. Only the idea of describing objects by what they have is shared.",
+       "senseDiffers": "AI4K12 features are values a computer can reason about. The stage says property and sorts by one at a time. It builds no feature table.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-c-i-k-2-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage has children label each group with a word or picture. The item has children create a labelled dataset with features. Labelling groups is a first step toward a labelled dataset, but the stage builds no dataset for a computer.",
+       "senseDiffers": "In AI4K12 a label is a class name that a computer learns to predict. In the stage a label names a group that a child made.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C1:3-5",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-i-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage asks what a chart leaves out. The item has children show how different map styles capture different aspects of the world. Both teach that a representation keeps some things and drops others. The stage compares no styles.",
+       "senseDiffers": "The item is about maps of places. The stage is about charts of measured data, a different kind of representation.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-iv-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage records measurements in a table. The item builds a row of values for each object and compares objects by closeness. The table is the same structure. The stage does not compare closeness.",
+       "senseDiffers": null,
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C1:6-8",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-1-a-iii-3-5-lo",
+       "relation": "broader",
+       "strength": "strong",
+       "why": "No 6-8 item covers image encoding. The 3-5 item asks how an image is stored as numbers. The stage encodes a small image in binary with a stated scheme, so it covers the item and adds text and a comparison of encodings.",
+       "senseDiffers": null,
+       "adjacentBand": true
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-1-a-iii-6-8-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item asks how sound becomes numbers by sampling. The stage has no sound and names no sampling rate. The shared idea is that media are stored as numbers, which the stage teaches for text and images.",
+       "senseDiffers": "AI4K12 files encoding under sensing, as the way a machine takes in the world. The stage treats encoding as a scheme chosen for stored data.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-c-i-6-8-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says the best encoding of features depends on the problem. The stage compares two encodings of the same data on size and kept detail. Both show that an encoding choice changes what can be done with the data.",
+       "senseDiffers": "In AI4K12 encoding means how a feature value is written for a classifier. In the stage it means a binary scheme for text, an image or numbers.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C1:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-c-i-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says people decide which features go into a dataset and how to encode them, with consequences downstream. The stage names a limit of a representation and its effect on a result. The overlap is the effect of an encoding choice.",
+       "senseDiffers": "The item concerns features in a machine learning dataset. The stage concerns limits such as precision or size in any representation. AI4K12 has no item on information in bits or compression.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C2:K-2",
+     "items": [],
+     "none": "AI4K12 has no item on following or writing steps. Its algorithm items start from reasoning and learning algorithms. Writing and fixing steps belongs to general computing standards, which this alignment does not cover."
+    },
+    {
+     "stage": "C2:3-5",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-i-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item draws the sequence of board positions a game produces. The stage traces the values a program stores at each step. Both follow how the stored condition of a system changes step by step.",
+       "senseDiffers": "In the item, state is a board position in a game. The stage uses state for any values a program stores.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C2:6-8",
+     "items": [],
+     "none": "The reviewer found no defensible AI4K12 match for this stage. The item asks for training and evaluating a model on a table of data. The stage has no data, model or training. Test cases against a specification and"
+    },
+    {
+     "stage": "C2:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-ii-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says several algorithms can build a search tree, each with its own advantages. The stage compares algorithms for any task on step counts and names no search task. Both weigh one algorithm against another.",
+       "senseDiffers": "AI4K12 algorithms here build search trees over states. The stage compares any algorithms on how steps grow with input. Search through a list would be a different sense of search.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-c-ii-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says different reasoning problems call for different algorithms. The stage chooses between algorithms for a stated need and justifies the choice. Both tie the choice of algorithm to the problem.",
+       "senseDiffers": "AI4K12 reasoning algorithms solve classification, search or inference problems. The stage compares algorithms for any task on how many steps they take.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C3:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-d-i-k-2-eu",
+       "relation": "narrower",
+       "strength": "partial",
+       "why": "The stage has children say who wrote a machine's rules and show a machine doing exactly what its instructions say. That meets the clause that AI devices are programs designed by people. The stage does not address the clause about people.",
+       "senseDiffers": "The item sits under philosophy of mind. The alignment rests on the technical core only: a device runs a program that people wrote. The stage says nothing about understanding or about AI devices in particular.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-a-iv-k-2-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says intelligent assistants respond to a limited set of requests. The stage asks for a machine doing exactly what its instructions say and what happens when they are wrong. Both tie a machine's behaviour to how it was set up.",
+       "senseDiffers": "Technical core only: a device answers only the requests its program was built for. Intelligent in the item names a class of devices. The stage avoids the word.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C3:3-5",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-i-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage has children build a model with named parts and say one thing it leaves out. The item shows that different map styles capture different aspects. Both teach that a representation keeps some things and drops others. The stage compares no styles.",
+       "senseDiffers": "The item is about maps of places. The stage's model is something that can be run and observed over time.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-i-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item draws the sequence of states a game goes through. The stage runs a simulation and records what happens over time. Both follow a system through a sequence of states. The item uses game boards. The stage uses a pond or a queue.",
+       "senseDiffers": null,
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C3:6-8",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-b-ii-6-8-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says weights change in response to errors in the output. The stage identifies a feedback loop in a model. The error signal in training is one case of output returned to change later behaviour. The stage has no training or weights.",
+       "senseDiffers": "In the item, feedback is an error signal used at each training step. In the stage the loop runs inside the model as agents act and the pattern changes.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "C3:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-a-ii-9-12-lo",
+       "relation": "same",
+       "strength": "strong",
+       "why": "The stage describes how machine learning adjusts parameters from data to improve a measured result. The item models how a reasoner is built by adjusting its parameters. The matching enduring understanding adds that a person selects the model in advance.",
+       "senseDiffers": "AI4K12 speaks of learning and a reasoner. The stage keeps both as a parameter-adjusting procedure and attributes no understanding to the machine.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-i-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says search solves problems written as a path from a start state to a goal state. The stage names search on an objective as one of three methods to compare. Problem formulation, the item's content, is absent from the stage.",
+       "senseDiffers": "The item's search finds a path of states to a goal. The stage's search explores candidates and keeps those that score higher on an objective, so it also covers optimisation.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-c-i-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item sorts reasoning problems by input, output and search space. The stage compares three kinds of system on what each needs as input and what each guarantees. Both ask what goes in and what comes out. They sort different things.",
+       "senseDiffers": "AI4K12 sorts problems such as classification, prediction and search. The stage sorts kinds of system: machine learning, search and distributed systems. Distributed systems have no AI4K12 counterpart.",
+       "adjacentBand": false
+      },
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-a-i-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The item says supervised and unsupervised learning find patterns in data and reinforcement learning uses trial and error. The stage describes machine learning as parameter adjustment from data. It does not separate the three kinds of learning.",
+       "senseDiffers": "The item compares machine learning with human learning. The stage describes only the machine procedure and attributes no intention. The alignment rests on the machine side.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    }
+   ],
+   "conceptAlignments": [
+    {
+     "concept": "Data",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-c-i",
+      "OE-COMPETENCY-ai4k12-3-c-ii"
+     ],
+     "relation": "broader",
+     "why": "AI4K12 handles data in its Datasets rows: feature sets for training and large training sets. Computational-Core's Data is wider. It covers any recorded values that stand for something, from sorted objects to charted measurements."
+    },
+    {
+     "concept": "Representation",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-a-i",
+      "OE-COMPETENCY-ai4k12-2-a-ii",
+      "OE-COMPETENCY-ai4k12-2-a-iii",
+      "OE-COMPETENCY-ai4k12-2-a-iv",
+      "OE-COMPETENCY-ai4k12-1-a-iii"
+     ],
+     "relation": "broader",
+     "why": "Computational-Core's Representation names any structure that stands for something and can be stored or processed. In principle that includes the five AI4K12 rows. The stages teach only symbols, tables, charts and binary encodings."
+    },
+    {
+     "concept": "Abstraction",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-a-i",
+      "OE-COMPETENCY-ai4k12-1-b-iii",
+      "OE-COMPETENCY-ai4k12-1-b-iv"
+     ],
+     "relation": "related",
+     "why": "Only the Representation (Abstraction) row matches: a map keeps some aspects and drops others, which is hiding detail. The two pipeline rows use abstraction for levels of processing from signal to meaning, which is a different sense."
+    },
+    {
+     "concept": "Algorithm",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-c-ii",
+      "OE-COMPETENCY-ai4k12-2-b-ii"
+     ],
+     "relation": "broader",
+     "why": "AI4K12 names reasoning algorithms and search algorithms. Computational-Core's Algorithm is any finite sequence of steps that turns input into output, so these two are special cases."
+    },
+    {
+     "concept": "State",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-b-i"
+     ],
+     "relation": "broader",
+     "why": "AI4K12 uses state for a game position or a step in a search. Computational-Core's State is the stored values of any system at one moment, which includes a game position."
+    },
+    {
+     "concept": "Model",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-a-iii",
+      "OE-COMPETENCY-ai4k12-3-a-iv"
+     ],
+     "relation": "related",
+     "why": "AI4K12 uses model for a trained mapping from inputs to outputs. Computational-Core's Model is a simplified description of a system that is run to see what follows. The senses meet where a trained model is run on new inputs."
+    },
+    {
+     "concept": "Search",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-b-i",
+      "OE-COMPETENCY-ai4k12-2-b-ii"
+     ],
+     "relation": "related",
+     "why": "AI4K12 search finds a path from a start state to a goal by growing a search tree. Computational-Core's Search explores candidates and keeps those that score higher on an objective. The two overlap on exploring options."
+    },
+    {
+     "concept": "Machine Learning",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-a-ii",
+      "OE-COMPETENCY-ai4k12-3-a-iii",
+      "OE-COMPETENCY-ai4k12-3-a-iv",
+      "OE-COMPETENCY-ai4k12-3-a-v",
+      "OE-COMPETENCY-ai4k12-3-a-vi",
+      "OE-COMPETENCY-ai4k12-3-b-ii"
+     ],
+     "relation": "broader",
+     "why": "These AI4K12 rows cover finding patterns, training, using a trained model, adjusting internal representations, learning from experience and weight adjustment. Computational-Core's Machine Learning, a procedure that adjusts parameters from data to improve a result, is the general idea behind them."
+    },
+    {
+     "concept": "Feedback",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-b-ii",
+      "OE-COMPETENCY-ai4k12-3-a-vi"
+     ],
+     "relation": "related",
+     "why": "Error signals and reinforcement signals are fed back to change later behaviour, so they are cases of feedback. In training the signal goes to the learning rule. In Computational-Core output is returned as input. AI4K12 has no row on feedback loops in models."
+    }
+   ],
+   "ai4k12Unaligned": [
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-a-iii-6-8-eu",
+     "why": "Sound stored as samples of a waveform. C1:6-8 encodes text and images and could add sampling a sound into a series of numbers."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-b-ii-6-8-lo",
+     "why": "Simulating an edge detector on pixels. C1:6-8 or C2:6-8 could add a small program that finds features in an image from pixel values."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-iii-3-5-eu",
+     "why": "Trees as labelled nodes with parent links. No stage teaches tree structures. C1:3-5 could grow to cover them as a way to organise data."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-iii-6-8-eu",
+     "why": "Graphs as labelled nodes and links. No stage covers graphs. C1:6-8 could add them as a representation next to encodings."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-iv-6-8-lo",
+     "why": "Embeddings are numbers chosen so that words of similar meaning sit close together. C1:6-8 encodes text as character codes, which carry no meaning. A further encoding could show the difference between the two."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-ii-9-12-eu",
+     "why": "Statements written in logical notation so that a program derives new facts by inference rules. C1:9-12 or C2:9-12 could add rule-based derivation."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-iii-9-12-eu",
+     "why": "Schemas that list attributes and inherited properties, used in knowledge graphs. C1:9-12 could add structured records with inheritance as a data representation."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-b-i-6-8-eu",
+     "why": "Graph search for mazes and routes builds a search tree. Search appears only at C3:9-12. C2:6-8 or C3:6-8 could add a small search program."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-b-ii-3-5-lo",
+     "why": "Drawing every possible next move in a simple game and picking the best. C2:3-5 or C3:3-5 could add this as a program that explores options."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-c-i-3-5-eu",
+     "why": "Sorting problems into classification and search problems. C3:3-5 could add this when it compares what systems do with data."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-c-i-6-8-eu",
+     "why": "Prediction and sequential decision problems alongside classification and search. C3:6-8 could add a way to name the kind of task a model performs."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-c-ii-3-5-lo",
+     "why": "Comparing a decision tree with a neural network as two ways to classify. Computational-Core compares methods only at C3:9-12."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-ii-3-5-lo",
+     "why": "Modelling how supervised learning finds patterns in labelled data. Machine learning enters Computational-Core only at C3:9-12. C3:3-5 or C3:6-8 could add a hands-on version."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-ii-6-8-eu",
+     "why": "Unsupervised learning groups nearby points into clusters. No stage covers clustering. C3:6-8 could add it next to feedback models."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-iii-3-5-lo",
+     "why": "Training a classifier and checking its accuracy on new inputs. No stage below C3:9-12 trains a model."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-iii-6-8-lo",
+     "why": "Training and evaluating a model on a tabular dataset. It connects to the C1 data tables. C3:6-8 could grow to cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-iv-6-8-eu",
+     "why": "Training builds a reasoning model and using it applies the model to new data. Computational-Core does not yet separate these two phases."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-v-6-8-eu",
+     "why": "Decision tree learning adds nodes and neural network learning changes weights. C3:9-12 mentions adjusting parameters but names no specific method."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-vi-3-5-eu",
+     "why": "A reinforcement signal lets a computer learn from trial and error. No stage covers a reward signal. C3:3-5 or C3:6-8 could connect it to Feedback."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-b-i-6-8-eu",
+     "why": "Neural networks as layers of units with weighted connections. No stage describes this structure. C3:6-8 or C3:9-12 could add it as one model structure."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-c-ii-6-8-eu",
+     "why": "Machine learning needs large amounts of labelled data, and labelling takes labour. Technical need for data only. C3:9-12 could state it as a condition of Machine Learning."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-c-iii-6-8-eu",
+     "why": "Technical core only: a model misbehaves on inputs unlike its training data or when the data hold irrelevant correlations. C3:9-12 could state this as a limit of Machine Learning."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-c-iii-k-2-eu",
+     "why": "Technical core only: how well a computer classifies depends on its training data. Machine learning enters Computational-Core at C3:9-12, so an earlier stage would first need a classifier example."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-4-a-iv-9-12-eu",
+     "why": "Technical core only: simple methods such as keyword and template matching compared with learned methods on what each can guarantee. C2:9-12 or C3:9-12 could host the comparison with language as the example."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-iv-9-12-eu",
+     "why": "Steps of building a classifier: source the data, choose features, label, run learning, stop on a validation set, measure on a test set. C3:9-12 says what machine learning is and teaches no build or check steps."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-b-ii-9-12-lo",
+     "why": "Breadth-first, depth-first and best-first search growing a search tree. C3:9-12 names Search and teaches no search method. Best-first search scores candidates, which fits the space's own definition."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-iii-9-12-lo",
+     "why": "Train a model on data and evaluate the result. C3:9-12 describes parameter adjustment and has no indicator for training or evaluating. Covers the evaluation idea that the dropped C2:6-8 match claimed."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-c-iii-9-12-eu",
+     "why": "Technical core only: learning algorithms exploit imbalances and correlations in the training set, and an unrepresentative set makes those correlations misleading. C3:9-12 states no data limit of machine learning."
+    }
+   ]
+  },
+  "int": {
+   "space": "int",
+   "focusRule": "I looked for a match across all five Big Ideas, using each stage's performance indicators and the domain senses of its concepts. Where a shared word differs in meaning (learning, agency, search), I matched on what students do and stated the difference. Stages on heredity, copying and selection in populations have no AI4K12 counterpart, so they received none.",
+   "stageAlignments": [
+    {
+     "stage": "I1:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-ii-k-2-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage lists signs among the ways people share ideas. The item asks for symbols met in daily life. Signs are a kind of symbol, so the two share one example and little else.",
+       "senseDiffers": "Both treat a sign or symbol as a stand-in. The stage frames signs as a way to tell others something. The item frames a symbol as replacing a word, with no computer use stated at this band.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I1:3-5",
+     "items": [],
+     "none": "The stage compares communities, cooperation, conflict and the history of a tool. No 3-5 AI4K12 item asks for any of these. The 3-5 items on effects on different groups assume an AI technology the stage never introduces."
+    },
+    {
+     "stage": "I1:6-8",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-5-a-iii-6-8-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage separates norms from institutions and treats culture as transmitted practice. The item says AI must fit the norms and values of the groups it serves. Norms are the shared topic. The stage has no content on values across cultures or on AI design.",
+       "senseDiffers": "In the stage, norms are informal expectations that students tell apart from institutions. In AI4K12, norms and values are requirements a designer must learn about, and 'values' means what stakeholders want.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I1:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-5-b-i-9-12-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage has students explain how technology and cultural selection shape an information environment such as a social media platform. The item says new AI technologies challenge cultural norms and expectations. A platform case could serve both.",
+       "senseDiffers": "AI4K12 asks which norms are challenged and what debates follow. The stage asks for mechanisms: how a group-level outcome emerges and how a platform and its users shape each other.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I2:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-d-i-k-2-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage's third indicator has children see that acting to meet a need does not require thinking as a person does. The item has them show ways intelligent agents do not understand as people do. Both separate action from human-style understanding.",
+       "senseDiffers": "The stage applies this to animals acting on their own needs. AI4K12 applies it to programs designed by people. An 'agent' in AI4K12 has goals set by a designer.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I2:3-5",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-a-i-3-5-eu",
+       "relation": "narrower",
+       "strength": "partial",
+       "why": "The stage asks for an animal or person learning a behavior by watching another. The item says people learn by observing others and by linking to earlier learning, while computers learn from data or trial and error. The stage covers the living half.",
+       "senseDiffers": "The stage's learning is a lasting change in behavior from experience, in a living thing. A computer's learning adjusts numbers from example data and implies no understanding. Teaching and scaffolding have no machine counterpart here.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I2:6-8",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-d-i-6-8-eu",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage defines agency without conscious intention. The item names self-awareness and personal history as criteria for consciousness in AI. The shared topic is awareness versus goal-directed behavior. The stage teaches no consciousness criteria and names no machine.",
+       "senseDiffers": "The stage's agency applies to organisms and needs no consciousness. The item asks whether machines are conscious and calls the question unsolved. Agency and consciousness are different things in both.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I2:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-d-i-9-12-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage ranks four organisms on an agency spectrum and analyzes one designed system. The item has students debate human versus artificial intelligence. The shared topic is how machine systems compare with living ones. The stage sets up no debate.",
+       "senseDiffers": "The stage grades agency as a capacity to act toward goals, with designer-set goals for software. The item debates whether machines can match human-like intelligence, which is a different question.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I3:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-4-b-i-k-2-lo",
+       "relation": "narrower",
+       "strength": "partial",
+       "why": "The stage has children explain an action by what the person wanted, such as reaching for a cup because of thirst. The item asks for commonsense explanations of human behavior. The stage covers the explaining. The item adds what a robot would need.",
+       "senseDiffers": "AI4K12 frames commonsense as knowledge a computer may lack. The stage treats explaining by wants as a natural early skill in children.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I3:3-5",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-a-ii-3-5-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "In the guess-my-rule game, children test a hidden pattern with yes or no answers. The item asks students to model how supervised learning finds a pattern in labeled data. Both infer a rule from labeled examples. The stage models no machine process.",
+       "senseDiffers": "Children choose their own test examples and reflect on whether they tried to confirm or refute a guess. A supervised learner fits the labeled data it is given. It does not choose examples or judge its own method.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I3:6-8",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-i-6-8-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage compares starting from a random guess with starting from the closest known example, then making small revisions. The item draws a search tree for a maze or route. Both concern moving through candidate solutions. The stage defines no states or operators.",
+       "senseDiffers": "The stage describes a human habit, local search from a familiar start, with no fixed list of options. The item uses systematic graph search over defined states. One word, 'search', covers two procedures.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I3:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-b-i-9-12-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage explains that a search for a solution can test only ideas already generated. The full space of possible ideas stays untested. The item has students describe problems as search with states and operators. Both rest on a space of options.",
+       "senseDiffers": "The stage uses search loosely for how people and science explore ideas, where the space is never fully listed. The item needs explicit states, operators and a goal, so the space is defined.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I4:K-2",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-2-a-iv-k-2-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage has children notice that members of a family differ. The item has them identify the features that make each object unique and tabulate them. A table of how family members differ would meet both.",
+       "senseDiffers": "In the stage, variation matters because some differences are passed on. The item lists features to describe or classify objects and has no idea of passing on.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    },
+    {
+     "stage": "I4:3-5",
+     "items": [],
+     "none": "The stage compares passing on genes with passing on game rules, with change along the way. No 3-5 AI4K12 item covers inheritance, copying or change across generations. The nearest items concern one learner trained on data."
+    },
+    {
+     "stage": "I4:6-8",
+     "items": [],
+     "none": "The stage covers variation, selection and transmission in biology and culture. AI4K12 has no item on variants being kept or dropped across rounds. Its learning items adjust one model, which is a different process from selection in a population."
+    },
+    {
+     "stage": "I4:9-12",
+     "items": [
+      {
+       "id": "OE-COMPETENCY-ai4k12-3-a-v-9-12-lo",
+       "relation": "related",
+       "strength": "weak",
+       "why": "The stage compares biological selection with algorithmic selection such as a genetic algorithm's fitness function. The item describes how machine learning methods improve by adjusting internal representations. Both are machine procedures that improve a score.",
+       "senseDiffers": "Selection works on a population of candidates over rounds. The item's methods adjust one model's numbers or tree. AI4K12 does not name evolutionary algorithms, so the match covers only the improve-a-score idea.",
+       "adjacentBand": false
+      }
+     ],
+     "none": null
+    }
+   ],
+   "conceptAlignments": [
+    {
+     "concept": "Representation",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-a-i",
+      "OE-COMPETENCY-ai4k12-2-a-ii",
+      "OE-COMPETENCY-ai4k12-2-a-iii",
+      "OE-COMPETENCY-ai4k12-2-a-iv"
+     ],
+     "relation": "broader",
+     "why": "Representation here spans mental, cultural, educational and computational stand-ins. AI4K12 covers the last two ends: maps, symbols, trees, graphs and feature vectors. Its rows say nothing about mental representation."
+    },
+    {
+     "concept": "Abstraction",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-a-i"
+     ],
+     "relation": "broader",
+     "why": "The education sense of Abstraction runs from drawing a map to describing a game board by its essential parts. AI4K12 row 2-A-i follows the same progression, from a map to a game board to a schema."
+    },
+    {
+     "concept": "Model",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-a-iii",
+      "OE-COMPETENCY-ai4k12-3-a-iv"
+     ],
+     "relation": "broader",
+     "why": "The AI sense of Model is a runnable description whose numbers were set from data. The AI4K12 rows on training a model, and on training versus using one, cover that sense. The scientific, cultural and cognitive senses have no row."
+    },
+    {
+     "concept": "Learning",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-a-i",
+      "OE-COMPETENCY-ai4k12-3-a-ii",
+      "OE-COMPETENCY-ai4k12-3-a-vi"
+     ],
+     "relation": "broader",
+     "why": "Learning here spans cognition, biology, culture, education and machine learning. AI4K12 rows on humans versus machines, finding patterns and learning from experience cover the machine sense and its contrast with people."
+    },
+    {
+     "concept": "Search",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-b-i",
+      "OE-COMPETENCY-ai4k12-2-b-ii"
+     ],
+     "relation": "broader",
+     "why": "Search here has senses in computing, cognition, biology (foraging) and education. AI4K12 rows on state spaces and combinatorial search cover the computing sense only."
+    },
+    {
+     "concept": "Algorithm",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-c-ii"
+     ],
+     "relation": "broader",
+     "why": "Algorithm here is a fixed series of steps, with senses in computation, education and technology. AI4K12 row 2-C-ii covers reasoning algorithms for classification and search, which is the computation sense."
+    },
+    {
+     "concept": "Feedback",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-b-ii",
+      "OE-COMPETENCY-ai4k12-3-a-vi"
+     ],
+     "relation": "broader",
+     "why": "The AI sense of Feedback is a training loop that compares output with a target or reward and adjusts numbers. AI4K12 rows on weight adjustment and on reinforcement signals cover it. The body-regulation and classroom senses have no row."
+    },
+    {
+     "concept": "Incentive",
+     "items": [
+      "OE-COMPETENCY-ai4k12-3-a-vi"
+     ],
+     "relation": "broader",
+     "why": "The AI sense of Incentive is a reward signal that a learning program collects more of. AI4K12 row 3-A-vi covers learning from a reinforcement signal. Prices, grades and animal payoffs have no row."
+    },
+    {
+     "concept": "Information",
+     "items": [
+      "OE-COMPETENCY-ai4k12-1-a-iii",
+      "OE-COMPETENCY-ai4k12-1-b-i"
+     ],
+     "relation": "related",
+     "why": "Information here is a pattern a receiver can use. AI4K12 covers how measurements are encoded as numbers and how perception extracts meaning from sensory signals. Neither row mentions uncertainty or bits."
+    },
+    {
+     "concept": "Communication",
+     "items": [
+      "OE-COMPETENCY-ai4k12-4-a-i",
+      "OE-COMPETENCY-ai4k12-4-a-ii"
+     ],
+     "relation": "related",
+     "why": "Communication here links sender, signal, shared code and receiver. AI4K12 rows on the structure and ambiguity of language cover the code in the human case and where computers struggle with it."
+    },
+    {
+     "concept": "Intuitive Theories",
+     "items": [
+      "OE-COMPETENCY-ai4k12-4-b-i"
+     ],
+     "relation": "related",
+     "why": "Intuitive Theories are folk physics, folk biology and folk psychology formed without instruction. AI4K12 row 4-B-i lists naive physics and folk psychology as knowledge a computer would need. Folk biology and development are absent."
+    },
+    {
+     "concept": "Theory of Mind",
+     "items": [
+      "OE-COMPETENCY-ai4k12-4-b-i",
+      "OE-COMPETENCY-ai4k12-4-c-i"
+     ],
+     "relation": "related",
+     "why": "Theory of Mind is representing another's goals and beliefs. AI4K12 row 4-B-i lists folk psychology as knowledge a computer would need. Row 4-C-i covers recognizing feelings, which the concept does not include, so it is left out. False-belief tasks have no row."
+    },
+    {
+     "concept": "Agency",
+     "items": [
+      "OE-COMPETENCY-ai4k12-4-d-i",
+      "OE-COMPETENCY-ai4k12-1-b-i"
+     ],
+     "relation": "related",
+     "why": "Agency here is sensing a setting and responding flexibly toward aims. AI4K12 row 4-D-i asks whether machines understand or are conscious. Row 1-B-i, on perception, covers only the sensing half, so it is left out. Organism agency has no row."
+    },
+    {
+     "concept": "Knowledge",
+     "items": [
+      "OE-COMPETENCY-ai4k12-1-c-i",
+      "OE-COMPETENCY-ai4k12-2-a-iii"
+     ],
+     "relation": "broader",
+     "why": "The AI sense of Knowledge is a store of statements a program searches. AI4K12 rows on domain knowledge and on schemas in knowledge graphs cover it. Knowledge held by people and groups has no row."
+    },
+    {
+     "concept": "Technology",
+     "items": [
+      "OE-COMPETENCY-ai4k12-5-b-i",
+      "OE-COMPETENCY-ai4k12-5-c-i"
+     ],
+     "relation": "related",
+     "why": "Technology here covers tools made and adopted in every domain. AI4K12 rows on AI in daily life and on AI's effects on sectors of society treat one family of tools and what follows from using it. They do not define technology."
+    },
+    {
+     "concept": "Culture",
+     "items": [
+      "OE-COMPETENCY-ai4k12-5-b-i"
+     ],
+     "relation": "related",
+     "why": "The AI sense of Culture is machine culture, a proposed extension. AI4K12 row 5-B-i covers AI in daily life and the debates it raises. The shared ground is that AI products shape what people see and make. The row uses 'culture' for a society's norms."
+    },
+    {
+     "concept": "Norms",
+     "items": [
+      "OE-COMPETENCY-ai4k12-5-a-iii"
+     ],
+     "relation": "related",
+     "why": "Norms are shared expectations upheld by a group's approval. AI4K12 row 5-A-iii asks designers to learn the norms and values of the groups an AI system serves. Norms as a topic in themselves have no row."
+    },
+    {
+     "concept": "Institutions",
+     "items": [
+      "OE-COMPETENCY-ai4k12-5-b-ii"
+     ],
+     "relation": "related",
+     "why": "Institutions are stable rules with arrangements that apply them. AI4K12 row 5-B-ii asks students to judge which uses of AI deserve regulation, and regulation is an institution. The row stays on AI."
+    },
+    {
+     "concept": "Descent",
+     "items": [
+      "OE-COMPETENCY-ai4k12-2-a-ii",
+      "OE-COMPETENCY-ai4k12-2-a-iii"
+     ],
+     "relation": "related",
+     "why": "Descent is drawn as a branching tree, and borrowing between lines turns it into a network. AI4K12 rows on trees and graphs teach those two diagram forms as data structures. The match covers the diagram form only. Ancestry has no row."
+    }
+   ],
+   "ai4k12Unaligned": [
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-a-i-3-5-lo",
+     "why": "Comparing human and animal perception. I2:3-5 compares how species act and learn, and its Agency definition includes sensing. Adding a senses comparison there would cover this item."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-a-ii-3-5-lo",
+     "why": "Computer sensing compared with human sensing. Pair it with the item above in I2:3-5 so that animal, human and device senses sit in one comparison."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-a-i-6-8-lo",
+     "why": "Humans combining information from several senses. The cognition sense of Information (sensory input and a receiver whose expectations change) could carry a 6-8 stage on how nervous systems and sensors combine signals."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-b-i-3-5-eu",
+     "why": "Perception as extracting meaning from sensory signals. Information separates a cue, a signal and meaning across biology, cognition and AI. A 3-5 stage on Information could cover this."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-c-ii-6-8-lo",
+     "why": "A vision system lacking knowledge of objects from other cultures. I1:6-8 covers culture as transmitted knowledge. A case on what a system trained in one culture misses would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-c-i-9-12-eu",
+     "why": "AI domain knowledge drawn from statistics over millions of human texts and images. I1:9-12 (Distributed Cognition, Knowledge) could add machine culture as knowledge spread across people and artifacts."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-i-k-2-eu",
+     "why": "A map is a representation of a territory. Representation and Abstraction have no primary stage. A K-2 stage on maps and symbols would cover this item."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-i-6-8-lo",
+     "why": "Describing a game board in plain language by its essential parts. The education sense of Abstraction names this step. A 6-8 stage on Abstraction or Representation would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-2-a-iii-6-8-eu",
+     "why": "Graphs as labeled nodes and links, with trees as a special case. Descent notes that a tree fits ancestry only partly. An I4 stage on Descent could compare trees and networks."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-i-k-2-lo",
+     "why": "How people learn and how computers learn, at K-2. Learning is primary only from I2:3-5. Adding Learning to I2:K-2 beside Development would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-i-6-8-lo",
+     "why": "Contrasting human learning with machine learning. Learning has no 6-8 stage here. I2:6-8 or I3:6-8 could add it, using the 'does not carry over' note on what changes in each."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-vi-6-8-eu",
+     "why": "Supervised learning versus learning from reward alone. Feedback and Incentive have no stage. A 6-8 stage on Incentive across culture, biology and AI would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-v-3-5-eu",
+     "why": "A decision tree whose branches are questions and whose leaves are classes. The education sense of Algorithm describes a plant key built the same way. A 3-5 stage on Algorithm would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-c-iii-3-5-eu",
+     "why": "Training data from history can carry past human biases. Transmission (AI sense) and Culture (machine culture) cover patterns carried forward in data. I1:6-8 could add a case."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-4-b-i-9-12-eu",
+     "why": "Understanding a story needs cultural knowledge, naive physics and folk psychology. Intuitive Theories at I3:9-12 could add folk physics and folk biology as what machines lack."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-4-a-ii-9-12-eu",
+     "why": "Computers struggle when a word has several senses. Communication (culture sense: interpretation depends on context) is the nearest concept, and I2:9-12 could add a language case. The vocabulary's cross-domain word notes are a separate matter."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-4-c-i-6-8-eu",
+     "why": "Computers recognize emotional states from face, voice and words. Communication (biology and culture: signals and cues) could feed a 6-8 stage on reading other people's states. Theory of Mind covers goals and beliefs and adds little here."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-4-d-i-6-8-lo",
+     "why": "Evaluating AI or fictional characters against criteria for consciousness. I2:6-8 separates agency from conscious intention and could add this evaluation task."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-a-i-3-5-lo",
+     "why": "How an AI technology affects different groups differently. I1:3-5 compares two communities and could add one technology and its different effects on each."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-a-ii-6-8-eu",
+     "why": "Accountability and privacy as design criteria. Institutions at I1:6-8 (stable rules and the arrangements that apply them) could cover accountability as a rule-based structure."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-b-ii-3-5-eu",
+     "why": "Deepfakes undermine trust in digital media. Information (culture sense: sources need checking) and Knowledge could carry a stage on checking sources."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-b-ii-9-12-lo",
+     "why": "Deciding where to regulate AI. Institutions and Norms (I1:6-8) lead into a 9-12 stage on how formal rules are made and enforced."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-c-i-6-8-lo",
+     "why": "Comparing AI-driven change with earlier industrial revolutions. Technology, Innovation and Niche Construction (I1:9-12) could host a historical comparison of how technologies reshaped societies."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-1-a-ii-9-12-lo",
+     "why": "Limits and advantages of computer sensors. I2:9-12 names information processing as a shared substrate. Adding sensors beside nervous systems there would cover this item."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-b-i-k-2-lo",
+     "why": "Identify devices in daily life that use AI. I1:K-2 has Technology as a primary concept and asks for tools people use. Adding AI devices among the tools would cover it."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-i-3-5-lo",
+     "why": "Differentiate how people and computers learn. I2:3-5 covers only the living side, so this is the part of the row its aligned item leaves unmet."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-3-a-i-9-12-lo",
+     "why": "Define supervised, unsupervised and reinforcement learning with human parallels. Unmet in all stages once the I2:9-12 match is dropped. I2:9-12 or I3:9-12 could add it using the Learning facets."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-a-i-9-12-lo",
+     "why": "Unequal effects of AI on groups. Unmet once the I2:9-12 match is dropped. The recommendation algorithm case in I2:9-12 could grow a question about who is affected differently."
+    },
+    {
+     "id": "OE-COMPETENCY-ai4k12-5-c-ii-6-8-eu",
+     "why": "Cultures change as technologies are adopted, and jobs shift. Unmet once the I1:6-8 match is dropped. Technology and Innovation in a 6-8 stage could cover it."
+    }
+   ],
+   "interdisciplinaryAdds": [
+    {
+     "stage": "I2:3-5",
+     "ai4k12": "OE-COMPETENCY-ai4k12-3-a-i-3-5-eu",
+     "adds": "Animals copy and are helped by others (biology), children learn from adults and peers (cognition, education), and machines fit patterns in data. The comparison brings in teaching and scaffolding, which machines lack."
+    },
+    {
+     "stage": "I2:6-8",
+     "ai4k12": "OE-COMPETENCY-ai4k12-4-d-i-6-8-eu",
+     "adds": "Organisms regulate behavior toward goal-states with no awareness (biology). Software has goals set by designers (computation). People have intentions (cognition). Together students sort goal-directed, aware and designed apart."
+    },
+    {
+     "stage": "I2:9-12",
+     "ai4k12": "OE-COMPETENCY-ai4k12-4-d-i-9-12-lo",
+     "adds": "A graded agency scale from bacterium to human to recommendation system replaces a yes or no question about machine minds. It draws on biology, cognition and computation and asks what each rung can and cannot do."
+    },
+    {
+     "stage": "I3:K-2",
+     "ai4k12": "OE-COMPETENCY-ai4k12-4-b-i-k-2-lo",
+     "adds": "Children already explain actions by wants (developmental cognition). Comparative biology asks whether apes do the same. Robots lack this knowledge (computation). The cross-domain view treats it as a skill that develops, with a different history in machines."
+    },
+    {
+     "stage": "I3:3-5",
+     "ai4k12": "OE-COMPETENCY-ai4k12-3-a-ii-3-5-lo",
+     "adds": "Students test a rule as human hypothesis testers (cognition, education) and reflect on confirming versus refuting. A supervised learner has no such reflection. The comparison shows what a person does that a fitting procedure does not."
+    },
+    {
+     "stage": "I3:6-8",
+     "ai4k12": "OE-COMPETENCY-ai4k12-2-b-i-6-8-lo",
+     "adds": "People search by small changes to a known solution (cognition), cultures keep stocks of solved examples (culture), and programs search defined states (computation). The reading shows search with and without a stated list of options."
+    },
+    {
+     "stage": "I1:6-8",
+     "ai4k12": "OE-COMPETENCY-ai4k12-5-a-iii-6-8-eu",
+     "adds": "Anthropology and sociology explain why values differ: norms are passed on by social learning and upheld by approval (culture, cognition). That gives the AI design question a source for the differences it asks designers to respect."
+    },
+    {
+     "stage": "I1:9-12",
+     "ai4k12": "OE-COMPETENCY-ai4k12-5-b-i-9-12-eu",
+     "adds": "Collective intelligence and distributed cognition (culture, technology) give mechanisms for how a platform changes what a group knows. AI4K12 names the cultural challenge. The stage explains how copying, selection and tools produce it."
+    },
+    {
+     "concept": "Information",
+     "ai4k12": "OE-COMPETENCY-ai4k12-1-b-i-3-5-eu",
+     "adds": "A cue carries information that nobody sent (biology), a text carries meaning that can mislead (culture), and a message carries bits (computation). The cross-domain view separates signal from meaning before asking what perception extracts."
+    },
+    {
+     "concept": "Incentive",
+     "ai4k12": "OE-COMPETENCY-ai4k12-3-a-vi-6-8-eu",
+     "adds": "A reward signal in machine learning matches payoffs that shape animal choices (biology) and prices or grades that people weigh (culture). People understand incentives. Animals and programs only respond. A badly set reward is followed faithfully."
+    },
+    {
+     "concept": "Descent",
+     "ai4k12": "OE-COMPETENCY-ai4k12-2-a-iii-6-8-eu",
+     "adds": "Species trees, language trees and manuscript trees (biology, culture) show when a tree fits and when borrowing makes a network. Students choose between a tree and a graph for a given set of relations."
+    },
+    {
+     "concept": "Representation",
+     "ai4k12": "OE-COMPETENCY-ai4k12-2-a-i-k-2-eu",
+     "adds": "A map is a stand-in (culture, education), a mental image is a stand-in (cognition), and a stored vector is a stand-in only for a user who reads it that way (computation). The cross-domain view asks who treats the thing as a stand-in."
+    }
+   ]
+  }
+ }
+}

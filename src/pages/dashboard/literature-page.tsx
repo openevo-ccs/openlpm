@@ -1,23 +1,48 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext, useSearchParams } from 'react-router-dom'
-import { BookOpen, Pencil, Plus, Search } from 'lucide-react'
+import { BarChart3, BookOpen, CheckCircle2, Download, Info, Pencil, Plus, Search, Send, Tag } from 'lucide-react'
 import { searchOpenAlex, type SearchResult as OpenAlexResult } from '@/lib/api/openalex'
 import { searchSemanticScholar, type SearchResult as SemanticScholarResult } from '@/lib/api/semantic-scholar'
-import { searchCrossRef, type CrossRefSearchResult } from '@/lib/api/crossref'
+import { searchCrossRef, verifyDOI, type CrossRefSearchResult } from '@/lib/api/crossref'
+import { fetchZoteroLibrary, type ZoteroResult } from '@/lib/api/zotero'
+import { toBibTeX, toCSLJSON, toRIS, downloadText, type ExportableReference } from '@/lib/export/bibliography'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { logActivity } from '@/lib/supabase/activity'
+import {
+  createLiteratureContribution,
+  findLiteraturebaseMatchesByDoi,
+  getLiteraturebaseLink,
+  getLiteraturebaseSnapshotByIds,
+  listLiteratureContributions,
+  searchLiteraturebaseSnapshot,
+  setLiteraturebaseLink,
+  type LiteraturebaseSnapshotRow,
+  type LiteratureContributionRow,
+  type ProjectBaseLinkRow,
+} from '@/lib/supabase/literature'
+import { buildLiteratureBaseDraftYaml } from '@/lib/literaturebase-export'
+import { LiteratureCollectionsPanel } from '@/components/literature-collections-panel'
+import { LiteratureRelationsGraph } from '@/components/literature-relations-graph'
+import { buildRelationGraph, computeEvidenceStrength, EVIDENCE_LABEL_TEXT } from '@/lib/literature-analytics'
 
 type LiteratureRow = Database['public']['Tables']['literature_references']['Row']
-type Engine = 'openalex' | 'semantic_scholar' | 'crossref'
+type Engine = 'openalex' | 'semantic_scholar' | 'crossref' | 'literaturebase' | 'zotero'
 
 // Real feedback c327878b (Dustin Eirdosh, 2026-10-02): "expand the search
 // options with radio-selectors for OpenAlex, cross-ref, semantic scholar."
 // Each engine's own client (src/lib/api/*) returns a differently-shaped
 // result -- normalized here to one local shape so the rest of this page
 // doesn't need to care which engine a result came from.
-const ENGINE_LABEL: Record<Engine, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', crossref: 'Crossref' }
+//
+// Extended 2026-10-09 per feedback 36f3fe54 ("integrate with OpenEvo's
+// LiteratureBase and validate across OpenAlex, Semantic Scholar, CrossRef")
+// + f580e9a1 ("annotate and tag additions"): a fourth engine searches
+// OpenEvo's own curated library directly, and every result -- regardless
+// of which engine found it -- gets cross-checked by DOI against that same
+// library so a "this is already a trusted source" badge shows either way.
+const ENGINE_LABEL: Record<Engine, string> = { openalex: 'OpenAlex', semantic_scholar: 'Semantic Scholar', crossref: 'Crossref', literaturebase: 'OpenEvo LiteratureBase', zotero: 'My Zotero library' }
 const STATUS_OPTIONS: LiteratureRow['status'][] = ['draft', 'submitted', 'under_review', 'accepted', 'rejected']
 
 interface LitResult {
@@ -30,19 +55,28 @@ interface LitResult {
   type: string
   openalexId: string | null
   semanticScholarId: string | null
+  literaturebaseId: string | null
 }
 
 const fromOpenAlex = (r: OpenAlexResult): LitResult => ({
   key: r.openAlexId, doi: r.doi, title: r.title, authors: r.authors, year: r.year, venue: r.venue, type: r.type,
-  openalexId: r.openAlexId, semanticScholarId: null,
+  openalexId: r.openAlexId, semanticScholarId: null, literaturebaseId: null,
 })
 const fromSemanticScholar = (r: SemanticScholarResult): LitResult => ({
   key: r.semanticScholarId, doi: r.doi, title: r.title, authors: r.authors, year: r.year, venue: r.venue, type: 'article',
-  openalexId: null, semanticScholarId: r.semanticScholarId,
+  openalexId: null, semanticScholarId: r.semanticScholarId, literaturebaseId: null,
 })
 const fromCrossRef = (r: CrossRefSearchResult): LitResult => ({
   key: r.doi ?? r.title, doi: r.doi, title: r.title, authors: r.authors, year: r.year, venue: r.venue, type: r.type,
-  openalexId: null, semanticScholarId: null,
+  openalexId: null, semanticScholarId: null, literaturebaseId: null,
+})
+const fromLiteraturebase = (r: LiteraturebaseSnapshotRow): LitResult => ({
+  key: r.id, doi: r.doi, title: r.title, authors: r.authors ?? [], year: r.year, venue: r.venue, type: r.type ?? 'article',
+  openalexId: null, semanticScholarId: null, literaturebaseId: r.id,
+})
+const fromZotero = (r: ZoteroResult): LitResult => ({
+  key: `zotero:${r.key}`, doi: r.doi, title: r.title, authors: r.authors, year: r.year, venue: r.venue, type: r.type,
+  openalexId: null, semanticScholarId: null, literaturebaseId: null,
 })
 
 interface EditDraft {
@@ -52,11 +86,13 @@ interface EditDraft {
   year: string
   status: LiteratureRow['status']
   notes: string
+  tagsText: string
 }
 
 export default function LiteraturePage() {
   const { project, supabase, role } = useOutletContext<ProjectOutletContext>()
   const canEdit = role !== 'viewer'
+  const canManageBaseLink = role === 'owner' || role === 'maintainer'
   const [searchParams] = useSearchParams()
   const refParam = searchParams.get('ref')
   const highlightRefs = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -64,12 +100,54 @@ export default function LiteraturePage() {
   const [engine, setEngine] = useState<Engine>('openalex')
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<LitResult[] | null>(null)
+  const [resultMatches, setResultMatches] = useState<Map<string, LiteraturebaseSnapshotRow>>(new Map())
   const [searching, setSearching] = useState(false)
   const [savingId, setSavingId] = useState<string | null>(null)
+  const [annotatingKey, setAnnotatingKey] = useState<string | null>(null)
+  const [addTags, setAddTags] = useState('')
+  const [addNote, setAddNote] = useState('')
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<EditDraft | null>(null)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [baseLink, setBaseLink] = useState<ProjectBaseLinkRow | null | undefined>(undefined)
+  const [savedMatches, setSavedMatches] = useState<Map<string, LiteraturebaseSnapshotRow>>(new Map())
+  const [zoteroLibraryId, setZoteroLibraryId] = useState('')
+  const [zoteroApiKey, setZoteroApiKey] = useState('')
+  const [zoteroLibraryType, setZoteroLibraryType] = useState<'user' | 'group'>('user')
+  const [zoteroError, setZoteroError] = useState<string | null>(null)
+
+  const linked = !!baseLink
+
+  // Real feedback 2d5c7530 (Dustin Eirdosh, 2026-10-24): "a view [of] quick
+  // stats about the state of the literature collection... a graph of top
+  // literature links... word cloud of tags." Everything here is derived
+  // from data already loaded on this page (items, savedMatches) -- no new
+  // query. The relation graph/evidence-strength signal below reuses the
+  // exact same analytics built for a project's attached Collections
+  // (literature-analytics.ts, 2026-10-23), applied to this project's own
+  // flat reference list instead of a collection, so "no collection
+  // attached yet" no longer means "no overview at all."
+  const statusCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const it of items ?? []) counts.set(it.status, (counts.get(it.status) ?? 0) + 1)
+    return counts
+  }, [items])
+
+  const tagCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const it of items ?? []) for (const t of ((it as any).tags ?? []) as string[]) counts.set(t, (counts.get(t) ?? 0) + 1)
+    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 20)
+  }, [items])
+
+  const relationGraph = useMemo(() => buildRelationGraph(Array.from(savedMatches.values())), [savedMatches])
+  const evidenceStrength = useMemo(() => computeEvidenceStrength(relationGraph), [relationGraph])
+
+  const openPaperInCollection = (literaturebaseId: string) => {
+    const match = (items ?? []).find((it) => (it as any).literaturebase_id === literaturebaseId)
+    const el = match ? highlightRefs.current.get(match.id) : undefined
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
 
   const reload = async () => {
     const { data } = await supabase
@@ -78,12 +156,20 @@ export default function LiteraturePage() {
       .eq('project_id', project.id)
       .order('created_at', { ascending: false })
     setItems(data ?? [])
+    const ids = (data ?? []).map((it) => (it as any).literaturebase_id).filter(Boolean)
+    setSavedMatches(await getLiteraturebaseSnapshotByIds(supabase, ids))
   }
 
   useEffect(() => {
     reload()
+    getLiteraturebaseLink(supabase, project.id).then(setBaseLink)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase, project.id])
+
+  const toggleBaseLink = async () => {
+    await setLiteraturebaseLink(supabase, project.id, !linked)
+    setBaseLink(await getLiteraturebaseLink(supabase, project.id))
+  }
 
   // A search-bar hit for a reference in this project's own collection --
   // jump to and briefly highlight the matching card, since this page has no
@@ -99,15 +185,44 @@ export default function LiteraturePage() {
     if (!query.trim()) return
     setSearching(true)
     setNotice(null)
+    let found: LitResult[]
     if (engine === 'openalex') {
-      const { results: found } = await searchOpenAlex(query.trim())
-      setResults(found.map(fromOpenAlex))
+      found = (await searchOpenAlex(query.trim())).results.map(fromOpenAlex)
     } else if (engine === 'semantic_scholar') {
-      const { results: found } = await searchSemanticScholar(query.trim())
-      setResults(found.map(fromSemanticScholar))
+      found = (await searchSemanticScholar(query.trim())).results.map(fromSemanticScholar)
+    } else if (engine === 'literaturebase') {
+      found = (await searchLiteraturebaseSnapshot(supabase, query.trim())).map(fromLiteraturebase)
     } else {
-      const { results: found } = await searchCrossRef(query.trim())
-      setResults(found.map(fromCrossRef))
+      found = (await searchCrossRef(query.trim())).results.map(fromCrossRef)
+    }
+    setResults(found)
+    // Cross-check every result's DOI against the real LiteratureBase corpus,
+    // regardless of which engine found it (feedback 36f3fe54) -- only once
+    // this project is actually linked (same explicit-opt-in convention as
+    // TheoryBase), and skipped when the engine already *is* literaturebase,
+    // since every one of those results is already a confirmed match by
+    // construction.
+    if (!linked || engine === 'literaturebase') {
+      setResultMatches(new Map())
+    } else {
+      setResultMatches(await findLiteraturebaseMatchesByDoi(supabase, found.map((r) => r.doi).filter((d): d is string => !!d)))
+    }
+    setSearching(false)
+  }
+
+  const fetchZotero = async () => {
+    if (!zoteroLibraryId.trim() || !zoteroApiKey.trim()) return
+    setSearching(true)
+    setNotice(null)
+    setZoteroError(null)
+    const { results: zoteroResults, error } = await fetchZoteroLibrary(zoteroLibraryId.trim(), zoteroApiKey.trim(), zoteroLibraryType)
+    if (error) {
+      setZoteroError(error)
+      setResults(null)
+    } else {
+      const found = zoteroResults.map(fromZotero)
+      setResults(found)
+      setResultMatches(linked ? await findLiteraturebaseMatchesByDoi(supabase, found.map((r) => r.doi).filter((d): d is string => !!d)) : new Map())
     }
     setSearching(false)
   }
@@ -117,9 +232,24 @@ export default function LiteraturePage() {
       (it) => (r.doi && it.doi === r.doi) || (r.openalexId && it.openalex_id === r.openalexId) || (r.semanticScholarId && it.semantic_scholar_id === r.semanticScholarId)
     )
 
-  const addToProject = async (r: LitResult) => {
+  // Either this result came straight from searching LiteratureBase itself
+  // (a confirmed match by construction), or its DOI matched one of the
+  // real records cross-checked for every other engine's results.
+  const literaturebaseIdFor = (r: LitResult): string | null =>
+    r.literaturebaseId ?? (r.doi ? resultMatches.get(r.doi)?.id ?? null : null)
+
+  const addToProject = async (r: LitResult, tagsText: string, note: string) => {
     setSavingId(r.key)
-    const { data, error } = await supabase
+    const litbaseId = literaturebaseIdFor(r)
+    const tags = tagsText.split(',').map((t) => t.trim()).filter(Boolean)
+    // verifyDOI() has existed in src/lib/api/crossref.ts since this page's
+    // Crossref search was added, but nothing ever called it -- confirm the
+    // DOI against Crossref itself at save time, regardless of which search
+    // engine actually found this result. A result with no DOI (an
+    // OpenEvo LiteratureBase hit without one, etc.) just stays unverified,
+    // same as before this call existed.
+    const crossrefVerified = r.doi ? (await verifyDOI(r.doi)).verified : false
+    const { data, error } = await (supabase as any)
       .from('literature_references')
       .insert({
         project_id: project.id,
@@ -131,7 +261,11 @@ export default function LiteraturePage() {
         type: r.type === 'article' || r.type === 'book' || r.type === 'chapter' || r.type === 'report' || r.type === 'thesis' ? r.type : 'article',
         openalex_id: r.openalexId,
         semantic_scholar_id: r.semanticScholarId,
+        literaturebase_id: litbaseId,
+        tags,
+        notes: note || null,
         status: 'draft',
+        crossref_verified: crossrefVerified,
       })
       .select('id')
       .single()
@@ -140,6 +274,9 @@ export default function LiteraturePage() {
     } else {
       setNotice({ kind: 'ok', text: `Added "${r.title}" to ${project.name}.` })
       await logActivity(supabase, { projectId: project.id, actionType: 'literature_added', targetType: 'literature_reference', targetId: data.id, details: { title: r.title } })
+      setAnnotatingKey(null)
+      setAddTags('')
+      setAddNote('')
       await reload()
     }
     setSavingId(null)
@@ -154,6 +291,7 @@ export default function LiteraturePage() {
       year: it.year?.toString() ?? '',
       status: it.status,
       notes: (it as any).notes ?? '',
+      tagsText: ((it as any).tags ?? []).join(', '),
     })
   }
 
@@ -174,6 +312,7 @@ export default function LiteraturePage() {
         year: draft.year ? Number(draft.year) : null,
         status: draft.status,
         notes: draft.notes || null,
+        tags: draft.tagsText.split(',').map((t) => t.trim()).filter(Boolean),
       })
       .eq('id', id)
     setSavingEdit(false)
@@ -190,19 +329,54 @@ export default function LiteraturePage() {
   return (
     <div>
       <h1>Literature</h1>
-      <p className="muted" style={{ marginBottom: 20 }}>
+      <p className="muted" style={{ marginBottom: 12 }}>
         The evidence this project&apos;s content is grounded in. Search to find and add real
         papers — everything below is already part of {project.name}&apos;s own collection.
       </p>
+
+      {baseLink === undefined ? null : !linked ? (
+        <div className="notice" style={{ marginBottom: 16 }}>
+          <Info size={14} />
+          This project isn&apos;t linked to LiteratureBase yet — checking whether a paper is
+          already one of OpenEvo&apos;s vetted sources, and proposing a paper you find back into
+          that shared library, both need that link first.
+          {canManageBaseLink && (
+            <button className="btn btn-mini" style={{ marginLeft: 10 }} onClick={toggleBaseLink}>Link this project to LiteratureBase</button>
+          )}
+        </div>
+      ) : (
+        <div className="notice" style={{ marginBottom: 16 }}>
+          <Info size={14} />
+          Linked to LiteratureBase. Every search result below is checked against a
+          periodically-refreshed copy of the real library (not a live connection), and any
+          reference without a match can be proposed back to it.
+          {canManageBaseLink && (
+            <button className="btn-linklike" style={{ marginLeft: 10, fontSize: 12 }} onClick={toggleBaseLink}>Unlink</button>
+          )}
+        </div>
+      )}
 
       {notice && (
         <div className={`notice notice-${notice.kind}`}>{notice.text}</div>
       )}
 
-      <div className="card">
+      {items && items.length > 0 && (
+        <LiteratureOverview
+          totalCount={items.length}
+          statusCounts={statusCounts}
+          tagCounts={tagCounts}
+          relationGraph={relationGraph}
+          evidenceStrength={evidenceStrength}
+          onOpenPaper={openPaperInCollection}
+        />
+      )}
+
+      <LiteratureCollectionsPanel projectId={project.id} canManage={canEdit} supabase={supabase} />
+
+      <div className="card" style={{ marginTop: 16 }}>
         <h3>Search for literature</h3>
         <div className="row" style={{ gap: 6, marginBottom: 10 }}>
-          {(Object.keys(ENGINE_LABEL) as Engine[]).map((e) => (
+          {(Object.keys(ENGINE_LABEL) as Engine[]).filter((e) => e !== 'literaturebase' || linked).map((e) => (
             <button
               key={e}
               type="button"
@@ -213,49 +387,121 @@ export default function LiteraturePage() {
             </button>
           ))}
         </div>
-        <form onSubmit={runSearch} className="row">
-          <input
-            type="search"
-            placeholder="Search for papers by title, author, or topic…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{ flex: 1, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
-          />
-          <button type="submit" className="btn btn-primary" disabled={searching}>
-            <Search size={14} />
-            {searching ? 'Searching…' : 'Search'}
-          </button>
-        </form>
+        {engine === 'zotero' ? (
+          <div>
+            <p className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
+              Pulls your Zotero library in — nothing here is ever written back to Zotero. Your API
+              key is used for this one fetch only and isn&apos;t stored. Find your user ID and
+              create a read-only key at{' '}
+              <a href="https://www.zotero.org/settings/keys" target="_blank" rel="noreferrer">zotero.org/settings/keys</a>.
+            </p>
+            <div className="row" style={{ gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+              <select value={zoteroLibraryType} onChange={(e) => setZoteroLibraryType(e.target.value as 'user' | 'group')}>
+                <option value="user">My library</option>
+                <option value="group">A group library</option>
+              </select>
+              <input
+                placeholder={zoteroLibraryType === 'user' ? 'Your Zotero user ID' : 'Group ID'}
+                value={zoteroLibraryId}
+                onChange={(e) => setZoteroLibraryId(e.target.value)}
+                style={{ padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+              />
+              <input
+                type="password"
+                placeholder="Zotero API key (read access)"
+                value={zoteroApiKey}
+                onChange={(e) => setZoteroApiKey(e.target.value)}
+                style={{ flex: 1, minWidth: 180, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+              />
+              <button type="button" className="btn btn-primary" disabled={searching || !zoteroLibraryId.trim() || !zoteroApiKey.trim()} onClick={fetchZotero}>
+                <Search size={14} />
+                {searching ? 'Fetching…' : 'Fetch my library'}
+              </button>
+            </div>
+            {zoteroError && <div className="notice notice-bad">{zoteroError}</div>}
+          </div>
+        ) : (
+          <form onSubmit={runSearch} className="row">
+            <input
+              type="search"
+              placeholder="Search for papers by title, author, or topic…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ flex: 1, padding: '7px 9px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface-1)' }}
+            />
+            <button type="submit" className="btn btn-primary" disabled={searching}>
+              <Search size={14} />
+              {searching ? 'Searching…' : 'Search'}
+            </button>
+          </form>
+        )}
 
         {results !== null && (
           <div style={{ marginTop: 14 }}>
             {results.length === 0 ? (
               <p className="muted">No results.</p>
             ) : (
-              results.map((r) => (
-                <div key={r.key} className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-                  <div>
-                    <strong>{r.title}</strong>
-                    <div className="muted" style={{ fontSize: 12 }}>
-                      {r.authors.slice(0, 3).join(', ')}{r.authors.length > 3 ? ' et al.' : ''} — {r.venue ?? 'unknown venue'} ({r.year || 'n.d.'})
+              results.map((r) => {
+                const litbaseMatch = literaturebaseIdFor(r)
+                return (
+                  <div key={r.key} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                    <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <strong>{r.title}</strong>
+                        <div className="muted" style={{ fontSize: 12 }}>
+                          {r.authors.slice(0, 3).join(', ')}{r.authors.length > 3 ? ' et al.' : ''} — {r.venue ?? 'unknown venue'} ({r.year || 'n.d.'})
+                        </div>
+                        {linked && (
+                          litbaseMatch ? (
+                            <span className="chip chip-good" style={{ fontSize: 10, marginTop: 4, display: 'inline-flex' }}>
+                              <CheckCircle2 size={10} style={{ marginRight: 3 }} />Already in LiteratureBase
+                            </span>
+                          ) : (
+                            <span className="muted" style={{ fontSize: 10, marginTop: 4, display: 'inline-block' }}>Not yet in LiteratureBase</span>
+                          )
+                        )}
+                      </div>
+                      {alreadySaved(r) ? (
+                        <span className="chip chip-good">Already added</span>
+                      ) : (
+                        <div className="row" style={{ gap: 4 }}>
+                          <button className="btn btn-mini" onClick={() => setAnnotatingKey(annotatingKey === r.key ? null : r.key)} title="Add with tags/notes">
+                            <Tag size={11} />
+                          </button>
+                          <button className="btn btn-mini" onClick={() => addToProject(r, '', '')} disabled={savingId === r.key}>
+                            <Plus size={11} />
+                            {savingId === r.key ? 'Adding…' : 'Add'}
+                          </button>
+                        </div>
+                      )}
                     </div>
+                    {annotatingKey === r.key && (
+                      <div className="card" style={{ marginTop: 6, background: 'var(--surface-1)' }}>
+                        <div className="field">
+                          <label>Tags (comma-separated)</label>
+                          <input value={addTags} onChange={(e) => setAddTags(e.target.value)} placeholder="e.g. restructuration, agent-based-modeling" />
+                        </div>
+                        <div className="field">
+                          <label>Note — why this reference matters</label>
+                          <textarea rows={2} value={addNote} onChange={(e) => setAddNote(e.target.value)} />
+                        </div>
+                        <button className="btn btn-mini btn-primary" disabled={savingId === r.key} onClick={() => addToProject(r, addTags, addNote)}>
+                          {savingId === r.key ? 'Adding…' : 'Add to project'}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  {alreadySaved(r) ? (
-                    <span className="chip chip-good">Already added</span>
-                  ) : (
-                    <button className="btn btn-mini" onClick={() => addToProject(r)} disabled={savingId === r.key}>
-                      <Plus size={11} />
-                      {savingId === r.key ? 'Adding…' : 'Add'}
-                    </button>
-                  )}
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         )}
       </div>
 
-      <h2 style={{ marginTop: 20 }}>{project.name}&apos;s collection</h2>
+      <div className="row" style={{ marginTop: 20, justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <h2 style={{ margin: 0 }}>{project.name}&apos;s collection</h2>
+        {items && items.length > 0 && <ExportMenu items={items} />}
+      </div>
       {items === null ? (
         <p className="muted">Loading…</p>
       ) : items.length === 0 ? (
@@ -266,7 +512,10 @@ export default function LiteraturePage() {
         </div>
       ) : (
         <div className="grid grid-2">
-          {items.map((it) => (
+          {items.map((it) => {
+            const litbaseId = (it as any).literaturebase_id as string | null
+            const tags = ((it as any).tags ?? []) as string[]
+            return (
             <div
               key={it.id}
               ref={(el) => { if (el) highlightRefs.current.set(it.id, el); else highlightRefs.current.delete(it.id) }}
@@ -300,6 +549,10 @@ export default function LiteraturePage() {
                     </select>
                   </div>
                   <div className="field">
+                    <label>Tags (comma-separated)</label>
+                    <input value={draft.tagsText} onChange={(e) => setDraft({ ...draft, tagsText: e.target.value })} placeholder="e.g. restructuration, agent-based-modeling" />
+                  </div>
+                  <div className="field">
                     <label>Notes</label>
                     <textarea rows={3} value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
                   </div>
@@ -327,17 +580,244 @@ export default function LiteraturePage() {
                     {(Array.isArray(it.authors) ? it.authors : []).slice(0, 3).join(', ')} — {it.venue ?? 'unknown venue'} ({it.year ?? 'n.d.'})
                   </span>
                   {it.doi && <div className="muted" style={{ fontSize: 11, marginTop: 4 }}>DOI: {it.doi}</div>}
+                  {litbaseId && (
+                    <a
+                      href={`https://github.com/openevo-ccs/literaturebase/blob/main/records/${litbaseId.replace(/^OE-LITERATURE-/, '')}.yaml`}
+                      target="_blank" rel="noreferrer"
+                      className="chip chip-good"
+                      style={{ fontSize: 10, marginTop: 4, display: 'inline-flex', width: 'fit-content' }}
+                    >
+                      <CheckCircle2 size={10} style={{ marginRight: 3 }} />In LiteratureBase
+                    </a>
+                  )}
+                  {tags.length > 0 && (
+                    <div className="row" style={{ gap: 4, marginTop: 6, flexWrap: 'wrap' }}>
+                      {tags.map((t) => <span key={t} className="chip" style={{ fontSize: 10 }}>{t}</span>)}
+                    </div>
+                  )}
                   {(it as any).notes && (
                     <div style={{ fontSize: 12, marginTop: 6, padding: '6px 8px', background: 'var(--surface-2)', borderRadius: 6 }}>
                       {(it as any).notes}
                     </div>
                   )}
+                  {linked && canEdit && !litbaseId && (
+                    <ProposeToLiteratureBase reference={it} projectId={project.id} supabase={supabase} />
+                  )}
                 </>
               )}
+            </div>
+          )})}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Overview -- real feedback 2d5c7530 (Dustin Eirdosh, 2026-10-24). Shows
+// regardless of whether a Collection is attached, since it's built from
+// this project's own flat reference list (items), not a collection.
+// ============================================================================
+
+function tagFontSize(count: number, max: number): number {
+  if (max <= 1) return 12
+  const scale = 11 + (count / max) * 9 // 11px for the rarest shown tag, 20px for the most frequent
+  return Math.round(scale)
+}
+
+function LiteratureOverview({
+  totalCount,
+  statusCounts,
+  tagCounts,
+  relationGraph,
+  evidenceStrength,
+  onOpenPaper,
+}: {
+  totalCount: number
+  statusCounts: Map<string, number>
+  tagCounts: [string, number][]
+  relationGraph: ReturnType<typeof buildRelationGraph>
+  evidenceStrength: ReturnType<typeof computeEvidenceStrength>
+  onOpenPaper: (literaturebaseId: string) => void
+}) {
+  const maxTagCount = tagCounts.length > 0 ? tagCounts[0][1] : 0
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }}>
+      <h3 className="row" style={{ marginBottom: 10 }}><BarChart3 size={15} style={{ color: 'var(--text-muted)' }} />Overview</h3>
+      <div className="row" style={{ gap: 24, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Collection</div>
+          <div style={{ fontSize: 22, fontWeight: 600 }}>{totalCount}</div>
+          <div className="muted" style={{ fontSize: 11 }}>{totalCount === 1 ? 'reference' : 'references'}</div>
+        </div>
+        {statusCounts.size > 0 && (
+          <div>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>By status</div>
+            <div className="row" style={{ gap: 6, flexWrap: 'wrap', maxWidth: 240 }}>
+              {Array.from(statusCounts.entries()).map(([status, count]) => (
+                <span key={status} className="row" style={{ gap: 3 }}>
+                  <Chip status={status as LiteratureRow['status']} /><span className="muted" style={{ fontSize: 11 }}>{count}</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {evidenceStrength.edgeCount > 0 && (
+          <div>
+            <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 4 }}>Evidence signal</div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>{EVIDENCE_LABEL_TEXT[evidenceStrength.label]}</div>
+            <div className="muted" style={{ fontSize: 11 }}>
+              {evidenceStrength.reinforcingCount} reinforcing, {evidenceStrength.tensionCount} contested, of {evidenceStrength.edgeCount} linked relations
+            </div>
+          </div>
+        )}
+      </div>
+
+      {tagCounts.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 6 }}>Top tags</div>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'baseline' }}>
+            {tagCounts.map(([tag, count]) => (
+              <span key={tag} title={`${count} reference${count === 1 ? '' : 's'}`} style={{ fontSize: tagFontSize(count, maxTagCount), color: 'var(--text-secondary)' }}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {relationGraph.papers.length > 1 && (
+        <div style={{ marginTop: 16 }}>
+          <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 6 }}>
+            How these papers relate to each other
+          </div>
+          <LiteratureRelationsGraph graph={relationGraph} onOpenPaper={onOpenPaper} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Export -- the other half of decision 2 (standard bibliographic formats
+// out, as a plain client-side text download; nothing round-trips to
+// Zotero or anywhere else).
+// ============================================================================
+
+function ExportMenu({ items }: { items: LiteratureRow[] }) {
+  const [open, setOpen] = useState(false)
+  const toExportable = (): ExportableReference[] =>
+    items.map((it) => ({ key: it.id, title: it.title, authors: Array.isArray(it.authors) ? it.authors : [], year: it.year, venue: it.venue, doi: it.doi, type: it.type }))
+
+  const run = (format: 'bibtex' | 'ris' | 'csl') => {
+    const refs = toExportable()
+    if (format === 'bibtex') downloadText('literature.bib', 'application/x-bibtex', toBibTeX(refs))
+    else if (format === 'ris') downloadText('literature.ris', 'application/x-research-info-systems', toRIS(refs))
+    else downloadText('literature.json', 'application/vnd.citationstyles.csl+json', toCSLJSON(refs))
+    setOpen(false)
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <button className="btn btn-mini" onClick={() => setOpen(!open)}>
+        <Download size={12} />Export
+      </button>
+      {open && (
+        <div className="card" style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, zIndex: 5, minWidth: 160 }}>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('bibtex')}>BibTeX (.bib)</button>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('ris')}>RIS (.ris)</button>
+          <button className="btn-linklike" style={{ display: 'block', padding: '4px 0' }} onClick={() => run('csl')}>CSL-JSON (.json)</button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================================================
+// Propose to LiteratureBase -- the "sending back out" half of feedback
+// 36f3fe54. Shown only for a reference not already linked to a real
+// LiteratureBase record -- proposing something that's already a tracked
+// match would be proposing LiteratureBase's own content back at itself.
+// Mirrors theories-page.tsx's ProposeToTheoryBase.
+// ============================================================================
+
+function ProposeToLiteratureBase({
+  reference,
+  projectId,
+  supabase,
+}: {
+  reference: LiteratureRow
+  projectId: string
+  supabase: ProjectOutletContext['supabase']
+}) {
+  const [contributions, setContributions] = useState<LiteratureContributionRow[]>([])
+  const [preview, setPreview] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (open) listLiteratureContributions(supabase, reference.id).then(setContributions)
+  }, [open, supabase, reference.id])
+
+  const buildPreview = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    setPreview(buildLiteratureBaseDraftYaml({ ...reference, notes: (reference as any).notes }, user?.email ?? 'an OpenLPM researcher'))
+  }
+
+  const submit = async () => {
+    if (!preview) return
+    setBusy(true); setError(null)
+    try {
+      await createLiteratureContribution(supabase, reference.id, projectId, preview)
+      setPreview(null)
+      setContributions(await listLiteratureContributions(supabase, reference.id))
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not record this proposal.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (!open) {
+    return (
+      <button className="btn-linklike" style={{ fontSize: 11, marginTop: 6 }} onClick={() => setOpen(true)}>
+        <Send size={11} style={{ marginRight: 3 }} />Propose to LiteratureBase
+      </button>
+    )
+  }
+
+  return (
+    <section style={{ marginTop: 8 }}>
+      <p className="muted" style={{ fontSize: 11.5 }}>
+        Package this reference in LiteratureBase&apos;s own record format and flag it for a human
+        to actually commit to the real repo on a new branch, as a real reviewed contribution — not
+        a silent copy. This doesn&apos;t touch the real LiteratureBase repo by itself.
+      </p>
+      {contributions.length > 0 && (
+        <div style={{ marginBottom: 6 }}>
+          {contributions.map((c) => (
+            <div key={c.id} className="row" style={{ justifyContent: 'space-between', fontSize: 11, padding: '2px 0' }}>
+              <span>Proposed {new Date(c.created_at ?? '').toLocaleDateString()}</span>
+              <span className="chip" style={{ fontSize: 10 }}>{c.status.replace(/_/g, ' ')}</span>
             </div>
           ))}
         </div>
       )}
-    </div>
+      {error && <div className="notice notice-bad">{error}</div>}
+      {!preview ? (
+        <button className="btn btn-mini" onClick={buildPreview}>Draft a proposal</button>
+      ) : (
+        <div className="card" style={{ marginTop: 6 }}>
+          <strong style={{ fontSize: 12 }}>Draft record (review before sending)</strong>
+          <pre style={{ fontSize: 10.5, whiteSpace: 'pre-wrap', maxHeight: 200, overflow: 'auto', background: 'var(--surface-1)', padding: 8, borderRadius: 6 }}>{preview}</pre>
+          <div className="row" style={{ gap: 8, marginTop: 6 }}>
+            <button className="btn btn-primary" disabled={busy} onClick={submit}>{busy ? 'Recording…' : 'Record this proposal'}</button>
+            <button className="btn-linklike" onClick={() => setPreview(null)}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </section>
   )
 }

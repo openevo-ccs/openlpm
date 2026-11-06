@@ -1,11 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
-import { ChevronDown, ChevronRight, LayoutList, Layers, Maximize2, Network, Shapes, X } from 'lucide-react'
+import dagre from 'cytoscape-dagre'
+import { ChevronDown, ChevronRight, Download, LayoutList, Layers, Loader2, Maximize2, Network, Shapes, X } from 'lucide-react'
 import { Chip } from '@/components/chip'
 import type { ProjectOutletContext } from './project-layout'
 import type { Database } from '@/lib/supabase/database.types'
-import { layoutTier } from '@/lib/graph-layout'
+import { listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
+import { conceptDefinition, conceptExtension, conceptSource, fieldOf, isFieldMeaning } from '@/lib/concept-source'
+import { loadRegisteredConceptIds } from '@/lib/conceptbase-registry'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { ReviewQuestionsPanel } from '@/components/review-questions-panel'
+import {
+  DEFAULT_GRAPH_SETTINGS,
+  arcHeight,
+  lineOpacity,
+  physicsLayoutOptions,
+  pickVisibleLabels,
+  truncateLabel,
+  type GraphEdgeMode,
+  type GraphViewSettings,
+  type LabelCandidate,
+} from '@/lib/graph-standards'
+
+cytoscape.use(dagre)
 
 function cssVar(name: string, fallback: string) {
   if (typeof window === 'undefined') return fallback
@@ -14,6 +32,24 @@ function cssVar(name: string, fallback: string) {
 }
 
 const MAP_PALETTE = ['--map-1', '--map-2', '--map-3', '--map-4', '--map-5', '--map-6']
+
+// Real feedback 2427b091 (Dustin): "zooming the full map to fit perfectly
+// within the window on loading" -- a plain cy.fit() does exactly that, but
+// for a real tree this size (EvoMentor Thuringia: ~130 nodes once laid out
+// with real, non-overlapping spacing) that means zooming out far enough
+// that every node and label becomes illegible, which defeats the point of
+// fitting in the first place. Fits, then refuses to go below a zoom level
+// where a label would still be readable -- the whole tree may no longer
+// fit in that case, but what's on screen is actually usable, and panning
+// reaches the rest.
+const MIN_READABLE_ZOOM = 0.45
+function fitWithReadableFloor(cy: Core) {
+  cy.fit(undefined, 24)
+  if (cy.zoom() < MIN_READABLE_ZOOM) {
+    cy.zoom(MIN_READABLE_ZOOM)
+    cy.center()
+  }
+}
 
 type SchemaElement = Database['public']['Tables']['lpm_schema_elements']['Row']
 type ProjectRow = Database['public']['Tables']['projects']['Row']
@@ -55,14 +91,24 @@ function mapStatus(cbStatus: string): 'proposed' | 'discussed' | 'accepted' | 'd
 type Tab = 'explore' | 'manage'
 
 export default function ConceptsPage() {
+  const { conceptId } = useParams<{ conceptId?: string }>()
   const [tab, setTab] = useState<Tab>('explore')
+
+  // A concept link only ever points at the Explore tab's tree+detail view
+  // (where real cross-project connections live) -- land there regardless of
+  // which tab was open before, whether the link came from the Manage tab's
+  // own "see how this connects to real content" button, a shared link, or
+  // the search bar.
+  useEffect(() => {
+    if (conceptId) setTab('explore')
+  }, [conceptId])
 
   return (
     <div>
       <h1 className="row"><Layers size={18} style={{ color: 'var(--text-muted)' }} />Concepts</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
         The concepts and concept-domain relations this LPM is organized around — browse how they
-        connect to real content, or manage the taxonomy itself.
+        connect to the parts of the progression, or manage the taxonomy itself.
       </p>
 
       <div className="row" style={{ gap: 8, marginBottom: 20 }}>
@@ -108,6 +154,7 @@ function ConceptMapTab() {
   const { conceptId } = useParams<{ conceptId?: string }>()
   const navigate = useNavigate()
   const [taxonomy, setTaxonomy] = useState<SchemaElement[] | null>(null)
+  const [relations, setRelations] = useState<ConceptRelation[]>([])
   const [children, setChildren] = useState<ProjectRow[]>([])
   const [hitsByTaxId, setHitsByTaxId] = useState<Map<string, Hit[]>>(new Map())
   const [hitsByBk, setHitsByBk] = useState<Map<string, Map<string, { sum: number; count: number }>>>(new Map())
@@ -250,6 +297,18 @@ function ConceptMapTab() {
       setHitsByTaxId(byTaxId)
       setHitsByBk(byBk)
       setHubName(hubProject.name)
+
+      // Real feedback 553dc7cd (Dustin, 2026-10-20): "Why is this concept
+      // map without links?" -- the graph below only ever drew parent_id
+      // tree edges; lpm_concept_relations (migration 087) is a real,
+      // separate many-to-many concept network that existed in the schema
+      // but was never fetched here (only the Jena Basiskonzepte Netz tab
+      // used it). Fetched for every taxonomy project, not just the hub --
+      // same reasoning as taxonomyProjectIds above.
+      const allRelations = (
+        await Promise.all(taxonomyProjectIds.map((pid) => listConceptRelations(supabase, pid)))
+      ).flat()
+      if (!cancelled) setRelations(allRelations)
     }
     load()
     return () => { cancelled = true }
@@ -295,17 +354,27 @@ function ConceptMapTab() {
   const selectNode = (n: SchemaElement) => navigate(`/dashboard/${project.slug}/concepts/${n.id}`)
   const closeNode = () => navigate(`/dashboard/${project.slug}/concepts`)
 
+  // A synthetic space has no regional sub-projects: its sandbox sub-projects would show up as columns of dashes.
+  const isSyntheticSpace = project.epistemic_status === 'designed-thought-experiment'
+
   if (taxonomy === null) return <p className="muted">Loading…</p>
 
   return (
     <div>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        One concept structure, shared across every real regional curriculum in {hubName} — for
-        finding what a specific concept looks like across states, and for comparing how much weight
-        each state's curriculum actually gives it.
-      </p>
+      {isSyntheticSpace ? (
+        <p className="muted" style={{ marginBottom: 16 }}>
+          The concepts of {hubName}, with their definitions and how they relate. This space is a synthetic model: its vocabulary is an
+          AI-drafted design that no subject expert has reviewed yet. The coverage of official curricula is on the comparison pages.
+        </p>
+      ) : (
+        <p className="muted" style={{ marginBottom: 16 }}>
+          One concept structure, shared across every real regional curriculum in {hubName} — for
+          finding what a specific concept looks like across states, and for comparing how much weight
+          each state's curriculum actually gives it.
+        </p>
+      )}
 
-      {children.length > 1 && (
+      {children.length > 1 && !isSyntheticSpace && (
         <div className="card" style={{ marginBottom: 16, overflowX: 'auto' }}>
           <h3 style={{ marginTop: 0 }}>How much each state emphasizes each concept</h3>
           <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
@@ -363,24 +432,15 @@ function ConceptMapTab() {
       </div>
 
       {view === 'map' ? (
-        <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
-          <ConceptGraph taxonomy={taxonomy} hitsByTaxId={hitsByTaxId} roots={roots} selectedId={selectedNode?.id ?? null} onSelect={selectNode} />
-          <div className="drawer-shell wide">
-            <div className="drawer">
-              {!selectedNode ? (
-                <>
-                  <h2>Concept map</h2>
-                  <p className="muted">
-                    Each circle is a concept, sized by how much real content touches it. Click one to see what
-                    connects to it. Scroll to zoom, drag to pan.
-                  </p>
-                </>
-              ) : (
-                <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={closeNode} />
-              )}
-            </div>
-          </div>
-        </div>
+        <ConceptMapPanel
+          taxonomy={taxonomy}
+          hitsByTaxId={hitsByTaxId}
+          roots={roots}
+          relations={relations}
+          selectedNode={selectedNode}
+          onSelect={selectNode}
+          onClose={closeNode}
+        />
       ) : (
         <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
           <div className="card">
@@ -413,6 +473,117 @@ function ConceptMapTab() {
   )
 }
 
+// The Concepts map follows the OpenLPM graph standard (see
+// lab_manager/docs/design-notes/openlpm-graph-visualization-standards-proposal-
+// 2026-10-25.md, tracker row 2). Roles here:
+//   item        a concept
+//   group       a top-level concept (always labeled), when the taxonomy has a hierarchy
+//   main link   the parent-to-child line of the hierarchy (always drawn)
+//   other link  a named concept-to-concept relation (lpm_concept_relations)
+//   arc         the number of relations between two top-level concepts' subtrees
+// Two shapes of data exist today. A hierarchy of about six top-level concepts
+// (EvoMentor) gets the tree layout and counted arcs. A flat list of 17 to 29
+// concepts with dozens of co-occurrence relations (the synthetic spaces) gets
+// a ring layout, because a tree layout would invent a ranking among peers, and
+// the relations are the only structure, drawn quiet and brought into focus on
+// hover.
+function ConceptMapPanel({
+  taxonomy,
+  hitsByTaxId,
+  roots,
+  relations,
+  selectedNode,
+  onSelect,
+  onClose,
+}: {
+  taxonomy: SchemaElement[]
+  hitsByTaxId: Map<string, Hit[]>
+  roots: SchemaElement[]
+  relations: ConceptRelation[]
+  selectedNode: SchemaElement | null
+  onSelect: (n: SchemaElement) => void
+  onClose: () => void
+}) {
+  const hasHierarchy = useMemo(() => taxonomy.some((n) => !!n.parent_id), [taxonomy])
+  const relationCount = useMemo(() => {
+    const ids = new Set(taxonomy.map((n) => n.id))
+    return relations.filter((r) => ids.has(r.from_element_id) && ids.has(r.to_element_id)).length
+  }, [taxonomy, relations])
+
+  const defaults = useMemo(() => ({ ...DEFAULT_GRAPH_SETTINGS, edges: (hasHierarchy ? 'bundled' : 'all') as GraphEdgeMode }), [hasHierarchy])
+  const [gs, updateGs, resetGs] = useGraphSettings(hasHierarchy ? 'concepts-map-tree' : 'concepts-map-flat', defaults)
+  // Physics spacing fires on every pixel of a drag; the layout recomputes once it holds still.
+  const [physicsSpacing, setPhysicsSpacing] = useState(gs.spacing)
+  useEffect(() => {
+    const t = window.setTimeout(() => setPhysicsSpacing(gs.spacing), 250)
+    return () => window.clearTimeout(t)
+  }, [gs.spacing])
+
+  const apiRef = useRef<{ zoomBy: (f: number) => void; fit: () => void } | null>(null)
+
+  return (
+    <>
+      <GraphControls
+        settings={gs}
+        onChange={updateGs}
+        onReset={() => resetGs()}
+        lang="en"
+        showConnections={relationCount > 0}
+        edgeModes={hasHierarchy ? ['tree', 'bundled', 'all'] : ['tree', 'all']}
+        wording={{
+          tree: hasHierarchy
+            ? { label: 'Hierarchy only', hint: 'Only the parent and child lines. A concept’s named relations appear when you point at it or select it.' }
+            : { label: 'On hover only', hint: 'No relation lines until you point at a concept or select it.' },
+          bundled: { label: 'Bundled', hint: 'The hierarchy, plus thick arcs between the top-level concepts with the number of relations between their subtrees. A concept’s own relations appear when you point at it.' },
+          all: { label: 'All relations', hint: 'Every named relation is drawn. Pointing at a concept brings its relations forward.' },
+          fixed: hasHierarchy
+            ? { label: 'Tree', hint: 'A fixed top-down tree, always the same.' }
+            : { label: 'Ring', hint: 'A fixed ring in alphabetical order, always the same.' },
+        }}
+        onZoomIn={() => apiRef.current?.zoomBy(1.25)}
+        onZoomOut={() => apiRef.current?.zoomBy(0.8)}
+        onFit={() => apiRef.current?.fit()}
+      />
+      <div className="explorer-body" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)' }}>
+        <ConceptGraph
+          taxonomy={taxonomy}
+          hitsByTaxId={hitsByTaxId}
+          roots={roots}
+          relations={relations}
+          selectedId={selectedNode?.id ?? null}
+          onSelect={onSelect}
+          gs={gs}
+          physicsSpacing={physicsSpacing}
+          hasHierarchy={hasHierarchy}
+          apiRef={apiRef}
+        />
+        <div className="drawer-shell wide">
+          <div className="drawer">
+            {!selectedNode ? (
+              <>
+                <h2>Concept map</h2>
+                <p className="muted">
+                  Each circle is a concept, sized by how much of the progression uses it
+                  {hasHierarchy ? '' : ' and by how many relations it has'}. Click one to see what connects to
+                  it. Scroll to zoom, drag to pan.
+                </p>
+                {relationCount > 0 && (
+                  <p className="muted">
+                    {relationCount} named relations connect these concepts. Point at a concept to bring its own
+                    relations forward, or change what is drawn with the controls above the map.
+                  </p>
+                )}
+              </>
+            ) : (
+              <ConceptDetail node={selectedNode} hits={hitsByTaxId.get(selectedNode.id) ?? []} onClose={onClose} />
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 // A real interactive diagram instead of an indented list -- the single
 // biggest gap found comparing this page against EvoMentor DE v1.2's concept
 // map (2026-09-19). Reuses the same graph-drawing library (Cytoscape)
@@ -425,17 +596,29 @@ function ConceptGraph({
   taxonomy,
   hitsByTaxId,
   roots,
+  relations,
   selectedId,
   onSelect,
+  gs,
+  physicsSpacing,
+  hasHierarchy,
+  apiRef,
 }: {
   taxonomy: SchemaElement[]
   hitsByTaxId: Map<string, Hit[]>
   roots: SchemaElement[]
+  relations: ConceptRelation[]
   selectedId: string | null
   onSelect: (n: SchemaElement) => void
+  gs: GraphViewSettings
+  physicsSpacing: number
+  hasHierarchy: boolean
+  apiRef: React.MutableRefObject<{ zoomBy: (f: number) => void; fit: () => void } | null>
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
+  const selectedIdRef = useRef<string | null>(selectedId)
+  selectedIdRef.current = selectedId
 
   const rootIndexOf = useMemo(() => {
     const byId = new Map(taxonomy.map((e) => [e.id, e]))
@@ -466,44 +649,46 @@ function ConceptGraph({
     return memo
   }, [taxonomy])
 
+  // Colors mean "which top-level concept this belongs to", so they only appear
+  // when there is a hierarchy with few enough top-level concepts for the
+  // six-color palette. A flat list of 29 peers would cycle the six colors
+  // with no meaning, so it gets one neutral color instead.
+  const groupColored = hasHierarchy && roots.length <= MAP_PALETTE.length
+
   useEffect(() => {
     if (!containerRef.current) return
-    const width = containerRef.current.clientWidth || 700
 
-    // Real bug found live 2026-10-01 (Dustin: "makes little to no sense"):
-    // Cytoscape's 'breadthfirst'+circle layout treats this real tree (a
-    // handful of root concepts, each with a real and sometimes-large
-    // number of its own sub-concepts, no edges between siblings) as a
-    // tangle -- the same category of problem the student Netz tab's own
-    // 'cose' layout had, rejected there 2026-09-30 for the identical
-    // reason. Same fix: a deterministic tiered layout, one row per real
-    // depth level, reusing the exact layoutTier helper Netz already
-    // proved out rather than inventing a second algorithm. Depth isn't
-    // hardcoded to 2 -- this walks however many real levels the taxonomy
-    // actually has, same generality the original code already had.
-    const maxDepth = taxonomy.reduce((m, n) => Math.max(m, depthOf.get(n.id) ?? 0), 0)
-    const positions = new Map<string, { x: number; y: number }>()
-    const ROW_GAP = 64
-    const CHILD_SPACING = 74
-    roots.forEach((r, i) => positions.set(r.id, { x: (i + 0.5) * (width / Math.max(1, roots.length)), y: 36 }))
-    let currentLevel = roots.map((r) => r.id)
-    let y = 36
-    for (let depth = 1; depth <= maxDepth; depth++) {
-      let maxRowsThisLevel = 0
-      const nextLevel: string[] = []
-      for (const parentId of currentLevel) {
-        const kids = taxonomy.filter((n) => n.parent_id === parentId)
-        if (kids.length === 0) continue
-        const parentPos = positions.get(parentId)
-        if (!parentPos) continue
-        const maxWidth = Math.max(CHILD_SPACING, CHILD_SPACING * Math.ceil(Math.sqrt(kids.length)))
-        const { positions: kidPositions, rows } = layoutTier(kids.map((k) => ({ id: k.id })), parentPos.x, y + ROW_GAP, maxWidth, ROW_GAP * 0.65, CHILD_SPACING)
-        for (const [id, pos] of kidPositions) positions.set(id, pos)
-        maxRowsThisLevel = Math.max(maxRowsThisLevel, rows)
-        nextLevel.push(...kids.map((k) => k.id))
+    const taxIds = new Set(taxonomy.map((n) => n.id))
+    const validRelations = relations.filter((r) => taxIds.has(r.from_element_id) && taxIds.has(r.to_element_id))
+    const neutral = cssVar('--series-a', '#2a78d6')
+
+    // Rule 2: one counted arc per pair of top-level concepts, summarizing the
+    // relations between their subtrees. Only meaningful with a hierarchy.
+    const bundleEdges: ElementDefinition[] = []
+    if (hasHierarchy && gs.edges !== 'tree') {
+      const pairCount = new Map<string, number>()
+      for (const r of validRelations) {
+        const a = rootIndexOf.get(r.from_element_id) ?? 0
+        const b = rootIndexOf.get(r.to_element_id) ?? 0
+        if (a === b) continue
+        const key = a < b ? `${a}|${b}` : `${b}|${a}`
+        pairCount.set(key, (pairCount.get(key) ?? 0) + 1)
       }
-      y += ROW_GAP + maxRowsThisLevel * (ROW_GAP * 0.65)
-      currentLevel = nextLevel
+      for (const [key, count] of pairCount) {
+        const [a, b] = key.split('|').map(Number)
+        bundleEdges.push({
+          data: { id: `b-${key}`, source: roots[a].id, target: roots[b].id, weight: count, tooltip: `${count} relations between “${roots[a].label}” and “${roots[b].label}”` },
+          classes: 'bundle',
+        })
+      }
+    }
+
+    // In a flat list there is no hierarchy to size by, so a concept grows with
+    // how many relations it has: the hubs stand out.
+    const degree = new Map<string, number>()
+    for (const r of validRelations) {
+      degree.set(r.from_element_id, (degree.get(r.from_element_id) ?? 0) + 1)
+      degree.set(r.to_element_id, (degree.get(r.to_element_id) ?? 0) + 1)
     }
 
     const elements: ElementDefinition[] = [
@@ -511,15 +696,23 @@ function ConceptGraph({
         const count = hitsByTaxId.get(n.id)?.length ?? 0
         const depth = depthOf.get(n.id) ?? 0
         const colorVar = MAP_PALETTE[(rootIndexOf.get(n.id) ?? 0) % MAP_PALETTE.length]
-        const size = Math.max(10, 36 - depth * 8) + Math.min(count, 10) * 1.3
-        return {
-          data: { id: n.id, label: n.label, color: cssVar(colorVar, '#2a78d6'), size, depth },
-          position: positions.get(n.id) ?? { x: width / 2, y: y + 60 },
-        }
+        const base = hasHierarchy ? Math.max(10, 36 - depth * 8) : 22
+        const size = base + Math.min(count, 10) * 1.3 + (hasHierarchy ? 0 : Math.min(degree.get(n.id) ?? 0, 16) * 1.1)
+        // Labels at depth 0 and 1 are on while the tree is laid out, so the
+        // layout leaves room for them; the final set is chosen afterwards.
+        return { data: { id: n.id, label: depth < 2 ? n.label : '', fullLabel: n.label, color: groupColored ? cssVar(colorVar, '#2a78d6') : neutral, size, depth } }
       }),
       ...taxonomy
         .filter((n): n is SchemaElement & { parent_id: string } => !!n.parent_id)
-        .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id } })),
+        .map((n) => ({ data: { id: `e-${n.id}`, source: n.parent_id, target: n.id }, classes: 'tree' })),
+      // lpm_concept_relations: a separate many-to-many network (migration
+      // 087), distinct from the parent_id tree. Dropped silently when one end
+      // is outside the loaded set, so Cytoscape never sees a dangling edge.
+      ...validRelations.map((r) => ({
+        data: { id: `rel-${r.id}`, source: r.from_element_id, target: r.to_element_id, relationType: r.relation_type },
+        classes: 'relation',
+      })),
+      ...bundleEdges,
     ]
 
     const cy = cytoscape({
@@ -527,48 +720,137 @@ function ConceptGraph({
       elements,
       boxSelectionEnabled: false,
       layout: { name: 'preset' },
-      minZoom: 0.3,
+      minZoom: 0.1,
       maxZoom: 3,
       style: [
         {
           selector: 'node',
           style: {
-            'background-color': 'data(color)',
+            'background-color': 'data(color)', 'background-opacity': 0.92,
+            'border-width': 1.5, 'border-color': cssVar('--surface-0', '#ffffff'),
             width: 'data(size)', height: 'data(size)',
             label: 'data(label)', 'font-size': 9, 'text-wrap': 'wrap', 'text-max-width': '70px',
             'text-valign': 'bottom', 'text-margin-y': 4, color: cssVar('--text-primary', '#0b0b0b'),
-          },
-        },
-        {
-          // Real bug found live 2026-10-01: every sub-concept's label
-          // permanently on, all at once, overlapped into unreadable text
-          // -- the same fix Netz already proved: deep (leaf-ish) labels
-          // only show on hover, same as a Lernziel node there.
-          selector: 'node[depth >= 2]',
-          style: { label: '' },
+          } as any,
         },
         {
           selector: 'node.hover-label',
           style: {
-            label: 'data(label)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
+            label: 'data(fullLabel)', 'font-size': 10, 'font-weight': 600, 'z-index': 999,
             'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1,
             'text-background-padding': '3px', 'text-border-width': 1, 'text-border-color': cssVar('--border', '#ccc'),
           } as any,
         },
         { selector: 'node:selected', style: { 'border-width': 3, 'border-color': cssVar('--text-primary', '#0b0b0b') } },
         {
-          selector: 'edge',
+          selector: 'edge.tree',
           style: { width: 1, 'line-color': cssVar('--baseline', '#c3c2b7'), 'curve-style': 'bezier', 'target-arrow-shape': 'none' },
         },
+        {
+          // Named relations: thin, solid, quiet (opacity comes from the line
+          // strength control through data(op)). Hidden unless the mode is
+          // "all", and brought forward on hover or selection (.reveal).
+          selector: 'edge.relation',
+          style: {
+            width: 0.9, 'line-color': '#6f7d8c', 'curve-style': 'bezier', 'target-arrow-shape': 'none',
+            opacity: 'data(op)', display: gs.edges === 'all' ? 'element' : 'none',
+          } as any,
+        },
+        { selector: 'edge.relation.reveal, edge.relation.reveal-selected', style: { display: 'element', opacity: 0.85, width: 1.8, 'line-color': cssVar('--series-a', '#006c66'), 'z-index': 50 } as any },
+        {
+          selector: 'edge.bundle',
+          style: {
+            width: 'mapData(weight, 1, 40, 1.5, 8)', 'line-color': '#8896a5', opacity: 0.3, 'curve-style': 'unbundled-bezier',
+            'target-arrow-shape': 'none', 'z-index': 1,
+          } as any,
+        },
+        {
+          selector: 'edge.bundle.hover-label',
+          style: {
+            opacity: 0.7, label: 'data(tooltip)', 'font-size': 10, 'font-weight': 600, 'text-wrap': 'wrap', 'text-max-width': '180px', 'z-index': 999,
+            'text-background-color': cssVar('--surface-0', '#fff'), 'text-background-opacity': 1, 'text-background-padding': '4px',
+          } as any,
+        },
+        { selector: '.dimmed', style: { opacity: 0.1 } },
       ],
     })
+
+    // ---- Layout (graph standards rule 6): fixed by default, physics optional ----
+    // A hierarchy is laid out with dagre on the parent/child lines only. Left
+    // to see the relations too, dagre ranked peers above and below one another
+    // and implied a hierarchy that does not exist.
+    const runFixed = () => {
+      if (hasHierarchy) {
+        cy.elements().not('.relation').not('.bundle').layout({
+          name: 'dagre', rankDir: 'TB', nodeSep: 26, rankSep: 64, nodeDimensionsIncludeLabels: true, fit: false, animate: false,
+        } as any).run()
+      } else {
+        cy.nodes().layout({
+          name: 'circle', animate: false, fit: false, padding: 40,
+          sort: (a: any, b: any) => String(a.data('fullLabel')).localeCompare(String(b.data('fullLabel'))),
+        } as any).run()
+      }
+    }
+    runFixed()
+    if (gs.layout === 'physics') {
+      cy.edges('.bundle').style('curve-style', 'bezier')
+      // With a hierarchy, the top-level concepts stay put (when there are few
+      // enough to read as groups) and the rest moves around them. A flat set
+      // has no groups to pin; its relations pull related concepts together.
+      const pinned = hasHierarchy && roots.length <= MAP_PALETTE.length ? cy.nodes('[depth = 0]') : cy.collection()
+      pinned.lock()
+      const simulated = hasHierarchy ? cy.elements().not('.relation').not('.bundle') : cy.elements().not('.bundle')
+      simulated.layout(physicsLayoutOptions(physicsSpacing) as any).run()
+      pinned.unlock()
+    }
+
+    cy.edges('.bundle').forEach((e) => {
+      const gap = Math.abs(e.source().position('x') - e.target().position('x'))
+      e.style('control-point-distances', [-arcHeight(gap, Math.max(95, Math.min(420, gap * 0.14)))])
+      e.style('control-point-weights', [0.5])
+    })
+
+    // ---- Labels (graph standards rule 4): none overlap ----
+    {
+      const candidates: LabelCandidate[] = cy.nodes().map((n) => ({
+        id: n.id(), label: n.data('fullLabel'), x: n.position('x'), y: n.position('y'), size: n.data('size'),
+        priority: n.data('size'), alwaysShow: hasHierarchy && n.data('depth') === 0, fontPx: 9, maxWidthPx: 70, labelSide: 'below',
+      }))
+      const visible = gs.labels === 'few' ? pickVisibleLabels(candidates) : null
+      cy.nodes().forEach((n) => {
+        const full = String(n.data('fullLabel'))
+        const isGroup = hasHierarchy && n.data('depth') === 0
+        if (visible && !visible.has(n.id())) n.data('label', '')
+        else n.data('label', isGroup ? full : truncateLabel(full, gs.labels === 'few' ? 24 : 30))
+      })
+    }
+
+    // Line strength is applied through data(op) so the hover styles above can
+    // still override it (a direct style bypass would win over them).
+    cy.edges('.relation').forEach((e) => { e.data('op', lineOpacity(1.5, gs.lineStrength)) })
 
     cy.on('tap', 'node', (evt) => {
       const n = taxonomy.find((e) => e.id === evt.target.id())
       if (n) onSelect(n)
     })
-    cy.on('mouseover', 'node', (evt) => evt.target.addClass('hover-label'))
-    cy.on('mouseout', 'node', (evt) => evt.target.removeClass('hover-label'))
+    // Pointing at a concept shows its full name and brings its relations
+    // forward, dimming the rest. A concept with no relations just shows its name.
+    cy.on('mouseover', 'node', (evt) => {
+      const node = evt.target
+      node.addClass('hover-label')
+      const rel = node.connectedEdges('.relation')
+      if (rel.length === 0) return
+      rel.addClass('reveal')
+      cy.elements().not(node.closedNeighborhood()).addClass('dimmed')
+    })
+    cy.on('mouseout', 'node', (evt) => {
+      evt.target.removeClass('hover-label')
+      cy.elements().removeClass('dimmed')
+      cy.edges('.reveal').removeClass('reveal')
+    })
+    cy.on('mouseout', (evt) => { if (evt.target === cy) { cy.elements().removeClass('dimmed'); cy.edges('.reveal').removeClass('reveal') } })
+    cy.on('mouseover', 'edge.bundle', (evt) => evt.target.addClass('hover-label'))
+    cy.on('mouseout', 'edge.bundle', (evt) => evt.target.removeClass('hover-label'))
 
     // `.graph-canvas` fills whatever height its flex parent gives it
     // (position:absolute; inset:0 -- unlike the student Netz tab's plain
@@ -576,36 +858,89 @@ function ConceptGraph({
     // height from the viewport, not page scroll), so a real multi-row
     // tiered tree needs an explicit fit rather than a JS-set pixel height
     // (which `inset:0` would just override anyway).
-    cy.fit(undefined, 24)
+    fitWithReadableFloor(cy)
     cyRef.current = cy
-    return () => { cy.destroy() }
+    apiRef.current = {
+      zoomBy: (factor: number) => {
+        if (!containerRef.current) return
+        const rect = containerRef.current.getBoundingClientRect()
+        cy.zoom({ level: cy.zoom() * factor, renderedPosition: { x: rect.width / 2, y: rect.height / 2 } })
+      },
+      fit: () => fitWithReadableFloor(cy),
+    }
+    // A rebuild (new setting or new data) keeps the concept that is selected.
+    const keep = selectedIdRef.current
+    if (keep) {
+      const el = cy.getElementById(keep)
+      if (el.length) { el.select(); el.connectedEdges('.relation').addClass('reveal-selected') }
+    }
+    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null; apiRef.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [taxonomy, hitsByTaxId, rootIndexOf, depthOf])
+  }, [taxonomy, hitsByTaxId, relations, rootIndexOf, depthOf, gs.edges, gs.labels, gs.layout, physicsSpacing, hasHierarchy])
+
+  // Line strength restyles the existing lines in place (no rebuild, so zoom and pan are kept).
+  useEffect(() => {
+    const cy = cyRef.current
+    if (!cy) return
+    cy.edges('.relation').forEach((e) => { e.data('op', lineOpacity(1.5, gs.lineStrength)) })
+  }, [gs.lineStrength, taxonomy, relations])
 
   // Keep the graph's own selection in sync with the URL-driven selectedId
   // (a search-bar link, a shared link, or a plain refresh) without
-  // re-running the mount/layout effect above.
+  // re-running the mount/layout effect above. The selected concept's
+  // relations stay forward until another concept is chosen.
   useEffect(() => {
     const cy = cyRef.current
     if (!cy) return
     cy.nodes(':selected').unselect()
+    cy.edges('.reveal-selected').removeClass('reveal-selected')
     if (selectedId) {
       const el = cy.getElementById(selectedId)
-      if (el.length) { el.select(); cy.center(el) }
+      if (el.length) { el.select(); el.connectedEdges('.relation').addClass('reveal-selected'); cy.center(el) }
     }
   }, [selectedId])
 
+  // Real feedback 2427b091 (Dustin): "let users download the map image as
+  // PNG." Cytoscape's own built-in export -- `full: true` captures the
+  // whole graph, not just the current viewport, so the downloaded image
+  // matches what "Fit to screen" shows, not whatever happened to be
+  // scrolled into view; `bg` set explicitly since a transparent PNG
+  // dropped onto a slide or doc would otherwise pick up whatever's behind
+  // it, not this page's own background.
+  const downloadPng = () => {
+    const cy = cyRef.current
+    if (!cy) return
+    const uri = cy.png({ full: true, scale: 2, bg: cssVar('--surface-0', '#ffffff') })
+    const a = document.createElement('a')
+    a.href = uri
+    a.download = 'concept-map.png'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  }
+
   return (
-    <div className="graph-host">
+    // Real feedback 2427b091 (Dustin): the default 400px floor (shared with
+    // Notebooks/Learning Goals' own smaller graphs) left too little room
+    // once overlap-free spacing made this particular tree genuinely wide --
+    // fitting ~130 real nodes into 400px of height forced the zoom down to
+    // illegible. Taller here specifically (not changed globally, since the
+    // other two consumers' graphs are usually much smaller).
+    <div className="graph-host" style={{ minHeight: 640 }}>
       <div ref={containerRef} className="graph-canvas" />
-      <button
-        className="btn btn-mini"
-        style={{ position: 'absolute', top: 10, right: 10, zIndex: 10 }}
-        aria-label="Fit to screen"
-        onClick={() => cyRef.current?.fit(undefined, 24)}
-      >
-        <Maximize2 size={12} />
-      </button>
+      <div className="row" style={{ position: 'absolute', top: 10, right: 10, zIndex: 10, gap: 6 }}>
+        <button className="btn btn-mini" aria-label="Download as PNG" title="Download as PNG" onClick={downloadPng}>
+          <Download size={12} />
+        </button>
+        <button
+          className="btn btn-mini"
+          aria-label="Fit to screen"
+          title="Fit to screen"
+          onClick={() => apiRef.current?.fit()}
+        >
+          <Maximize2 size={12} />
+        </button>
+      </div>
       {taxonomy.length === 0 && (
         <div className="empty" style={{ position: 'absolute', inset: 0 }}>
           <Network size={32} />
@@ -680,7 +1015,7 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
         <h3 style={{ marginTop: 0 }}>{node.label}</h3>
         <button className="btn btn-mini" onClick={onClose}><X size={11} /></button>
       </div>
-      {node.definition && <p className="muted">{node.definition}</p>}
+      {conceptDefinition(node) && <p className="muted" style={{ whiteSpace: 'pre-line' }}>{conceptDefinition(node)}</p>}
       {hits.length === 0 ? (
         <p className="muted">No real learning goal has been tagged to this specific concept yet — it may still be relevant, just not tied to it at this level of detail.</p>
       ) : (
@@ -712,10 +1047,16 @@ function ConceptDetail({ node, hits, onClose }: { node: SchemaElement; hits: Hit
 
 function ManageConceptsTab() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
+  const navigate = useNavigate()
   const [elements, setElements] = useState<SchemaElement[]>([])
   const [baseLink, setBaseLink] = useState<ProjectBaseLink | null>(null)
-  const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [registered, setRegistered] = useState<Set<string> | null>(null)
+  useEffect(() => {
+    loadRegisteredConceptIds().then(setRegistered)
+  }, [])
 
   const reload = async () => {
     const projectIds = [project.id, project.parent_project_id].filter((id): id is string => !!id)
@@ -741,78 +1082,83 @@ function ManageConceptsTab() {
 
   const canManage = role === 'owner' || role === 'maintainer'
 
-  const importConcepts = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const vocabulary = String(formData.get('vocabulary') ?? '').trim()
-    if (!vocabulary) return
-    setBusy(true); setNotice(null)
+  // A root is a top-level concept, OR a concept whose parent lives on a row
+  // this tab never fetched (e.g. a cross-project parent) -- same orphan
+  // guard as the Explore tab's dedup logic, just without needing the full
+  // hub/dedup machinery since this tab only ever shows one project's rows.
+  const roots = useMemo(
+    () => elements.filter((e) => !e.parent_id || !elements.some((x) => x.id === e.parent_id)),
+    [elements]
+  )
+  const childrenOf = (id: string) => elements.filter((e) => e.parent_id === id)
+  const selected = useMemo(() => elements.find((e) => e.id === selectedId) ?? null, [elements, selectedId])
+  const selectedParent = useMemo(
+    () => (selected?.parent_id ? elements.find((e) => e.id === selected.parent_id) ?? null : null),
+    [elements, selected]
+  )
 
-    try {
-      const treeRes = await fetch(`https://api.github.com/repos/${CONCEPTBASE_REPO}/git/trees/main?recursive=1`, {
-        headers: { Accept: 'application/vnd.github+json' },
-      })
-      if (!treeRes.ok) throw new Error(`GitHub API error (${treeRes.status})`)
-      const tree: { tree: { path: string; type: string }[] } = await treeRes.json()
+  // Short taxonomies (the common case) read better fully open than requiring
+  // a click per root to see there's anything underneath them at all.
+  const rootKey = roots.map((r) => r.id).join(',')
+  useEffect(() => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      for (const r of roots) next.add(r.id)
+      return next
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootKey])
 
-      const conceptPaths = tree.tree
-        .filter((entry) => entry.type === 'blob' && entry.path.startsWith('registry/concept/') && entry.path.endsWith('.json'))
-        .map((entry) => entry.path)
+  const toggle = (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
-      const concepts = await Promise.all(
-        conceptPaths.map(async (path) => {
-          const res = await fetch(`https://raw.githubusercontent.com/${CONCEPTBASE_REPO}/main/${path}`)
-          if (!res.ok) return null
-          return (await res.json()) as ConceptBaseConcept
-        })
-      )
+  const importConcepts = async (vocabulary: string, matching: ConceptBaseConcept[]) => {
+    for (const concept of matching) {
+      const label = concept.labels?.en ?? concept.id
+      const definitionsForLang = concept.definitions?.en ?? {}
+      const definition = Object.values(definitionsForLang)[0] ?? null
 
-      const matching = concepts.filter((c): c is ConceptBaseConcept => c !== null && c.definedInVocabulary === vocabulary)
+      const { data: existing } = await supabase
+        .from('lpm_schema_elements')
+        .select('id')
+        .eq('project_id', project.id)
+        .eq('metadata->>conceptbase_id', concept.id)
+        .maybeSingle()
 
-      for (const concept of matching) {
-        const label = concept.labels?.en ?? concept.id
-        const definitionsForLang = concept.definitions?.en ?? {}
-        const definition = Object.values(definitionsForLang)[0] ?? null
-
-        const { data: existing } = await supabase
-          .from('lpm_schema_elements')
-          .select('id')
-          .eq('project_id', project.id)
-          .eq('metadata->>conceptbase_id', concept.id)
-          .maybeSingle()
-
-        const row = {
-          project_id: project.id,
-          element_type: 'concept' as const,
-          label,
-          definition,
-          status: mapStatus(concept.status),
-          metadata: {
-            conceptbase_id: concept.id,
-            vocabulary: concept.definedInVocabulary,
-            version: concept.version,
-            relations: concept.relations ?? {},
-            source: 'conceptbase',
-          },
-        }
-
-        if (existing) await supabase.from('lpm_schema_elements').update(row).eq('id', existing.id)
-        else await supabase.from('lpm_schema_elements').insert(row)
+      const row = {
+        project_id: project.id,
+        element_type: 'concept' as const,
+        label,
+        definition,
+        status: mapStatus(concept.status),
+        metadata: {
+          conceptbase_id: concept.id,
+          vocabulary: concept.definedInVocabulary,
+          version: concept.version,
+          relations: concept.relations ?? {},
+          source: 'conceptbase',
+        },
       }
 
-      setNotice({ kind: 'ok', text: `Imported ${matching.length} concept(s) from "${vocabulary}".` })
-      await reload()
-    } catch (err) {
-      setNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+      if (existing) await supabase.from('lpm_schema_elements').update(row).eq('id', existing.id)
+      else await supabase.from('lpm_schema_elements').insert(row)
     }
-    setBusy(false)
+
+    setNotice({ kind: 'ok', text: `Imported ${matching.length} concept${matching.length === 1 ? '' : 's'} from "${vocabulary}".` })
+    await reload()
   }
 
   return (
     <div>
       <p className="muted" style={{ marginBottom: 20 }}>
-        Concepts, competencies, and grade bands used across this project — imported from
-        ConceptBase or added directly.
+        The concepts, competencies, and grade bands this project is organized around — some added
+        directly, some imported from ConceptBase — shown here as the tree they form.
       </p>
 
       {notice && (
@@ -828,37 +1174,363 @@ function ManageConceptsTab() {
           <p>No schema elements yet.</p>
         </div>
       ) : (
-        <div className="grid grid-3" style={{ marginBottom: 20 }}>
-          {elements.map((el) => (
-            <div key={el.id} className="card">
-              <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <h3>{el.label}</h3>
-                <Chip status={el.status} />
-              </div>
-              <span className="muted capitalize">{el.element_type}</span>
-              {el.definition && <p style={{ marginTop: 8 }}>{el.definition}</p>}
-            </div>
-          ))}
+        <div className="grid grid-2" style={{ alignItems: 'flex-start', marginBottom: 20 }}>
+          <div className="card">
+            <h3 style={{ marginTop: 0 }}>Taxonomy</h3>
+            {roots.map((el) => (
+              <ManageConceptNode
+                key={el.id}
+                node={el}
+                depth={0}
+                childrenOf={childrenOf}
+                expanded={expanded}
+                onToggle={toggle}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+              />
+            ))}
+          </div>
+
+          <div className="card" style={{ minHeight: 200 }}>
+            {!selected ? (
+              <p className="muted">
+                Pick a concept on the left to see its full definition, where it came from, and how
+                it connects to the parts of the progression.
+              </p>
+            ) : (
+              <ManageConceptDetail
+                node={selected}
+                parent={selectedParent}
+                kids={childrenOf(selected.id)}
+                onSelect={setSelectedId}
+                onViewInMap={() => navigate(`/dashboard/${project.slug}/concepts/${selected.id}`)}
+                registered={registered}
+                questions={<ReviewQuestionsPanel supabase={supabase} projectId={project.id} projectSlug={project.slug} linkedType="schema_element" linkedId={selected.id} />}
+              />
+            )}
+          </div>
         </div>
       )}
 
       {canManage && (
-        <div className="card">
-          <h3>Import from ConceptBase</h3>
-          <p className="muted">
-            {baseLink?.can_import
-              ? 'Pulls real oe:Concept records for one vocabulary from the public ConceptBase registry. Read-only — never writes back.'
-              : "This project isn't linked to ConceptBase for import yet (see project_base_links)."}
+        <ImportFromConceptBase baseLink={baseLink} onImport={importConcepts} onNotice={setNotice} />
+      )}
+    </div>
+  )
+}
+
+function ManageConceptNode({
+  node,
+  depth,
+  childrenOf,
+  expanded,
+  onToggle,
+  selectedId,
+  onSelect,
+}: {
+  node: SchemaElement
+  depth: number
+  childrenOf: (id: string) => SchemaElement[]
+  expanded: Set<string>
+  onToggle: (id: string) => void
+  selectedId: string | null
+  onSelect: (id: string) => void
+}) {
+  const kids = childrenOf(node.id)
+  const isOpen = expanded.has(node.id)
+  return (
+    <div style={{ marginLeft: depth * 16 }}>
+      <div className="row" style={{ gap: 6, padding: '4px 0' }}>
+        {kids.length > 0 ? (
+          <button className="btn-linklike" onClick={() => onToggle(node.id)} style={{ textDecoration: 'none' }}>
+            {isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
+          </button>
+        ) : (
+          <span style={{ width: 13 }} />
+        )}
+        <button
+          className="btn-linklike"
+          style={{ textDecoration: node.id === selectedId ? 'underline' : 'none', fontWeight: depth === 0 ? 600 : 400 }}
+          onClick={() => onSelect(node.id)}
+        >
+          {node.label}
+        </button>
+        <Chip status={node.status} />
+        {kids.length > 0 && <span className="chip" style={{ fontSize: 10 }}>{kids.length}</span>}
+      </div>
+      {isOpen && kids.map((k) => (
+        <ManageConceptNode key={k.id} node={k} depth={depth + 1} childrenOf={childrenOf} expanded={expanded} onToggle={onToggle} selectedId={selectedId} onSelect={onSelect} />
+      ))}
+    </div>
+  )
+}
+
+function ManageConceptDetail({
+  node,
+  parent,
+  kids,
+  onSelect,
+  onViewInMap,
+  questions,
+  registered,
+}: {
+  node: SchemaElement
+  parent: SchemaElement | null
+  kids: SchemaElement[]
+  onSelect: (id: string) => void
+  onViewInMap: () => void
+  questions?: React.ReactNode
+  registered?: ReadonlySet<string> | null
+}) {
+  const definition = conceptDefinition(node)
+  const origin = conceptSource(node, registered)
+  const ext = conceptExtension(node)
+  const meaning = isFieldMeaning(node)
+  const parentExt = parent ? conceptExtension(parent) : null
+  const fieldMeanings = kids.filter(isFieldMeaning)
+  const otherKids = kids.filter((k) => !isFieldMeaning(k))
+
+  return (
+    <div>
+      <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <h3 style={{ marginTop: 0 }}>{node.label}</h3>
+        <Chip status={node.status} />
+      </div>
+      <p className="muted capitalize" style={{ marginTop: -8, fontSize: 12 }}>{node.element_type}</p>
+      {meaning && parent ? (
+        <div style={{ margin: '8px 0', padding: '6px 10px', borderLeft: '3px solid var(--border)', background: 'var(--surface-2)' }}>
+          <p style={{ margin: 0, fontSize: 13 }}>
+            This is the meaning of <strong>{parent.label}</strong> in {fieldOf(node.label) ?? 'one field'}. The general definition sits on the page of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>, together with what does not carry over between fields.
           </p>
-          <form onSubmit={importConcepts} className="row">
-            <div className="field" style={{ marginBottom: 0 }}>
-              <input name="vocabulary" placeholder="e.g. BIO-CORE-v1.0.0" style={{ width: 220 }} required />
-            </div>
-            <button type="submit" className="btn btn-primary" disabled={!baseLink?.can_import || busy}>
-              Import concepts
-            </button>
-          </form>
+          {parentExt?.excludes && <p style={{ margin: '6px 0 0', fontSize: 13 }}><strong>Does not carry over:</strong> {parentExt.excludes}</p>}
         </div>
+      ) : (
+        parent && (
+          <p className="muted" style={{ fontSize: 12 }}>
+            Part of <button className="btn-linklike" onClick={() => onSelect(parent.id)}>{parent.label}</button>
+          </p>
+        )
+      )}
+      <p style={{ marginTop: 8, whiteSpace: 'pre-line' }}>{definition || 'No definition yet.'}</p>
+      {origin.kind === 'conceptbase' ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          In ConceptBase.{' '}
+          {definition ? 'The definition above comes from there. ' : ''}
+          <a href={origin.url} target="_blank" rel="noopener noreferrer">See the ConceptBase record</a>
+        </p>
+      ) : origin.kind === 'proposed' ? (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Proposed in this space. ConceptBase holds no record for it, so nobody outside the lab has checked the wording.
+        </p>
+      ) : (
+        <p className="muted" style={{ fontSize: 12 }}>
+          Added directly to this project. It is not linked to a ConceptBase record{definition ? '' : ', so it has no shared definition yet'}.
+        </p>
+      )}
+
+      {ext && (
+        <section style={{ marginTop: 12 }} aria-label="General meaning and what does not carry over">
+          {ext.general && ext.general !== definition && (
+            <p style={{ margin: '0 0 6px', fontSize: 13 }}><strong>Proposed wider wording (AI-drafted):</strong> {ext.general}</p>
+          )}
+          {ext.excludes && <p style={{ margin: '0 0 6px', fontSize: 13 }}><strong>Does not carry over between fields:</strong> {ext.excludes}</p>}
+          {ext.curriculumUse && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>Where curricula use it: {ext.curriculumUse}</p>}
+          {ext.confidence && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>Confidence the drafter gave: {ext.confidence}.</p>}
+          {ext.draftNote && <p className="muted" style={{ margin: '0 0 6px', fontSize: 12 }}>{ext.draftNote}</p>}
+          {ext.sources.length > 0 && (
+            <details style={{ fontSize: 12 }}>
+              <summary>Sources named ({ext.sources.length})</summary>
+              <ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{ext.sources.map((src) => <li key={src}>{src}</li>)}</ul>
+            </details>
+          )}
+        </section>
+      )}
+
+      {fieldMeanings.length > 0 && (
+        <section style={{ marginTop: 14 }} aria-label="Meanings by field">
+          <h4 style={{ marginBottom: 4 }}>Meaning in {fieldMeanings.length} field{fieldMeanings.length === 1 ? '' : 's'}</h4>
+          {!ext?.excludes && (
+            <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>Nobody has written yet what does not carry over between these fields. That note is the first thing an expert reader could add.</p>
+          )}
+          {fieldMeanings.map((k) => (
+            <div key={k.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <button className="btn-linklike" style={{ fontWeight: 600 }} onClick={() => onSelect(k.id)}>{fieldOf(k.label) ?? k.label}</button>
+                <Chip status={k.status} />
+              </div>
+              <p style={{ margin: '2px 0 0', fontSize: 13 }}>{conceptDefinition(k) ?? 'No definition yet.'}</p>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {otherKids.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <h4 style={{ marginBottom: 4 }}>{otherKids.length} sub-concept{otherKids.length === 1 ? '' : 's'}</h4>
+          <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
+            {otherKids.map((k) => (
+              <button key={k.id} className="btn btn-mini" onClick={() => onSelect(k.id)}>{k.label}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button className="btn btn-mini" style={{ marginTop: 14 }} onClick={onViewInMap}>
+        <Network size={12} />See how this connects to real content
+      </button>
+      {questions}
+    </div>
+  )
+}
+
+// Was a single blind text field (type the exact vocabulary id, hit Import,
+// find out afterward what happened) -- real feedback 5f48d774 (2026-10-03,
+// Dustin): "the Import from conceptbase needs a better ui/ux." Now a
+// three-step flow sharing one registry fetch: browse what's actually in
+// ConceptBase, pick a vocabulary from what's really there (no typing an id
+// from memory), see exactly which concepts will be added before committing
+// to anything.
+function ImportFromConceptBase({
+  baseLink,
+  onImport,
+  onNotice,
+}: {
+  baseLink: ProjectBaseLink | null
+  onImport: (vocabulary: string, matching: ConceptBaseConcept[]) => Promise<void>
+  onNotice: (notice: { kind: 'ok' | 'bad'; text: string } | null) => void
+}) {
+  const [status, setStatus] = useState<'idle' | 'loading' | 'loaded' | 'error'>('idle')
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [allConcepts, setAllConcepts] = useState<ConceptBaseConcept[]>([])
+  const [vocabularies, setVocabularies] = useState<{ name: string; count: number }[]>([])
+  const [selectedVocab, setSelectedVocab] = useState('')
+  const [importing, setImporting] = useState(false)
+
+  const browse = async () => {
+    setStatus('loading'); setLoadError(null); onNotice(null)
+    try {
+      const treeRes = await fetch(`https://api.github.com/repos/${CONCEPTBASE_REPO}/git/trees/main?recursive=1`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      })
+      if (!treeRes.ok) throw new Error(`Couldn't reach the ConceptBase registry (error ${treeRes.status}).`)
+      const tree: { tree: { path: string; type: string }[] } = await treeRes.json()
+
+      const conceptPaths = tree.tree
+        .filter((entry) => entry.type === 'blob' && entry.path.startsWith('registry/concept/') && entry.path.endsWith('.json'))
+        .map((entry) => entry.path)
+
+      const fetched = await Promise.all(
+        conceptPaths.map(async (path) => {
+          const res = await fetch(`https://raw.githubusercontent.com/${CONCEPTBASE_REPO}/main/${path}`)
+          if (!res.ok) return null
+          return (await res.json()) as ConceptBaseConcept
+        })
+      )
+      const concepts = fetched.filter((c): c is ConceptBaseConcept => c !== null)
+
+      const counts = new Map<string, number>()
+      for (const c of concepts) counts.set(c.definedInVocabulary, (counts.get(c.definedInVocabulary) ?? 0) + 1)
+      const vocabList = Array.from(counts.entries())
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+
+      setAllConcepts(concepts)
+      setVocabularies(vocabList)
+      setSelectedVocab(vocabList[0]?.name ?? '')
+      setStatus('loaded')
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : "Couldn't reach the ConceptBase registry.")
+      setStatus('error')
+    }
+  }
+
+  const reset = () => {
+    setStatus('idle'); setAllConcepts([]); setVocabularies([]); setSelectedVocab('')
+  }
+
+  const previewMatches = useMemo(
+    () => allConcepts.filter((c) => c.definedInVocabulary === selectedVocab),
+    [allConcepts, selectedVocab]
+  )
+
+  const confirmImport = async () => {
+    if (!selectedVocab || previewMatches.length === 0) return
+    setImporting(true)
+    try {
+      await onImport(selectedVocab, previewMatches)
+      reset()
+    } catch (err) {
+      onNotice({ kind: 'bad', text: err instanceof Error ? err.message : 'Import failed.' })
+    }
+    setImporting(false)
+  }
+
+  return (
+    <div className="card">
+      <h3 style={{ marginTop: 0 }}>Import from ConceptBase</h3>
+      <p className="muted">
+        {baseLink?.can_import
+          ? "Brings concept definitions from the shared ConceptBase registry into this project. It only reads from ConceptBase — nothing here is ever written back to it."
+          : "This project isn't connected to ConceptBase for importing yet. Ask a lab admin to connect it."}
+      </p>
+
+      {baseLink?.can_import && (
+        <>
+          {status === 'idle' && (
+            <button className="btn btn-primary" onClick={browse}>Browse ConceptBase vocabularies</button>
+          )}
+
+          {status === 'loading' && (
+            <p className="row muted">
+              <Loader2 size={14} style={{ animation: 'feedback-capturing-spin 0.9s linear infinite' }} />
+              Looking up what's available in ConceptBase…
+            </p>
+          )}
+
+          {status === 'error' && (
+            <div className="notice notice-bad">
+              {loadError}
+              <button className="btn btn-mini" onClick={browse} style={{ marginLeft: 'auto' }}>Try again</button>
+            </div>
+          )}
+
+          {status === 'loaded' && (
+            vocabularies.length === 0 ? (
+              <p className="muted">No concept vocabularies found in the ConceptBase registry.</p>
+            ) : (
+              <div>
+                <div className="field" style={{ maxWidth: 320 }}>
+                  <label>Vocabulary</label>
+                  <select value={selectedVocab} onChange={(e) => setSelectedVocab(e.target.value)}>
+                    {vocabularies.map((v) => (
+                      <option key={v.name} value={v.name}>{v.name} ({v.count} concept{v.count === 1 ? '' : 's'})</option>
+                    ))}
+                  </select>
+                </div>
+
+                {previewMatches.length > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <p className="muted" style={{ marginBottom: 4 }}>
+                      This will add or update {previewMatches.length} concept{previewMatches.length === 1 ? '' : 's'} in this project:
+                    </p>
+                    <div className="row" style={{ flexWrap: 'wrap', gap: 4 }}>
+                      {previewMatches.map((c) => (
+                        <span key={c.id} className="chip">{c.labels?.en ?? c.id}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="row" style={{ marginTop: 12, gap: 8 }}>
+                  <button className="btn btn-primary" disabled={importing || previewMatches.length === 0} onClick={confirmImport}>
+                    {importing ? 'Importing…' : `Import ${previewMatches.length} concept${previewMatches.length === 1 ? '' : 's'}`}
+                  </button>
+                  <button className="btn btn-mini" onClick={reset} disabled={importing}>Cancel</button>
+                </div>
+              </div>
+            )
+          )}
+        </>
       )}
     </div>
   )

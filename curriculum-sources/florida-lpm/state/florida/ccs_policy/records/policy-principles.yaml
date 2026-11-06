@@ -1,0 +1,136 @@
+$schema: ../../../../schema/policy-principle-record.schema.json
+$description: >
+  OpenEvo-authored positions grounded in the institutional facts, mandates,
+  and controversies documented in state/florida/local_policy/ -- our own
+  stance, not a claim about what any Florida authority's text says. Compare
+  local_policy's verificationStatus discipline: these records instead use
+  the ordinary review_status lifecycle, and inherit their credibility from
+  whatever groundedIn records they point at.
+
+principles:
+  - id: FLLP-PRINCIPLE-explicit-naming-outlasts-euphemism
+    slug: explicit-naming-outlasts-euphemism
+    label: Standards that name a contested concept explicitly are more durable than standards that gesture at it euphemistically
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-FL
+    statement: >
+      When a curriculum standard avoids naming a scientifically settled but
+      politically contested concept directly -- using a vaguer substitute
+      phrase instead of the term itself -- that avoidance does not resolve
+      the underlying political pressure; it just defers the fight to the
+      next revision cycle, at a cost paid by whichever cohort of students
+      sits between editions. Florida's own record is the clearest evidence
+      for this available anywhere in this ecosystem: standards that avoided
+      "evolution" (pre-2008) were graded academically unsound by name; the
+      standards that then explicitly named it, even in hedged form, held for
+      eighteen years; and the current proposal to drop explicit naming again
+      is being criticized in the same terms the 2005 Fordham review used
+      against the pre-2008 standards. A standards body gains nothing durable
+      by euphemism -- only a shorter interval before the same argument
+      recurs.
+    rationale: >
+      This is not a claim that explicit naming settles the underlying
+      political disagreement -- it doesn't, and Florida's 2008 compromise
+      ("the scientific theory of evolution") shows a state can name a
+      concept explicitly while still hedging around it. The claim is
+      narrower and empirical: avoidance is not even a stable truce. It is
+      simply the shortest-lived of the three postures a standards document
+      can take (avoid, hedge, name plainly), based on the one case this
+      ecosystem has tracked across four decades.
+    groundedIn:
+      - FLLP-FINDING-evolution-naming-1996-to-2008-explicitness-shift
+      - FLLP-FINDING-2026-draft-omits-evolution-and-climate-explicit-naming
+      - FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight
+      - FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission
+      - FLLP-MANDATE-ngsss-2008-sc912l15-standard
+    designPrinciples: []
+    contentAnchors: ["Our Mind"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: FLLP-PRINCIPLE-standards-committees-need-proportionate-disciplinary-expertise
+    slug: standards-committees-need-proportionate-disciplinary-expertise
+    label: A standards-writing committee needs disciplinary experts proportionate to what it is writing standards for
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-FL
+    statement: >
+      A committee asked to write K-12 science standards should include
+      enough working scientists and science educators that the document's
+      scientific framing is actually load-bearing in the room, not a single
+      voice outnumbered seventeen to one. Florida's 2026 draft was written
+      by an 18-person committee with exactly one science-education
+      professional on it -- the rest school-district employees -- at the
+      same time FLDOE reportedly has no K-12 science specialists on its own
+      staff. This is a staffing-composition fact, independent of what the
+      resulting standards actually say, and it is a predictable risk factor
+      for exactly the kind of gap (a 1,000-benchmark document a national
+      science-education organization calls "a mile wide and an inch deep")
+      that followed.
+    rationale: >
+      This principle deliberately stops short of asserting the committee
+      composition CAUSED the specific omissions reported in the 2026 draft
+      -- that causal claim isn't something this repo's research established,
+      and asserting it would overstate what's actually known. What IS
+      established is the staffing fact itself, confirmed by FLDOE's own
+      named officials (Patricia Duncan, Alicia Foy). A review process this
+      thin on subject-matter expertise is a structural risk condition worth
+      naming on its own terms.
+    groundedIn:
+      - FLLP-EVENT-2026-standards-review-process-begins
+      - FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission
+    designPrinciples: []
+    contentAnchors: []
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: FLLP-PRINCIPLE-documented-controversy-is-teachable-nature-of-science-content
+    slug: documented-controversy-is-teachable-nature-of-science-content
+    label: A well-documented, decades-long curriculum controversy is itself legitimate classroom content, not just background politics to route around
+    domain: interdisciplinary-curriculum-design
+    jurisdictionScope: US-FL
+    statement: >
+      Florida's own evolution-standards history -- a real, four-decade,
+      multiply-recurring public fight over what a state is willing to name
+      in its own science standards -- is a concrete, well-sourced case study
+      in how scientific consensus, institutional governance, and organized
+      public pressure actually interact. Rather than treating this history
+      as noise to be kept out of the classroom, a curriculum designed around
+      OpenEvo's Nature of Science and civic-reasoning goals can use Florida's
+      own documented record (who took which position, what changed, what
+      didn't) as a worked example of how a real governing body resolves --
+      or fails to resolve -- a contested empirical question under public
+      pressure, distinct from and in addition to teaching the underlying
+      biology itself.
+    rationale: >
+      This is the practical payoff of building policy-controversy-record in
+      the first place: once a controversy is modeled as a structured record
+      (named positions, real press coverage, a tracked outcome) rather than
+      left as prose, it becomes something a curriculum designer can actually
+      build a lesson or discussion unit from, not just background context a
+      teacher has to research independently.
+    groundedIn:
+      - FLLP-CONTROVERSY-2008-ngsss-evolution-wording-fight
+      - FLLP-CONTROVERSY-2017-hb989-textbook-challenges
+      - FLLP-CONTROVERSY-2026-proposed-standards-evolution-climate-omission
+    designPrinciples: []
+    contentAnchors: ["Our Mind", "Cultural Diversity"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0

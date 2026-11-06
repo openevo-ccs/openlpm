@@ -13,13 +13,21 @@ import ProfilePage from '@/pages/dashboard/profile-page'
 import ProjectLayout from '@/pages/dashboard/project-layout'
 import DashboardPage from '@/pages/dashboard/dashboard-page'
 import SettingsPage from '@/pages/dashboard/settings-page'
+import TourEditorPage from '@/pages/dashboard/tour-editor-page'
 import NewProjectWizard from '@/pages/dashboard/new-project-wizard'
 import LiteraturePage from '@/pages/dashboard/literature-page'
 import ConceptsPage from '@/pages/dashboard/concepts-page'
+import ConceptMeaningsPage from '@/pages/dashboard/concept-meanings-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
+import CalendarPage from '@/pages/dashboard/calendar-page'
+import TimePage from '@/pages/dashboard/time-page'
+import MethodsPage from '@/pages/dashboard/methods-page'
 import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-page'
-import TimelinePage from '@/pages/dashboard/timeline-page'
+import CurriculumStructurePage from '@/pages/dashboard/curriculum-structure-page'
+import TimelineSwitch from '@/pages/dashboard/timeline-switch'
+import ContextItemsPage from '@/pages/dashboard/context-items-page'
+import MapPage from '@/pages/dashboard/map-page'
 import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
 import AnalyticsPage from '@/pages/dashboard/analytics-page'
 import ReviewPage from '@/pages/dashboard/review-page'
@@ -31,11 +39,27 @@ import GroupsPage from '@/pages/dashboard/groups-page'
 import GroupDetailPage from '@/pages/dashboard/groups/group-detail-page'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
+import AdminBaseRepoExplorerPage from '@/pages/dashboard/admin-base-repo-explorer-page'
+import AdminContentEditorPage from '@/pages/dashboard/admin-content-editor-page'
 import JoinPage from '@/pages/join-page'
+import WelcomePage from '@/pages/welcome-page'
+import StudentWorkPage from '@/pages/dashboard/student/student-work-page'
 import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
 import StudentPromptPage from '@/pages/dashboard/student/student-prompt-page'
+import { ComparisonOnly } from '@/pages/dashboard/comparison/context'
+import ComparisonOverviewPage from '@/pages/dashboard/comparison/overview-page'
+import ComparisonCoveragePage from '@/pages/dashboard/comparison/coverage-page'
+import ComparisonNetworkPage from '@/pages/dashboard/comparison/network-page'
+import ComparisonFlowsPage from '@/pages/dashboard/comparison/flows-page'
+import ComparisonSchoolYearsPage from '@/pages/dashboard/comparison/school-years-page'
+import ComparisonMeasuresPage from '@/pages/dashboard/comparison/measures-page'
+import ComparisonSideBySidePage from '@/pages/dashboard/comparison/side-by-side-page'
+import ComparisonCuratePage from '@/pages/dashboard/comparison/curate-page'
+import ComparisonDraftLinksPage from '@/pages/dashboard/comparison/draft-links-page'
+import ComparisonReportPage from '@/pages/dashboard/comparison/report-page'
+import ComparisonSpacesPage from '@/pages/dashboard/comparison/spaces-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -85,6 +109,7 @@ export default function App() {
         <Route path="/auth/update-password" element={<UpdatePasswordPage />} />
         <Route path="/impressum" element={<ImpressumPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/willkommen/:slug" element={<WelcomePage />} />
         <Route
           path="/join/:slug"
           element={
@@ -105,26 +130,53 @@ export default function App() {
           <Route index element={<ProjectSwitcherPage />} />
           <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="concept-meanings" element={<ConceptMeaningsPage />} />
+          <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsPage />} />
           <Route path="admin/feedback" element={<AdminFeedbackPage />} />
           <Route path="admin/users" element={<AdminUsersPage />} />
+          <Route path="admin/explore" element={<AdminBaseRepoExplorerPage />} />
+          <Route path="admin/content" element={<AdminContentEditorPage />} />
           <Route path=":project" element={<ProjectLayout />}>
             <Route index element={<ProjectIndexRouter />} />
             <Route path=":objectId" element={<StudentLernzielePage />} />
             <Route path="basiskonzepte" element={<StudentBasiskonzeptePage />} />
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
+            <Route path="meine-arbeit" element={<StudentWorkPage />} />
+            <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
+            <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
+            <Route path="timeline" element={<TimelineSwitch />} />
+            <Route path="flows" element={<ComparisonOnly><ComparisonFlowsPage /></ComparisonOnly>} />
+            <Route path="school-years" element={<ComparisonOnly><ComparisonSchoolYearsPage /></ComparisonOnly>} />
+            <Route path="measures" element={<ComparisonOnly><ComparisonMeasuresPage /></ComparisonOnly>} />
+            <Route path="side-by-side" element={<ComparisonOnly><ComparisonSideBySidePage /></ComparisonOnly>} />
+            <Route path="spaces" element={<ComparisonOnly><ComparisonSpacesPage /></ComparisonOnly>} />
+            <Route path="curate" element={<ComparisonOnly><ComparisonCuratePage /></ComparisonOnly>} />
+            <Route path="draft-links" element={<ComparisonOnly><ComparisonDraftLinksPage /></ComparisonOnly>} />
+            <Route path="report" element={<ComparisonOnly><ComparisonReportPage /></ComparisonOnly>} />
+            {/* Addresses the comparison views used before the 2026-10-28 rebuild. */}
+            <Route path="curriculum-connections" element={<ComparisonOnly><ComparisonOverviewPage /></ComparisonOnly>} />
+            <Route path="curriculum-network" element={<Navigate to="../network" replace />} />
+            <Route path="curriculum-regions" element={<Navigate to="../coverage" replace />} />
+            <Route path="curriculum-comparison" element={<Navigate to="../spaces" replace />} />
+            <Route path="curriculum-report" element={<Navigate to="../report" replace />} />
             <Route path="new-project" element={<NewProjectWizard />} />
             <Route path="learning-goals" element={<LearningGoalsPage />} />
             <Route path="learning-goals/:objectId" element={<LearningGoalsPage />} />
+            <Route path="methods" element={<MethodsPage />} />
             <Route path="concepts" element={<ConceptsPage />} />
             <Route path="concepts/:conceptId" element={<ConceptsPage />} />
             <Route path="theories" element={<TheoriesPage />} />
             <Route path="theories/:theoryId" element={<TheoriesPage />} />
             <Route path="strands" element={<StrandsPage />} />
             <Route path="strands/:strandId" element={<StrandsPage />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="time" element={<TimePage />} />
             <Route path="curriculum-repository" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
-            <Route path="timeline" element={<TimelinePage />} />
+            <Route path="curriculum-structure" element={<CurriculumStructurePage />} />
+            <Route path="context" element={<ContextItemsPage />} />
+            <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />
@@ -135,6 +187,7 @@ export default function App() {
             <Route path="groups/:groupId" element={<GroupDetailPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="tours" element={<TourEditorPage />} />
           </Route>
         </Route>
 

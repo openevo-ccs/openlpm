@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/pennsylvania-lpm/schema/synthetic-curriculum-redesign-record.schema.json",
+  "title": "pennsylvania-lpm Synthetic Curriculum-Redesign Record",
+  "description": "A PROPOSED, hypothetical redesign of a real curriculum/assessment object -- new or restructured benchmark content that does NOT exist in official PDE/State Board of Education guidance today -- reachable from the real baseline by changing one explicit theoretical commitment (an 'adjacent possible' curriculum, not an arbitrary invention). This is a third, weaker-still tier below coherence-finding-record (verifiable textual fact about existing policy) and latent-connection-record (a reinterpretive lens on existing, UNCHANGED content, never a claim about what PDE's own text asserts or requires): this schema proposes content that would need to be ADDED or CHANGED to exist. Never conflate the three. A synthetic-curriculum-redesign-record must never be cited in briefs/ or any PDE/school-district-facing material as describing real, adopted policy -- see GOVERNANCE.md's synthetic-content rule. Identical shape to deutsche_lp's/nys_lp's synthetic-curriculum-redesign-record.schema.json.",
+  "type": "object",
+  "required": [
+    "id", "slug", "label", "status", "contentStatus",
+    "baselineCurriculumObject", "theoreticalGrounding",
+    "proposedRedesign", "tradeoffAssessment", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^PALP-SYNTHETIC-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "reviewed", "recommended", "rejected"],
+      "description": "This record's own review pipeline -- how much scrutiny the PROPOSAL itself has received. Never conflate with contentStatus below, which is about what KIND of claim the record makes, not how reviewed it is."
+    },
+    "contentStatus": {
+      "type": "string",
+      "enum": ["adjacent-possible-synthetic-redesign"],
+      "description": "Single-value by design, same rationale as deutsche_lp's identical field: every record under this schema IS a synthetic redesign proposal by construction.",
+      "const": "adjacent-possible-synthetic-redesign"
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "baselineCurriculumObject": {
+      "type": "object",
+      "description": "The single, real, unchanged policy/curriculum object this redesign starts from.",
+      "required": ["jurisdiction", "policyArea", "sourceDocument"],
+      "additionalProperties": false,
+      "properties": {
+        "jurisdiction": { "type": "string", "pattern": "^US-[A-Z]{2}$" },
+        "policyArea": { "type": "string" },
+        "excerptText": { "type": "string" },
+        "sourceDocument": { "type": "string" },
+        "sourcePage": { "type": "string" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "accessTier": {
+          "type": "string",
+          "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+          "description": "How much of the REAL baseline's source document this record actually keeps in excerptText, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Same four values and meaning as coherence-finding-record.schema.json's identical field. Applies only to baselineCurriculumObject's real, quoted starting point -- proposedRedesign is this repo's own invented content and carries no source-rights question. Optional; a baselineCurriculumObject without this field predates 2026-09-30 and should be treated as 'excerpt-only' at most until reviewed."
+        },
+        "licenseOrRightsNote": {
+          "type": "string",
+          "description": "The legal basis for storing excerptText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+        },
+        "externalDatasetRef": {
+          "type": "string",
+          "description": "Optional pointer into a real external dataset this repo doesn't own but reads directly, e.g. 'bio-core-k12/strands/strand-102-natural-selection-adaptation.yaml' or a specific CompetencyBase id."
+        }
+      }
+    },
+    "theoreticalGrounding": {
+      "type": "object",
+      "description": "The explicit theoretical commitment that generates this redesign from the real baseline -- required, per the same discipline as deutsche_lp: a redesign not traceable to a specific TheoryBase claim is undisciplined brainstorming, not this schema's job.",
+      "required": ["theorybaseTheory", "changedCommitment"],
+      "additionalProperties": false,
+      "properties": {
+        "theorybaseTheory": {
+          "type": "string",
+          "pattern": "^OE-THEORY-[a-z0-9-]+$",
+          "description": "The real TheoryBase Theory id whose commitment this redesign applies."
+        },
+        "theorybaseDesignPrinciple": {
+          "type": "string",
+          "pattern": "^OE-DESIGNPRINCIPLE-[a-z0-9-]+$"
+        },
+        "theorybaseConstruct": {
+          "type": "string",
+          "pattern": "^OE-CROSSDOMAINCONSTRUCT-[a-z0-9-]+$"
+        },
+        "changedCommitment": {
+          "type": "string",
+          "description": "Plain-language statement of exactly what theoretical commitment changes between the real baseline and this redesign -- one named variable changes, not an unconstrained rewrite."
+        }
+      }
+    },
+    "proposedRedesign": {
+      "type": "object",
+      "required": ["narrative", "newOrChangedElements"],
+      "additionalProperties": false,
+      "properties": {
+        "narrative": { "type": "string" },
+        "newOrChangedElements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["description"],
+            "additionalProperties": false,
+            "properties": {
+              "description": { "type": "string" },
+              "relatedRealCompetencyIds": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Real CompetencyBase/ConceptBase ids this new/changed element builds on or cross-references."
+              }
+            }
+          }
+        }
+      }
+    },
+    "tradeoffAssessment": {
+      "type": "object",
+      "required": ["gains", "costs"],
+      "additionalProperties": false,
+      "properties": {
+        "gains": { "type": "string" },
+        "costs": {
+          "type": "string",
+          "description": "What the real baseline does well that this redesign risks losing or complicating. Required, not optional."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": {
+          "type": "string",
+          "enum": ["human", "llm", "human-llm-collaborative"]
+        },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

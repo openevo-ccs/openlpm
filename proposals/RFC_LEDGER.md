@@ -26,3 +26,4 @@ itself (see `GOVERNANCE.md`'s own Identifier Block Allocation / RFC process, if 
 | 0004 | 2026 (pre-ledger) | portfolio-discovery-collaboration-and-commons | main | — | |
 | 0005 | 2026 (pre-ledger) | multi-language-content | main | — | |
 | 0006 | 2026 (pre-ledger) | commons-spaces | main | — | |
+| 0007 | 2026-10-23T12:15:21Z | data-rights-and-licensing-framework | (claimed, not yet a branch) | lab-manager-licensing-framework | |

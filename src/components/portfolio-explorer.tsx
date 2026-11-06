@@ -5,6 +5,8 @@ import { Chip } from '@/components/chip'
 import { LayoutGrid, MessageSquare, Network, Plus, Search, Send, X } from 'lucide-react'
 import type { PortfolioEdge, PortfolioNode } from '@/lib/supabase/portfolios'
 import { submitForReview } from '@/lib/supabase/generic-review'
+import { GraphControls, useGraphSettings } from '@/components/graph-controls'
+import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 
 function token(name: string, fallback: string) {
   if (typeof window === 'undefined') return fallback
@@ -29,6 +31,7 @@ export function PortfolioExplorer({
   const supabase = useMemo(() => createClient(), [])
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
+  const [gs, updateGs, resetGs] = useGraphSettings('portfolio-notebook')
 
   const [nodes, setNodes] = useState(initialNodes)
   const [edges, setEdges] = useState(initialEdges)
@@ -116,38 +119,49 @@ export function PortfolioExplorer({
   // ---- Cytoscape mount + selection/context-menu wiring ----
   useEffect(() => {
     if (!containerRef.current) return
+    const info = new Map<string, NodeLabelInfo>()
     const elements: ElementDefinition[] = [
-      ...visible.nodes.map((n) => ({ data: { id: n.id, label: n.label, kind: n.kind, subtype: n.subtype } })),
-      ...visible.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, label: e.label ?? '' } })),
+      ...visible.nodes.map((n) => {
+        info.set(n.id, { full: n.label, priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
+        return { data: { id: n.id, kind: n.kind, subtype: n.subtype, size: 30 } }
+      }),
+      ...visible.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, name: e.label ?? '' } })),
     ]
     const cy = cytoscape({
       container: containerRef.current,
       elements,
       boxSelectionEnabled: true,
-      layout: { name: 'cose', animate: false },
+      minZoom: 0.3,
+      maxZoom: 3,
       style: [
         {
           selector: 'node',
           style: {
-            label: 'data(label)', 'font-size': 10, 'text-wrap': 'wrap', 'text-max-width': '80px',
-            'text-valign': 'bottom', 'text-margin-y': 6, color: token('--text-primary', '#0b0b0b'),
-            width: 32, height: 32,
+            width: 'data(size)', height: 'data(size)', label: 'data(label)', 'font-size': 10, 'font-weight': 600,
+            'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 5,
+            color: token('--text-primary', '#0b0b0b'), 'border-width': 2, 'border-color': token('--surface-0', '#fff'),
           },
         },
         { selector: 'node[kind = "canonical"]', style: { 'background-color': token('--series-a', '#006c66'), shape: 'ellipse' } },
-        { selector: 'node[kind = "private"]', style: { 'background-color': token('--text-muted', '#898781'), shape: 'round-rectangle' } },
-        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--series-a', '#006c66') } },
+        { selector: 'node[kind = "private"]', style: { 'background-color': token('--place-other', '#6f7d8c'), shape: 'round-rectangle' } },
+        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--text-primary', '#0b0b0b') } },
         {
           selector: 'edge',
           style: {
-            width: 1.5, 'line-color': token('--baseline', '#c3c2b7'), 'target-arrow-color': token('--baseline', '#c3c2b7'),
-            'target-arrow-shape': 'triangle', 'curve-style': 'bezier', label: 'data(label)', 'font-size': 9,
-            color: token('--text-secondary', '#52514e'),
+            width: 1.6, 'line-color': token('--place-other', '#6f7d8c'), 'target-arrow-color': token('--place-other', '#6f7d8c'),
+            'target-arrow-shape': 'triangle', 'arrow-scale': 0.8, 'curve-style': 'bezier', opacity: 'data(op)', 'font-size': 9,
+            color: token('--text-primary', '#0b0b0b'),
           },
         },
-        { selector: 'edge:selected', style: { 'line-color': token('--series-a', '#006c66'), width: 2.5 } },
-      ],
+        { selector: 'edge:selected', style: { 'line-color': token('--series-a', '#006c66'), width: 2.5, opacity: 1 } },
+        ...hoverStyles(),
+      ] as never,
     })
+    // Notes with more links get a label first when space is short.
+    cy.nodes().forEach((n) => { const i = info.get(n.id()); if (i) i.priority += n.degree(false) * 10 })
+    applyGraphSettings(cy, gs, { name: 'concentric', concentric: (n: cytoscape.NodeSingular) => n.degree(false), levelWidth: () => 1, minNodeSpacing: 46 } as never, info)
+    applyLineLooks(cy, gs.lineStrength, () => 2)
+    attachHover(cy)
 
     cy.on('tap', 'node', (evt) => { setSelectedId(evt.target.id()); setCtxMenu(null) })
     cy.on('tap', 'edge', () => { setCtxMenu(null) })
@@ -159,8 +173,16 @@ export function PortfolioExplorer({
     })
 
     cyRef.current = cy
-    return () => { cy.destroy() }
-  }, [visible])
+    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null }
+    // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, gs.layout, gs.labels, gs.spacing])
+
+  useEffect(() => {
+    if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
+  }, [gs.lineStrength])
+
+  const zoomBy = (f: number) => { const cy = cyRef.current; if (cy) cy.animate({ zoom: Math.max(cy.minZoom(), Math.min(cy.maxZoom(), cy.zoom() * f)) }, { duration: 160 }) }
 
   // ---- mutations ----
   const NODE_TYPES = ['note', 'question', 'draft_concept', 'draft_lesson'] as const
@@ -342,6 +364,14 @@ export function PortfolioExplorer({
           {visible.nodes.length === 0 && <div className="empty"><p>Nothing here yet.</p></div>}
         </div>
       ) : (
+        <>
+        <div style={{ padding: '8px 10px 0', borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}>
+          <GraphControls
+            settings={gs} onChange={updateGs} onReset={resetGs} lang="en" showConnections={false} showLayout
+            wording={{ fixed: { label: 'Rings', hint: 'The notes with most links in the middle. Always the same.' } }}
+            onZoomIn={() => zoomBy(1.25)} onZoomOut={() => zoomBy(0.8)} onFit={() => cyRef.current?.fit(undefined, 30)}
+          />
+        </div>
         <div className="explorer-body">
           <div className="graph-host">
             <div ref={containerRef} className="graph-canvas" />
@@ -404,6 +434,7 @@ export function PortfolioExplorer({
             </div>
           </div>
         </div>
+        </>
       )}
     </div>
   )

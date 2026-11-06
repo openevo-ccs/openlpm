@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { CalendarRange } from 'lucide-react'
+import { CalendarRange, Info } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import { listTimelineItems, sortLanes, type TimelineItem } from '@/lib/supabase/timeline'
-
-const DAY_MS = 24 * 60 * 60 * 1000
-const LANE_HEIGHT = 40
-const HEADER_HEIGHT = 28
-// Below this span, ticks fall monthly rather than yearly -- chosen so a
-// single mandate's multi-year effective range still gets a readable month
-// grid, while a repository spanning decades of policy history stays
-// legible instead of crowding in a tick for every one of ~300 months.
-const MONTHLY_TICK_SPAN_DAYS = 450
+import { RecordKindIcon, RecordKindLine } from '@/lib/record-type-display'
+import { TimelineChart, type TimelineChartItem, type TimelineChartLane } from '@/components/timeline-chart'
+import { distinctLinkedProjects, listContentLinksForRecord, type RepositoryRecordRow } from '@/lib/supabase/curriculum-repository'
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
@@ -22,25 +16,6 @@ function formatRange(item: TimelineItem): string {
   if (item.openStart) return `through ${fmtDate(item.end as Date)}`
   if (item.openEnded) return `${fmtDate(item.start)} – ongoing`
   return `${fmtDate(item.start)} – ${item.end ? fmtDate(item.end) : fmtDate(item.start)}`
-}
-
-function buildTicks(min: Date, max: Date): { date: Date; label: string }[] {
-  const spanDays = (max.getTime() - min.getTime()) / DAY_MS
-  const ticks: { date: Date; label: string }[] = []
-  if (spanDays <= MONTHLY_TICK_SPAN_DAYS) {
-    const cursor = new Date(min.getFullYear(), min.getMonth(), 1)
-    while (cursor <= max) {
-      if (cursor >= min) ticks.push({ date: new Date(cursor), label: cursor.toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) })
-      cursor.setMonth(cursor.getMonth() + 1)
-    }
-  } else {
-    const cursor = new Date(min.getFullYear(), 0, 1)
-    while (cursor <= max) {
-      if (cursor >= min) ticks.push({ date: new Date(cursor), label: String(cursor.getFullYear()) })
-      cursor.setFullYear(cursor.getFullYear() + 1)
-    }
-  }
-  return ticks
 }
 
 // Any `curriculum_repository_records` row with an `event_date` or an
@@ -54,10 +29,10 @@ function buildTicks(min: Date, max: Date): { date: Date; label: string }[] {
 export default function TimelinePage() {
   const { project, supabase, slug } = useOutletContext<ProjectOutletContext>()
   const [items, setItems] = useState<TimelineItem[] | null>(null)
+  const [undatedCount, setUndatedCount] = useState(0)
   const [kind, setKind] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [selected, setSelected] = useState<TimelineItem | null>(null)
-
   // A curriculum-repository-custom-view (migration 095) holds no records of
   // its own -- it's a view of its parent Curriculum Repository's content --
   // so this resolves to the PARENT's id, same as curriculum-repository-page.tsx.
@@ -69,7 +44,10 @@ export default function TimelinePage() {
   useEffect(() => {
     setItems(null)
     setSelected(null)
-    listTimelineItems(supabase, repoProjectId).then(setItems)
+    listTimelineItems(supabase, repoProjectId).then(({ items: result, undatedRecordCount }) => {
+      setItems(result)
+      setUndatedCount(undatedRecordCount)
+    })
   }, [supabase, repoProjectId])
 
   const lanesAll = useMemo(() => sortLanes(items ?? []), [items])
@@ -84,39 +62,32 @@ export default function TimelinePage() {
   )
   const lanes = useMemo(() => sortLanes(filtered), [filtered])
 
-  const { minDate, maxDate } = useMemo(() => {
-    const now = new Date()
-    let min: Date | null = null
-    let max: Date | null = null
-    for (const i of filtered) {
-      if (!min || i.start < min) min = i.start
-      const end = i.end ?? (i.openEnded ? now : i.start)
-      if (!max || end > max) max = end
-    }
-    if (!min || !max) return { minDate: new Date(now.getFullYear(), 0, 1), maxDate: new Date(now.getFullYear(), 11, 31) }
-    const span = Math.max(max.getTime() - min.getTime(), DAY_MS)
-    const pad = Math.max(span * 0.04, 14 * DAY_MS)
-    return { minDate: new Date(min.getTime() - pad), maxDate: new Date(max.getTime() + pad) }
-  }, [filtered])
-
-  const totalDays = Math.max(1, Math.round((maxDate.getTime() - minDate.getTime()) / DAY_MS))
-  const pxPerDay = Math.min(24, Math.max(0.6, 1400 / totalDays))
-  const width = Math.round(totalDays * pxPerDay)
-  const x = (d: Date) => Math.round(((d.getTime() - minDate.getTime()) / DAY_MS) * pxPerDay)
-
-  const ticks = useMemo(() => buildTicks(minDate, maxDate), [minDate, maxDate])
-  const today = new Date()
-  const showToday = today >= minDate && today <= maxDate
-
-  const itemsByLane = useMemo(() => {
-    const m = new Map<string, TimelineItem[]>()
-    for (const i of filtered) {
-      const arr = m.get(i.laneKey) ?? []
-      arr.push(i)
-      m.set(i.laneKey, arr)
-    }
-    return m
-  }, [filtered])
+  // Items and lanes in the shape the shared timeline chart takes. One color
+  // per kind of source, the same on every timeline: teal for repository
+  // records, green for standards document versions.
+  const chartLanes: TimelineChartLane[] = useMemo(
+    () => lanes.map((l) => ({
+      key: l.laneKey,
+      label: l.laneLabel,
+      icon: l.source === 'repository-record' ? <RecordKindIcon type={l.laneKey as RepositoryRecordRow['record_type']} /> : undefined,
+    })),
+    [lanes]
+  )
+  const chartItems: TimelineChartItem[] = useMemo(
+    () => filtered.map((i) => ({
+      id: i.id,
+      laneKey: i.laneKey,
+      title: i.title,
+      start: i.start,
+      end: i.end,
+      isPoint: i.isPoint,
+      openEnded: i.openEnded,
+      openStart: i.openStart,
+      color: i.source === 'repository-record' ? 'var(--series-a)' : 'var(--series-b)',
+      tooltip: `${i.title} — ${formatRange(i)}`,
+    })),
+    [filtered]
+  )
 
   return (
     <div>
@@ -127,6 +98,15 @@ export default function TimelinePage() {
         version history. A span is something in force over a period; a marker is a single
         point-in-time event.
       </p>
+      {undatedCount > 0 && (
+        <div className="notice" style={{ marginBottom: 12, maxWidth: 640 }}>
+          <Info size={14} />
+          {undatedCount} more record{undatedCount === 1 ? '' : 's'} {undatedCount === 1 ? "isn't" : "aren't"} shown here
+          — {undatedCount === 1 ? 'it has' : 'they have'} no real-world date (an analytical finding or a proposed
+          redesign, for example, isn&apos;t something that &ldquo;happened&rdquo; on a day). See the Curriculum
+          Repository list for the full set.
+        </div>
+      )}
 
       <div className="card" style={{ marginBottom: 12 }}>
         <div className="grid grid-3">
@@ -170,41 +150,17 @@ export default function TimelinePage() {
         </div>
       ) : (
         <div className="row" style={{ alignItems: 'flex-start', gap: 16 }}>
-          <div className="timeline-wrap" style={{ flex: '3 1 480px', minWidth: 0 }}>
-            <div className="timeline-labels">
-              <div style={{ height: HEADER_HEIGHT }} />
-              {lanes.map((l) => (
-                <div key={l.laneKey} className="timeline-lane-label" style={{ height: LANE_HEIGHT }} title={l.laneLabel}>
-                  {l.laneLabel}
-                </div>
-              ))}
-            </div>
-            <div className="timeline-scroll">
-              <div style={{ width, position: 'relative' }}>
-                <div className="timeline-axis" style={{ height: HEADER_HEIGHT }}>
-                  {ticks.map((t) => (
-                    <div key={t.date.toISOString()} className="timeline-tick" style={{ left: x(t.date) }}>
-                      <span>{t.label}</span>
-                    </div>
-                  ))}
-                </div>
-                {lanes.map((l) => (
-                  <div key={l.laneKey} className="timeline-lane-row" style={{ height: LANE_HEIGHT }}>
-                    {ticks.map((t) => <div key={t.date.toISOString()} className="timeline-gridline" style={{ left: x(t.date) }} />)}
-                    {(itemsByLane.get(l.laneKey) ?? []).map((item) => (
-                      <TimelineMark key={item.id} item={item} x={x} laneWidth={width} selected={selected?.id === item.id} onSelect={() => setSelected(item)} />
-                    ))}
-                  </div>
-                ))}
-                {showToday && (
-                  <div className="timeline-today" style={{ left: x(today), top: HEADER_HEIGHT, height: lanes.length * LANE_HEIGHT }} title="Today" />
-                )}
-              </div>
-            </div>
+          <div style={{ flex: '3 1 520px', minWidth: 0 }}>
+            <TimelineChart
+              lanes={chartLanes}
+              items={chartItems}
+              selectedId={selected?.id ?? null}
+              onSelect={(id) => setSelected(id ? filtered.find((i) => i.id === id) ?? null : null)}
+            />
           </div>
 
           <div className="card" style={{ flex: '1 1 280px', minHeight: 200 }}>
-            {selected ? <TimelineDetail item={selected} slug={slug} /> : <p className="muted">Click a marker or span to see its details.</p>}
+            {selected ? <TimelineDetail item={selected} slug={slug} supabase={supabase} /> : <p className="muted">Click a marker or span to see its details.</p>}
           </div>
         </div>
       )}
@@ -212,52 +168,26 @@ export default function TimelinePage() {
   )
 }
 
-function TimelineMark({
-  item,
-  x,
-  laneWidth,
-  selected,
-  onSelect,
-}: {
-  item: TimelineItem
-  x: (d: Date) => number
-  laneWidth: number
-  selected: boolean
-  onSelect: () => void
-}) {
-  const color = item.source === 'repository-record' ? 'var(--series-a)' : 'var(--series-b)'
-  const title = `${item.title} — ${formatRange(item)}`
-  const outline = selected ? '2px solid var(--text-primary)' : 'none'
+function TimelineDetail({ item, slug, supabase }: { item: TimelineItem; slug: string; supabase: ProjectOutletContext['supabase'] }) {
+  // Real feedback ea3a4c01: "always enable ways to show which standards
+  // from which times are used in which OpenLPM projects" -- the data
+  // already existed (curriculum_repository_links, surfaced on the record
+  // page's own "Connected to your own work" section) but was a click-through
+  // away rather than visible right where you're looking at something's date.
+  const [usedBy, setUsedBy] = useState<{ id: string; name: string; slug: string }[] | null>(null)
 
-  if (item.isPoint) {
-    return (
-      <button
-        type="button"
-        className="timeline-mark timeline-mark-point"
-        style={{ left: x(item.start), background: color, outline }}
-        title={title}
-        onClick={onSelect}
-      />
-    )
-  }
+  useEffect(() => {
+    setUsedBy(null)
+    if (!item.recordId) return
+    listContentLinksForRecord(supabase, item.recordId).then((links) => setUsedBy(distinctLinkedProjects(links)))
+  }, [item.recordId, supabase])
 
-  const startX = item.openStart ? 0 : x(item.start)
-  const endX = item.openEnded ? laneWidth : x(item.end ?? item.start)
-  return (
-    <button
-      type="button"
-      className="timeline-mark timeline-mark-bar"
-      style={{ left: startX, width: Math.max(4, endX - startX), background: color, outline }}
-      title={title}
-      onClick={onSelect}
-    />
-  )
-}
-
-function TimelineDetail({ item, slug }: { item: TimelineItem; slug: string }) {
   return (
     <div>
       <h3 style={{ marginTop: 0, marginBottom: 4 }}>{item.title}</h3>
+      {item.source === 'repository-record' && (
+        <div style={{ marginBottom: 4 }}><RecordKindLine type={item.laneKey as RepositoryRecordRow['record_type']} withBlurb /></div>
+      )}
       <div className="row" style={{ gap: 6, marginBottom: 8 }}>
         <span className="chip" style={{ fontSize: 10 }}>{item.laneLabel}</span>
         {item.jurisdiction && <span className="chip" style={{ fontSize: 10 }}>{item.jurisdiction}</span>}
@@ -269,6 +199,16 @@ function TimelineDetail({ item, slug }: { item: TimelineItem; slug: string }) {
           <span style={{ fontSize: 13 }}>{d.value}</span>
         </div>
       ))}
+      {item.recordId && usedBy !== null && (
+        <div style={{ margin: '8px 0' }}>
+          <strong style={{ fontSize: 12, display: 'block', marginBottom: 2 }}>Used in</strong>
+          {usedBy.length === 0 ? (
+            <span className="muted" style={{ fontSize: 13 }}>Not yet connected to any OpenLPM project.</span>
+          ) : (
+            <span style={{ fontSize: 13 }}>{usedBy.map((p) => p.name).join(', ')}</span>
+          )}
+        </div>
+      )}
       {item.recordId && (
         <p style={{ marginTop: 12 }}>
           <Link to={`/dashboard/${slug}/curriculum-repository/${item.recordId}`}>View full record →</Link>

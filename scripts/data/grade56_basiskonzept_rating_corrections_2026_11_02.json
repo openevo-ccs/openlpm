@@ -1,0 +1,39 @@
+[
+ {
+  "id8": "ab8e80c2",
+  "bk": "bk_struktur_funktion",
+  "relevanz": 1
+ },
+ {
+  "id8": "933a3a9e",
+  "bk": "bk_information_kommunikation",
+  "relevanz": 1
+ },
+ {
+  "id8": "59e6c2ac",
+  "bk": "bk_information_kommunikation",
+  "relevanz": 1
+ },
+ {
+  "id8": "d66905dd",
+  "bk": "bk_information_kommunikation",
+  "relevanz": 1
+ },
+ {
+  "id8": "148db929",
+  "bk": "bk_stoff_energie_umwandlung",
+  "relevanz": 1
+ },
+ {
+  "id8": "545b6f70",
+  "bk": "bk_stoff_energie_umwandlung",
+  "relevanz": 2,
+  "begruendung": "Mahlzeiten liefern Stoffe und Energie, und der Ernährungskreis hilft, sie in passenden Mengen zusammenzustellen. Das Lernziel berührt damit den Bedarf des Körpers an Stoffen und Energie. Der Bezug ist eher handlungsorientiert als fachlich vertieft. Dem Kern fehlt, was im Körper mit den aufgenommenen Stoffen geschieht."
+ },
+ {
+  "id8": "1f911a33",
+  "bk": "bk_individuelle_entwicklung",
+  "relevanz": 2,
+  "begruendung": "Das Lernziel gehört zur Pubertät, in der Jugendliche sich auch in ihrer Identität und Orientierung unterscheiden. Im Mittelpunkt steht die Akzeptanz unterschiedlicher sexueller Orientierungen und Identitäten, also ein Aspekt der Entwicklung im Lebenslauf. Dem Kern fehlt der biologische Entwicklungsvorgang selbst, etwa die körperliche Reifung. Das Unterkonzept Pubertät und Geschlechtsreife wird nur am Rand berührt."
+ }
+]

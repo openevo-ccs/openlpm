@@ -26,10 +26,10 @@
 
    Also carries the RGB channel triplets for the handful of tokens used as
    translucent tints (chip backgrounds, notices, the graph legend backdrop)
-   -- rgb(var(--x-rgb) / <alpha>) needs channels, not a hex string. Kept
-   here, not in openevo-design-tokens.css, since that file is a faithful
-   vendored copy; these are OpenLPM's own derived values, re-synced by hand
-   if the source tokens (or the brand colors above) change. */
+   -- rgb(var(--x-rgb) / <alpha>) needs channels rather than a hex string.
+   openevo-design-tokens.css is a faithful vendored copy, so these derived
+   values live here instead, as OpenLPM's own, re-synced by hand if the
+   source tokens (or the brand colors above) change. */
 :root {
   --brand-navy: #272d63;
   --brand-teal: #006c66;
@@ -39,13 +39,15 @@
   --primary-rgb: 0 108 102;      /* brand-teal */
   --good-rgb: 12 163 12;
   --warning-rgb: 250 178 25;
+  /* Amber as TEXT: the bright amber above is 1.75:1 on the light page. This darker one is 5.8:1 on the page and 5.4:1 on the amber tint. */
+  --warning-text: #8a5700;
   --critical-rgb: 208 59 59;
 
   /* A small rotating palette for the Concepts map (concepts-page.tsx) --
-     cycled by index via modulo, not tied to any fixed concept count, so it
-     works whether a project has 3 root concepts or 20. Purely a visual
-     grouping aid (every node shares its top-level ancestor's color), not a
-     semantic status color like the tokens above.
+     cycled by index via modulo, independent of any fixed concept count, so
+     it works whether a project has 3 root concepts or 20. Purely a visual
+     grouping aid (every node shares its top-level ancestor's color), kept
+     separate from the semantic status colors above.
 
      Real feedback 478397f9 (Susan, 2026-10-02): wanted the 6 real Thuringia
      Basiskonzepte colored green/red/blue/brown/orange/purple, in that
@@ -55,13 +57,38 @@
      canonical order, see basiskonzepte.ts's getRootConcepts) picks this up
      automatically. Red (--map-2) deliberately isn't identical to
      --critical-rgb above -- a different, slightly deeper red, so a concept
-     dot never reads as a status/error indicator at a glance. */
-  --map-1: #1c8a4e;
-  --map-2: #b3372e;
-  --map-3: #2a78d6;
-  --map-4: #8a5a2a;
-  --map-5: #d9791f;
-  --map-6: #7a3ec2;
+     dot never reads as a status/error indicator at a glance.
+
+     Re-tuned 2026-10-25 (Dustin's graph-standards decision: softer colors
+     after a color-blind check). Same six hue families and same order, so
+     Susan's green/red/blue/brown/orange/purple mapping is unchanged. The
+     previous palette's red and brown were nearly identical to someone with
+     red-green color blindness (CIEDE2000 distance 1.9; under about 10 two
+     colors read as the same). This set keeps every pair at 13.6 or more
+     under normal vision and under simulated protanopia, deuteranopia and
+     tritanopia (dark mode: 11.1 or more), and every color at 3:1 or better
+     against its background. Checked with a script (Machado 2009 simulation
+     matrices, CIEDE2000); re-run it before changing any of these. */
+  --map-1: #719f87;
+  --map-2: #c94856;
+  --map-3: #275c8d;
+  --map-4: #755323;
+  --map-5: #c68724;
+  --map-6: #a96fc1;
+  /* Places in the comparison views (Germany, United States, India, anything else).
+     Chosen by a search over hues so every pair stays 24.9 apart under normal vision and under
+     simulated protanopia, deuteranopia and tritanopia (dark mode 21.8), with 3:1 contrast against
+     the background. Re-run scripts/check_palette_colorblind.mjs after editing: it checks these too. */
+  --place-de: #3c1c9c;
+  --place-us: #8e2929;
+  --place-in: #ae8f32;
+  --place-other: #6f7d8c;
+  /* Grade bands run light to dark with the school years. They are a sequence, so one hue changes in lightness. */
+  --band-1: #9bd3cc;
+  --band-2: #5fb8ae;
+  --band-3: #2f8f85;
+  --band-4: #14625b;
+  --band-span: #8b96a3;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -70,7 +97,10 @@
     --series-a: var(--brand-teal);
     --background-rgb: 13 13 13;
     --primary-rgb: 43 182 168;
-    --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
+    --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+    --warning-text: rgb(var(--warning-rgb));
+    --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
+    --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
   }
 }
 :root[data-theme="dark"] {
@@ -79,7 +109,10 @@
   --series-a: var(--brand-teal);
   --background-rgb: 13 13 13;
   --primary-rgb: 43 182 168;
-  --map-1: #3fae70; --map-2: #e06a5a; --map-3: #5b9ee8; --map-4: #c08a52; --map-5: #e0954f; --map-6: #a374e0;
+  --map-1: #a4d1b5; --map-2: #fe8687; --map-3: #73b2f9; --map-4: #b38156; --map-5: #feba53; --map-6: #a38dba;
+  --warning-text: rgb(var(--warning-rgb));
+  --place-de: #5a5ae2; --place-us: #d36969; --place-in: #e2e25a; --place-other: #a7b0bb;
+  --band-1: #1f5a54; --band-2: #2f8f85; --band-3: #5fb8ae; --band-4: #a6e0d8; --band-span: #7d8996;
 }
 
 * { box-sizing: border-box; }
@@ -129,10 +162,10 @@ code {
    topbar, and with it the whole page, wider than the device, so the
    browser zooms the entire app out to fit rather than laying it out at
    the real device width. Confirmed by measuring window.innerWidth (563)
-   against the real visual viewport (390) on a live page: not a rendering
-   quirk, a genuine forced-overflow bug, and the reason a mobile user's
-   whole session looks zoomed out and cramped, not just this one button
-   being hard to reach. The email address itself is the single biggest
+   against the real visual viewport (390) on a live page: a genuine
+   forced-overflow bug. It's the reason a mobile user's whole session looks
+   zoomed out and cramped -- this one button being hard to reach is just a
+   symptom of that same bug. The email address itself is the single biggest
    contributor (long test/real addresses easily run 250px+) and isn't
    essential chrome -- the Profile page already shows it. */
 @media (max-width: 480px) {
@@ -160,7 +193,8 @@ code {
    project name/badges/preview-button block (.project-side-info) hide
    via CSS rather than unmounting, so collapsing never loses React state
    or re-fetches anything. Width shrinks just enough for a centered
-   16px icon with real padding, not the narrowest possible rail. */
+   16px icon with real padding, deliberately wider than the narrowest
+   possible rail. */
 .project-side.collapsed { width: 52px; }
 .project-side.collapsed .project-side-info,
 .project-side.collapsed .project-side-title,
@@ -184,9 +218,10 @@ code {
 .card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
 
 /* Real feedback b4b23580/74e440a3 (2026-10-01): a real visible box around a
-   group of cards, not just a heading -- one step lighter than .card (which
-   stays the brightest surface) so a frame full of cards reads as a group
-   sitting slightly off the page, not another card of its own. */
+   group of cards, stronger than a plain heading alone -- one step lighter
+   than .card (which stays the brightest surface) so a frame full of cards
+   reads as a group sitting slightly off the page, distinct from a card of
+   its own. */
 .frame { background: var(--surface-1); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; }
 
 /* Real feedback a4be05a6 (2026-10-01): "differentiate at the frame level
@@ -219,12 +254,13 @@ code {
 .btn-primary:hover { filter: brightness(0.92); }
 .btn-danger { color: var(--critical); border-color: var(--critical); }
 .btn-mini { padding: 2px 8px; font-size: 11px; border-radius: 10px; }
+.btn-mini.active { background: rgb(var(--primary-rgb) / 0.12); border-color: var(--series-a); color: var(--series-a); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-linklike { background: none; border: none; padding: 0; color: var(--series-a); cursor: pointer; font: inherit; text-decoration: underline; }
 
 /* Real finding from layout_check/capture.mjs's first live run, 2026-09-30:
-   .btn-mini renders ~21-25px tall everywhere (icon buttons throughout the
-   whole app, not just one page) -- well under the 44px touch-target
+   .btn-mini renders ~21-25px tall everywhere -- icon buttons across the
+   whole app, every page alike -- well under the 44px touch-target
    guideline, identically on phone, tablet AND desktop, because button
    sizing was never touch-aware at all. `pointer: coarse` (true for a
    finger, false for a mouse) is the correct, targeted fix: it only grows
@@ -246,8 +282,8 @@ code {
 }
 .field textarea { min-height: 80px; }
 
-/* ---- status chips: color by MEANING, not literal enum value, so any
-   status column in the app (literature/schema/branch/project status)
+/* ---- status chips: color by MEANING rather than literal enum value, so
+   any status column in the app (literature/schema/branch/project status)
    can reuse the same handful of classes. ---- */
 .chip {
   display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px;
@@ -255,7 +291,10 @@ code {
   background: var(--surface-1); color: var(--text-secondary);
 }
 .chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.chip-draft, .chip-proposed { color: var(--warning); border-color: var(--warning); background: rgb(var(--warning-rgb) / 0.12); }
+/* A chip that opens something (the stage-link count on the Structure page). Gets a phone-sized tap target on touch screens, like .btn. */
+.chip-button { cursor: pointer; font-family: inherit; }
+@media (pointer: coarse) { .chip-button { min-height: 40px; padding: 8px 12px; } }
+.chip-draft, .chip-proposed { color: var(--warning-text); border-color: var(--warning); background: rgb(var(--warning-rgb) / 0.12); }
 .chip-progress, .chip-submitted, .chip-under_review, .chip-discussed, .chip-pending, .chip-active { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
 .chip-good, .chip-accepted, .chip-canonical, .chip-promoted, .chip-completed { color: var(--good); border-color: var(--good); background: rgb(var(--good-rgb) / 0.12); }
 .chip-muted, .chip-rejected, .chip-deprecated, .chip-archived, .chip-merged, .chip-discontinued, .chip-paused, .chip-planning { color: var(--text-muted); }
@@ -263,10 +302,13 @@ code {
 /* Real feedback fd88f0cd (Susan, 2026-10-02): the Thema/Unterthema line on a
    student Lernziel card needed to read as more than plain grey text -- same
    chip shape as the status chips above, colored with the app's own primary
-   accent so it's visually distinct from the grade chip next to it. Truncates
-   with an ellipsis rather than wrapping the whole card wider; full text is
-   in the chip's own title attribute. */
-.chip-thema { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+   accent so it's visually distinct from the grade chip next to it.
+   Feedback 9b4c5116 (Susan, 2026-10-31): "use the space to show the full
+   length of the topic/subtopic name". The chip now takes the width of its
+   card and wraps onto a second line when the name is longer. */
+.chip-thema { color: var(--series-a); border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); max-width: 100%; white-space: normal; line-height: 1.35; }
+/* Konzeptanker marker on a learning goal card; the border takes the concept's own map color. */
+.chip-anchor { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; border-width: 2px; max-width: 100%; white-space: normal; line-height: 1.35; }
 
 table { border-collapse: collapse; width: 100%; font-size: 13px; }
 th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
@@ -349,6 +391,8 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
   transition: opacity 120ms ease 250ms;
 }
 .tip:hover::after, .tip:hover::before, .tip:focus-within::after, .tip:focus-within::before { opacity: 1; }
+/* For a tip sitting at the right edge of a clipped box: the bubble ends at the tip's right edge instead of being centered. */
+.tip-end::after { left: auto; right: 0; transform: none; }
 .help {
   display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px;
   border-radius: 50%; border: 1px solid var(--text-muted); color: var(--text-muted); font-size: 10px;
@@ -543,6 +587,8 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .topic-card { cursor: pointer; margin-bottom: 0; transition: border-color 0.12s; }
 .topic-card:hover { border-color: var(--series-a); }
 .topic-card.active { border-color: var(--series-a); background: rgb(var(--primary-rgb) / 0.1); }
+/* The goal a student arrived at through a link (Netz, Davor/Danach): a clear ring that stays until they leave the page. */
+.topic-card.linked-to { border-color: var(--series-a); box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.35); }
 
 /* Real feedback 2026-10-01 (Susan): "view does not switch back to card
    view" -- a collapsed Listenansicht row used to render identically to a
@@ -669,36 +715,111 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 }
 
 /* Small, text-only legal links reachable from every signed-in page --
-   German TMG/DDG imprint-duty applies to the whole service, not just the
-   page before sign-in, but the full logo footer above would eat real
-   working space on every dashboard screen, so this stays minimal. */
+   German TMG/DDG imprint-duty applies to the whole service, including every
+   page after sign-in. The full logo footer above would eat real working
+   space on every dashboard screen though, so this stays minimal. */
 .app-legal-footer {
   text-align: center; padding: 8px 12px; font-size: 11px; color: var(--text-muted);
 }
 .app-legal-footer a { color: var(--text-muted); }
 
-/* Curriculum Repository timeline (2026-10-03): a fixed label column next to
-   a horizontally-scrolling time axis + lanes -- both columns render the
-   same lane rows at the same height, so no independent vertical scroll is
-   needed to keep them aligned. */
-.timeline-wrap { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface-2); }
-.timeline-labels { width: 180px; flex-shrink: 0; border-right: 1px solid var(--border); }
-.timeline-lane-label {
-  display: flex; align-items: center; padding: 0 10px; font-size: 12px; color: var(--text-secondary);
-  border-bottom: 1px solid var(--gridline); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+/* Shared timeline (feedback 4c10c072, 2026-10-29; rules in lib/timeline-standards.ts).
+   A fixed label column, a plot that fits the width with no sideways page scroll,
+   and an overview strip with a draggable window underneath. */
+.tl { margin-bottom: 8px; }
+.tl-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.tl-range { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.tl-toolbar-gap { flex: 1; }
+.tl-body { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface-1); }
+.tl-labels { flex-shrink: 0; border-right: 1px solid var(--border); background: var(--surface-2); }
+.tl-lane-label {
+  display: flex; align-items: center; gap: 6px; padding: 0 10px; font-size: 12px; font-weight: 500; color: var(--text-secondary);
+  border-bottom: 1px solid var(--gridline); box-sizing: border-box;
 }
-.timeline-scroll { flex: 1; min-width: 0; overflow-x: auto; overflow-y: hidden; position: relative; }
-.timeline-axis { position: relative; border-bottom: 1px solid var(--border); }
-.timeline-tick {
-  position: absolute; top: 0; height: 100%; display: flex; align-items: center; font-size: 11px;
-  color: var(--text-muted); padding-left: 4px; border-left: 1px solid var(--gridline); white-space: nowrap;
+.tl-lane-label span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tl-plot { flex: 1; min-width: 0; position: relative; overflow: hidden; cursor: grab; touch-action: pan-y; outline: none; user-select: none; }
+.tl-plot:active { cursor: grabbing; }
+.tl-plot:focus-visible { box-shadow: inset 0 0 0 2px var(--series-a); }
+.tl-axis { position: relative; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+.tl-axis-context { position: absolute; top: 0; left: 0; right: 0; height: 20px; }
+.tl-context-label { position: absolute; top: 3px; font-size: 11px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
+.tl-axis-minor { position: absolute; left: 0; right: 0; height: 18px; }
+.tl-tick-label { position: absolute; font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.tl-tick-label.major { color: var(--text-primary); font-weight: 600; }
+.tl-lane { position: relative; border-bottom: 1px solid var(--gridline); box-sizing: border-box; }
+.tl-grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gridline); opacity: 0.6; pointer-events: none; }
+.tl-grid.major { opacity: 1; background: var(--border); }
+.tl-mark { position: absolute; border: none; padding: 0; cursor: pointer; box-shadow: 0 0 0 2px var(--surface-1); transition: transform 90ms ease, box-shadow 90ms ease; }
+.tl-mark:hover { transform: translateY(-1px); box-shadow: 0 0 0 2px var(--surface-1), 0 2px 6px rgba(0,0,0,0.25); z-index: 5; }
+.tl-mark:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; z-index: 6; }
+.tl-mark.selected { outline: 2px solid var(--text-primary); outline-offset: 1px; z-index: 6; }
+.tl-bar { border-radius: 4px; color: #fff; font-size: 11px; font-weight: 600; text-align: left; overflow: hidden; }
+.tl-bar span { display: block; padding: 0 6px; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-point { border-radius: 3px; transform: rotate(45deg); }
+.tl-point:hover { transform: rotate(45deg) translateY(-1px); }
+.tl-point.s-square, .tl-point.s-circle, .tl-point.s-triangle { transform: none; }
+.tl-point.s-square:hover, .tl-point.s-circle:hover, .tl-point.s-triangle:hover { transform: translateY(-1px); }
+.tl-point.s-circle { border-radius: 50%; }
+.tl-point.s-triangle { border-radius: 0; clip-path: polygon(50% 4%, 100% 96%, 0 96%); box-shadow: none; }
+.tl-today { position: absolute; width: 0; border-left: 2px dashed var(--series-a); pointer-events: none; z-index: 4; }
+.tl-today span { position: absolute; top: 2px; left: 4px; font-size: 10px; font-weight: 700; color: var(--series-a); background: var(--surface-2); padding: 0 3px; border-radius: 3px; }
+.tl-overview-row { display: flex; align-items: stretch; margin-top: 8px; }
+.tl-overview-label { flex-shrink: 0; font-size: 11px; display: flex; align-items: center; padding-left: 2px; }
+.tl-overview { flex: 1; min-width: 0; position: relative; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); cursor: pointer; overflow: hidden; }
+.tl-ov-mark { position: absolute; border-radius: 1px; opacity: 0.75; pointer-events: none; }
+.tl-ov-window {
+  position: absolute; top: 0; bottom: 0; min-width: 14px; cursor: grab; box-sizing: border-box;
+  background: color-mix(in srgb, var(--series-a) 16%, transparent); border: 2px solid var(--series-a); border-radius: 4px; touch-action: none;
 }
-.timeline-lane-row { position: relative; border-bottom: 1px solid var(--gridline); }
-.timeline-gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gridline); pointer-events: none; }
-.timeline-mark { position: absolute; top: 50%; border: none; cursor: pointer; padding: 0; }
-.timeline-mark-point {
-  width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 3px;
-  transform: rotate(45deg); box-shadow: 0 0 0 2px var(--surface-2);
+.tl-ov-window:active { cursor: grabbing; }
+.tl-ov-window:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 1px; }
+.tl-ov-handle { position: absolute; top: -2px; bottom: -2px; width: 10px; cursor: ew-resize; background: var(--series-a); opacity: 0.9; touch-action: none; }
+.tl-ov-handle.left { left: -6px; border-radius: 4px 0 0 4px; }
+.tl-ov-handle.right { right: -6px; border-radius: 0 4px 4px 0; }
+.tl-hint { font-size: 11px; margin: 6px 0 0; }
+@media (max-width: 640px) {
+  .tl-labels { width: 112px !important; }
+  .tl-overview-label { width: 112px !important; }
 }
-.timeline-mark-bar { height: 14px; margin-top: -7px; border-radius: 4px; box-shadow: 0 0 0 2px var(--surface-2); }
-.timeline-today { position: absolute; width: 0; border-left: 2px dashed var(--series-a); pointer-events: none; }
+
+/* Guided tours (guided-tour.tsx, tour-editor-page.tsx). The bright window is a
+   transparent box with a huge shadow, so the dimming needs no extra layer and
+   clicks pass straight through to the page. */
+.tour-layer { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+.tour-dim { position: absolute; inset: 0; background: rgba(15, 23, 32, 0.45); }
+.tour-spot {
+  position: absolute; border-radius: 10px; pointer-events: none;
+  box-shadow: 0 0 0 100vmax rgba(15, 23, 32, 0.55), 0 0 0 3px var(--series-a);
+  transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+.tour-card {
+  position: fixed; z-index: 61; pointer-events: auto;
+  width: min(380px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow-y: auto;
+  background: var(--surface-1); color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28); padding: 12px 16px 12px; font-size: 14px; line-height: 1.5;
+}
+.tour-card-top { display: flex; align-items: center; justify-content: space-between; }
+.tour-count { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.tour-x { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; border-radius: 6px; display: inline-flex; }
+.tour-x:hover { background: var(--surface-2); color: var(--text-primary); }
+.tour-progress { height: 3px; border-radius: 2px; background: var(--surface-2); margin: 6px 0 10px; overflow: hidden; }
+.tour-progress div { height: 100%; background: var(--series-a); transition: width 0.25s ease; }
+.tour-title { margin: 0 0 6px; font-size: 17px; }
+.tour-body { margin: 0 0 8px; }
+.tour-try { display: flex; flex-direction: column; gap: 2px; margin: 10px 0 4px; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--series-a); background: color-mix(in srgb, var(--series-a) 10%, transparent); font-size: 13.5px; }
+.tour-try strong { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--series-a); }
+.tour-missing { display: flex; flex-direction: column; align-items: flex-start; margin: 10px 0 4px; padding: 8px 10px; border-radius: 8px; background: rgb(var(--warning-rgb) / 0.12); border: 1px solid var(--warning); font-size: 13.5px; }
+.tour-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.tour-end { display: block; margin: 8px auto 0; background: none; border: none; cursor: pointer; font-size: 12px; color: var(--text-muted); text-decoration: underline; }
+.tour-offer {
+  position: fixed; right: 20px; bottom: 20px; z-index: 55; width: min(320px, calc(100vw - 40px));
+  background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22); padding: 12px 16px; font-size: 14px;
+}
+.tour-offer p { margin: 0 0 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .tour-spot, .tour-progress div { transition: none; }
+}
+.tour-edit-step { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; background: var(--surface-1); }
+.tour-edit-step-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }

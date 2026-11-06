@@ -1,0 +1,237 @@
+{
+  "note": "Thinking-tool stations for the Nature of Schooling and Languages of Being Human strands. They follow the form of the Interdisciplinary thinking-tool threads (scripts/data/thinking-tool-strategies.json, section int): Tinbergen's questions are renamed for each domain and band, every analogy map ends in a break column, every payoff table says whose choice it is, causal arrows say who or what decides them. Wording for children is kept short. Evidence for the youngest bands is thin and the stations say so. Nothing is tested in a classroom.",
+  "tools": {
+    "tinbergen": {
+      "role": "primary",
+      "form": "The Guide's questions in plain words for each band. K-2 uses two cards: what is it for, and what came before it. 3-5 adds what is happening right now and how a learner got good at it. 6-8 uses four rows: what does it do for the people involved, how does it run today, how did a learner come to it, and where did it come from over many years. 9-12 uses the full grid with inside and outside causes, may rename rows for machines, and lets 'unknown' be an answer. Rows that do not apply are marked empty with a reason.",
+      "roleReason": "Both strands study things that pass between people (skills, schools, words), so the questions about where something came from and what it does are central. The Guide's wording is renamed here for learning and for language.",
+      "mustNotImport": "A school or a language is never called a species or an organism. A tool or an app gets no wants and no family. Near causes and far causes are never ranked by importance. A function answer never stands in for a how answer. A word is not said to have a purpose of its own: the purpose belongs to the people who use it.",
+      "teachingPrompt": "Which row is this answer in: what sets it off now, how a learner got good at it, how it was passed on, or what it does for the people involved? Does the row mean the same thing for a school, a word and a tool?",
+      "gaps": ["No study of children under 11 using these questions on learning or language was found.", "The K-2 and 3-5 wording is a proposal for a teacher or researcher to test."],
+      "stations": [
+        {
+          "strand": "schooling", "band": "K-2", "level": "precursor",
+          "move": "Children choose something they learned, such as tying a shoe, cooking rice or a song. Two question cards guide them: what is it for, and who or what helped, if anyone? They place picture cards on a strip: now, when I was little, before I was born.",
+          "example": "Tying a shoe, and a family recipe that two cousins both cook.",
+          "representation": "Two question cards and picture cards on a three-part strip.",
+          "challenge": "First sorting of where a skill came from, with a person at each step. Children give purpose answers readily at this age, so the function card stays simple.",
+          "concepts": ["Learning", "Teaching"]
+        },
+        {
+          "strand": "language", "band": "K-2", "level": "precursor",
+          "move": "Children compare a greeting word from a home language, a sign and a bird's alarm call. For each they answer what is it for and who passed it on. They see that a person taught the greeting and that people in the group use it the same way.",
+          "example": "A greeting in two languages or signs, and a bird's alarm call.",
+          "representation": "Picture cards with a 'who passed it on' sticker for each.",
+          "challenge": "Keep a word that a group uses by shared habit apart from a call. Adults help, because the line between learned and inborn calls is not simple and the lesson does not need to settle it.",
+          "concepts": ["Communication", "Signal", "Language"]
+        },
+        {
+          "strand": "schooling", "band": "6-8", "level": "full",
+          "move": "Students put a school and a family workshop side by side in a two-column grid. Rows: what it does for the people involved, how it runs day to day, how a learner comes to it over the years, and where it came from over many years. Rows that do not fit are marked empty with a reason.",
+          "example": "A school with a timetable and bells, and a family workshop where a young person learns by helping.",
+          "representation": "Two-column grid with four rows and an 'empty, because' note.",
+          "challenge": "Keep the answer about what it does for people apart from the answer about how it runs. Neither setting is called better.",
+          "concepts": ["Schooling", "Apprenticeship", "Institutions", "Education"]
+        },
+        {
+          "strand": "language", "band": "6-8", "level": "full",
+          "move": "Students ask four questions about one word that travelled between languages: what is it used for, how is it said and understood today, how does a child come to know it, and where did it come from over centuries. They mark how the word reached each language: inherited from an ancestor or borrowed.",
+          "example": "The two main forms of the word for tea, 'te' and 'cha', both from Chinese. 'Te' came from Min Nan and spread with Dutch sea trade. 'Cha' came from Mandarin and Cantonese and spread overland and through Portuguese traders from Macau. A linguist must confirm the example before use.",
+          "representation": "Four-row grid with a 'route' note under the history row.",
+          "challenge": "Separate how a word is used today from how it arrived. History answers do not explain use, and use does not explain history.",
+          "concepts": ["Borrowing", "Language Evolution", "Word Meaning"]
+        },
+        {
+          "strand": "schooling", "band": "9-12", "level": "extended",
+          "move": "Students take one AI tool used for study and ask the grid questions. Rows are renamed for machines: inputs and rules, training and updates, lineage of versions, and what builders and learners gain. They mark rows that do not apply and rows where the answer is unknown, such as the training data.",
+          "example": "An AI writing helper offered to students, across several versions.",
+          "representation": "Grid with renamed rows, 'empty because' and 'unknown' marks.",
+          "challenge": "Say row by row where a question stops meaning the same thing for a student, a teacher and a tool. 'Unknown' counts as an answer.",
+          "concepts": ["Technology", "Learning", "Curriculum", "Institutions"]
+        },
+        {
+          "strand": "language", "band": "9-12", "level": "extended",
+          "move": "Students turn the grid on a popular claim: that people whose language has no word for an idea cannot think it. They ask what sets the claim off, how people come to believe it, how it spreads, and what it does for those who repeat it. They write the claim again in a form that can be tested.",
+          "example": "A repeated saying that one language has many words for one thing and another has none.",
+          "representation": "Five-row grid applied to the claim, with the rewritten claim beside it.",
+          "challenge": "Use the grid on a habit of thought, and judge each answer by its row. A claim can be popular and still fail when tested. The strong version, that people cannot think what they have no word for, mostly fails, and weaker effects have mixed evidence.",
+          "concepts": ["Meaning", "Metacognition", "Knowledge"]
+        }
+      ]
+    },
+    "causal": {
+      "role": "supporting",
+      "form": "Factors joined by arrows with plus and minus signs, loops and delays, as in the existing causal-mapping thread. In these strands each arrow also says who or what decides it: a person, a rule someone wrote, or nobody. Measured arrows and supposed arrows are shown differently once claims about effects appear.",
+      "roleReason": "Both strands rest on questions about what causes what: what makes help fade, what changes a message, what a school changes in a society, what a language does to thought. Causal maps make hidden assumptions and common causes visible.",
+      "mustNotImport": "No arrow gives a school, a word or a language a goal. No loop is read as foresight. A correlation across countries is not drawn as an arrow without a note that it is supposed. A hidden controller is not accepted as an explanation of a group pattern.",
+      "teachingPrompt": "Which arrows were measured and which are guesses? Who or what decides this arrow? What else could produce the same pattern?",
+      "gaps": ["Evidence for causal mapping at ages 8 to 10 comes from studies on other topics.", "The maps about schooling and income depend on data that a reviewer has to supply."],
+      "stations": [
+        {
+          "strand": "schooling", "band": "3-5", "level": "full",
+          "move": "Students extend the learner-helper loop (skill rises, help falls) to two settings: a lesson at school and learning beside an older relative at work. Each arrow gets a sign. Each arrow is also marked with who decides it: the teacher's plan, the helper's judgement or nobody.",
+          "example": "Learning to cook a family dish beside a relative, and learning a maths method in a lesson.",
+          "representation": "Moving cards on a poster, arrows with plus or minus, a coloured dot for who decides.",
+          "challenge": "Read the same pattern in two settings, help falling as skill rises, and see that the shape is similar and the decider differs.",
+          "concepts": ["Scaffolding", "Teaching", "Learning"]
+        },
+        {
+          "strand": "language", "band": "3-5", "level": "full",
+          "move": "Students map the message chain from the strand. A noisy room lowers how well each person hears. Interest raises how much detail they add. Each arrow is marked by colour: nobody chose it (mishearing) or a person chose it (retelling in their own words).",
+          "example": "A whispered message passed along five children.",
+          "representation": "Factor cards with plus and minus arrows in two colours.",
+          "challenge": "Tell changes nobody chose from changes a person chose, and name one way the game exaggerates drift: nobody can ask \"what?\".",
+          "concepts": ["Transmission", "Variation", "Communication"]
+        },
+        {
+          "strand": "schooling", "band": "6-8", "level": "full",
+          "move": "Students map why people at a school add or drop a subject: families ask for it, teachers are available or not, hours in the day are fixed, and an exam rewards some subjects. They mark the delay between a request and a timetable change, and who decides each arrow.",
+          "example": "People at a school deciding whether to add a computing or language class.",
+          "representation": "Factor cards, arrows with signs, a delay mark and a decider dot.",
+          "challenge": "Add a fixed quantity (hours in a day) that makes more of one subject mean less of another, and a delay.",
+          "concepts": ["Institutions", "Curriculum", "Educational Purpose"]
+        },
+        {
+          "strand": "language", "band": "6-8", "level": "full",
+          "move": "Students draw four different causal stories for one word that two languages have in common: common ancestor, borrowing, imitation of a sound or baby talk, and chance. Each arrow says who or what decides it: children learning the word from their families (ancestor), speakers choosing to take it over (borrowing), the way a sound is made (imitation), or nobody (chance). For each story they list what evidence would favour it: the history of the word, the sound pattern, and relatives in other languages.",
+          "example": "One word that two neighbouring languages share, with its history hidden until the end.",
+          "representation": "Four small maps side by side, each with an 'evidence that would favour it' list.",
+          "challenge": "Compare four explanations of one fact, name the evidence that would separate them, and mark who or what decides each arrow.",
+          "concepts": ["Borrowing", "Inheritance", "Language Family"]
+        },
+        {
+          "strand": "schooling", "band": "9-12", "level": "extended",
+          "move": "Students map the claim that more years of schooling raise income. They add other causes that could produce the same pattern: family wealth, local jobs, and income paying for more schooling. They mark each arrow as measured or supposed, say who decides it (employers, families, a government or nobody), and name a study that could help separate them.",
+          "example": "A report that countries with more years of schooling have higher incomes.",
+          "representation": "Factor cards, arrows with signs, solid lines for measured and dashed lines for supposed.",
+          "challenge": "Include a reverse arrow and a shared cause, and name a study design. Evidence at this age is better than for younger bands, and the data still need a reviewer.",
+          "concepts": ["Institutions", "Knowledge", "Educational Purpose"]
+        },
+        {
+          "strand": "language", "band": "9-12", "level": "extended",
+          "move": "Students map the claim that language shapes thought: a language's categories shape habits of attention, and habits shape behaviour. They add other causes of the same pattern: shared history, geography, writing and schooling. They add an arrow in the other direction, from what matters to a community to the words it has. They draw shared ancestry as a hidden common cause across a sample of related languages. Each arrow says who or what decides it, and a note says that a difference between groups describes averages and says little about any one speaker.",
+          "example": "A study that compares speakers of a few related languages on a task.",
+          "representation": "Factor cards and arrows with a hidden-cause box, measured and supposed arrows in different styles.",
+          "challenge": "Show why related languages are not fully independent examples, as a common cause on the map.",
+          "concepts": ["Language Family", "Meaning", "Knowledge"]
+        }
+      ]
+    },
+    "payoff": {
+      "role": "limited",
+      "form": "A table of outcomes for each pair of choices by two parties, as in the existing payoff thread. Every table says whose choice it is and whether choice is the right word. These strands use ranked outcomes (best, middle, worst) before numbers. Outcomes are worded in plain terms and carry a 'what this table leaves out' note.",
+      "roleReason": "Coordination and cost-sharing problems sit under both subjects: agreeing on a word, deciding who teaches, choosing a language of instruction. A small table shows why individually sensible choices can add up to outcomes nobody wanted. It is a limited tool here.",
+      "mustNotImport": "No table gives a language, a school or a custom a choice or a reason. Human cases are not used as evidence for what evolved. A model of language shift or schooling is never presented as a prediction for any particular community, and no particular community is named. Fairness and identity are named as left out and never silently counted as payoffs.",
+      "teachingPrompt": "Who is choosing here, and is choosing the right word? What is left out of the table: pride, identity, pressure, rules?",
+      "gaps": ["No study of students under 11 using payoff tables for coordination was found.", "Whether payoff tables help students think about language choice has not been tested."],
+      "stations": [
+        {
+          "strand": "language", "band": "K-2", "level": "precursor",
+          "move": "Two children each pick one of two made-up words for 'start the game'. A picture table with face cards shows what happens when both pick the same word and when they pick different words. Children say which outcomes they like and what they could do to match.",
+          "example": "Two children who invent 'go' and 'now' as a signal to begin.",
+          "representation": "Picture table with face cards, one row per choice.",
+          "challenge": "First outcome table where the good result needs both children to match. Long-term columns are left out. Evidence for this age is thin.",
+          "concepts": ["Communication", "Language", "Cooperation"]
+        },
+        {
+          "strand": "language", "band": "6-8", "level": "full",
+          "move": "Students fill a two-by-two table for traders in two neighbouring markets who each choose which language to trade in. Both do best when both pick the same, though each would rather it was its own. They read the two matching cells, ask what could move both to one, and name what the table leaves out.",
+          "example": "Traders in two market towns choosing a trade language.",
+          "representation": "Two-by-two table with best, middle and worst, and a 'left out' note.",
+          "challenge": "Find a table where both matching cells are good and the choice between them is open. Choosing is the right word for traders and the wrong word for a child learning a first language.",
+          "concepts": ["Language", "Communication", "Cooperation", "Institutions"]
+        },
+        {
+          "strand": "schooling", "band": "6-8", "level": "full",
+          "move": "Students fill a table in which an education authority picks the language for lessons (the home language, a wider language, or both) and families then choose to enrol, move or pay for a school elsewhere. Cells rank outcomes best, middle and worst for learners, families and the authority, now and later. They look for an arrangement that none of the sides proposed at first.",
+          "example": "An authority choosing a language of instruction and families responding, with no particular place named.",
+          "representation": "Table with ranked outcomes in the cells, a 'later' column and a 'left out' note.",
+          "challenge": "The table depends on assumptions the students list. Left out: who holds power, and a child's right to follow the lesson. Choosing is the right word for the authority, and families may have no other school nearby.",
+          "concepts": ["Language of Instruction", "Educational Purpose", "Multilingualism", "Institutions"]
+        },
+        {
+          "strand": "schooling", "band": "9-12", "level": "extended",
+          "move": "Students fill a table for two adults who can each spend time teaching a child or doing other work. Both gain if the child learns. Each gains most if the other carries the teaching. They compare ways a group might handle it: a custom, a shared payment, a school, or children learning alongside the work. They say which of these the table fits and which it misses.",
+          "example": "Two households in a community deciding who teaches a skill to the children.",
+          "representation": "Two-by-two table, then a changed table after each way out.",
+          "challenge": "Read why a group may set up a shared arrangement, and state that the table is a model of one explanation. It is not evidence that schools arose this way, and it leaves out children who learn by joining the work. Evidence for this skill at ages 15 to 18 is thin.",
+          "concepts": ["Teaching", "Cooperation", "Institutions", "Norms"]
+        },
+        {
+          "strand": "language", "band": "9-12", "level": "extended",
+          "move": "Students fill a table for two families that each choose which language to use at home with children. The best choice for each family depends on what the other does and on what school and work reward. They compare outcomes now and a generation later, and list what the table leaves out, such as pride, identity, pressure and policy.",
+          "example": "Two families in a place with a dominant language, with no particular community named.",
+          "representation": "Two-by-two table with 'now' and 'a generation later' columns and a 'left out' list.",
+          "challenge": "Say that the table makes no prediction about any particular community and that loss of a language is not inevitable. Name which assumptions would change the result.",
+          "concepts": ["Multilingualism", "Language of Instruction", "Norms", "Culture"]
+        }
+      ]
+    },
+    "analogy": {
+      "role": "primary",
+      "form": "Two or more cases from different domains side by side, shared relations in rows, and a 'where it breaks' column filled from the vocabulary's 'does not carry over' notes. Where a concept has no such note, the map names the neighbouring note it borrows. A map is a hypothesis that needs separate evidence. K-2 starts with picture cards sorted into same job, looks alike and different.",
+      "roleReason": "Both strands rest on comparisons that are tempting and partly wrong: schools and scaffolds, language and living things, translators and language models. Analogy mapping gives students a way to use a comparison and to say where it fails.",
+      "mustNotImport": "No map treats surface resemblance as evidence, and no map ends without a break column. A language model is never said to understand, or not to understand, without the debate being stated. 'Species', 'offspring' and 'fitness' for schools or languages appear only as quoted words under test, and are kept or dropped after the break column is filled. Each map names the senses it joins.",
+      "teachingPrompt": "Which rows match because the relations are the same, and which because the pictures look alike? Where does the map break, and which note says so?",
+      "gaps": ["Naming a break between two cases is untested at ages 5 to 7.", "The 9-12 maps need a reviewer who knows both domains."],
+      "stations": [
+        {
+          "strand": "language", "band": "K-2", "level": "precursor",
+          "move": "Children compare a handshake and a word with picture cards. They sort what is the same (both work because two people know the same rule) from what looks alike and what differs. An adult helps them name one difference.",
+          "example": "A handshake and a greeting word.",
+          "representation": "Two picture cards and three sorting mats: same job, looks alike, different.",
+          "challenge": "Name one difference between two cases that share a job, as the Analogical Reasoning note asks. Relation words help. Naming a break is untested at this age.",
+          "concepts": ["Analogical Reasoning", "Communication", "Representation"]
+        },
+        {
+          "strand": "schooling", "band": "3-5", "level": "full",
+          "move": "Students fill a two-column map: scaffolding on a building and the help a learner gets. Rows: what the support is for, when it is added, when it is taken away, who decides. The break column names the Teaching note, because Scaffolding has no note of its own: a wall takes no part in its own building, and a learner acts, can ask and can refuse.",
+          "example": "Scaffolding around a wall being built, and an older child helping a younger one learn to swim.",
+          "representation": "Two-column table with four shared rows and a break column.",
+          "challenge": "Match on relations such as when support is added and removed. Name one break taken from the Teaching note.",
+          "concepts": ["Scaffolding", "Teaching", "Analogical Reasoning"]
+        },
+        {
+          "strand": "language", "band": "3-5", "level": "full",
+          "move": "Students map a word that moved from one language to another beside a tool that moved from one group to another. Rows: who holds it, who gets it, what changes on arrival, whether it can go back. The break column uses the Transmission note and the Borrowing note: nothing is handed back, and the new language reshapes the word to its own sounds.",
+          "example": "A food word that travelled with the food, and a tool that was copied by a neighbouring group.",
+          "representation": "Two-column table with four rows and a break column.",
+          "challenge": "Match on relations, and name where borrowing differs from inheritance.",
+          "concepts": ["Borrowing", "Transmission", "Analogical Reasoning"]
+        },
+        {
+          "strand": "schooling", "band": "6-8", "level": "full",
+          "move": "Students compare three stand-ins for what some people chose to pass on: a written curriculum, a textbook and a teacher's lessons. Rows: what is kept, what is left out, who treats it as a stand-in. The break column uses the Representation note and the Curriculum note: the written plan, the lesson given and the learning that results are three different things.",
+          "example": "A national syllabus, a class textbook and a teacher's lessons on the same topic.",
+          "representation": "Three-column table with rows for kept, left out and who reads it.",
+          "challenge": "Say who treats each item as a stand-in and what each leaves out, then name a use for which each would fail.",
+          "concepts": ["Curriculum", "Representation", "Knowledge"]
+        },
+        {
+          "strand": "language", "band": "6-8", "level": "full",
+          "move": "Students map a tree of languages beside a tree of living things. Rows: shared ancestor, branching, change along a branch. The break column uses the Descent and Inheritance notes and the Language Family note: languages borrow across branches and can be changed on purpose. They test the map against a second picture, streams that join and split, to see which picture fits borrowing better.",
+          "example": "A family of related languages beside a tree of related birds.",
+          "representation": "Two-column table with three relation rows, a break column and a second picture.",
+          "challenge": "Check the map against a second analogy, since one analogy can leave a wrong picture. Name where the tree hides what the streams show.",
+          "concepts": ["Language Family", "Language Evolution", "Inheritance", "Borrowing"]
+        },
+        {
+          "strand": "schooling", "band": "9-12", "level": "extended",
+          "move": "Students test whether a teaching method spreading between schools works like a trait spreading in a population. They fill the break column first from the notes on Selection, Fitness, Inheritance and Institutions: who sets the target, whether versions are copied or designed, whether any lineage dies out. Then they fill the match column and keep or drop the words 'variation', 'selection' and 'fitness'.",
+          "example": "A new teaching method that spreads between schools, beside a trait spreading in a population.",
+          "representation": "Table with columns for case A, case B and where it breaks, the break column filled first, and a keep-or-drop list of words.",
+          "challenge": "Fill the break column before the match column, then test the kept words on a second case, a market or a garden. Keep a word only if it survives both.",
+          "concepts": ["Selection", "Institutions", "Innovation", "Analogical Reasoning"]
+        },
+        {
+          "strand": "language", "band": "9-12", "level": "extended",
+          "move": "Students compare a human translator and a machine translator on a technical passage. Rows: what is kept, what is left out, who checks. The break column uses the Meaning note and the Translation note: fluent output alone does not settle whether software understands, and quality drops for languages with little written text. They keep or drop the words 'understands' and 'knows' and say what evidence would decide.",
+          "example": "A short passage about a scientific idea, translated by a person and by software, and read by someone who knows both languages.",
+          "representation": "Two-column table with rows for kept, left out and who checks, and a keep-or-drop list.",
+          "challenge": "Fill the break column first. Test the kept words on a second case, a traveller using a phrasebook. Keep a word only if it survives both.",
+          "concepts": ["Translation", "Meaning", "Representation", "Technology"]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/pennsylvania-lpm/schema/coherence-finding-record.schema.json",
+  "title": "pennsylvania-lpm Coherence-Analysis Finding Record",
+  "description": "One empirical finding from directly reading official Pennsylvania science-standards or court-record documents: a gap, a working cross-reference, a wording change between editions, or a divergence between what a school district mandated and what the state's own standards actually require. The computable unit underneath prose in docs/source-notes/ -- lets a query ask 'which adopted mandates (institutional-mandate-record) have a supporting or contradicting finding' and 'did Dover Area School District's 2004 policy go further than anything in Pennsylvania's own state science standards ever required'. Modeled on deutsche_lp's/nys_lp's/india-lpm's/florida-lpm's coherence-finding-record.schema.json; findingType is adapted since Pennsylvania's defining pattern is NOT a single state authority re-adopting the same standard across decades (contrast florida-lpm) -- it is a three-level story (a single school district's own policy, the state's separate standards, and a federal court ruling that bound neither directly but shaped both going forward).",
+  "type": "object",
+  "required": ["id", "slug", "label", "findingType", "objects", "summary", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^PALP-FINDING-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "findingType": {
+      "type": "string",
+      "enum": [
+        "uncrossreferenced-gap", "working-crossreference",
+        "standard-wording-change-across-editions", "standard-naming-explicitness-gap",
+        "district-vs-state-standard-divergence", "litigation-finding-vs-standard-text",
+        "convergent-coverage-pattern", "cross-state-standards-divergence"
+      ],
+      "description": "'uncrossreferenced-gap' = no link found between related content in two policy objects that would benefit from one. 'working-crossreference' = a real cross-reference was found and confirmed. 'standard-wording-change-across-editions' = a finding about how a specific benchmark's own wording changed between two named editions of Pennsylvania's own state science standards -- a fact about the policy text's own evolution, not about external curriculum. 'standard-naming-explicitness-gap' = whether a given edition names a contested concept (e.g. 'evolution', 'natural selection', 'climate change') explicitly at all, versus using vaguer or substitute language, versus omitting it entirely. 'district-vs-state-standard-divergence' = a finding about how a specific school district's own curriculum mandate (e.g. Dover Area School District's 2004 policy) compared to what Pennsylvania's own state-level standards actually required at the same time -- distinct from a cross-EDITION comparison, this is a cross-LEVEL comparison within the same jurisdiction. 'litigation-finding-vs-standard-text' = whether a specific factual or legal finding from a court ruling (e.g. a Kitzmiller v. Dover finding about what intelligent design is or isn't) is reflected, contradicted, or simply absent in subsequent official standards text. 'convergent-coverage-pattern' = 2+ independent sources (official text, a textbook, a state resource page) converge on the same content emphasis. 'cross-state-standards-divergence' = comparison with another state's (Florida via florida-lpm, New York via nys_lp, or any state covered in national_ccs_policy/) equivalent standard or episode."
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The policy object(s) this finding is about. One object alone is valid for a single-source placement fact that a later finding might compare against; most findings compare 2+ (e.g. the same benchmark across two editions).",
+      "items": {
+        "type": "object",
+        "required": ["jurisdiction", "sourceDocument"],
+        "additionalProperties": false,
+        "properties": {
+          "jurisdiction": { "type": "string", "pattern": "^US-[A-Z]{2}$|^US$" },
+          "policyArea": { "type": "string", "description": "e.g. 'Dover Area School District's intelligent-design disclaimer statement', 'Pennsylvania Academic Standards for Science and Technology, biological evolution benchmarks', 'Kitzmiller v. Dover ruling, Establishment Clause findings'." },
+          "documentDate": { "type": "string", "format": "date" },
+          "excerptText": { "type": "string", "description": "A short verbatim excerpt grounding the object, where one exists in the source doc." },
+          "sourceDocument": { "type": "string" },
+          "sourcePage": { "type": "string" },
+          "sourceUrl": { "type": "string", "format": "uri" },
+          "accessTier": {
+            "type": "string",
+            "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+            "description": "How much of this object's source document this record actually keeps in excerptText, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Identical field to deutsche_lp's/nys_lp's/india-lpm's coherence-finding-record.schema.json."
+          },
+          "licenseOrRightsNote": {
+            "type": "string",
+            "description": "The legal basis for storing excerptText at the accessTier chosen above. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "description": "One or two sentences stating the finding in plain language -- what was found, not why it matters (see policyRelevance for that)."
+    },
+    "policyRelevance": {
+      "type": "string",
+      "description": "Optional: why this finding matters for curriculum policy or for OpenEvo's own strategy, if not already obvious from summary."
+    },
+    "testsMandateIds": {
+      "type": "array",
+      "description": "Institutional-mandate-record ids this finding provides evidence for, against, or relevant to.",
+      "items": { "type": "string", "pattern": "^PALP-MANDATE-[a-z0-9-]+$" }
+    },
+    "relatedControversyIds": {
+      "type": "array",
+      "description": "policy-controversy-record ids this finding provides direct textual evidence for -- e.g. a wording-change finding that documents exactly what a controversy's contestedObjects fight was actually about.",
+      "items": { "type": "string", "pattern": "^PALP-CONTROVERSY-[a-z0-9-]+$" }
+    },
+    "themes": {
+      "type": "array",
+      "description": "Which content theme(s) this finding is evidentially about -- kept as an open, non-enum string list since this repo's theme taxonomy has not yet stabilized.",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "exhaustivenessCaveat": {
+      "type": "string",
+      "description": "Explicit statement of how exhaustive the underlying search was, e.g. 'based on the specific editions and benchmark codes fetched this session, not a systematic benchmark-by-benchmark diff of every life-science standard across all four editions' -- required honesty; omit only when a search genuinely was exhaustive (rare)."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

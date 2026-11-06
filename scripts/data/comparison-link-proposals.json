@@ -1,0 +1,437 @@
+{
+ "generated": "2026-10-28",
+ "note": "AI-drafted proposals for links between the Social-Core and Computational-Core spaces and German and US curriculum policy records. Every row is loaded as a proposed link (relation type starts with proposed_) for a person to confirm, edit or remove. Source: two drafting passes grounded in the record titles and summaries; see the design note.",
+ "spaces": {
+  "social": {
+   "slug": "social-core-lpm-synth",
+   "links": [
+    {
+     "objectId": "067d4563-07b7-5c5c-8e9c-1dba9b610402",
+     "recordId": "5c82c34f-fb3c-434d-9252-5e90464f416d",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "The KMK names cross-subject teaching as one of three pillars of democracy education, under a goal of tolerant and democratic living together. It gives the national frame in which a strand on groups, rules and institutions would sit in Germany.",
+     "objectTitle": "Groups, Norms and Rules",
+     "recordTitle": "KMK/Bildungsministerkonferenz names Faecherubergreifendes Unterrichtsprinzip as one of three pillars of Demokratiebildung, nationally, for 2025",
+     "recordJurisdiction": "DE"
+    },
+    {
+     "objectId": "067d4563-07b7-5c5c-8e9c-1dba9b610402",
+     "recordId": "805134c3-5583-4f3f-aee8-7a45d3132f0c",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Describes Sozialkunde and G/R/W outside the Gymnasium in Sachsen, Sachsen-Anhalt and Thüringen as covering civics, law, economics and international relations. It points to where rules and institutions are taught in these states.",
+     "objectTitle": "Groups, Norms and Rules",
+     "recordTitle": "Sozialkunde/G-R-W's absence of human-origins content is confirmed across all three states' non-Gymnasium tracks, closing the last subject-coverage gap",
+     "recordJurisdiction": "DE-SN, DE-ST, DE-TH"
+    },
+    {
+     "objectId": "c4836b7e-c2ac-5eda-9368-08e410453278",
+     "recordId": "a272b254-13dd-461b-b85e-3d8188baa02e",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Lower Saxony put a Kerncurriculum for Werte und Normen in grades 1 to 4 out for consultation in February 2026. The subject name points to values and rules in early schooling. Only the title is available, so the fit is untested.",
+     "objectTitle": "Groups We Belong To and Their Rules",
+     "recordTitle": "Kerncurricula in Anhörung: Mathematik Grundschule, Christliche Religion 5-10, Werte und Normen 1-4",
+     "recordJurisdiction": "DE-NI"
+    },
+    {
+     "objectId": "f21b382b-ed4a-5e4e-b69b-d603834fbbe9",
+     "recordId": "a272b254-13dd-461b-b85e-3d8188baa02e",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "The same Lower Saxony consultation covers Werte und Normen for grades 1 to 4, which overlaps this grades 3 to 5 band. The title gives no detail on roles or on why rules differ, so the fit is a candidate for checking.",
+     "objectTitle": "Roles and Why Rules Differ",
+     "recordTitle": "Kerncurricula in Anhörung: Mathematik Grundschule, Christliche Religion 5-10, Werte und Normen 1-4",
+     "recordJurisdiction": "DE-NI"
+    },
+    {
+     "objectId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+     "recordId": "c65a2182-5b01-4a40-a9ab-083acea6524b",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Eight Dover biology teachers refused to read a school-board disclaimer, citing their profession's ethics code, and administrators read it instead. A case where a professional norm and an authority's rule pull apart, usable for sorting peer-held norms from enforced rules.",
+     "objectTitle": "How Norms Are Enforced",
+     "recordTitle": "All 8 Dover biology teachers refuse to read the disclaimer; it is read by administrators instead",
+     "recordJurisdiction": "US-PA"
+    },
+    {
+     "objectId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+     "recordId": "cc06207e-12a5-4c17-8e89-44145d0a39e3",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Notes that the Butler Act was enforced exactly once in 42 years and the 2012 Teacher Protection Act apparently never. It treats both as mandates teachers must still account for, which suits the question of what a rarely enforced rule still does.",
+     "objectTitle": "How Norms Are Enforced",
+     "recordTitle": "A law nobody has prosecuted under, or ever invoked, is still a real curriculum mandate worth documenting precisely",
+     "recordJurisdiction": "US-TN"
+    },
+    {
+     "objectId": "56eb4828-57c2-589b-92ba-180f901b2443",
+     "recordId": "5074bf81-5e69-43b6-ba0e-618a5a00b45c",
+     "relationType": "relates_to",
+     "confidence": "strong",
+     "rationale": "Saxony's Gymnasium G/R/W plan builds the subject on analytic categories such as Macht and Institutionen, together with law and negotiated order. This matches the item's focus on formal institutions and power.",
+     "objectTitle": "Formal Institutions and Informal Norms",
+     "recordTitle": "G/R/W's own foundational categories (Macht, Institutionen, Recht...) <-> evolved reliance on institutions for large-scale non-kin cooperation",
+     "recordJurisdiction": "DE-SN"
+    },
+    {
+     "objectId": "56eb4828-57c2-589b-92ba-180f901b2443",
+     "recordId": "bdc9d32c-1eb3-4982-9ca1-ec5b617e2632",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Traces how Supreme Court rulings in 1968 and 1987 ended certain teaching bans and mandates, after which new laws appeared in forms built to avoid the defect the Court named. It shows an institution reshaping the options people face.",
+     "objectTitle": "Formal Institutions and Informal Norms",
+     "recordTitle": "A landmark ruling changes what the next legislative attempt looks like; it rarely ends the underlying attempt",
+     "recordJurisdiction": "US"
+    },
+    {
+     "objectId": "56eb4828-57c2-589b-92ba-180f901b2443",
+     "recordId": "364a3071-4279-4feb-aef5-9b447c8a1c9f",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Sets Florida's negotiated 2008 wording on evolution beside Pennsylvania's Dover case, which a federal court decided on the constitutional question. A board vote and a court settle the same kind of dispute in different ways, which suits the item's comparison of institutions.",
+     "objectTitle": "Formal Institutions and Informal Norms",
+     "recordTitle": "A court ruling can settle a curriculum dispute more durably than a subsequent vote, where a constitutional question is actually at stake",
+     "recordJurisdiction": "US-PA"
+    },
+    {
+     "objectId": "56eb4828-57c2-589b-92ba-180f901b2443",
+     "recordId": "dcdf6f52-6ea1-4192-9098-a259e0a91b21",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Records eight Dover teachers' collective refusal to read a district disclaimer, citing their profession's ethics code, as a check on curriculum governance. It gives a case for sorting a formal board policy from an informal professional norm.",
+     "objectTitle": "Formal Institutions and Informal Norms",
+     "recordTitle": "Teachers refusing to implement a mandate they judge unscientific is itself a documentable form of curriculum governance",
+     "recordJurisdiction": "US-PA"
+    },
+    {
+     "objectId": "1d8ecb11-c3b4-57b0-9a0f-b32667147fea",
+     "recordId": "ecfff55e-af26-4d46-9cf1-da297382a7c7",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "An OpenEvo brief proposes that Cooperation Games and Governing the Commons content can supply evidence for New York's Global Citizen attribute. It points to where cooperation teaching could sit in a US state framework.",
+     "objectTitle": "Cooperation, Conflict and Collective Action",
+     "recordTitle": "Map OpenEvo's content anchors directly onto the Portrait's attributes as ready-to-use content, not a competing framework",
+     "recordJurisdiction": "US-NY"
+    },
+    {
+     "objectId": "3d964122-338c-548e-882b-d833d2ec4209",
+     "recordId": "c524b7e5-4bbd-4510-abbc-ac42c661cb34",
+     "relationType": "contrasts_with",
+     "confidence": "weak",
+     "rationale": "Saxony's grade 10 economics goals teach an idealized rational-actor model, which the record sets against cross-cultural ultimatum-game findings on fairness. It is a later-grade treatment of this item's question of why people give or keep.",
+     "objectTitle": "Why People Cooperate or Hold Back",
+     "recordTitle": "Wirtschaft und Wirtschaftsordnung (Kl. 10) <-> evolved fairness/reciprocity psychology vs. the idealtypische homo-oeconomicus model",
+     "recordJurisdiction": "DE-SN"
+    },
+    {
+     "objectId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+     "recordId": "5074bf81-5e69-43b6-ba0e-618a5a00b45c",
+     "relationType": "relates_to",
+     "confidence": "strong",
+     "rationale": "Saxony's Gymnasium G/R/W plan puts Macht and Konflikt among its central analytic categories, alongside institutions and negotiated rules. These are the ideas this item uses to compare governance designs and judge the part power plays.",
+     "objectTitle": "Governing Shared Resources: Power and Conflict",
+     "recordTitle": "G/R/W's own foundational categories (Macht, Institutionen, Recht...) <-> evolved reliance on institutions for large-scale non-kin cooperation",
+     "recordJurisdiction": "DE-SN"
+    },
+    {
+     "objectId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+     "recordId": "92fc5a61-e765-4928-8cdf-1894662fbb8f",
+     "relationType": "contrasts_with",
+     "confidence": "moderate",
+     "rationale": "Argues that global citizenship teaching needs an account of why cooperation at scale is hard, built on evolved cooperation mechanisms and the psychology of institutions. This item builds its account from power, conflict and institutions, so the two can be compared.",
+     "objectTitle": "Governing Shared Resources: Power and Conflict",
+     "recordTitle": "Global Citizen attribute <-> evolved cooperation and the psychology of institutions",
+     "recordJurisdiction": "US-NY"
+    },
+    {
+     "objectId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+     "recordId": "ecfff55e-af26-4d46-9cf1-da297382a7c7",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "An OpenEvo brief maps the Governing the Commons content anchor onto New York's Global Citizen attribute. It shows one US state framework in which content on governing shared resources could be placed.",
+     "objectTitle": "Governing Shared Resources: Power and Conflict",
+     "recordTitle": "Map OpenEvo's content anchors directly onto the Portrait's attributes as ready-to-use content, not a competing framework",
+     "recordJurisdiction": "US-NY"
+    },
+    {
+     "objectId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+     "recordId": "1cb2950b-0d4b-415c-a2a2-ad3a9bfca2e7",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Saxony's grade 11 plan asks students to learn theories of international relations and to analyze international conflicts. It extends this item's questions about power and conflict to the international scale.",
+     "objectTitle": "Governing Shared Resources: Power and Conflict",
+     "recordTitle": "Internationale Politik (Jgst. 11) <-> evolved intergroup cooperation/conflict and the security dilemma",
+     "recordJurisdiction": "DE-SN"
+    },
+    {
+     "objectId": "925d0b84-162d-5a26-a26c-c15db8863af1",
+     "recordId": "5bf82c77-725d-4cab-94ee-7992d51621a0",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "The title says North Rhine-Westphalia revised its Kernlehrplan for Gesellschaftslehre in the Hauptschule. That plan is a candidate source on how a German state teaches about societies. No text is available, so the fit is untested.",
+     "objectTitle": "Social Change and Diversity of Societies",
+     "recordTitle": "Kernlehrplan im Lernbereich Gesellschaftslehre (Hauptschule) novellierten",
+     "recordJurisdiction": "DE-NW"
+    },
+    {
+     "objectId": "925d0b84-162d-5a26-a26c-c15db8863af1",
+     "recordId": "b835dc33-a53f-409d-bb1e-d9b95a3280d2",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "The title says Saarland published new Gemeinschaftsschule curricula for 2025/26, among them one for Gesellschaftswissenschaften. It is a candidate source for how a German state frames social studies. No text is available, so the fit is untested.",
+     "objectTitle": "Social Change and Diversity of Societies",
+     "recordTitle": "New Gemeinschaftsschule curricula published for 2025/26: Gesellschaftswissenschaften, Naturwissenschaften, integrated Informatik",
+     "recordJurisdiction": "DE-SL"
+    },
+    {
+     "objectId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+     "recordId": "9a2cd62a-9e6c-4a8d-ba82-b7637f3b8bbf",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Sachsen-Anhalt's Sekundarschule Geographie covers population development in regions of Asia at grades 7/8. A regional comparison of this kind could supply evidence when students explain why societies differ.",
+     "objectTitle": "Why Societies Differ",
+     "recordTitle": "Sachsen-Anhalt Sekundarschule Geographie: Bevölkerungsentwicklung in two touches, both at or before Gymnasium's placement",
+     "recordJurisdiction": "DE-ST"
+    },
+    {
+     "objectId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+     "recordId": "1cdfa96f-3c92-42aa-ba38-69211c312c44",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Compares Florida, Pennsylvania and Tennessee, which currently take three different postures on evolution education, each with its own history of standards, litigation or statute. It is a cross-state comparison of the kind this item asks students to make.",
+     "objectTitle": "Why Societies Differ",
+     "recordTitle": "Florida, Pennsylvania, and Tennessee have three genuinely different current postures on evolution-education policy",
+     "recordJurisdiction": "US-FL, US-PA, US-TN"
+    },
+    {
+     "objectId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+     "recordId": "afa254d5-36cb-4f50-8969-44b4e1511e5f",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Follows one question in Tennessee over a century, from a 1925 prohibition to a 1973 equal-emphasis mandate and a later law in secular language. A worked case of courts and legislators shaping each other over generations.",
+     "objectTitle": "Explaining Large-Scale Change",
+     "recordTitle": "When a recurring legislative fight loses in court, the next round tends to arrive in secularized language, not a changed goal",
+     "recordJurisdiction": "US-TN"
+    },
+    {
+     "objectId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+     "recordId": "f6c75e6e-d735-4a66-9cb1-a4e5dd49111a",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Describes how one question about teaching human origins recurred across US states and decades, from Tennessee's 1925 law to the Arkansas and Mississippi bans and later cases. It gives a long-run case for evaluating explanations of change.",
+     "objectTitle": "Explaining Large-Scale Change",
+     "recordTitle": "The American evolution-education culture war, 1925-present",
+     "recordJurisdiction": "US"
+    },
+    {
+     "objectId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+     "recordId": "44c8c6ff-2d37-49cc-ba0d-3be44384bd23",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Reports that a model Academic Freedom Act template from the Discovery Institute was enacted in Louisiana in 2008 and Tennessee in 2012, and used for Florida bills. A documented case of a policy spreading between states.",
+     "objectTitle": "Explaining Large-Scale Change",
+     "recordTitle": "The 2008 \"Academic Freedom Act\" (SB 2692/HB 1483) legislative fight",
+     "recordJurisdiction": "US-FL"
+    }
+   ],
+   "itemsWithoutLinks": [
+    {
+     "objectId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+     "title": "Sharing and Taking Turns",
+     "why": "The corpus has no record on early-grade cooperation, sharing or turn-taking in either country."
+    },
+    {
+     "objectId": "2de4fac1-1590-5260-a501-d040c57c2acf",
+     "title": "Shared-Resource Problems",
+     "why": "No record in the corpus deals with commons, public goods or other shared-resource dilemmas as a classroom topic."
+    },
+    {
+     "objectId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+     "title": "Communities Then and Now",
+     "why": "The corpus has no early-grade record on local history or community change, such as Sachunterricht or K-2 social studies."
+    },
+    {
+     "objectId": "aae0bca6-2dfa-5fb1-a2bd-4e8d4381b87c",
+     "title": "How a Practice Spreads",
+     "why": "No record covers how customs, foods or tools spread between communities at upper-primary level; the only diffusion examples are state laws, which sit too far from this grade band."
+    }
+   ],
+   "corpusGaps": "The corpus has no records on early-grade social learning in either country, such as Sachunterricht in Germany or K-2 social studies in the US, so the K-2 items and the Shared-Resource Problems item have nothing to attach to. It also lacks any record on commons governance, public goods or collective-action cases taught in schools. Records from social-studies, civics and Gesellschaftslehre curricula are scarce: the usable German ones are a few Saxon G/R/W and Sozialkunde findings plus title-only timeline entries, and the only US civics-adjacent material is a set of New York graduate-profile briefs. Cross-curricular principle records, such as the Leitperspektiven in Baden-Württemberg and Hamburg, the Medienkompetenz supplement in Schleswig-Holstein and the Demokratiebildung entry, are mostly timeline events with empty text, so their fit cannot be judged. Nearly all US records concern evolution and climate education, and the few linked here are governance cases (courts, school boards, legislatures) that a curator should treat as bridge cases. Full-text records of German state Lehrpläne for Gesellschaftslehre, Politik, Sozialkunde and Geschichte, and of US state social-studies and civics standards, would let most of these items be linked on content."
+  },
+  "computational": {
+   "slug": "computational-core-lpm-synth",
+   "links": [
+    {
+     "objectId": "7d846794-560b-58b9-a9f0-267a680c308d",
+     "recordId": "ec7c0238-5ac5-4a8c-8620-46fe947eff59",
+     "relationType": "contrasts_with",
+     "confidence": "moderate",
+     "rationale": "Baden-Württemberg makes Informatik und Medienbildung a compulsory subject from grade 5, with its own Bildungsplan planned for 2027/28. This strand starts in K-2, so the record shows a later entry point for the same question of when computing begins. Title only.",
+     "objectTitle": "Algorithms and Programs",
+     "recordTitle": "New Pflichtfach 'Informatik und Medienbildung' taught from grade 5; own Bildungsplan 2027/28",
+     "recordJurisdiction": "DE-BW"
+    },
+    {
+     "objectId": "7d846794-560b-58b9-a9f0-267a680c308d",
+     "recordId": "f71a6610-a989-4524-9988-8b9d0683b179",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Bremen makes Informatik a compulsory subject at all its secondary schools from August 2026. It shows one state giving computing its own required place in the timetable, which is a point of comparison for this K-12 strand. Only the title is available.",
+     "objectTitle": "Algorithms and Programs",
+     "recordTitle": "Informatik becomes a compulsory subject at all Bremen secondary schools",
+     "recordJurisdiction": "DE-HB"
+    },
+    {
+     "objectId": "7d846794-560b-58b9-a9f0-267a680c308d",
+     "recordId": "f0a1c369-5165-456e-bbbe-d9de5b54fac9",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Mecklenburg-Vorpommern gives Informatik und Medienbildung a standalone place in its 2025/26 timetable changes. It is a second example of a state placing computing in its own subject, useful for comparison with this strand. The record has a title only.",
+     "objectTitle": "Algorithms and Programs",
+     "recordTitle": "Stundentafel and subject changes for 2025/26: Informatik und Medienbildung standalone, Geschichte from grade 5, Chemie from grade 7",
+     "recordJurisdiction": "DE-MV"
+    },
+    {
+     "objectId": "7d846794-560b-58b9-a9f0-267a680c308d",
+     "recordId": "35845e3d-239f-4f48-8049-8680c23e9d22",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Thüringen introduced Medienbildung und Informatik (MBI) in August 2024. The title gives no grade or content, so the link to this strand rests on the subject name alone.",
+     "objectTitle": "Algorithms and Programs",
+     "recordTitle": "Medienbildung und Informatik (MBI) introduced",
+     "recordJurisdiction": "DE-TH"
+    },
+    {
+     "objectId": "7d846794-560b-58b9-a9f0-267a680c308d",
+     "recordId": "34658a80-bb0f-46a2-bbfc-7750a2d17deb",
+     "relationType": "contrasts_with",
+     "confidence": "moderate",
+     "rationale": "Sachsen makes Informatik compulsory in grades 7-10, while Sachsen-Anhalt offers it as an elective from grade 9 and Thüringen from grade 9/10. This is a different treatment from a strand that runs from K through grade 12.",
+     "objectTitle": "Algorithms and Programs",
+     "recordTitle": "All three states independently center Informatik on the same 'Modellieren' competency, despite differing on compulsory status and grade",
+     "recordJurisdiction": "DE-SN, DE-ST, DE-TH"
+    },
+    {
+     "objectId": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+     "recordId": "34658a80-bb0f-46a2-bbfc-7750a2d17deb",
+     "relationType": "contrasts_with",
+     "confidence": "moderate",
+     "rationale": "The three states center Informatik on 'Modellieren', yet the subject begins in grade 7 at the earliest. This substrand has students build models of everyday systems in grades 3-5. The German term may cover more than simulation, which needs checking.",
+     "objectTitle": "Models and Simulations of Everyday Systems",
+     "recordTitle": "All three states independently center Informatik on the same 'Modellieren' competency, despite differing on compulsory status and grade",
+     "recordJurisdiction": "DE-SN, DE-ST, DE-TH"
+    },
+    {
+     "objectId": "45c484c9-e753-5bb3-86af-086bc28fce31",
+     "recordId": "34658a80-bb0f-46a2-bbfc-7750a2d17deb",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Sachsen, Sachsen-Anhalt and Thüringen each build Informatik around informatische Modellierung, with Sachsen teaching it in grades 7-10. That is the closest German counterpart to the model-building focus of this grades 6-8 substrand, although the German term may cover more than simulation.",
+     "objectTitle": "Agent-Based and Feedback Models",
+     "recordTitle": "All three states independently center Informatik on the same 'Modellieren' competency, despite differing on compulsory status and grade",
+     "recordJurisdiction": "DE-SN, DE-ST, DE-TH"
+    },
+    {
+     "objectId": "45c484c9-e753-5bb3-86af-086bc28fce31",
+     "recordId": "e86b117f-3ddd-4a69-9b9e-3ea41c14a95b",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "Sachsen's 2022 Oberschule Informatik and Sachsen-Anhalt's new Sekundarschule Informatik also center on Modellieren, and the latter lists 'Modellieren und Implementieren' among five core competency areas. This adds a second school type to the evidence for this substrand's focus.",
+     "objectTitle": "Agent-Based and Feedback Models",
+     "recordTitle": "The cross-state 'Modellieren' Informatik convergence extends to two more non-Gymnasium tracks",
+     "recordJurisdiction": "DE-SN, DE-ST"
+    },
+    {
+     "objectId": "31f4c2e2-f909-5cf1-ae61-ca82e22bda0e",
+     "recordId": "e86b117f-3ddd-4a69-9b9e-3ea41c14a95b",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "Sachsen-Anhalt's Sekundarschule Informatik pairs 'Modellieren' with 'Implementieren' as one of five core competency areas. That sits next to this substrand's work on splitting problems into functions. The match is loose, so check how the source describes 'Implementieren'.",
+     "objectTitle": "Decomposition, Functions and Testing",
+     "recordTitle": "The cross-state 'Modellieren' Informatik convergence extends to two more non-Gymnasium tracks",
+     "recordJurisdiction": "DE-SN, DE-ST"
+    },
+    {
+     "objectId": "45c484c9-e753-5bb3-86af-086bc28fce31",
+     "recordId": "8f4334ac-d29c-4aa4-a2ce-b3bd7ba02918",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "KMK names systemic thinking and handling complexity among five criteria for sustainability-oriented teaching (June 2024). That gives a national policy hook for the feedback models in this substrand, although the record concerns sustainability education in general.",
+     "objectTitle": "Agent-Based and Feedback Models",
+     "recordTitle": "KMK names fachuebergreifendes/faecherverbindendes Lernen as a core BNE criterion",
+     "recordJurisdiction": "DE"
+    },
+    {
+     "objectId": "e6374470-9533-570e-8d98-0e5b24060f4d",
+     "recordId": "d67cfe5a-60fa-4921-84fb-98af728a15fd",
+     "relationType": "relates_to",
+     "confidence": "moderate",
+     "rationale": "The national ministers' conference adopted a recommendation for action on AI in school education in October 2024. It gives the policy background for this machine learning substrand. The record has a title only, so what it asks of schools needs checking.",
+     "objectTitle": "Machine Learning, Search and Distributed Systems Compared",
+     "recordTitle": "Bildungsministerkonferenz adopts Handlungsempfehlung on AI in school education",
+     "recordJurisdiction": "DE"
+    },
+    {
+     "objectId": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+     "recordId": "8aef6424-d486-45f5-a437-b688ebeb81b7",
+     "relationType": "relates_to",
+     "confidence": "weak",
+     "rationale": "This synthetic redesign proposal for Thüringen frames the hormone system as an information-processing system, a Biologie and Informatik bridge. It touches the idea of information, though the sense may differ from bits and compression. Title only.",
+     "objectTitle": "Information, Compression and the Limits of Representation",
+     "recordTitle": "A Proposed Biologie/Informatik Bridge: Modeling the Hormone System as an Information-Processing System",
+     "recordJurisdiction": "DE-TH"
+    }
+   ],
+   "itemsWithoutLinks": [
+    {
+     "objectId": "37a89183-dce2-506d-a724-968c6ec03d06",
+     "title": "Data and Representation",
+     "why": "No record in the corpus deals with data literacy, representation or information as school content in Germany or the US."
+    },
+    {
+     "objectId": "528aba11-45e9-5ec4-b5da-4ddf071ff6a2",
+     "title": "Sorting, Labelling and Symbols",
+     "why": "No record describes primary-school work on sorting, labelling or symbols in any subject."
+    },
+    {
+     "objectId": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+     "title": "Recording and Charting Data",
+     "why": "No record covers recording, tabulating or charting data in a German or US curriculum."
+    },
+    {
+     "objectId": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+     "title": "Encoding Text, Images and Numbers",
+     "why": "No record covers binary encoding or the representation of text, images and numbers in any state's Informatik curriculum."
+    },
+    {
+     "objectId": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+     "title": "Following and Writing Steps",
+     "why": "No record describes computing or step-by-step instruction work in German Grundschule or US K-2 curricula, and the Informatik records start at grade 5 or later."
+    },
+    {
+     "objectId": "8c7bc083-021f-5891-b502-de2f708a1e09",
+     "title": "Sequences, Loops and Conditions",
+     "why": "No record covers programming with sequences, loops and conditions in grades 3-5, and the Informatik records only name the subject from grade 5 onward."
+    },
+    {
+     "objectId": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+     "title": "Correctness and Efficiency",
+     "why": "No record covers upper-secondary Informatik content such as algorithm correctness or efficiency in any state."
+    },
+    {
+     "objectId": "04edbe9b-292d-5101-a009-fc46ead81427",
+     "title": "Machines Follow Rules People Write",
+     "why": "No record describes how any curriculum introduces young children to what machines do or who writes the rules they follow."
+    },
+    {
+     "objectId": "a652b045-d46e-5ad9-acfe-052eea355407",
+     "title": "Systems, Models and Learning from Data",
+     "why": "No record covers this strand as a whole, and the few matches found attach to single substrands."
+    }
+   ],
+   "corpusGaps": "The corpus has no US record on computing, computer science, data science or digital literacy, because the US records cover evolution-education disputes and graduation frameworks. A curator would need to add state computer-science and technology standards for the states already tracked (New York, Florida, Pennsylvania, Tennessee, California). On the German side, Informatik appears mostly as dated timeline events with no text (Bremen, Mecklenburg-Vorpommern, Baden-Württemberg, Thüringen), so each needs a written summary of grade placement, compulsory status and competency areas. The only content-level Informatik records are the Modellieren findings for Sachsen, Sachsen-Anhalt and Thüringen secondary schools. Nothing covers primary-school computing, data and representation, algorithm correctness and efficiency, or the national digital-education strategy, and the media-education and AI items exist as titles only."
+  }
+ }
+}

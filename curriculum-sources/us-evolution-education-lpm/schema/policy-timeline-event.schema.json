@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/us-evolution-education-lpm/schema/policy-timeline-event.schema.json",
+  "title": "us-evolution-education-lpm Policy Timeline Event Record",
+  "description": "A single dated event that bound, or directly shaped, every US state at once -- the national layer above florida-lpm's/pennsylvania-lpm's/tennessee-lpm's own state- or district-level timelines. In practice, almost every event here is a US Supreme Court ruling (eventType 'court-ruling'), since that is the one mechanism genuinely capable of acting at this level; a state legislature or a single district's school board cannot. The point of a machine-readable timeline is to let a query ask 'what nationally-binding precedent existed when state X passed its own law' rather than re-deriving it from prose each time. Same base shape as deutsche_lp's/nys_lp's/india-lpm's/florida-lpm's/pennsylvania-lpm's/tennessee-lpm's policy-timeline-event.schema.json.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "eventType", "temporalStatus", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^USLP-EVENT-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^US(-[A-Z]{2})?$"
+    },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "commission-formed", "consultation-phase", "strategy-published",
+        "implementation-begins", "framework-adopted",
+        "requirement-sunset", "pilot-program", "legislation",
+        "milestone-target", "court-ruling", "public-hearing",
+        "school-board-action", "advocacy-campaign", "election", "other"
+      ],
+      "description": "The five values added across florida-lpm (court-ruling, public-hearing, school-board-action, advocacy-campaign) and pennsylvania-lpm (election) are inherited here unchanged. 'court-ruling' is this repo's single most central value -- Epperson v. Arkansas (1968) and Edwards v. Aguillard (1987) are both this, at the one level (US Supreme Court) that genuinely binds every state at once, distinct from tennessee-lpm's own Tennessee Supreme Court ruling (binding only Tennessee) or pennsylvania-lpm's federal DISTRICT ruling (binding only that district). 'public-hearing', 'school-board-action', and 'election' are inherited for structural parity but not expected to be used here -- none of those three levels (a state board's hearing, a district board's own vote, a local election) acts at the national level this repo exists to document. 'advocacy-campaign' = a named, organized national push by a non-governmental actor (an advocacy body, think tank, or grassroots group) that is itself the notable event, not a government action -- e.g. the Discovery Institute's own national 'Academic Freedom Act' legislative template, promoted across multiple states rather than tied to one."
+    },
+    "dateStart": { "type": "string", "format": "date" },
+    "dateEnd": { "type": "string", "format": "date" },
+    "dateGranularity": {
+      "type": "string",
+      "enum": ["day", "month", "school-year", "year"],
+      "description": "Some the national administrative dates are given as a school year (e.g. '2020-21') rather than a calendar date; record dateStart as the school year's start (e.g. 2020-08-01) and note the granularity here."
+    },
+    "temporalStatus": {
+      "type": "string",
+      "enum": ["past-completed", "current-in-progress", "planned-future"],
+      "description": "Relative to this record's own provenance.date -- not auto-derived, since 'current' drifts."
+    },
+    "description": { "type": "string" },
+    "involvedActors": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^USLP-ACTOR-[a-z0-9-]+$" }
+    },
+    "partOf": {
+      "type": "string",
+      "pattern": "^USLP-EVENT-[a-z0-9-]+$",
+      "description": "Id of a broader event/programme this is one milestone of, if any (e.g. a specific public-comment hearing that is part of the overall 2026 proposed-standards review process)."
+    },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "accessTier": {
+      "type": "string",
+      "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+      "description": "How much of the underlying source this record actually keeps, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Relevant here because `description` sometimes embeds a substantial verbatim quotation (e.g. a State Board of Education statement, or a news report's headline/lede). 'full-text-stored' = description reproduces the source substantially verbatim. 'excerpt-only' = description contains only short, clearly-bounded quotations -- the de facto tier this repo has used by default. 'summary-only' = description is paraphrase only, no verbatim text. 'citation-only' = only sourceUrl is kept, no text from the source at all. Optional; a record without this field predates founding and should be treated as 'excerpt-only' at most until reviewed. Identical field to deutsche_lp's/nys_lp's/india-lpm's policy-timeline-event.schema.json."
+    },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal basis for storing this source at the accessTier chosen above, e.g. 'the national state-government publications and State Board of Education rule text are public records and not subject to copyright', 'a state or federal appellate court's own published opinion is a public judicial record', or 'news-outlet reporting -- headline/short excerpt only, fair-use/citation basis, full article not reproduced'. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

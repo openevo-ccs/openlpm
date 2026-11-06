@@ -1,0 +1,218 @@
+{
+  "meta": {
+    "source": "lab_manager/docs/design-notes/social-core-and-computational-core-synthetic-lpm-preparation-2026-10-25.md",
+    "date": "2026-10-25",
+    "status": "AI-drafted, unreviewed. Social-Core carries equity risk named in the note and was built on Dustin's instruction before any expert review."
+  },
+  "spaces": [
+    {
+      "key": "social",
+      "slug": "social-core-lpm-synth",
+      "name": "Social-Core LPM (Synthetic)",
+      "color": "orange",
+      "vocabulary": "SOCIAL-CORE-v0.1.0-draft",
+      "domain": "Social Studies",
+      "homeSubject": "social-studies",
+      "description": "Synthetic, designed-thought-experiment K-12 Learning Progression Model for the social sciences (groups, norms and rules; cooperation, conflict and collective action; social change and the diversity of societies). It uses an intentional and institutional vocabulary only and borrows no mechanism from biology or computing. It is a comparison object for LPM design research and has not been validated in any classroom.",
+      "epistemicNote": "Synthetic comparison object per ConceptBase RFC-0019 -- always label distinctly from in-process/field-validated projects. AI-drafted 2026-10-25 from the Social-Core and Computational-Core preparation note. No social-science or equity review has taken place.",
+      "introduction": "Status: synthetic. Nobody has taught from this space, AI drafted it from published research, and no subject-matter expert has reviewed it. Use it to compare designs and test ideas. Do not use it to plan lessons. It was built on 2026-10-25 before any social-science or equity review, so read every claim about groups, norms and societies as a draft for expert reading.\r\n\r\nSocial-Core is a thought experiment about how far an intentional and institutional vocabulary carries a student from kindergarten to grade 12 in explaining why groups cooperate, conflict, hold rules and change. Every explanation cites goals, beliefs, rules, roles, incentives, power or history. It borrows no mechanism from biology or computing, so it cannot say that a custom spread because it was selected. That gap is the point. It shows what the integrated Interdisciplinary space adds when it allows cultural selection as an explanation, and what that addition risks.\r\n\r\nIt has 15 concepts, 3 strands (Groups, Norms and Rules; Cooperation, Conflict and Collective Action; Social Change and Diversity of Societies) and 12 stages across four grade bands. It is the social member of a four-space comparison with Bio-Core, Computational-Core and Interdisciplinary. It covers a narrow part of what schools teach as social studies and has nothing on economics, geography or history as such. Its sources lean Western and English-language. How much of a real social-studies curriculum it covers is a measured result of the comparison and a known limit here.",
+      "concepts": [
+        {"slug": "agency", "label": "Agency", "origin": "interdisciplinary", "definition": "The capacity of persons or groups to act for reasons within the limits their circumstances set."},
+        {"slug": "communication", "label": "Communication", "origin": "interdisciplinary", "definition": "The exchange of meaning between people through language, symbols and shared codes."},
+        {"slug": "conflict", "label": "Conflict", "origin": "interdisciplinary", "definition": "Competing interests or goals among individuals or groups in a shared setting."},
+        {"slug": "cooperation", "label": "Cooperation", "origin": "interdisciplinary", "definition": "Coordinated action for mutual benefit, sustained by trust, norms, incentives or institutions."},
+        {"slug": "culture", "label": "Culture", "origin": "interdisciplinary", "definition": "Knowledge, beliefs, practices and artifacts a group shares and passes on."},
+        {"slug": "institutions", "label": "Institutions", "origin": "interdisciplinary", "definition": "Stable, recognized rules and structures that organize collective behaviour."},
+        {"slug": "knowledge", "label": "Knowledge", "origin": "interdisciplinary", "definition": "Understanding that a group holds and justifies, such as shared records and expertise."},
+        {"slug": "norms", "label": "Norms", "origin": "interdisciplinary", "definition": "Shared expectations enforced by social approval and disapproval."},
+        {"slug": "group", "label": "Group", "origin": "new", "definition": "People who see themselves, or are seen, as one body with shared interests or identity."},
+        {"slug": "role", "label": "Role", "origin": "new", "definition": "A position in a group with expected behaviours and responsibilities."},
+        {"slug": "incentive", "label": "Incentive", "origin": "new", "definition": "A benefit or cost that changes which choices look attractive."},
+        {"slug": "collective-action", "label": "Collective Action", "origin": "new", "definition": "Action that needs many contributors, where individuals can gain without contributing."},
+        {"slug": "power", "label": "Power", "origin": "new", "definition": "The capacity to affect others' options or outcomes, including through authority and resources."},
+        {"slug": "diffusion", "label": "Diffusion", "origin": "new", "definition": "The spread of an idea or practice through contact and adoption."},
+        {"slug": "social-change", "label": "Social Change", "origin": "new", "definition": "Change over time in a group's norms, institutions or practices."}
+      ],
+      "strands": [
+        {
+          "code": "S1", "slug": "groups-norms-and-rules", "title": "Groups, Norms and Rules", "role": "foundation",
+          "connectingIdea": "People live in groups, and groups hold rules and expectations that shape what members do. The strand builds from naming groups to telling formal institutions from informal norms.",
+          "description": "The foundation strand. Students move from naming the groups they belong to and the rules those groups share, through roles and the reasons rules differ, to how norms are enforced and how formal institutions differ from informal norms. Explanations cite goals, rules, roles, incentives and power. They never borrow a mechanism from biology or computing.",
+          "relations": {"foundationalTo": ["S2"]},
+          "anchors": {"theory": ["OE-THEORY-sociocultural-progression-as-community-practice"], "method": ["OE-METHOD-role-play", "OE-METHOD-controlled-dialogue", "OE-METHOD-case-study-method"]},
+          "stages": [
+            {"band": "K-2", "title": "Groups We Belong To and Their Rules", "description": "Children name the groups they belong to and the rules those groups share.", "pis": ["Names at least three groups the child belongs to, such as family, class and a team.", "Says what a rule in one of those groups asks people to do.", "Gives an example of a rule that differs between two groups."], "concepts": [["group", "primary"], ["norms", "primary"], ["role", "reinforcing"]]},
+            {"band": "3-5", "title": "Roles and Why Rules Differ", "description": "Students compare roles in different groups and ask why rules differ between groups.", "pis": ["Describes the role of a person in two different groups and what each group expects of that person.", "Explains one reason a rule differs between two groups, such as purpose, history or size.", "Tells a rule written down from a custom people follow without being told."], "concepts": [["role", "primary"], ["group", "primary"], ["norms", "reinforcing"], ["culture", "reinforcing"]]},
+            {"band": "6-8", "title": "How Norms Are Enforced", "description": "Students explain how norms are enforced by approval, disapproval and sanction.", "pis": ["Explains how approval and disapproval keep a norm in place in a named case.", "Tells a norm enforced by peers from a rule enforced by an authority.", "Predicts what happens to a norm when enforcement stops, and says what evidence would test the prediction."], "concepts": [["norms", "primary"], ["incentive", "primary"], ["institutions", "reinforcing"], ["power", "reinforcing"]]},
+            {"band": "9-12", "title": "Formal Institutions and Informal Norms", "description": "Students distinguish formal institutions from informal norms and trace how each constrains choice.", "pis": ["Sorts the constraints in a case into formal institutions and informal norms and justifies each placement.", "Traces how an institution changes the incentives people face.", "Compares how the same aim is pursued under two different institutions."], "concepts": [["institutions", "primary"], ["norms", "primary"], ["incentive", "reinforcing"], ["power", "reinforcing"], ["agency", "reinforcing"]]}
+          ]
+        },
+        {
+          "code": "S2", "slug": "cooperation-conflict-and-collective-action", "title": "Cooperation, Conflict and Collective Action", "role": "central",
+          "connectingIdea": "People cooperate when incentives, trust, norms and institutions make it worth doing, and shared-resource problems show where cooperation fails and what groups do about it.",
+          "description": "The central strand. Students move from sharing and taking turns, through why people cooperate or hold back, to shared-resource problems where individuals can gain without contributing, and finally to comparing designs for governing shared resources and judging the part power and conflict play in each.",
+          "relations": {},
+          "anchors": {"theory": ["OE-THEORY-core-design-principles-for-cooperation", "OE-PROPOSITION-nine-conditions-for-group-cooperation", "OE-PROPOSITION-commons-dilemma-misaligned-interests"], "method": ["OE-METHOD-public-goods-game", "OE-METHOD-dictator-game", "OE-METHOD-ultimatum-game", "OE-METHOD-pro-con-debate", "OE-METHOD-teaching-evolution-cooperation-primary"]},
+          "stages": [
+            {"band": "K-2", "title": "Sharing and Taking Turns", "description": "Children practise sharing and taking turns and say what happens when someone does not.", "pis": ["Takes turns in a simple game and says why turns are fair.", "Says what happens to a group when one member does not share.", "Names one way a group can fix an unfair turn."], "concepts": [["cooperation", "primary"], ["conflict", "reinforcing"], ["norms", "reinforcing"], ["communication", "reinforcing"]]},
+            {"band": "3-5", "title": "Why People Cooperate or Hold Back", "description": "Students explain why people cooperate or hold back, using incentives and trust.", "pis": ["Explains in a game or a story why a person gives or keeps.", "Names an incentive and a form of trust that support cooperation.", "Describes how talking together changes whether people cooperate."], "concepts": [["cooperation", "primary"], ["incentive", "primary"], ["communication", "reinforcing"], ["conflict", "reinforcing"]]},
+            {"band": "6-8", "title": "Shared-Resource Problems", "description": "Students analyse a shared-resource problem where individuals can gain without contributing.", "pis": ["Describes a shared-resource problem and who gains and who loses when someone does not contribute.", "Explains why each person's best choice can leave the group worse off.", "Proposes two ways a group could reduce the problem and says what each costs."], "concepts": [["collective-action", "primary"], ["incentive", "primary"], ["cooperation", "reinforcing"], ["conflict", "reinforcing"], ["norms", "reinforcing"]]},
+            {"band": "9-12", "title": "Governing Shared Resources: Power and Conflict", "description": "Students compare designs for governing shared resources and judge the role of power and conflict in each.", "pis": ["Compares two designs for governing a shared resource on who decides, who monitors and how breaches are handled.", "Judges how power and conflict shape which design a group ends up with.", "Says what evidence from cases would favour one design over another."], "concepts": [["collective-action", "primary"], ["power", "primary"], ["conflict", "primary"], ["institutions", "reinforcing"], ["cooperation", "reinforcing"]]}
+          ]
+        },
+        {
+          "code": "S3", "slug": "social-change-and-diversity-of-societies", "title": "Social Change and Diversity of Societies", "role": "macro",
+          "connectingIdea": "Societies change and differ, and explaining either takes more than one cause. The strand builds from comparing communities across time to judging large-scale explanations of change.",
+          "description": "The macro strand. Students compare communities then and now, trace how a practice spread from one community to another, explain why societies differ using geography, history and institutions, and evaluate explanations of large-scale change. It is the weakest strand for grounding: the corpus holds no native social-science source for it, and the sources it has are bridge sources used as contrast cases.",
+          "relations": {},
+          "anchors": {"theory": ["OE-ASSUMPTION-cultural-evolution-nos-profile-differs-from-biological-evolution"], "method": ["OE-METHOD-causal-mapping", "OE-METHOD-case-study-method"]},
+          "stages": [
+            {"band": "K-2", "title": "Communities Then and Now", "description": "Children compare communities, then and now.", "pis": ["Names two things that are different in a community now compared with long ago.", "Asks an older person what changed.", "Says one reason a change happened."], "concepts": [["social-change", "primary"], ["culture", "reinforcing"], ["group", "reinforcing"]]},
+            {"band": "3-5", "title": "How a Practice Spreads", "description": "Students trace how a practice spread from one community to another.", "pis": ["Traces a practice such as a food, a tool, a game or a custom from where it began to where it is now.", "Names the contact that carried it from one community to another.", "Explains why one community adopted it and another did not."], "concepts": [["diffusion", "primary"], ["knowledge", "primary"], ["culture", "reinforcing"], ["communication", "reinforcing"]]},
+            {"band": "6-8", "title": "Why Societies Differ", "description": "Students explain why societies differ, citing geography, history and institutions.", "pis": ["Explains a difference between two societies using geography, history and institutions, and names the evidence.", "Says where one cause alone fails to explain the difference.", "Compares how two societies handle the same problem."], "concepts": [["culture", "primary"], ["institutions", "primary"], ["social-change", "reinforcing"], ["knowledge", "reinforcing"]]},
+            {"band": "9-12", "title": "Explaining Large-Scale Change", "description": "Students evaluate explanations of large-scale change and say where single-cause accounts fail.", "pis": ["Evaluates two explanations of a large-scale change against the same evidence.", "Identifies where a single-cause account fails.", "Explains how agency, power and institutions interact in a change over generations."], "concepts": [["social-change", "primary"], ["agency", "primary"], ["power", "reinforcing"], ["institutions", "reinforcing"], ["knowledge", "reinforcing"], ["diffusion", "reinforcing"]]}
+          ]
+        }
+      ],
+      "stageEdges": [
+        {"from": "S1:3-5", "to": "S2:3-5", "rationale": "Roles and the reasons rules differ come before explaining why people cooperate or hold back inside a group."},
+        {"from": "S1:6-8", "to": "S2:6-8", "rationale": "How norms are enforced comes before analysing a shared-resource problem, where enforcement is the open question."},
+        {"from": "S2:6-8", "to": "S1:9-12", "rationale": "The shared-resource problem is what motivates the formal institutions the 9-12 stage compares with informal norms. The dependency runs from the central strand back into the foundation strand."},
+        {"from": "S1:9-12", "to": "S2:9-12", "rationale": "Comparing designs for governing a shared resource needs the distinction between formal institutions and informal norms."},
+        {"from": "S1:9-12", "to": "S3:9-12", "rationale": "Judging large-scale explanations of change needs institutions as a named cause."},
+        {"from": "S2:9-12", "to": "S3:9-12", "rationale": "Power and conflict are causes the 9-12 change explanations weigh."}
+      ],
+      "literature": [
+        {"id": "OE-LITERATURE-ostrom-1990", "strands": ["S1", "S2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-ostrom-1998", "strands": ["S1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-greene-2013", "strands": ["S1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-meng-2026", "strands": ["S1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-basurto-ostrom-2009", "strands": ["S2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-ostrom-2009-ses-framework", "strands": ["S2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-koomen-herrmann-2018", "strands": ["S2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-leighton-2014", "strands": ["S2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-tomasello-2016", "strands": ["S1"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-tomasello-2014-what-makes-us-human", "strands": ["S1"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-muthukrishna-2020", "strands": ["S1"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-wilson-ostrom-cox-2013", "strands": ["S2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-richerson-2016", "strands": ["S2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-mesoudi-2011", "strands": ["S3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-cultural-evolution-society-2023", "strands": ["S3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-schimmelpfennig-muthukrishna-2023-cultural-evolutionary-behavioural-science", "strands": ["S3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-waring-et-al-2015", "strands": ["S3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-tehrani-2011", "strands": ["S3"], "role": "contrast-case"}
+      ]
+    },
+    {
+      "key": "computational",
+      "slug": "computational-core-lpm-synth",
+      "name": "Computational-Core LPM (Synthetic)",
+      "color": "blue",
+      "vocabulary": "COMPUTATIONAL-CORE-v0.1.0-draft",
+      "domain": "Computer Science",
+      "homeSubject": "computer-science",
+      "description": "Synthetic, designed-thought-experiment K-12 Learning Progression Model for computing (data and representation; algorithms and programs; systems, models and learning from data). It uses a procedural and formal vocabulary only and attributes no intention or understanding to machines. It is a comparison object for LPM design research and has not been validated in any classroom.",
+      "epistemicNote": "Synthetic comparison object per ConceptBase RFC-0019 -- always label distinctly from in-process/field-validated projects. AI-drafted 2026-10-25 from the Social-Core and Computational-Core preparation note. No computing-education expert has reviewed it.",
+      "introduction": "Status: synthetic. Nobody has taught from this space, AI drafted it from published research, and no subject-matter expert has reviewed it. Use it to compare designs and test ideas. Do not use it to plan lessons.\r\n\r\nComputational-Core is a thought experiment about how far a procedural and formal vocabulary carries a student from kindergarten to grade 12 in explaining what computing systems do and how they are built. Every explanation cites data, rules, state, algorithms, specifications, models or simulation. No explanation says that a system wants, understands or intends anything, and none borrows a mechanism from biology or social science. The word agent appears only as a technical term for a process that follows rules. This guard against attributing mind to machines is the computing counterpart of the guard Bio-Core keeps against attributing purpose to organisms.\r\n\r\nIt has 15 concepts, 3 strands (Data and Representation; Algorithms and Programs; Systems, Models and Learning from Data) and 12 stages across four grade bands. It is the computational member of a four-space comparison with Bio-Core, Social-Core and Interdisciplinary. The integrated space asks when the algorithm wants is useful shorthand and when it misleads. This core has no word for wants, so it cannot ask. It covers a narrow part of what schools teach as computing, and how much of a real computing curriculum it covers is a measured result of the comparison. Only 5 of its 15 concepts trace to the Interdisciplinary vocabulary, which is thin on core computing.",
+      "concepts": [
+        {"slug": "data", "label": "Data", "origin": "new", "definition": "Recorded values or symbols that stand for something."},
+        {"slug": "information", "label": "Information", "origin": "interdisciplinary", "definition": "A pattern that reduces uncertainty for a receiver, measured in bits."},
+        {"slug": "representation", "label": "Representation", "origin": "interdisciplinary", "definition": "A structure that stands for something else and can be stored or processed."},
+        {"slug": "abstraction", "label": "Abstraction", "origin": "new", "definition": "Hiding detail to expose what matters at a chosen level."},
+        {"slug": "decomposition", "label": "Decomposition", "origin": "new", "definition": "Splitting a problem into parts that can be solved and recombined."},
+        {"slug": "algorithm", "label": "Algorithm", "origin": "new", "definition": "A finite, unambiguous sequence of steps that turns input into output."},
+        {"slug": "program", "label": "Program", "origin": "new", "definition": "An algorithm written in a language a machine can execute."},
+        {"slug": "state", "label": "State", "origin": "new", "definition": "The stored values of a system at one moment."},
+        {"slug": "specification", "label": "Specification", "origin": "new", "definition": "A precise statement of what a system must do."},
+        {"slug": "model", "label": "Model", "origin": "new", "definition": "A simplified formal description of a system that can be run or analyzed."},
+        {"slug": "simulation", "label": "Simulation", "origin": "new", "definition": "Running a model forward to see what follows."},
+        {"slug": "search", "label": "Search", "origin": "interdisciplinary", "definition": "Exploring candidates and keeping those that score higher on a stated objective."},
+        {"slug": "machine-learning", "label": "Machine Learning", "origin": "interdisciplinary", "definition": "A procedure that adjusts a system's parameters from data to improve a measured result."},
+        {"slug": "feedback", "label": "Feedback", "origin": "new", "definition": "Output returned as input, changing later behaviour."},
+        {"slug": "distributed-system", "label": "Distributed System", "origin": "interdisciplinary", "definition": "Many components exchanging messages with no single controller."}
+      ],
+      "strands": [
+        {
+          "code": "C1", "slug": "data-and-representation", "title": "Data and Representation", "role": "foundation",
+          "connectingIdea": "Computing works on data that stands for things, and every representation keeps some detail and drops some. The strand builds from sorting and labelling to the limits of any representation.",
+          "description": "The foundation strand. Students move from sorting and labelling things and learning that symbols stand for things, through recording and charting data and encoding text, images and numbers in binary, to the relation between information, compression and the limits of any representation.",
+          "relations": {},
+          "anchors": {"theory": ["OE-CROSSDOMAINCONSTRUCT-information-processing-domain-general"], "competency": ["OE-COMPETENCY-openevo-core-competencies-ct"], "method": []},
+          "stages": [
+            {"band": "K-2", "title": "Sorting, Labelling and Symbols", "description": "Children sort and label things and learn that symbols stand for things.", "pis": ["Sorts a set of objects by one property and says which property was used.", "Labels each group with a word or a picture.", "Says what a symbol such as an arrow, an icon or a letter stands for."], "concepts": [["data", "primary"], ["representation", "primary"], ["abstraction", "reinforcing"]]},
+            {"band": "3-5", "title": "Recording and Charting Data", "description": "Students record data, find patterns in it and chart it.", "pis": ["Records measurements in a table.", "Charts the data and describes a pattern in it.", "Says what the chart leaves out."], "concepts": [["data", "primary"], ["representation", "primary"], ["information", "reinforcing"], ["abstraction", "reinforcing"]]},
+            {"band": "6-8", "title": "Encoding Text, Images and Numbers", "description": "Students encode text, images and numbers in binary and compare encodings.", "pis": ["Encodes a short text and a small image in binary using a stated scheme.", "Compares two encodings of the same data on size and on the detail they keep.", "Explains why a decoder needs to know the scheme."], "concepts": [["representation", "primary"], ["data", "primary"], ["information", "reinforcing"], ["abstraction", "reinforcing"], ["specification", "reinforcing"]]},
+            {"band": "9-12", "title": "Information, Compression and the Limits of Representation", "description": "Students relate information, compression and the limits of any representation.", "pis": ["Relates the information in a message to how far it can be compressed, using bits.", "Explains a case where compression loses detail and says what was lost.", "Names a limit of a representation, such as precision, size or ambiguity, and the effect on a result."], "concepts": [["information", "primary"], ["representation", "primary"], ["data", "reinforcing"], ["abstraction", "reinforcing"]]}
+          ]
+        },
+        {
+          "code": "C2", "slug": "algorithms-and-programs", "title": "Algorithms and Programs", "role": "central",
+          "connectingIdea": "A program is an algorithm a machine can run, and it is right only against a specification. The strand builds from following steps to arguing that an algorithm is correct and comparing its efficiency.",
+          "description": "The central strand. Students move from following and writing step-by-step instructions, through programs with sequences, loops and conditions, to decomposing problems, writing functions and testing against a specification, and finally arguing for an algorithm's correctness and comparing its efficiency with another.",
+          "relations": {"foundationalTo": ["C3"]},
+          "anchors": {"theory": ["OE-CROSSDOMAINCONSTRUCT-computational-thinking-domain-generality"], "competency": ["OE-COMPETENCY-openevo-core-competencies-ct"], "method": []},
+          "stages": [
+            {"band": "K-2", "title": "Following and Writing Steps", "description": "Children follow and write step-by-step instructions.", "pis": ["Follows a sequence of steps to complete a task.", "Writes steps another child can follow and fixes a step that fails.", "Says why the order of steps matters."], "concepts": [["algorithm", "primary"], ["program", "reinforcing"]]},
+            {"band": "3-5", "title": "Sequences, Loops and Conditions", "description": "Students build programs with sequences, loops and conditions, and debug them.", "pis": ["Builds a program that uses a sequence, a loop and a condition.", "Finds and fixes a fault using a test run.", "Explains what the program does at each step by tracing the values it stores."], "concepts": [["program", "primary"], ["algorithm", "primary"], ["state", "reinforcing"], ["decomposition", "reinforcing"]]},
+            {"band": "6-8", "title": "Decomposition, Functions and Testing", "description": "Students decompose problems, write functions and test a program against a specification.", "pis": ["Splits a problem into parts and writes a function for each part.", "Writes test cases from a stated specification.", "Explains when a program meets the specification and when a test shows that it does not."], "concepts": [["decomposition", "primary"], ["specification", "primary"], ["program", "reinforcing"], ["abstraction", "reinforcing"], ["state", "reinforcing"]]},
+            {"band": "9-12", "title": "Correctness and Efficiency", "description": "Students argue for an algorithm's correctness and compare its efficiency with another.", "pis": ["Argues why an algorithm gives the right output for all valid inputs.", "Compares two algorithms for the same task on the steps they take as the input grows.", "Chooses between them for a stated need and justifies the choice."], "concepts": [["algorithm", "primary"], ["specification", "primary"], ["abstraction", "reinforcing"], ["state", "reinforcing"]]}
+          ]
+        },
+        {
+          "code": "C3", "slug": "systems-models-and-learning-from-data", "title": "Systems, Models and Learning from Data", "role": "macro",
+          "connectingIdea": "Systems made of many parts can be modelled and run, and some adjust themselves from data. The strand builds from machines that follow written rules to stating what machine learning, search and distributed systems can and cannot be said to do.",
+          "description": "The macro strand. Students learn that machines follow rules people write, build simple models and simulations of everyday systems, build agent-based and feedback models where many simple rules produce one pattern, and compare machine learning, search and distributed systems. Its grounding is the strongest of the three strands in the corpus and its standards backing for search is the weakest.",
+          "relations": {},
+          "anchors": {"theory": ["OE-THEORY-restructuration-theory", "OE-THEORY-computational-models-as-theory-mediators", "OE-THEORY-critical-ai-literacies"], "competency": ["OE-COMPETENCY-ai4k12-4-d-i-k-2-eu", "OE-COMPETENCY-ai4k12-4-d-i-9-12-lo"], "method": ["OE-METHOD-agent-based-modeling-netlogo", "OE-METHOD-odd-protocol-model-description", "OE-METHOD-causal-mapping"]},
+          "stages": [
+            {"band": "K-2", "title": "Machines Follow Rules People Write", "description": "Children learn that machines follow rules people write.", "pis": ["Gives an example of a machine doing exactly what its instructions say.", "Says what happens when the instructions are wrong.", "Says who wrote the rules the machine follows."], "concepts": [["program", "primary"], ["algorithm", "reinforcing"]]},
+            {"band": "3-5", "title": "Models and Simulations of Everyday Systems", "description": "Students build simple models and simulations of everyday systems.", "pis": ["Builds a model of an everyday system such as a pond, a queue or a traffic light, with a few named parts.", "Runs the simulation and records what happens over time.", "Says one thing the model leaves out."], "concepts": [["model", "primary"], ["simulation", "primary"], ["state", "reinforcing"], ["data", "reinforcing"]]},
+            {"band": "6-8", "title": "Agent-Based and Feedback Models", "description": "Students build agent-based and feedback models where many simple rules produce one pattern.", "pis": ["Builds an agent-based model in which many agents follow the same simple rules.", "Identifies a feedback loop in the model and shows its effect on the output.", "Changes one rule and reports how the pattern changes."], "concepts": [["model", "primary"], ["simulation", "primary"], ["feedback", "primary"], ["state", "reinforcing"], ["distributed-system", "reinforcing"]]},
+            {"band": "9-12", "title": "Machine Learning, Search and Distributed Systems Compared", "description": "Students compare machine learning, search and distributed systems and state what each can and cannot be said to do.", "pis": ["Describes how machine learning adjusts parameters from data to improve a measured result.", "Compares machine learning, search on an objective and a distributed system on what each needs as input and what each guarantees.", "States what each can and cannot be said to do without attributing intention to it."], "concepts": [["machine-learning", "primary"], ["search", "primary"], ["distributed-system", "primary"], ["model", "reinforcing"], ["feedback", "reinforcing"], ["data", "reinforcing"]]}
+          ]
+        }
+      ],
+      "stageEdges": [
+        {"from": "C1:3-5", "to": "C3:3-5", "rationale": "Building a model of an everyday system uses data recorded and charted in the foundation strand."},
+        {"from": "C2:3-5", "to": "C3:6-8", "rationale": "Agent-based and feedback models are programs. Sequences, loops, conditions and debugging come first."},
+        {"from": "C2:6-8", "to": "C3:6-8", "rationale": "Agent-based models need functions and testing against a specification."},
+        {"from": "C1:9-12", "to": "C3:9-12", "rationale": "Comparing what machine learning can be said to do needs the limits of representation and the notion of information."},
+        {"from": "C2:9-12", "to": "C3:9-12", "rationale": "Comparing machine learning, search and distributed systems needs correctness and efficiency as the ground for judging them."}
+      ],
+      "literature": [
+        {"id": "OE-LITERATURE-wing-2006", "strands": ["C1", "C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-wing-2008", "strands": ["C1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-shannon-1948", "strands": ["C1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-weintrop-2016", "strands": ["C1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-denning-tedre-2019", "strands": ["C1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-grover-pea-2013", "strands": ["C1"], "role": "anchor"},
+        {"id": "OE-LITERATURE-brennan-resnick-2012", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-lye-koh-2014", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-barr-stephenson-2011", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-shute-2017", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-denning-2017", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-roman-gonzalez-2017", "strands": ["C2"], "role": "anchor"},
+        {"id": "OE-LITERATURE-wilensky-2020", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-tullis-goldstone-2017", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-grimm-etal-2020-odd", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-guest-2026-models", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-guest-martin-vanrooij-2026", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-guest-suarez-vanrooij-2025-cail", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-shiffrin-mitchell-2023", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-binz-schulz-2023", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-anwarzai-2026", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-falandays-2023", "strands": ["C3"], "role": "anchor"},
+        {"id": "OE-LITERATURE-kirby-tamariz-cornish-smith-2015", "strands": ["C1"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-arnon-kirby-2024", "strands": ["C1"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-peel-sadler-friedrichsen-2019", "strands": ["C2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-peel-sadler-friedrichsen-2021", "strands": ["C2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-peel-sadler-friedrichsen-2025", "strands": ["C2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-christensen-lombardi-2023", "strands": ["C2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-christensen-lombardi-2024", "strands": ["C2"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-rahwan-2019-machine-behaviour", "strands": ["C3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-watson-szathmary-2016", "strands": ["C3"], "role": "contrast-case"},
+        {"id": "OE-LITERATURE-kosal-2026", "strands": ["C3"], "role": "contrast-case"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1997 @@
+{
+ "entries": [
+  {
+   "label": "Variation",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Differences among the members of a set, such as organisms, practices, designs or candidate solutions. These differences give selection and chance something to act on. Variation matters for change over time only when some of it is passed on.",
+   "facets": {
+    "biology": "Individuals of a species differ in the versions of genes they carry (alleles) and in the traits these help produce. New versions arise by mutation, and recombination shuffles existing ones. Only differences that parents pass on count toward evolution.",
+    "culture": "People differ in the words, skills and beliefs they hold. Differences arise from invention and from copying errors, and only those that others learn can spread. Pottery styles and first names are tracked this way.",
+    "technology": "Versions of a tool, machine or program differ in materials, shape and code. They arise from deliberate changes and from imperfect copying of an earlier design. Only versions that are built or recorded can be copied later.",
+    "AI and computation": "The candidates in an evolutionary algorithm differ in their encoded contents. Random mutation and crossover (mixing two parents) create new differences. If the pool loses its variety, the search stalls."
+   },
+   "excludes": "Variation builds up only if it is passed on, by genes in biology and by learning or copying elsewhere. A tan is not inherited. Cultural and computing variants can be made on purpose, while mutation ignores need. Diversity of kinds, such as many species, is a different idea.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Mutation",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Allele",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Heritable Variation",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 5-6 Vielfalt topics, grade 10 Genetik and Entstehung der Artenvielfalt (Mutation, Rekombination), and any topic about differences among designs, styles or candidate solutions.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-variation",
+    "OE-CONCEPT-bio-core-mutation",
+    "OE-CONCEPT-bio-core-allele",
+    "doi:10.1146/annurev.es.01.110170.000245 (Lewontin 1970, The units of selection; Crossref-checked)",
+    "doi:10.1016/j.jaa.2005.08.001 (Eerkens & Lipo 2005; Crossref-checked)",
+    "doi:10.1098/rspb.2004.2746 (Bentley, Hahn & Shennan 2004; Crossref-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "ISBN 9780521296816 (Basalla 1988, The Evolution of Technology; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "The current sentence leaves out heritability and has no domain meanings. Adds four facets. Allele and Heritable Variation fold in here.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Evolutionary Process",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Change in the make-up of a population of variants over repeated rounds of copying or reproduction. Variants arise, are passed on, and differ in how often they are kept, by selection and by chance. Rounds are generations, turns of social learning or algorithm cycles.",
+   "facets": {
+    "biology": "Populations of organisms change across generations in the heritable traits they carry. Mutation and recombination supply variants. Selection, chance and isolation change which variants are common.",
+    "culture": "Practices, words and designs held by a community change as people learn from one another. Invention and copying errors supply variants. Biased adoption, chance and group size change which variants are common.",
+    "technology": "Designs change across successive versions. Makers vary a design, buyers and testers favor some versions, and later makers copy those. Parts can also be borrowed from unrelated designs.",
+    "AI and computation": "An evolutionary algorithm keeps a pool of candidate solutions. Each round it varies candidates, scores them and copies higher scorers into the next round. The programmer sets the pool, the scoring rule and the number of rounds."
+   },
+   "excludes": "One growing organism or one tuned program is not a population evolving. Biological variants arise without regard to need, and evolution has no target. An evolutionary algorithm has one, set by its programmer. Trial and error in one person as selection (Skinner, Campbell) is contested and left out.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Drift",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Change in Populations",
+     "relation": "broader"
+    },
+    {
+     "space": "soc",
+     "label": "Social Change",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Search",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Entstehung der Artenvielfalt', the hint 'biologische und kulturelle Evolution' under Stammesgeschichte des Menschen, and any topic on change in technology or language over time.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-evolutionary-process",
+    "OE-CONCEPT-bio-core-evolution",
+    "OE-PROPOSITION-blind-variation-selection-by-consequences",
+    "doi:10.1146/annurev.es.01.110170.000245 (Lewontin 1970, The units of selection; Crossref-checked)",
+    "doi:10.1017/S0140525X06009083 (Mesoudi, Whiten & Laland 2006; Crossref-checked)",
+    "doi:10.1037/h0040373 (Campbell 1960; Crossref-checked)",
+    "doi:10.1126/science.7244649 (Skinner 1981; Crossref-checked)",
+    "doi:10.1038/nature14544 (Eiben & Smith 2015; Crossref-checked)",
+    "ISBN 9780226520438 (Mesoudi 2011, Cultural Evolution; Open Library-checked)",
+    "ISBN 9780226069333 (Boyd & Richerson, Culture and the Evolutionary Process; Open Library-checked)",
+    "ISBN 9780521296816 (Basalla 1988, The Evolution of Technology; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "The current sentence says variants must be selected, which leaves out drift, and offers no domain meanings. Repaired to name a population, rounds of copying and chance. Four facets added.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Niche Construction",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Organisms or groups change their surroundings, and the changes alter the conditions that later members of their own or other populations face. The changes often outlast the individuals who made them. They may be accidental or planned.",
+   "facets": {
+    "biology": "Beavers build dams, earthworms change soil and termites build mounds. The changes last, so descendants and neighbors face altered conditions and different traits may do well. No plan is needed.",
+    "culture": "Farming, herding, building and fire use change landscapes, diets and disease. Later generations inherit the altered conditions together with the knowledge. Dairy farming raised the advantage of genes that let adults digest milk sugar."
+   },
+   "excludes": "Intent is optional: dams and earthworm soil are unplanned, while farming is often planned. A change counts only if it alters later conditions for the maker or others. Footprints that the next tide erases do not. It changes what selection acts on and carries no plan for evolving.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Selection Pressure",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie hints under Stammesgeschichte des Menschen (Feuergebrauch, Nahrungszubereitung, Übergang von Jagd zu Feldbau), grade 9 Zusammenhänge im Ökosystem, and Haustiere.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-niche-construction",
+    "OE-DESIGNPRINCIPLE-behaviorally-mediated-selection-first-class",
+    "doi:10.1017/S0140525X00002417 (Laland, Odling-Smee & Feldman 2000; Crossref-checked)",
+    "doi:10.1098/rspb.2015.1019 (Laland et al. 2015; Crossref-checked)",
+    "doi:10.1038/nrg2734 (Laland, Odling-Smee & Myles 2010; Crossref-checked)",
+    "doi:10.1098/rstb.2010.0253 (Smith 2011; Crossref-checked)",
+    "ISBN 9780691044378 (Odling-Smee, Laland & Feldman 2003; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "Existing sentence is sound once Selection Pressure is defined. Adds biology and culture facets and an excludes note. Technology and AI have no documented process that I could verify.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Domestication",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A long-running two-way relationship in which people shape another species' breeding and that species shapes human food, work and settlement. It is a case of niche construction and coevolution.",
+   "facets": {
+    "biology": "People choose which plants or animals breed and supply food and shelter. Over generations the kept population shifts, as in tamer animals or seed-holding plants. Some selection is deliberate and some is an unplanned effect of life with people.",
+    "culture": "Keeping crops and herds changes human life: diets, work, villages and trade. Dairying favored adults who digest milk sugar. Knowledge of breeding and care is passed on as practice and as tradition."
+   },
+   "excludes": "Domestication goes beyond selective breeding, because the relationship runs both ways. Early stages were often unplanned. Taming one animal changes its behavior within one lifetime and is not inherited. Claims about self-domestication of humans or other species are contested and left out.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Domestication",
+     "relation": "shifted"
+    },
+    {
+     "space": "bio",
+     "label": "Selection Pressure",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie Genetik (klassische Züchtungsmethoden), grade 5 Biologie Vögel als Haustiere, and the hint Übergang von Jagd zu Feldbau under Stammesgeschichte des Menschen.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-natural-selection",
+    "doi:10.1073/pnas.1501711112 (Zeder 2015; Crossref-checked)",
+    "doi:10.1146/annurev-ecolsys-110512-135813 (Larson & Fuller 2014; Crossref-checked)",
+    "doi:10.1038/nrg2734 (Laland, Odling-Smee & Myles 2010; Crossref-checked)",
+    "doi:10.1098/rstb.2010.0253 (Smith 2011; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "The existing sentence is sound and stays. Adds biology and culture facets so the two-way relationship is stated from each side, plus an excludes note.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Innovation",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A new variant appears in a system that did not hold it before. It may arise by chance, by copying error, by recombining old parts or by deliberate effort. Whether it spreads is a separate question.",
+   "facets": {
+    "biology": "A new heritable variant arises as a change in DNA (mutation) or as a new combination of existing DNA (recombination). Mutations arise without regard to whether they would help.",
+    "cognition": "An individual finds a new solution to a problem, usually by trial and error and sometimes by apparent insight. Animals do this in many species, for example when they exploit a new food source. It can aim at a goal.",
+    "culture": "A new practice, word, belief or artifact enters a community's repertoire, by invention or by recombining old ideas. Many innovations are small changes to existing ones.",
+    "technology": "A new device, method or material is invented, often by combining existing parts or principles in a new way. Deliberate search and testing guide many inventions.",
+    "AI and computation": "Mutation randomly changes a candidate and crossover swaps parts between two candidates, producing new candidates. Some methods reward novelty itself, instead of the score or alongside it."
+   },
+   "excludes": "Biological mutation ignores need, while human invention is often aimed at a goal. Chance may play a part in both. A new variant changes a population only after it is copied. Innovation does not imply improvement. Most mutations change nothing or do harm, and many inventions fail.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Mutation",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 9-10 Biologie topics on Mutation and Rekombination, topics on inventions in Technik and Geschichte, and any topic on how solutions are generated.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-innovation",
+    "OE-CONCEPT-bio-core-mutation",
+    "ISBN 9780198526223 (Reader & Laland 2003, Animal Innovation; Open Library-checked)",
+    "ISBN 9781416544050 (Arthur 2009, The Nature of Technology; Open Library-checked)",
+    "ISBN 9780521296816 (Basalla 1988, The Evolution of Technology; Open Library-checked)",
+    "doi:10.1016/j.jaa.2005.08.001 (Eerkens & Lipo 2005; Crossref-checked)",
+    "doi:10.1162/EVCO_a_00025 (Lehman & Stanley 2011; Crossref-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "ISBN 9780226520438 (Mesoudi 2011, Cultural Evolution; Open Library-checked)"
+   ],
+   "reason": "Existing sentence stands with a note that spread is a separate step. Adds five facets. Mutation folds in as the biology facet. Behavioral innovation in animals sits under cognition.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Development",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Change in one individual over its own lifetime, in which later states build on earlier ones. It comes from growth and from interaction with the setting, and it often follows a typical sequence.",
+   "facets": {
+    "biology": "An organism grows from egg or seed to adult through cell division, specialization of cells and interaction with its surroundings. Genes and conditions together shape the outcome, and some traits respond to conditions during growth.",
+    "cognition": "A child's thinking, language and social understanding change with age and experience, often in a typical order. Maturation, social interaction and cultural learning all contribute.",
+    "education": "The progressive growth of a learner's knowledge, skills or competencies over time, often supported by instruction that is gradually withdrawn (scaffolding).",
+    "AI and computation": "Analogy only. Developmental robotics trains a robot in stages modelled on child development. The robot does not grow or mature, and its designers choose the stages."
+   },
+   "excludes": "Development is not a kind of evolution. A growing organism does not evolve, and a population does not grow up. The link is causal: development turns inherited information into a body and responds to conditions, which shapes the variants selection sees. Software development is another sense.",
+   "coreCounterparts": [],
+   "curriculumUse": "Grade 1-2 Sachunterricht (Entwicklungsstadien von Blütenpflanzen, Keimung und Wachstum), grade 8 Biologie (vorgeburtliche Entwicklung, Individualentwicklung), and learner growth in any subject.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-development",
+    "OE-CONCEPT-openevo-design-concept-child-development",
+    "ISBN 9780195122343 (West-Eberhard 2003, Developmental Plasticity and Evolution; Open Library-checked)",
+    "doi:10.1002/bies.202100185 (Sultan, Moczek & Walsh 2022; Crossref-checked)",
+    "doi:10.1016/j.dr.2015.07.004 (Barrouillet 2015; Crossref-checked)",
+    "doi:10.1080/09540090310001655110 (Lungarella et al. 2003; Crossref-checked)"
+   ],
+   "reason": "The existing text has two senses and no general sentence. Adds a general sentence plus cognition and AI facets. Excludes separates individual development from population evolution.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Agency",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "The capacity of an entity to sense its setting and respond flexibly in pursuit of its own aims, so that its actions change what happens next. Intention is one form of this capacity, found in some domains.",
+   "facets": {
+    "biology": "Organisms act to keep themselves going: they seek food, choose habitats and change their surroundings. On the organismal-agency view, this needs no intention, planning or awareness. It alters the pressures later generations face (niche construction).",
+    "culture": "People act for reasons, plan and weigh options, but within limits set by resources, rules and other people's actions. Groups and organisations act through their members' decisions. Their choices can reproduce or change those limits over time.",
+    "cognition": "A person acts intentionally: forms intentions, plans ahead, regulates their own action and reflects on whether the plan works (Bandura's four core properties). This form of agency needs a represented goal.",
+    "education": "A learner sets goals, chooses strategies, monitors progress and takes responsibility for learning. Teachers support agency by giving meaningful choices and gradually reducing guidance.",
+    "AI and computation": "Technical reading: a software or robot agent senses its setting and selects actions to reach goals set by its designer. It holds no reasons of its own, and others can change its goals."
+   },
+   "excludes": "Intention and reasons belong to the human and cognition senses and are absent in bacteria and plants. Software has designer-set goals. A species, evolution or a gene is not an agent. Organism agency does not make variants arise to meet a need. Agency comes in degrees.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Agency",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes organisms as active in niche construction and behaviour units (Biologie), citizens acting within rules (Ethik, Gemeinschaftskunde), and software agents in AI units, and flags where agent language misleads.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-agency",
+    "OE-PROPOSITION-agency-legitimate-in-many-cases",
+    "OE-MISCONCEPTION-agency-negation",
+    "OE-DIVERGENCE-role-of-organism-agency",
+    "OE-DESIGNPRINCIPLE-behaviorally-mediated-selection-first-class",
+    "doi:10.1002/bies.202100185 (Sultan, Moczek & Walsh 2022; Crossref-checked)",
+    "doi:10.1111/ede.12448 (Walsh & Rupik 2023; Crossref-checked)",
+    "ISBN 9781107122109 (Walsh 2015, Organisms, Agency, and Evolution; Open Library-checked)",
+    "doi:10.1098/rspb.2015.1019 (Laland et al. 2015; Crossref-checked)",
+    "doi:10.1111/j.1745-6916.2006.00011.x (Bandura 2006; Crossref-checked)",
+    "doi:10.1086/231294 (Emirbayer & Mische 1998; Crossref-checked)",
+    "ISBN 9780134610993 (Russell & Norvig 2020, Artificial Intelligence: A Modern Approach; Open Library-checked)",
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-agency",
+    "ConceptBase AI4K12 OE-COMPETENCY-000263 (an intelligent agent)",
+    "DOI 10.1080/00219266.2025.2486963 (Hanisch, Eirdosh & González Galli 2025, Crossref checked; LiteratureBase OE-LITERATURE-hanisch-2025)",
+    "DOI 10.1002/bies.202100185 (Sultan, Moczek & Walsh 2021, Crossref checked; LiteratureBase OE-LITERATURE-sultan-2022)",
+    "LiteratureBase OE-LITERATURE-ariew-panchanathan-2023 and OE-LITERATURE-moore-et-al-2002 (agency ascribed to evolution as a learning problem)",
+    "DOI 10.1111/j.1745-6916.2006.00011.x (Bandura 2006, Crossref checked)",
+    "DOI 10.1017/S0269888900008122 (Wooldridge & Jennings 1995, Crossref checked)",
+    "DOI 10.1017/cbo9781316402719.001 (Walsh, Organisms, Agency, and Evolution, front-matter record, Crossref checked)"
+   ],
+   "reason": "The Interdisciplinary sentence requires intention yet is used for organisms and systems. It also drops the limits that circumstances set, which Social-Core keeps. Intention becomes a domain variable and constraint returns in the culture facet.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Transmission",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "The process by which information, traits or practices move from one holder (organism, person, group or system) to another, so that the receiver ends up with something similar to what the sender had.",
+   "facets": {
+    "biology": "Genes pass from parents to offspring through eggs, sperm or cell division. Some microbes also pass genes sideways to unrelated cells. Parents can also pass on a made environment such as a nest or burrow.",
+    "culture": "Practices pass between people by social learning: from parents, from peers and from older non-relatives. Imitation, teaching and language carry them. Learners often rebuild what they learn, so practices can change in passing.",
+    "technology": "Designs pass by copying drawings, code or products, by training apprentices and by taking a device apart to see how it works. A copied file can be exact. A copied skill usually is not.",
+    "AI and computation": "Data and trained models are copied exactly between machines. A smaller model can also be trained to imitate a larger one (distillation), which passes on behavior without copying its inner parts.",
+    "education": "A teacher explains, demonstrates and sets tasks, and the learner rebuilds the knowledge. What arrives is the learner's own version, so understanding can differ from what was taught."
+   },
+   "excludes": "Fidelity differs. DNA copying and file copying are nearly exact. Human learning often rebuilds what it receives. Biological transmission runs mainly from parent to offspring. Culture and technology also allow transmission between peers and from many sources. A learner brings prior ideas, so understanding can differ from what was taught.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Inheritance",
+     "relation": "broader"
+    },
+    {
+     "space": "soc",
+     "label": "Diffusion",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Genetik (Weitergabe der Erbanlagen), grade 5 Säugetiere (Sender-Empfänger-Modell), spread of ideas in Geschichte, and grade 9 Informatik Netzwerke (Datenpakete).",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-transmission",
+    "OE-CONCEPT-oe-interdisciplinary-inheritance",
+    "ISBN 9780691082806 (Cavalli-Sforza & Feldman 1981; Open Library-checked)",
+    "ISBN 9780691044378 (Odling-Smee, Laland & Feldman 2003; Open Library-checked)",
+    "doi:10.1016/j.jaa.2005.08.001 (Eerkens & Lipo 2005; Crossref-checked)",
+    "arXiv:1503.02531 (Hinton, Vinyals & Dean 2015, Distilling the knowledge in a neural network; arXiv API-checked)",
+    "ISBN 9780631200444 (Sperber 1996, Explaining Culture; listed by Open Library, edition not matched)",
+    "unverified: education facet rests on the constructivist view of learning; no source retrieved"
+   ],
+   "reason": "Existing sentence is sound. Adds five facets that state the copy-fidelity and direction differences, plus an excludes note.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Agency and Niche Construction",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Organizing heading for the Agency, Development, Niche Construction and Domestication group. Its text covers the whole group.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-agency",
+    "OE-CONCEPT-oe-interdisciplinary-niche-construction",
+    "OE-CURRICULUMDECISION-oe-interdisciplinary-agency-niche-construction-first-class-strand"
+   ],
+   "reason": "It is an organizing heading, so domain meanings sit in its child concepts. Its sentence stays consistent with the repaired Agency, which drops the intention requirement.",
+   "confidence": "high"
+  },
+  {
+   "label": "Adaptation",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A feature of a system that fits the demands of its setting, together with whatever process made it fit. The fit can be observed on its own. The process differs by domain: selection over generations, adjustment within a lifetime, or deliberate design.",
+   "facets": {
+    "biology": "A heritable trait that natural selection built for its function, such as camouflage. Angepasstheit (adaptedness) is the fit of structure to habitat seen today, whatever its origin. Adaptations are the fits that selection explains; other fits have other causes.",
+    "culture": "A practice or tool whose form suits local conditions. Researchers argue that this comes from keeping and copying variants that worked, as with ways of making toxic food crops safe to eat. Users often cannot say why it works.",
+    "technology": "A design whose features suit its use and operating conditions. It is reached by trying variants and copying those that perform, or by deliberate engineering. The measure of fit is the job the design must do.",
+    "AI and computation": "A candidate solution whose encoded features score well against a fixed objective, reached by rounds of variation, scoring and copying in an evolutionary algorithm. The designer picks the objective and so defines what counts as fit.",
+    "cognition": "A learner or animal revises behavior after experience so that it suits current conditions. The adjustment belongs to that individual and lasts at most one lifetime. Offspring do not inherit it."
+   },
+   "excludes": "Fit today does not show that selection built it. A trait selected for another use, or a by-product, can also fit. Lifetime adjustment is not inherited. Individuals can adjust to need, but populations do not evolve traits because individuals need them. In design and computing a person sets the target.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Adaptation",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Fitness",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Search",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Sachsen teaches Angepasstheit as a fit of structure to habitat in grades 4-6 (Fische, Lurche, Vögel, Säugetiere) and links it to selection only in grade 10 (Entstehung der Artenvielfalt, Vogelschnäbel).",
+   "grounding": [
+    "OE-CONCEPT-bio-core-adaptation",
+    "OE-CURRICULUMDECISION-bio-core-natural-selection-decentralized-vocabulary-only",
+    "doi:10.1098/rsbl.2009.0674 (Gardner 2009, Adaptation as organism design; Crossref-checked)",
+    "doi:10.1017/S0094837300004310 (Gould & Vrba 1982, Exaptation; Crossref-checked)",
+    "ISBN 9780691026152 (Williams, Adaptation and Natural Selection; Open Library-checked)",
+    "doi:10.1017/S0140525X00002417 (Laland, Odling-Smee & Feldman 2000; Crossref-checked)",
+    "ISBN 9780691166858 (Henrich 2016, The Secret of Our Success; Open Library-checked)",
+    "ISBN 9780226712840 (Richerson & Boyd 2005, book titled Not by Genes Alone; Open Library-checked)",
+    "ISBN 9780521296816 (Basalla 1988, The Evolution of Technology; Open Library-checked)",
+    "ISBN 9780262581110 (Holland, Adaptation in Natural and Artificial Systems; Open Library-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "ISBN 9780195122343 (West-Eberhard 2003, Developmental Plasticity and Evolution; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)",
+    "Sachsen Lehrplan topic lehrplan-80-1/lernbereich-6293-1 (Sachunterricht grade 4, Beispiele fuer Angepasstheit; read in the topic cache)",
+    "unverified: Piaget (1952) uses adaptation for assimilation and accommodation. I did not retrieve it and the facets do not rely on it"
+   ],
+   "reason": "Priority concept. Bio-Core defines only the selection-built case. The general sentence separates the observable fit (Angepasstheit) from the process that made it, then each facet names the process of its domain.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Fitness",
+   "action": "new",
+   "foldedInto": null,
+   "general": "How well a variant does, compared with its alternatives, at being kept and passed on in a given setting. What is counted depends on the domain: offspring, adopters or a score.",
+   "facets": {
+    "biology": "Relative reproductive success: the average number of offspring that individuals of a type leave, compared with other types in the same setting. Strength or health matter only through their effect on offspring numbers.",
+    "culture": "How often a practice or belief is learned and kept by others, compared with rival variants. It depends on ease of learning, apparent usefulness and who holds it. A popular practice can harm those who adopt it.",
+    "AI and computation": "A number a program assigns to each candidate solution to show how well it meets the objective. The score decides which candidates are copied or varied next. The programmer usually defines it before the run starts."
+   },
+   "excludes": "Biological fitness is estimated from offspring counts and depends on the environment. In computing a designer usually assigns it beforehand. Cultural success can follow learners' biases and can harm adopters. Fitness always compares a variant with rivals in a stated setting.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Fitness",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Search",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Entstehung der Artenvielfalt' (hints: Fitness, Reproduktionserfolg), the spread of practices in Geschichte, and scoring rules for candidate solutions.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-fitness",
+    "doi:10.1038/nrg2603 (Orr 2009, Fitness and its role in evolutionary genetics; Crossref-checked)",
+    "doi:10.1086/288865 (Mills & Beatty 1979, The propensity interpretation of fitness; Crossref-checked)",
+    "doi:10.1002/evan.10110 (Henrich & McElreath 2003; Crossref-checked)",
+    "ISBN 9780226069333 (Boyd & Richerson, Culture and the Evolutionary Process; Open Library-checked)",
+    "doi:10.1016/B978-0-08-050684-5.50008-2 (Goldberg & Deb 1991, selection schemes in genetic algorithms; Crossref-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "The quantity that makes selection measurable differs by domain: offspring counted afterwards, adopters tallied, or a score assigned beforehand. A student needs that contrast stated, so a general concept is warranted.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Population",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A set of members counted together because they vary and affect one another's chances of being copied. Change over time is described as a shift in the mix of variants across the set. No single member needs to change for the set to change.",
+   "facets": {
+    "biology": "Interbreeding organisms of one species in a place and time. Members share a gene pool, so their alleles mix each generation. Evolution is a change in how common alleles or traits are in this group.",
+    "culture": "The people who can learn from one another, such as a village or an online community. Who copies whom sets the boundary, so one person belongs to several. Researchers count variants, such as first names or pottery styles.",
+    "technology": "All versions of a design in use or on record, such as the car models on the road or the pottery found at a site. Counts of each version show which designs spread or vanish.",
+    "AI and computation": "The pool of candidate solutions in an evolutionary algorithm. The programmer chooses its size, which usually stays fixed. Each round replaces the pool with a new one built from the better candidates."
+   },
+   "excludes": "Interbreeding defines a biological population only. A cultural population is defined by who copies whom, and populations overlap. A program's population has a size set by the programmer. Population thinking treats differences among members as the data, so a population is never one typical member repeated.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Population",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Populationsbegriff' (Entstehung der Artenvielfalt), grade 9 Zusammenhänge im Ökosystem, and counts of names, styles or designs across a community.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-population",
+    "doi:10.1086/288942 (Sober 1980, Population thinking; Crossref-checked)",
+    "doi:10.1093/genetics/16.2.97 (Wright 1931; Crossref-checked)",
+    "ISBN 9780199552047 (Godfrey-Smith 2009, Darwinian Populations and Natural Selection; Open Library-checked)",
+    "doi:10.1098/rspb.2004.2746 (Bentley, Hahn & Shennan 2004; Crossref-checked)",
+    "doi:10.1016/j.jas.2009.12.039 (Steele, Glatz & Kandler 2010; Crossref-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "The Interdisciplinary Variation sentence already says population but never defines it. A general definition makes the contrast between interbreeding, copying and pool size explicit.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Drift",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Change in how common a variant is that comes from chance in which copies get passed on. It needs no advantage for the variant and is strongest in small populations. Drift can remove variants and can make rare variants common.",
+   "facets": {
+    "biology": "Allele frequencies shift from one generation to the next because the parents that happen to reproduce are a random sample. In small populations an allele can disappear or take over without any advantage.",
+    "culture": "When people copy at random from those around them, the popularity of baby names, pottery styles or other variants rises and falls by chance. Random-copying models fit several such records.",
+    "technology": "Which of several similar designs becomes common can depend on chance in early adoption. A random-copying model fits counts of technology patent applications, which suggests chance can decide this. Other processes could give the same counts.",
+    "AI and computation": "In a genetic algorithm with a small pool, features can spread or vanish by luck in which candidates get picked to reproduce, even when scores are equal. This can end the search early."
+   },
+   "excludes": "A fit to a random-copying model does not prove random copying, because other processes can give the same counts. Many people copy with biases such as prestige, which acts like selection. Drift in computing comes from pool size. Drift acts on a set and never on one individual.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Drift",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Entstehung der Artenvielfalt' (Veränderung der Arten), the chance side of population genetics, and chance in how names, styles or designs spread.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-drift",
+    "doi:10.1093/genetics/16.2.97 (Wright 1931; Crossref-checked)",
+    "doi:10.1093/genetics/47.6.713 (Kimura 1962; Crossref-checked)",
+    "doi:10.1098/rsbl.2003.0045 (Hahn & Bentley 2003; Crossref-checked)",
+    "doi:10.1098/rspb.2004.2746 (Bentley, Hahn & Shennan 2004; Crossref-checked)",
+    "doi:10.1016/j.jas.2009.12.039 (Steele, Glatz & Kandler 2010; Crossref-checked)",
+    "doi:10.1109/4235.797972 (Rogers & Prugel-Bennett 1999, Genetic drift in genetic algorithm selection schemes; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Documented in culture as random copying (names, pottery, patents) and in evolutionary algorithms as drift. Each domain ties it to a different source of chance, so the general sentence names chance in who gets copied.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Selection Pressure",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A factor that makes some variants more likely than others to be kept and passed on, and so sets the direction in which the mix of variants shifts. It acts on the mix across a population and gives individuals no push to change.",
+   "facets": {
+    "biology": "A feature of the surroundings or of other organisms that changes survival or reproduction of variants, such as predators, drought, disease, food supply or rivals for mates. Its strength shows in how much survival or reproduction differs among variants.",
+    "culture": "Conditions that make some practices easier to keep and pass on: climate and resources, laws and prices, and the learning biases of the people who copy, such as favoring prestigious models.",
+    "AI and computation": "In an evolutionary algorithm, selection pressure is how strongly the selection rule favors higher scorers, for example by letting only the best few of a random sample become parents. The programmer sets it, and high pressure reduces variety."
+   },
+   "excludes": "In biology a pressure is a factor in the setting. In computing it is the strength of a rule a programmer chose, a different quantity. A pressure changes which variants are kept and makes no individual change or try to change. Cultural pressures include learners' own preferences.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Selection Pressure",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Search",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 9 Biologie Zusammenhänge im Ökosystem (Konkurrenz), grade 10 Entstehung der Artenvielfalt, and why some practices or designs persist.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-selection-pressure",
+    "doi:10.1038/nrg2603 (Orr 2009, Fitness and its role in evolutionary genetics; Crossref-checked)",
+    "doi:10.1002/evan.10110 (Henrich & McElreath 2003; Crossref-checked)",
+    "ISBN 9780226069333 (Boyd & Richerson, Culture and the Evolutionary Process; Open Library-checked)",
+    "ISBN 9780226712840 (Richerson & Boyd 2005, book titled Not by Genes Alone; Open Library-checked)",
+    "doi:10.1109/ICEC.1994.350042 (Back 1994, Selective pressure in evolutionary algorithms; Crossref-checked)",
+    "doi:10.1016/B978-0-08-050684-5.50008-2 (Goldberg & Deb 1991, selection schemes in genetic algorithms; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "The Interdisciplinary Niche Construction sentence already uses selective pressures without defining them. Separating the driver from the process matters, and evolutionary computing uses the term in a different sense.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Extinction",
+   "action": "new",
+   "foldedInto": null,
+   "general": "The end of a lineage: a kind of thing that was once passed on stops being passed on, so no later copies exist. Causes include loss of holders, failure to reproduce and an end to copying.",
+   "facets": {
+    "biology": "A species ends when its last member dies without leaving offspring. Common causes include habitat loss, climate change, hunting and disease.",
+    "culture": "A language goes extinct when its last speakers die or when the community stops passing it to children. Studies of thousands of languages test predictors such as road density and years of schooling.",
+    "technology": "A technique is lost when no one who can make it remains and no record survives. Tasmanian tool loss is debated: one model blames a small isolated population, and a later study doubts that population size explains such losses."
+   },
+   "excludes": "A species cannot return, while languages and techniques can sometimes be revived from records and learners. Cultural loss does not need the holders to die, because they may adopt another language or tool. A fall in numbers is not yet extinction. Software and file-format obsolescence is left out.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Extinction",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 5 Biologie Kriechtiere (ausgestorbene Kriechtiere), Fossilien in grade 10, and loss of languages or old crafts if a topic raises them.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-extinction",
+    "doi:10.1038/s41559-021-01604-y (Bromham et al., Global predictors of language endangerment, Nature Ecology & Evolution; Crossref-checked)",
+    "ISBN 9780195152463 (Nettle & Romaine, Vanishing Voices; Open Library-checked)",
+    "doi:10.2307/4128416 (Henrich 2004, Tasmanian case; Crossref-checked)",
+    "doi:10.1073/pnas.1520288113 (Vaesen et al. 2016; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7066-1 (Biologie grade 5, Kriechtiere in ihren Lebensräumen, ausgestorbene Kriechtiere; read in the topic cache)"
+   ],
+   "reason": "Language loss has a documented process (transmission to the next generation stops). Technology loss is documented but disputed. Biology is the clear case, so the general sentence is built on a lineage ending.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Descent",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Links between earlier and later versions through reproduction or copying, so that shared features can be traced to a shared origin. Where one line splits in two, descendants share an ancestor and differ by what changed afterwards. Relatedness can be drawn as a branching tree.",
+   "facets": {
+    "biology": "Organisms descend from parents. Two lineages that split from a common ancestor share inherited features, and the pattern of splits is drawn as a phylogenetic tree. Population splits can end in separate species.",
+    "culture": "Languages and hand-copied texts descend from earlier ones. Shared words or shared copying errors show which versions are related, and trees are rebuilt with methods borrowed from biology. Borrowing and mixing between lines also happens.",
+    "technology": "Designs descend from earlier designs, with features carried forward across versions. Family trees of artifacts can be drawn, but makers often combine features from different lines, which makes the pattern more like a network."
+   },
+   "excludes": "Biological descent runs mostly from parent to offspring, so a tree fits well for most animals. Microbes, languages, texts and designs borrow across lines, so a tree fits only partly. Shared features can come from shared ancestry or from independent solutions. A tree has no ladder or main line.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Common Ancestor",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Phylogeny",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Common Descent and Deep Time",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Stammesgeschichte des Menschen' (Modell zum Hominidenstammbaum), Homologien and Zwischenformen, and language families if a topic raises them.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-common-ancestor",
+    "OE-CONCEPT-bio-core-phylogeny",
+    "OE-SANDBOX-CONCEPT-000003",
+    "doi:10.1038/29667 (Barbrook et al. 1998, The phylogeny of The Canterbury Tales; Crossref-checked)",
+    "doi:10.1038/nature02029 (Gray & Atkinson 2003; Crossref-checked)",
+    "doi:10.1080/10635150590950317 (Atkinson & Gray 2005; Crossref-checked)",
+    "doi:10.1126/science.1219669 (Bouckaert et al. 2012; Crossref-checked)",
+    "doi:10.1016/j.tree.2004.12.002 (Mace & Holden 2005; Crossref-checked)",
+    "doi:10.1371/journal.pbio.1001069 (Howe & Windram 2011; Crossref-checked)",
+    "doi:10.1038/nrg2560 (Pagel 2009; Crossref-checked)",
+    "doi:10.1086/510463 (Temkin & Eldredge 2007; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "Common Ancestor and Phylogeny share one idea: later versions trace back to earlier ones and relatedness is drawn as a tree. Documented in languages and manuscripts, so one general concept carries both Core concepts.",
+   "confidence": "medium",
+   "organizing": "The Evolutionary Pattern"
+  },
+  {
+   "label": "Differential Reproduction",
+   "action": "fold",
+   "foldedInto": "Selection",
+   "general": null,
+   "facets": {
+    "biology": "Variants leave different numbers of offspring because of how they interact with their surroundings. Over generations this shifts which variants are common.",
+    "culture": "Variants are learned by different numbers of new holders, so some practices become common while others fade.",
+    "AI and computation": "Candidates are picked as parents at different rates according to their scores, so higher scorers leave more copies in the next round."
+   },
+   "excludes": "The number of copies left is the criterion in biology and in algorithms that pick parents by score. In culture it is the number of new holders. Education and search methods without copies have no such count. Organisms do not try to leave offspring in order to evolve.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Differential Reproduction",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Entstehung der Artenvielfalt' (Reproduktionserfolg, Fitness).",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-selection",
+    "OE-CONCEPT-bio-core-natural-selection",
+    "doi:10.1146/annurev.es.01.110170.000245 (Lewontin 1970, The units of selection; Crossref-checked)",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Same idea as the biology sense of Selection: variants leave different numbers of offspring. The facets restate it as copies left, which also fits culture and computing.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Sexual Selection",
+   "action": "fold",
+   "foldedInto": "Selection",
+   "general": null,
+   "facets": {
+    "biology": "Variants differ in mating success because members of one sex compete for, or are chosen by, the other. Traits can spread by raising mating success even when they lower survival."
+   },
+   "excludes": "Mate competition and mate choice are behaviors that shape selection, which links this to Agency. Neither needs planning for evolutionary ends. Only biology is drafted here. Other domains were not checked, so no facet is claimed for them.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Sexual Selection",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Peacock plumage and similar cases used in evolution teaching; no Sachsen digest case found.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-selection",
+    "OE-MISCONCEPTION-agency-negation",
+    "ISBN 9780691000572 (Andersson 1994, Sexual Selection; Open Library-checked)"
+   ],
+   "reason": "A case of selection where other members of the species do the choosing or competing. It fits Selection. Other domains have no documented process of this kind, so only biology gets a facet.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Common Ancestor",
+   "action": "fold",
+   "foldedInto": "Descent",
+   "general": null,
+   "facets": {
+    "biology": "The organism or population from which two or more later lineages split. Relatives share it, and branch points in the tree mark such ancestors.",
+    "culture": "An earlier language or text from which several later versions were copied or developed, such as a parent language. It is usually inferred from what the descendants share."
+   },
+   "excludes": null,
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Common Ancestor",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie Stammesgeschichte des Menschen (Hominidenstammbaum) and Zwischenformen.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-common-ancestor",
+    "OE-SANDBOX-CONCEPT-000003",
+    "doi:10.1038/nature02029 (Gray & Atkinson 2003; Crossref-checked)",
+    "doi:10.1038/29667 (Barbrook et al. 1998, The phylogeny of The Canterbury Tales; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "The branch point of Descent: the source of later versions. Handled as part of Descent, which also covers languages and texts.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Phylogeny",
+   "action": "fold",
+   "foldedInto": "Descent",
+   "general": null,
+   "facets": {
+    "biology": "The branching tree of relatedness among organisms, built from shared inherited features such as anatomy and DNA.",
+    "culture": "Language trees and text-family trees built from shared words or copying errors, using methods borrowed from biology.",
+    "technology": "Trees of artifact lineages built from shared design features. Borrowing across lines often makes the pattern more like a net than a tree."
+   },
+   "excludes": "A tree shows relatedness. It does not rank branches, and it has no main line toward one group.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Phylogeny",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie Modell zum Hominidenstammbaum and Homologien.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-phylogeny",
+    "doi:10.1016/j.tree.2004.12.002 (Mace & Holden 2005; Crossref-checked)",
+    "doi:10.1371/journal.pbio.1001069 (Howe & Windram 2011; Crossref-checked)",
+    "doi:10.1086/510463 (Temkin & Eldredge 2007; Crossref-checked)",
+    "doi:10.1080/10635150590950317 (Atkinson & Gray 2005; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
+   ],
+   "reason": "The tree-drawing side of Descent. Language trees, manuscript trees and artifact trees use the same method, so one general concept carries all of them.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Gene",
+   "action": "fold",
+   "foldedInto": "Information",
+   "general": null,
+   "facets": {},
+   "excludes": "Whether a gene carries information in a strict sense is debated in the philosophy of biology. A cultural or computing counterpart of the gene as a discrete unit is contested and left out.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Gene",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie Genetik (Speicherung, Weitergabe und Realisierung der Erbanlagen).",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-information",
+    "OE-CONCEPT-bio-core-gene",
+    "doi:10.1086/392768 (Maynard Smith 2000, The concept of information in biology; Crossref-checked)"
+   ],
+   "reason": "The general idea a gene carries is stored information that is copied and read out. Information already names genetic encoding, so a biology facet there is enough. Gene itself stays a biology-only term.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Allele",
+   "action": "fold",
+   "foldedInto": "Variation",
+   "general": null,
+   "facets": {
+    "biology": "An allele is one alternative version of a gene. The mix of alleles in a population is its genetic variation, and a mutation creates a new allele."
+   },
+   "excludes": null,
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Allele",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie Genetik and the Mutation, Rekombination, Selektion factors in Entstehung der Artenvielfalt.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-allele",
+    "OE-CONCEPT-oe-interdisciplinary-variation",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Alleles are one unit of biological variation. Variation already says differences among members, so a biology facet there covers alleles.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Mutation",
+   "action": "fold",
+   "foldedInto": "Innovation",
+   "general": null,
+   "facets": {
+    "biology": "A heritable change in a DNA sequence, such as a swapped base, a deletion or a duplication. It creates a new genetic variant and arises without regard to whether it would help.",
+    "AI and computation": "A mutation operator randomly changes part of a candidate, standing in for DNA mutation. The programmer sets how often and how much."
+   },
+   "excludes": "Mutation in biology ignores need. Human invention can aim at a goal, and the two should not be merged.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Mutation",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 9-10 Biologie Genetik and the Mutation, Rekombination, Selektion factors in Entstehung der Artenvielfalt.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-mutation",
+    "OE-CONCEPT-oe-interdisciplinary-innovation",
+    "ISBN 9780262631853 (Mitchell, An Introduction to Genetic Algorithms; Open Library-checked)",
+    "doi:10.1162/EVCO_a_00025 (Lehman & Stanley 2011; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Mutation is the biology case of generating a new variant, which Innovation names. The crosswalk already treated Innovation as broader.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Heritable Variation",
+   "action": "fold",
+   "foldedInto": "Variation",
+   "general": null,
+   "facets": {
+    "biology": "Differences among individuals in traits, some of which pass from parents to offspring through genes. Only the part that is passed on can build up over generations.",
+    "culture": "Differences in practices that others learn and so carry on. A habit that nobody copies is variation that ends with its holder.",
+    "technology": "Differences in design that are carried into later versions of a tool, machine or program.",
+    "AI and computation": "Differences stored in the encoded candidate, which the next round copies. Settings that are not copied do not count."
+   },
+   "excludes": "Variation without heritability exists in every domain and cannot build up. Heritable variation in culture is made and changed on purpose as well as by error.",
+   "coreCounterparts": [
+    {
+     "space": "bio",
+     "label": "Heritable Variation",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Grade 10 Biologie 'Entstehung der Artenvielfalt' and any topic that asks which differences get passed on.",
+   "grounding": [
+    "OE-CONCEPT-oe-interdisciplinary-variation",
+    "OE-CONCEPT-oe-interdisciplinary-inheritance",
+    "doi:10.1146/annurev.es.01.110170.000245 (Lewontin 1970, The units of selection; Crossref-checked)",
+    "doi:10.1016/j.jaa.2005.08.001 (Eerkens & Lipo 2005; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Variation plus the condition that differences are passed on. That condition links Variation to Inheritance and is better stated inside Variation than as a second concept.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Speciation",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Grade 10 Biologie 'Veränderung der Arten und Artbildung' and the isolation case in Stammesgeschichte des Menschen stay in biology.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-speciation",
+    "ISBN 9780878930890 (Coyne & Orr 2004, Speciation; Open Library-checked)",
+    "doi:10.1080/10635150701701083 (de Queiroz 2007, Species concepts and species delimitation; Crossref-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Defined by reproductive isolation between species, which has no counterpart in culture, technology or code. The branching idea is covered by Descent. Language splits lack an isolation test of this kind.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Species",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Grade 5 Biologie Artenkenntnis (Fische, Lurche, Kriechtiere, Vögel) and grade 10 Artbegriff stay in biology. Identification keys point to a separate classification idea.",
+   "grounding": [
+    "OE-CONCEPT-bio-core-species",
+    "doi:10.1080/10635150701701083 (de Queiroz 2007, Species concepts and species delimitation; Crossref-checked)",
+    "ISBN 9780878930890 (Coyne & Orr 2004, Speciation; Open Library-checked)",
+    "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7601-1 (Biologie grade 10, Entstehung der Artenvielfalt; read in the topic cache)"
+   ],
+   "reason": "Species concepts conflict even within biology. Reproductive isolation has no counterpart in culture or code. Sachsen also uses Art for naming and identifying kinds, which is a classification task.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Cooperation",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Parties act together so that each gains from the others' actions, and some mechanism keeps the arrangement going when a party could gain by holding back. The mechanism differs by domain.",
+   "facets": {
+    "biology": "Animals or other organisms help or work with partners, and selection has favoured the helping. It is kept going by shared interest in the result, relatedness, repeated dealings, or partner choice and sanctions. Examples: cooperative breeding, cleaner fish, pollination partnerships.",
+    "culture": "People coordinate on a task or shared resource. Trust, norms, incentives, reputation or institutions keep members contributing when free riding would pay. Examples: a village water scheme, a cooperative, an alliance between states, a school project team.",
+    "AI and computation": "Programs or robots pursue a joint result. A shared reward or a common protocol keeps each one contributing, and the designer sets it. Agents with separate rewards can face a free-rider temptation. Example: robot teams."
+   },
+   "excludes": "Intention is needed in many human cases and absent in bees, cleaner fish and software. Hunting together is not always cooperation, because each animal may gain alone. Costly help to relatives counts only if gains to shared genes are included. Cooperation within a group can harm outsiders.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Cooperation",
+     "relation": "broader"
+    },
+    {
+     "space": "soc",
+     "label": "Collective Action",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Lets one concept describe packs (Klasse 5), bee colonies (Klasse 6), pollination and cleaner partnerships (Klasse 9), cooperatives and Bismarck's alliances (Klasse 8), and team work in Informatik (Klassen 8, 10), each with its own sustaining mechanism.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-cooperation",
+    "ConceptBase OE-CONCEPT-openevo-design-concept-cooperation-games",
+    "TheoryBase OE-THEORY-core-design-principles-for-cooperation (author-draft status)",
+    "DOI 10.1111/j.1420-9101.2006.01258.x (West, Griffin & Gardner 2007, Crossref checked)",
+    "DOI 10.1126/science.1133755 (Nowak 2006, Crossref checked)",
+    "DOI 10.1126/science.7466396 (Axelrod & Hamilton 1981, Crossref checked)",
+    "DOI 10.1016/0022-5193(64)90038-4 (Hamilton 1964, Crossref checked)",
+    "DOI 10.1038/nature04755 (Bshary & Grutter 2006, cleaner fish, Crossref checked)",
+    "DOI 10.1038/nature01931 (Kiers et al. 2003, host sanctions, Crossref checked)",
+    "DOI 10.1046/j.1461-0248.2001.00218.x (Bronstein 2001, exploitation of mutualisms, Crossref checked)",
+    "DOI 10.1086/284844 (Packer & Ruttan 1988, cooperative hunting, Crossref checked)",
+    "DOI 10.1017/cbo9780511807763 (Ostrom 1990; LiteratureBase OE-LITERATURE-ostrom-1990)",
+    "DOI 10.1038/415137a (Fehr & Gächter 2002, Crossref checked)",
+    "unverified: Leibo et al. 2017, Multi-agent reinforcement learning in sequential social dilemmas (AAMAS)"
+   ],
+   "reason": "The general sentence names the benefit but drops what keeps cooperation going when holding back would pay, which Social-Core keeps. Adding it and three domain meanings also covers the animal and symbiosis cases.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Conflict",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Two or more parties whose pursuits cannot all succeed at once, because they draw on the same limited resource or have incompatible aims. Parties can be organisms, species, people, groups or programs.",
+   "facets": {
+    "biology": "Competition and fighting. Individuals or species use the same limited food, space or mates, so one party's gain is another's loss. It can be indirect, with no contact, or direct, as in threat display, fights and territory defence.",
+    "culture": "People or groups hold opposed interests, values or goals and act on them, from arguments and strikes to war. They can negotiate, appeal to rules or use force. Conflict can end in settlement, domination or a standoff.",
+    "AI and computation": "Programs with opposed objectives, such as two game-playing agents where one's win is the other's loss. The designer builds the opposition into the objectives. The programs have no interests of their own."
+   },
+   "excludes": "Competition between organisms needs no intention and can involve no contact. Predation and parasitism are one-sided and differ from competition. Persecution and bullying are one-sided harm, and calling them a clash of interests hides who acted. Software 'conflict' is a clash of operations.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Conflict",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Selection Pressure",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes ecological Konkurrenz (Klasse 9), territory and aggression in mammals (Klasse 5), and war and resistance topics (Klassen 8 to 10). The excludes line guards the persecution and bullying cases (Ethik Klasse 6) against a two-sided reading.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-conflict",
+    "ConceptBase NGSS competencies OE-COMPETENCY-000110 (MS-LS2-1) and OE-COMPETENCY-000148 (HS-LS4-2, competition for limited resources)",
+    "ConceptBase OE-SANDBOX-CONCEPT-000016 (Social Dilemma: distinguishes aligned, mixed and fully opposed interests)",
+    "LiteratureBase OE-LITERATURE-jessup-ode-balgopal-2016 (competition for limiting resources)",
+    "LiteratureBase OE-LITERATURE-schluter-2010 (resource competition in sticklebacks)",
+    "unverified: the computing facet rests on standard AI textbook material on zero-sum game search and on resource contention; no citation checked"
+   ],
+   "reason": "The Interdisciplinary sentence can already hold ecological competition, but Social-Core's wording cannot. Naming competition on purpose, and separating it from predation and one-sided harm, settles the Konkurrenz case.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Culture",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Behaviours, knowledge, beliefs and artifacts that group members acquire from one another by social learning (watching, listening to or copying others), that are typical of the group, and that persist as individual members come and go.",
+   "facets": {
+    "biology": "Group-typical behaviour that animals learn from others and pass on: chimpanzee tool use, regional bird dialects, humpback whale song. Documented in primates, birds, whales and fish. Cumulative build-up over generations is rare or debated.",
+    "culture": "Human culture adds language, symbols, shared norms and deliberate teaching. Knowledge, beliefs, practices and artifacts build up over generations, so a group holds more than any one member could invent alone (cumulative culture).",
+    "AI and computation": "Proposed extension. Systems trained on human cultural products carry patterns forward, and their outputs shape what people see and make next, which later systems learn from. Researchers call this machine culture. Whether machines learn socially is debated."
+   },
+   "excludes": "Animal traditions lack, as far as is known, symbols, enforced norms and steady cumulative gain. Cultural differences between peoples are learned and show nothing about genetic differences, although culture and genes can affect each other (dairy farming and milk digestion). A culture has no fixed trait list.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Culture",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes kulturelle Leistungen (China, Klasse 8) and citizenship education across eras (Klasse 6). Also gives a bounded way to place animal traditions as a contrast case to human culture.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-culture",
+    "ConceptBase OE-SANDBOX-CONCEPT-000019 (Cumulative Culture) and OE-SANDBOX-CONCEPT-000005 (Machine Culture)",
+    "DOI 10.1038/21415 (Whiten, Goodall, McGrew et al. 1999, Crossref checked)",
+    "DOI 10.1098/rstb.2006.1998 (Whiten & van Schaik 2007, Crossref checked)",
+    "DOI 10.1017/ehs.2019.1 (Schuppli & van Schaik 2019, Crossref checked)",
+    "DOI 10.1002/evan.10111 (Laland & Hoppitt 2003, Crossref checked)",
+    "DOI 10.1017/S0140525X0100396X (Rendell & Whitehead 2001, Crossref checked)",
+    "DOI 10.1098/rspb.2018.0712 (Mesoudi & Thornton 2018, Crossref checked)",
+    "DOI 10.1073/pnas.1203179109 (Riedl et al. 2012, no third-party punishment in chimpanzees, Crossref checked)",
+    "DOI 10.1038/s41562-023-01742-2 (Brinkmann et al. 2023, Crossref checked)"
+   ],
+   "reason": "Compared with Social-Core, the Interdisciplinary sentence drops no condition. It is wide enough to admit animal traditions and machine culture, so facets say where each fits and where it does not.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Culture and Social Structure",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Groups the social concepts. Animal groups are reached through Group, Role, Power, Cooperation and Conflict, and human rule systems through Norms and Institutions.",
+   "grounding": [
+    "Organizing concept text read in the OpenLPM Interdisciplinary vocabulary on 2026-10-25",
+    "lab_manager design note social-core-and-computational-core-synthetic-lpm-preparation-2026-10-25, sections 3 and 5"
+   ],
+   "reason": "Organizing heading; the domain meanings sit on its child concepts. Its sentence names norms and institutions, which are mainly human, so read it as the human layer. List Group, Role and Power under it.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Institutions",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Stable rules, written or unwritten, that a group recognises, together with the arrangements that apply them. They shape what members may, must or must not do and outlast any one member. This is mainly a human case.",
+   "facets": {
+    "culture": "Laws, constitutions, courts, schools, markets and customs. Formal institutions are written down and applied by officials. Informal ones are customs and conventions upheld by approval and disapproval (see Norms). People make, follow and change them."
+   },
+   "excludes": "Law is a formal institution. Norms and conventions are the informal kind. Animal rank orders and policing belong under Group, Power and Cooperation, because no rule that members recognise is known. Software rules (protocols, permissions) cannot be broken, while laws and customs can, and people enforce them afterwards.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Institutions",
+     "relation": "same"
+    }
+   ],
+   "curriculumUse": "Describes law and constitutions (Klassen 8 to 10), traffic rules (Klassen 1 to 2), market forms (Klasse 8), class rules (Klasse 5) and public facilities. Protocols and access rules in Informatik can be compared as built-in rules.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-institutions",
+    "ConceptBase OE-CONCEPT-openevo-design-concept-governing-the-commons",
+    "DOI 10.1017/CBO9780511808678 (North 1990, formal and informal rules, Crossref checked)",
+    "DOI 10.1017/cbo9780511807763 (Ostrom 1990; LiteratureBase OE-LITERATURE-ostrom-1990)",
+    "DOI 10.1038/nature04326 (Flack et al. 2006, policing in primates, Crossref checked)",
+    "DOI 10.1038/342796a0 (Ratnieks & Visscher 1989, worker policing, Crossref checked)",
+    "unverified: Lessig 1999, Code and Other Laws of Cyberspace (software as a regulator)"
+   ],
+   "reason": "The tagger could not tell whether formal law counts. Settled here: law is a formal institution and informal rules are Norms. The concept is mainly human, with a built-in-rules reading in computing.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Norms",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A shared expectation within a group about how members should behave, upheld by the group's own approval, disapproval or exclusion. No formal authority is needed. This is mainly a human case.",
+   "facets": {
+    "culture": "Customs, manners, netiquette and religious duties, as held and upheld by a community. Members praise those who follow a norm and criticise or shun those who do not. Whether a norm is justified is an ethical question.",
+    "cognition": "In a person's mind, a rule of conduct taken on as one's own. The person expects to feel guilt or shame for breaking it and may follow it with nobody watching. One account of why people follow norms unwatched."
+   },
+   "excludes": "Animal conformity is copying the majority, and no animal is known to expect that others ought to follow. Written law (Rechtsnorm) is an institution. A report of what a group expects differs from a claim that something ought to be done. Averages, Normwerte, DIN-Normen and the Reaktionsnorm are other senses.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Norms",
+     "relation": "same"
+    }
+   ],
+   "curriculumUse": "Describes Netiquette and Umgangsformen, class and community rules, group pressure, and ethical demands of religions (Klassen 5 to 9). Separates these from descriptive versus normative statements in Biologie (Klassen 7 to 10).",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-norms",
+    "ConceptBase AI4K12 OE-COMPETENCY-000528 (AI systems and the norms of the groups they serve)",
+    "DOI 10.1017/CBO9780511616037 (Bicchieri 2005, Crossref checked)",
+    "DOI 10.1037/0022-3514.58.6.1015 (Cialdini, Reno & Kallgren 1990, Crossref checked)",
+    "DOI 10.1006/jtbi.2003.3104 (Gintis 2003, internalisation of norms, Crossref checked)",
+    "DOI 10.1017/S0140525X14001356 (Norenzayan et al. 2016, religion and prosociality, Crossref checked)",
+    "DOI 10.1038/nature04047 (Whiten et al. 2005, conformity in chimpanzees, Crossref checked)",
+    "DOI 10.1073/pnas.1203179109 (Riedl et al. 2012, Crossref checked)"
+   ],
+   "reason": "Formal law goes to Institutions and Norms keep the informal part. Religious duties count when a community upholds them. Descriptive-versus-normative statements and statistical norms in Biologie are excluded on purpose.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Collective Intelligence",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A group's combined output solves a problem or estimates a quantity better than a typical member could alone. How members' contributions are combined decides whether the group does better, and some ways of combining make it worse.",
+   "facets": {
+    "biology": "Animal groups reach good decisions or solutions through simple local interactions with no leader. Honeybee scouts compare nest sites and reach a quorum (enough scouts agree), and ant trails converge on short routes through pheromone reinforcement.",
+    "culture": "People pool estimates, skills or knowledge: averaging many guesses, team problem solving, science built on many researchers. Larger, well-connected populations may invent more (the collective brain; debated). Independent estimates help, while copying each other can spoil the result.",
+    "AI and computation": "Methods that combine many simple units: voting ensembles of models, ant-colony and swarm search. The designer writes the combining rule. Units need no understanding of the whole problem."
+   },
+   "excludes": "Groups are not automatically smarter: copying, shared bias and a loud leader can make a crowd worse than its members (information cascades). Bees and ants have no leader and no plan, while human groups can plan and talk.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Distributed System",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes colony-level problem solving and Arbeitsteilung in bees (Klasse 6), peer-to-peer and collaboration services in networks (Klassen 8 and 9), and team projects in Informatik (Klasse 10).",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-collective-intelligence",
+    "ConceptBase OE-SANDBOX-CONCEPT-000008 (Decentralized Causal Reasoning)",
+    "LiteratureBase OE-LITERATURE-anwarzai-2026, OE-LITERATURE-falandays-2023, OE-LITERATURE-muthukrishna-2016",
+    "DOI 10.1126/science.1193147 (Woolley et al. 2010, Crossref checked)",
+    "DOI 10.1126/science.1210361 (Seeley et al. 2012, honeybee swarms, Crossref checked)",
+    "DOI 10.1073/pnas.1008636108 (Lorenz et al. 2011, Crossref checked)",
+    "DOI 10.1038/075450a0 (Galton 1907, Crossref checked)",
+    "DOI 10.1073/pnas.0403723101 (Hong & Page 2004, Crossref checked; its result is debated)",
+    "DOI 10.1098/rstb.2015.0192 (Muthukrishna & Henrich 2016, Crossref checked)",
+    "unverified: Dorigo & Stützle 2004, Ant Colony Optimization (MIT Press)"
+   ],
+   "reason": "The general sentence promises more than groups deliver: it omits that the combining rule decides the outcome and that crowds can fail. Adds biology, culture and computing meanings with the failure case in excludes.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Communication",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A sender produces a signal, a receiver responds to it, and a code shared by both sides links the signal to the response. Whether anything is understood differs by domain.",
+   "facets": {
+    "biology": "A signal shaped by selection to change a receiver's behaviour, and a response shaped to read it: bird song, alarm calls, the honeybee dance. A cue carries information without being sent. No meaning is needed.",
+    "culture": "People exchange meaning through language, writing, images and gestures. Speakers intend to be understood, read each other's intentions and share conventions that can be learned and changed. Messages can mislead, and interpretation depends on context.",
+    "technology": "Devices exchange encoded messages over a channel under an agreed protocol, as in networks and telephony. The protocol fixes the format and the steps. A message can be delivered correctly with nobody understanding it, and noise can corrupt it."
+   },
+   "excludes": "Meaning and intention are present in human language and may be absent in animal signals and machine messages. A cue is information that nobody sent. Delivering a message correctly differs from being understood. Signals are not always honest in any domain.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Communication",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Information",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Distributed System",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes bird song and the Sender-Empfänger-Modell (Klasse 5), bee communication (Klasse 6), media and propaganda, and network protocols and communication services (Informatik Klassen 8 and 9).",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-communication",
+    "DOI 10.1111/j.1420-9101.2007.01497.x (Scott-Phillips 2008, Defining biological communication, Crossref checked)",
+    "DOI 10.1002/j.1538-7305.1948.tb01338.x (Shannon 1948; LiteratureBase OE-LITERATURE-shannon-1948)",
+    "DOI 10.1017/S0140525X05000129 (Tomasello et al. 2005, shared intentions, Crossref checked)",
+    "unverified: Maynard Smith & Harper 2003, Animal Signals (Oxford University Press)"
+   ],
+   "reason": "The sentence says 'between agents' and drops the human holder and the meaning that Social-Core keeps. A sender-signal-receiver-code structure covers animal and machine cases, and facets say where meaning is required.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Group",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A set of individuals who interact with one another more than with outsiders, or who are treated as belonging together, so that membership affects who helps, shares with, competes with or excludes whom.",
+   "facets": {
+    "biology": "Animals that stay together and interact repeatedly (sozialer Verband): packs, troops, insect colonies. Members may know one another as individuals, and insects use colony smell. Group life brings gains such as defence and costs such as competition.",
+    "culture": "People who see themselves, or are seen by others, as one body with shared interests or identity: families, school classes, parties, nations. Members need not meet. Membership can be chosen, inherited, or assigned by outsiders, sometimes against a person's will."
+   },
+   "excludes": "Animal groups can carry markers such as colony smell. Belonging needs no shared identity. A bee colony has no ruler: the queen lays eggs and does not command. In animals, a population or a chance crowd is a group only if members interact. Human groups can rest on identity alone.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Group",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Population",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes the bee colony as sozialer Verband (Klasse 6), packs and herds (Klasse 5), and parties, interest groups and nationalist movements (Klassen 8 and 9) with one concept and stated differences.",
+   "grounding": [
+    "DOI 10.1146/annurev.es.05.110174.001545 (Alexander 1974, evolution of social behaviour, Crossref checked)",
+    "DOI 10.1038/nature08366 (Clutton-Brock 2009, Crossref checked)",
+    "DOI 10.1002/ejsp.2420010202 (Tajfel et al. 1971, social categorization, Crossref checked)",
+    "DOI 10.1126/science.1210361 (Seeley et al. 2012, colony decisions without a ruler, Crossref checked)",
+    "ConceptBase OE-COMPETENCY-000141 (NGSS HS-LS2-8, group behavior)",
+    "ConceptBase OE-SANDBOX-CONCEPT-000021 (Ultrasociality)",
+    "TheoryBase OE-THEORY-symbolic-group-marking (author-draft status)"
+   ],
+   "reason": "Social-Core has Group and the Interdisciplinary space has none. Animal social groups (sozialer Verband) are well documented, so the concept travels to biology. Computing offers only clusters and sets, so no facet is given there.",
+   "confidence": "medium",
+   "organizing": "Culture and Social Structure"
+  },
+  {
+   "label": "Role",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A recurring position in a group's division of labour, with typical behaviour attached. Who fills it, and whether they can change position, differs by domain.",
+   "facets": {
+    "biology": "Social insect castes and age-linked tasks, and helpers in cooperative breeders. In honeybees, workers shift from nursing to foraging as they age. Roles arise from development or age, and a caste can be fixed for life.",
+    "culture": "A position such as teacher, parent, judge or citizen. Other people expect certain behaviour from whoever holds it, and sanction departures. People are assigned, choose, train for or inherit roles, and can hold several at once.",
+    "AI and computation": "Named positions in a system: client and server in a network, administrator and user in an access scheme. The role fixes what its holder may do, and any machine or account can hold it."
+   },
+   "excludes": "Insect individuals do not accept or refuse a role. Human roles carry expectations and sanctions and can be negotiated. 'Caste' also names a hereditary human social class, a different thing. Software roles carry no expectations or feelings.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Role",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Distributed System",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes Arbeitsteilung in bees (Klasse 6), roles in groups and society (Ethik and Gemeinschaftskunde), and client-server versus peer-to-peer roles in Informatik (Klasse 9).",
+   "grounding": [
+    "DOI 10.1146/annurev.so.12.080186.000435 (Biddle 1986, role theory, Crossref checked)",
+    "DOI 10.1146/annurev.en.37.010192.003225 (Robinson 1992, division of labour in insects, Crossref checked)",
+    "DOI 10.1146/annurev.ento.46.1.413 (Beshers & Fewell 2001, Crossref checked)",
+    "DOI 10.1038/nature08366 (Clutton-Brock 2009, helpers, Crossref checked)",
+    "DOI 10.1109/2.485845 (Sandhu et al. 1996, role-based access control, Crossref checked)",
+    "DOI 10.1023/A:1010071910869 (Wooldridge, Jennings & Kinny 2000, roles for software agents, Crossref checked)"
+   ],
+   "reason": "Division of labour gives Role a documented non-human reading (insect castes, helpers) and a designed one in computing. Expectations and sanctions stay human, and the excludes line says so.",
+   "confidence": "medium",
+   "organizing": "Culture and Social Structure"
+  },
+  {
+   "label": "Incentive",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A benefit or cost attached to an option that changes how often the option is chosen. How the effect arises differs by domain: through expectation and judgement, through learning, or through an update rule.",
+   "facets": {
+    "culture": "Prices, wages, grades, fines, praise and taxes. People weigh expected gains and costs, along with fairness, reputation and values. Material incentives can backfire: a fine for lateness can make lateness more common if it turns a duty into a price.",
+    "biology": "Animals shift their choices toward options with higher payoffs: foraging animals leave a patch when the gain rate falls, and rewarded actions are repeated (reinforcement). Evolution shapes which payoffs matter. The animal needs no idea of why.",
+    "AI and computation": "A reward signal returned after an action. A learning program changes its behaviour to collect more reward. People set the reward, so a badly chosen reward is followed faithfully, including in unintended ways."
+   },
+   "excludes": "People can offer and understand an incentive. Animals and learning programs respond to payoffs without understanding them. Payoffs in evolution change which strategies persist across generations, which is selection. They do not change one individual's choice. Money is one kind of incentive. Approval and fairness also move people.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Incentive",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Machine Learning",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes market coordination through prices, supply and demand (Gemeinschaftskunde Klassen 8 and 10), reward-based learning in AI units, and foraging choices in animal behaviour.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000023 (Homo Economicus: material incentives can backfire)",
+    "ConceptBase AI4K12 OE-COMPETENCY-000399 (reinforcement learning) and OE-COMPETENCY-000341 (maximizing reward)",
+    "DOI 10.1086/468061 (Gneezy & Rustichini 2000, A fine is a price, Crossref checked)",
+    "DOI 10.1037/0033-2909.125.6.627 (Deci, Koestner & Ryan 1999, Crossref checked)",
+    "DOI 10.1111/1467-6419.00150 (Frey & Jegen 2001, Crossref checked)",
+    "DOI 10.1016/0040-5809(76)90040-X (Charnov 1976, marginal value theorem, Crossref checked)",
+    "unverified: Amodei et al. 2016, Concrete problems in AI safety (reward misspecification)"
+   ],
+   "reason": "Social-Core's Incentive has no match, and the education sense of Selection says nothing about what makes an option attractive. Payoff-driven choice is documented in animals and in learning software, so the concept travels with care.",
+   "confidence": "medium",
+   "organizing": "Culture and Social Structure"
+  },
+  {
+   "label": "Power",
+   "action": "new",
+   "foldedInto": null,
+   "general": "The ability of one party to affect another party's options or outcomes, for example by controlling something the other needs, by force, or by shaping what the other believes. The ability belongs to the relationship between the parties.",
+   "facets": {
+    "biology": "Dominance: in a pair, one animal reliably gets first access to food, mates or space, because of past contest wins, size, age or inherited rank, and a threat now suffices. Ranks form an order in the group (Rangordnung).",
+    "culture": "People hold power through force, control of money or resources, authority accepted as rightful, or influence over what others know and believe. Rulers, employers, owners, media and states all have it. Power can be limited by law, institutions and resistance."
+   },
+   "excludes": "Legitimacy, authority and law belong to human cases. Animal dominance does not rest on any rule that members accept. In wild wolf packs the 'alpha' pair are the parents, so rank follows family position. Animal rank orders give no reason for human hierarchies. Shaping beliefs is mainly a human case.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Power",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes Rangordnung in mammals (Klasse 5), media manipulation (Ethik Klasse 7), colonial influence on borders and oil as an economic and political factor (Geographie Klasse 7), with the animal reading's limits stated.",
+   "grounding": [
+    "DOI 10.1002/bs.3830020303 (Dahl 1957, The concept of power, Crossref checked)",
+    "DOI 10.1163/156853993X00290 (Drews 1993, dominance in animal behaviour, Crossref checked)",
+    "DOI 10.1139/z99-099 (Mech 1999, alpha status in wolf packs, Crossref checked)",
+    "DOI 10.1016/S1090-5138(00)00071-4 (Henrich & Gil-White 2001, prestige, Crossref checked)",
+    "DOI 10.1037/0033-295X.110.2.265 (Keltner, Gruenfeld & Anderson 2003, Crossref checked)",
+    "ConceptBase OE-SANDBOX-CONCEPT-000022 (Egalitarianism: leveling mechanisms against dominance)",
+    "LiteratureBase OE-LITERATURE-turchin-gavrilets-2009"
+   ],
+   "reason": "Power has a thin but documented animal reading in dominance and rank order, which Klasse 5 teaches. Authority, legitimacy and control of beliefs stay human, so the general sentence is relational and excludes names what does not transfer.",
+   "confidence": "low",
+   "organizing": "Culture and Social Structure"
+  },
+  {
+   "label": "Diffusion",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Something spreads through a population because holders pass it to others they are in contact with. The pattern of spread depends on who is in contact with whom and on what makes a contact pass it on.",
+   "facets": {
+    "biology": "A pathogen passing between hosts, or a learned behaviour spreading along an animal group's social ties, such as a new foraging trick in wild birds or lobtail feeding in humpback whales. Infection needs no choice by the host.",
+    "culture": "An idea, practice or technology spreads as people see it, hear of it and adopt it. Adoption often follows an S-shaped curve, with early adopters first. People adopt for many reasons: benefit, prestige, pressure or chance.",
+    "AI and computation": "A file, message or program copy spreads over a network, or a node adopts a state when enough neighbours have. Simple rules on a contact network can reproduce epidemics and viral posts. A designer writes the passing-on rule."
+   },
+   "excludes": "Wide spread does not show that the thing is better or fitter. Spread can follow popularity, prestige or chance. One hand-over is Transmission, and Diffusion is the pattern across a population. Selection needs a reason some variants spread more, such as fit to the setting. Diffusion needs only contact.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Diffusion",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes the spread of industrialisation from England (Geschichte Klasse 8), of customs between communities, of infections between hosts, and of data across networks in Informatik.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-transmission",
+    "DOI 10.1086/226707 (Granovetter 1978, threshold models, Crossref checked)",
+    "DOI 10.1073/pnas.082090499 (Watts 2002, cascades on networks, Crossref checked)",
+    "DOI 10.1287/mnsc.15.5.215 (Bass 1969, product growth model, Crossref checked)",
+    "DOI 10.1038/nature13998 (Aplin et al., wild birds, Crossref checked)",
+    "DOI 10.1126/science.1231976 (Allen et al. 2013, humpback whales, Crossref checked)",
+    "LiteratureBase OE-LITERATURE-kendal-etal-2018-social-learning-strategies",
+    "unverified: Rogers, Diffusion of Innovations (5th edition, 2003)"
+   ],
+   "reason": "Diffusion is the spread pattern across a population, and one-to-one Transmission is a single step. Contact-network models fit infections, ideas and files. Kept apart from Selection. The lead could fold it into Transmission instead.",
+   "confidence": "medium",
+   "organizing": "Culture and Social Structure"
+  },
+  {
+   "label": "Social Change",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Topics such as the shift from agrarian to service society (Geographie Klasse 10) and industrialisation (Geschichte Klasse 8) stay describable through Culture, Institutions, Technology and Evolutionary Process. The gap is a recorded difference between the spaces.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-evolutionary-process",
+    "lab_manager design note social-core-and-computational-core-synthetic-lpm-preparation-2026-10-25, sections 3.2, 3.5 and 6",
+    "unverified: no social-change literature was checked"
+   ],
+   "reason": "A label for change in human norms, institutions and practices. Its general reading is only 'change over time'. Evolutionary Process is one explanation among several, so folding would import a mechanism Social-Core excludes.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Knowledge",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Information that a holder has kept, has grounds to rely on and can use to act or to answer questions. The holders are people and groups. The kind of grounds differs by domain.",
+   "facets": {
+    "cognition": "What a person has learned and keeps, including facts, concepts and know-how. It guides action and reasoning. People can often give reasons, and know-how is backed by a track record even when they cannot.",
+    "culture": "Understanding a group holds and justifies together through shared records, expertise and checks such as evidence, peer review and source criticism. No member holds all of it. It outlasts its members when written down or taught.",
+    "education": "The facts, concepts and procedures a curriculum selects for learners, which teaching tries to turn into understanding the learner can use. Knowing facts differs from applying them, so curricula also name skills and competences.",
+    "AI and computation": "Technical reading: a knowledge base stores statements that a program searches to answer questions. People wrote or checked them and quality varies. The program has no grounds of its own. Whether a trained model's patterns count is debated."
+   },
+   "excludes": "Information in genes, a library or a model's weights is knowledge only when a holder can use it and has grounds to rely on it. Genes and immune memory were shaped by selection, and no holder checked them. A group can share a mistake, so agreement alone is not enough.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Knowledge",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes knowledge in history source work (limits of interpreting sources), curriculum goals about what students should know, and school topics on memory. Gives knowledge-base topics in informatics a flagged technical reading.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-knowledge",
+    "ConceptBase AI4K12 OE-COMPETENCY-000263 (what an agent must know)",
+    "DOI 10.1207/s15430421tip4104_2 (Krathwohl 2002, knowledge dimension, Crossref checked)",
+    "DOI 10.1145/3447772 (Hogan et al. 2021, Knowledge Graphs, Crossref checked)",
+    "DOI 10.1098/rstb.2015.0192 (Muthukrishna & Henrich 2016, Crossref checked)",
+    "TheoryBase OE-ASSUMPTION-factual-recall-adequate-proxy",
+    "DOI 10.1093/analys/23.6.121 (Gettier 1963, Crossref verified; background on justification)"
+   ],
+   "reason": "Adds domain meanings. The current wording lets any system hold knowledge, which invites machine attribution. Holders are narrowed to people and groups, and the machine reading becomes a flagged technical facet.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Collective Action",
+   "action": "fold",
+   "foldedInto": "Cooperation",
+   "general": null,
+   "facets": {
+    "culture": "Many people must contribute to a shared good, such as a clean river, and each can gain by letting others pay. Commons, taxes and public goods raise this problem. Rules, monitoring, sanctions and trust are the usual answers.",
+    "biology": "Individuals produce something that benefits all nearby members, and non-producers gain without paying. Pathogenic bacteria release iron-scavenging molecules, and cheaters that do not make them can spread unless relatedness or other checks limit them."
+   },
+   "excludes": "Collective action names a problem and cooperation is one way it ends. When interests align there is no dilemma. Free riding needs no intention in bacteria.",
+   "coreCounterparts": [
+    {
+     "space": "soc",
+     "label": "Collective Action",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes shared-resource problems such as commons and public goods in Gemeinschaftskunde and Ethik, and partnerships such as cleaner fish where cheating is possible, with one problem statement across domains.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000016 (Social Dilemma) and OE-SANDBOX-CONCEPT-000017 (Tragedy of the Commons)",
+    "TheoryBase OE-PROPOSITION-commons-dilemma-misaligned-interests (author-draft status)",
+    "DOI 10.1126/science.162.3859.1243 (Hardin 1968; LiteratureBase OE-LITERATURE-hardin-1968)",
+    "DOI 10.1017/cbo9780511807763 (Ostrom 1990; LiteratureBase OE-LITERATURE-ostrom-1990)",
+    "DOI 10.1038/nature02744 (Griffin, West & Buckling 2004, Crossref checked)",
+    "LiteratureBase OE-LITERATURE-koomen-herrmann-2018 and OE-LITERATURE-leighton-2014 (teaching the commons)"
+   ],
+   "reason": "Collective Action names the free-rider problem that Cooperation's sustaining mechanisms answer. ConceptBase holds a general Social Dilemma sense, so it fits as domain meanings of Cooperation. Merge with Cooperation's own facets.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Information",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A pattern that varies in step with something else. A receiver that can use that link becomes less uncertain about the other thing, or can act on it. Receivers include cells, animals, people and machines.",
+   "facets": {
+    "biology": "Pattern: a gene's base sequence, a hormone level or an animal signal. Receiver: the cell's machinery, an organ or another animal. Accounts differ on whether genes carry meaning or only cause effects. School biology rarely measures it in bits.",
+    "cognition": "Pattern: sensory input or a stored trace. Receiver: a nervous system whose later expectations and actions change. Memory is partly rebuilt at each recall, so a stored trace is not a copy of the input.",
+    "culture": "Pattern: words, pictures, records or media. Receiver: a person who reads them with shared codes. Meaning and truth matter here, so a message can mislead and its source needs checking.",
+    "AI and computation": "Pattern: a message chosen from a known set of possible messages. Receiver: a decoder built around the odds of each message. The less likely the message, the more bits it carries. Meaning plays no part."
+   },
+   "excludes": "Bits measure information only where the possible messages and their odds are known. Meaning and truth play no part in the bit count, yet both matter in human communication. Animal tracks and tree rings carry information although nobody meant to send it. Uncertainty here counts possibilities for any receiver.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Information",
+     "relation": "broader"
+    },
+    {
+     "space": "soc",
+     "label": "Communication",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Inheritance",
+     "relation": "related"
+    },
+    {
+     "space": "bio",
+     "label": "Gene",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes the Sachsen biology organizing field 'Information' (senses, hormones, genes, brain memory), informatics 'Informationen und Daten' with bits and units, and the source-checking topics in media, history and geography.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-information",
+    "TheoryBase OE-CROSSDOMAINCONSTRUCT-information-processing-domain-general",
+    "TheoryBase OE-CURRICULUMDECISION-bio-core-strand-101-no-information-concept",
+    "ConceptBase OE-COMPETENCY-000108 (NGSS MS-LS1-8, sensory receptors and memory)",
+    "DOI 10.1002/j.1538-7305.1948.tb01338.x (Shannon 1948, Crossref verified)",
+    "DOI 10.1086/392768 (Maynard Smith 2000, Crossref verified)",
+    "DOI 10.1086/392760 (Godfrey-Smith 2000, Crossref verified)",
+    "DOI 10.1086/344621 (Jablonka 2002, Crossref verified)",
+    "DOI 10.1007/s10539-006-9046-6 (Shea 2007, Crossref verified)"
+   ],
+   "reason": "Adds facets and repairs the general sentence. Source, pattern and receiver travel across domains. Bits, meaning, truth and a sender do not. Meaning enters only with human communication.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Representation",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Something that stands in for something else, so that people can think about, talk about or act on the second thing through the first, and programs can process it. What makes it a stand-in differs by domain: shared structure, agreed conventions or learning history.",
+   "facets": {
+    "cognition": "Mental structures such as images, concepts and schemas that stand for things and let a person reason about them when they are absent. They are largely built from experience and can be partial or wrong.",
+    "culture": "Shared sign systems such as words, writing, numerals, maps and diagrams. A community agrees what the signs stand for, and the choice of system changes what is easy to say, calculate or notice.",
+    "education": "Maps, diagrams, tables and models used to teach. Learners must learn the conventions and see that a map is a simplified stand-in for a place. Reading and making representations is taught as a skill.",
+    "AI and computation": "Technical reading: tables, code, vectors and recorded values (data) that a program stores and processes as standing for something. Data become information only for a receiver who can read them. People supply the meaning."
+   },
+   "excludes": "A shared or computed stand-in works only for a user who treats it as one, so the same marks can stand for different things. Brains use mental representations without anyone treating them as stand-ins. A map is not the territory; a stored vector means nothing to the program alone.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Representation",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Data",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Model",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes map work in geography and Sachunterricht (the map as a generalized picture), number systems, markup languages and binary coding in informatics, and mental images or concepts in cognition topics.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-representation",
+    "ConceptBase OE-COMPETENCY-000283 (AI4K12: the map is not the territory)",
+    "TheoryBase OE-THEORY-restructuration-theory",
+    "LiteratureBase OE-LITERATURE-wilensky-papert-2010",
+    "DOI 10.1007/s10539-006-9046-6 (Shea 2007, Crossref verified; representation in inheritance systems, background only)"
+   ],
+   "reason": "Adds domain meanings and a general sentence that names the user and conventions, which the current text leaves out. Names who supplies the meaning in each domain.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Data",
+   "action": "fold",
+   "foldedInto": "Representation",
+   "general": null,
+   "facets": {
+    "AI and computation": "Data: recorded values such as numbers, text or pixels, stored so a program can process them. They stand for measurements or events and become information only for a receiver who can read them."
+   },
+   "excludes": null,
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Data",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Covers data protection, databases, binary data and data analysis in informatics, and measurement tables in science topics. Every digest case fits the narrow sense, so no separate Interdisciplinary entry is needed.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-representation",
+    "TheoryBase OE-CROSSDOMAINCONSTRUCT-information-processing-domain-general"
+   ],
+   "reason": "Data is a recorded kind of representation. Every Sachsen case tagged for it fits the narrow sense, so a separate general entry adds a word and no new structure.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Learning",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A lasting change in how an individual or system acts or responds, brought about by experience. Experience may be direct, observed in others or arranged by a teacher or designer.",
+   "facets": {
+    "cognition": "A person changes what they know, expect or can do because of experience. The change is stored in the nervous system, lasts, and shapes later action. It can be accurate or wrong, and it includes learning from other people.",
+    "biology": "Many animals change behavior through experience: habituation, association, trial and error and copying others. The change happens within one lifetime and, in nervous systems, rests on altered connections between nerve cells. Change across generations by selection is a separate process.",
+    "culture": "Newcomers take on a group's norms, roles and knowledge by taking part in its activities and being instructed. The change is described as growing participation. What changes is a person's skill and place in the group.",
+    "education": "A learner meets planned experiences, and the change is judged against stated goals. Prior ideas shape what is learned. The result can be new knowledge, a skill or a revised belief, and it can fade without practice.",
+    "AI and computation": "Technical reading: a procedure adjusts a model's numbers from example data or trial outcomes so that a designer-chosen score improves. Supervised, unsupervised and reinforcement methods differ in their feedback. No understanding is implied."
+   },
+   "excludes": "In machine learning what changes is a set of numbers, and no understanding is implied. Many trained models stay fixed until retrained. Evolution changes populations over generations, while learning changes one individual; some theories link the two as selection. Fatigue or injury can change behavior without learning.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Machine Learning",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes learning in Sachunterricht (learning from mistakes, learning together), human and animal learned behavior in biology, and machine learning in informatics grade 9 under a flagged technical reading.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-learning",
+    "ConceptBase OE-COMPETENCY-000358 (AI4K12 3-5: people and computers both learn from patterns, people are flexible)",
+    "ConceptBase OE-COMPETENCY-000360 (AI4K12 6-8: human learning versus machine learning)",
+    "ConceptBase OE-COMPETENCY-000394 (AI4K12 9-12: algorithms adjust internal representations)",
+    "TheoryBase OE-THEORY-sociocultural-progression-as-community-practice",
+    "DOI 10.1147/rd.33.0210 (Samuel 1959, Crossref verified)",
+    "TheoryBase OE-CROSSDOMAINCONSTRUCT-selection-as-hierarchical-bayesian-updating (theory bridge: the record treats learning and evolution as one kind of updating at different grains and does not claim they are identical)"
+   ],
+   "reason": "Facets and excludes settle the shared word: in living things knowledge or skill changes, in machine learning a parameter set changes. Machine Learning folds in as a flagged technical facet.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Machine Learning",
+   "action": "fold",
+   "foldedInto": "Learning",
+   "general": null,
+   "facets": {
+    "AI and computation": "Technical reading: a procedure adjusts a model's numbers from example data or trial outcomes so that a score chosen by designers improves. Supervised, unsupervised and reinforcement methods differ in the feedback they use. No understanding is implied."
+   },
+   "excludes": null,
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Machine Learning",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Covers the informatics grade 9 topic on artificial intelligence (supervised, unsupervised and reinforcement learning, data basis, model) and the grade 10 AI web application project. Both fit the narrow sense.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-learning",
+    "ConceptBase OE-COMPETENCY-000362 (AI4K12 9-12: supervised, unsupervised and reinforcement learning)",
+    "ConceptBase OE-COMPETENCY-000394 (AI4K12 9-12: algorithms adjust internal representations)",
+    "DOI 10.1147/rd.33.0210 (Samuel 1959, Crossref verified)"
+   ],
+   "reason": "Machine Learning shares the word with Learning and differs in what changes. It fits better as one flagged technical facet of Learning than as a second general concept.",
+   "confidence": "high"
+  },
+  {
+   "label": "Teaching",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Behavior by one individual or system that responds to another's learning needs and helps that other acquire a skill or piece of knowledge sooner or more reliably than it would alone.",
+   "facets": {
+    "biology": "Meerkat adults give pups prey in forms matched to the pups' age, which improves the pups' skill. Researchers test the behavior pattern and its cost to the adult. They do not need to know whether the adult intends to teach.",
+    "cognition": "On one account, adults signal that a demonstration is meant to teach, using eye contact and infant-directed speech. Infants are tuned to these signals and then treat what is shown as general knowledge.",
+    "education": "A teacher plans tasks, explains, checks understanding and adjusts to the class. Intention and a stated learning goal are present. Success is judged by what students can do later.",
+    "AI and computation": "Technical reading: tutoring software picks tasks, hints and feedback from a student's answers by rules or learned patterns. People designed it to fill a teaching role. The software has no intent that the student understand."
+   },
+   "excludes": "Intention to teach is part of human teaching. Animal studies test only the behavior pattern and its cost to the teacher. Setting an example without regard to who is watching is modeling. Tutoring software has no intent. Learners can learn with no teacher present.",
+   "coreCounterparts": [],
+   "curriculumUse": "Describes teaching in school topics such as learning together in Sachunterricht, and lets the biology grade 10 topic on learned behavior separate teaching from learning alone.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-teaching",
+    "DOI 10.1086/417553 (Caro and Hauser 1992, Crossref verified)",
+    "DOI 10.1126/science.1128727 (Thornton and McAuliffe 2006, Crossref verified)",
+    "DOI 10.1016/j.tics.2009.01.005 (Csibra and Gergely 2009, Crossref verified)"
+   ],
+   "reason": "Repairs the general sentence by removing 'intentional', which fails for animal teaching studies. Intention moves to the education facet and the excludes. Adds four domain meanings.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Scaffolding",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "Stays available for school tasks with hints or worked examples that fade. No Sachsen digest case needs a wider reading.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-scaffolding",
+    "DOI 10.1111/j.1469-7610.1976.tb00381.x (Wood, Bruner and Ross 1976, Crossref verified)"
+   ],
+   "reason": "Scaffolding is defined by support that is matched to a learner and fades as skill grows, which is a teacher-learner practice. Cross-domain cases of matched support sit in the Teaching facets. The education meaning stays.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Metacognition",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "A thinker's monitoring and control of its own thinking: judging how well it knows or understands something, noticing when a strategy fails and switching to another.",
+   "facets": {
+    "cognition": "People judge how well they know something, how hard a task is and whether to keep going. These judgments guide study and problem solving. They can be miscalibrated, with too much or too little confidence. Young children show early forms.",
+    "education": "Learners plan, check and revise their own work. Teachers prompt this with questions such as 'How do I know I understand?' and model it aloud. It is often taught as a strategy meant to apply across subjects.",
+    "biology": "Comparative studies test whether monkeys, apes and a few other animals decline difficult trials, which may reflect tracking their own uncertainty. Simpler explanations, such as learned cues, are also proposed. Whether any awareness is involved is debated."
+   },
+   "excludes": "Knowing facts about thinking differs from controlling thinking in the moment. Confidence is not accuracy. Declining a hard trial may reflect monitoring and may show no awareness. A machine's confidence score is a computed number and shows no awareness of its own thinking.",
+   "coreCounterparts": [],
+   "curriculumUse": "No digest case tags it. Typical use is school goals about reviewing one's own work and strategies, and the OpenEvo content anchor Our Mind.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000011 (sandbox tier)",
+    "ConceptBase OE-CONCEPT-openevo-design-concept-our-mind",
+    "DOI 10.1037/0003-066X.34.10.906 (Flavell 1979, Crossref verified)",
+    "DOI 10.1017/S0140525X03000086 (Smith, Shields and Washburn 2003, Crossref verified)"
+   ],
+   "reason": "Adds cognition, education and a debated comparative-animal facet. No machine facet is offered, because a confidence score is an engineered number and the excludes says so.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Theory of Mind",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Representing another agent's goals, beliefs or knowledge, and using that to interpret and predict what it will do. The represented states can differ from the facts and from one's own.",
+   "facets": {
+    "cognition": "Children come to predict actions from what another person believes, including false beliefs, at about four to five years in standard tasks. Earlier forms track goals and attention.",
+    "biology": "Studies ask whether apes and other animals anticipate actions from what another sees, wants or believes. Evidence is stronger for goals and perception than for false belief, and the question remains debated.",
+    "AI and computation": "Technical reading: agent-modeling programs estimate another agent's goals from its behavior to predict its next move. Language models are tested on false-belief stories. Passing such tests shows how their text output behaves and settles nothing about inner states."
+   },
+   "excludes": "Mental-state attributions can be wrong, and the attributed state can differ from the facts. Predicting an agent's behavior does not show that the predictor feels, understands or wants anything. Passing or failing one test, in children, animals or language models, may not carry over to other tasks.",
+   "coreCounterparts": [],
+   "curriculumUse": "No digest case tags it. Typical use is child development, comparing animal and human social thinking, and perspective-taking topics such as understanding others in Ethik grade 6.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000010 (sandbox tier)",
+    "DOI 10.1017/S0140525X00076512 (Premack and Woodruff 1978, Crossref verified)",
+    "DOI 10.1111/1467-8624.00304 (Wellman, Cross and Watson 2001, Crossref verified)",
+    "DOI 10.1016/j.tics.2008.02.010 (Call and Tomasello 2008, Crossref verified)",
+    "DOI 10.1126/science.aaf8110 (Krupenye et al. 2016, Crossref verified)",
+    "DOI 10.2307/2025382 (Dennett 1971, Crossref verified)",
+    "DOI 10.18653/v1/2020.acl-main.463 (Bender and Koller 2020, Crossref verified)",
+    "DOI 10.1038/s41562-024-01882-z (Strachan et al. 2024, Crossref verified; tests of language models and humans on theory-of-mind tasks)"
+   ],
+   "reason": "Adds a neutral general sentence that does not make human minds the default, plus cognition, animal and flagged machine readings. The machine facet is separated by wording and by the excludes.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Intuitive Theories",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Informal, domain-specific explanations of how things work, such as folk physics, folk biology and folk psychology, formed before and outside instruction.",
+   "facets": {
+    "cognition": "Young children expect objects to fall, living things to grow from inside and people to act on wants. These expectations support explanation and prediction, and they change with age and evidence.",
+    "education": "Students arrive with ideas such as 'organisms change because they need to'. Instruction can build on them, revise them or compete with them, and they often resurface under time pressure even after the science is learned.",
+    "culture": "Communities share folk theories, for example about illness or inheritance, and pass them on through talk and practice. Content differs across cultures, while some early expectations recur widely."
+   },
+   "excludes": "Intuitive theories are often useful and need not be wrong. Intuitive means formed without instruction and does not mean innate. They differ from formal models, which are stated openly and tested. Purpose-based explanations are common and do not show a learner is careless.",
+   "coreCounterparts": [],
+   "curriculumUse": "No digest case tags it. Typical use is teaching that starts from student preconceptions, such as purpose-based explanations of traits in evolution lessons.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000012 (sandbox tier)",
+    "TheoryBase OE-MISCONCEPTION-need-based-teleology",
+    "TheoryBase OE-PROPOSITION-agential-biases-as-barriers",
+    "DOI 10.1037/a0028044 (Gopnik and Wellman 2012, Crossref verified)",
+    "DOI 10.1111/j.1468-0017.1992.tb00202.x (Gopnik and Wellman 1992, Crossref verified)",
+    "DOI 10.1146/annurev-anthro-081309-145822 (Gelman and Legare 2011, Crossref verified)",
+    "DOI 10.1016/S0010-0277(99)00010-4 (Kelemen 1999, Crossref verified)",
+    "DOI 10.1016/j.cognition.2012.04.005 (Shtulman and Valcarcel 2012, Crossref verified)"
+   ],
+   "reason": "Adds cognition, education and culture meanings and a shorter neutral general sentence. The excludes separates informal theories from formal models and from innate ideas.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Analogical Reasoning",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Using a familiar case to understand a new one by matching the relations between their parts, then checking which matches hold and where the match breaks.",
+   "facets": {
+    "cognition": "A reasoner recalls a familiar case, maps its relational structure onto the new case and carries over inferences. Matching on shared relations gives better analogies than matching on appearance.",
+    "education": "Teachers and students build analogies and check where they fail, for example comparing breeders' choices with natural selection. Listing what maps and what breaks guards against false carry-over.",
+    "culture": "One proposal holds that analogies help complex ideas pass between people with less distortion, which supports cumulative cultural change. Scientists also move ideas between fields by analogy.",
+    "AI and computation": "Technical reading: programs such as the structure-mapping engine match relational descriptions of a known case and a new case and score the match. People write the descriptions. The program follows a stated procedure and claims no insight."
+   },
+   "excludes": "Analogy needs matching relations, and surface resemblance alone does not count. Every analogy breaks somewhere. A mapping proposes a hypothesis and needs separate evidence. A program that scores a match is not reasoning as a person does. Cross-domain analogies, such as selection in biology and culture, need stated break points.",
+   "coreCounterparts": [],
+   "curriculumUse": "Describes analogy-based teaching, such as breeders' selection as a way into natural selection. No Sachsen digest case tags it directly.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000013 (sandbox tier)",
+    "DOI 10.1207/s15516709cog0702_3 (Gentner 1983, Crossref verified)",
+    "DOI 10.1016/0004-3702(89)90077-5 (Falkenhainer, Forbus and Gentner 1989, Crossref verified)",
+    "DOI 10.1016/j.tics.2021.03.002 (Brand, Mesoudi and Smaldino 2021, Crossref verified)",
+    "DOI 10.1111/tops.12703 (Bramley et al. 2023, Crossref verified)"
+   ],
+   "reason": "Shortens the general sentence to the word limit and adds domain meanings. The excludes states the break-point rule that cross-domain analogies, including this space's own, need.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Distributed Cognition",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Thinking or remembering carried out by a system of several people and tools, so that the whole system does the task and no single member holds all of it.",
+   "facets": {
+    "cognition": "In an airliner cockpit, the pilots, a speed card, the markers on the speed dial and their talk together set and remember the speeds needed for landing. Each holds a part. The unit of study is the whole cockpit system.",
+    "technology": "Notes, calculators, maps, search tools and AI assistants hold part of a person's task, and their design shapes how the person thinks. The tool stores and transforms information for a goal the person holds.",
+    "culture": "Teams, institutions and written records let a community remember and decide beyond any member's capacity, and they pass tasks on to newcomers."
+   },
+   "excludes": "A tool in the system stores and transforms information but holds no goals of its own. A network of computers is a distributed system and counts here only when it serves a human thinking task. Groups can also think worse than their best member.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Distributed System",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes personal memory aids in Sachunterricht grades 1 and 2, media and databases used as outside memory, and teamwork on shared tasks. No digest case tags it directly.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-distributed-cognition",
+    "DOI 10.1207/s15516709cog1903_1 (Hutchins 1995, Crossref verified)",
+    "DOI 10.1145/353485.353487 (Hollan, Hutchins and Kirsh 2000, Crossref verified)",
+    "DOI 10.1093/analys/58.1.7 (Clark and Chalmers 1998, Crossref verified)"
+   ],
+   "reason": "Adds cognition, technology and culture meanings. The cognition facet stays separate from the Distributed System entry, so a computer network is not called cognition.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Technology",
+   "action": "add-facets",
+   "foldedInto": null,
+   "general": "Tools, techniques and systems that individuals or groups make or adopt to extend what they can do. Designs can be passed on, improved and combined over time.",
+   "facets": {
+    "technology": "Engineers and makers design a tool or system to meet stated needs, build it, test it and revise it. Tests compare the result with the needs, and trade-offs are named.",
+    "culture": "Technologies are shared practices as well as objects: skills, materials and know-how pass on by teaching and imitation, and improvements accumulate across generations and shape how groups live and work.",
+    "biology": "Some animals make and use tools, such as New Caledonian crows shaping hooks from twigs. Designs differ between groups and may be learned from others. Whether improvements accumulate is debated.",
+    "education": "As a school subject, technology is designing, making and evaluating objects. It also covers digital tools for learning. Students judge a design by whether it meets its requirements.",
+    "AI and computation": "Technical reading: AI systems are tools that process data to give outputs for users who set the goals. The system has no purpose of its own."
+   },
+   "excludes": "Technology has purposes set by makers and users. An artifact holds none of its own. Animal tool use may lack planning and accumulation. Technology is not always digital or new. A tool can extend one capacity and weaken another.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Program",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Specification",
+     "relation": "related"
+    },
+    {
+     "space": "comp",
+     "label": "Distributed System",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes Technik und Computer grades 5 and 6 (designing, making and evaluating objects, work plans), tool use in human origins (biology grade 10) and industrialisation (history grade 8).",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-technology",
+    "ConceptBase OE-SANDBOX-CONCEPT-000005 (Machine Culture, sandbox tier)",
+    "DOI 10.1098/rspb.2002.2302 (Hunt and Gray 2003, Crossref verified)",
+    "DOI 10.1038/s41562-023-01742-2 (Brinkmann et al. 2023, Crossref verified)"
+   ],
+   "reason": "The general sentence now allows animal tool traditions and does not require human makers. Adds technology, culture, biology, education and a flagged AI facet. Specification folds in here.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Abstraction",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Leaving out detail so that what matters for some use stays in view. The leaving-out can be chosen, as in a map or a software layer, or happen without choice, as when a concept forms from many instances.",
+   "facets": {
+    "cognition": "Forming a concept or schema by dropping differences among instances, as 'bird' from many birds. The abstract relational structure of a case is what an analogy carries to another case.",
+    "culture": "Maps, diagrams and summaries leave out detail on purpose. Mapmakers generalize coastlines and roads so the picture serves one use, and a different use needs different detail.",
+    "education": "Students move from drawing a map of their school to asking what each kind of map keeps and leaves out, and later to describing a game board or a concept by its essential parts.",
+    "AI and computation": "Hiding how something works behind an interface, so that users and other parts need only know what it does. Layers each hide the one below, and the chosen level of detail is a design decision."
+   },
+   "excludes": "What is left out suits one use and may matter for another. Everyday 'abstract' often means vague or hard to picture; abstraction here is exact about what it keeps. In concept formation it is often unconscious. In computing it is a deliberate design choice.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Abstraction",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Model",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes the geography topic on the map as a generalized picture of reality (grade 5), simplified models in several subjects, and layers and interfaces in informatics. All four digest cases fit the narrow sense.",
+   "grounding": [
+    "ConceptBase OE-COMPETENCY-000281 (AI4K12: Representation (Abstraction))",
+    "ConceptBase OE-COMPETENCY-000284 (AI4K12 3-5: different maps capture different aspects)",
+    "ConceptBase OE-COMPETENCY-000286 (AI4K12 6-8: a game board described in plain language)",
+    "DOI 10.1145/1118178.1118215 (Wing 2006, Crossref verified)",
+    "DOI 10.1098/rsta.2008.0118 (Wing 2008, Crossref verified)",
+    "DOI 10.1207/s15516709cog0702_3 (Gentner 1983, Crossref verified)"
+   ],
+   "reason": "Dropping detail for a purpose shows up in concept formation, mapmaking, school map work and software design, with different mechanisms. The Interdisciplinary space has no concept for it, though analogy depends on it.",
+   "confidence": "medium",
+   "organizing": "Learning, Minds and Discovery"
+  },
+  {
+   "label": "Algorithm",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A fixed series of steps that a person or machine can follow to get from a given start to a result.",
+   "facets": {
+    "AI and computation": "Finite, unambiguous steps a machine can execute with no judgment, turning input into output. A program is an algorithm written in a language the machine can run. Correctness and step counts can be checked.",
+    "education": "Step-by-step procedures taught in school, such as long division, a recipe or a key that asks one yes-or-no question per step to name a plant. Students test whether each step is clear enough that anyone could follow it without guessing.",
+    "technology": "A work plan or production sequence lists operations in order with tools and materials. Workers may need judgment at a step, so it meets the strict test only if every step is exact."
+   },
+   "excludes": "A strict algorithm has finite, exact steps and needs no judgment, and many recipes and work plans fail that test. A natural process described as an algorithm has no author and no list of steps. A procedure that runs is not shown to be correct or fast.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Algorithm",
+     "relation": "broader"
+    },
+    {
+     "space": "comp",
+     "label": "Program",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes informatics grade 7 and 8 algorithm topics including transfer to everyday cases, dichotomous keys in biology grades 6 and 9, and the work plan in Technik und Computer grades 5 and 6.",
+   "grounding": [
+    "ConceptBase OE-COMPETENCY-000321 (AI4K12 3-5: an algorithm chooses the next move)",
+    "DOI 10.1038/msb.2011.78 (Navlakha and Bar-Joseph 2011, Crossref verified)",
+    "DOI 10.1145/1118178.1118215 (Wing 2006, Crossref verified)"
+   ],
+   "reason": "School topics apply the term to recipes, keys and work plans. A general 'fixed series of steps' reading lets students test which procedures meet the strict conditions. The biology facet is a modeling reading.",
+   "confidence": "low",
+   "organizing": "Information, Technology and Collective Systems"
+  },
+  {
+   "label": "Decomposition",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "The Sachsen case on splitting data into packets in networks stays at the Comp-Core level. Division of labour in insect colonies belongs with the cooperation concepts.",
+   "grounding": [
+    "DOI 10.1145/1118178.1118215 (Wing 2006, Crossref verified; names decomposition among computational thinking moves)"
+   ],
+   "reason": "Splitting a problem needs a solver who chooses the split, and that move is the same wherever it is used. Modularity in nature or machines is a property of systems and belongs with a systems concept.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Feedback",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Information about a system's own output is returned to the system, so that its later behavior depends on its earlier results. The loop can damp a change or amplify it.",
+   "facets": {
+    "biology": "Body systems hold conditions near a range with loops: receptors detect a change, a control center compares it with a set range and organs respond, as insulin lowers blood sugar after a meal.",
+    "technology": "A controller compares a measured output with a target and adjusts the input, as a thermostat does. Designers choose the target, the sensor and the size of the correction.",
+    "education": "Information about a learner's work, goal and gap that the learner uses to improve the next attempt. A grade or comment becomes feedback only when the learner acts on it.",
+    "AI and computation": "Training loops compare a model's output with a target or reward and adjust its numbers. Deployed systems can also feed their outputs back into the data they later learn from, which can amplify errors."
+   },
+   "excludes": "In everyday speech positive feedback means praise and negative feedback means criticism. In systems, negative feedback damps change and positive feedback amplifies it, whatever the tone. A comment the learner never uses is no loop. Late feedback can cause swings.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Feedback",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Describes the biological control loop for blood sugar (biology grade 8) and feedback to learners as used in lessons. The blood sugar case tags as narrower under Comp-Core.",
+   "grounding": [
+    "ConceptBase OE-COMPETENCY-000128 (NGSS HS-LS1-3: feedback mechanisms maintain homeostasis)",
+    "ConceptBase OE-COMPETENCY-000397 (AI4K12 3-5: a reinforcement signal lets a computer learn from experience)",
+    "DOI 10.1086/286788 (Rosenblueth, Wiener and Bigelow 1943, Crossref verified)",
+    "DOI 10.3102/003465430298487 (Hattie and Timperley 2007, Crossref verified)"
+   ],
+   "reason": "A loop from output back to input is documented in body regulation, control engineering, teaching and training. The school sense of feedback as comment differs, so the excludes spells out the loop condition and the everyday tone words.",
+   "confidence": "medium",
+   "organizing": "Information, Technology and Collective Systems"
+  },
+  {
+   "label": "Model",
+   "action": "new",
+   "foldedInto": null,
+   "general": "A simplified stand-in for a system, built for a purpose, that people use to explain, predict or explore the system. It is judged by its fit to that purpose and can be revised.",
+   "facets": {
+    "education": "School models include scale models, diagrams, analogies, equations and simulations. Students use them to explain a phenomenon, learn that a model leaves features out, and test and improve it, for example by changing a simulation's settings.",
+    "biology": "Biologists use diagrams, equations and trees as models. A tree of human ancestors states which lineages share ancestors, and new fossils or DNA can revise it.",
+    "culture": "Geographers and economists use models such as the sector model of an economy or a model of a North American city region. They sort cases into types and state how parts relate. Places in the world differ from the model.",
+    "cognition": "On one account, a mental model is a person's internal, simplified stand-in used to reason about how something works. It can be incomplete or wrong, and it may run as a mental simulation.",
+    "AI and computation": "A formal description a computer can run: rules, equations or a fitted function whose numbers were set from data. Running it forward (a simulation) shows what follows; changing settings and rerunning shows what results depend on."
+   },
+   "excludes": "A model is not the system, and one built for a purpose may fail for another. A role model is an example to copy, a different sense of the word. Scientific models face tests against evidence. Ethics lessons also call worldviews and accounts of conscience models, judged by other standards.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Model",
+     "relation": "broader"
+    }
+   ],
+   "curriculumUse": "Covers the hominid family tree, sector and city-region models, conscience models, the input-process-output model and scale models. Worldview 'models' in the Ethik grade 10 topic count only if testable; an expert should judge.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-openevo-design-concept-computer-models",
+    "ConceptBase OE-COMPETENCY-000102 (NGSS MS-LS1-2: develop and use a model)",
+    "TheoryBase OE-THEORY-computational-models-as-theory-mediators",
+    "DOI 10.1002/tea.3660280907 (Grosslight et al. 1991, Crossref verified)",
+    "DOI 10.1080/095006900416884 (Harrison and Treagust 2000, Crossref verified)",
+    "DOI 10.1002/tea.20311 (Schwarz et al. 2009, Crossref verified)",
+    "unverified: mental models (Craik 1943; Johnson-Laird 1983) cited from memory"
+   ],
+   "reason": "Sachsen topics use 'Modell' for trees, sector schemes, conscience theories and scale models. A stand-in built for a purpose and judged by fit covers them. Role models and untestable worldviews are left out, which an expert should check.",
+   "confidence": "medium",
+   "organizing": "Learning, Minds and Discovery"
+  },
+  {
+   "label": "Simulation",
+   "action": "fold",
+   "foldedInto": "Model",
+   "general": null,
+   "facets": {
+    "AI and computation": "Running a model's rules forward step by step from chosen starting values to see what follows. Changing a setting and rerunning shows how results depend on it.",
+    "education": "Students change settings in a simulation, such as an agent-based model, and compare outcomes with their predictions to test ideas about how a system works."
+   },
+   "excludes": null,
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Simulation",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "No Sachsen digest case tags Simulation. Typical use is classroom agent-based models and software that lets students vary settings and watch results.",
+   "grounding": [
+    "ConceptBase OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling, sandbox tier)",
+    "ConceptBase OE-CONCEPT-openevo-design-concept-computer-models"
+   ],
+   "reason": "A simulation is a model being run, so it shares the structure of Model. No Sachsen case in the digest separates the two. A facet of Model covers it.",
+   "confidence": "medium"
+  },
+  {
+   "label": "State",
+   "action": "no-extension",
+   "foldedInto": null,
+   "general": null,
+   "facets": {},
+   "excludes": null,
+   "coreCounterparts": [],
+   "curriculumUse": "The four digest cases fit the narrow sense, so nothing in the Sachsen topics needs a wider reading.",
+   "grounding": [
+    "unverified: no external source checked; judged from the Comp-Core definition and the digest"
+   ],
+   "reason": "State is a general systems word with one meaning wherever it is used: the values of chosen variables at one moment. Its wider uses, such as mental state or political state, name different things and are better kept apart.",
+   "confidence": "medium"
+  },
+  {
+   "label": "Search",
+   "action": "new",
+   "foldedInto": null,
+   "general": "Looking through a set of possible options for one that meets a goal, by trying some and checking each against a criterion.",
+   "facets": {
+    "AI and computation": "A program explores candidate states or answers and keeps those scoring higher on a stated objective. Web search ranks documents by a relevance score. Good-enough answers are often accepted when the best would take too long.",
+    "cognition": "Problem solving as moving through possible steps toward a goal, trying options and testing them. People prune the options with rules of thumb. Local search from a familiar starting point is one proposed pattern.",
+    "biology": "Animals search for food, mates or shelter by sampling places and moving on or staying according to what they find. Foraging theory asks which choices of where and how long to search raise food intake in a habitat.",
+    "education": "Learners research a question by choosing search terms, scanning results and judging sources against the question. The criterion is the learner's need, which can change as they learn."
+   },
+   "excludes": "Search needs a goal and a way to check candidates. Natural selection has no goal, so calling it a search covers only the trying and keeping. Searching for meaning is a figure of speech with no candidate set. Search may stop at good enough, and the criterion can shift.",
+   "coreCounterparts": [
+    {
+     "space": "comp",
+     "label": "Search",
+     "relation": "broader"
+    },
+    {
+     "space": "bio",
+     "label": "Natural Selection",
+     "relation": "related"
+    }
+   ],
+   "curriculumUse": "Describes the informatics grade 8 topic on search strategies and ranking of results, search strategies in Sachunterricht and Technik und Computer, and animal foraging. Leaves out 'Sinnsuche' in Ethik grade 8.",
+   "grounding": [
+    "ConceptBase OE-CONCEPT-oe-interdisciplinary-selection (its AI sense is close to Search)",
+    "ConceptBase OE-COMPETENCY-000325 (AI4K12 9-12: problems as search from a start state to a goal state)",
+    "DOI 10.1145/360018.360022 (Newell and Simon 1976, Crossref verified)",
+    "DOI 10.1111/tops.12703 (Bramley et al. 2023, Crossref verified)",
+    "DOI 10.1086/409852 (Pyke, Pulliam and Charnov 1977, Crossref verified)"
+   ],
+   "reason": "The Selection AI facet covers search as optimization. School topics also use 'Suche' for looking up information and for animal foraging. A goal-and-criterion definition covers these and leaves out searching for meaning.",
+   "confidence": "medium",
+   "organizing": "Information, Technology and Collective Systems"
+  }
+ ],
+ "introAddition": "How this space differs from the Core spaces. Bio-Core, Social-Core and Computational-Core each define their concepts inside one discipline. This space defines each concept in a general way that names what the domains share. It gives a separate meaning for each domain where a documented process or practice fits, and it says what does not carry over from one domain to another, for example whether intention is needed or whether copies exist. A concept that belongs to one discipline only, such as speciation, has no general entry. A meaning that begins with 'Technical reading' describes how computing uses a word that normally describes a mind, and it makes no claim that software has one. The added concepts and domain meanings have the status proposed. AI drafted them, a second AI checked them and no subject expert has reviewed them."
+}

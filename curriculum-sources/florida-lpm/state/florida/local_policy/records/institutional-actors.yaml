@@ -1,0 +1,246 @@
+$schema: ../../../../schema/institutional-actor-record.schema.json
+$description: >
+  Florida-specific institutional actors in the evolution-curriculum history:
+  the two governmental bodies that actually set/change standards, the
+  legislature, the official standards-repository partner, and the named
+  advocacy/professional organizations that have driven the public fight on
+  both sides since 2006. See national_ccs_policy/records/institutional-actors.yaml
+  for the federal/multi-state actors (NCSE, Discovery Institute, Fordham,
+  NAS, Answers in Genesis) that interact with these.
+
+actors:
+  - id: FLLP-ACTOR-fldoe
+    slug: fldoe
+    label: Florida Department of Education (FLDOE)
+    actorType: state-education-department
+    jurisdiction: US-FL
+    role: >
+      Administers K-12 standards development, review, and textbook/instructional-
+      materials adoption for Florida public schools. Ran the 2007-08 NGSSS
+      standards-review process, the 2019-20 B.E.S.T. Standards rewrite
+      (ELA/Math only), the 2024 textbook-review process in which publishers
+      were asked to reduce/remove climate-change content, and the 2024-2026
+      science-standards rewrite (first since 2008) now in public comment.
+    currentHolder:
+      name: Henry Mack
+      title: Florida Education Commissioner
+      asOf: "2026-10-20"
+    url: https://www.fldoe.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Florida Phoenix, "New K-12 science curriculum scrutinized; December
+        vote by Board of Ed expected" (Oct 14, 2026), fetched and read
+        directly; FLDOE's own site (fldoe.org).
+
+  - id: FLLP-ACTOR-florida-state-board-of-education
+    slug: florida-state-board-of-education
+    label: Florida State Board of Education
+    actorType: governing-board
+    jurisdiction: US-FL
+    role: >
+      The seven-member body with final rule-making authority to adopt Florida's
+      K-12 academic standards. Voted 4-3 on Feb 19, 2008 to adopt the NGSSS
+      with the "scientific theory of evolution" compromise wording (see
+      FLLP-EVENT-ngsss-2008-state-board-vote); adopted the B.E.S.T. Standards
+      in Feb 2020 (ELA/Math only); expected to vote on the current proposed
+      science-standards rewrite in December 2026.
+    currentHolder:
+      name: unknown -- not researched this session
+      title: Chair
+      asOf: "2026-10-20"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        2008 vote composition (Fair, Taylor, Shanahan, Raulerson voting yes;
+        Martinez, Desai, Callaway voting no) is well-documented for that date
+        specifically -- see FLLP-EVENT-ngsss-2008-state-board-vote. The
+        BOARD'S CURRENT (2026) membership was not researched this session;
+        currentHolder above is a placeholder, not a verified claim.
+      sourceProvenance: >
+        NCSE, "Evolution Comes to Florida's Science Standards" and "The
+        e-word arrives in Florida" (both ncse.ngo), fetched and read
+        directly; contemporaneous AP/Orlando Sentinel/Education Week
+        coverage cited therein.
+
+  - id: FLLP-ACTOR-florida-legislature
+    slug: florida-legislature
+    label: Florida Legislature
+    actorType: governing-board
+    jurisdiction: US-FL
+    role: >
+      Bicameral state legislature (House + Senate). Considered but did not
+      pass the 2008 "Academic Freedom Act" (SB 2692/HB 1483); passed and Gov.
+      Scott signed the 2017 instructional-materials-objection law (HB 989);
+      considered but did not pass Sen. Dennis Baxley's 2018/2019
+      "controversial theories" bills.
+    url: https://www.flsenate.gov
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Florida Senate's own bill pages (flsenate.gov/Session/Bill/2008/2692,
+        flsenate.gov/Session/Bill/2017/00989), fetched and read directly.
+
+  - id: FLLP-ACTOR-cpalms-usf
+    slug: cpalms
+    label: CPALMS (University of South Florida)
+    actorType: university-research-center
+    jurisdiction: US-FL
+    role: >
+      FLDOE's designated official online standards repository, run by the
+      University of South Florida (hosted the 2007 public-comment review tool
+      at tools.fcit.usf.edu/ScienceReview/). Per a 1EdTech Consortium
+      announcement, CPALMS is "the authorized publisher of Florida academic
+      standards in digital format" and joined 1EdTech as a Contributing
+      Member to publish Florida's standards via the CASE (Competencies &
+      Academic Standards Exchange) format through the free public CASE
+      Network -- though this repo's own research could not confirm the
+      Florida CASE data is actually live/browsable today (JS-rendering
+      blocked automated verification of both casenetwork.1edtech.org/
+      rosetta.commongoodlt.com and CPALMS's own Standards API page). See
+      docs/source-notes/2026-10-20-florida-machine-readable-standards-landscape-research.md
+      and case/README.md.
+    url: https://www.cpalms.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        1EdTech's own certification directory (site.imsglobal.org/certifications/cpalms)
+        separately states "CPALMS is not a member of 1EdTech" with no active
+        product certifications -- read as a different thing (formal product
+        certification) than the "Contributing Member" tier the workshop
+        announcement describes, not a contradiction, but flagged since both
+        statements come from 1EdTech's own domain.
+      sourceProvenance: >
+        1EdTech, "Florida CASE Network Workshop (Invitation Only)" event page
+        (imsglobal.org/event/florida-case-network-workshop-invitation-only)
+        and site.imsglobal.org/certifications/cpalms, both fetched directly.
+
+  - id: FLLP-ACTOR-florida-citizens-for-science
+    slug: florida-citizens-for-science
+    label: Florida Citizens for Science (FCS)
+    actorType: advocacy-body
+    jurisdiction: US-FL
+    role: >
+      Statewide grassroots 501(c)(3) founded 2006 specifically to defend
+      evolution education in Florida's public schools. Members directly
+      participated in writing/framing the 2007-08 NGSSS draft; ran a public
+      petition (1,700+ signatures) defending it; has tracked and publicized
+      textbook challenges under the 2017 HB 989 process (Nassau, Collier,
+      Martin counties). No direct, dated 2026 public statement on the current
+      proposed-standards rewrite was found as of this repo's founding
+      session -- a real, notable gap given the organization's historical
+      centrality to this exact issue; flagged for a direct (not
+      search-indexed) check of flascience.org in a follow-up.
+    currentHolder:
+      name: Brandon Haught
+      title: Co-founder, Communications Director (as of the 2008 episode; current role not re-verified this session)
+      asOf: "2008-02-19"
+    url: https://www.flascience.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NCSE's 2007-08 articles (ncse.ngo/e-word-arrives-florida,
+        ncse.ngo/evolution-comes-floridas-science-standards) and
+        flascience.org's own site/timeline page (flascience.org/?p=3506),
+        fetched and read directly.
+
+  - id: FLLP-ACTOR-florida-family-policy-council
+    slug: florida-family-policy-council
+    label: Florida Family Policy Council
+    actorType: advocacy-body
+    jurisdiction: US-FL
+    role: >
+      Religious-right advocacy organization. Led by John Stemberger, who was
+      the lead public advocate for the 2008 "Academic Freedom Act" (SB
+      2692/HB 1483), citing anecdotal/unnamed claims of teachers facing
+      reprisal for questioning evolution.
+    currentHolder:
+      name: John Stemberger
+      title: President (as of the 2008 episode)
+      asOf: "2008-01-01"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Discovery Institute, "Anti-Freedom Activists Try to Censor Science
+        Education in Florida" (discovery.org/a/4510/), fetched and read
+        directly.
+
+  - id: FLLP-ACTOR-florida-education-association
+    slug: florida-education-association
+    label: Florida Education Association (FEA)
+    actorType: professional-association
+    jurisdiction: US-FL
+    role: >
+      Florida's statewide teachers' union. Publicly warned during the 2026
+      standards-review process that teaching outside mainstream science
+      leaves Florida students "at a disadvantage," and formally requested
+      extended review periods and additional virtual town halls.
+    url: https://feaweb.org
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Florida Phoenix, "New K-12 science curriculum scrutinized; December
+        vote by Board of Ed expected" (Oct 14, 2026), fetched and read
+        directly.
+
+  - id: FLLP-ACTOR-teacher-institute-for-evolutionary-science
+    slug: teacher-institute-for-evolutionary-science
+    label: Teacher Institute for Evolutionary Science (TIES)
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      Nonprofit providing evolution-education professional development to
+      teachers nationally. Its Director, Bertha Vazquez (a former Miami-Dade
+      middle-school science teacher and an NCSE "Friend of Darwin" award
+      recipient), is a named, vocal critic of Florida's 2026 proposed
+      standards.
+    currentHolder:
+      name: Bertha Vazquez
+      title: Director
+      asOf: "2026-10-20"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        WUSF (Nancy Guan), "Evolution and climate change are missing from
+        Florida's new K-12 science standards" (Sept 30, 2026), fetched and
+        read directly.

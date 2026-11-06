@@ -82,6 +82,14 @@ export default function ProfilePage() {
     (m) => !m.project.parent_project_id || !byId.has(m.project.parent_project_id)
   )
   const childMembershipsOf = (id: string) => (memberships ?? []).filter((m) => m.project.parent_project_id === id)
+  // Real feedback 29ad2634 (Dustin): this list used to mix real
+  // collaborative projects and curriculum repositories (reference content
+  // archives like the Thuringia curriculum repo) in one unlabeled list --
+  // the exact project_kind check project-switcher-page.tsx and
+  // admin-users-page.tsx already use to split these apart there.
+  const isRepository = (p: { id: string }) => (p as any).project_kind === 'curriculum-repository'
+  const standardTopLevel = topLevelMemberships.filter((m) => !isRepository(m.project))
+  const repoTopLevel = topLevelMemberships.filter((m) => isRepository(m.project))
   const availableToJoin = (joinable ?? []).filter((jp) => !byId.has(jp.project.id))
 
   const hasEmailPassword = (identities ?? []).some((i) => i.provider === 'email')
@@ -150,33 +158,38 @@ export default function ProfilePage() {
         ) : memberships.length === 0 ? (
           <p className="muted">You aren&apos;t a member of any project space yet.</p>
         ) : (
-          topLevelMemberships.map(({ project, role }) => {
-            const children = childMembershipsOf(project.id)
-            return (
-              <div key={project.id} style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-                <div className="row" style={{ justifyContent: 'space-between' }}>
-                  <Link to={`/dashboard/${project.slug}`}>{project.name}</Link>
-                  <span className={`chip capitalize${role === 'owner' ? ' chip-progress' : ''}`}>{role}</span>
-                </div>
-                {children.map((c) => (
-                  <div key={c.project.id} className="row" style={{ justifyContent: 'space-between', paddingLeft: 16, marginTop: 4, fontSize: 13 }}>
-                    <Link to={`/dashboard/${c.project.slug}`} className="muted">{c.project.name}</Link>
-                    <span className={`chip capitalize${c.role === 'owner' ? ' chip-progress' : ''}`}>{c.role}</span>
-                  </div>
-                ))}
-              </div>
-            )
-          })
+          <>
+            {standardTopLevel.length === 0 && <p className="muted">No projects yet.</p>}
+            {standardTopLevel.map(({ project, role }) => (
+              <ProfileProjectRow key={project.id} project={project} role={role} childRows={childMembershipsOf(project.id)} />
+            ))}
+          </>
         )}
       </div>
 
+      {repoTopLevel.length > 0 && (
+        <div className="card">
+          <h3>Your curriculum repositories</h3>
+          <p className="muted" style={{ fontSize: 12.5, marginTop: -6, marginBottom: 10 }}>
+            Reference curriculum content you own or maintain, separate from the collaborative projects above.
+          </p>
+          {repoTopLevel.map(({ project, role }) => (
+            <ProfileProjectRow key={project.id} project={project} role={role} childRows={childMembershipsOf(project.id)} />
+          ))}
+        </div>
+      )}
+
       <div className="card">
-        <h3 className="row"><LogIn size={16} />Join a group</h3>
+        {/* Real feedback be47dea7 (Dustin): "group" here was ambiguous with
+            the real, separate within-project Gruppen feature (project
+            members forming their own working groups) -- this section is
+            about joining a PROJECT SPACE itself, so it's named that. */}
+        <h3 className="row"><LogIn size={16} />Join a project space</h3>
 
         {availableToJoin.length > 0 && (
           <div style={{ marginBottom: 14 }}>
             <p className="muted" style={{ marginBottom: 6 }}>
-              Your account&apos;s email is eligible to join {availableToJoin.length === 1 ? 'this group' : 'these groups'} right
+              Your account&apos;s email is eligible to join {availableToJoin.length === 1 ? 'this project space' : 'these project spaces'} right
               away:
             </p>
             {availableToJoin.map((jp) => (
@@ -206,7 +219,7 @@ export default function ProfilePage() {
         <p className="muted">
           {availableToJoin.length > 0
             ? 'Have a join link or code for something else? Paste it here.'
-            : "Got a join link from an instructor or research lead? Paste it here — or just type the group's short name if that's all you were given."}
+            : "Got a join link from an instructor or research lead? Paste it here — or just type the project space's short name if that's all you were given."}
         </p>
         <form
           className="row"
@@ -287,6 +300,23 @@ export default function ProfilePage() {
           </form>
         </div>
       )}
+    </div>
+  )
+}
+
+function ProfileProjectRow({ project, role, childRows }: { project: ProjectWithRole['project']; role: string; childRows: ProjectWithRole[] }) {
+  return (
+    <div style={{ padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <Link to={`/dashboard/${project.slug}`}>{project.name}</Link>
+        <span className={`chip capitalize${role === 'owner' ? ' chip-progress' : ''}`}>{role}</span>
+      </div>
+      {childRows.map((c) => (
+        <div key={c.project.id} className="row" style={{ justifyContent: 'space-between', paddingLeft: 16, marginTop: 4, fontSize: 13 }}>
+          <Link to={`/dashboard/${c.project.slug}`} className="muted">{c.project.name}</Link>
+          <span className={`chip capitalize${c.role === 'owner' ? ' chip-progress' : ''}`}>{c.role}</span>
+        </div>
+      ))}
     </div>
   )
 }

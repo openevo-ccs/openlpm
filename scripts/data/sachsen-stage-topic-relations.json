@@ -1,0 +1,1676 @@
+{
+ "bio": [
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7064-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 2.667
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7065-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.167
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7066-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 2.333
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7067-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 3.0
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7068-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.444
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7069-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "covers",
+   "hoursUstd": 1.0
+  },
+  {
+   "stageId": "ae85f5be-aead-5819-99df-8b3d431f79d1",
+   "topicId": "lehrplan-522-1/lernbereich-7069-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.0
+  },
+  {
+   "stageId": "b8bf5ec4-fe31-593a-8177-15b8109517b4",
+   "topicId": "lehrplan-522-1/lernbereich-7069-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.0
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7202-1",
+   "subject": "biologie",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 1.333
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7203-1",
+   "subject": "biologie",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 1.333
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7479-1",
+   "subject": "biologie",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.778
+  },
+  {
+   "stageId": "8e62e70a-437d-540d-83f6-90a0fe54783a",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.663
+  },
+  {
+   "stageId": "70cf40f5-cb5d-508a-95dc-d18eaa465e94",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.663
+  },
+  {
+   "stageId": "8a1c0b8f-8e98-526f-bd7a-8cb2795daa85",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 6.391
+  },
+  {
+   "stageId": "6c0b740a-cb12-5c3d-8a32-75fc01624ddf",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.195
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-522-1/lernbereich-7601-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 1.333
+  },
+  {
+   "stageId": "ae85f5be-aead-5819-99df-8b3d431f79d1",
+   "topicId": "lehrplan-522-1/lernbereich-7601-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.667
+  },
+  {
+   "stageId": "4f1b4d5d-6232-5ef5-b44c-a850224b58a5",
+   "topicId": "lehrplan-522-1/lernbereich-7601-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 1.867
+  },
+  {
+   "stageId": "b8bf5ec4-fe31-593a-8177-15b8109517b4",
+   "topicId": "lehrplan-522-1/lernbereich-7601-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.4
+  },
+  {
+   "stageId": "ca152c60-d9a5-509f-afdb-e2e7bdf983b4",
+   "topicId": "lehrplan-522-1/lernbereich-7601-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.933
+  },
+  {
+   "stageId": "ca152c60-d9a5-509f-afdb-e2e7bdf983b4",
+   "topicId": "lehrplan-522-1/lernbereich-7602-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 2.045
+  },
+  {
+   "stageId": "60df174a-b374-5cd1-9d06-9d76ecc4af9f",
+   "topicId": "lehrplan-522-1/lernbereich-7602-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 2.045
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-74-1/lernbereich-3756-1",
+   "subject": "geographie",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.333
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-74-1/lernbereich-3758-1",
+   "subject": "geographie",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 4.333
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-74-1/lernbereich-3859-1",
+   "subject": "geographie",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 4.0
+  },
+  {
+   "stageId": "aac5e307-a98f-50c6-ba5d-5cc6bcd7ebdf",
+   "topicId": "lehrplan-80-1/lernbereich-6293-1",
+   "subject": "sachunterricht",
+   "grades": [
+    4
+   ],
+   "class": "partly",
+   "hoursUstd": 7.667
+  }
+ ],
+ "soc": [
+  {
+   "stageId": "c4836b7e-c2ac-5eda-9368-08e410453278",
+   "topicId": "lehrplan-77-1/lernbereich-11936-1",
+   "subject": "ethik",
+   "grades": [
+    5
+   ],
+   "class": "covers",
+   "hoursUstd": 4.848
+  },
+  {
+   "stageId": "f21b382b-ed4a-5e4e-b69b-d603834fbbe9",
+   "topicId": "lehrplan-77-1/lernbereich-11936-1",
+   "subject": "ethik",
+   "grades": [
+    5
+   ],
+   "class": "covers",
+   "hoursUstd": 3.394
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-77-1/lernbereich-11936-1",
+   "subject": "ethik",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 2.424
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-77-1/lernbereich-11936-1",
+   "subject": "ethik",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 2.424
+  },
+  {
+   "stageId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "topicId": "lehrplan-77-1/lernbereich-11970-1",
+   "subject": "ethik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 2.824
+  },
+  {
+   "stageId": "3d964122-338c-548e-882b-d833d2ec4209",
+   "topicId": "lehrplan-77-1/lernbereich-11970-1",
+   "subject": "ethik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 2.824
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-77-1/lernbereich-11970-1",
+   "subject": "ethik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.529
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.526
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 3.158
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-76-1/lernbereich-4858-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.438
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-76-1/lernbereich-4858-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.438
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-76-1/lernbereich-4926-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 7.813
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-76-1/lernbereich-4926-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 7.813
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-76-1/lernbereich-4927-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 7.813
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-76-1/lernbereich-4927-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 7.813
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-76-1/lernbereich-4970-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 4.167
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-76-1/lernbereich-4970-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 7.292
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-76-1/lernbereich-4970-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 5.208
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.906
+  },
+  {
+   "stageId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.125
+  },
+  {
+   "stageId": "3d964122-338c-548e-882b-d833d2ec4209",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.125
+  },
+  {
+   "stageId": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.125
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 4.688
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.906
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-74-1/lernbereich-4099-1",
+   "subject": "geographie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 3.333
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-74-1/lernbereich-4099-1",
+   "subject": "geographie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.333
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-65-1/lernbereich-772-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "covers",
+   "hoursUstd": 2.727
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-772-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 2.182
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-65-1/lernbereich-772-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 3.818
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-65-1/lernbereich-792-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.667
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-792-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "covers",
+   "hoursUstd": 2.333
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-65-1/lernbereich-841-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.857
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-65-1/lernbereich-841-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 5.0
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-841-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 3.571
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-65-1/lernbereich-841-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 4.286
+  },
+  {
+   "stageId": "aae0bca6-2dfa-5fb1-a2bd-4e8d4381b87c",
+   "topicId": "lehrplan-65-1/lernbereich-866-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 1.739
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-866-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.174
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-65-1/lernbereich-901-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 3.111
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-65-1/lernbereich-901-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.111
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-65-1/lernbereich-920-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 2.667
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-65-1/lernbereich-920-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 2.667
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-920-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 4.667
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-65-1/lernbereich-933-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 2.667
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-65-1/lernbereich-933-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 4.667
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-933-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 4.667
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-933-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.333
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-943-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 1.818
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-65-1/lernbereich-982-1",
+   "subject": "geschichte",
+   "grades": [
+    8
+   ],
+   "class": "covers",
+   "hoursUstd": 5.833
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-65-1/lernbereich-982-1",
+   "subject": "geschichte",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 5.833
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-1012-1",
+   "subject": "geschichte",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 5.158
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-1038-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.5
+  },
+  {
+   "stageId": "9ef944f3-b11a-5327-9082-b53ba736a834",
+   "topicId": "lehrplan-65-1/lernbereich-1039-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 4.889
+  },
+  {
+   "stageId": "56eb4828-57c2-589b-92ba-180f901b2443",
+   "topicId": "lehrplan-65-1/lernbereich-1039-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 4.889
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-1040-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 3.36
+  },
+  {
+   "stageId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "topicId": "lehrplan-65-1/lernbereich-1041-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 1.684
+  },
+  {
+   "stageId": "3d964122-338c-548e-882b-d833d2ec4209",
+   "topicId": "lehrplan-65-1/lernbereich-1041-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 1.684
+  },
+  {
+   "stageId": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "topicId": "lehrplan-65-1/lernbereich-1041-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 1.684
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-1041-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.947
+  },
+  {
+   "stageId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "topicId": "lehrplan-65-1/lernbereich-1113-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.368
+  },
+  {
+   "stageId": "3d964122-338c-548e-882b-d833d2ec4209",
+   "topicId": "lehrplan-65-1/lernbereich-1113-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.368
+  },
+  {
+   "stageId": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "topicId": "lehrplan-65-1/lernbereich-1113-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 3.368
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-1113-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 5.895
+  },
+  {
+   "stageId": "e0e725b5-1716-5f38-95d7-bdaa1297f892",
+   "topicId": "lehrplan-65-1/lernbereich-1115-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 7.333
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-65-1/lernbereich-1117-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 3.182
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-65-1/lernbereich-1117-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 2.545
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-65-1/lernbereich-1117-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 4.455
+  },
+  {
+   "stageId": "f7608bc0-18ff-52e5-8238-ac0220214ec9",
+   "topicId": "lehrplan-80-1/lernbereich-5585-1",
+   "subject": "sachunterricht",
+   "grades": [
+    1,
+    2
+   ],
+   "class": "partly",
+   "hoursUstd": 0.711
+  },
+  {
+   "stageId": "2de4fac1-1590-5260-a501-d040c57c2acf",
+   "topicId": "lehrplan-80-1/lernbereich-5585-1",
+   "subject": "sachunterricht",
+   "grades": [
+    1,
+    2
+   ],
+   "class": "partly",
+   "hoursUstd": 0.711
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-80-1/lernbereich-5980-1",
+   "subject": "sachunterricht",
+   "grades": [
+    3
+   ],
+   "class": "partly",
+   "hoursUstd": 1.647
+  },
+  {
+   "stageId": "fd772a6a-0dd8-5410-96c5-79f75443183c",
+   "topicId": "lehrplan-80-1/lernbereich-5980-1",
+   "subject": "sachunterricht",
+   "grades": [
+    3
+   ],
+   "class": "covers",
+   "hoursUstd": 2.882
+  },
+  {
+   "stageId": "ec43321e-dd60-5bd9-bdfc-2e4e17dd7b85",
+   "topicId": "lehrplan-80-1/lernbereich-6230-1",
+   "subject": "sachunterricht",
+   "grades": [
+    4
+   ],
+   "class": "covers",
+   "hoursUstd": 3.333
+  },
+  {
+   "stageId": "504c7645-bc71-5a81-a114-cd2d598d1621",
+   "topicId": "lehrplan-80-1/lernbereich-6230-1",
+   "subject": "sachunterricht",
+   "grades": [
+    4
+   ],
+   "class": "partly",
+   "hoursUstd": 3.333
+  }
+ ],
+ "comp": [
+  {
+   "stageId": "528aba11-45e9-5ec4-b5da-4ddf071ff6a2",
+   "topicId": "lehrplan-630-1/lernbereich-118698-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 2.6
+  },
+  {
+   "stageId": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+   "topicId": "lehrplan-630-1/lernbereich-118698-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 3.12
+  },
+  {
+   "stageId": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+   "topicId": "lehrplan-630-1/lernbereich-118698-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 3.12
+  },
+  {
+   "stageId": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+   "topicId": "lehrplan-630-1/lernbereich-118698-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 3.12
+  },
+  {
+   "stageId": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+   "topicId": "lehrplan-630-1/lernbereich-118726-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 1.909
+  },
+  {
+   "stageId": "45c484c9-e753-5bb3-86af-086bc28fce31",
+   "topicId": "lehrplan-630-1/lernbereich-118726-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 1.909
+  },
+  {
+   "stageId": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+   "topicId": "lehrplan-630-1/lernbereich-118740-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 1.68
+  },
+  {
+   "stageId": "8c7bc083-021f-5891-b502-de2f708a1e09",
+   "topicId": "lehrplan-630-1/lernbereich-118740-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "covers",
+   "hoursUstd": 1.68
+  },
+  {
+   "stageId": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+   "topicId": "lehrplan-630-1/lernbereich-118740-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 1.2
+  },
+  {
+   "stageId": "04edbe9b-292d-5101-a009-fc46ead81427",
+   "topicId": "lehrplan-630-1/lernbereich-118740-2",
+   "subject": "informatik",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 0.96
+  },
+  {
+   "stageId": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+   "topicId": "lehrplan-630-1/lernbereich-118763-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "covers",
+   "hoursUstd": 2.52
+  },
+  {
+   "stageId": "8c7bc083-021f-5891-b502-de2f708a1e09",
+   "topicId": "lehrplan-630-1/lernbereich-118763-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "covers",
+   "hoursUstd": 2.52
+  },
+  {
+   "stageId": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+   "topicId": "lehrplan-630-1/lernbereich-118763-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 1.8
+  },
+  {
+   "stageId": "04edbe9b-292d-5101-a009-fc46ead81427",
+   "topicId": "lehrplan-630-1/lernbereich-118763-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 1.44
+  },
+  {
+   "stageId": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+   "topicId": "lehrplan-630-1/lernbereich-118774-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 1.364
+  },
+  {
+   "stageId": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+   "topicId": "lehrplan-630-1/lernbereich-118774-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 1.364
+  },
+  {
+   "stageId": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+   "topicId": "lehrplan-630-1/lernbereich-118774-2",
+   "subject": "informatik",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 1.364
+  },
+  {
+   "stageId": "528aba11-45e9-5ec4-b5da-4ddf071ff6a2",
+   "topicId": "lehrplan-630-1/lernbereich-118824-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.222
+  },
+  {
+   "stageId": "f95b2dff-2e43-597e-b8c6-a1857c0f60c7",
+   "topicId": "lehrplan-630-1/lernbereich-118824-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.222
+  },
+  {
+   "stageId": "f63a89a8-8a27-5cd6-acdf-7ed9f179442b",
+   "topicId": "lehrplan-630-1/lernbereich-118824-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.222
+  },
+  {
+   "stageId": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+   "topicId": "lehrplan-630-1/lernbereich-118824-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 1.778
+  },
+  {
+   "stageId": "71bc5265-fbcd-5e5a-b093-399a24bce44d",
+   "topicId": "lehrplan-630-1/lernbereich-118841-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 0.87
+  },
+  {
+   "stageId": "e6374470-9533-570e-8d98-0e5b24060f4d",
+   "topicId": "lehrplan-630-1/lernbereich-118841-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 1.957
+  },
+  {
+   "stageId": "e6374470-9533-570e-8d98-0e5b24060f4d",
+   "topicId": "lehrplan-630-1/lernbereich-118850-2",
+   "subject": "informatik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 5.714
+  },
+  {
+   "stageId": "bd2869a3-e2d1-58c1-9878-0c17f2a21c68",
+   "topicId": "lehrplan-630-1/lernbereich-118883-2",
+   "subject": "informatik",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.2
+  },
+  {
+   "stageId": "8c7bc083-021f-5891-b502-de2f708a1e09",
+   "topicId": "lehrplan-630-1/lernbereich-118883-2",
+   "subject": "informatik",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 3.771
+  },
+  {
+   "stageId": "31f4c2e2-f909-5cf1-ae61-ca82e22bda0e",
+   "topicId": "lehrplan-630-1/lernbereich-118883-2",
+   "subject": "informatik",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 1.257
+  },
+  {
+   "stageId": "06ca57c6-f90e-5354-84b4-ee88dd292147",
+   "topicId": "lehrplan-630-1/lernbereich-118883-2",
+   "subject": "informatik",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 1.571
+  },
+  {
+   "stageId": "04edbe9b-292d-5101-a009-fc46ead81427",
+   "topicId": "lehrplan-630-1/lernbereich-118883-2",
+   "subject": "informatik",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.2
+  },
+  {
+   "stageId": "22e68923-d1f7-54a7-9cb5-6a3591c04a02",
+   "topicId": "lehrplan-80-1/lernbereich-6356-1",
+   "subject": "sachunterricht",
+   "grades": [
+    4
+   ],
+   "class": "partly",
+   "hoursUstd": 1.667
+  }
+ ],
+ "int": [
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-522-1/lernbereich-7063-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.5
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-522-1/lernbereich-7065-1",
+   "subject": "biologie",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 1.75
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-522-1/lernbereich-7202-1",
+   "subject": "biologie",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.4
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-522-1/lernbereich-7407-1",
+   "subject": "biologie",
+   "grades": [
+    8
+   ],
+   "class": "partly",
+   "hoursUstd": 5.5
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-522-1/lernbereich-7479-1",
+   "subject": "biologie",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 16.667
+  },
+  {
+   "stageId": "04d57493-ac2f-5ec6-a1ba-0596eae3158a",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.931
+  },
+  {
+   "stageId": "db1fca08-0dcf-5910-a3df-2de902e8630a",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "covers",
+   "hoursUstd": 2.931
+  },
+  {
+   "stageId": "396e3dd9-4f22-5160-b6c7-3752caefa1b8",
+   "topicId": "lehrplan-522-1/lernbereich-7600-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 1.675
+  },
+  {
+   "stageId": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "topicId": "lehrplan-522-1/lernbereich-7602-1",
+   "subject": "biologie",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 1.227
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "covers",
+   "hoursUstd": 2.5
+  },
+  {
+   "stageId": "31b2be29-7a8c-5f98-a447-55ecf57f1ff9",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.5
+  },
+  {
+   "stageId": "3a112595-4435-5db0-950d-ca7c6da5160d",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.5
+  },
+  {
+   "stageId": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+   "topicId": "lehrplan-77-1/lernbereich-12162-1",
+   "subject": "ethik",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 2.5
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-76-1/lernbereich-4858-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 11.0
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-76-1/lernbereich-4926-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 25.0
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-76-1/lernbereich-4927-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 25.0
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-76-1/lernbereich-4970-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 17.857
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 11.111
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-76-1/lernbereich-4971-1",
+   "subject": "gemeinschaftskunde-rechtserziehung-wirtschaft",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 13.889
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-65-1/lernbereich-792-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 5.091
+  },
+  {
+   "stageId": "3a112595-4435-5db0-950d-ca7c6da5160d",
+   "topicId": "lehrplan-65-1/lernbereich-803-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 0.833
+  },
+  {
+   "stageId": "5d938d91-e81b-516c-ba58-a234b6d5559f",
+   "topicId": "lehrplan-65-1/lernbereich-803-1",
+   "subject": "geschichte",
+   "grades": [
+    5
+   ],
+   "class": "partly",
+   "hoursUstd": 0.833
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-65-1/lernbereich-841-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 11.111
+  },
+  {
+   "stageId": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "topicId": "lehrplan-65-1/lernbereich-866-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.288
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-65-1/lernbereich-866-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "covers",
+   "hoursUstd": 3.203
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-65-1/lernbereich-866-1",
+   "subject": "geschichte",
+   "grades": [
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 2.288
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-65-1/lernbereich-901-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 3.556
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-65-1/lernbereich-933-1",
+   "subject": "geschichte",
+   "grades": [
+    7
+   ],
+   "class": "partly",
+   "hoursUstd": 9.0
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-65-1/lernbereich-1041-1",
+   "subject": "geschichte",
+   "grades": [
+    9
+   ],
+   "class": "partly",
+   "hoursUstd": 8.0
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-65-1/lernbereich-1113-1",
+   "subject": "geschichte",
+   "grades": [
+    10
+   ],
+   "class": "partly",
+   "hoursUstd": 16.0
+  },
+  {
+   "stageId": "31b2be29-7a8c-5f98-a447-55ecf57f1ff9",
+   "topicId": "lehrplan-80-1/lernbereich-5585-1",
+   "subject": "sachunterricht",
+   "grades": [
+    1,
+    2
+   ],
+   "class": "partly",
+   "hoursUstd": 3.636
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-80-1/lernbereich-5661-1",
+   "subject": "sachunterricht",
+   "grades": [
+    1,
+    2
+   ],
+   "class": "partly",
+   "hoursUstd": 22.5
+  },
+  {
+   "stageId": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "topicId": "lehrplan-80-1/lernbereich-5980-1",
+   "subject": "sachunterricht",
+   "grades": [
+    3
+   ],
+   "class": "partly",
+   "hoursUstd": 1.667
+  },
+  {
+   "stageId": "a1bc92d8-3730-53b8-a059-f3999e4387cf",
+   "topicId": "lehrplan-80-1/lernbereich-5980-1",
+   "subject": "sachunterricht",
+   "grades": [
+    3
+   ],
+   "class": "partly",
+   "hoursUstd": 1.667
+  },
+  {
+   "stageId": "ad0173a4-5c64-5d05-96ac-2b61810c4153",
+   "topicId": "lehrplan-80-1/lernbereich-5980-1",
+   "subject": "sachunterricht",
+   "grades": [
+    3
+   ],
+   "class": "partly",
+   "hoursUstd": 1.667
+  },
+  {
+   "stageId": "6f04ee30-2be3-537b-9d0e-b339d9fed79c",
+   "topicId": "lehrplan-80-1/lernbereich-6276-1",
+   "subject": "sachunterricht",
+   "grades": [
+    4
+   ],
+   "class": "partly",
+   "hoursUstd": 4.5
+  },
+  {
+   "stageId": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "topicId": "lehrplan-130-1/lernbereich-30736-1",
+   "subject": "technik-computer",
+   "grades": [
+    5,
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 4.615
+  },
+  {
+   "stageId": "9fc65a59-5de1-51ad-ad30-a9c0faca177a",
+   "topicId": "lehrplan-130-1/lernbereich-30753-1",
+   "subject": "technik-computer",
+   "grades": [
+    5,
+    6
+   ],
+   "class": "partly",
+   "hoursUstd": 12.755
+  }
+ ]
+}

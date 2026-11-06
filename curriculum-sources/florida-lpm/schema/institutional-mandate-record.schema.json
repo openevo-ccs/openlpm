@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/florida-lpm/schema/institutional-mandate-record.schema.json",
+  "title": "florida-lpm Institutional Mandate Record",
+  "description": "A single named, dated commitment by a real Florida education authority (the State Board of Education, the Florida Legislature, FLDOE) that sets, changes, or constrains K-12 science-standards content -- the computable unit for 'what does this authority actually require', so a coherence-finding record can point at exactly which mandate it tests, and a query can ask 'which adopted mandates have no supporting finding yet' or 'how did the required wording on evolution change across editions'. Modeled on deutsche_lp's/nys_lp's/india-lpm's institutional-mandate-record.schema.json; mandateType replaces NY's Regents-specific vocabulary and India's NEP/NCF vocabulary with Florida's own governance shape -- a State Board of Education rule-making vote (not a Regents vote), a Legislature-passed statute (not a national policy framework), and FLDOE guidance.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "issuingBody", "mandateType", "statementText", "status", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^FLLP-MANDATE-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^US(-[A-Z]{2})?$",
+      "description": "'US-FL' for a Florida-specific mandate; 'US' for a multi-state or federal-level mandate (e.g. NGSS, a federal court ruling's binding scope)."
+    },
+    "issuingBody": {
+      "type": "string",
+      "description": "Free text, e.g. 'Florida State Board of Education', 'Florida Department of Education (FLDOE)', 'Florida Legislature'. Not a controlled vocabulary."
+    },
+    "mandateType": {
+      "type": "string",
+      "enum": [
+        "state-board-adopted-standard", "state-statute",
+        "state-policy-announcement", "commission-recommendation",
+        "state-guidance-document"
+      ],
+      "description": "'state-board-adopted-standard' = a formal Florida State Board of Education rule-making vote adopting a standards document (e.g. the 2008 Next Generation Sunshine State Standards adoption, the 2020 B.E.S.T. Standards adoption, a prospective 2026 readoption). 'state-statute' = a Florida Statute passed by the Legislature and signed into law (e.g. the 2017 instructional-materials-objection law, any 'academic freedom' act). 'state-policy-announcement' = an FLDOE/Governor's-office policy direction not yet a formal rule (e.g. the 2026 standards-review process while still in draft/public-comment). 'commission-recommendation' = a recommendation from an advisory committee or workgroup, not yet itself binding. 'state-guidance-document' = FLDOE implementation guidance released to districts/CPALMS resource pages."
+    },
+    "interdisciplinaryExplicitness": {
+      "type": "string",
+      "enum": [
+        "names-interdisciplinary-explicitly", "implies-cross-subject-via-pathway",
+        "silent-on-cross-subject", "unspecified"
+      ],
+      "description": "Optional, kept for structural parity with deutsche_lp/nys_lp's identical field -- whether this mandate's own text uses interdisciplinary/cross-subject framing. Expected to be 'silent-on-cross-subject' or 'unspecified' for most Florida science-standards mandates, which are typically single-subject benchmark lists rather than cross-subject graduation frameworks; not required."
+    },
+    "statementText": {
+      "type": "string",
+      "description": "The mandate's own text, quoted exactly (or as exactly as the available source allows) as read in the primary source -- e.g. the literal benchmark text of SC.912.L.15.1, or the literal statutory text of an instructional-materials-objection provision. Do not paraphrase where a verbatim quote is available."
+    },
+    "adoptionDate": { "type": "string", "format": "date" },
+    "dateGranularity": {
+      "type": "string",
+      "enum": ["day", "month", "school-year", "year"]
+    },
+    "targetDate": {
+      "type": "string",
+      "format": "date",
+      "description": "If the mandate names a completion/implementation horizon distinct from its adoption date (e.g. 'full implementation begins school year 2027-28' for a prospective 2026 readoption)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["adopted", "proposed", "superseded"],
+      "description": "'adopted' = formally in force (a State Board vote, a signed statute). 'proposed' = drafted/released for public comment but not yet a binding rule (e.g. the 2026 draft standards as of this repo's founding session). 'superseded' = replaced by a later mandate (link via supersededBy)."
+    },
+    "supersededBy": {
+      "type": "string",
+      "pattern": "^FLLP-MANDATE-[a-z0-9-]+$"
+    },
+    "sourceDocument": { "type": "string" },
+    "sourcePage": { "type": "string" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "accessTier": {
+      "type": "string",
+      "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+      "description": "How much of the underlying mandate document this record actually keeps, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Governs statementText specifically. 'full-text-stored' = statementText reproduces the mandate's full relevant text. 'excerpt-only' = statementText is a short, bounded quotation -- the de facto tier this repo has used by default for Florida Statutes and State Board-adopted benchmark text, both of which are public records. 'summary-only' = statementText is paraphrase only. 'citation-only' = no statementText at all. Identical field to deutsche_lp's/nys_lp's/india-lpm's institutional-mandate-record.schema.json."
+    },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal basis for storing this mandate's statementText at the accessTier chosen above, e.g. 'Florida Statutes and State Board of Education rule text (including adopted academic standards/benchmarks) are public records under Florida's public-records law (Ch. 119, Fla. Stat.) and are not subject to copyright as works of Florida state government'. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

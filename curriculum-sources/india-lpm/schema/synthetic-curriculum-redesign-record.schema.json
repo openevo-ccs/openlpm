@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/synthetic-curriculum-redesign-record.schema.json",
+  "title": "india_lp Synthetic Curriculum-Redesign Record",
+  "description": "A PROPOSED, hypothetical redesign of a real curriculum object -- new or restructured content that does NOT exist in official Indian curriculum documents today -- reachable from a real baseline by changing one explicit theoretical commitment (an 'adjacent possible' curriculum, not an arbitrary invention). Identical shape and identical hard rule to deutsche_lp's/nys_lp's synthetic-curriculum-redesign-record.schema.json: a record under this schema must never be cited in outreach material as describing real, adopted policy. No records exist under this schema yet as of this repo's founding session (2026-09-30).",
+  "type": "object",
+  "required": [
+    "id", "slug", "label", "status", "contentStatus",
+    "baselineCurriculumObject", "theoreticalGrounding",
+    "proposedRedesign", "tradeoffAssessment", "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-SYNTHETIC-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "reviewed", "recommended", "rejected"]
+    },
+    "contentStatus": {
+      "type": "string",
+      "enum": ["adjacent-possible-synthetic-redesign"],
+      "const": "adjacent-possible-synthetic-redesign"
+    },
+    "themes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "baselineCurriculumObject": {
+      "type": "object",
+      "required": ["jurisdiction", "subject", "sourceDocument"],
+      "additionalProperties": false,
+      "properties": {
+        "jurisdiction": { "type": "string", "pattern": "^IN(-[A-Z]{2})?$" },
+        "subject": { "type": "string" },
+        "gradeLevel": { "type": "string" },
+        "excerptText": { "type": "string" },
+        "sourceDocument": { "type": "string" },
+        "sourcePage": { "type": "string" },
+        "sourceUrl": { "type": "string", "format": "uri" },
+        "accessTier": {
+          "type": "string",
+          "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+          "description": "Applies only to baselineCurriculumObject's real, quoted starting point -- proposedRedesign is this repo's own invented content and carries no source-rights question. Same four values as deutsche_lp's/nys_lp's identical field."
+        },
+        "licenseOrRightsNote": {
+          "type": "string",
+          "description": "The legal basis for storing excerptText at the accessTier chosen above."
+        },
+        "externalDatasetRef": {
+          "type": "string",
+          "description": "Optional pointer into a real external dataset this repo doesn't own but reads directly, e.g. a specific CompetencyBase id or bio-core-k12/interdisciplinary-k12 strand file."
+        }
+      }
+    },
+    "theoreticalGrounding": {
+      "type": "object",
+      "required": ["theorybaseTheory", "changedCommitment"],
+      "additionalProperties": false,
+      "properties": {
+        "theorybaseTheory": {
+          "type": "string",
+          "pattern": "^OE-THEORY-[a-z0-9-]+$"
+        },
+        "theorybaseDesignPrinciple": {
+          "type": "string",
+          "pattern": "^OE-DESIGNPRINCIPLE-[a-z0-9-]+$"
+        },
+        "theorybaseConstruct": {
+          "type": "string",
+          "pattern": "^OE-CROSSDOMAINCONSTRUCT-[a-z0-9-]+$"
+        },
+        "changedCommitment": { "type": "string" }
+      }
+    },
+    "proposedRedesign": {
+      "type": "object",
+      "required": ["narrative", "newOrChangedElements"],
+      "additionalProperties": false,
+      "properties": {
+        "narrative": { "type": "string" },
+        "newOrChangedElements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["description"],
+            "additionalProperties": false,
+            "properties": {
+              "description": { "type": "string" },
+              "relatedRealCompetencyIds": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "tradeoffAssessment": {
+      "type": "object",
+      "required": ["gains", "costs"],
+      "additionalProperties": false,
+      "properties": {
+        "gains": { "type": "string" },
+        "costs": { "type": "string" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": {
+          "type": "string",
+          "enum": ["human", "llm", "human-llm-collaborative"]
+        },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

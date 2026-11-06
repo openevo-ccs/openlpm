@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useOutletContext, useSearchParams } from 'react-router-dom'
 import { MessageSquare, Plus, Reply, X } from 'lucide-react'
 import type { ProjectOutletContext } from './project-layout'
 import {
@@ -23,6 +23,8 @@ export default function DiscussionsPage() {
   const [tagsByTopic, setTagsByTopic] = useState<Map<string, string[]>>(new Map())
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
+  const [searchParams] = useSearchParams()
+  const requestedTopic = searchParams.get('topic')
 
   const reload = async () => {
     const t = await listTopics(supabase, project.id)
@@ -32,10 +34,10 @@ export default function DiscussionsPage() {
 
   useEffect(() => {
     setTopics(null)
-    setSelectedId(null)
+    setSelectedId(requestedTopic)
     reload()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, project.id])
+  }, [supabase, project.id, requestedTopic])
 
   const selected = topics?.find((t) => t.id === selectedId) ?? null
 

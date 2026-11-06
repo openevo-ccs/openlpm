@@ -42,3 +42,6 @@ supabase/.temp/
 
 # layout_check screenshots/audits -- generated, not committed
 layout_check/out/
+
+# Jena semester synthetic cohort: generated working files
+scripts/jena_semester/cache/

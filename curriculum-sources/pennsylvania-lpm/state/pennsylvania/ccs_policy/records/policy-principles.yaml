@@ -1,0 +1,124 @@
+$schema: ../../../../schema/policy-principle-record.schema.json
+$description: >
+  OpenEvo-authored positions grounded in the institutional facts, mandates,
+  and controversies documented in state/pennsylvania/local_policy/.
+
+principles:
+  - id: PALP-PRINCIPLE-a-state-standard-does-not-bind-a-local-mandate
+    slug: a-state-standard-does-not-bind-a-local-mandate
+    label: A state standard requiring evolution be taught does not, by itself, prevent a local district from undermining it
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-PA
+    statement: >
+      Pennsylvania's own state science standard required students to
+      "analyze the theory of evolution" years before Dover's board required
+      a disclaimer suggesting the theory has unresolved "gaps/problems" and
+      promoting "intelligent design" as an alternative. The state's own
+      requirement did neither cause nor prevent the district's policy -- a
+      well-worded state standard is necessary but not sufficient protection
+      against a local curriculum mandate that goes further than the state
+      ever authorized. A curriculum-policy archive that only tracks state-
+      level standards would have missed the entire Dover story, which
+      happened one level down.
+    rationale: >
+      This is the direct, practical lesson of building
+      district-vs-state-standard-divergence as its own finding type: the
+      interesting and consequential curriculum politics in a region are not
+      always where the state-level authority sits. Florida's own case
+      (florida-lpm) is the inverse: there, the state authority itself was the
+      site of the fight. Both are real, and a repository that only modeled
+      one level would be systematically blind to half of what actually
+      happens in curriculum politics.
+    groundedIn:
+      - PALP-FINDING-dover-policy-exceeded-state-standard
+      - PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution
+      - PALP-MANDATE-dover-2004-id-disclaimer-policy
+      - PALP-CONTROVERSY-dover-intelligent-design-disclaimer
+    designPrinciples: []
+    contentAnchors: ["Our Mind"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: PALP-PRINCIPLE-litigation-resolves-what-votes-sometimes-cannot
+    slug: litigation-resolves-what-votes-sometimes-cannot
+    label: A court ruling can settle a curriculum dispute more durably than a subsequent vote, where a constitutional question is actually at stake
+    domain: computational-curriculum-studies
+    jurisdictionScope: US-PA
+    statement: >
+      Florida's 2008 compromise over "the scientific theory of evolution" was
+      a negotiated wording that satisfied neither side fully and left the
+      same underlying question open to recur in 2026. Pennsylvania's Dover
+      case was resolved differently: a federal court found the specific
+      constitutional question (whether the policy was religiously motivated)
+      as a matter of fact and law, not as a negotiated compromise -- and
+      eighteen years later, no comparable Pennsylvania evolution-standards
+      controversy has recurred, where Florida's has. A dispute that genuinely
+      raises a constitutional question is a different kind of dispute than a
+      disagreement over standards wording, and the two should not be expected
+      to resolve the same way or with the same durability.
+    rationale: >
+      This is a direct, evidence-based comparison across two repos built in
+      the same session -- not a general claim that litigation is always
+      better than politics. Most curriculum disputes (Florida's, most of
+      Pennsylvania's own 2002 standards fight) never raise a genuine
+      constitutional question and have no litigation path available; this
+      principle applies narrowly to the subset that do.
+    groundedIn:
+      - PALP-CONTROVERSY-dover-intelligent-design-disclaimer
+      - PALP-FINDING-evolution-was-never-steels-controversy
+    designPrinciples: []
+    contentAnchors: []
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+
+  - id: PALP-PRINCIPLE-teacher-professional-judgment-as-a-real-check
+    slug: teacher-professional-judgment-as-a-real-check
+    label: Teachers refusing to implement a mandate they judge unscientific is itself a documentable form of curriculum governance
+    domain: interdisciplinary-curriculum-design
+    jurisdictionScope: US-PA
+    statement: >
+      All eight of Dover's biology teachers formally refused to read the
+      district's disclaimer, citing their profession's own ethics code --
+      not a lawsuit, not a vote, but a collective act of professional
+      judgment that forced the district to have administrators read it
+      instead, visibly separating the policy from the people actually
+      teaching the subject. This is a real, recordable check on curriculum
+      governance distinct from litigation, elections, or standards text
+      itself, and a curriculum-politics archive should have a place to
+      record it as a historical fact (here, as part of
+      PALP-EVENT-dover-teachers-refuse-and-disclaimer-first-read), not only
+      as color in a narrative.
+    rationale: >
+      Worth naming as its own principle because none of this ecosystem's
+      existing record types (institutional-actor, mandate, controversy
+      position) are quite built around "a profession's own collective
+      refusal to implement" as a category -- it currently lives as a
+      timeline event and a controversy position, which works, but a future
+      session building out more teacher-driven curriculum-resistance cases
+      (a real, recurring category in US curriculum politics) might find it
+      worth a more explicit modeling treatment than this repo attempted.
+    groundedIn:
+      - PALP-EVENT-dover-teachers-refuse-and-disclaimer-first-read
+      - PALP-CONTROVERSY-dover-intelligent-design-disclaimer
+    designPrinciples: []
+    contentAnchors: ["Our Mind"]
+    conceptRefs: []
+    status: draft
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0

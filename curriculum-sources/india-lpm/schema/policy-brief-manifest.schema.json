@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/india_lp/schema/policy-brief-manifest.schema.json",
+  "title": "india_lp Policy Brief Manifest",
+  "description": "The compilation unit: which policy-principle records go into one audience-tailored brief, in what order, with what framing. Identical purpose to deutsche_lp's/nys_lp's policy-brief-manifest.schema.json. No records exist under this schema yet as of this repo's founding session (2026-09-30).",
+  "type": "object",
+  "required": ["id", "slug", "label", "audience", "jurisdictionScope", "principleIds", "status", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^INLP-BRIEF-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "audience": {
+      "type": "string",
+      "enum": [
+        "central-government-official", "state-education-official",
+        "autonomous-body-staff", "curriculum-researcher", "teacher-educator",
+        "school-leader", "nonprofit-network-partner", "policy-actor",
+        "general-public", "other"
+      ],
+      "description": "Adapted from deutsche_lp's/nys_lp's audience vocabulary. 'autonomous-body-staff' covers NCERT/CBSE/state-textbook-board staff specifically, kept distinct from 'central-government-official'/'state-education-official' for the same legal-form reason institutional-actor-record.schema.json's actorType distinguishes them."
+    },
+    "audienceDetail": { "type": "string" },
+    "jurisdictionScope": {
+      "type": "string",
+      "pattern": "^IN(-[A-Z]{2})?$"
+    },
+    "purpose": { "type": "string" },
+    "principleIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^INLP-PRINCIPLE-[a-z0-9-]+$" }
+    },
+    "framingNotes": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "ready-to-draft", "drafted", "sent", "superseded"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

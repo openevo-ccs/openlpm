@@ -1,0 +1,216 @@
+$schema: ../../../../schema/institutional-mandate-record.schema.json
+$description: >
+  Named, dated requirements set by a real Pennsylvania authority -- at two
+  genuinely different levels, a school district's own board (Dover) and the
+  state (PA State Board of Education). See
+  docs/source-notes/2026-10-20-pennsylvania-evolution-curriculum-policy-history-research.md.
+
+mandates:
+  - id: PALP-MANDATE-dover-2004-id-disclaimer-policy
+    slug: dover-2004-id-disclaimer-policy
+    label: Dover Area School District's 2004 intelligent-design disclaimer policy
+    jurisdiction: US-PA
+    issuingBody: Dover Area School District Board
+    mandateType: school-district-policy
+    statementText: >
+      [Board policy, adopted 2004-10-18:] "Students will be made aware of
+      gaps/problems in Darwin's theory and of other theories of evolution
+      including, but not limited to, intelligent design." [Disclaimer
+      statement actually read to students, first on 2005-01-18:] "The state
+      standards require students to learn about Darwin's Theory of Evolution
+      and to eventually take a standardized test of which evolution is a
+      part. Because Darwin's Theory is a theory, it is still being tested as
+      new evidence is discovered. The Theory is not a fact. Gaps in the
+      Theory exist for which there is no evidence. A theory is defined as a
+      well-tested explanation that unifies a broad range of observations.
+      Intelligent Design is an explanation of the origin of life that differs
+      from Darwin's view. The reference book, Of Pandas and People, is
+      available for students to see if they would like to explore this view
+      in an effort to gain an understanding of what Intelligent Design
+      actually involves. As is true with any theory, students are encouraged
+      to keep an open mind. The school leaves the discussion of the Origins
+      of Life up to individual students and their families. As a
+      standards-driven district, class instruction focuses on the standards
+      and preparing students to be successful on standards-based
+      assessments."
+    adoptionDate: "2004-10-18"
+    dateGranularity: day
+    status: superseded
+    supersededBy: PALP-MANDATE-dover-2006-policy-rescission
+    sourceDocument: Dover Area School Board meeting minutes / Kitzmiller v. Dover trial exhibit
+    sourceUrl: https://ncse.ngo/design-trial-dover-pennsylvania
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Reproduced from the Kitzmiller v. Dover trial record, as quoted
+      verbatim on NCSE's page citing the trial exhibit -- a public judicial
+      record. NCSE's transcription was not independently cross-checked
+      against a scanned courtroom exhibit this session, but matches
+      Wikipedia's independent summary of the same document.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        This record combines the board's own Oct 18 2004 policy-vote language
+        with the separate, longer disclaimer statement actually read to
+        students starting Jan 18 2005 -- both are "the mandate's own text"
+        in the sense this schema cares about, the first being what the board
+        voted on, the second being what was actually implemented in
+        classrooms. Kept together since they describe the same single
+        mandate's adoption-to-implementation arc, not two different
+        mandates.
+      sourceProvenance: NCSE, "Design on Trial in Dover, Pennsylvania," fetched and read directly.
+
+  - id: PALP-MANDATE-dover-2006-policy-rescission
+    slug: dover-2006-policy-rescission
+    label: Dover Area School District rescinds the intelligent-design disclaimer policy
+    jurisdiction: US-PA
+    issuingBody: Dover Area School District Board (newly elected "Dover CARES" board)
+    mandateType: school-district-policy
+    statementText: >
+      The newly elected board voted unanimously, by voice vote with no
+      discussion, to formally rescind the October 2004 intelligent-design
+      policy. Board president Bernadette Reinking's comment after the vote:
+      "This is it."
+    adoptionDate: "2006-01-03"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: Dover Area School Board meeting minutes
+    sourceUrl: https://www.nbcnews.com/id/wbna10698535
+    accessTier: excerpt-only
+    licenseOrRightsNote: >
+      Short, attributed quotation from contemporaneous news coverage (fair
+      use / citation basis); the underlying board-vote fact itself is a
+      public record.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        NBC News, "Intelligent-design policy rescinded"; Boston Globe/AP,
+        "Pa. board rescinds school policy" (Jan 4 2006) -- both fetched and
+        read directly.
+
+  - id: PALP-MANDATE-pa-2002-standard-3-3-10-d-evolution
+    slug: pa-2002-standard-3-3-10-d-evolution
+    label: "Pennsylvania 2002 standard 3.3.10.D: analyze the theory of evolution"
+    jurisdiction: US-PA
+    issuingBody: Pennsylvania State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      [Standard 3.3.10.D, as finally adopted, within 3.3 Biological Sciences,
+      subsection D. Evolution:] students must "analyze the theory of
+      evolution." [The final wording was itself the product of a real
+      rulemaking fight: the PROPOSED version required students to analyze
+      records/studies "that support or do not support the theory of
+      evolution," changed in final form to require analysis "relevant to the
+      theory of evolution" after 120+ public comments and Independent
+      Regulatory Review Commission concern that the original wording could
+      "permit or even encourage schools to teach creationism or intelligent
+      design." The State Board stated in the Pennsylvania Bulletin that it
+      "did not intend to encourage the teaching of creationism or intelligent
+      design" and the standard was "written to encourage critical thinking."]
+    adoptionDate: "2002-01-05"
+    dateGranularity: day
+    status: superseded
+    supersededBy: PALP-MANDATE-pa-2022-steels-evolution-benchmarks
+    sourceDocument: "Academic Standards for Science and Technology, 22 Pa. Code, Chapter 4, Appendix B; Pennsylvania Bulletin Vol. 32, Issue 1, Document No. 02-9"
+    sourceUrl: https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol32/32-1/9.html
+    accessTier: excerpt-only
+    licenseOrRightsNote: >
+      The Pennsylvania Bulletin is the Commonwealth's own official
+      legal-notice publication, a public record. Note (see GOVERNANCE.md):
+      Pennsylvania law (71 Pa. Stat. Ann. S636) permits the Commonwealth to
+      affirmatively claim copyright on its own publications, unlike Florida's
+      stronger public-domain default -- but the Bulletin's own rulemaking
+      notices carry no such copyright assertion and are official legal
+      notice, read here directly rather than via a secondary characterization.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The final 3.3.10.D descriptor's full verbatim text beyond "analyze
+        the theory of evolution" was not independently re-confirmed this
+        session (the PDF fetched directly was a 2009 draft elementary-
+        standards document, not the 2002 high-school text) -- the proposed-
+        vs-final WORDING CHANGE itself, however, is read directly from the
+        Pennsylvania Bulletin's own rulemaking preamble, which is the higher-
+        value primary source for this record's central claim.
+      sourceProvenance: >
+        Pennsylvania Bulletin, Vol. 32, Issue 1, Document No. 02-9
+        (pacodeandbulletin.gov), fetched and read directly.
+
+  - id: PALP-MANDATE-pa-2022-steels-evolution-benchmarks
+    slug: pa-2022-steels-evolution-benchmarks
+    label: "Pennsylvania 2022 STEELS standards, Discipline 3.1 Life Science: evolution/natural-selection benchmarks"
+    jurisdiction: US-PA
+    issuingBody: Pennsylvania State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      [Discipline 3.1 Life Science, Strand "Evidence of Common Ancestry and
+      Diversity," benchmark 3.1.9-12.S:] "Communicate scientific information
+      that common ancestry and biological evolution are supported by multiple
+      lines of empirical evidence." [Strand "Natural Selection," benchmark
+      3.1.9-12.T:] "Construct an explanation based on evidence that the
+      process of evolution primarily results from four factors: (1) the
+      potential for a species to increase in number, (2) the heritable
+      genetic variation of individuals in a species due to mutation and
+      sexual reproduction, (3) competition for limited resources, and (4) the
+      proliferation of those organisms that are better able to survive and
+      reproduce in the environment." [Strand "Adaptation," benchmark
+      3.1.9-12.W:] "Construct an explanation based on evidence for how
+      natural selection leads to adaptation of populations." [The full
+      benchmark set -- 3.1.9-12.P through X at high school, 3.1.6-8.M through
+      T at middle school, covering inheritance of traits, variation of
+      traits, evidence of common ancestry, natural selection, and adaptation
+      -- is reproduced in full in case/pennsylvania-steels-2022-evolution-benchmarks.json.]
+    adoptionDate: "2022-01-01"
+    dateGranularity: month
+    targetDate: "2025-06-30"
+    status: adopted
+    sourceDocument: "Science, Technology & Engineering and Environmental Literacy & Sustainability Standards (STEELS), 22 Pa. Code, Chapter 4 (as amended); Common Standards Project document D21358967"
+    sourceUrl: https://api.commonstandardsproject.com/api/v1/standard_sets/5A99211C6D874994A2CFEE2AE40023DD_D21358967_grades-09-10-11-12
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Pennsylvania law (71 Pa. Stat. Ann. S636) permits the Commonwealth to
+      affirmatively claim copyright on its own publications, but this is
+      discretionary, not automatic. Direct inspection of PA's own published
+      standards PDFs found no copyright notice, (c), or rights-reservation
+      statement anywhere -- a 2009 draft elementary-standards PDF explicitly
+      states "These standards are offered as a voluntary resource for
+      Pennsylvania's schools." The Common Standards Project's own API data
+      for this document carries NO explicit open-license statement either
+      (license title/URL fields are blank, rightsHolder listed only as "D2L
+      Corporation," almost certainly the data submitter rather than a rights
+      claim) -- unlike Florida's confirmed CC BY 3.0 US, do not cite an open
+      license for this specific text; rely only on the Commonwealth's own
+      apparent non-assertion of copyright over the standards document itself.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Benchmark text fetched directly from the Common Standards Project
+        API (api.commonstandardsproject.com), not a secondary mirror --
+        cross-validated against a second, independent CSP cataloging of the
+        same content (document D21302564's grades 6-8 entry) which uses a
+        different internal code scheme but identical wording, giving high
+        confidence this is authentic. targetDate reflects the 2025-06-30
+        sunset of the prior 2002 standards / start of mandatory full
+        implementation, not this mandate's own adoption date.
+      sourceProvenance: >
+        api.commonstandardsproject.com/api/v1/standard_sets/5A99211C6D874994A2CFEE2AE40023DD_D21358967_grades-09-10-11-12,
+        fetched directly 2026-10-20.

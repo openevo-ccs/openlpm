@@ -54,6 +54,22 @@ export function bkEntries(content: unknown): BkbEntry[] {
   return ((content as any)?.basiskonzeptbezug ?? []) as BkbEntry[]
 }
 
+// The Konzeptanker definition from EvoMentor DE v1.2's own tooltip text
+// (apps/evomentor_de_v1_2.html's KONZEPTANKER_DEF constant), word for word.
+export const KONZEPTANKER_DEF = 'ein Lernziel, das einen besonders konkreten, anschaulichen Einstiegspunkt in ein Basiskonzept bildet.'
+
+/**
+ * The Basiskonzept entries for which this goal is a Konzeptanker: the goal is
+ * flagged ist_konzeptanker and the entry is rated hoch (3/3). Every goal carries
+ * an entry for all six concepts, so the flag alone does not say which concept
+ * the goal anchors (feedback 2026-10-01, the Konzeptanker table showing one
+ * number everywhere). Empty when the goal is not a Konzeptanker.
+ */
+export function konzeptankerEntries(content: unknown): BkbEntry[] {
+  if (!(content as any)?.ist_konzeptanker) return []
+  return bkEntries(content).filter((e) => e.relevanz_beurteilung === 3)
+}
+
 // Shared with prompt-generator-page.tsx's own original fix (2026-09-30):
 // the six-Basiskonzept ids inside content.basiskonzeptbezug are EvoMentor
 // DE's own original identifiers baked into the imported curriculum data --
@@ -250,4 +266,18 @@ export function ancestorAtDepth(id: string, targetDepth: number, byId: Map<strin
     depth--
   }
   return depth === targetDepth ? cur : undefined
+}
+
+// Real Thuringia curriculum structure, named directly by Susan Hanisch
+// (feedback 2026-10-01): grades 5/6 and 7/8 are taught as one combined band,
+// not as separate single-grade steps -- Kl.9 and Kl.10 stay their own band.
+// A raw literal grade_band value of '5/6' (some MNT content, see migration
+// 104) already IS a band and falls through unchanged. Shared here so every
+// page that groups Lernziele by grade (Lernziele filter, Basiskonzepte
+// Dashboard) buckets the same way -- the Dashboard's own table used to group
+// on the raw value directly, which is what produced an all-dash "Kl. 5/6"
+// column next to separate "Kl. 5"/"Kl. 6" columns (feedback b0323f40).
+const GRADE_BAND_KEY: Record<string, string> = { '5': '5/6', '6': '5/6', '7': '7/8', '8': '7/8' }
+export function bandKeyForGrade(g: string): string {
+  return GRADE_BAND_KEY[g] ?? g
 }

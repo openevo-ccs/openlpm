@@ -1,0 +1,228 @@
+$schema: ../../../../schema/institutional-mandate-record.schema.json
+$description: >
+  Named, dated requirements set by a real Florida education authority. Only
+  things actually adopted-or-currently-pending are modeled here -- bills that
+  were introduced and died (HB 837 2005, SB 2692/HB 1483 2008, the 2018/2019
+  "controversial theories" bills) never became a requirement, so they live
+  only as policy-timeline-event records and as contestedObjects inside
+  policy-controversy-record, not here. See
+  docs/source-notes/2026-10-20-florida-evolution-curriculum-policy-history-research.md.
+
+mandates:
+  - id: FLLP-MANDATE-ngsss-2008-sc912l15-1
+    slug: ngsss-2008-sc912l15-1
+    label: "NGSSS benchmark SC.912.L.15.1 (2008): evolution supported by multiple lines of evidence"
+    jurisdiction: US-FL
+    issuingBody: Florida State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      Explain how the scientific theory of evolution is supported by the
+      fossil record, comparative anatomy, comparative embryology,
+      biogeography, molecular biology, and observed evolutionary change.
+    adoptionDate: "2008-02-19"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Next Generation Sunshine State Standards (NGSSS), Science, benchmark SC.912.L.15.1 (document D1000338)"
+    sourceUrl: https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Florida State Board of Education-adopted benchmark text is a public
+      record under Fla. Stat. ch. 119 / Fla. Const. Art. I, S24(a) and not
+      subject to copyright (Microdecisions, Inc. v. Skinner, 889 So.2d 871
+      (Fla. 2d DCA 2004)). Independently, the structured dataset this exact
+      text was fetched from is separately licensed CC BY 3.0 US by its
+      compiler (rightsHolder: Desire2Learn Incorporated, Common Standards
+      Project, http://creativecommons.org/licenses/by/3.0/us/) -- attribute
+      both when reusing this text elsewhere.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Upgraded 2026-10-20 (same session) from excerpt-only/unverified-secondary-source
+        to full-text-stored/primary-source-confirmed after directly fetching
+        the Common Standards Project API (a real, live REST endpoint, not
+        blocked by the JS-rendering wall that stopped the CASE Network/CPALMS
+        checks -- see docs/source-notes/2026-10-20-florida-machine-readable-standards-landscape-research.md).
+        This exact wording matches what secondary teacher-resource mirrors
+        had already reported, so no correction was needed here (contrast
+        FLLP-MANDATE-ngsss-2008-sc912l15-standard below, which WAS corrected).
+      sourceProvenance: >
+        api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12,
+        fetched directly 2026-10-20; cross-confirmed against NCSE's
+        contemporaneous reporting
+        (ncse.ngo/evolution-comes-floridas-science-standards).
+
+  - id: FLLP-MANDATE-ngsss-2008-sc912l15-standard
+    slug: ngsss-2008-sc912l15-standard
+    label: "NGSSS standard SC.912.L.15 (2008): \"Diversity and Evolution of Living Organisms\""
+    jurisdiction: US-FL
+    issuingBody: Florida State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      Diversity and Evolution of Living Organisms
+    adoptionDate: "2008-02-19"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Next Generation Sunshine State Standards (NGSSS), Science, standard SC.912.L.15 (document D1000338)"
+    sourceUrl: https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1 (Florida
+      public-record status + Common Standards Project's own CC BY 3.0 US
+      license on the compiled dataset).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        CORRECTED 2026-10-20 (same session): this record originally quoted
+        "[Evolution is] the fundamental concept underlying all of
+        biology... supported by multiple forms of scientific evidence" as
+        the standard's statementText, sourced only via a secondary
+        characterization. Directly fetching the real Common Standards
+        Project data found the standard's actual, exact statement at this
+        structural level is simply "Diversity and Evolution of Living
+        Organisms" (Common Standards Project asnIdentifier S1130831) -- no
+        "fundamental concept"/"multiple forms of evidence" language exists
+        at the standard-title level. That phrasing may exist elsewhere in
+        FLDOE's own framework preamble/rationale text (not yet located) as a
+        characterization of the standard's intent, not as SC.912.L.15's own
+        statement -- flagged for a future session to track down if the
+        distinction matters for a specific use. Left uncorrected, this would
+        have been a fabricated-sounding quote attributed to a real standard
+        code -- exactly the kind of error this repo's verification discipline
+        exists to catch.
+      sourceProvenance: >
+        api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12,
+        fetched directly 2026-10-20.
+
+  - id: FLLP-MANDATE-ngsss-2008-sc912l15-10-11-human-evolution
+    slug: ngsss-2008-sc912l15-10-11-human-evolution
+    label: "NGSSS benchmarks SC.912.L.15.10-11 (2008): hominid evolution and fossil evidence"
+    jurisdiction: US-FL
+    issuingBody: Florida State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      SC.912.L.15.10: Identify basic trends in hominid evolution from early
+      ancestors six million years ago to modern humans, including brain
+      size, jaw size, language, and manufacture of tools. SC.912.L.15.11:
+      Discuss specific fossil hominids and what they show about human
+      evolution.
+    adoptionDate: "2008-02-19"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Next Generation Sunshine State Standards (NGSSS), Science, benchmarks SC.912.L.15.10 and SC.912.L.15.11 (document D1000338)"
+    sourceUrl: https://api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Same dual basis as FLLP-MANDATE-ngsss-2008-sc912l15-1.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Added 2026-10-20 after directly fetching the full benchmark set --
+        these two benchmarks are the specific, named human-origins content
+        Pat Beall's Sun Sentinel column (cited via NCSE) characterized the
+        2026 draft as "all but erasing." Modeled as one combined record
+        (two adjacent, closely related benchmarks) rather than split in two,
+        since both support the same FLLP-FINDING/FLLP-CONTROVERSY references.
+      sourceProvenance: >
+        api.commonstandardsproject.com/api/v1/standard_sets/80B94A122D3D4B95884660FF09CC357E_D1000338_grades-09-10-11-12,
+        fetched directly 2026-10-20.
+
+  - id: FLLP-MANDATE-hb989-2017-instructional-materials
+    slug: hb989-2017-instructional-materials
+    label: HB 989 (2017) -- any Florida resident may formally challenge instructional materials
+    jurisdiction: US-FL
+    issuingBody: Florida Legislature / Gov. Rick Scott
+    mandateType: state-statute
+    statementText: >
+      [Summary, not a verbatim statutory quotation -- see accessTier.] CS/CS/HB
+      989 overhauls Florida school districts' textbook/instructional-materials
+      review and adoption process and extends standing to formally object to
+      any Florida resident, not only a parent of an enrolled student,
+      triggering a hearing before an independent review officer.
+    adoptionDate: "2017-06-26"
+    targetDate: "2017-07-01"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Chapter law 2017-177 (CS/CS/HB 989, \"Instructional Materials\")"
+    sourceUrl: https://www.flsenate.gov/Session/Bill/2017/00989
+    accessTier: summary-only
+    licenseOrRightsNote: >
+      Florida statutory text is a public record and not subject to
+      copyright; summary-only here reflects that the exact codified statutory
+      language was not quoted verbatim this session (the Senate bill page was
+      read for its legislative-history metadata, not transcribed in full) --
+      raise to excerpt-only/full-text-stored once the enacted statute's exact
+      text is pulled and quoted directly.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: Florida Senate's own bill page (flsenate.gov/Session/Bill/2017/00989), fetched and read directly.
+
+  - id: FLLP-MANDATE-2026-draft-science-standards-evolution-omission
+    slug: 2026-draft-science-standards-evolution-omission
+    label: 2026 draft K-12 science standards omit the word "evolution" from high-school life-science content
+    jurisdiction: US-FL
+    issuingBody: Florida Department of Education (FLDOE)
+    mandateType: state-policy-announcement
+    statementText: >
+      [Not a verbatim quotation of the draft standards themselves -- a
+      reporting-level characterization, see accessTier/verificationStatus.]
+      Per named reviewers at public-comment sessions, the word "evolution"
+      does not appear anywhere in the proposed high-school life-science
+      standards; specifically named missing vocabulary includes gene flow,
+      genetic drift, origins of life, evidence of evolution, DNA
+      transcription, and genetics. Middle-school standards reference natural
+      selection without an explicit evolution framing. The terms "climate
+      change" and "global warming" do not appear anywhere in the draft
+      (which retains "weather and climate," "climate systems," and "climate
+      impacts on biodiversity").
+    adoptionDate: "2026-09-25"
+    dateGranularity: day
+    status: proposed
+    sourceDocument: Draft 2026 Florida K-12 Science Standards (FLDOE standards-review process)
+    sourceUrl: https://www.wusf.org/education/2026-09-30/evolution-climate-change-missing-from-floridas-new-k-12-science-standards
+    accessTier: summary-only
+    licenseOrRightsNote: >
+      This record characterizes the draft's content via news reporting, not
+      a verbatim quotation of the draft document itself (fldoe.org/standardsreview/
+      returned HTTP 403 on automated fetch this session) -- summary-only is
+      the honest tier here, not a rights restriction. Raise to excerpt-only/
+      full-text-stored once the draft PDF itself is fetched and specific
+      benchmark text can be quoted directly.
+    verificationStatus: unverified-secondary-source
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        This is the single most important mandate record to upgrade in a
+        follow-up session -- fetch fldoe.org/standardsreview/ or the draft
+        PDF directly (a human browser session may be needed; automated fetch
+        was blocked this session) and replace this reporting-level
+        characterization with actual quoted benchmark text.
+      sourceProvenance: >
+        WUSF (Nancy Guan), "Evolution and climate change are missing from
+        Florida's new K-12 science standards" (Sept 30, 2026); Florida
+        Phoenix (Jay Waagmeester), Oct 14, 2026; NCSE (Glenn Branch), Oct 2
+        and Oct 9, 2026 -- all fetched and read directly, but all are
+        reporting ABOUT the draft, not the draft text itself.

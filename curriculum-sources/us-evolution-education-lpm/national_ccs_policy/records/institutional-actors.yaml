@@ -1,0 +1,123 @@
+$schema: ../../schema/institutional-actor-record.schema.json
+$description: >
+  Canonical records for national organizations already modeled independently
+  (2-3 times each) across florida-lpm/pennsylvania-lpm/tennessee-lpm's own
+  national_ccs_policy/ folders. These are peer records, not a replacement
+  for the state repos' own -- see GOVERNANCE.md and
+  ../../cross-repo-notes/national-actors-across-state-repos-2026-10-20.md
+  for why, and crossRepoRefs below for the two-way links.
+
+actors:
+  - id: USLP-ACTOR-ncse
+    slug: ncse
+    label: National Center for Science Education (NCSE)
+    actorType: nonprofit-curriculum-organization
+    jurisdiction: US
+    role: >
+      Founded by Stanley L. Weinberg, a retired Iowa high school biology
+      teacher, who began organizing state-level "Committees of
+      Correspondence" to track and counter creationist legislative efforts
+      starting in 1980, linked by a Creation/Evolution Newsletter; formally
+      incorporated as NCSE in 1983 (1981 is also commonly cited as the
+      founding/organizing year). The single most consistent institutional
+      voice defending evolution/climate-science education in US public
+      schools for over four decades, with a confirmed, independent role in
+      all three state repos this ecosystem has built so far.
+    currentHolder:
+      name: Glenn Branch
+      title: Deputy Director
+      asOf: "2026-10-20"
+    url: https://ncse.ngo
+    crossRepoRefs:
+      - "florida-lpm:FLLP-ACTOR-ncse"
+      - "pennsylvania-lpm:PALP-ACTOR-ncse"
+      - "tennessee-lpm:TNLP-ACTOR-ncse"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        1981 vs. 1983 founding-year discrepancy reflects organizing-effort
+        vs. legal-incorporation dates, both found in reputable sources.
+      sourceProvenance: >
+        NCSE's own site and Wikipedia's NCSE entry, cross-checked -- fetched
+        and read directly this session.
+
+  - id: USLP-ACTOR-aclu
+    slug: aclu
+    label: American Civil Liberties Union (ACLU)
+    actorType: advocacy-body
+    jurisdiction: US
+    role: >
+      Founded 1920 in New York (Roger Baldwin among the founders), emerging
+      from the National Civil Liberties Bureau in response to the WWI-era
+      Palmer Raids -- unrelated to evolution at founding. The Scopes Trial
+      (1925) was one of its earliest and most famous cases: it recruited
+      John Scopes to challenge Tennessee's Butler Act and partnered with
+      Clarence Darrow for his defense. Filed an amicus brief (not direct
+      counsel) supporting Susan Epperson in Epperson v. Arkansas (1968,
+      Leo Pfeffer, Melvin L. Wulf, Joseph B. Robison). Its Pennsylvania
+      affiliate was co-counsel for the Kitzmiller plaintiffs (2005); it also
+      represented Gary Scott in Tennessee (1967).
+    url: https://www.aclu.org
+    crossRepoRefs:
+      - "pennsylvania-lpm:PALP-ACTOR-aclu"
+      - "tennessee-lpm:TNLP-ACTOR-aclu"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        The Epperson v. Arkansas opinion itself (Library of Congress
+        digitized US Reports volume), read directly; ACLU's own history
+        page (aclu.org/about/aclu-history), fetched and read directly.
+
+  - id: USLP-ACTOR-discovery-institute
+    slug: discovery-institute
+    label: Discovery Institute (Center for Science and Culture)
+    actorType: think-tank
+    jurisdiction: US
+    role: >
+      Founded 1991 (not 1990, an earlier assumption corrected this session)
+      by Bruce Chapman (a former Reagan-era official) and George Gilder, in
+      Seattle, as a spinoff of the Hudson Institute. Its Center for Science
+      and Culture (originally "Center for the Renewal of Science and
+      Culture," the intelligent-design-focused unit) was established in
+      1996. Its internal 1998 strategy memo, the "Wedge Document" (leaked
+      1999-02-05), states its actual long-term goal in its own words: "To
+      defeat scientific materialism and its destructive moral, cultural and
+      political legacies" and "To replace materialistic explanations with
+      the theistic understanding that nature and human beings are created
+      by God." Authored the model "Academic Freedom Act" legislative
+      template (used in Louisiana 2008 and Tennessee 2012) -- language
+      deliberately designed, per NCSE's own analysis, to avoid the specific
+      religious-purpose reasoning Edwards v. Aguillard (1987) used to strike
+      down Louisiana's earlier, more explicit law.
+    url: https://www.discovery.org
+    crossRepoRefs:
+      - "florida-lpm:FLLP-ACTOR-discovery-institute"
+      - "pennsylvania-lpm:PALP-ACTOR-discovery-institute"
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        No actor record for Discovery Institute exists in tennessee-lpm --
+        that repo's own research found no direct institutional tie between
+        the Institute and Tennessee's 2012 law specifically, so no
+        crossRepoRef to tennessee-lpm is added here either (an informal
+        cross-reference should not assert a connection a sibling repo's own
+        research did not confirm).
+      sourceProvenance: >
+        Discovery Institute's own history page (discovery.org/f/4441/); the
+        Wedge Document itself, hosted in full by NCSE (ncse.ngo/wedge-document)
+        -- both fetched and read directly.

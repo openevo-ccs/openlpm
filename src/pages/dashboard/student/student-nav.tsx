@@ -1,16 +1,52 @@
 import { NavLink } from 'react-router-dom'
-import { ClipboardList, Dna, Sparkles, Users } from 'lucide-react'
+import { BarChart3, CalendarRange, ClipboardList, Columns2, Dna, FileEdit, FileText, GitCompare, Grid3x3, ListChecks, Network, PenLine, GraduationCap, Sparkles, Users, Waypoints, type LucideIcon } from 'lucide-react'
+import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates'
+import { makeT, type StringKey } from '../comparison/strings'
+import { KNOWN_COMPARISON_PAIRS } from '@/lib/supabase/comparative-analysis'
 
-// Two groups, three items -- EvoMentor DE v1.2's own real sidebar shape
-// (ERKUNDEN: Lernziele, Basiskonzepte / PLANEN: KI-Prompt-Generator),
-// carried over deliberately since it's the exact reference Dustin asked
-// this student view to match. Intentionally narrow by design for a
-// first-time student user, not a placeholder to expand later -- which is
-// why Groups (the one real exception) is its own clearly-separate third
-// section, shown only when the project owner has actually turned it on
-// (migration 075), rather than folded into ERKUNDEN/PLANEN as if it were
-// part of the original EvoMentor DE reference.
-export function StudentNav({ slug, groupsEnabled }: { slug: string; groupsEnabled: boolean }) {
+// The comparison views (country and cross-national, rebuilt 2026-10-28) share one
+// sidebar of four groups: explore the data, compare it, improve it, share it.
+// "Between spaces" appears only for a space that has a written comparison with
+// another space (today Bio-Core and Interdisciplinary).
+// Spaces that hold parts nobody has accepted yet and so have a "Draft links" page (src/pages/dashboard/comparison/draft-links-page.tsx).
+const DRAFT_LINK_SPACES = new Set(['interdisciplinary-lpm-synth'])
+
+function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 'de' | 'en' }) {
+  const base = `/dashboard/${slug}`
+  const t = (key: StringKey) => makeT(language)(key)
+  const item = (to: string, key: StringKey, Icon: LucideIcon, end = false) => (
+    <NavLink to={to} end={end} title={t(key)} className={({ isActive }) => (isActive ? 'active' : '')}>
+      <Icon size={14} /><span className="nav-label">{t(key)}</span>
+    </NavLink>
+  )
+  return (
+    <nav className="student-nav">
+      <p className="muted student-nav-group">{t('groupExplore')}</p>
+      {item(base, 'navOverview', ClipboardList, true)}
+      {item(`${base}/coverage`, 'navCoverage', Grid3x3)}
+      {item(`${base}/network`, 'navNetwork', Network)}
+      {item(`${base}/timeline`, 'navTimeline', CalendarRange)}
+      <p className="muted student-nav-group">{t('groupCompare')}</p>
+      {item(`${base}/flows`, 'navFlows', Waypoints)}
+      {item(`${base}/school-years`, 'navSchoolYears', GraduationCap)}
+      {item(`${base}/measures`, 'navMeasures', BarChart3)}
+      {item(`${base}/side-by-side`, 'navSideBySide', Columns2)}
+      {KNOWN_COMPARISON_PAIRS[slug] && item(`${base}/spaces`, 'navSpaces', GitCompare)}
+      <p className="muted student-nav-group">{t('groupImprove')}</p>
+      {item(`${base}/curate`, 'navCurate', ListChecks)}
+      {DRAFT_LINK_SPACES.has(slug) && item(`${base}/draft-links`, 'navDraftLinks', FileEdit)}
+      <p className="muted student-nav-group">{t('groupShare')}</p>
+      {item(`${base}/report`, 'navReport', FileText)}
+    </nav>
+  )
+}
+
+export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; groupsEnabled: boolean; templateId?: string | null }) {
+  const curriculumConnectionsConfig = getCurriculumConnectionsViewConfig(templateId ?? null)
+  if (curriculumConnectionsConfig) {
+    return <CurriculumConnectionsNav slug={slug} language={curriculumConnectionsConfig.language} />
+  }
+
   const base = `/dashboard/${slug}`
   return (
     <nav className="student-nav">
@@ -21,9 +57,16 @@ export function StudentNav({ slug, groupsEnabled }: { slug: string; groupsEnable
       <NavLink to={`${base}/basiskonzepte`} title="Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Dna size={14} /><span className="nav-label">Basiskonzepte</span>
       </NavLink>
+      <p className="muted student-nav-group">MEINE ARBEIT</p>
+      <NavLink to={`${base}/meine-arbeit`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <PenLine size={14} /><span className="nav-label">Aufgabe 1: Basiskonzepte</span>
+      </NavLink>
       <p className="muted student-nav-group">PLANEN</p>
       <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Sparkles size={14} /><span className="nav-label">KI-Prompt-Generator</span>
+      </NavLink>
+      <NavLink to={`${base}/calendar`} title="Wochenplan" className={({ isActive }) => (isActive ? 'active' : '')}>
+        <CalendarRange size={14} /><span className="nav-label">Wochenplan</span>
       </NavLink>
       {groupsEnabled && (
         <>

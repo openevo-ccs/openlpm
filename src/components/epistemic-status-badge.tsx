@@ -55,3 +55,11 @@ export function EpistemicStatusBadge({ status }: { status: EpistemicStatus }) {
     </span>
   )
 }
+
+// The three choices an admin or a project owner can pick from. Shared by the Admin projects
+// card and each project's own Settings page, so the wording cannot drift between them.
+export const EPISTEMIC_STATUS_OPTIONS: { value: EpistemicStatus; label: string }[] = [
+  { value: 'in-development', label: 'Human-curated — real content, still being built' },
+  { value: 'field-validated-curriculum', label: 'Human-curated — already in real classroom use' },
+  { value: 'designed-thought-experiment', label: 'Synthetic-theoretical — a designed comparison or research construct' },
+]

@@ -186,3 +186,99 @@ export async function removeJoinRule(supabase: Client, rule: JoinRule) {
   }
   return { error }
 }
+
+// ============================================================================
+// Member requests (migration 107) -- real feedback 092405e2 (2026-10-04):
+// adding someone findable by name who then has to accept, rather than
+// inviteMembers()'s immediate silent add for anyone who already has an
+// account. That stays as-is for its own use case (a known class roster);
+// this is the separate, consent-gated path for approaching one specific
+// person. `project_member_requests` isn't in the generated Supabase types
+// yet (same reason as project_join_rules above) -- cast at the query
+// boundary rather than block on a type regen that needs the real push first.
+// ============================================================================
+
+export interface UserSearchResult {
+  id: string
+  name: string
+  email: string
+  avatar_url: string | null
+}
+
+/** Name-or-email search across every real OpenLPM account, for the "search by name" add-member flow. Excludes anyone already a member of this project or already asked. */
+export async function searchUsersToInvite(supabase: Client, projectId: string, query: string): Promise<UserSearchResult[]> {
+  const trimmed = query.trim()
+  if (trimmed.length < 2) return []
+
+  const [{ data: users }, { data: members }, { data: pending }] = await Promise.all([
+    supabase.from('users').select('id, name, email, avatar_url').or(`name.ilike.%${trimmed}%,email.ilike.%${trimmed}%`).limit(10),
+    supabase.from('project_members').select('user_id').eq('project_id', projectId),
+    (supabase as any).from('project_member_requests').select('user_id').eq('project_id', projectId).eq('status', 'pending'),
+  ])
+
+  const exclude = new Set([...(members ?? []).map((m) => m.user_id), ...((pending ?? []) as { user_id: string }[]).map((p) => p.user_id)])
+  return (users ?? []).filter((u) => !exclude.has(u.id))
+}
+
+export interface MemberRequestRow {
+  id: string
+  project_id: string
+  user_id: string
+  role: ProjectMemberRole
+  requested_by: string | null
+  status: 'pending' | 'accepted' | 'declined'
+  created_at: string
+  responded_at: string | null
+}
+
+export async function createMemberRequest(supabase: Client, projectId: string, userId: string, role: ProjectMemberRole) {
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser()
+  const { error } = await (supabase as any)
+    .from('project_member_requests')
+    .insert({ project_id: projectId, user_id: userId, role, requested_by: currentUser?.id ?? null })
+  if (!error) {
+    await logActivity(supabase, { projectId, actionType: 'member_requested', details: { user_id: userId, role } })
+  }
+  return { error }
+}
+
+export interface PendingRequestForUser extends MemberRequestRow {
+  project: { id: string; name: string; slug: string }
+  requester: { name: string; email: string } | null
+}
+
+/** Requests waiting on the SIGNED-IN user's own response -- shown on the project switcher page, the real post-login landing spot. */
+export async function listMyPendingRequests(supabase: Client): Promise<PendingRequestForUser[]> {
+  const {
+    data: { user: currentUser },
+  } = await supabase.auth.getUser()
+  if (!currentUser) return []
+  const { data } = await (supabase as any)
+    .from('project_member_requests')
+    .select('*, project:projects(id, name, slug), requester:users!project_member_requests_requested_by_fkey(name, email)')
+    .eq('user_id', currentUser.id)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  return (data ?? []) as PendingRequestForUser[]
+}
+
+/** Requests a project's owner/maintainer has sent that are still waiting -- shown in that project's own Settings, alongside email invites. */
+export async function listPendingRequestsSent(supabase: Client, projectId: string): Promise<(MemberRequestRow & { user: UserSearchResult })[]> {
+  const { data } = await (supabase as any)
+    .from('project_member_requests')
+    .select('*, user:users!project_member_requests_user_id_fkey(id, name, email, avatar_url)')
+    .eq('project_id', projectId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false })
+  return data ?? []
+}
+
+export async function respondToMemberRequest(supabase: Client, requestId: string, status: 'accepted' | 'declined') {
+  return (supabase as any).from('project_member_requests').update({ status }).eq('id', requestId)
+}
+
+export async function cancelMemberRequest(supabase: Client, requestId: string) {
+  return (supabase as any).from('project_member_requests').delete().eq('id', requestId)
+}

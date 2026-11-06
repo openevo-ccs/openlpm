@@ -1,0 +1,485 @@
+{
+  "draftNote": "AI-drafted on 2026-10-30 from the lab's design note on the two strands. No linguist, anthropologist of learning, education researcher or speaker of the languages involved has reviewed it, and no classroom has used it.",
+  "introAddition": "Two extension strands were added in October 2026: The Nature of Schooling and The Languages of Being Human. They have no counterpart in the Bio-Core model. They reuse the shared vocabulary of the first four strands (Teaching, Scaffolding, Institutions, Communication, Representation and others) and bring those concepts to the centre of a part for the first time. They are AI-drafted proposals. They stay in draft status, outside the comparison views, until a reviewer accepts them.",
+  "strands": [
+    {
+      "key": "schooling",
+      "slug": "nature-of-schooling",
+      "sourceId": "OE-STRAND-oe-interdisciplinary-k12-nature-of-schooling",
+      "title": "The Nature of Schooling",
+      "subjectArea": "Social Studies, Biology",
+      "description": "Every society passes knowledge to its next generation. Schools are several thousand years old and were for a few children. Schooling for nearly every child is recent, a matter of the last two centuries or so, and began at different times in different countries. This strand asks what is passed on, who teaches, who decides and for whose benefit, in many settings, with schools treated as one case among several. It reuses Teaching, Scaffolding, Institutions, Norms, Knowledge and Development, which the first four strands use but never place at the centre of a part. It does not treat school as the standard that other ways of learning are measured against, and it does not claim that schooling is an adaptation. Many children still have no place in a school and many families want one, so missing school is also a question of justice.",
+      "associatedDomains": ["Social Studies", "Biology", "Computer Science"],
+      "connectingIdea": "Education is wider than schooling. Learning, teaching, education and schooling are four different things, and the strand keeps them apart from the first part to the last.",
+      "narrative": "Questions that run through the bands: How do people learn, and who or what helps? What separates learning, teaching, education and schooling? Who decides what is worth passing on? What are schools for, and what happens when their purposes conflict? How do tools, including AI, change what can be passed on? The 6-8 and 9-12 parts use a layered frame of purposes (the learner, the family, the community, the school, the nation, the world and future generations) and allow the layers to disagree. The 9-12 part asks where evolutionary accounts of teaching and transmission have been applied to schools, and where critics say they leave out justice, care, power and who decides.",
+      "parents": ["agency-development-and-niche-construction", "culture-technology-and-collective-systems"],
+      "guardrails": [
+        "Do not present school as the standard that other ways of learning are graded against.",
+        "Do not describe the practices of any named community. Consultation with that community has to come first.",
+        "Do not call schooling an adaptation or say it is where human learning was heading.",
+        "Do not suggest that families who want schooling for their children are mistaken.",
+        "Keep teaching in other species separate from intentional instruction by people."
+      ],
+      "parts": [
+        {
+          "band": "K-2",
+          "suffix": "k2",
+          "title": "People Who Show Us How",
+          "subjectArea": "Social Studies",
+          "indicators": [
+            "Names ways a child learns something from a family member or neighbour, such as watching, helping, playing or being told.",
+            "Tells about something learned outside a classroom and who helped.",
+            "Says what a person does to help someone learn, such as showing, telling, letting them try or correcting.",
+            "Notes that families and places can differ in how they help children learn the same kind of thing."
+          ],
+          "concepts": [["Learning", "primary"], ["Teaching", "primary"], ["Culture", "reinforcing"], ["Guided Participation", "reinforcing"]],
+          "assessment": {
+            "prompt": "Think of something you can do now that you could not do last year. Who or what helped you learn it? What did they do?",
+            "goodAnswerShows": "Names a helper or a way of learning (watching, trying, being told) and one thing the helper did.",
+            "commonMisreading": "Naming only a teacher is fine. Ask who or what else helped."
+          }
+        },
+        {
+          "band": "3-5",
+          "suffix": "35",
+          "title": "Many Places to Learn, Many Ways to Teach",
+          "subjectArea": "Social Studies",
+          "indicators": [
+            "Compares how one skill, such as cooking a dish, caring for an animal, reading or playing a sport, is learned in two settings, and says who teaches in each.",
+            "Describes with one example how a helper gives less support as a learner improves.",
+            "Tells apart a person learning with no one teaching, a lesson that leads to learning, and a lesson that does not.",
+            "Names one thing a classroom does well and one thing another setting does well."
+          ],
+          "concepts": [["Teaching", "primary"], ["Scaffolding", "primary"], ["Culture", "reinforcing"], ["Learning", "reinforcing"], ["Apprenticeship", "reinforcing"], ["Guided Participation", "reinforcing"]],
+          "assessment": {
+            "prompt": "Two children learn to ride a bicycle. One is taught by a parent who holds the seat and lets go. The other watches older children and tries alone. Compare what each learner and each helper does.",
+            "goodAnswerShows": "Separates the helper's actions from the learner's actions, and notes that support shrinks as skill grows in the first case.",
+            "commonMisreading": "Treating one way as better. The part asks for a comparison of what each way does, with no ranking."
+          }
+        },
+        {
+          "band": "6-8",
+          "suffix": "68",
+          "title": "Why Societies Build Schools",
+          "subjectArea": "Social Studies, Biology",
+          "indicators": [
+            "Describes schooling as one way societies organise education and uses a timeline to show that schools are old and that schooling for nearly every child is recent.",
+            "Gives two purposes people have claimed for schools, such as job skills, shared citizenship, sorting people for jobs and positions, passing on a language or faith, or fairness, and describes a case where they conflict.",
+            "Explains that what a school teaches is chosen by people and groups, and names who takes part in the choice in one example.",
+            "Separates the curriculum as written, as taught and as learned, using one example, and gives one example of something a school teaches without saying so.",
+            "Describes how the choice of language of instruction helps some learners and makes learning harder for others."
+          ],
+          "concepts": [["Institutions", "primary"], ["Knowledge", "primary"], ["Norms", "reinforcing"], ["Selection", "reinforcing"], ["Education", "primary"], ["Schooling", "primary"], ["Curriculum", "reinforcing"], ["Educational Purpose", "reinforcing"], ["Language of Instruction", "reinforcing"], ["Literacy", "reinforcing"]],
+          "assessment": {
+            "prompt": "A town argues about adding a subject to its school timetable. List two groups who might care and what each might want. Which of these wants are about the learner, which about the town, which about the country?",
+            "goodAnswerShows": "Names at least two groups with different aims and places the aims at different levels, without declaring one group right.",
+            "commonMisreading": "Reading 'selection' as natural selection. The part says people choose what is taught, and the choice has an author."
+          }
+        },
+        {
+          "band": "9-12",
+          "suffix": "912",
+          "title": "Education as a Changing System",
+          "subjectArea": "Social Studies, Science, Computer Science",
+          "indicators": [
+            "Evaluates a claim that schooling improves a named outcome such as literacy, earnings or health, says what evidence would support it, and names two other explanations, such as a shared cause or an effect running the other way.",
+            "Uses the layers of purposes (learner, family, community, school, nation, world, future generations) to analyse a policy argument and shows where the layers pull in different directions.",
+            "Describes where evolutionary accounts of teaching and transmission have been applied to schools, such as what spreads and what is kept, and where critics say they leave out justice, care and power.",
+            "Compares two accounts of why education systems changed over time, such as the need for skilled workers, the building of states, the passing on of class position, or competition for credentials, and says what evidence would help choose between them.",
+            "Analyses how a tool such as AI writing or translation software changes what must be taught, what can be copied and who decides, naming one benefit and one risk, and says what is still debated about what the software does."
+          ],
+          "concepts": [["Institutions", "primary"], ["Selection", "primary"], ["Transmission", "primary"], ["Innovation", "reinforcing"], ["Knowledge", "reinforcing"], ["Culture", "reinforcing"], ["Educational Purpose", "primary"], ["Curriculum", "reinforcing"], ["Learning", "reinforcing"], ["Metacognition", "reinforcing"], ["Technology", "reinforcing"]],
+          "assessment": {
+            "prompt": "A report says that countries with more years of schooling have higher incomes. Draw the causal map the report assumes. Add two other arrows that could produce the same pattern, and mark who or what decides each arrow. State what study would help separate them.",
+            "goodAnswerShows": "Marks each arrow as measured or supposed, includes at least one reverse or shared cause, and names a study design.",
+            "commonMisreading": "Taking the correlation as proof, or dismissing the claim without saying what evidence would settle it."
+          }
+        }
+      ]
+    },
+    {
+      "key": "language",
+      "slug": "languages-of-being-human",
+      "sourceId": "OE-STRAND-oe-interdisciplinary-k12-languages-of-being-human",
+      "title": "The Languages of Being Human",
+      "subjectArea": "Language Arts, Social Studies",
+      "description": "Every human group has language. Languages differ in how they package meanings, and they share a great deal. This strand asks how language carries knowledge across people and time, how languages change and relate, and what can and cannot be concluded from differences between them. It reuses Communication, Representation, Information, Signal, Cue and Meaning, which the information work of October 2026 placed in the model, and gives them a concrete subject. Sign languages count as full languages from the first part.",
+      "associatedDomains": ["Language Arts", "Social Studies", "Computer Science"],
+      "connectingIdea": "Words are shared habits within a community. One word can carry several meanings, one meaning can have several words, and similar words in two languages can come from shared ancestry, borrowing or chance.",
+      "narrative": "Questions that run through the bands: How can many different words and signs do the same job? How does a message change as it passes from person to person? Why are two languages alike: shared ancestry, borrowing or chance? What does a word mean, and what is lost in translation? What can differences between languages show about how people think, and what can they not show? The 9-12 part treats the question of independent samples as a statistics lesson: languages in one family share ancestry and neighbours share contact, so agreement among them is weaker evidence than it looks.",
+      "parents": ["inheritance-variation-selection-across-systems", "culture-technology-and-collective-systems"],
+      "guardrails": [
+        "Do not treat a word that two languages have in common as evidence that the speakers think alike.",
+        "Do not present a translation table as a set of equivalents. Show it as a draft that a speaker of both languages has to check.",
+        "Do not say that translation or language software understands, and do not say it cannot. Whether it does is debated, and fluent output alone does not settle it.",
+        "Do not claim how speakers of a named language think or live from features of their language. Word examples are fine once a speaker has checked them."
+      ],
+      "parts": [
+        {
+          "band": "K-2",
+          "suffix": "k2",
+          "title": "Many Ways to Say It",
+          "subjectArea": "Language Arts, Social Studies",
+          "indicators": [
+            "Shows that people in the class or community say the same thing in different languages or signs, and that a word works because a group shares the habit of using it.",
+            "Tells a spoken word, a written word and a sign for the same thing apart from a gesture or an animal call, and says who understands each.",
+            "Names a way to share a message with someone who does not share a language, such as pointing, drawing or asking a helper."
+          ],
+          "concepts": [["Communication", "primary"], ["Representation", "primary"], ["Signal", "reinforcing"], ["Culture", "reinforcing"], ["Language", "primary"]],
+          "assessment": {
+            "prompt": "Show three ways to say or show 'water' to a friend. Which of these would a stranger understand without help? Why?",
+            "goodAnswerShows": "Includes more than one language or a sign, and notes that a shared habit is what makes a word work, while pointing is widely understood though people point in different ways.",
+            "commonMisreading": "Assuming one language is the original and the others are copies of it."
+          }
+        },
+        {
+          "band": "3-5",
+          "suffix": "35",
+          "title": "Words Travel and Change",
+          "subjectArea": "Language Arts, Social Studies",
+          "indicators": [
+            "Passes a message along a chain of at least five people, records how it changed, and says which changes came from mishearing and which from retelling in one's own way.",
+            "Gives an example of a word that moved from one language to another and says what it was used for.",
+            "Shows that a word can have more than one meaning in one language and that the same meaning can have different words in other languages.",
+            "Compares two ways of writing the same word and names one thing that is easier and one that is harder in each."
+          ],
+          "concepts": [["Transmission", "primary"], ["Variation", "primary"], ["Representation", "reinforcing"], ["Language", "reinforcing"], ["Borrowing", "primary"], ["Word Meaning", "primary"], ["Writing System", "reinforcing"]],
+          "assessment": {
+            "prompt": "Pick a word with two meanings that feel connected, like the foot of a person and the foot of a hill. Find out whether another language uses one word or two for those meanings. What does this tell you about words?",
+            "goodAnswerShows": "States that the same word can cover different ranges of meaning in different languages, and that finding one example does not give a rule.",
+            "commonMisreading": "Concluding that the language with one word has a 'simpler' idea."
+          }
+        },
+        {
+          "band": "6-8",
+          "suffix": "68",
+          "title": "Languages Have Families and Neighbours",
+          "subjectArea": "Language Arts, Social Studies, Biology",
+          "indicators": [
+            "Tells apart four reasons two languages can have a similar word, namely a common ancestor, borrowing, a word that imitates a sound or comes from baby talk, and chance, and gives one example of each.",
+            "Reads a small table of related words from two or three languages of one family and describes the pattern of similarity.",
+            "Compares a family tree of languages with a family tree of living things, naming two things the tree shows well and two things it hides, such as borrowing across branches and deliberate change.",
+            "Shows with a translation example that the closest word in another language often covers a different range of meaning.",
+            "Describes how a person who knows several languages uses each with different people and in different places."
+          ],
+          "concepts": [["Language Evolution", "primary"], ["Inheritance", "primary"], ["Variation", "reinforcing"], ["Analogical Reasoning", "reinforcing"], ["Borrowing", "reinforcing"], ["Language Family", "primary"], ["Translation", "reinforcing"], ["Word Meaning", "reinforcing"], ["Multilingualism", "reinforcing"]],
+          "assessment": {
+            "prompt": "Two languages have a similar word for the same thing. Give four possible reasons, and say what extra information would help you tell them apart.",
+            "goodAnswerShows": "Names ancestry, borrowing, sound imitation or baby talk, and chance, and asks for the history of the word, further related languages or the sound pattern.",
+            "commonMisreading": "Treating similarity as proof of shared ancestry, or treating a family tree of languages as a record of who is related by blood."
+          }
+        },
+        {
+          "band": "9-12",
+          "suffix": "912",
+          "title": "What Can We Conclude From Differences Between Languages",
+          "subjectArea": "Language Arts, Social Studies, Computer Science, Science",
+          "indicators": [
+            "Evaluates a claim that speakers of different languages think differently, separates a weaker and a stronger version of it, and says what evidence each needs.",
+            "Explains why languages from one family or region are not fully independent examples, and how that changes what a pattern across them shows.",
+            "Reads a table of meanings that share one word in some languages and states what it can suggest and what it cannot show about how speakers think.",
+            "Analyses a translation of a key idea, such as evolution or agency, into another language, finds where the ranges of meaning differ, and states what a reviewer who speaks both languages has to check.",
+            "Evaluates what machine translation does well and badly on a technical text, including for languages with little written text, and why fluent output alone does not settle whether the software understands.",
+            "Explains how the loss of a language affects what a community can pass on, and how the choice of language of instruction bears on it."
+          ],
+          "concepts": [["Knowledge", "primary"], ["Meaning", "primary"], ["Representation", "primary"], ["Metacognition", "reinforcing"], ["Analogical Reasoning", "reinforcing"], ["Language", "reinforcing"], ["Translation", "primary"], ["Multilingualism", "reinforcing"], ["Information", "reinforcing"], ["One Word, Two Meanings", "primary"], ["Language of Instruction", "reinforcing"]],
+          "assessment": {
+            "prompt": "A study says that the languages in its sample all use one word for two meanings, so people everywhere link the two ideas. List what is wrong or missing in this conclusion, using what you know about how languages are related.",
+            "goodAnswerShows": "Notes that related languages are not fully independent samples, that a word two languages have in common is not the same as a shared idea, and asks about sample size and spread.",
+            "commonMisreading": "Rejecting the whole study as worthless. The part asks for a measured reading: what the pattern can still suggest."
+          }
+        }
+      ]
+    }
+  ],
+  "partPrerequisites": [
+    { "from": ["schooling", "k2"], "to": ["schooling", "35"], "why": "The 3-5 part compares settings, which needs the K-2 idea that people help each other learn." },
+    { "from": ["schooling", "35"], "to": ["schooling", "68"], "why": "The 6-8 part asks why societies organise schools, which builds on comparing the ways learning is organised." },
+    { "from": ["schooling", "68"], "to": ["schooling", "912"], "why": "The 9-12 part evaluates claims about the effects of schooling, which needs the purposes and the written, taught and learned curriculum from 6-8." },
+    { "from": ["language", "k2"], "to": ["language", "35"], "why": "The 3-5 part follows words as they travel, which needs the K-2 idea that a word is an agreement within a group." },
+    { "from": ["language", "35"], "to": ["language", "68"], "why": "The 6-8 part explains why languages are alike, which builds on borrowing and shifting meaning from 3-5." },
+    { "from": ["language", "68"], "to": ["language", "912"], "why": "The 9-12 part evaluates conclusions drawn from language differences, which needs the family and borrowing ideas from 6-8." }
+  ],
+  "crossLinks": [
+    { "fromTitle": "Comparing Biological and Cultural Transmission", "to": ["language", "35"], "relation": "foundationalTo", "why": "Passing a message along a chain is a classroom-sized case of transmission with variation, which the Strand 1 3-5 part introduces." },
+    { "fromTitle": "Culture as Transmitted, Institutions as Stabilizing Structures", "to": ["schooling", "68"], "relation": "foundationalTo", "why": "The Strand 3 6-8 part introduces institutions as structures that keep practices going. The schooling part applies that to schools." }
+  ],
+  "concepts": [
+    {
+      "label": "Education",
+      "organizing": "Culture and Social Structure",
+      "strand": "schooling",
+      "general": "The organised ways a group helps its members take on knowledge, skills, values and ways of taking part in community life. It includes teaching in homes, workplaces and communities as well as in schools.",
+      "facets": {
+        "culture": "Every known society has ways of passing knowledge to children and newcomers. For most of human history children learned mostly through daily life and joining in adult work. Today nearly every country also runs schools, and people still learn much outside them.",
+        "education": "The field and the practice of helping people learn, in schools and elsewhere, with its own aims, methods and arguments about both."
+      },
+      "excludes": "Education is wider than schooling. Learning can happen without any education, and education can happen with little learning. Years of education are not a measure of intelligence or of a person's worth.",
+      "confidence": "low"
+    },
+    {
+      "label": "Schooling",
+      "organizing": "Culture and Social Structure",
+      "strand": "schooling",
+      "general": "Education carried out in a school: a place set apart, with teachers, groups of learners, a timetable and a plan of what to teach. It is one arrangement among many. Schools are several thousand years old, and schooling for nearly every child is recent.",
+      "facets": {
+        "culture": "A cultural institution that societies built and keep changing. Its form, aims and reach differ between places and periods.",
+        "education": "The organised teaching of groups in schools, with a curriculum, assessment and qualifications."
+      },
+      "excludes": "Schooling is not the same as learning or education. It is not a biological adaptation, and nothing in the evolutionary account says schools are where human learning was heading. Other ways of learning are not shortfalls compared with it.",
+      "confidence": "low"
+    },
+    {
+      "label": "Curriculum",
+      "organizing": "Culture and Social Structure",
+      "strand": "schooling",
+      "general": "A plan for what is to be learned, in what order and how it is checked. The word is also used for what is taught and for what learners end up learning, and researchers keep the three apart: the intended curriculum (the written plan), the implemented curriculum (what is taught) and the attained curriculum (what learners learn). They add the hidden curriculum: what a school teaches without saying so, such as habits, obedience and who counts as clever.",
+      "facets": {
+        "culture": "What a group decides to pass on, and in what form. The decision involves people, groups and aims.",
+        "education": "The written plan, the lessons given and the learning that results. A comparison of two curricula says which of the three it means.",
+        "AI and computation": "In machine learning, 'curriculum learning' means ordering training examples from easier to harder. A person or a program sets the order, and the training does not need the program to know there is a plan."
+      },
+      "excludes": "A curriculum is not a fixed list of facts. What is written, what is taught and what is learned differ. Choosing what enters a curriculum is a human decision with aims and power behind it, which differs from natural selection, where nobody chooses.",
+      "confidence": "low"
+    },
+    {
+      "label": "Guided Participation",
+      "organizing": "Learning, Minds and Discovery",
+      "strand": "schooling",
+      "general": "Learning by taking part in a shared activity with adults, older children or peers. Guidance can be spoken or silent, and learners often join in on their own. The others may or may not intend to teach.",
+      "facets": {
+        "culture": "A common way children take on skills in many societies, through helping with everyday work and watching those who do them.",
+        "cognition": "A learner takes on more of a shared task as skill grows, helped by what others do and say and by their own initiative.",
+        "education": "Classroom methods that build on joint activity, such as working together on a task with coaching."
+      },
+      "excludes": "Guided participation does not require intentional teaching. It is not a school method only. It does not rank ways of learning: observation, helping and instruction each suit different skills.",
+      "confidence": "low"
+    },
+    {
+      "label": "Apprenticeship",
+      "organizing": "Learning, Minds and Discovery",
+      "strand": "schooling",
+      "general": "Learning a skill by taking part in the work alongside experienced workers, with tasks that grow harder as skill grows.",
+      "facets": {
+        "culture": "A common way skills such as farming, building, cooking and craft pass between generations, with or without payment or contracts.",
+        "education": "A formal training scheme that combines work with instruction and a recognised qualification."
+      },
+      "excludes": "The word covers informal learning on the job and formal schemes with contracts. Apprenticeship does not imply low status or a lack of schooling. Work that harms children or keeps them from school is not apprenticeship.",
+      "confidence": "low"
+    },
+    {
+      "label": "Educational Purpose",
+      "organizing": "Culture and Social Structure",
+      "strand": "schooling",
+      "general": "A reason a person, group or society gives for why education exists or what it is for. Purposes sit at several levels (the learner, the family, the community, the school, the nation, the world and future generations) and can conflict.",
+      "facets": {
+        "culture": "Aims such as passing on a language, a faith or a craft, keeping a community together, or preparing members for change.",
+        "education": "Aims written into laws and curricula, such as work skills, citizenship, personal growth and fairness, which are argued over. Some researchers describe three aims that compete: equal citizenship, skills for work, and sorting people for social position."
+      },
+      "excludes": "A stated purpose is not the same as what a system does. Purposes do not all have equal evidence behind them. The levels do not always agree, and naming them does not settle which should win.",
+      "confidence": "low"
+    },
+    {
+      "label": "Literacy",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "schooling",
+      "general": "The ability to read and write a language and, more widely, to use a written or other symbol system for the tasks a community needs.",
+      "facets": {
+        "culture": "Reading and writing take different forms and serve different uses in different communities, from record keeping to religion to letters.",
+        "education": "A skill taught in schools, homes and religious settings, and measured in tests and surveys.",
+        "technology": "Skill with a system of tools for recording and sharing information, which changes as the tools change."
+      },
+      "excludes": "Literacy is not intelligence. Communities that rely mostly on speech hold knowledge in other forms, such as story, song and apprenticeship. Test scores measure one version of literacy. Schooling and literacy are different things and their effects have been found to differ.",
+      "confidence": "low"
+    },
+    {
+      "label": "Language of Instruction",
+      "organizing": "Culture and Social Structure",
+      "strand": "schooling",
+      "general": "The language in which lessons are taught.",
+      "facets": {
+        "culture": "A choice about which languages carry knowledge in public life. It affects which languages are used and passed on. Schooling has been used to move children away from the languages of their families, and some communities have asked for schools to teach their languages.",
+        "education": "A choice made by schools or governments that affects who can follow lessons and how well."
+      },
+      "excludes": "The language of instruction is not always a learner's home language. A choice that suits administration may make learning harder for some children. Research broadly finds that children learn best early on in a language they understand. The effects of switching later depend on the setting.",
+      "confidence": "low"
+    },
+    {
+      "label": "Language",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "language",
+      "general": "A shared system of signs, spoken, signed or written, that a community uses to communicate and to hold and pass on knowledge. Children learn a language from the people around them.",
+      "facets": {
+        "biology": "Some animals have rich call systems. Researchers disagree about how far these resemble human language, and the question is not settled.",
+        "culture": "A set of conventions a community shares and keeps changing as its speakers use it.",
+        "cognition": "A skill for understanding and producing sentences, learned in childhood by hearing or seeing a language.",
+        "technology": "A formal language, such as a programming language, has fixed rules that designers wrote.",
+        "AI and computation": "A language model predicts likely next words from large amounts of text. It produces language-like output. Whether that amounts to understanding is debated, and fluent output alone does not settle it."
+      },
+      "excludes": "Calls, programming languages and the output of language models are not human languages, even where they share some features. Sign languages are full languages, and they differ from one another. A language and a nation are different things.",
+      "confidence": "low"
+    },
+    {
+      "label": "Word Meaning",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "language",
+      "general": "What a word or sign stands for among the people who use it. Many words have several related meanings, and meanings shift over time and with setting.",
+      "facets": {
+        "culture": "The shared understanding of a word in a community, which changes as the community changes.",
+        "cognition": "The ideas a listener links with a word, which differ a little from person to person."
+      },
+      "excludes": "The closest word in another language often covers a different range of meanings. A dictionary translation is a summary of a meaning. One word with several meanings does not show that the speakers confuse them.",
+      "confidence": "low"
+    },
+    {
+      "label": "Borrowing",
+      "organizing": "Culture and Social Structure",
+      "strand": "language",
+      "general": "Taking a word, sound or structure from another language into one's own.",
+      "facets": {
+        "culture": "Loanwords travel with goods, ideas, religions and technologies, and become part of the borrowing language."
+      },
+      "excludes": "Borrowing is a different route from inheritance from a common ancestor, so a word shared by two languages may have come by either route. Borrowing is normal and does not make a language lesser.",
+      "confidence": "low"
+    },
+    {
+      "label": "Translation",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "language",
+      "general": "Expressing what was said or written in one language in another language.",
+      "facets": {
+        "culture": "A skill and a trade that keeps ideas moving between communities and always involves choices.",
+        "AI and computation": "Machine translation maps text to text using patterns learned from examples. Its output can read well and still be wrong, and fluent output alone does not settle whether the software understands."
+      },
+      "excludes": "A translation is a judgement. It rarely matches word for word. A draft translation by software or by an AI helper needs review by a speaker of both languages before anyone relies on it.",
+      "confidence": "low"
+    },
+    {
+      "label": "Language Family",
+      "organizing": "The Evolutionary Pattern",
+      "strand": "language",
+      "general": "A group of languages that descend from one earlier language.",
+      "facets": {
+        "biology": "A tree of descent resembles a tree of living things in that groups share an origin, and differs in that languages borrow across branches and speakers can change a language on purpose.",
+        "culture": "A grouping of languages that gives clues to the history of speaker movement and contact. Languages also spread when people switch languages without moving."
+      },
+      "excludes": "A family tree of languages is a partial picture. It hides borrowing between branches and says nothing about the biological ancestry of speakers. Languages are not organisms. Languages in one family are not fully independent examples when testing a claim.",
+      "confidence": "low"
+    },
+    {
+      "label": "Writing System",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "language",
+      "general": "A set of marks and rules used to record a language, such as an alphabet, a syllabary, a set of characters or a script that writes consonants with marks for vowels.",
+      "facets": {
+        "culture": "A tool a community uses to keep records and pass on texts. Communities adopt, adapt and sometimes replace scripts.",
+        "technology": "A recording technology, whose form shapes what is easy to copy, store and search."
+      },
+      "excludes": "Writing records language and is not language itself. Many languages have no written form, and one language can be written in more than one script. Not having writing does not make a language or a culture less developed.",
+      "confidence": "low"
+    },
+    {
+      "label": "Multilingualism",
+      "organizing": "Culture and Social Structure",
+      "strand": "language",
+      "general": "Using more than one language in daily life.",
+      "facets": {
+        "culture": "A normal condition in many parts of the world, where people use different languages with family, neighbours, in markets and in school.",
+        "cognition": "A person who uses several languages draws on them according to the listener and the setting.",
+        "education": "Learners who use several languages arrive at school with resources, and the language of instruction decides how much of those resources the school uses."
+      },
+      "excludes": "Multilingualism is not a deficit or a delay. A multilingual person does not hold the languages in sealed compartments. A country or a school does not have one language only because its official documents use one.",
+      "confidence": "low"
+    },
+    {
+      "label": "One Word, Two Meanings",
+      "organizing": "Information, Technology and Collective Systems",
+      "strand": "language",
+      "general": "A single word that covers two meanings in one language, such as a word for both time and weather. Researchers call this colexification and study which meanings share words across many languages.",
+      "facets": {
+        "culture": "A pattern in how a language packages meanings, which can point to metaphors, history or contact.",
+        "cognition": "A prompt for questions about how speakers link two ideas, to be tested with other kinds of evidence."
+      },
+      "excludes": "A shared word shows how a language packages meanings. It does not show that speakers confuse the two meanings. Sharing can come from ancestry, borrowing or chance, so it takes a wide, well-spread sample of languages to say anything general.",
+      "confidence": "low"
+    },
+    {
+      "label": "Language Evolution",
+      "organizing": "The Evolutionary Pattern",
+      "strand": "language",
+      "sandboxConceptbaseId": "OE-SANDBOX-CONCEPT-000003",
+      "general": "The process by which languages change, diversify and descend from common ancestral languages over time, through transmission with variation of the kind that shapes other cultural traits.",
+      "facets": {
+        "culture": "Words, sounds and structures change as speakers copy, vary and borrow them, with no central author."
+      },
+      "excludes": "Language change differs from biological evolution: words move sideways between languages, the copied units (words, sounds, patterns) are fuzzier than genes and copied less exactly, and speakers sometimes change a language on purpose. The family tree picture is partial. A change in a language is not progress.",
+      "confidence": "low"
+    }
+  ],
+  "threads": [
+    {
+      "slug": "who-decides-what-is-passed-on",
+      "strand": "schooling",
+      "title": "Who decides what is passed on",
+      "idea": "In every society someone or something shapes what the next generation gets to learn. The thread follows that choice from copying in a group, through institutions, to curricula and AI.",
+      "stations": [
+        { "ref": { "title": "The General Pattern: Variation, Selection, Transmission" }, "note": "6-8, from Strand 1. Variants of a practice spread when they are copied. The question for this thread is who or what does the choosing, which differs from case to case." },
+        { "ref": { "title": "Culture as Transmitted, Institutions as Stabilizing Structures" }, "note": "6-8, from Strand 3. Institutions keep practices going. A school is one such structure." },
+        { "ref": { "part": ["schooling", "68"] }, "note": "6-8, Why Societies Build Schools. Students find out who takes part in deciding what a school teaches and how purposes conflict." },
+        { "ref": { "part": ["schooling", "912"] }, "note": "9-12, Education as a Changing System. Students test claims about what schooling does and say where the evolutionary account of transmission fits poorly." },
+        { "ref": { "title": "Bridge Case: Machine Culture and AI" }, "note": "9-12, draft bridge case. Machines now take part in what is copied and recommended. Students ask who sets the rules that decide what a learner sees." }
+      ]
+    },
+    {
+      "slug": "one-goal-many-settings",
+      "strand": "schooling",
+      "title": "One goal, many settings",
+      "idea": "The same skill or idea can be learned at home, at work, in a community or in a school. The thread compares the settings without ranking them.",
+      "stations": [
+        { "ref": { "part": ["schooling", "k2"] }, "note": "K-2, People Who Show Us How. Children name how they learned something and who helped." },
+        { "ref": { "title": "Comparing How Different Living Things Act, Learn, and Teach" }, "note": "3-5, from Strand 2. Learning and teaching in other species, with a functional definition of teaching that does not require intention." },
+        { "ref": { "title": "Bridge Case: Learning from and Teaching Others" }, "note": "3-5, draft bridge case. Teaching and learning link agency, cultural transmission and the Culture strand." },
+        { "ref": { "part": ["schooling", "35"] }, "note": "3-5, Many Places to Learn, Many Ways to Teach. Students compare one skill learned in two settings." },
+        { "ref": { "part": ["schooling", "68"] }, "note": "6-8, Why Societies Build Schools. The curriculum as written, taught and learned gives a way to compare what happens in different settings." }
+      ]
+    },
+    {
+      "slug": "one-word-many-meanings",
+      "strand": "language",
+      "title": "One word, many meanings",
+      "idea": "A word and a concept are different things. The thread follows how one word covers several meanings, and one meaning has several words, up to a careful reading of what a translation or a table of shared words can show.",
+      "stations": [
+        { "ref": { "part": ["language", "k2"] }, "note": "K-2, Many Ways to Say It. A word works because a group agrees on it, and groups agree differently." },
+        { "ref": { "part": ["language", "35"] }, "note": "3-5, Words Travel and Change. Students find a word with two meanings and check how another language handles them." },
+        { "ref": { "title": "Culture as Transmitted, Institutions as Stabilizing Structures" }, "note": "6-8, from Strand 3. Representation and information: how a community keeps and passes on what it knows through symbols." },
+        { "ref": { "part": ["language", "68"] }, "note": "6-8, Languages Have Families and Neighbours. Students see that the closest word in another language covers a different range." },
+        { "ref": { "part": ["language", "912"] }, "note": "9-12, What Can We Conclude From Differences Between Languages. Students read tables of meanings that one word covers and translations of key ideas, and state what they can and cannot show." }
+      ]
+    },
+    {
+      "slug": "how-a-message-changes",
+      "strand": "language",
+      "title": "How a message changes on its way",
+      "idea": "Messages, words and languages change as they are passed on. The thread uses language as a close, human case of transmission with variation, and says where the comparison with living things breaks.",
+      "stations": [
+        { "ref": { "title": "Comparing Biological and Cultural Transmission" }, "note": "3-5, from Strand 1. Biological and cultural transmission side by side." },
+        { "ref": { "part": ["language", "35"] }, "note": "3-5, Words Travel and Change. A message passed along a chain shows where change enters." },
+        { "ref": { "title": "The General Pattern: Variation, Selection, Transmission" }, "note": "6-8, from Strand 1. The general pattern, with the question of what plays the part of selection for words." },
+        { "ref": { "part": ["language", "68"] }, "note": "6-8, Languages Have Families and Neighbours. A tree of languages and a tree of living things, and the places where the tree picture hides borrowing." },
+        { "ref": { "part": ["language", "912"] }, "note": "9-12, What Can We Conclude From Differences Between Languages. Students judge conclusions drawn from differences between related languages." }
+      ]
+    },
+    {
+      "slug": "language-of-instruction-and-who-can-learn",
+      "strand": "both",
+      "title": "Language of instruction and who can learn",
+      "idea": "Schools choose a language for lessons, and the choice affects who follows, who is heard and which languages are passed on. The thread joins the two new strands.",
+      "stations": [
+        { "ref": { "part": ["schooling", "68"] }, "note": "6-8, Why Societies Build Schools. Students describe how a choice of language of instruction helps some learners and makes learning harder for others." },
+        { "ref": { "part": ["language", "68"] }, "note": "6-8, Languages Have Families and Neighbours. Students describe how people who know several languages use each in different places." },
+        { "ref": { "part": ["language", "912"] }, "note": "9-12, What Can We Conclude From Differences Between Languages. Students explain how the loss of a language affects what a community can pass on." },
+        { "ref": { "part": ["schooling", "912"] }, "note": "9-12, Education as a Changing System. Students bring language choices into an analysis of purposes at several levels." }
+      ]
+    }
+  ]
+}

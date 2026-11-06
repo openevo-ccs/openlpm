@@ -3,14 +3,14 @@ import { Link, useOutletContext, useParams } from 'react-router-dom'
 import { ArrowLeft, Sparkles, Trash2, UserPlus } from 'lucide-react'
 import { addShare, getPortfolioGraph, listShares, removeShare, type PortfolioEdge, type PortfolioNode, type ShareGrant } from '@/lib/supabase/portfolios'
 import { PortfolioExplorer } from '@/components/portfolio-explorer'
-import { listGroupsWithMyMembership, type ProjectGroup } from '@/lib/supabase/groups'
+import { canShareInGroup, listGroupsWithMyMembership, type ProjectGroup } from '@/lib/supabase/groups'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 
 type Portfolio = Database['public']['Tables']['portfolios']['Row']
 
 export default function PortfolioDetailPage() {
-  const { project, slug, supabase } = useOutletContext<ProjectOutletContext>()
+  const { project, role, slug, supabase } = useOutletContext<ProjectOutletContext>()
   const { portfolioId } = useParams<{ portfolioId: string }>()
   const [portfolio, setPortfolio] = useState<Portfolio | null | undefined>(undefined)
   const [graph, setGraph] = useState<{ nodes: PortfolioNode[]; edges: PortfolioEdge[] } | null>(null)
@@ -67,6 +67,7 @@ export default function PortfolioDetailPage() {
           <VisibilityEditor
             portfolio={portfolio}
             project={project}
+            role={role}
             supabase={supabase}
             onChanged={(next) => setPortfolio((p) => (p ? ({ ...p, ...next } as any) : p))}
           />
@@ -90,11 +91,13 @@ export default function PortfolioDetailPage() {
 function VisibilityEditor({
   portfolio,
   project,
+  role,
   supabase,
   onChanged,
 }: {
   portfolio: Portfolio
   project: ProjectOutletContext['project']
+  role: ProjectOutletContext['role']
   supabase: ProjectOutletContext['supabase']
   onChanged: (next: { visibility: string; group_id: string | null }) => void
 }) {
@@ -103,6 +106,10 @@ function VisibilityEditor({
   const [groupId, setGroupId] = useState<string | null>(current.group_id ?? null)
   const [myGroups, setMyGroups] = useState<{ group: ProjectGroup; membership: { id: string } | null }[] | null>(null)
   const [busy, setBusy] = useState(false)
+  // Real feedback 771f5fa2 (Dustin) / migration 117: hide the option
+  // entirely for a role the project has restricted from group-sharing,
+  // rather than letting them pick it and only then hit an RLS error.
+  const canShare = canShareInGroup(role, project)
 
   useEffect(() => {
     listGroupsWithMyMembership(supabase, project.id).then(setMyGroups)
@@ -139,7 +146,7 @@ function VisibilityEditor({
           <option value="private">Private (just you)</option>
           <option value="shared">Shared (explicit grants)</option>
           <option value="project">Project (any member)</option>
-          <option value="group">Group</option>
+          {(canShare || visibility === 'group') && <option value="group">Group</option>}
         </select>
       </div>
       {visibility === 'group' && (

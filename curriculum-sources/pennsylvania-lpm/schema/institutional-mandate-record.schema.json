@@ -1,0 +1,101 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/openevo-ccs/pennsylvania-lpm/schema/institutional-mandate-record.schema.json",
+  "title": "pennsylvania-lpm Institutional Mandate Record",
+  "description": "A single named, dated commitment by a real Pennsylvania education authority -- which, unlike florida-lpm's single state-level authority, spans at least two genuinely different levels of government: the State Board of Education/PDE/Legislature at the state level, AND an individual school district's own board at the local level (Dover Area School District's 2004 intelligent-design policy was exactly this -- a real, binding curriculum mandate, just not a state one). The computable unit for 'what does this authority actually require', so a coherence-finding record can point at exactly which mandate it tests. Modeled on deutsche_lp's/nys_lp's/india-lpm's/florida-lpm's institutional-mandate-record.schema.json; mandateType adds 'school-district-policy', a level none of the sibling repos' own mandates needed, since Pennsylvania's single most consequential curriculum mandate in this story was never a state action at all.",
+  "type": "object",
+  "required": ["id", "slug", "label", "jurisdiction", "issuingBody", "mandateType", "statementText", "status", "verificationStatus", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": {
+      "type": "string",
+      "pattern": "^PALP-MANDATE-[a-z0-9-]+$",
+      "description": "Provisional, repo-local id. See GOVERNANCE.md."
+    },
+    "slug": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "label": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "pattern": "^US(-[A-Z]{2})?$",
+      "description": "'US-PA' for a Pennsylvania-specific mandate; 'US' for a multi-state or federal-level mandate (e.g. NGSS, a federal court ruling's binding scope)."
+    },
+    "issuingBody": {
+      "type": "string",
+      "description": "Free text, e.g. 'Pennsylvania State Board of Education', 'Pennsylvania Department of Education (PDE)', 'Pennsylvania Legislature'. Not a controlled vocabulary."
+    },
+    "mandateType": {
+      "type": "string",
+      "enum": [
+        "state-board-adopted-standard", "state-statute",
+        "state-policy-announcement", "commission-recommendation",
+        "state-guidance-document", "school-district-policy"
+      ],
+      "description": "'state-board-adopted-standard' = a formal Pennsylvania State Board of Education regulatory rule-making action adopting a standards document (Pennsylvania's process runs through formal rulemaking -- publication in the Pennsylvania Bulletin, review by the Independent Regulatory Review Commission and legislative education committees -- not a single public board vote like Florida's). 'state-statute' = a Pennsylvania statute passed by the Legislature and signed into law. 'state-policy-announcement' = a PDE/Governor's-office policy direction not yet a formal rule. 'commission-recommendation' = a recommendation from an advisory committee or workgroup, not yet itself binding. 'state-guidance-document' = PDE implementation guidance released to districts. 'school-district-policy' = a binding curriculum mandate issued by an individual school district's own board, not the state -- the level Dover Area School District's October 2004 intelligent-design-disclaimer policy operated at. A district-level mandate is just as real and quotable a 'what does this authority actually require' fact as a state-level one; it simply binds a smaller jurisdiction."
+    },
+    "interdisciplinaryExplicitness": {
+      "type": "string",
+      "enum": [
+        "names-interdisciplinary-explicitly", "implies-cross-subject-via-pathway",
+        "silent-on-cross-subject", "unspecified"
+      ],
+      "description": "Optional, kept for structural parity with deutsche_lp/nys_lp's identical field -- whether this mandate's own text uses interdisciplinary/cross-subject framing. Expected to be 'silent-on-cross-subject' or 'unspecified' for most Pennsylvania science-standards mandates, which are typically single-subject benchmark lists rather than cross-subject graduation frameworks; not required."
+    },
+    "statementText": {
+      "type": "string",
+      "description": "The mandate's own text, quoted exactly (or as exactly as the available source allows) as read in the primary source -- e.g. the literal benchmark text of SC.912.L.15.1, or the literal statutory text of an instructional-materials-objection provision. Do not paraphrase where a verbatim quote is available."
+    },
+    "adoptionDate": { "type": "string", "format": "date" },
+    "dateGranularity": {
+      "type": "string",
+      "enum": ["day", "month", "school-year", "year"]
+    },
+    "targetDate": {
+      "type": "string",
+      "format": "date",
+      "description": "If the mandate names a completion/implementation horizon distinct from its adoption date (e.g. 'full implementation begins school year 2027-28' for a prospective 2026 readoption)."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["adopted", "proposed", "superseded"],
+      "description": "'adopted' = formally in force (a completed State Board regulatory rulemaking, a signed statute, an enacted school-district board policy). 'proposed' = drafted/released for public comment or introduced but not yet binding. 'superseded' = replaced by a later mandate (link via supersededBy)."
+    },
+    "supersededBy": {
+      "type": "string",
+      "pattern": "^PALP-MANDATE-[a-z0-9-]+$"
+    },
+    "sourceDocument": { "type": "string" },
+    "sourcePage": { "type": "string" },
+    "sourceUrl": { "type": "string", "format": "uri" },
+    "accessTier": {
+      "type": "string",
+      "enum": ["full-text-stored", "excerpt-only", "summary-only", "citation-only"],
+      "description": "How much of the underlying mandate document this record actually keeps, chosen per-source based on what's legally safe to redistribute for this document -- not one all-or-nothing repo-wide rule. Governs statementText specifically. 'full-text-stored' = statementText reproduces the mandate's full relevant text -- the de facto tier this repo uses for Pennsylvania state-government standards/statute text and for school-district policy text quoted directly from the Kitzmiller v. Dover trial record, both of which are public records. 'excerpt-only' = statementText is a short, bounded quotation. 'summary-only' = statementText is paraphrase only. 'citation-only' = no statementText at all. Identical field to deutsche_lp's/nys_lp's/india-lpm's/florida-lpm's institutional-mandate-record.schema.json."
+    },
+    "licenseOrRightsNote": {
+      "type": "string",
+      "description": "The legal basis for storing this mandate's statementText at the accessTier chosen above, e.g. 'Pennsylvania state-government publications and State Board of Education rule text are public records and not subject to copyright as works of Pennsylvania state government' for a state-level mandate, or 'quoted directly from the Kitzmiller v. Dover trial record, a public federal court record' for Dover Area School District's own policy text. Mirrors OpenLPM's standards_documents.license_or_rights_note field (openlpm migration 019) for ecosystem-wide naming consistency."
+    },
+    "verificationStatus": {
+      "type": "string",
+      "enum": ["unverified-secondary-source", "primary-source-confirmed", "verified"]
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "date", "review_status", "version", "sourceProvenance"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": { "type": "string", "enum": ["human", "llm"] },
+        "added_by": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "review_status": {
+          "type": "string",
+          "enum": ["author-draft", "peer-nominated", "community-reviewed", "expert-validated", "deprecated"]
+        },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "contributor_notes": { "type": "string" },
+        "sourceProvenance": { "type": "string" }
+      }
+    }
+  }
+}

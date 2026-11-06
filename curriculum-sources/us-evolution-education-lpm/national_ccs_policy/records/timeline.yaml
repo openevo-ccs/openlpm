@@ -1,0 +1,102 @@
+$schema: ../../schema/policy-timeline-event.schema.json
+$description: >
+  Dated events that bound, or directly shaped, every US state at once.
+
+events:
+  - id: USLP-EVENT-epperson-v-arkansas-ruling
+    slug: epperson-v-arkansas-ruling
+    label: Supreme Court strikes down Arkansas's outright evolution-teaching ban
+    jurisdiction: US
+    eventType: court-ruling
+    dateStart: "1968-11-12"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Epperson v. Arkansas, 393 U.S. 97 (1968). Unanimous (9-0), Justice Abe
+      Fortas writing. Struck down Arkansas's Initiated Act No. 1 (1928) --
+      itself, per the Court's own opinion, "an adaptation of the famous
+      Tennessee 'monkey law' which that State adopted in 1925" -- as an
+      unconstitutional establishment of religion. Tennessee had already
+      repealed its own law roughly 18 months earlier (see tennessee-lpm);
+      Mississippi's identical law was struck down separately two years
+      later (Smith v. State, 1970).
+    involvedActors: [USLP-ACTOR-aclu]
+    sourceUrl: https://tile.loc.gov/storage-services/service/ll/usrep/usrep393/usrep393097/usrep393097.pdf
+    accessTier: excerpt-only
+    licenseOrRightsNote: A US Supreme Court opinion is a public judicial record.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Library of Congress's own digitized US Reports volume, fetched and
+        read directly.
+
+  - id: USLP-EVENT-edwards-v-aguillard-ruling
+    slug: edwards-v-aguillard-ruling
+    label: Supreme Court strikes down Louisiana's "balanced treatment" creationism law
+    jurisdiction: US
+    eventType: court-ruling
+    dateStart: "1987-06-19"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Edwards v. Aguillard, 482 U.S. 578 (1987). 7-2, Justice William
+      Brennan writing; Scalia dissented, joined by Rehnquist. Struck down
+      Louisiana's "Balanced Treatment for Creation-Science and
+      Evolution-Science Act" (1981), finding its stated "academic freedom"
+      purpose a sham for a religious one. Reached the Court via summary
+      judgment, not a trial. This ruling's own reasoning is the specific
+      legal target the later "academic freedom act" template (Louisiana
+      2008, Tennessee 2012 -- see tennessee-lpm) was designed around,
+      avoiding explicit religious language to survive it.
+    involvedActors: []
+    sourceUrl: https://www.law.cornell.edu/supremecourt/text/482/578
+    accessTier: excerpt-only
+    licenseOrRightsNote: A US Supreme Court opinion is a public judicial record.
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Scalia's dissent is quoted in docs/source-notes/ via a
+        non-official reproduction -- substance confirmed, exact pincites
+        flagged as needing one more cross-check.
+      sourceProvenance: >
+        Cornell Legal Information Institute and FindLaw's hosted opinion
+        text, cross-checked against each other, fetched and read directly.
+
+  - id: USLP-EVENT-smith-v-state-mississippi-ruling
+    slug: smith-v-state-mississippi-ruling
+    label: Mississippi Supreme Court strikes down its own identical anti-evolution law
+    jurisdiction: US
+    eventType: court-ruling
+    dateStart: "1970-12-21"
+    dateGranularity: day
+    temporalStatus: past-completed
+    description: >
+      Smith v. State, 242 So. 2d 692 (Miss. 1970). The Mississippi Supreme
+      Court held Epperson v. Arkansas had "for all practical purposes
+      already held that our anti-evolution statutes are unconstitutional" --
+      Mississippi and Arkansas were, per Epperson's own footnote 8, the
+      only two states that still had Butler-Act-style teaching bans on the
+      books as of 1968.
+    involvedActors: []
+    partOf: USLP-EVENT-epperson-v-arkansas-ruling
+    sourceUrl: https://law.justia.com/cases/mississippi/supreme-court/1970/46058-0.html
+    accessTier: excerpt-only
+    licenseOrRightsNote: A state supreme court's own published opinion is a public judicial record.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: Justia's reproduction of the opinion, fetched and read directly.

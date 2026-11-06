@@ -1,0 +1,227 @@
+$schema: ../../../../schema/institutional-mandate-record.schema.json
+$description: >
+  Named, dated requirements set by the Tennessee General Assembly or State
+  Board of Education across a full century -- unlike pennsylvania-lpm, every
+  mandate here is state-level; no school-district-level mandate appears in
+  Tennessee's own central story. See
+  docs/source-notes/2026-10-20-tennessee-evolution-curriculum-policy-history-research.md.
+
+mandates:
+  - id: TNLP-MANDATE-butler-act-1925
+    slug: butler-act-1925
+    label: The Butler Act (1925) -- criminal prohibition on teaching evolution
+    jurisdiction: US-TN
+    issuingBody: Tennessee General Assembly / Governor Austin Peay
+    mandateType: state-statute
+    statementText: >
+      Section 1: "Be it enacted by the General Assembly of the State of
+      Tennessee, That it shall be unlawful for any teacher in any of the
+      Universities, Normals and all other public schools of the State which
+      are supported in whole or in part by the public school funds of the
+      State, to teach any theory that denies the story of the Divine
+      Creation of man as taught in the Bible, and to teach instead that man
+      has descended from a lower order of animals." Section 2: a violation
+      is a misdemeanor punishable by a fine of not less than $100 nor more
+      than $500 per offense.
+    adoptionDate: "1925-03-21"
+    dateGranularity: day
+    status: superseded
+    supersededBy: TNLP-MANDATE-butler-act-1967-repeal
+    sourceDocument: Tennessee House Bill No. 185 (1925)
+    sourceUrl: https://todayinsci.com/S/Scopes_John/ButlerAct.htm
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Enacted Tennessee statutory text; the raw text of enacted law is not
+      copyrightable under the federal government-edicts doctrine (Georgia v.
+      Public.Resource.Org, Inc., 2020) -- see GOVERNANCE.md for the more
+      complicated Tennessee-specific access picture (a real dispute exists
+      about ACCESS to the modern, LexisNexis-compiled annotated code, not
+      about copyright in the bare statutory text itself, which is what is
+      quoted here).
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      sourceProvenance: >
+        Full statutory text hosted at todayinsci.com, cross-checked against
+        Wikipedia's "Butler Act" article -- both fetched and read directly.
+
+  - id: TNLP-MANDATE-butler-act-1967-repeal
+    slug: butler-act-1967-repeal
+    label: Repeal of the Butler Act (1967)
+    jurisdiction: US-TN
+    issuingBody: Tennessee General Assembly / Governor Buford Ellington
+    mandateType: state-statute
+    statementText: >
+      House Bill No. 48, Chapter No. 237 of the 1967 Public Acts, repealing
+      the Butler Act in its entirety. Passed both chambers within three days
+      of science teacher Gary Scott's lawsuit over his firing for teaching
+      evolution.
+    adoptionDate: "1967-05-18"
+    dateGranularity: day
+    targetDate: "1967-09-01"
+    status: adopted
+    sourceDocument: Tennessee House Bill No. 48, Chapter No. 237 (1967)
+    sourceUrl: https://todayinsci.com/S/Scopes_John/ButlerActRepeal.htm
+    accessTier: summary-only
+    licenseOrRightsNote: Enacted Tennessee statutory text, not independently copyrightable.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The exact signing day (May 17 vs. 18, 1967) is disputed across
+        secondary sources; this record uses the better-supported May 18.
+      sourceProvenance: >
+        Wikipedia, "Butler Act"; Scientific American's retrospective; Today
+        in Science's hosted repeal text -- all fetched and read directly.
+
+  - id: TNLP-MANDATE-tn-1973-equal-time-law
+    slug: tn-1973-equal-time-law
+    label: "The 1973 \"equal time\" / \"Genesis Bill\" (struck down 1975)"
+    jurisdiction: US-TN
+    issuingBody: Tennessee General Assembly / Governor Winfield Dunn
+    mandateType: state-statute
+    statementText: >
+      Chapter 377 of the 1973 Public Acts of Tennessee: required that any
+      biology textbook expressing an opinion on "origins or creation of man
+      and his world" give "commensurate attention to, and an equal amount of
+      emphasis on" other theories, "including, but not limited to, the
+      Genesis account in the Bible," and required textbooks discussing
+      evolution state it was "not represented to be scientific fact" -- a
+      disclaimer not applied to the Bible, which the statute itself defined
+      as a "reference work."
+    adoptionDate: "1973-04-30"
+    dateGranularity: day
+    status: superseded
+    sourceDocument: Tennessee Senate Bill 394 / House Bill 597, Chapter 377 of the 1973 Public Acts
+    sourceUrl: https://jsreligion.org/issues/vol16/edwards.html
+    accessTier: excerpt-only
+    licenseOrRightsNote: Enacted Tennessee statutory text, not independently copyrightable.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        No supersededBy link set -- this mandate was invalidated by a court
+        ruling (Daniel v. Waters, 1975), not replaced by a later mandate
+        with its own text. See TNLP-EVENT-daniel-v-waters and
+        TNLP-CONTROVERSY-tn-1973-equal-time-law for the resolution itself.
+      sourceProvenance: >
+        Journal of Southern Religion, "'Equal Space With Adam and Eve':
+        Tennessee's 'Genesis Bill' of 1973," fetched and read directly.
+
+  - id: TNLP-MANDATE-tn-2012-teacher-protection-act
+    slug: tn-2012-teacher-protection-act
+    label: The Tennessee Teacher Protection Act (2012, "monkey law")
+    jurisdiction: US-TN
+    issuingBody: Tennessee General Assembly / allowed to become law without Governor Bill Haslam's signature
+    mandateType: state-statute
+    statementText: >
+      T.C.A. S49-6-1030 (Acts 2012, ch. 670, S2): bars the State Board of
+      Education and any school administrator from stopping a teacher from
+      helping students "understand, analyze, critique, and review in an
+      objective manner the scientific strengths and scientific weaknesses of
+      existing scientific theories" on subjects that "cause debate and
+      disputation," naming biological evolution, the chemical origins of
+      life, global warming (climate change), and human cloning -- while
+      directing schools to foster an environment of scientific inquiry and
+      critical thinking generally.
+    adoptionDate: "2012-04-10"
+    dateGranularity: day
+    status: adopted
+    sourceDocument: "Tennessee Code Annotated S49-6-1030 (HB 368 / SB 893, Acts 2012, ch. 670)"
+    sourceUrl: https://law.justia.com/codes/tennessee/title-49/chapter-6/part-10/section-49-6-1030/
+    accessTier: excerpt-only
+    licenseOrRightsNote: >
+      Enacted Tennessee statutory text is not independently copyrightable
+      under the federal government-edicts doctrine, but see GOVERNANCE.md:
+      Tennessee's complete, official annotated code is distributed under an
+      exclusive LexisNexis contract, upheld by the Tennessee Court of
+      Appeals (2023) as exempt from public-records disclosure on that
+      basis. This record's own excerpt was sourced via Justia's
+      independently-hosted mirror of the bare code section, not the
+      LexisNexis-compiled annotated version.
+    verificationStatus: primary-source-confirmed
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        The law's precise in-force effective date is disputed across
+        sources (April 20 vs. July 1, 2012); "became law" on April 10 is
+        solid. Still in force as of this repo's founding session, apparently
+        never challenged in court or invoked in a documented case (absence
+        of evidence, not a confirmed negative -- see docs/source-notes/).
+      sourceProvenance: >
+        Justia's hosting of T.C.A. S49-6-1030 (direct fetch of justia.com
+        succeeded; a direct fetch of the primary capitol.tn.gov bill PDF and
+        of law.justia.com's own page both separately returned errors this
+        session -- see source-notes for the specific flags); NCSE's and
+        contemporaneous news coverage of the bill's substance, fetched and
+        read directly.
+
+  - id: TNLP-MANDATE-tn-2022-academic-standards-science
+    slug: tn-2022-academic-standards-science
+    label: "Tennessee Academic Standards for Science (2022): BIO1.LS4 Biological Change benchmarks"
+    jurisdiction: US-TN
+    issuingBody: Tennessee State Board of Education
+    mandateType: state-board-adopted-standard
+    statementText: >
+      [Strand BIO1.LS4, Biological Change: Unity and Diversity, benchmark
+      BIO1.LS4.1:] "Analyze and interpret scientific data that common
+      ancestry and biological evolution are supported by multiple lines of
+      empirical evidence (e.g. DNA sequences, amino acid sequences,
+      anatomical structures, the fossil record, biogeography, or order of
+      appearance of structures during embryological development)."
+      [Benchmark BIO1.LS4.3:] "Analyze and interpret data that natural
+      selection is influenced by (1) the potential for a species to
+      increase in number, (2) the heritable genetic variation of
+      individuals in a species due to mutation and sexual reproduction, (3)
+      competition for limited resources, and (4) the proliferation of those
+      organisms that are better able to survive and reproduce in the
+      environment." [Benchmark BIO1.LS4.4:] "Construct an explanation based
+      on evidence for how natural selection leads to adaptation in
+      populations." [The full benchmark set -- BIO1.LS3.1-4, BIO1.LS4.1-5,
+      and 8.LS4.1-5 -- is reproduced in full in
+      case/tennessee-2022-evolution-benchmarks.json.]
+    adoptionDate: "2022-10-28"
+    dateGranularity: day
+    targetDate: "2025-08-01"
+    status: adopted
+    sourceDocument: "Tennessee Academic Standards for Science; Common Standards Project document (Biology I standard set)"
+    sourceUrl: https://api.commonstandardsproject.com/api/v1/standard_sets/E068CD122CE146DFBCED7A17EE6E130A
+    accessTier: full-text-stored
+    licenseOrRightsNote: >
+      Independently and openly licensed by the Common Standards Project's
+      compiler: CC BY 4.0 US (http://creativecommons.org/licenses/by/4.0/us/),
+      rightsHolder "Common Curriculum, Inc." -- a third distinct licensing
+      case among this ecosystem's three state repos so far (Florida: CC BY
+      3.0 US; Pennsylvania: no confirmed open license).
+    verificationStatus: verified
+    provenance:
+      extracted_by: llm
+      added_by: dustin.eirdosh@eva.mpg.de
+      date: "2026-10-20"
+      review_status: author-draft
+      version: 1.0.0
+      contributor_notes: >
+        Fetched directly from the Common Standards Project API, confirmed
+        independently twice (a delegated research agent and the main
+        session's own direct curl calls) -- not a secondary mirror.
+        targetDate reflects the 2025-26 school year full-implementation
+        milestone, not this mandate's own adoption date.
+      sourceProvenance: >
+        api.commonstandardsproject.com/api/v1/standard_sets/E068CD122CE146DFBCED7A17EE6E130A,
+        fetched directly 2026-10-20.

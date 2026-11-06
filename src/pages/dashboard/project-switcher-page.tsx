@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FolderKanban, Library, Plus, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
-import { ADMIN_EMAIL } from '@/lib/admin'
 import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listAllProjects } from '@/lib/supabase/admin-users'
+import { listMyPendingRequests, respondToMemberRequest, type PendingRequestForUser } from '@/lib/supabase/members'
+import { listMyJoinableProjects } from '@/lib/supabase/join'
 
 // Admin-only: a project the admin can see exists (migration 049's directory
 // reach) but isn't personally a member of -- role is null rather than one
@@ -45,8 +46,7 @@ const CURATION_GLOSS: Record<Curation, string> = {
 export default function ProjectSwitcherPage() {
   const supabase = useMemo(() => createClient(), [])
   const navigate = useNavigate()
-  const { session } = useSession()
-  const isAdmin = session?.user.email === ADMIN_EMAIL
+  const { isAdmin } = useSession()
   const [memberships, setMemberships] = useState<ProjectWithRole[] | null>(null)
   const [allProjects, setAllProjects] = useState<ProjectWithRole['project'][] | null>(null)
   // Both on by default -- this only narrows the view, never hides a project
@@ -61,9 +61,21 @@ export default function ProjectSwitcherPage() {
   // no toggle of its own at all. On by default, same convention as the two
   // curation checkboxes.
   const [showRepos, setShowRepos] = useState(true)
+  // null = not loaded yet, distinct from "loaded, zero pending" -- the
+  // single-membership auto-redirect below has to wait for a real answer
+  // here before it decides whether to fire, or an account with exactly one
+  // membership AND a pending invitation elsewhere would get redirected
+  // straight past the one page that invitation is ever shown on (real bug,
+  // caught live 2026-10-05: the standing QA account has exactly one
+  // membership, so it never saw its own test invitation).
+  const [pendingRequests, setPendingRequests] = useState<PendingRequestForUser[] | null>(null)
+
+  const reloadPendingRequests = () => { listMyPendingRequests(supabase).then(setPendingRequests) }
 
   useEffect(() => {
     getUserProjects(supabase).then(setMemberships)
+    reloadPendingRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase])
 
   // Real need, stated directly (2026-10-01): "I need to always be able to
@@ -96,13 +108,24 @@ export default function ProjectSwitcherPage() {
   // platform-wide view, even on a day it happens to have just one real
   // membership of its own.
   useEffect(() => {
-    if (!isAdmin && memberships?.length === 1) {
+    if (!isAdmin && memberships?.length === 1 && pendingRequests !== null && pendingRequests.length === 0) {
       navigate(`/dashboard/${memberships[0].project.slug}`, { replace: true })
     }
-  }, [isAdmin, memberships, navigate])
+  }, [isAdmin, memberships, pendingRequests, navigate])
 
-  const stillLoading = memberships === null || (isAdmin && allProjects === null)
-  const redirecting = !isAdmin && memberships?.length === 1
+  // A brand-new account that matches exactly one self-join rule (the seminar
+  // case: a student who confirmed their email on another device than the one
+  // they signed up on, so the welcome page's redirect never fired) goes
+  // straight to that space's join screen instead of an empty list.
+  useEffect(() => {
+    if (isAdmin || memberships === null || memberships.length > 0) return
+    listMyJoinableProjects(supabase).then((joinable) => {
+      if (joinable.length === 1) navigate(`/join/${joinable[0].project.slug}`, { replace: true })
+    })
+  }, [isAdmin, memberships, supabase, navigate])
+
+  const stillLoading = memberships === null || pendingRequests === null || (isAdmin && allProjects === null)
+  const redirecting = !isAdmin && memberships?.length === 1 && pendingRequests?.length === 0
   if (stillLoading || redirecting) {
     return <p className="muted">Loading…</p>
   }
@@ -162,17 +185,43 @@ export default function ProjectSwitcherPage() {
         </Link>
       </div>
 
+      {pendingRequests.length > 0 && (
+        <div className="card" style={{ marginBottom: 16 }}>
+          <h3>Invitations waiting for you</h3>
+          {pendingRequests.map((r) => (
+            <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <span>
+                <strong>{r.project?.name ?? 'A project'}</strong>
+                <span className="muted" style={{ marginLeft: 6 }}>
+                  as {r.role}{r.requester ? ` -- invited by ${r.requester.name}` : ''}
+                </span>
+              </span>
+              <span className="row">
+                <button className="btn btn-mini btn-primary" onClick={() => respondToMemberRequest(supabase, r.id, 'accepted').then(() => { reloadPendingRequests(); getUserProjects(supabase).then(setMemberships) })}>
+                  Accept
+                </button>
+                <button className="btn btn-mini" onClick={() => respondToMemberRequest(supabase, r.id, 'declined').then(reloadPendingRequests)}>
+                  Decline
+                </button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Real feedback 6df024a9 (Dustin): wanted these in a specific order --
+          Curriculum Repositories, Human-Curated, Synthetic-Theoretical. */}
       <div className="row" style={{ gap: 16, marginBottom: 20 }}>
+        <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Reference curriculum documents for a country or region.">
+          <input type="checkbox" checked={showRepos} onChange={() => setShowRepos((v) => !v)} />
+          Curriculum Repositories
+        </label>
         {(['human-curated', 'synthetic-theoretical'] as const).map((c) => (
           <label key={c} className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title={CURATION_GLOSS[c]}>
             <input type="checkbox" checked={visibleCurations.has(c)} onChange={() => toggleCuration(c)} />
             {CURATION_LABEL[c]}
           </label>
         ))}
-        <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Reference curriculum documents for a country or region.">
-          <input type="checkbox" checked={showRepos} onChange={() => setShowRepos((v) => !v)} />
-          Curriculum Repositories
-        </label>
       </div>
 
       {entries.length === 0 ? (
@@ -260,6 +309,18 @@ function ProjectCard({
   const [expanded, setExpanded] = useState(false)
   const visibleChildren = expanded ? children : children.slice(0, CAP)
   const hiddenCount = children.length - visibleChildren.length
+  // Dustin, 2026-10-21: a nation-level Curriculum Repository can hold two
+  // real kinds of sub-space -- a region (Florida, Saxony) and a
+  // comparative/analytic repo that cuts across the whole nation instead of
+  // belonging to one place (US Evolution Education). Flattening both into
+  // one list reads as a plain state directory until a thematic entry shows
+  // up in it unexplained. Only worth splitting into two labeled groups once
+  // a thematic child actually exists -- a nation with regions alone (every
+  // one of them today except the US) still renders as the single flat list
+  // this always was.
+  const thematicChildren = visibleChildren.filter((c) => (c.project as any).focus_type === 'thematic')
+  const regionalChildren = visibleChildren.filter((c) => (c.project as any).focus_type !== 'thematic')
+  const showGroups = thematicChildren.length > 0 && regionalChildren.length > 0
   return (
     <div
       className="card"
@@ -306,12 +367,31 @@ function ProjectCard({
       </Link>
       {children.length > 0 && (
         <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
-          <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
-          {visibleChildren.map((c) => (
-            <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
-              {c.project.name}
-            </Link>
-          ))}
+          {showGroups ? (
+            <>
+              <span className="muted" style={{ fontSize: 12 }}>States / regions:</span>
+              {regionalChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+              <span className="muted" style={{ fontSize: 12, marginTop: 8, display: 'block' }}>Thematic / comparative repositories:</span>
+              {thematicChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+            </>
+          ) : (
+            <>
+              <span className="muted" style={{ fontSize: 12 }}>{(project as any).project_kind === 'curriculum-repository' ? 'Repositories inside:' : 'Projects inside:'}</span>
+              {visibleChildren.map((c) => (
+                <Link key={c.project.id} to={`/dashboard/${c.project.slug}`} className="row" style={{ textDecoration: 'none', color: 'inherit', marginTop: 4, fontSize: 13 }}>
+                  {c.project.name}
+                </Link>
+              ))}
+            </>
+          )}
           {hiddenCount > 0 && (
             <button
               type="button"

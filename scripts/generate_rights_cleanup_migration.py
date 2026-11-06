@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+"""Rights clean-up of the Curriculum Repositories found by the audit of 2026-11-02. Writes migration 217 and edits the in-repo source YAML.
+
+    python scripts/generate_rights_cleanup_migration.py --descriptions <json {id: new description}>
+
+1. 20 timeline events (Florida, Pennsylvania, Tennessee) stored third-party quotations at the excerpt-only tier with no rights note. Dustin chose,
+   2026-11-02: keep a summary in our own words. Each description is replaced by the rewrite in --descriptions and the record moves to summary-only.
+2. 5 coherence findings hold excerptText (short quotations of documents). The excerpt text is dropped and the object tier becomes summary-only.
+3. 9 cite-only mandate records still hold statementTextEn (the English translation of the official wording): the field is removed.
+4. 2 test rows (source_repo diagnostic-test) are deleted.
+The source YAML of florida-lpm, pennsylvania-lpm, tennessee-lpm and us-evolution-education-lpm is edited the same way, so a re-import does not bring
+the text back. The importer now also drops statementTextEn on cite-only rows (import_curriculum_repository.py).
+"""
+import argparse
+import json
+import re
+import sys
+import textwrap
+from pathlib import Path
+
+import yaml
+
+ROOT = Path(__file__).resolve().parent.parent
+SOURCES = ROOT / "curriculum-sources"
+
+
+def record_files():
+    return [p for p in SOURCES.glob("*-lpm/**/records/*.yaml")]
+
+
+def edit_record(text, record_id, new_description=None, drop_excerpts=False):
+    lines = text.split("\n")
+    start = next((i for i, l in enumerate(lines) if re.match(rf"^  - id: {re.escape(record_id)}\s*$", l)), None)
+    if start is None:
+        return text, False
+    end = next((i for i in range(start + 1, len(lines)) if re.match(r"^  - id:", lines[i])), len(lines))
+    block = lines[start:end]
+    out = []
+    i = 0
+    while i < len(block):
+        l = block[i]
+        if new_description is not None and re.match(r"^    description:", l):
+            i += 1
+            while i < len(block) and (block[i].strip() == "" or block[i].startswith("     ")):
+                i += 1
+            out.append("    description: >")
+            out += ["      " + w for w in textwrap.wrap(new_description, 74)]
+            continue
+        if drop_excerpts and re.match(r"^        excerptText:", l):
+            i += 1
+            while i < len(block) and block[i].startswith("          "):  # continuation lines of a long scalar
+                i += 1
+            continue
+        if re.match(r"^(    |        )accessTier: excerpt-only\s*$", l):
+            l = l.replace("excerpt-only", "summary-only")
+        out.append(l)
+        i += 1
+    return "\n".join(lines[:start] + out + lines[end:]), True
+
+
+def q(v):
+    return "'" + str(v).replace("'", "''") + "'"
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--descriptions", required=True)
+    ap.add_argument("--ids", required=True, help="json with {'events': [...ids], 'findings': [...ids]} (source_record_id and source_repo)")
+    ap.add_argument("--out", default=str(ROOT / "supabase/migrations/217_rights_cleanup_excerpts_translations_test_rows.sql"))
+    args = ap.parse_args()
+    desc = json.loads(Path(args.descriptions).read_text(encoding="utf-8"))
+    ids = json.loads(Path(args.ids).read_text(encoding="utf-8"))
+    files = record_files()
+    done = set()
+    for f in files:
+        text = f.read_text(encoding="utf-8")
+        orig = text
+        for rid, repo in ids["events"]:
+            text, ok = edit_record(text, rid, new_description=desc[rid])
+            if ok:
+                done.add(rid)
+        for rid, repo in ids["findings"]:
+            text, ok = edit_record(text, rid, drop_excerpts=True)
+            if ok:
+                done.add(rid)
+        if text != orig:
+            yaml.safe_load(text)  # still valid
+            f.write_text(text, encoding="utf-8", newline="\n")
+    missing = [r for r, _ in ids["events"] + ids["findings"] if r not in done]
+    if missing:
+        sys.exit(f"not found in source files: {missing}")
+
+    sql = ["""-- 217: Rights clean-up found by the audit of the Curriculum Repositories (lab_manager docs/design-notes/curriculum-repository-audit-2026-11-02.md).
+--
+-- 1. 20 timeline events kept quotations of news, advocacy and encyclopedia pages at the excerpt-only tier without a rights note. Dustin chose
+--    (2026-11-02) to keep a summary in our own words: the description is replaced by a paraphrase and the record moves to summary-only.
+-- 2. 5 coherence findings hold excerptText (short quotations of documents). The excerpt text goes and the object tier becomes summary-only.
+-- 3. 9 cite-only mandate records still hold statementTextEn, the English translation of the official wording. The field goes.
+-- 4. 2 test rows (source_repo diagnostic-test) are deleted.
+-- Each statement is guarded, so running this twice changes nothing. Generated by scripts/generate_rights_cleanup_migration.py.
+SET search_path = public, extensions;
+"""]
+    for rid, repo in ids["events"]:
+        sql.append(
+            "UPDATE curriculum_repository_records SET\n"
+            f"  content = jsonb_set(jsonb_set(content, '{{description}}', to_jsonb({q(desc[rid])}::text)), '{{accessTier}}', '\"summary-only\"'),\n"
+            "  access_tier = 'summary-only', updated_at = now()\n"
+            f"WHERE source_repo = {q(repo)} AND source_record_id = {q(rid)} AND access_tier = 'excerpt-only';\n")
+    for rid, repo in ids["findings"]:
+        sql.append(
+            "UPDATE curriculum_repository_records SET\n"
+            "  content = jsonb_set(content, '{objects}', (SELECT jsonb_agg((t.o - 'excerptText') || '{\"accessTier\": \"summary-only\"}'::jsonb ORDER BY t.n) "
+            "FROM jsonb_array_elements(content -> 'objects') WITH ORDINALITY AS t(o, n))),\n"
+            "  access_tier = 'summary-only', updated_at = now()\n"
+            f"WHERE source_repo = {q(repo)} AND source_record_id = {q(rid)} AND access_tier = 'excerpt-only';\n")
+    sql.append("UPDATE curriculum_repository_records SET content = content - 'statementTextEn', updated_at = now()\n"
+               "WHERE record_type = 'institutional-mandate-record' AND access_tier = 'citation-only' AND content ? 'statementTextEn';\n")
+    sql.append("DELETE FROM curriculum_repository_records WHERE source_repo = 'diagnostic-test' AND source_record_id IN ('diagnostic-ping-2', 'diagnostic-ping-3');\n")
+    n = len(ids["events"]) + len(ids["findings"])
+    all_ids = ", ".join(q(r) for r, _ in ids["events"] + ids["findings"])
+    sql.append(f"""DO $$
+DECLARE left_excerpts integer; left_en integer; left_tests integer;
+BEGIN
+  SELECT count(*) INTO left_excerpts FROM curriculum_repository_records WHERE source_record_id IN ({all_ids}) AND access_tier <> 'summary-only';
+  SELECT count(*) INTO left_en FROM curriculum_repository_records WHERE access_tier = 'citation-only' AND content ? 'statementTextEn';
+  SELECT count(*) INTO left_tests FROM curriculum_repository_records WHERE source_repo = 'diagnostic-test';
+  IF left_excerpts <> 0 OR left_en <> 0 OR left_tests <> 0 THEN
+    RAISE EXCEPTION 'migration 217: % of {n} excerpt rows still above summary-only, % cite-only rows with statementTextEn, % test rows', left_excerpts, left_en, left_tests;
+  END IF;
+END $$;
+""")
+    Path(args.out).write_text("\n".join(sql), encoding="utf-8", newline="\n")
+    print(f"wrote {args.out}; edited {len(done)} records in source files")
+
+
+if __name__ == "__main__":
+    main()

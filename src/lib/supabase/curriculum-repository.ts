@@ -17,6 +17,17 @@ export const RECORD_TYPE_LABEL: Record<RepositoryRecordRow['record_type'], strin
   'synthetic-curriculum-redesign-record': 'Proposed redesign',
   'policy-principle-record': 'Policy principle',
   'policy-brief-manifest': 'Policy brief',
+  'policy-controversy-record': 'Public controversy',
+}
+
+/** The wording Dustin set (2026-11-02) for anything a model wrote that no person has reviewed yet. Use exactly this text. */
+export const DRAFT_LABEL = { en: 'LLM synthesized draft, awaiting review', de: 'LLM-erzeugter Entwurf, Prüfung ausstehend' } as const
+
+/** True while the record's own provenance still says author-draft (or has no review status): nobody has reviewed it. */
+export function isUnreviewedDraft(record: Pick<RepositoryRecordRow, 'content'>): boolean {
+  const prov = (record.content as { provenance?: { review_status?: string } } | null)?.provenance
+  const status = prov?.review_status
+  return !status || status === 'author-draft'
 }
 
 export const ACCESS_TIER_LABEL: Record<RepositoryRecordRow['access_tier'], string> = {
@@ -25,6 +36,17 @@ export const ACCESS_TIER_LABEL: Record<RepositoryRecordRow['access_tier'], strin
   'summary-only': 'Summary only, no original wording',
   'citation-only': 'Source citation only',
 }
+
+// Same four values and researcher-facing wording as new-project-wizard.tsx's
+// own ACCESS_TIER_OPTIONS (project_source_declarations/standards_documents,
+// migration 044) -- kept as a separate copy here rather than a shared import
+// since this table's access_tier is NOT NULL with no "not sure yet" state.
+export const ACCESS_TIER_OPTIONS: { value: RepositoryRecordRow['access_tier']; label: string }[] = [
+  { value: 'full-text-stored', label: 'The full document — we have clear rights to keep all of it' },
+  { value: 'excerpt-only', label: 'Short excerpts only — a few quoted lines at a time, never the whole document' },
+  { value: 'summary-only', label: 'A summary only — described in our own words, no direct quotes' },
+  { value: 'citation-only', label: "Just a citation — we'll link to the original without storing any of its text" },
+]
 
 /** Fields shown even at the most restrictive (citation-only) tier -- facts about the record, not quoted/paraphrased source text. */
 const SAFE_ALWAYS_KEYS = new Set([
@@ -38,10 +60,15 @@ const SAFE_ALWAYS_KEYS = new Set([
 const NARRATIVE_KEYS = new Set([
   'description', 'statementText', 'summary', 'connectionNarrative', 'proposedRedesign',
   'role', 'evidenceMethod', 'tradeoffAssessment', 'theoreticalGrounding', 'strengthAssessment',
-  'objects', 'baselineCurriculumObject',
+  'objects', 'curriculumObject', 'baselineCurriculumObject',
 ])
 
-const ALWAYS_HIDDEN_KEYS = new Set(['id', 'slug', 'label', '$schema', 'provenance', 'accessTier', 'licenseOrRightsNote'])
+// `supersedes`/`supersededBy` are the raw source-repo ids the import script
+// already resolves into the real `supersedes_record_id` foreign key
+// (migration 100) -- hidden here so a record shows the one real, clickable
+// link (see getSupersessionInfo) instead of also listing the bare
+// unresolved source id as an ordinary text field.
+const ALWAYS_HIDDEN_KEYS = new Set(['id', 'slug', 'label', '$schema', 'provenance', 'accessTier', 'licenseOrRightsNote', 'supersedes', 'supersededBy'])
 
 function humanizeKey(key: string): string {
   return key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase())
@@ -88,6 +115,93 @@ export async function getRepositoryRecord(supabase: Client, recordId: string): P
   return data ?? null
 }
 
+export interface SupersessionInfo {
+  predecessor: { id: string; title: string } | null
+  successor: { id: string; title: string } | null
+}
+
+// A record's place in an edition chain (migration 100), e.g. Thuringia
+// Biologie's 1999 -> 2024 -> 2026-Erprobungsfassung -- which prior edition
+// this one directly replaced, and (the reverse lookup, since the FK only
+// points one direction) which later edition replaced this one, if any.
+// Most records are in no chain at all and get both sides null.
+export async function getSupersessionInfo(supabase: Client, record: RepositoryRecordRow): Promise<SupersessionInfo> {
+  const [predecessorRes, successorRes] = await Promise.all([
+    record.supersedes_record_id
+      ? supabase.from('curriculum_repository_records').select('id, title').eq('id', record.supersedes_record_id).maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase.from('curriculum_repository_records').select('id, title').eq('supersedes_record_id', record.id).maybeSingle(),
+  ])
+  return {
+    predecessor: predecessorRes.data ?? null,
+    successor: successorRes.data ?? null,
+  }
+}
+
+export interface RepositoryRecordDraft {
+  recordType: RepositoryRecordRow['record_type']
+  title: string
+  jurisdiction: string | null
+  accessTier: RepositoryRecordRow['access_tier']
+  licenseOrRightsNote: string | null
+  // Alternatives, not both: a point-in-time record sets eventDate; a
+  // standing one sets effectiveFrom/effectiveUntil. Enforced by the form,
+  // not here -- this layer just writes whatever it's given.
+  eventDate: string | null
+  effectiveFrom: string | null
+  effectiveUntil: string | null
+}
+
+/** Maintainer/owner only (RLS-enforced) -- a hand-entered record never produced by scripts/import_curriculum_repository.py, so it gets its own source_repo marker and a generated source_record_id rather than colliding with a real import's (source_repo, source_record_id) identity. */
+export async function createRepositoryRecord(
+  supabase: Client,
+  projectId: string,
+  draft: RepositoryRecordDraft
+): Promise<{ id: string | null; error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('curriculum_repository_records')
+    .insert({
+      project_id: projectId,
+      record_type: draft.recordType,
+      title: draft.title.trim(),
+      jurisdiction: draft.jurisdiction?.trim() || null,
+      source_repo: 'openlpm-manual',
+      source_record_id: crypto.randomUUID(),
+      access_tier: draft.accessTier,
+      license_or_rights_note: draft.licenseOrRightsNote?.trim() || null,
+      event_date: draft.eventDate || null,
+      effective_from: draft.effectiveFrom || null,
+      effective_until: draft.effectiveUntil || null,
+      created_by: user?.id ?? null,
+    })
+    .select('id')
+    .single()
+  return { id: data?.id ?? null, error: error?.message ?? null }
+}
+
+/** Maintainer/owner only (RLS-enforced). Never touches source_repo/source_record_id -- a record's import identity (or its manual-entry marker) doesn't change after creation. */
+export async function updateRepositoryRecord(
+  supabase: Client,
+  recordId: string,
+  draft: RepositoryRecordDraft
+): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('curriculum_repository_records')
+    .update({
+      record_type: draft.recordType,
+      title: draft.title.trim(),
+      jurisdiction: draft.jurisdiction?.trim() || null,
+      access_tier: draft.accessTier,
+      license_or_rights_note: draft.licenseOrRightsNote?.trim() || null,
+      event_date: draft.eventDate || null,
+      effective_from: draft.effectiveFrom || null,
+      effective_until: draft.effectiveUntil || null,
+    })
+    .eq('id', recordId)
+  return { error: error?.message ?? null }
+}
+
 export async function listJurisdictions(supabase: Client, projectId: string): Promise<string[]> {
   const { data } = await supabase.from('curriculum_repository_records').select('jurisdiction').eq('project_id', projectId)
   const set = new Set((data ?? []).map((r) => r.jurisdiction).filter((j): j is string => !!j))
@@ -126,12 +240,66 @@ export async function createProjectRepositoryLink(
   return { error: error?.message ?? null }
 }
 
-export async function listContentLinksForRecord(supabase: Client, repositoryRecordId: string): Promise<(RepositoryContentLinkRow & { data_object: { id: string; title: string; project_id: string } })[]> {
+export interface ContentLinkWithContext extends RepositoryContentLinkRow {
+  data_object: { id: string; title: string; project_id: string }
+  // The record's own project_id column (same one listRepositoryLinkSummaryForProject
+  // filters on below), joined here so "which OpenLPM projects actually use
+  // this" (real feedback ea3a4c01) never has to be inferred from the data
+  // object's own project_id in two different places.
+  project: { id: string; name: string; slug: string } | null
+}
+
+export async function listContentLinksForRecord(supabase: Client, repositoryRecordId: string): Promise<ContentLinkWithContext[]> {
   const { data } = await supabase
     .from('curriculum_repository_links')
-    .select('*, data_object:lpm_data_objects(id, title, project_id)')
+    .select('*, data_object:lpm_data_objects(id, title, project_id), project:projects(id, name, slug)')
     .eq('repository_record_id', repositoryRecordId)
-  return (data ?? []) as unknown as (RepositoryContentLinkRow & { data_object: { id: string; title: string; project_id: string } })[]
+  return (data ?? []) as unknown as ContentLinkWithContext[]
+}
+
+/** Distinct projects that have linked content to this record -- the compact "used by" summary, e.g. for the Timeline's detail panel. */
+export function distinctLinkedProjects(links: ContentLinkWithContext[]): { id: string; name: string; slug: string }[] {
+  const seen = new Map<string, { id: string; name: string; slug: string }>()
+  for (const l of links) if (l.project && !seen.has(l.project.id)) seen.set(l.project.id, l.project)
+  return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export interface ProjectRepositoryLinkSummary {
+  record: RepositoryRecordRow
+  linkedContentCount: number
+  supersession: SupersessionInfo
+}
+
+// The content side of the "browse + connect" feature (migration 066's
+// curriculum_repository_links, Level 2) -- which Repository record(s) THIS
+// project's own content points at, with a count of how many of its items
+// point at each one, and whether a newer edition already exists. Needs
+// migration 105's read-access policy to actually see the records
+// themselves (this project's members aren't necessarily Repository
+// members) -- without it, record comes back null and this silently drops
+// that row.
+export async function listRepositoryLinkSummaryForProject(supabase: Client, projectId: string): Promise<ProjectRepositoryLinkSummary[]> {
+  const { data } = await supabase
+    .from('curriculum_repository_links')
+    .select('repository_record_id, record:curriculum_repository_records(*)')
+    .eq('project_id', projectId)
+  const rows = (data ?? []) as unknown as { repository_record_id: string; record: RepositoryRecordRow | null }[]
+
+  const counts = new Map<string, number>()
+  const records = new Map<string, RepositoryRecordRow>()
+  for (const row of rows) {
+    counts.set(row.repository_record_id, (counts.get(row.repository_record_id) ?? 0) + 1)
+    if (row.record && !records.has(row.repository_record_id)) records.set(row.repository_record_id, row.record)
+  }
+
+  const summaries = await Promise.all(
+    Array.from(records.values()).map(async (record) => ({
+      record,
+      linkedContentCount: counts.get(record.id) ?? 0,
+      supersession: await getSupersessionInfo(supabase, record),
+    }))
+  )
+  return summaries.sort((a, b) => a.record.title.localeCompare(b.record.title))
 }
 
 export async function createContentLink(
@@ -148,4 +316,50 @@ export async function createContentLink(
     created_by: user?.id ?? null,
   })
   return { error: error?.message ?? null }
+}
+
+/** The one editable note per connection (2026-10-20 design decision: a single text field, not a comment thread) -- needs migration 142's own UPDATE policy on curriculum_repository_links, which only grants this to is_project_editor(). */
+export async function updateContentLinkRationale(supabase: Client, linkId: string, rationale: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('curriculum_repository_links').update({ rationale: rationale.trim() || null }).eq('id', linkId)
+  return { error: error?.message ?? null }
+}
+
+export async function deleteContentLink(supabase: Client, linkId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('curriculum_repository_links').delete().eq('id', linkId)
+  return { error: error?.message ?? null }
+}
+
+export interface DataObjectLinkWithRecord extends RepositoryContentLinkRow {
+  record: RepositoryRecordRow
+}
+
+/** The reverse of listContentLinksForRecord -- for a given set of this project's own content ids, every real-world connection already made, keyed by data_object_id. Used by the Curriculum Connections workspace (the 4 2026-10-20 custom views) so each strand/substrand can show its own existing connections without a separate query per row. */
+export async function listContentLinksForDataObjects(supabase: Client, dataObjectIds: string[]): Promise<Record<string, DataObjectLinkWithRecord[]>> {
+  if (dataObjectIds.length === 0) return {}
+  const { data } = await supabase
+    .from('curriculum_repository_links')
+    .select('*, record:curriculum_repository_records(*)')
+    .in('data_object_id', dataObjectIds)
+  const rows = (data ?? []) as unknown as DataObjectLinkWithRecord[]
+  const byObject: Record<string, DataObjectLinkWithRecord[]> = {}
+  for (const row of rows) {
+    if (!row.record) continue
+    ;(byObject[row.data_object_id] ??= []).push(row)
+  }
+  return byObject
+}
+
+/** Every real-world record available to link against, across a set of Curriculum Repository projects (e.g. Germany + Saxony + Thuringia for a German-context view) -- resolved from real project slugs, not ids, since callers only know the slug. */
+export async function listRepositoryRecordsForRegionSlugs(supabase: Client, regionSlugs: string[]): Promise<RepositoryRecordRow[]> {
+  if (regionSlugs.length === 0) return []
+  const { data: regionProjects } = await supabase.from('projects').select('id').in('slug', regionSlugs)
+  const regionIds = (regionProjects ?? []).map((p) => p.id)
+  if (regionIds.length === 0) return []
+  const { data } = await supabase
+    .from('curriculum_repository_records')
+    .select('*')
+    .in('project_id', regionIds)
+    .order('record_type', { ascending: true })
+    .order('title', { ascending: true })
+  return data ?? []
 }

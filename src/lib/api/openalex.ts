@@ -53,7 +53,12 @@ export async function searchOpenAlex(
     const data: OpenAlexResponse = await response.json()
     
     const results: SearchResult[] = data.results.map(work => ({
-      doi: work.doi,
+      // OpenAlex's own API returns doi as a full https://doi.org/... URL,
+      // unlike Semantic Scholar/Crossref's bare-DOI convention (and
+      // LiteratureBase's own citation.doi field) -- normalized here so a
+      // DOI-based match against either this app's own saved references or
+      // a real LiteratureBase record actually works for OpenAlex results.
+      doi: work.doi ? work.doi.replace(/^https?:\/\/doi\.org\//i, '') : null,
       title: work.title,
       year: work.publication_year,
       authors: work.authorships.map(a => a.author.display_name),
