@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import { BookOpen, LogOut, Pencil, User, Users } from 'lucide-react'
+import { BookOpen, LogOut, Pencil, Sparkles, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -37,6 +37,10 @@ export default function DashboardLayout() {
               instead of its own topbar button. The full feedback list page
               itself (admin-feedback-page.tsx) is unchanged, just no longer
               linked from here directly. */}
+          <Link to="/dashboard/concept-meanings" className="btn btn-mini">
+            <Sparkles size={12} />
+            Concept meanings
+          </Link>
           {isAdmin && (
             <Link to="/dashboard/admin/users" className="btn btn-mini">
               <Users size={12} />

@@ -208,7 +208,7 @@ export default function WelcomePage() {
         <div style={{ borderTop: '1px solid var(--border)', marginTop: 16, paddingTop: 12, fontSize: 12.5 }} className="muted">
           <strong>Wer sieht was?</strong> Deine Dozentin und das OpenEvo-Team können deine Arbeit in diesem Bereich einsehen (gemerkte Lernziele,
           Beurteilungen, Gruppen). Andere Studierende sehen deinen Namen in der Gruppenliste und nur das aus deiner Arbeit, was du mit deiner Gruppe teilst.
-          Deine E-Mail-Adresse sehen sie nicht. Zur Abgabe lädst du zwei Dateien herunter und gibst sie in Moodle ab.
+          Deine E-Mail-Adresse sehen sie nicht.
           Die Daten liegen auf einem Server in Frankfurt. Mehr steht in der <Link to="/privacy">Datenschutzerklärung</Link>.
         </div>
       </div>

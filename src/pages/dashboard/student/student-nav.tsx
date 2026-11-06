@@ -41,6 +41,14 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
   )
 }
 
+// The seminar's further tasks (Susan, 10/29). They stay hidden until the task is
+// ready: set visible to true here once the page for it exists (route `path`
+// in App.tsx and in JENA_STUDENT_PATHS in project-layout.tsx).
+const SEMINAR_TASKS = [
+  { path: 'aufgabe-2', label: 'Aufgabe 2', visible: false },
+  { path: 'aufgabe-3', label: 'Aufgabe 3', visible: false },
+]
+
 export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; groupsEnabled: boolean; templateId?: string | null }) {
   const curriculumConnectionsConfig = getCurriculumConnectionsViewConfig(templateId ?? null)
   if (curriculumConnectionsConfig) {
@@ -61,6 +69,11 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
       <NavLink to={`${base}/meine-arbeit`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <PenLine size={14} /><span className="nav-label">Aufgabe 1: Basiskonzepte</span>
       </NavLink>
+      {SEMINAR_TASKS.filter((task) => task.visible).map((task) => (
+        <NavLink key={task.path} to={`${base}/${task.path}`} title={task.label} className={({ isActive }) => (isActive ? 'active' : '')}>
+          <PenLine size={14} /><span className="nav-label">{task.label}</span>
+        </NavLink>
+      ))}
       <p className="muted student-nav-group">PLANEN</p>
       <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Sparkles size={14} /><span className="nav-label">KI-Prompt-Generator</span>

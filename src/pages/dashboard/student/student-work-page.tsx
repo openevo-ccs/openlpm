@@ -216,7 +216,7 @@ function BeurteilenTab({
     <div>
       <p className="muted" style={{ maxWidth: 720 }}>
         Zu jedem gemerkten Lernziel schlägt EvoMentor Verknüpfungen zu Basiskonzepten vor. Beurteile jede Verknüpfung, die du dir ansiehst,
-        nach drei Kriterien. Du musst nicht alle beurteilen. Beurteile die, für die du eine begründete Meinung hast.
+        nach vier Kriterien. Du musst nicht alle beurteilen. Beurteile die, für die du eine begründete Meinung hast.
       </p>
       {starredTopics.map((t) => (
         <LernzielCard
@@ -272,10 +272,15 @@ function LernzielCard({
     <div className="card" style={{ marginBottom: 14 }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <div>
-          <p className="muted" style={{ margin: 0, fontSize: 12 }}>
-            Klasse {topic.grade_band ?? '?'}
-            {topic.thema ? ` · ${topic.thema}` : ''}
-          </p>
+          {/* Same chips as on the Lernziele page, so a goal is recognised at a glance (Susan, 11/3). */}
+          <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+            <span className="chip">{`Kl. ${topic.grade_band ?? '?'}`}</span>
+            {(topic.thema || topic.unterthema) && (
+              <span className="chip chip-thema" title={[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}>
+                {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
+              </span>
+            )}
+          </div>
           <h3 style={{ margin: '2px 0 4px' }}>{topic.title}</h3>
         </div>
         <span className="muted" style={{ fontSize: 12, whiteSpace: 'nowrap' }}>{judged} von {all.length} beurteilt</span>
@@ -355,6 +360,7 @@ function LinkJudgmentRow({
       basiskonzept_id: basiskonzeptId,
       correctness: p.correctness ?? null,
       own_knowledge: p.own_knowledge ?? null,
+      relevance_level: p.relevance_level ?? null,
       didactic_relevance: p.didactic_relevance ?? null,
       note: noteRef.current,
       ...patch,

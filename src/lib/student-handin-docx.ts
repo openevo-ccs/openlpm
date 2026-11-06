@@ -79,17 +79,18 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   if (h.link_judgments.length) {
     children.push(
       table(
-        ['Lernziel', 'Basiskonzept', 'Vorschlag im Tool (0–3)', 'Fachliche Korrektheit', 'Beitrag zum eigenen Fachwissen', 'Didaktische Relevanz', 'Anmerkung'],
+        ['Lernziel', 'Basiskonzept', 'Vorschlag im Tool (0–3)', 'Fachliche Korrektheit', 'Beitrag zum eigenen Fachwissen', 'Relevanzstufe', 'Didaktische Relevanz', 'Anmerkung'],
         h.link_judgments.map((j) => [
           j.lernziel_title,
           j.basiskonzept,
           j.curriculum_relevance == null ? '–' : String(j.curriculum_relevance),
           rating(j.ratings.correctness),
           rating(j.ratings.own_knowledge),
+          rating(j.ratings.relevance_level),
           rating(j.ratings.didactic_relevance),
           j.note,
         ]),
-        [22, 14, 8, 12, 12, 12, 20]
+        [20, 12, 8, 11, 11, 11, 11, 16]
       )
     )
   } else children.push(empty())

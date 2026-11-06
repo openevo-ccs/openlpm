@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom'
-import { ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
+import { Anchor, ChevronDown, ChevronUp, Compass, Search, Star } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import {
   compareTopicsByCurriculumOrder,
@@ -13,7 +13,7 @@ import {
   type ThreadStationWithThread,
   type TopicListItem,
 } from '@/lib/supabase/curriculum'
-import { bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, type BkbEntry } from '@/lib/supabase/basiskonzepte'
+import { bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, getConceptElementsById, getRootConcepts, groupBkIdsByRoot, KONZEPTANKER_DEF, konzeptankerEntries, type BkbEntry } from '@/lib/supabase/basiskonzepte'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
 import { logStudentEvent } from '@/lib/supabase/student-work'
 import type { Database } from '@/lib/supabase/database.types'
@@ -195,6 +195,10 @@ export default function StudentLernzielePage() {
   // entry here doesn't constrain the result at all -- same as the old
   // presence-only checkbox being unchecked.
   const [conceptLevels, setConceptLevels] = useState<Map<string, Set<number>>>(new Map())
+  // Feedback 7b1de182 (Susan, 2026-11-04): show only the Konzeptanker of a
+  // Basiskonzept. Root ids that are narrowed to their Konzeptanker. Only
+  // meaningful while the concept itself is ticked in conceptLevels.
+  const [anchorOnly, setAnchorOnly] = useState<Set<string>>(new Set())
   // Real feedback 2026-10-01 (Susan): "add option to filter by/select-
   // deselect didactic methods (which should be coded in the knowledge
   // graph)" -- they already are (content.didaktische_strategien.
@@ -281,11 +285,38 @@ export default function StudentLernzielePage() {
   useEffect(() => {
     if (!objectId || !topics) return
     setExpandedIds((prev) => (prev.has(objectId) ? prev : new Set(prev).add(objectId)))
-    const raf = requestAnimationFrame(() => {
-      document.getElementById(`lz-card-${objectId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    })
-    return () => cancelAnimationFrame(raf)
   }, [objectId, topics])
+
+  // Feedback 6dc15b4c (Susan, 2026-11-04): after tapping a goal in the Netz the
+  // card opened but the page did not show it. Cause (reproduced live): the
+  // single smooth scroll ran before the other cards had their final height
+  // (the relevance dots and expanded detail arrive afterwards), so it stopped
+  // far above the target. Now the page scrolls once the goal contents have
+  // loaded, jumps instead of gliding, and re-checks twice while the layout
+  // settles. Any wheel, touch or key press by the student cancels the re-checks.
+  useEffect(() => {
+    if (!objectId || !topics || contentById.size === 0) return
+    let cancelled = false
+    const timers: number[] = []
+    const scrollToCard = () => {
+      if (cancelled) return
+      document.getElementById(`lz-card-${objectId}`)?.scrollIntoView({ behavior: 'auto', block: 'start' })
+    }
+    const cancel = () => { cancelled = true }
+    window.addEventListener('wheel', cancel, { once: true, passive: true })
+    window.addEventListener('touchstart', cancel, { once: true, passive: true })
+    window.addEventListener('keydown', cancel, { once: true })
+    const raf = requestAnimationFrame(scrollToCard)
+    for (const ms of [250, 900]) timers.push(window.setTimeout(scrollToCard, ms))
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+      timers.forEach((t) => window.clearTimeout(t))
+      window.removeEventListener('wheel', cancel)
+      window.removeEventListener('touchstart', cancel)
+      window.removeEventListener('keydown', cancel)
+    }
+  }, [objectId, topics, contentById.size > 0])
 
   const allBkIds = useMemo(() => {
     const ids = new Set<string>()
@@ -387,10 +418,14 @@ export default function StudentLernzielePage() {
       if (favoritesOnly && !favorites.has(t.id)) return false
       if (conceptLevels.size > 0) {
         const entries = bkEntries(contentById.get(t.id))
+        const anchorIds = new Set(konzeptankerEntries(contentById.get(t.id)).map((e) => e.basiskonzept_id))
         const passes = entries.some((e) => {
           const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
           const levels = conceptLevels.get(rootKey)
-          return levels && levels.has(e.relevanz_beurteilung)
+          if (!levels) return false
+          // "nur Konzeptanker" for this concept: the goal must anchor exactly this concept.
+          if (anchorOnly.has(rootKey)) return anchorIds.has(e.basiskonzept_id)
+          return levels.has(e.relevanz_beurteilung)
         })
         if (!passes) return false
       }
@@ -405,7 +440,7 @@ export default function StudentLernzielePage() {
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
+  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, anchorOnly, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
 
   // A deep link (Davor/Danach, or a Netz-tab tap) can point at a Lernziel
   // the current filters would otherwise hide (different grade, excluded
@@ -432,7 +467,23 @@ export default function StudentLernzielePage() {
   const allExpanded = sortedDisplayed.length > 0 && sortedDisplayed.every((t) => expandedIds.has(t.id))
   const toggleExpandAll = () => setExpandedIds(allExpanded ? new Set() : new Set(sortedDisplayed.map((t) => t.id)))
 
+  const toggleAnchorOnly = (rootId: string) => {
+    setAnchorOnly((prev) => {
+      const next = new Set(prev)
+      if (next.has(rootId)) next.delete(rootId)
+      else next.add(rootId)
+      return next
+    })
+  }
+
   const toggleConceptAll = (rootId: string) => {
+    // Unticking a concept also drops its "nur Konzeptanker" setting.
+    setAnchorOnly((prev) => {
+      if (!prev.has(rootId)) return prev
+      const next = new Set(prev)
+      next.delete(rootId)
+      return next
+    })
     setConceptLevels((prev) => {
       const next = new Map(prev)
       if (next.has(rootId)) next.delete(rootId)
@@ -599,6 +650,17 @@ export default function StudentLernzielePage() {
                       levels; these let a level be excluded without dropping
                       the concept entirely. */}
                   {activeLevels && (
+                    <label
+                      className="row"
+                      style={{ gap: 5, marginLeft: 21, marginTop: 3, fontSize: 11.5, cursor: 'pointer', flexWrap: 'nowrap', alignItems: 'center' }}
+                      title={KONZEPTANKER_DEF}
+                    >
+                      <input type="checkbox" checked={anchorOnly.has(g.rootId)} onChange={() => toggleAnchorOnly(g.rootId)} />
+                      <Anchor size={11} aria-hidden="true" />
+                      <span>nur Konzeptanker</span>
+                    </label>
+                  )}
+                  {activeLevels && !anchorOnly.has(g.rootId) && (
                     <div className="row" style={{ gap: 5, marginLeft: 21, marginTop: 3, alignItems: 'center' }}>
                       <span className="muted" style={{ fontSize: 10 }}>Relevanz:</span>
                       {/* Real feedback 769c5b85 (Susan): these should just
@@ -722,6 +784,7 @@ export default function StudentLernzielePage() {
                   onToggleFavoriteGoalMethod={onToggleFavoriteGoalMethod}
                   confirmedMethods={confirmedMethodsByLernziel.get(t.id) ?? []}
                   isExpanded={expandedIds.has(t.id)}
+                  isLinkedTo={t.id === objectId}
                   onToggleExpand={onToggleExpand}
                   supabase={supabase}
                   compact={viewMode === 'list'}
@@ -751,6 +814,7 @@ function LernzielCard({
   onToggleFavoriteGoalMethod,
   confirmedMethods,
   isExpanded,
+  isLinkedTo,
   onToggleExpand,
   supabase,
   compact,
@@ -770,6 +834,8 @@ function LernzielCard({
   onToggleFavoriteGoalMethod: (dataObjectId: string, methodKey: string) => void
   confirmedMethods: MethodLernzielLink[]
   isExpanded: boolean
+  /** True for the one goal the student arrived at through a link (for example from the Netz). */
+  isLinkedTo: boolean
   onToggleExpand: (id: string) => void
   supabase: ProjectOutletContext['supabase']
   compact: boolean
@@ -783,6 +849,7 @@ function LernzielCard({
   // single line (grade chip, title, favorite star) -- an EXPANDED card
   // still shows full detail either way, since the detail itself isn't
   // something "list mode" should hide.
+  const anchorEntries = konzeptankerEntries(content)
   if (compact && !isExpanded) {
     return (
       <div
@@ -794,6 +861,7 @@ function LernzielCard({
       >
         <span className="chip">{gradeChipLabel(topic.grade_band ?? '?')}</span>
         <strong style={{ flex: 1, minWidth: 0 }}>{topic.title}</strong>
+        {anchorEntries.length > 0 && <span title={`Konzeptanker: ${KONZEPTANKER_DEF}`} style={{ display: 'inline-flex' }}><Anchor size={14} aria-label="Konzeptanker" /></span>}
         <button
           className="btn-linklike"
           data-tour="lernziele.favorit"
@@ -810,9 +878,9 @@ function LernzielCard({
     <div
       id={`lz-card-${topic.id}`}
       key={topic.id}
-      className={`card topic-card${isExpanded ? ' active' : ''}`}
+      className={`card topic-card${isExpanded ? ' active' : ''}${isLinkedTo ? ' linked-to' : ''}`}
       data-tour="lernziele.karte"
-      style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined }}
+      style={{ gridColumn: isExpanded && !compact ? '1 / -1' : undefined, scrollMarginTop: 72 }}
       onClick={() => onToggleExpand(topic.id)}
     >
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
@@ -828,6 +896,20 @@ function LernzielCard({
               {[topic.thema, topic.unterthema].filter(Boolean).join(' › ')}
             </span>
           )}
+          {anchorEntries.map((e) => {
+            const rootIdx = rootIdxById.get(rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id)
+            return (
+              <span
+                key={e.basiskonzept_id}
+                className="chip chip-anchor"
+                title={`Konzeptanker: ${KONZEPTANKER_DEF}`}
+                style={rootIdx !== undefined ? { borderColor: `var(--map-${(rootIdx % 6) + 1})` } : undefined}
+              >
+                <Anchor size={11} aria-hidden="true" />
+                Konzeptanker{bkLabels[e.basiskonzept_id] ? `: ${bkLabels[e.basiskonzept_id]}` : ''}
+              </span>
+            )
+          })}
         </div>
         <button
           className="btn-linklike"
