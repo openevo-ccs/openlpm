@@ -33,7 +33,7 @@ const BASISKONZEPTE_RATIONALE =
 
 const TABS = ['dashboard', 'netz', 'detail'] as const
 type Tab = (typeof TABS)[number]
-const TAB_LABEL: Record<Tab, string> = { dashboard: 'Dashboard', netz: 'Netz', detail: 'Detail' }
+const TAB_LABEL: Record<Tab, string> = { dashboard: 'Dashboard', netz: 'Netz', detail: 'Details zu den Basiskonzepten' }
 
 export default function StudentBasiskonzeptePage() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()

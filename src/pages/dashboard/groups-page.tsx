@@ -92,7 +92,7 @@ export default function GroupsPage() {
           <p>{t.empty}</p>
         </div>
       ) : (
-        <div className="grid grid-3" style={{ marginBottom: 20 }}>
+        <div className="grid grid-3" style={{ marginBottom: 20 }} data-tour="gruppen.liste">
           {rows.map(({ group, membership }) => (
             <div key={group.id} className="card">
               <h3>{group.name}</h3>

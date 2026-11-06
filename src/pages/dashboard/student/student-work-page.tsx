@@ -10,7 +10,6 @@ import {
   JUDGMENT_SCALE,
   REFLECTION_PROMPTS,
   deleteWorkEntry,
-  getOrCreateParticipantCode,
   linkKey,
   listMyActivityEvents,
   listMyWorkEntries,
@@ -21,7 +20,7 @@ import {
   type WorkEntry,
   type WorkKind,
 } from '@/lib/supabase/student-work'
-import { buildHandIn, describeHandIn, handInFileBase, loadFavoriteTimes, type HandIn } from '@/lib/student-handin'
+import { buildHandIn, describeHandIn, handInFileBase, loadFavoriteTimes, loadProfileName, type HandIn } from '@/lib/student-handin'
 import { downloadBlob } from '@/lib/export-import'
 
 // "Meine Arbeit": where a student keeps the answers to the seminar 2 task
@@ -166,6 +165,7 @@ export default function StudentWorkPage() {
           contentById={contentById}
           bkLabels={bkLabels}
           judgedCount={judgedCount}
+          save={save}
         />
       )}
     </div>
@@ -215,8 +215,8 @@ function BeurteilenTab({
   return (
     <div>
       <p className="muted" style={{ maxWidth: 720 }}>
-        Zu jedem gemerkten Lernziel schlägt EvoMentor Verknüpfungen zu Basiskonzepten vor. Beurteile jede Verknüpfung, die du dir ansiehst,
-        nach vier Kriterien. Du musst nicht alle beurteilen. Beurteile die, für die du eine begründete Meinung hast.
+        Zu jedem gemerkten Lernziel schlägt EvoMentor Verknüpfungen zu Basiskonzepten vor. Beurteile für jedes deiner gemerkten Lernziele
+        die vorgeschlagenen Verknüpfungen nach vier Kriterien.
       </p>
       {starredTopics.map((t) => (
         <LernzielCard
@@ -486,6 +486,7 @@ function AbgabeTab({
   contentById,
   bkLabels,
   judgedCount,
+  save,
 }: {
   supabase: ProjectOutletContext['supabase']
   project: ProjectOutletContext['project']
@@ -495,9 +496,15 @@ function AbgabeTab({
   contentById: Map<string, unknown>
   bkLabels: Record<string, string>
   judgedCount: number
+  save: Save
 }) {
-  const [handIn, setHandIn] = useState<HandIn | null>(null)
   const [events, setEvents] = useState<ActivityEvent[]>([])
+  const [groupNames, setGroupNames] = useState<string[] | null>(null)
+  // Feedback 51ebbcdc (Susan, 2026-11-06): the file carries the student's own name. The random code is gone.
+  // The name is typed here once and kept with the student's work. The profile name pre-fills it
+  // when it is a real name.
+  const storedName = ((entries.find((e) => e.kind === 'meta' && e.entry_key === 'participant')?.payload?.participant_name as string | undefined) ?? '').trim()
+  const [name, setName] = useState(storedName)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const template = (project as any).student_view_template as string | undefined
@@ -505,36 +512,51 @@ function AbgabeTab({
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const [evs, groups, code] = await Promise.all([
+      const [evs, groups] = await Promise.all([
         listMyActivityEvents(supabase, project.id),
         listGroupsWithMyMembership(supabase, project.id),
-        getOrCreateParticipantCode(supabase, project.id, entries),
       ])
       if (cancelled) return
       setEvents(evs)
-      const topicRefs = new Map(
-        topics.map((t) => [t.id, { id: t.id, title: t.title, grade_band: t.grade_band, thema: t.thema, unterthema: t.unterthema, content: contentById.get(t.id) }])
-      )
-      setHandIn(
-        buildHandIn({
-          projectSlug: project.slug,
-          viewTemplateId: template ?? 'jena-biologiedidaktik-de',
-          sandbox: /sandbox/.test(project.slug),
-          participantCode: code,
-          groupNames: groups.filter((g) => g.membership).map((g) => g.group.name),
-          entries,
-          events: evs,
-          starred,
-          lernziele: topicRefs,
-          bkLabels,
-        })
-      )
+      setGroupNames(groups.filter((g) => g.membership).map((g) => g.group.name))
     })()
     return () => { cancelled = true }
-  }, [supabase, project.id, project.slug, entries, starred, topics, contentById, bkLabels, template])
+  }, [supabase, project.id])
+
+  // Pre-fill from the profile once, only while nothing is stored and nothing typed yet.
+  useEffect(() => {
+    if (storedName) return
+    let cancelled = false
+    loadProfileName(supabase).then((n) => { if (!cancelled && n) setName((cur) => cur || n) })
+    return () => { cancelled = true }
+  }, [supabase, storedName])
+
+  const handIn: HandIn | null = useMemo(() => {
+    if (groupNames === null) return null
+    const topicRefs = new Map(
+      topics.map((t) => [t.id, { id: t.id, title: t.title, grade_band: t.grade_band, thema: t.thema, unterthema: t.unterthema, content: contentById.get(t.id) }])
+    )
+    return buildHandIn({
+      projectSlug: project.slug,
+      viewTemplateId: template ?? 'jena-biologiedidaktik-de',
+      sandbox: /sandbox/.test(project.slug),
+      participantName: name.trim(),
+      groupNames,
+      entries,
+      events,
+      starred,
+      lernziele: topicRefs,
+      bkLabels,
+    })
+  }, [groupNames, name, events, project.slug, template, entries, starred, topics, contentById, bkLabels])
 
   if (!handIn) return <p className="muted">Bereitet deine Datei vor…</p>
   const base = handInFileBase(handIn)
+  const nameMissing = name.trim() === ''
+  const saveName = () => {
+    const n = name.trim()
+    if (n && n !== storedName) void save('meta', 'participant', { participant_name: n })
+  }
 
   const downloadWord = async () => {
     setBusy(true); setError(null)
@@ -560,9 +582,22 @@ function AbgabeTab({
       <h3>Abgabe</h3>
       <p className="muted" style={{ maxWidth: 720 }}>
         Du lädst eine Word-Datei herunter und gibst sie in Moodle ab. Sie ist zum Lesen, für dich, die Gruppe und die Dozentin.
-        Die Datei enthält weder deinen Namen noch deine E-Mail-Adresse, nur deinen Teilnahme-Code.
+        Die Datei enthält deinen Namen und deine Arbeit, aber keine E-Mail-Adresse.
       </p>
       {handIn.tool.sandbox && <div className="notice notice-bad">Sandbox: Dies ist ein Testkonto mit synthetischen Daten.</div>}
+
+      <div className="field" style={{ maxWidth: 420, marginBottom: 14 }}>
+        <label htmlFor="handin-name"><strong>Dein Name für die Datei</strong></label>
+        <input
+          id="handin-name"
+          type="text"
+          value={name}
+          placeholder="Vorname Nachname"
+          autoComplete="name"
+          onChange={(e) => setName(e.target.value)}
+          onBlur={saveName}
+        />
+      </div>
 
       <h4>Das steht in deiner Datei</h4>
       <table style={{ width: '100%', maxWidth: 720, marginBottom: 12 }}>
@@ -595,10 +630,13 @@ function AbgabeTab({
         </div>
       )}
       <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-        <button className="btn btn-primary" onClick={downloadWord} disabled={busy}>
+        <button className="btn btn-primary" onClick={() => { saveName(); void downloadWord() }} disabled={busy || nameMissing}>
           <FileText size={14} /> Word-Datei herunterladen
         </button>
       </div>
+      {nameMissing && (
+        <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Trage oben deinen Namen ein, dann kannst du die Datei herunterladen.</p>
+      )}
       {judgedCount === 0 && (
         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>
           Du hast noch keine Verknüpfung beurteilt. Du kannst trotzdem schon herunterladen und später eine neue Fassung erstellen.

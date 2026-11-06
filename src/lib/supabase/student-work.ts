@@ -39,11 +39,11 @@ export interface ActivityEvent {
 
 export const JUDGMENT_CRITERIA = [
   { key: 'correctness', label: 'Fachliche Korrektheit', hint: 'Stimmt die Verknüpfung fachlich?' },
-  { key: 'own_knowledge', label: 'Beitrag zum eigenen Fachwissen', hint: 'Habe ich dadurch etwas Neues oder Genaueres verstanden?' },
+  { key: 'own_knowledge', label: 'Beitrag zum eigenen Fachwissen', hint: 'Hat die Basiskonzeptverknüpfung mein eigenes biologisches Fachwissen erweitert oder vertieft?' },
   // Feedback 2a531174 (Susan, 2026-11-04): the relevance level the tool suggests
   // (niedrig, mittel, hoch) had no question of its own. This one asks about that level.
   { key: 'relevance_level', label: 'Relevanzstufe', hint: 'Passt die vorgeschlagene Einstufung (niedrig, mittel oder hoch) für dieses Basiskonzept?' },
-  { key: 'didactic_relevance', label: 'Didaktische Relevanz', hint: 'Hilft die Verknüpfung, den Unterricht zu planen?' },
+  { key: 'didactic_relevance', label: 'Didaktische Relevanz', hint: 'Hilft die Verknüpfung, einen an Basiskonzepten orientierten Unterricht zu planen?' },
 ] as const
 
 export type CriterionKey = (typeof JUDGMENT_CRITERIA)[number]['key']
@@ -189,27 +189,4 @@ export async function listMyActivityEvents(supabase: Client, projectId: string):
     .order('created_at', { ascending: true })
     .limit(5000)
   return (data ?? []) as ActivityEvent[]
-}
-
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-
-function randomParticipantCode(): string {
-  const bytes = new Uint8Array(8)
-  crypto.getRandomValues(bytes)
-  const chars = Array.from(bytes, (b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('')
-  return `JBD-${chars.slice(0, 4)}-${chars.slice(4)}`
-}
-
-/**
- * The random code that stands in for the student's name in the files they
- * hand in. Created once, stored on the student's own account, never shown to
- * anyone else. The files carry no name or email, so the instructor can
- * anonymise after the Moodle submission.
- */
-export async function getOrCreateParticipantCode(supabase: Client, projectId: string, entries: WorkEntry[]): Promise<string> {
-  const existing = entries.find((e) => e.kind === 'meta' && e.entry_key === 'participant')
-  if (existing?.payload?.participant_code) return existing.payload.participant_code as string
-  const code = randomParticipantCode()
-  await saveWorkEntry(supabase, projectId, 'meta', 'participant', { participant_code: code })
-  return code
 }

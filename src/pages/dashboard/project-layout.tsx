@@ -92,7 +92,6 @@ const JENA_STUDENT_PATHS = [
   /^$/,
   /^basiskonzepte(\/[^/]+)?$/,
   /^planen$/,
-  /^calendar$/,
   /^groups(\/[0-9a-f-]{36})?$/,
   /^meine-arbeit$/,
   /^[0-9a-f-]{36}$/,
