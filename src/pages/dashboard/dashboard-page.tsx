@@ -247,11 +247,28 @@ function ProjectsSection({
   supabase: ProjectOutletContext['supabase']
 }) {
   const [children, setChildren] = useState<Project[]>([])
+  const [builtOn, setBuiltOn] = useState<Project[]>([])
+  const isRepository = (project as any).project_kind === 'curriculum-repository'
 
   useEffect(() => {
     supabase.from('projects').select('*').eq('parent_project_id', project.id).order('created_at', { ascending: true })
       .then(({ data }) => setChildren(data ?? []))
   }, [supabase, project.id])
+
+  // Projects that are built on this repository (project_repository_links) sit beside it and never inside it,
+  // so they never showed up here. Only projects the signed-in person may see come back.
+  useEffect(() => {
+    setBuiltOn([])
+    if (!isRepository) return
+    supabase
+      .from('project_repository_links')
+      .select('project:projects!project_repository_links_project_id_fkey(*)')
+      .eq('repository_project_id', project.id)
+      .then(({ data }) => {
+        const rows = ((data ?? []) as unknown as { project: Project | null }[]).map((r) => r.project).filter((p): p is Project => !!p)
+        setBuiltOn(rows.sort((a, b) => a.name.localeCompare(b.name)))
+      })
+  }, [supabase, project.id, isRepository])
 
   return (
     <>
@@ -274,11 +291,13 @@ function ProjectsSection({
         )}
       </div>
 
-      {children.length === 0 ? (
+      {children.length === 0 && builtOn.length === 0 ? (
         <div className="card empty" style={{ marginBottom: 20 }}>
           <FolderKanban size={32} />
           <p>No projects here yet.</p>
         </div>
+      ) : children.length === 0 ? (
+        <p className="muted" style={{ marginBottom: 20 }}>No projects sit inside this space. The projects built on it are listed below.</p>
       ) : (
         <div className="grid grid-3" style={{ marginBottom: 20 }}>
           {children.map((child) => (
@@ -300,6 +319,35 @@ function ProjectsSection({
             </Link>
           ))}
         </div>
+      )}
+
+      {builtOn.length > 0 && (
+        <>
+          <h2 className="row" style={{ marginTop: 8 }}><BookOpen size={16} style={{ color: 'var(--text-muted)' }} />Projects built on this repository</h2>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            These projects take their content from the curriculum documents kept here. You see the ones you have access to.
+          </p>
+          <div className="grid grid-3" style={{ marginBottom: 20 }}>
+            {builtOn.map((child) => (
+            <Link key={child.id} to={`/dashboard/${child.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="card" style={{ height: '100%' }}>
+                    <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <h3>{child.name}</h3>
+                      <MaturityBadge status={child.maturity} />
+                    </div>
+                    {child.description && <p className="muted">{child.description}</p>}
+                    <div className="row" style={{ flexWrap: 'wrap' }}>
+                      <EpistemicStatusBadge status={child.epistemic_status} />
+                      <WorkingLanguagesTag languages={child.working_languages} />
+                    </div>
+                    <span className="row muted" style={{ fontSize: 12, marginTop: 8 }}>
+                      Open <ArrowRight size={12} />
+                    </span>
+                  </div>
+                </Link>
+            ))}
+          </div>
+        </>
       )}
     </>
   )

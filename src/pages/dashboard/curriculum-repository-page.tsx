@@ -31,6 +31,20 @@ import { LiteratureCollectionsPanel } from '@/components/literature-collections-
 // owner/maintainer-only action (RLS-enforced, same as canManage elsewhere).
 // Every record is shown only as much as its own access_tier allows -- see
 // splitContentFields.
+function capitalizeWord(text: string) {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : text
+}
+
+function recordFacets(r: RepositoryRecordRow): { subject: string | null; schoolType: string | null; grade: string | null } {
+  const c = (r.content ?? {}) as Record<string, unknown>
+  const m = /grades?\s+(\d+(?:\s+to\s+\d+)?)/i.exec(r.title)
+  return {
+    subject: typeof c.subject === 'string' ? c.subject : null,
+    schoolType: typeof c.schoolType === 'string' ? c.schoolType : null,
+    grade: m ? m[1].replace(/\s+/g, ' ') : null,
+  }
+}
+
 export default function CurriculumRepositoryPage() {
   const { project, role, supabase } = useOutletContext<ProjectOutletContext>()
   const { recordId } = useParams<{ recordId?: string }>()
@@ -41,6 +55,9 @@ export default function CurriculumRepositoryPage() {
   const [recordType, setRecordType] = useState('')
   const [jurisdiction, setJurisdiction] = useState('')
   const [search, setSearch] = useState('')
+  const [subject, setSubject] = useState('')
+  const [schoolType, setSchoolType] = useState('')
+  const [grade, setGrade] = useState('')
   const [creating, setCreating] = useState(false)
   const [refreshToken, setRefreshToken] = useState(0)
   const refresh = () => setRefreshToken((t) => t + 1)
@@ -79,6 +96,36 @@ export default function CurriculumRepositoryPage() {
     for (const r of records ?? []) m.set(r.record_type, (m.get(r.record_type) ?? 0) + 1)
     return m
   }, [records])
+
+  // Subject, school type and grade are not columns. Subject and school type sit in the record's content;
+  // the grade appears only in the title of a Lehrplan unit ("grade 9", "grades 5 to 6"). A filter is
+  // offered only when the records on screen show at least two different values for it.
+  // Each list offers only the values that still have records under the other two choices, so no choice leads to an empty page.
+  const facets = useMemo(() => {
+    const options = (pick: (f: ReturnType<typeof recordFacets>) => string | null, others: Partial<Record<'subject' | 'schoolType' | 'grade', string>>) => {
+      const set = new Set<string>()
+      for (const r of records ?? []) {
+        const f = recordFacets(r)
+        if ((others.subject && f.subject !== others.subject) || (others.schoolType && f.schoolType !== others.schoolType) || (others.grade && f.grade !== others.grade)) continue
+        const v = pick(f)
+        if (v) set.add(v)
+      }
+      return [...set].sort((a, b) => a.localeCompare(b, 'en', { numeric: true }))
+    }
+    return {
+      subjects: options((f) => f.subject, { schoolType, grade }),
+      schoolTypes: options((f) => f.schoolType, { subject, grade }),
+      grades: options((f) => f.grade, { subject, schoolType }),
+    }
+  }, [records, subject, schoolType, grade])
+
+  const shownRecords = useMemo(
+    () => (records ?? []).filter((r) => {
+      const f = recordFacets(r)
+      return (!subject || f.subject === subject) && (!schoolType || f.schoolType === schoolType) && (!grade || f.grade === grade)
+    }),
+    [records, subject, schoolType, grade],
+  )
 
   return (
     <div>
@@ -122,12 +169,39 @@ export default function CurriculumRepositoryPage() {
               {jurisdictions.map((j) => <option key={j} value={j}>{j}</option>)}
             </select>
           </div>
+          {(facets.subjects.length > 1 || subject) && (
+            <div className="field">
+              <label>Subject</label>
+              <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+                <option value="">All subjects</option>
+                {facets.subjects.map((v) => <option key={v} value={v}>{capitalizeWord(v)}</option>)}
+              </select>
+            </div>
+          )}
+          {(facets.schoolTypes.length > 1 || schoolType) && (
+            <div className="field">
+              <label>School type</label>
+              <select value={schoolType} onChange={(e) => setSchoolType(e.target.value)}>
+                <option value="">All school types</option>
+                {facets.schoolTypes.map((v) => <option key={v} value={v}>{v}</option>)}
+              </select>
+            </div>
+          )}
+          {(facets.grades.length > 1 || grade) && (
+            <div className="field">
+              <label>Grade (read from the title)</label>
+              <select value={grade} onChange={(e) => setGrade(e.target.value)}>
+                <option value="">All grades</option>
+                {facets.grades.map((v) => <option key={v} value={v}>{v.includes(' to ') ? `Grades ${v}` : `Grade ${v}`}</option>)}
+              </select>
+            </div>
+          )}
         </div>
       </div>
 
       {records === null ? (
         <p className="muted">Loading…</p>
-      ) : records.length === 0 && !creating ? (
+      ) : shownRecords.length === 0 && !creating ? (
         <div className="card empty">
           <Library size={32} />
           <p>No records match.</p>
@@ -135,8 +209,8 @@ export default function CurriculumRepositoryPage() {
       ) : (
         <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
           <div className="card" style={{ maxHeight: 640, overflowY: 'auto' }}>
-            <p className="muted" style={{ fontSize: 11, marginTop: 0 }}>{records.length} record{records.length === 1 ? '' : 's'}</p>
-            {records.map((r) => (
+            <p className="muted" style={{ fontSize: 11, marginTop: 0 }}>{shownRecords.length} record{shownRecords.length === 1 ? '' : 's'}</p>
+            {shownRecords.map((r) => (
               <button
                 key={r.id}
                 className="btn-linklike"
