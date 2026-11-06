@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Generates the German framework and policy linking round (4 Nov 2026), for German records that few or none of the four synthetic spaces reached:
-//   node scripts/generate_german_framework_round_links_migration.mjs > supabase/migrations/229_german_framework_round_links.sql
+//   node scripts/generate_german_framework_round_links_migration.mjs > supabase/migrations/230_german_framework_round_links.sql
 //
 // Input: scripts/data/german-framework-round-2026-11-04.json
 //   links     AI-drafted proposals from a part of one of the four synthetic spaces to a German record already in the database.
