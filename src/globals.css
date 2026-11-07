@@ -567,6 +567,7 @@ th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: 
 .student-nav a { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 8px; text-decoration: none; color: var(--text-primary); font-size: 13.5px; }
 .student-nav a:hover { background: var(--surface-1); }
 .student-nav a.active { background: var(--surface-2); color: var(--series-a); font-weight: 600; }
+.student-nav-section { display: flex; flex-direction: column; gap: 2px; }
 .student-nav-group { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em; margin: 12px 0 2px; }
 .student-nav-group:first-child { margin-top: 0; }
 

@@ -19,6 +19,9 @@ export const TOUR_ANCHORS: TourAnchor[] = [
   { key: 'sidebar', label: 'Side menu (with the collapse button)', group: 'On every page', page: '*' },
   { key: 'sidebar.toggle', label: 'Button that opens and closes the side menu', group: 'On every page', page: '*' },
 
+  { key: 'sidebar.meine-arbeit', label: 'Side menu section "Meine Arbeit"', group: 'On every page', page: '*', templates: 'jena' },
+  { key: 'sidebar.gruppen', label: 'Side menu section "Gruppen"', group: 'On every page', page: '*', templates: 'jena' },
+
   { key: 'lernziele.kopf', label: 'Page title and goal count', group: 'Lernziele page', page: '', templates: 'jena' },
   { key: 'lernziele.suche', label: 'Free search box', group: 'Lernziele page', page: '', templates: 'jena' },
   { key: 'lernziele.klassenstufe', label: 'Grade buttons', group: 'Lernziele page', page: '', templates: 'jena' },
@@ -33,6 +36,8 @@ export const TOUR_ANCHORS: TourAnchor[] = [
 
   { key: 'basiskonzepte.kopf', label: 'Page title and tabs', group: 'Basiskonzepte page', page: 'basiskonzepte', templates: 'jena' },
   { key: 'basiskonzepte.dashboard', label: 'Dashboard with the relevance overview', group: 'Basiskonzepte page', page: 'basiskonzepte', templates: 'jena' },
+
+  { key: 'gruppen.liste', label: 'The numbered groups with the join buttons', group: 'Gruppen page', page: 'groups', templates: 'jena' },
 ]
 
 export interface TourPage {
@@ -46,9 +51,10 @@ export const TOUR_PAGES: TourPage[] = [
   { path: '', label: 'Start page' },
   { path: 'basiskonzepte', label: 'Basiskonzepte (Dashboard tab)', templates: 'jena' },
   { path: 'basiskonzepte/netz', label: 'Basiskonzepte (Netz tab)', templates: 'jena' },
-  { path: 'basiskonzepte/detail', label: 'Basiskonzepte (Detail tab)', templates: 'jena' },
+  { path: 'basiskonzepte/detail', label: 'Basiskonzepte (Details zu den Basiskonzepten)', templates: 'jena' },
   { path: 'planen', label: 'KI-Prompt-Generator', templates: 'jena' },
-  { path: 'calendar', label: 'Wochenplan', templates: 'jena' },
+  { path: 'meine-arbeit', label: 'Meine Arbeit (Aufgabe 1)', templates: 'jena' },
+  { path: 'groups', label: 'Gruppen', templates: 'jena' },
 ]
 
 export function getTourAnchor(key: string | undefined | null): TourAnchor | null {

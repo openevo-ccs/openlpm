@@ -40,7 +40,7 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   children.push(new Paragraph({ text: 'Ergebnis zu Aufgabe 1: Basiskonzepte', heading: HeadingLevel.TITLE }))
   if (h.tool.sandbox) children.push(p('SANDBOX-DATEI: erzeugt von einer synthetischen Testperson, keine echte Studierendenarbeit.', { bold: true }))
   children.push(p(`${h.task.course}`))
-  children.push(p(`Teilnahme-Code: ${h.participant_code}`))
+  children.push(p(`Name: ${h.participant_name}`))
   children.push(p(`Gruppe: ${h.groups.length ? h.groups.join(', ') : 'keine gewählt'}`))
   children.push(p(`Erstellt am ${formatDate(h.exported_at)}`))
 

@@ -83,7 +83,7 @@ function RelevanceDots({ level, color }: { level: number; color?: string }) {
   )
 }
 
-type SortBy = 'default' | 'grade' | 'thema' | 'favorites' | 'sequence'
+type SortBy = 'grade' | 'thema' | 'favorites' | 'sequence'
 type ViewMode = 'cards' | 'list'
 
 // Real feedback fba146fa (Susan, 2026-10-02): the curriculum-order info
@@ -231,7 +231,7 @@ export default function StudentLernzielePage() {
   // a card that's no longer in `filtered` just doesn't render, instead of a
   // separate panel staying stuck on screen referencing it.
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-  const [sortBy, setSortBy] = useState<SortBy>('default')
+  const [sortBy, setSortBy] = useState<SortBy>('sequence')
   const [viewMode, setViewMode] = useState<ViewMode>('cards')
   // The real, live method vocabulary -- see METHOD_ICON's own comment above.
   // Empty until the project's prompt library resolves; the filter falls
@@ -455,7 +455,6 @@ export default function StudentLernzielePage() {
   }, [filtered, deepLinkedTopic])
 
   const sortedDisplayed = useMemo(() => {
-    if (sortBy === 'default') return displayed
     const arr = [...displayed]
     if (sortBy === 'grade') arr.sort((a, b) => (parseInt(a.grade_band ?? '', 10) || 0) - (parseInt(b.grade_band ?? '', 10) || 0))
     else if (sortBy === 'thema') arr.sort((a, b) => (a.thema ?? '').localeCompare(b.thema ?? '', 'de'))
@@ -735,7 +734,6 @@ export default function StudentLernzielePage() {
             <div className="student-toolbar-group">
               <label className="muted" style={{ fontSize: 11.5 }}>Sortieren:</label>
               <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortBy)} style={{ fontSize: 12.5 }}>
-                <option value="default">Standard</option>
                 <option value="grade">Klassenstufe</option>
                 <option value="thema">Thema</option>
                 <option value="favorites">Favoriten zuerst</option>

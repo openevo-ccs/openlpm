@@ -12,7 +12,8 @@ import {
 type Client = SupabaseClient<Database>
 
 export const HANDIN_SCHEMA = 'openlpm.jena-biologiedidaktik.handin'
-export const HANDIN_SCHEMA_VERSION = '1.0'
+// 1.1 (2026-11-06, feedback 51ebbcdc): the file carries the student's own name instead of a random participation code.
+export const HANDIN_SCHEMA_VERSION = '1.1'
 
 export interface LernzielRef {
   id: string
@@ -27,7 +28,7 @@ export interface HandInInput {
   projectSlug: string
   viewTemplateId: string
   sandbox: boolean
-  participantCode: string
+  participantName: string
   groupNames: string[]
   entries: WorkEntry[]
   events: ActivityEvent[]
@@ -44,7 +45,7 @@ export interface HandIn {
   exported_at: string
   tool: { app: 'OpenLPM'; space: string; view: string; sandbox: boolean }
   task: { course: string; seminar: string }
-  participant_code: string
+  participant_name: string
   groups: string[]
   topic: {
     favorite_themes: string[]
@@ -114,7 +115,7 @@ export function buildHandIn(input: HandInInput): HandIn {
     exported_at: (input.now ?? new Date()).toISOString(),
     tool: { app: 'OpenLPM', space: input.projectSlug, view: input.viewTemplateId, sandbox: input.sandbox },
     task: { course: 'Allgemeine Fachdidaktik Biologie, Universität Jena, WS 2026/27', seminar: 'S2 Themenfindung und EvoMentor (9.11.2026)' },
-    participant_code: input.participantCode,
+    participant_name: input.participantName,
     groups: input.groupNames,
     topic: {
       favorite_themes: (topic?.payload.favorite_themes as string[] | undefined) ?? [],
@@ -182,7 +183,7 @@ export function describeHandIn(h: HandIn): { label: string; value: string }[] {
     (j) => j.ratings.correctness != null && j.ratings.own_knowledge != null && j.ratings.relevance_level != null && j.ratings.didactic_relevance != null
   ).length
   return [
-    { label: 'Dein Teilnahme-Code (ersetzt deinen Namen)', value: h.participant_code },
+    { label: 'Dein Name', value: h.participant_name || 'noch nicht eingetragen' },
     { label: 'Gruppe', value: h.groups.length ? h.groups.join(', ') : 'noch keine Gruppe gewählt' },
     ...(h.topic.own_topic || h.topic.favorite_themes.length
       ? [{ label: 'Thema', value: h.topic.own_topic || h.topic.favorite_themes.join(', ') }]
@@ -214,7 +215,27 @@ export async function loadFavoriteTimes(supabase: Client): Promise<{ id: string;
 
 export function handInFileBase(h: HandIn): string {
   const date = h.exported_at.slice(0, 10)
-  return `${h.tool.sandbox ? 'SANDBOX_' : ''}EvoMentor_Abgabe_${h.participant_code}_${date}`
+  // Name as a safe file name part: umlauts folded, everything else but letters and digits dropped.
+  const who = h.participant_name
+    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
+  return `${h.tool.sandbox ? 'SANDBOX_' : ''}EvoMentor_Abgabe_${who || 'ohne_Name'}_${date}`
+}
+
+/**
+ * The name stored in the student's profile, used only to pre-fill the name field of the hand-in.
+ * Many profiles hold just the sign-in address as their name (it is the default at sign-up), so an
+ * address is never returned: the student types the name instead.
+ */
+export async function loadProfileName(supabase: Client): Promise<string> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return ''
+  const { data } = await supabase.from('users').select('name').eq('id', user.id).maybeSingle()
+  const name = ((data as { name?: string | null } | null)?.name ?? '').trim()
+  return name.includes('@') ? '' : name
 }
 
 export function handInJsonBlob(h: HandIn): Blob {

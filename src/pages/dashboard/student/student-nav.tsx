@@ -49,6 +49,11 @@ const SEMINAR_TASKS = [
   { path: 'aufgabe-3', label: 'Aufgabe 3', visible: false },
 ]
 
+// Susan, 11/6 (feedback b4412950): the Wochenplan page is not shown in this view.
+// The page and its route stay in the code; set to true to bring the menu entry
+// back (and add 'calendar' to JENA_STUDENT_PATHS in project-layout.tsx).
+const SHOW_WOCHENPLAN = false
+
 export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; groupsEnabled: boolean; templateId?: string | null }) {
   const curriculumConnectionsConfig = getCurriculumConnectionsViewConfig(templateId ?? null)
   if (curriculumConnectionsConfig) {
@@ -65,6 +70,7 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
       <NavLink to={`${base}/basiskonzepte`} title="Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Dna size={14} /><span className="nav-label">Basiskonzepte</span>
       </NavLink>
+      <div className="student-nav-section" data-tour="sidebar.meine-arbeit">
       <p className="muted student-nav-group">MEINE ARBEIT</p>
       <NavLink to={`${base}/meine-arbeit`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <PenLine size={14} /><span className="nav-label">Aufgabe 1: Basiskonzepte</span>
@@ -74,20 +80,23 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
           <PenLine size={14} /><span className="nav-label">{task.label}</span>
         </NavLink>
       ))}
+      </div>
       <p className="muted student-nav-group">PLANEN</p>
       <NavLink to={`${base}/planen`} title="KI-Prompt-Generator" className={({ isActive }) => (isActive ? 'active' : '')}>
         <Sparkles size={14} /><span className="nav-label">KI-Prompt-Generator</span>
       </NavLink>
-      <NavLink to={`${base}/calendar`} title="Wochenplan" className={({ isActive }) => (isActive ? 'active' : '')}>
-        <CalendarRange size={14} /><span className="nav-label">Wochenplan</span>
-      </NavLink>
+      {SHOW_WOCHENPLAN && (
+        <NavLink to={`${base}/calendar`} title="Wochenplan" className={({ isActive }) => (isActive ? 'active' : '')}>
+          <CalendarRange size={14} /><span className="nav-label">Wochenplan</span>
+        </NavLink>
+      )}
       {groupsEnabled && (
-        <>
+        <div className="student-nav-section" data-tour="sidebar.gruppen">
           <p className="muted student-nav-group">GRUPPEN</p>
           <NavLink to={`${base}/groups`} title="Gruppen" className={({ isActive }) => (isActive ? 'active' : '')}>
             <Users size={14} /><span className="nav-label">Gruppen</span>
           </NavLink>
-        </>
+        </div>
       )}
     </nav>
   )
