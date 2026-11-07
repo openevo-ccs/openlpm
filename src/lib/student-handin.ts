@@ -184,7 +184,7 @@ export function describeHandIn(h: HandIn): { label: string; value: string }[] {
   ).length
   return [
     { label: 'Dein Name', value: h.participant_name || 'noch nicht eingetragen' },
-    { label: 'Gruppe', value: h.groups.length ? h.groups.join(', ') : 'noch keine Gruppe gewählt' },
+    groupNumberLine(h.groups),
     ...(h.topic.own_topic || h.topic.favorite_themes.length
       ? [{ label: 'Thema', value: h.topic.own_topic || h.topic.favorite_themes.join(', ') }]
       : []),
@@ -213,6 +213,17 @@ export async function loadFavoriteTimes(supabase: Client): Promise<{ id: string;
   }))
 }
 
+/**
+ * The group line for the file. Groups are named "Gruppe 3" and so on, so a plain number is shown when
+ * the name has that shape (Susan, 2026-11-07: the group number goes into the file automatically).
+ */
+export function groupNumberLine(groups: string[]): { label: string; value: string } {
+  if (!groups.length) return { label: 'Gruppennummer', value: 'noch keine Gruppe gewählt' }
+  const numbers = groups.map((g) => /^\s*Gruppe\s*(\d+)\s*$/i.exec(g)?.[1])
+  if (numbers.every(Boolean)) return { label: groups.length > 1 ? 'Gruppennummern' : 'Gruppennummer', value: numbers.join(', ') }
+  return { label: 'Gruppe', value: groups.join(', ') }
+}
+
 export function handInFileBase(h: HandIn): string {
   const date = h.exported_at.slice(0, 10)
   // Name as a safe file name part: umlauts folded, everything else but letters and digits dropped.
@@ -220,7 +231,8 @@ export function handInFileBase(h: HandIn): string {
     .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss')
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '')
-  return `${h.tool.sandbox ? 'SANDBOX_' : ''}EvoMentor_Abgabe_${who || 'ohne_Name'}_${date}`
+  const groupNo = h.groups.length === 1 ? /^\s*Gruppe\s*(\d+)\s*$/i.exec(h.groups[0])?.[1] : undefined
+  return `${h.tool.sandbox ? 'SANDBOX_' : ''}EvoMentor_Abgabe_${who || 'ohne_Name'}${groupNo ? `_Gruppe${groupNo}` : ''}_${date}`
 }
 
 /**
