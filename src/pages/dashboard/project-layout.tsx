@@ -23,6 +23,7 @@ import { ComparisonProvider } from './comparison/context'
 import { getCurriculumConnectionsViewConfig, isJenaTemplate, isSandboxTemplate } from '@/lib/student-view-templates'
 import { logStudentEvent } from '@/lib/supabase/student-work'
 import { useTours } from '@/state/tours'
+import { recordSpaceVisit } from '@/lib/visited-spaces'
 import type { TourContext } from '@/lib/supabase/guided-tours'
 
 export interface ProjectOutletContext {
@@ -174,6 +175,12 @@ export default function ProjectLayout() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null))
   }, [supabase])
+
+  // Count a space as opened only once it has loaded for this person. A mistyped address or a space they cannot open does not count.
+  const loadedSlug = state?.project?.slug
+  useEffect(() => {
+    if (loadedSlug) recordSpaceVisit(loadedSlug)
+  }, [loadedSlug])
 
   // An old-style `?view=student` link (before Dashboard Custom Views
   // existed) just gets its query param cleaned up now -- there was never
