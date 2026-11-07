@@ -93,7 +93,7 @@ const JENA_STUDENT_PATHS = [
   /^basiskonzepte(\/[^/]+)?$/,
   /^planen$/,
   /^groups(\/[0-9a-f-]{36})?$/,
-  /^meine-arbeit$/,
+  /^(aufgabe1|meine-arbeit)$/,
   /^[0-9a-f-]{36}$/,
 ]
 
@@ -516,7 +516,7 @@ export default function ProjectLayout() {
           )}
           {isSandboxTemplate(templateId) && (
             <div className="notice notice-bad" style={{ marginBottom: 12 }}>
-              <strong>SANDBOX.</strong> Dieser Bereich ist für synthetische (KI-erzeugte) Testpersonen. Nichts hier stammt von echten Studierenden.
+              <strong>SANDBOX.</strong> Dieser Bereich ist für synthetische (KI-erzeugte) Testpersonen. Nichts hier stammt von Studierenden des Seminars.
             </div>
           )}
           {isJenaTemplate(templateId) ? (

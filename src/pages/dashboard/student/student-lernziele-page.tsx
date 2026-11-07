@@ -199,6 +199,8 @@ export default function StudentLernzielePage() {
   // Basiskonzept. Root ids that are narrowed to their Konzeptanker. Only
   // meaningful while the concept itself is ticked in conceptLevels.
   const [anchorOnly, setAnchorOnly] = useState<Set<string>>(new Set())
+  // Feedback 9c527501 (Susan, 2026-11-07): with several Basiskonzepte ticked, show goals that match any of them (default) or all of them.
+  const [conceptMatch, setConceptMatch] = useState<'any' | 'all'>('any')
   // Real feedback 2026-10-01 (Susan): "add option to filter by/select-
   // deselect didactic methods (which should be coded in the knowledge
   // graph)" -- they already are (content.didaktische_strategien.
@@ -419,14 +421,19 @@ export default function StudentLernzielePage() {
       if (conceptLevels.size > 0) {
         const entries = bkEntries(contentById.get(t.id))
         const anchorIds = new Set(konzeptankerEntries(contentById.get(t.id)).map((e) => e.basiskonzept_id))
-        const passes = entries.some((e) => {
-          const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
-          const levels = conceptLevels.get(rootKey)
-          if (!levels) return false
-          // "nur Konzeptanker" for this concept: the goal must anchor exactly this concept.
+        // One entry counts for one selected concept when it has a ticked relevance level (or anchors the concept, for "nur Konzeptanker").
+        const entryCounts = (e: (typeof entries)[number], rootKey: string, levels: Set<number>) => {
+          if ((rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id) !== rootKey) return false
           if (anchorOnly.has(rootKey)) return anchorIds.has(e.basiskonzept_id)
           return levels.has(e.relevanz_beurteilung)
-        })
+        }
+        const passes = conceptMatch === 'all' && conceptLevels.size > 1
+          ? Array.from(conceptLevels.entries()).every(([rootKey, levels]) => entries.some((e) => entryCounts(e, rootKey, levels)))
+          : entries.some((e) => {
+              const rootKey = rawIdToGroupKey.get(e.basiskonzept_id) ?? e.basiskonzept_id
+              const levels = conceptLevels.get(rootKey)
+              return !!levels && entryCounts(e, rootKey, levels)
+            })
         if (!passes) return false
       }
       if (methodFilter.size > 0) {
@@ -440,7 +447,7 @@ export default function StudentLernzielePage() {
       if (!q) return true
       return t.title.toLowerCase().includes(q) || (t.description ?? '').toLowerCase().includes(q)
     })
-  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, anchorOnly, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
+  }, [topics, query, selectedRawGrades, themaFilter, unterthemaFilter, favoritesOnly, favorites, conceptLevels, anchorOnly, conceptMatch, methodFilter, contentById, rawIdToGroupKey, confirmedMethodsByLernziel])
 
   // A deep link (Davor/Danach, or a Netz-tab tap) can point at a Lernziel
   // the current filters would otherwise hide (different grade, excluded
@@ -613,6 +620,26 @@ export default function StudentLernzielePage() {
 
           <div data-tour="lernziele.basiskonzepte">
           <p className="muted student-filter-label">BASISKONZEPTE &amp; RELEVANZ</p>
+          {conceptLevels.size > 1 && (
+            <div className="row" style={{ gap: 5, marginBottom: 8, alignItems: 'center' }} role="group" aria-label="Wie die gewählten Basiskonzepte verknüpft werden">
+              <button
+                className={`chip-btn${conceptMatch === 'any' ? ' active' : ''}`}
+                style={{ fontSize: 11 }}
+                title="Zeigt Lernziele, die zu mindestens einem der gewählten Basiskonzepte passen"
+                onClick={() => setConceptMatch('any')}
+              >
+                mindestens eines
+              </button>
+              <button
+                className={`chip-btn${conceptMatch === 'all' ? ' active' : ''}`}
+                style={{ fontSize: 11 }}
+                title="Zeigt nur Lernziele, die zu allen gewählten Basiskonzepten passen"
+                onClick={() => setConceptMatch('all')}
+              >
+                alle gewählten
+              </button>
+            </div>
+          )}
           <div className="student-concept-filter">
             {bkGroups.map((g) => {
               // Color by the concept's own real position among rootConcepts

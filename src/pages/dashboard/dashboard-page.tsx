@@ -57,7 +57,11 @@ type CountTable = 'literature_references' | 'lpm_schema_elements' | 'lpm_data_ob
 type Project = Database['public']['Tables']['projects']['Row']
 
 async function countFor(supabase: ProjectOutletContext['supabase'], table: CountTable, projectId: string) {
-  const { count } = await supabase.from(table).select('*', { count: 'exact', head: true }).eq('project_id', projectId)
+  let query = supabase.from(table).select('*', { count: 'exact', head: true }).eq('project_id', projectId)
+  // Feedback 3ded1b49 (Susan, 2026-11-07): the tile said 399 learning goals while every list showed 352. The 47 extra rows are archived
+  // goals. The lists only show accepted goals, so the tile counts the same ones.
+  if (table === 'lpm_data_objects') query = (query as any).eq('status', 'accepted')
+  const { count } = await query
   return count ?? 0
 }
 
