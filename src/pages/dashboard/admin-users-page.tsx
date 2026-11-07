@@ -64,7 +64,9 @@ const COMMON_LANGUAGES: { code: string; label: string }[] = [
 ]
 
 
-export default function AdminUsersPage() {
+export type AdminSection = 'accounts' | 'projects' | 'join-rules' | 'feedback'
+
+export default function AdminUsersPage({ section }: { section: AdminSection }) {
   const { session, isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
   const [users, setUsers] = useState<AdminUserRow[] | null>(null)
@@ -105,12 +107,28 @@ export default function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="row"><Users size={18} style={{ color: 'var(--text-muted)' }} />Admin</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        Every real account and every project across all of OpenLPM, in one place — regardless of
-        which projects your own account happens to belong to.
-      </p>
+      {section === 'accounts' && (
+        <>
+          <h1 className="row"><Users size={18} style={{ color: 'var(--text-muted)' }} />Accounts</h1>
+          <p className="muted" style={{ marginBottom: 16 }}>
+            Every account across all of OpenLPM, in one place, regardless of which projects your own account belongs to.
+          </p>
+        </>
+      )}
+      {section === 'projects' && (
+        <>
+          <h1 className="row"><FolderTree size={18} style={{ color: 'var(--text-muted)' }} />Projects</h1>
+          <p className="muted" style={{ marginBottom: 16 }}>Every project across all of OpenLPM.</p>
+        </>
+      )}
+      {section === 'join-rules' && (
+        <>
+          <h1 className="row"><Users size={18} style={{ color: 'var(--text-muted)' }} />Join rules</h1>
+          <p className="muted" style={{ marginBottom: 16 }}>Who may join which project by themselves.</p>
+        </>
+      )}
 
+      {section === 'accounts' && (
       <div className="card" style={{ marginBottom: 20 }}>
         <h3>Accounts</h3>
         {users === null || memberships === null ? (
@@ -148,22 +166,27 @@ export default function AdminUsersPage() {
           </>
         )}
       </div>
+      )}
 
-      <ProjectsAdminSection
-        supabase={supabase}
-        projects={projects}
-        memberships={memberships}
-        onChanged={reload}
-      />
+      {section === 'projects' && (
+        <ProjectsAdminSection
+          supabase={supabase}
+          projects={projects}
+          memberships={memberships}
+          onChanged={reload}
+        />
+      )}
 
-      <JoinRulesAdminSection
-        supabase={supabase}
-        projects={projects}
-        joinRules={joinRules}
-        onChanged={reload}
-      />
+      {section === 'join-rules' && (
+        <JoinRulesAdminSection
+          supabase={supabase}
+          projects={projects}
+          joinRules={joinRules}
+          onChanged={reload}
+        />
+      )}
 
-      <FeedbackAdminSection feedback={feedback} />
+      {section === 'feedback' && <FeedbackAdminSection feedback={feedback} />}
     </div>
   )
 }
@@ -1429,10 +1452,6 @@ function FeedbackAdminSection({ feedback }: { feedback: FeedbackItem[] | null })
         </>
       )}
 
-      <Link to="/dashboard/admin/feedback" className="btn btn-mini">
-        <MessageSquareText size={12} />
-        Open full feedback list
-      </Link>
     </div>
   )
 }

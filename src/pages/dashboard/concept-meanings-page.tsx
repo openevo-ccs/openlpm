@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ReviewStateChip } from '@/components/review-state-chip'
+import { BaseRepoTabBar, CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import { reviewSummary } from '@/lib/review-state'
 import {
   PILE_ORDER,
@@ -25,7 +26,7 @@ import {
 // word. Read-only first version (design note conceptbase-many-meanings-review-and-explorer-design-2026-11-04.md, step 2). The data is a dated
 // copy (src/data/concept-meanings.json). Nothing here writes to ConceptBase, and a model's topic tag is never linked to a concept by its name.
 
-const BASE = '/dashboard/concept-meanings'
+const BASE = CONCEPTBASE_TAB_PATH
 const NO_REVIEW = reviewSummary(undefined)
 type Tab = 'concepts' | 'tags' | 'ids'
 
@@ -361,10 +362,11 @@ export default function ConceptMeaningsPage() {
   if (failed) return <div className="notice notice-bad">The copy of ConceptBase could not be loaded.</div>
   if (!snap) return <p className="muted">Loading the copy of ConceptBase…</p>
 
-  if (conceptId) return <Detail id={decodeURIComponent(conceptId)} snap={snap} />
+  if (conceptId) return <div><BaseRepoTabBar /><Detail id={decodeURIComponent(conceptId)} snap={snap} /></div>
 
   return (
     <div>
+      <BaseRepoTabBar />
       <h1>Concept meanings</h1>
       <p>
         What ConceptBase says each concept means, in every discipline and word list, with the comparisons between word lists and the places that use the word.
