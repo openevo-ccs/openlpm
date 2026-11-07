@@ -1,4 +1,4 @@
-import type { HandIn } from './student-handin'
+import { groupNumberLine, type HandIn } from './student-handin'
 import { JUDGMENT_SCALE } from './supabase/student-work'
 
 // The readable Word version of the hand-in. Built from the same data object as
@@ -41,7 +41,8 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   if (h.tool.sandbox) children.push(p('SANDBOX-DATEI: erzeugt von einer synthetischen Testperson, keine echte Studierendenarbeit.', { bold: true }))
   children.push(p(`${h.task.course}`))
   children.push(p(`Name: ${h.participant_name}`))
-  children.push(p(`Gruppe: ${h.groups.length ? h.groups.join(', ') : 'keine gewählt'}`))
+  const grp = groupNumberLine(h.groups)
+  children.push(p(`${grp.label}: ${grp.value}`))
   children.push(p(`Erstellt am ${formatDate(h.exported_at)}`))
 
   // The Thema and Basiskonzepte/Querschnitt steps were taken out of the
