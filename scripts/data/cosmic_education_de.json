@@ -1,0 +1,126 @@
+{
+  "_note": "German wording for the parts of the cosmic-education-k12 draft that existed only in English (performance indicators, concept definitions, examples). Drafted by Claude on 2026-11-07. No German-speaking expert has reviewed it. Every row that uses these strings carries a 'machine translation, not yet reviewed' flag.",
+  "pis": {
+    "story-of-the-universe-gb0#0": "Bemerkt Sonne, Mond und Sterne und stellt Fragen dazu, über unmittelbare Sinneserfahrung (Tag- und Nachtspaziergänge, einfache Himmelsbeobachtung). Es gibt keine inhaltliche Erwartung. Das ist ein informeller Vorläufer, den dieses Modell ergänzt; er gehört nicht zu Montessoris Erster Großer Erzählung.",
+    "story-of-the-universe-gb1#0": "Hört die dramatische Erzählung von der Entstehung des Universums, des Sonnensystems und der Erde und gibt sie mit eigenen Worten wieder, ohne dass Fachbegriffe verlangt werden.",
+    "story-of-the-universe-gb1#1": "Nennt mindestens ein Gesetz oder eine Kraft (z. B. die Schwerkraft oder die Neigung der Materie, sich zu ordnen), von der die Erzählung sagt, dass sie überall im Universum gilt und nicht nur auf der Erde.",
+    "story-of-the-universe-gb1#2": "Drückt mit eigenen Worten oder in einem selbst gewählten kreativen Medium aus, wie die Größe der Erzählung auf sie oder ihn wirkt (Staunen, Dankbarkeit, Neugier). Das ist das Wahrnehmungswerkzeug (Noticing Tool), angewendet auf die eigene Reaktion und nicht nur auf den Inhalt.",
+    "story-of-the-universe-gb2#0": "Plant und führt einen selbstgesteuerten Erkundungsgang zu einer Frage durch, die die Große Erzählung aufgeworfen hat, z. B. zu Vulkanen, zum Wasserkreislauf oder zur Entstehung einer bestimmten Gesteinsart. Die Initiative geht weitgehend vom Kind aus.",
+    "story-of-the-universe-gb2#1": "Beschreibt mindestens drei Zustände oder Formen der Materie (fest, flüssig, gasförmig oder bestimmte Gesteins- und Mineralarten) als greifbaren Beleg für die Aussage der Erzählung, dass sich Materie nach gemeinsamen Regeln ordnet.",
+    "story-of-the-universe-gb2#2": "Vergleicht Wasserkreislauf, Wetter oder Jahreszeiten als direkt beobachtbare Belege von heute für dieselben physikalischen Gesetze, die die Große Erzählung beschrieben hat.",
+    "story-of-the-universe-gb3#0": "Erklärt an einem konkreten Beispiel, wie dasselbe physikalische Gesetz (z. B. die Schwerkraft bei Planetenbahnen und beim Fallen eines Gegenstands) in sehr unterschiedlichen Größenordnungen wirkt, und verbindet so die kosmische Größenordnung der Großen Erzählung mit Belegen im Klassenzimmermaßstab.",
+    "story-of-the-universe-gb3#1": "Ordnet die Entstehung von Universum, Sonnensystem und Erde auf einer gemeinsamen Zeitleiste ein, mit einheitlichen, vergleichbaren Einheiten für Tiefenzeit, und grenzt sie von der viel kürzeren Zeitleiste der Menschheitsgeschichte in Strang 3 ab.",
+    "story-of-the-universe-gb3#2": "Benennt eine offene wissenschaftliche Frage zu Ursprung oder Aufbau des Universums, die noch nicht geklärt ist, und unterscheidet gesichertes physikalisches Gesetz von aktueller Forschungsfront.",
+    "story-of-the-universe-gb4#0": "Diese Stufe bleibt bewusst ohne Inhalte aus Montessoris Pädagogik. Der Geltungsbereich der Kosmischen Erziehung endet bei etwa 12 Jahren (siehe Klassenstufenbänder). Wer darüber hinaus weiterarbeitet, sollte an eine übliche naturwissenschaftliche Sequenz oder an die Stränge 6-8/9-12 von oe-interdisciplinary-k12 übergeben, statt hier erfundene Inhalte zu erwarten.",
+
+    "story-of-life-gb0#0": "Sortiert vertraute Gegenstände über unmittelbare Sinneserfahrung in belebt und unbelebt. Es gibt keine inhaltliche Erwartung. Das ist ein informeller Vorläufer, den dieses Modell ergänzt; er gehört nicht zu Montessoris Zweiter Großer Erzählung.",
+    "story-of-life-gb1#0": "Hört mit Hilfe der Zeitleiste des Lebens (oder einer gleichwertigen Darstellung) die Erzählung, in welcher Reihenfolge die großen Lebensformen erschienen sind, und gibt sie wieder. Förmliche Namen der Erdzeitalter sind noch nicht nötig.",
+    "story-of-life-gb1#1": "Nennt eine einfache Art, wie ein Lebewesen einem anderen Lebewesen oder seiner Umgebung hilft (z. B. eine Pflanze erzeugt Sauerstoff, ein Wurm lockert den Boden). Das ist ein früher, gefühlsnaher, kindgerechter Einstieg in die Idee der Kosmischen Aufgabe und ausdrücklich noch keine förmliche biologische Behauptung.",
+    "story-of-life-gb1#2": "Auf dieser Stufe nicht behandelt: formale Genetik, die Mechanik der natürlichen Selektion oder die Begriffe Variation, Selektion und Vererbung. Dieser Wortschatz gehört in die K-2-Stufe von oe-interdisciplinary-k12. Diese Teilstufe bleibt auf der Ebene der eindrucksvollen Erzählung, mit der auch Montessoris Elementarstufe beginnt.",
+    "story-of-life-gb2#0": "Nutzt die Erdzeituhr (oder eine gleichwertige maßstäbliche Darstellung der Tiefenzeit), um zu vergleichen, wie lange verschiedene Lebensformen schon existieren, z. B. wie klein der Anteil der Uhr ist, den die gesamte Existenz des Menschen einnimmt.",
+    "story-of-life-gb2#1": "Plant und führt einen selbstgesteuerten Erkundungsgang zu einer ausgestorbenen oder lebenden Organismengruppe durch, auf die die Zeitleiste des Lebens neugierig gemacht hat.",
+    "story-of-life-gb2#2": "Ordnet Lebewesen mit einem einfachen System (z. B. Gruppen auf der Ebene der Reiche) und versteht das als greifbaren Beleg dafür, dass die Vielfalt des Lebens eine Ordnung hat. So wird die Erzählung an die heute beobachtbare Biologie zurückgebunden.",
+    "story-of-life-gb3#0": "Erklärt mit eigenen Worten sowohl die Darstellung der Kosmischen Aufgabe, warum ein Merkmal existiert (es erfüllt eine Rolle, die das Gesamtsystem braucht), als auch eine selektionsbasierte Darstellung (es blieb erhalten, weil es früheren Individuen half, öfter zu überleben und sich fortzupflanzen als Alternativen) für dasselbe echte Beispiel (z. B. Schnabelform eines Vogels, Dornen einer Pflanze).",
+    "story-of-life-gb3#1": "Erkennt bei zwei Sätzen über dasselbe Merkmal, welcher Satz beschreibt, was das Merkmal jetzt tut (seine heutige Rolle) und welcher, warum es historisch entstanden ist (seine Selektionsgeschichte). Das ist der altersgerechte Zugang zur zentralen Forschungsfrage dieses Modells, wie die Sprache der Kosmischen Aufgabe im Denken von Kindern tatsächlich ankommt.",
+    "story-of-life-gb3#2": "Wendet Tinbergens vier Fragen (Mechanismus, Entwicklung, Funktion, evolutionärer Ursprung) auf ein Beispiel aus der Zeitleiste des Lebens an und trennt dabei ausdrücklich „Was tut es?“ von „Warum hat es sich entwickelt?“ als zwei verschiedene, beide berechtigte Fragen und nicht als eine Frage mit einer Antwort.",
+    "story-of-life-gb4#0": "Dieses Modell unterrichtet formale natürliche Selektion, Genetik und Vererbungsmechanik hier bewusst nicht neu. Diese Inhalte gibt es bereits, klassenstufenweise zugeordnet, als Strang 1 (Vererbung, Variation, Selektion) in den Stufen 6-8 und 9-12 von oe-interdisciplinary-k12 und in der parallelen Behandlung von bio-core-k12. Wer eine auf Kosmischer Erziehung aufbauende Sequenz über das Alter von 12 hinaus fortsetzt, sollte direkt an eines dieser beiden Modelle übergeben und hier keine doppelten Inhalte erwarten.",
+
+    "story-of-humans-gb0#0": "Nennt Grundbedürfnisse (Essen, ein sicherer Schlafplatz) aus der eigenen Erfahrung. Es gibt keine inhaltliche Erwartung. Das ist ein informeller Vorläufer, den dieses Modell ergänzt; er gehört nicht zu Montessoris Dritter Großer Erzählung.",
+    "story-of-humans-gb1#0": "Hört die Erzählung vom Erscheinen des Menschen auf der Zeitleiste des Lebens, nach der viel längeren Zeitspanne aus Strang 2, und gibt sie wieder.",
+    "story-of-humans-gb1#1": "Nennt mindestens zwei körperliche Bedürfnisse (Nahrung, Unterkunft) und mindestens ein seelisches Bedürfnis (z. B. etwas Schönes schaffen wollen, zu einer Gruppe gehören wollen), das jeder Mensch hat. Das ist ein früher, gefühlsnaher Einstieg in die Grundbedürfnisse.",
+    "story-of-humans-gb2#0": "Vergleicht die Lösungen von mindestens drei Kulturen oder Zeitepochen für dasselbe körperliche Bedürfnis (z. B. Unterkunft: Iglu, Jurte, Langhaus) und benennt, was am zugrunde liegenden Bedürfnis gemeinsam ist und was an der Lösung wirklich verschieden. Das ist die kindgerechte Form der Lesart dieses Ökosystems von der evolutionären Anthropologie: ein Bedürfnis, viele kulturell verschiedene Lösungen.",
+    "story-of-humans-gb2#1": "Beschreibt einen konkreten Beleg für frühe menschliche Technik (z. B. Feuerbeherrschung, frühe Steinwerkzeuge) als tatsächliche historische Leistung, nicht als Mythos oder Vermutung. Dabei wird, wo vorhanden, die seitenverifizierte Materialsammlung zur vorgeschichtlichen Technik (oScis Auszug) genutzt.",
+    "story-of-humans-gb2#2": "Plant und führt einen selbstgesteuerten Erkundungsgang durch, der vergleicht, wie ein bestimmtes Bedürfnis in zwei vom Kind selbst gewählten Kulturen erfüllt wurde.",
+    "story-of-humans-gb3#0": "Erklärt mit einem Vergleich im Stil einer Auszahlungsmatrix, warum Gruppen, die ein gemeinsames Bedürfnis erfüllen (z. B. Verteidigung, Nahrungsproduktion im großen Maßstab), oft zusammenarbeiten mussten, um erfolgreich zu sein, und nennt mindestens ein historisches oder heutiges Beispiel.",
+    "story-of-humans-gb3#1": "Unterscheidet an einem echten Beispiel ein Bedürfnis (allgemein, alle Menschen teilen es) von einer Lösung (kulturell verschieden, historisch bestimmt) und erklärt, warum das Vermischen beider dazu führen kann, die Lösung einer Kultur für die einzig richtige zu halten. Das ist ausdrücklich ein Indikator gegen Ethnozentrismus und passt zu den Anliegen von Rassismuskritik und Vorurteilsbewusstsein im Sachunterricht (GDSU Journal 2026, Warburg & Seifert).",
+    "story-of-humans-gb3#2": "Benennt eine offene historische oder anthropologische Frage zum frühen menschlichen Leben, die noch erforscht wird, und unterscheidet gut belegte Aussagen von offenen Fragen.",
+    "story-of-humans-gb4#0": "Dieses Modell führt die Grundbedürfnisse hier bewusst nicht in einen formalen evolutionär-anthropologischen Unterricht der Sekundarstufe weiter. Das ist genau das Thema von eva_buch (Hanisch, erscheint 2027 bei Springer), gedacht für Biologie, Ethik/Philosophie, Sozialkunde, Geschichte und Psychologie in der Sekundarstufe. Wer eine auf Kosmischer Erziehung aufbauende Sequenz über das Alter von 12 hinaus fortsetzt, sollte auf dieses Buch und die zugehörige Lehrplananalyse-App zurückgreifen und hier keine doppelten Inhalte erwarten.",
+
+    "story-of-language-gb0#0": "Erkennt, dass eine geschriebene Markierung (der eigene Name, ein vertrautes Zeichen) für etwas steht, über unmittelbare sinnliche Vorerfahrung im Schreiben und Lesen. Das ist ein informeller Vorläufer und gehört nicht zu Montessoris Vierter Großer Erzählung im engeren Sinn.",
+    "story-of-language-gb1#0": "Hört die Erzählung, wie Menschen die gesprochene Sprache entwickelten und später Wege, sie in Zeichen festzuhalten, und gibt sie wieder.",
+    "story-of-language-gb1#1": "Erklärt am eigenen Namen oder an einem einfachen Wort, dass ein geschriebenes Zeichen nur deshalb etwas bedeutet, weil eine Gruppe von Menschen es so vereinbart hat, und nicht wegen irgendetwas in der Form des Zeichens selbst.",
+    "story-of-language-gb2#0": "Vergleicht mindestens zwei echte historische Schriftsysteme (z. B. Keilschrift, Hieroglyphen, ein Alphabet) danach, wie jedes Laut oder Bedeutung darstellt, und benennt mit dem Analogiewerkzeug (Analogy Mapping), was sich zwischen ihnen abbilden lässt und was nicht.",
+    "story-of-language-gb2#1": "Plant einen selbstgesteuerten Erkundungsgang zur Geschichte eines bestimmten Schriftsystems oder Alphabets.",
+    "story-of-language-gb3#0": "Erklärt, wie die Schrift es möglich machte, dass sich Wissen über das hinaus ansammelt, was eine Person sich merken oder eine Generation allein durch Sprechen weitergeben kann, und verbindet das mit der breiteren Aussage von Strang 204 in oe-interdisciplinary-k12: Köpfe, Kulturen und die Wissenschaft selbst suchen nach besseren Ideen, indem sie auf einem gemeinsamen, erinnerten Vorrat früherer Lösungen aufbauen.",
+    "story-of-language-gb3#1": "Benennt einen echten historischen Fall, in dem eine Änderung der Art, Information festzuhalten oder zu teilen (eine neue Schrift, ein neues Medium), veränderte, welche Art von Wissen sich ansammeln konnte, und erklärt, warum.",
+    "story-of-language-gb4#0": "Dieses Modell übergibt formale historische Sprachwissenschaft und Sprachgeschichte der Sekundarstufe an übliche Lehrpläne oder an Strang 204 von oe-interdisciplinary-k12, statt hier sich überschneidende Inhalte zu erfinden.",
+
+    "story-of-numbers-gb0#0": "Zählt kleine Mengen konkreter Gegenstände mit sinnlich erfahrbaren Zahlenmaterialien. Es gibt keine inhaltliche Erwartung. Das ist ein informeller Vorläufer und gehört nicht zu Montessoris Fünfter Großer Erzählung im engeren Sinn.",
+    "story-of-numbers-gb1#0": "Hört die Erzählung, wie Menschen Wege erfanden, Mengen festzuhalten, von der Strichliste bis zur geschriebenen Ziffer, und gibt sie wieder.",
+    "story-of-numbers-gb1#1": "Zeigt ein einfaches Strichlistensystem, mit dem eine echte Menge gezählt wird, als handfesten Beleg für die Aussage der Erzählung, dass Zahlzeichen erfunden und nicht vorgegeben waren.",
+    "story-of-numbers-gb2#0": "Vergleicht mindestens zwei echte historische Zahlensysteme (z. B. das ägyptische, das babylonische mit Basis 60, das römische, das der Maya mit Basis 20) danach, wie jedes Mengen darstellt, und benennt, was jedes leicht und was es schwer ausdrücken kann.",
+    "story-of-numbers-gb2#1": "Plant einen selbstgesteuerten Erkundungsgang zur Geschichte eines bestimmten Zahlensystems oder zur Erfindung der Null.",
+    "story-of-numbers-gb2#2": "Erklärt den Stellenwert mit einem System ohne Stellenwert (z. B. römische Zahlen) als Gegenbeispiel und macht deutlich, warum der Stellenwert selbst eine bestimmte, historisch verortbare Erfindung war.",
+    "story-of-numbers-gb3#0": "Erklärt an einem echten historischen Beispiel (z. B. Null, negative Zahlen, Algebra), wie eine neue mathematische Idee auf früheren Ideen aufbaute und sie veränderte, statt aus dem Nichts zu erscheinen. Das ist eine Anwendung des Musters „vom nächsten bekannten Fall ausgehen und ihn dann verbessern“, das Strang 204 von oe-interdisciplinary-k12 für individuelles und kulturelles Lernen allgemein entwickelt.",
+    "story-of-numbers-gb3#1": "Nimmt zu einer selbst gewählten mathematischen Idee begründet Stellung, ob sie „entdeckt“ wurde (sie war schon immer wahr und wartete darauf, gefunden zu werden) oder „erfunden“ (Menschen haben sie konstruiert und hätten plausibel etwas anderes konstruieren können). Das ist ein ausdrücklicher, altersgerechter erster Kontakt mit einer offenen Frage der Philosophie der Mathematik und keine Antwort, die dieses Modell vorgibt.",
+    "story-of-numbers-gb3#2": "Benennt eine Art, wie Computer oder Rechenwerkzeuge Mengen darstellen (z. B. binär), als heutige Fortsetzung derselben Großen Erzählung, und verbindet so historische Zahlensysteme mit dem Inhaltsanker „Computermodelle“.",
+    "story-of-numbers-gb4#0": "Dieses Modell übergibt formale Sekundarstufenmathematik sowie Geschichte und Philosophie der Mathematik an übliche Lehrpläne oder an die osci:synth:-Einträge von oSci, statt hier sich überschneidende Inhalte zu erfinden."
+  },
+  "concepts": {
+    "OE-CONCEPT-cosmic-k12-cosmic-task": {
+      "definition": "Aus Montessoris Pädagogik: Montessoris Aussage, dass jedes Element, jeder Organismus und jede Kraft eine Rolle spielt, die dem Fortbestand der gesamten belebten und physischen Welt dient. Das ist der gefühlsmäßige und ethische Kern der Kosmischen Erziehung; er soll beim Kind ein Gefühl von Sinn und Verantwortung innerhalb eines größeren Ganzen aufbauen.\n\nVorbehalt aus der Evolutionsbiologie: Wörtlich als Ursachenbehauptung gelesen („die Streifen einer Biene gibt es, weil das Ökosystem Bestäuber braucht“), ist das Zwecksetzung durch Absicht oder Plan (Design-Teleologie). Die Evolutionsdidaktik behandelt dieses Erklärungsmuster als hartnäckiges, gut belegtes Fehlkonzept (Kelemen und Rosset 2009 zu zweckgerichteten Erklärungen bei Erwachsenen). Die in diesem Ökosystem festgehaltene Position (theorybase:OE-PROPOSITION-selection-teleology-legitimate) lautet: Zweckgerichtete Sprache ist vertretbar, wenn sie der Selektions-Teleologie folgt (ein Merkmal bleibt erhalten, WEIL seine Wirkungen über Generationen hinweg unterschiedliches Überleben und Fortpflanzen bewirkten). Sie ist nicht vertretbar, wenn sie der Design-Teleologie folgt (ein Merkmal existiert, WEIL etwas es brauchte oder beabsichtigte). Ob Montessoris Rahmung der Kosmischen Aufgabe im realen Unterricht bei Kindern die eine oder die andere Art des Denkens hervorbringt, ist eine offene, noch nicht untersuchte empirische Frage. Sie ist die zentrale Forschungschance dieses Modells und kein Mangel, den man stillschweigend umgehen sollte.",
+      "examples": [
+        "Regenwürmer durchlüften den Boden, das hilft den Pflanzen beim Wachsen, die Tiere ernähren, welche Nährstoffe wieder an den Boden zurückgeben.",
+        "Ein Kind soll seine eigene „Aufgabe“ in der Familie oder Klasse benennen, als gefühlsnaher, kindgerechter Einstieg, bevor irgendeine biologische Behauptung gemacht wird."
+      ],
+      "nonExamples": [
+        "Ein Merkmal existiert, weil die Art es zum Überleben braucht (Design-Teleologie und nicht Selektions-Teleologie; genau diesen Unterschied soll der Begriff sichtbar machen und nicht übergehen)."
+      ]
+    },
+    "OE-CONCEPT-cosmic-k12-interconnectedness": {
+      "definition": "Die Idee, die für die Kosmische Erziehung zentral ist und unabhängig davon auch für die deutsche Sachunterrichtsdidaktik (Vielperspektivität und Vernetzung, Peschel, Goll & Schomaker 2026, GDSU Journal Heft 16): Kein einzelnes Phänomen wird aus nur einer Fachperspektive vollständig verstanden. Ein vollständiges Bild entsteht, wenn mehrere Perspektiven aktiv aufeinander bezogen und nicht bloß nebeneinandergestellt werden.",
+      "examples": [
+        "Ein Fluss verbindet Geologie (wohin das Wasser fließt), Biologie (was darin lebt), Geschichte (warum eine Stadt an ihm gebaut wurde) und Wirtschaft (wie er heute genutzt wird)."
+      ],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-great-story": {
+      "definition": "Eine eindrucksvolle Erzählung, die vom Ganzen zu den Teilen geht und bewusst dramatisch inszeniert wird (Materialien, Vorführungen, die vorbereitete Erzählung der Lehrkraft). Sie gibt Kindern ein vollständiges „großes Bild“, bevor ein einzelnes Fach für sich studiert wird. Strukturell ist das derselbe Schritt wie die Hierarchie Fakten, Konzepte, Prinzipien im Wissensstruktur-Diagramm, nur als Erzählung und nicht als Diagramm vermittelt.",
+      "examples": [
+        "Die dramatische Vorführung der Ersten Großen Erzählung zur Entstehung des Universums, erzählt bevor irgendeine Einheit zu Astronomie, Chemie oder Geographie beginnt."
+      ],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-fundamental-human-needs": {
+      "definition": "Aus Montessoris Pädagogik: Das Rahmenwerk der Dritten Großen Erzählung. Es unterscheidet körperliche Bedürfnisse (Nahrung, Unterkunft, Verteidigung, Fortbewegung) und seelische Bedürfnisse (Kunst, Religion, Musik, ein Gefühl von Bedeutung), die jede bekannte Menschengruppe in jeder Epoche und Kultur auf unterschiedliche Weise erfüllt hat. Es ist das Ordnungsprinzip der Kosmischen Erziehung für den Umgang mit kultureller Vielfalt.\n\nAus der evolutionären Anthropologie: Ein enges strukturelles Gegenstück zur Sicht der evolutionären Anthropologie auf allgemeine menschliche Bedürfnisse, die durch variable kulturelle Mittel erfüllt werden. Es ist unmittelbar vergleichbar mit der kulturübergreifenden Sicht mehrfach verwirklichter Lösungen, die eva_buch (Hanisch, erscheint) für Sozialkunde- und Ethik-Lehrpläne entwickelt. Keine der beiden Quellen zitiert die andere. Die Parallele ist die eigene Synthese dieses Modells und keine bestehende Aussage in einer der Quellen.",
+      "examples": [
+        "Unterkunft, erfüllt durch Iglu, Jurte, Langhaus oder Mehrfamilienhaus: ein Bedürfnis, viele kulturell verschiedene Lösungen."
+      ],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-cultural-diversity-of-solutions": {
+      "definition": "Das Muster, nach dem ein gemeinsames menschliches Bedürfnis oder Problem durch viele wirklich verschiedene, gleichermaßen berechtigte kulturelle Lösungen erfüllt wird, von denen keine die einzig „richtige“ ist.",
+      "examples": [],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-going-out": {
+      "definition": "Aus Montessoris Pädagogik: Der Begriff der Montessori-Elementarpädagogik für eine selbstgesteuerte Erkundungsreise, etwa ein Bibliotheksbesuch, ein Expertengespräch oder ein Ausflug, die ein Kind oder eine kleine Gruppe aufgrund einer Frage beginnt, die eine Große Erzählung aufgeworfen hat. Geplant und durchgeführt wird sie weitgehend von den Kindern selbst und nicht von oben zugewiesen. Es ist der benannte Mechanismus, durch den aus einer eindrucksvollen Großen Erzählung ein detailliertes, selbst motiviertes Fachstudium wird.",
+      "examples": [
+        "Eine kleine Gruppe, die in der Ersten Großen Erzählung neugierig auf Vulkane wurde, organisiert ohne Anstoß aus dem Stundenplan der Lehrkraft eigene Bibliotheksrecherche und Bericht."
+      ],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-timeline-reasoning": {
+      "definition": "Eine physische oder dargestellte Zeitleiste (Montessoris Zeitleiste des Lebens und Erdzeituhr gehören zu den benannten Materialien) als Denkwerkzeug nutzen, um Größenordnung, Reihenfolge und Dauer über Zeitspannen darzustellen, die weit länger sind als die unmittelbare Erfahrung. Das ist eine eigene, lehrbare Fähigkeit, verschieden vom bloßen Kennen datierter Fakten, und sie hat eine unabhängig entwickelte internationale Forschungsbasis (Lernprogressionsforschung zu „Big Ideas“, die Einheiten des Big History Project des OER Project zu Maßstab und Schwellen der Komplexität).",
+      "examples": [
+        "Eine Papierzeitleiste des eigenen Lebens, des Lebens einer Großmutter und der Menschheitsgeschichte an dieselbe Wand hängen, um ihre sehr verschiedenen Größenordnungen zu vergleichen."
+      ],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-gratitude-and-wonder": {
+      "definition": "Aus Montessoris Pädagogik: Die gefühlsmäßige, haltungsbezogene Antwort, die Montessori mit der Kosmischen Erziehung ausdrücklich neben dem Sachinhalt fördern wollte. Es ist eine emotionale und ethische Ausrichtung auf die Größe und gegenseitige Abhängigkeit, die die Großen Erzählungen zeigen. Sie ist kein Nebeneffekt des Unterrichts, sondern ein benanntes eigenes Ziel.",
+      "examples": [],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-sign-and-symbol": {
+      "definition": "Der Kerngedanke der Vierten Großen Erzählung (Geschichte der Sprache, Kommunikation in Zeichen): Ein beliebiges Zeichen oder ein Laut kann durch gemeinsame Vereinbarung für etwas anderes stehen. Diese eine Erfindung, und nicht ein einzelnes Alphabet oder eine einzelne Sprache, hat es möglich gemacht, dass sich menschliches Wissen ansammeln und über Generationen weitergeben lässt, weit über das hinaus, was das Gedächtnis allein tragen könnte.",
+      "examples": [],
+      "nonExamples": []
+    },
+    "OE-CONCEPT-cosmic-k12-quantity-and-symbol": {
+      "definition": "Der Kerngedanke der Fünften Großen Erzählung (Geschichte der Zahlen und der Mathematik): Menge selbst ist eine Abstraktion, die Menschen mit Zeichen darstellen lernten. Dieser Schritt der Darstellung (Strichliste, Stellenwert, Null) ist selbst eine historische menschliche Leistung und keine Tatsache der Natur. Mathematik ist deshalb selbst eine der Großen Erzählungen und kein davon getrenntes, erzählungsfreies Fach.",
+      "examples": [],
+      "nonExamples": []
+    }
+  }
+}
