@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
@@ -103,7 +105,10 @@ export default function AdminBaseRepoExplorerPage() {
   const { isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
 
-  const [tab, setTab] = useState<TabKey>('all')
+  // The ConceptBase tab links back here with ?tab=<repo>, so the tab asked for is the one shown first.
+  const [searchParams] = useSearchParams()
+  const askedTab = searchParams.get('tab')
+  const [tab, setTab] = useState<TabKey>(BASE_REPO_CONFIGS.some((c) => c.key === askedTab) ? (askedTab as BaseRepoKey) : 'all')
   const [view, setView] = useState<ViewMode>('table')
   const [search, setSearch] = useState('')
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({})
@@ -262,7 +267,7 @@ export default function AdminBaseRepoExplorerPage() {
       <h1 className="row"><BookOpen size={18} style={{ color: 'var(--text-muted)' }} />Base Repo Explorer</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
         Browse, review, and discuss real content from the OpenEvo CCS Foundational Repos, across every
-        project. Admin-only for now. ConceptBase is browsable via its own Schema page; the dispute/graph
+        project. Admin-only for now. The ConceptBase tab shows what each concept means; the dispute/graph
         layer isn&apos;t covered here.
       </p>
 
@@ -279,6 +284,7 @@ export default function AdminBaseRepoExplorerPage() {
             {cfg.name}{rowsByRepo.has(cfg.key) ? ` (${searchedCountFor(cfg.key)})` : ''}
           </button>
         ))}
+        <Link to={CONCEPTBASE_TAB_PATH} className="btn btn-mini" title="What ConceptBase says each concept means">ConceptBase</Link>
       </div>
 
       <div className="row" style={{ gap: 8, marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>

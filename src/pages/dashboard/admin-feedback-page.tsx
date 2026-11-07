@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle2, ChevronDown, ChevronUp, ImageIcon, MessageSquareText, RotateCcw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -13,7 +13,7 @@ import { getScreenshotUrl, listFeedback, setFeedbackStatus, type FeedbackItem } 
 // Not a per-project page -- feedback spans every project plus project-less
 // pages (the switcher, profile), so it lives as its own top-level route.
 
-export default function AdminFeedbackPage() {
+export default function AdminFeedbackPage({ summary }: { summary?: ReactNode } = {}) {
   const { isAdmin } = useSession()
   const supabase = useMemo(() => createClient(), [])
   const [items, setItems] = useState<FeedbackItem[] | null>(null)
@@ -44,6 +44,8 @@ export default function AdminFeedbackPage() {
       <p className="muted" style={{ marginBottom: 16 }}>
         Every submission from the Feedback button, across every project.
       </p>
+
+      {summary}
 
       <div className="row" style={{ gap: 8, marginBottom: 16 }}>
         <button className={`btn btn-mini${filter === 'open' ? ' btn-primary' : ''}`} onClick={() => setFilter('open')}>Open</button>

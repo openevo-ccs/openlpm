@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { SessionProvider, useSession } from '@/state/session'
 import { RequireAuth, REDIRECT_KEY } from '@/components/require-auth'
 import HomePage from '@/pages/home-page'
@@ -37,9 +37,9 @@ import PortfolioDetailPage from '@/pages/dashboard/portfolios/portfolio-detail-p
 import PromptGeneratorPage from '@/pages/dashboard/portfolios/prompt-generator-page'
 import GroupsPage from '@/pages/dashboard/groups-page'
 import GroupDetailPage from '@/pages/dashboard/groups/group-detail-page'
-import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
 import AdminBaseRepoExplorerPage from '@/pages/dashboard/admin-base-repo-explorer-page'
+import AdminLayout, { AdminFeedbackTab } from '@/pages/dashboard/admin-layout'
 import AdminContentEditorPage from '@/pages/dashboard/admin-content-editor-page'
 import JoinPage from '@/pages/join-page'
 import WelcomePage from '@/pages/welcome-page'
@@ -99,6 +99,12 @@ function RedirectAfterLogin() {
   return null
 }
 
+function ConceptMeaningsRedirect() {
+  const { conceptId } = useParams()
+  const { search } = useLocation()
+  return <Navigate to={`/dashboard/admin/concept-meanings${conceptId ? `/${conceptId}` : ''}${search}`} replace />
+}
+
 export default function App() {
   return (
     <SessionProvider>
@@ -130,12 +136,20 @@ export default function App() {
           <Route index element={<ProjectSwitcherPage />} />
           <Route path="new-project" element={<NewProjectWizard />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="concept-meanings" element={<ConceptMeaningsPage />} />
-          <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsPage />} />
-          <Route path="admin/feedback" element={<AdminFeedbackPage />} />
-          <Route path="admin/users" element={<AdminUsersPage />} />
-          <Route path="admin/explore" element={<AdminBaseRepoExplorerPage />} />
-          <Route path="admin/content" element={<AdminContentEditorPage />} />
+          {/* Old addresses of Concept meanings keep working. The page now lives inside the Admin area. */}
+          <Route path="concept-meanings" element={<ConceptMeaningsRedirect />} />
+          <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsRedirect />} />
+          <Route path="admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="users" replace />} />
+            <Route path="users" element={<AdminUsersPage section="accounts" />} />
+            <Route path="projects" element={<AdminUsersPage section="projects" />} />
+            <Route path="join-rules" element={<AdminUsersPage section="join-rules" />} />
+            <Route path="feedback" element={<AdminFeedbackTab />} />
+            <Route path="explore" element={<AdminBaseRepoExplorerPage />} />
+            <Route path="concept-meanings" element={<ConceptMeaningsPage />} />
+            <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsPage />} />
+            <Route path="content" element={<AdminContentEditorPage />} />
+          </Route>
           <Route path=":project" element={<ProjectLayout />}>
             <Route index element={<ProjectIndexRouter />} />
             <Route path=":objectId" element={<StudentLernzielePage />} />

@@ -1,5 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'
-import { BookOpen, LogOut, Pencil, Sparkles, User, Users } from 'lucide-react'
+import { LogOut, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -33,30 +33,15 @@ export default function DashboardLayout() {
           <span className="muted">{session?.user.email}</span>
           {/* Real feedback c0829815 (2026-10-01): "Move 'Feedback' on the
               header menu into a section on the Admin page" -- it now lives
-              as a card on /dashboard/admin/users (FeedbackAdminSection)
+              as a tab of the Admin area (/dashboard/admin/feedback)
               instead of its own topbar button. The full feedback list page
               itself (admin-feedback-page.tsx) is unchanged, just no longer
               linked from here directly. */}
-          <Link to="/dashboard/concept-meanings" className="btn btn-mini">
-            <Sparkles size={12} />
-            Concept meanings
-          </Link>
+          {/* Feedback cc19c44c (Dustin, 2026-11-07): Concept meanings, Explore and Edit Data now live as tabs inside Admin. */}
           {isAdmin && (
-            <Link to="/dashboard/admin/users" className="btn btn-mini">
+            <Link to="/dashboard/admin" className="btn btn-mini">
               <Users size={12} />
               Admin
-            </Link>
-          )}
-          {isAdmin && (
-            <Link to="/dashboard/admin/explore" className="btn btn-mini">
-              <BookOpen size={12} />
-              Explore
-            </Link>
-          )}
-          {isAdmin && (
-            <Link to="/dashboard/admin/content" className="btn btn-mini">
-              <Pencil size={12} />
-              Edit Data
             </Link>
           )}
           <HelpWidget />
