@@ -186,7 +186,7 @@ export default function ProjectSwitcherPage() {
         </Link>
       </div>
 
-      <StartHereCard slugs={new Set(entries.map((m) => m.project.slug))} />
+      <StartHereCard slugs={new Set(entries.map((m) => m.project.slug))} isAdmin={isAdmin} />
 
       {pendingRequests.length > 0 && (
         <div className="card" style={{ marginBottom: 16 }}>

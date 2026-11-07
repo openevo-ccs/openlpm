@@ -9,16 +9,18 @@ import {
   TOOLKIT_LINE,
   resolveStartingPoints,
 } from '@/lib/start-here'
+import { usesMultipleSpaces } from '@/lib/visited-spaces'
 
 const STORAGE_KEY = 'openlpm.startHere.collapsed'
 
-// A remembered "collapsed" choice is a convenience. Private windows and
-// blocked site data can make storage throw, so every access is wrapped.
+// The card starts collapsed. Someone who opened it on purpose keeps it open ('0'), and a remembered
+// choice is a convenience. Private windows and blocked site data can make storage throw, so every
+// access is wrapped and the card then starts collapsed.
 function readCollapsed(): boolean {
   try {
-    return window.localStorage.getItem(STORAGE_KEY) === '1'
+    return window.localStorage.getItem(STORAGE_KEY) !== '0'
   } catch {
-    return false
+    return true
   }
 }
 
@@ -30,12 +32,16 @@ function writeCollapsed(value: boolean) {
   }
 }
 
-// Shown at the top of the project list for everyone who signs in. It answers
-// the question first-time visitors asked most often ("what is this page?")
-// and offers three places to look first.
-export function StartHereCard({ slugs }: { slugs: ReadonlySet<string> }) {
+// Shown at the top of the project list. It answers the question first-time visitors asked most
+// often ("what is this page?") and offers three places to look first. It starts collapsed and
+// steps aside once someone has opened two or more spaces. Admins always see it, so the text
+// stays easy to update.
+export function StartHereCard({ slugs, isAdmin }: { slugs: ReadonlySet<string>; isAdmin: boolean }) {
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  const [multiSpace] = useState(usesMultipleSpaces)
   const points = resolveStartingPoints(slugs)
+
+  if (multiSpace && !isAdmin) return null
 
   const toggle = () => {
     setCollapsed((c) => {
