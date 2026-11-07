@@ -5,7 +5,7 @@ import { Anchor, Info } from 'lucide-react'
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { ancestorAtDepth, bandKeyForGrade, bkAbbreviation, bkEntries, buildBkLabelMap, elementDepth, getConceptElementsById, getRootConcepts, KONZEPTANKER_DEF, type BkbEntry } from '@/lib/supabase/basiskonzepte'
-import { listAcceptedConnections, listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
+import { listTopicContents, listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { createConceptRelation, deleteConceptRelation, listConceptRelations, type ConceptRelation } from '@/lib/supabase/concept-relations'
 import { layoutTier } from '@/lib/graph-layout'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
@@ -375,13 +375,16 @@ type SizeBy = 'count' | 'relevance'
 interface GraphNodeDatum {
   id: string
   label: string
-  kind: 'bk' | 'uk' | 'lz'
+  kind: 'bk' | 'uk' | 'lz' | 'band'
   color: string
   size: number
   opacity: number
   x: number
   y: number
   tooltip: string
+  /** Only for a grade-band stripe (kind 'band'): its width and height. */
+  w?: number
+  h?: number
 }
 interface GraphEdgeDatum {
   id: string
@@ -415,11 +418,6 @@ function NetzTab({
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
   const navigate = useNavigate()
-  const [threads, setThreads] = useState<
-    { id: string; created_at: string; title: string; stations: { data_object_id: string; via_element_id: string | null; object_title: string }[] }[] | null
-  >(null)
-  const [connections, setConnections] = useState<{ from_object_id: string; to_object_id: string }[] | null>(null)
-
   const [showUk, setShowUk] = useState(true)
   const [showUk2, setShowUk2] = useState(false)
   const [showLz, setShowLz] = useState(true)
@@ -448,33 +446,6 @@ function NetzTab({
   // feedback named.
   const [containerWidth, setContainerWidth] = useState(0)
 
-  useEffect(() => {
-    const projectIds = Array.from(new Set([project.parent_project_id ?? project.id, project.id]))
-    supabase
-      .from('lpm_threads')
-      .select('id, created_at, title, status, lpm_thread_stations(data_object_id, via_element_id, lpm_data_objects(title))')
-      .in('project_id', projectIds)
-      .eq('status', 'accepted')
-      .then(({ data }) => {
-        setThreads(
-          (data ?? []).map((t: any) => ({
-            id: t.id,
-            created_at: t.created_at,
-            title: t.title,
-            stations: (t.lpm_thread_stations ?? []).map((s: any) => ({
-              data_object_id: s.data_object_id,
-              via_element_id: s.via_element_id,
-              object_title: s.lpm_data_objects?.title ?? '?',
-            })),
-          }))
-        )
-      })
-  }, [supabase, project])
-
-  useEffect(() => {
-    listAcceptedConnections(supabase, project.id).then(setConnections)
-  }, [supabase, project.id])
-
   const reloadRelations = () => listConceptRelations(supabase, project.id).then(setRelations)
   useEffect(() => {
     reloadRelations()
@@ -492,54 +463,6 @@ function NetzTab({
     return () => observer.disconnect()
   }, [])
 
-  // Real, derived Basiskonzept<->Basiskonzept relation -- see the crosswalk
-  // comment block above this component. First tried as arced lines drawn
-  // straight into the graph, arcing above a Basiskonzept row that sits too
-  // close to the top of the canvas to fit them -- confirmed visually messy
-  // live (a tangle of overlapping loops), Dustin's own read matched mine.
-  // A short list below the graph carries the same real, counted data
-  // without fighting bezier-curve geometry over six closely-spaced nodes.
-  const derivedRelations = useMemo(() => {
-    if (!connections || rootConcepts.length === 0) return []
-    // Real bug found live 2026-09-30: every Lernziel carries a
-    // basiskonzeptbezug entry for ALL SIX Basiskonzepte (a relevance rating
-    // 0-3 against each one, not just its own "primary" concept) -- counting
-    // every one of those as "this Lernziel belongs to that Basiskonzept"
-    // made every pair's count identical (746 for all 15 possible pairs, the
-    // same connection total inflated by the full 6x6 cross product every
-    // time). Only a high-relevance rating (3/3) counts as real, meaningful
-    // membership -- the same threshold the Dashboard tab's own relevance
-    // table already uses (looksLikeBk's caller, above).
-    const bkIdsForObject = new Map<string, string[]>()
-    for (const [objId, content] of contentById.entries()) {
-      bkIdsForObject.set(objId, bkEntries(content).filter((e) => e.relevanz_beurteilung === 3).map((e) => e.basiskonzept_id))
-    }
-    const allBkIds = Array.from(new Set(Array.from(bkIdsForObject.values()).flat()))
-    const resolvedLabel = buildBkLabelMap(allBkIds, rootConcepts)
-    const labelToRoot = new Map(rootConcepts.map((r, i) => [r.label, { id: r.id, label: r.label, i }]))
-    const pairCounts = new Map<string, number>()
-    for (const conn of connections) {
-      const fromRoots = new Set((bkIdsForObject.get(conn.from_object_id) ?? []).map((id) => labelToRoot.get(resolvedLabel[id] ?? '')).filter((v): v is NonNullable<typeof v> => !!v))
-      const toRoots = new Set((bkIdsForObject.get(conn.to_object_id) ?? []).map((id) => labelToRoot.get(resolvedLabel[id] ?? '')).filter((v): v is NonNullable<typeof v> => !!v))
-      for (const a of fromRoots) {
-        for (const b of toRoots) {
-          if (a.id === b.id) continue
-          const key = [a.id, b.id].sort().join('|')
-          pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1)
-        }
-      }
-    }
-    const byId = new Map(rootConcepts.map((r, i) => [r.id, { label: r.label, i }]))
-    return Array.from(pairCounts.entries())
-      .map(([key, count]) => {
-        const [aId, bId] = key.split('|')
-        const a = byId.get(aId)!
-        const b = byId.get(bId)!
-        return { aId, aLabel: a.label, aColor: cssVar(MAP_PALETTE[a.i % 6], '#999'), bId, bLabel: b.label, bColor: cssVar(MAP_PALETTE[b.i % 6], '#999'), count }
-      })
-      .sort((x, y) => y.count - x.count)
-  }, [connections, rootConcepts, contentById])
-
   // The real graph model -- nodes, edges, and the 2 insight stats -- built
   // once per real data/toggle change, kept separate from the Cytoscape
   // rendering effect below so toggling the highlight (a CSS class, no
@@ -551,6 +474,8 @@ function NetzTab({
     topUkByCount: NetzInsightUk[]
     mostCrossCutting: NetzInsightLz[]
     ukCoverage: { total: number; covered: number }
+    /** Learning goals with at least medium relevance to both of two top-level concepts (the counted arcs of the graph), keyed 'idA|idB'. */
+    rootPairs: Map<string, number>
   } | null => {
     if (!topics || rootConcepts.length === 0) return null
     const width = containerWidth || containerRef.current?.clientWidth || 900
@@ -746,6 +671,7 @@ function NetzTab({
     const lzRowHeight = LZ_ROW_HEIGHT_BASE * scale
     const lzStartY = showUk ? BK_ROW_Y + UK_ROW_GAP * scale + maxUkRows * ukRowHeight + LZ_GAP_ABOVE_BASE * scale * 0.6 : BK_ROW_Y + LZ_GAP_ABOVE_BASE * scale
     let maxLzRows = 0
+    const gradeStripes: { band: string; y0: number; y1: number }[] = []
     if (showLz) {
       const groupedByAnchor = new Map<string, string[]>()
       for (const [topicId, p] of primaryByTopic) {
@@ -757,23 +683,50 @@ function NetzTab({
       // Rows mean something when the dots are ordered by grade band: the first block under a concept is grade 5/6, then 7/8, 9, 10.
       const bandOfTopic = (topicId: string) => bandKeyForGrade(topics.find((t) => t.id === topicId)?.grade_band ?? '')
       const bandRank = (band: string) => { const i = GRADE_BAND_ORDER.indexOf(band); return i < 0 ? GRADE_BAND_ORDER.length : i }
-      for (const [anchorId, topicIds] of groupedByAnchor) {
-        const anchorPos = nodePositions.get(anchorId)
-        if (!anchorPos) continue
+      const anchorGeometry = (anchorId: string) => {
         const isRootAnchor = rootIndex.has(anchorId)
-        const maxWidth = isRootAnchor ? (colWidthByRoot.get(anchorId) ?? width / rootConcepts.length) - 16 : UK_CHILD_WIDTH_BASE * scale
-        const spacing = isRootAnchor ? 34 : 24
-        if (lzOrder === 'grade') {
-          let rowsUsed = 0
-          const bands = Array.from(new Set(topicIds.map(bandOfTopic))).sort((a, b) => bandRank(a) - bandRank(b))
-          for (const band of bands) {
+        return {
+          maxWidth: isRootAnchor ? (colWidthByRoot.get(anchorId) ?? width / rootConcepts.length) - 16 : UK_CHILD_WIDTH_BASE * scale,
+          spacing: isRootAnchor ? 34 : 24,
+        }
+      }
+      if (lzOrder === 'grade') {
+        // Feedback f940a34e (Susan, 2026-11-07): the grade blocks started at a different height under every concept, so a grade did not
+        // line up across the picture. Each grade band now owns one horizontal stripe, as tall as the busiest concept needs, and every
+        // concept places its goals of that grade inside the same stripe.
+        const rowsNeeded = new Map<string, number>()
+        for (const [anchorId, topicIds] of groupedByAnchor) {
+          if (!nodePositions.get(anchorId)) continue
+          const { maxWidth, spacing } = anchorGeometry(anchorId)
+          for (const band of new Set(topicIds.map(bandOfTopic))) {
             const ids = topicIds.filter((id) => bandOfTopic(id) === band)
-            const { positions, rows } = layoutTier(ids.map((id) => ({ id })), anchorPos.x, lzStartY + rowsUsed * lzRowHeight, maxWidth, lzRowHeight, spacing)
-            for (const [id, pos] of positions) nodePositions.set(id, pos)
-            rowsUsed += rows
+            const { rows } = layoutTier(ids.map((id) => ({ id })), 0, 0, maxWidth, lzRowHeight, spacing)
+            rowsNeeded.set(band, Math.max(rowsNeeded.get(band) ?? 0, rows))
           }
-          maxLzRows = Math.max(maxLzRows, rowsUsed)
-        } else {
+        }
+        const startRowOfBand = new Map<string, number>()
+        let cursor = 0
+        for (const band of Array.from(rowsNeeded.keys()).sort((a, b) => bandRank(a) - bandRank(b))) {
+          startRowOfBand.set(band, cursor)
+          gradeStripes.push({ band, y0: lzStartY + cursor * lzRowHeight - lzRowHeight / 2, y1: lzStartY + (cursor + rowsNeeded.get(band)!) * lzRowHeight - lzRowHeight / 2 })
+          cursor += rowsNeeded.get(band)!
+        }
+        maxLzRows = cursor
+        for (const [anchorId, topicIds] of groupedByAnchor) {
+          const anchorPos = nodePositions.get(anchorId)
+          if (!anchorPos) continue
+          const { maxWidth, spacing } = anchorGeometry(anchorId)
+          for (const band of new Set(topicIds.map(bandOfTopic))) {
+            const ids = topicIds.filter((id) => bandOfTopic(id) === band)
+            const { positions } = layoutTier(ids.map((id) => ({ id })), anchorPos.x, lzStartY + (startRowOfBand.get(band) ?? 0) * lzRowHeight, maxWidth, lzRowHeight, spacing)
+            for (const [id, pos] of positions) nodePositions.set(id, pos)
+          }
+        }
+      } else {
+        for (const [anchorId, topicIds] of groupedByAnchor) {
+          const anchorPos = nodePositions.get(anchorId)
+          if (!anchorPos) continue
+          const { maxWidth, spacing } = anchorGeometry(anchorId)
           const { positions, rows } = layoutTier(topicIds.map((id) => ({ id })), anchorPos.x, lzStartY, maxWidth, lzRowHeight, spacing)
           for (const [id, pos] of positions) nodePositions.set(id, pos)
           maxLzRows = Math.max(maxLzRows, rows)
@@ -827,7 +780,7 @@ function NetzTab({
         const tooltipBase = el.definition ? `${el.label}: ${el.definition}` : el.label
         nodes.push({
           id: ukId, label: el.label.length > 22 ? el.label.slice(0, 20) + '…' : el.label, kind: 'uk',
-          color: root ? rootColor(root.id) : '#999', size: relativeSize(metricVal, ukMetrics, 8, 22), opacity: 0.92,
+          color: root ? rootColor(root.id) : '#999', size: relativeSize(metricVal, ukMetrics, 9, 27), opacity: 0.92,
           x: pos.x, y: pos.y,
           tooltip: (tooltipBase.length > 180 ? tooltipBase.slice(0, 178) + '…' : tooltipBase) + (beispiel ? ` (Beispiel: ${beispiel.length > 80 ? beispiel.slice(0, 78) + '…' : beispiel})` : ''),
         })
@@ -840,10 +793,20 @@ function NetzTab({
         if (!pos) continue
         nodes.push({
           id: topicId, label: '', kind: 'lz',
-          color: rootColor(p.rootId), size: Math.min(13, 6 + Math.sqrt(p.totalWeight) * 2), opacity: Math.max(0.55, Math.min(0.9, p.totalWeight / 5)),
+          color: rootColor(p.rootId), size: Math.min(15, 7 + Math.sqrt(p.totalWeight) * 2), opacity: Math.max(0.55, Math.min(0.9, p.totalWeight / 5)),
           x: pos.x, y: pos.y, tooltip: gradeLabelOfTopic(topicId) ? `Kl. ${gradeLabelOfTopic(topicId)} · ${title}` : title,
         })
       }
+    }
+
+    // Grey stripes behind the learning goals, one per grade band, darker for higher grades (only in the fixed layout).
+    if (showLz && lzOrder === 'grade' && gs.layout !== 'physics') {
+      gradeStripes.forEach((st, i) => {
+        nodes.unshift({
+          id: `band-${st.band || 'none'}`, label: st.band ? `Kl. ${st.band}` : '', kind: 'band', color: '#808080', size: 1, opacity: 0.07 + 0.045 * i,
+          x: width / 2, y: (st.y0 + st.y1) / 2, w: width, h: st.y1 - st.y0, tooltip: '',
+        })
+      })
     }
 
     // ---- Labels (graph standards rule 4): none overlap ----
@@ -887,15 +850,17 @@ function NetzTab({
     }
     // Rule 2: one counted arc per pair of top-level concepts, in place of the
     // many separate lines their shared Lernziele would otherwise draw.
-    if (gs.edges !== 'tree') {
-      const pairCount = new Map<string, number>()
-      for (const roots of crossCuttingByTopic.values()) {
-        const ids = Array.from(roots).sort()
-        for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
-          const key = `${ids[i]}|${ids[j]}`
-          pairCount.set(key, (pairCount.get(key) ?? 0) + 1)
-        }
+    // The same counts feed the table below the graph (feedback e61f62ef, Susan 2026-11-07).
+    const matrixPairs = new Map<string, number>()
+    for (const roots of crossCuttingByTopic.values()) {
+      const ids = Array.from(roots).sort()
+      for (let i = 0; i < ids.length; i++) for (let j = i + 1; j < ids.length; j++) {
+        const key = `${ids[i]}|${ids[j]}`
+        matrixPairs.set(key, (matrixPairs.get(key) ?? 0) + 1)
       }
+    }
+    if (gs.edges !== 'tree') {
+      const pairCount = matrixPairs
       for (const [key, count] of pairCount) {
         const [a, b] = key.split('|')
         const labelA = rootConcepts.find((r) => r.id === a)?.label ?? '?'
@@ -953,15 +918,15 @@ function NetzTab({
     const totalRealUk = Array.from(conceptElementsById.values()).filter((e) => relevantDepths.includes(elementDepth(e.id, conceptElementsById))).length
     const ukCoverage = { total: totalRealUk, covered: usedUkIds.length }
 
-    return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage }
-  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, lzOrder, containerWidth, gs.edges, gs.labels])
+    return { nodes, edges, height: neededHeight, topUkByCount, mostCrossCutting, ukCoverage, rootPairs: matrixPairs }
+  }, [topics, rootConcepts, contentById, conceptElementsById, showUk, showUk2, showLz, showRelations, relations, sizeBy, lzOrder, containerWidth, gs.edges, gs.labels, gs.layout])
 
   useEffect(() => {
     if (!containerRef.current || !model) return
     containerRef.current.style.height = `${model.height}px`
 
     const elements: ElementDefinition[] = [
-      ...model.nodes.map((n) => ({ data: { id: n.id, label: n.label, color: n.color, size: n.size, opacity: n.opacity, kind: n.kind, tooltip: n.tooltip }, position: { x: n.x, y: n.y } })),
+      ...model.nodes.map((n) => ({ data: { id: n.id, label: n.label, color: n.color, size: n.size, opacity: n.opacity, kind: n.kind, tooltip: n.tooltip, w: n.w ?? n.size, h: n.h ?? n.size }, position: { x: n.x, y: n.y } })),
       ...model.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, color: e.color, weight: e.weight, kind: e.kind, tooltip: e.tooltip ?? '', gradient: e.gradient ?? e.color } })),
     ]
 
@@ -1001,8 +966,18 @@ function NetzTab({
           // permanently-on labels overlap into an unreadable smear. The
           // crossing EDGES are the real signal; a label only needs to show
           // once someone is actually looking at that one node.
+          // Learning goals are diamonds, concepts are circles (feedback 8bd701f6, Susan 2026-11-07).
           selector: 'node[kind="lz"]',
-          style: { label: '' },
+          style: { label: '', shape: 'diamond' },
+        },
+        {
+          // Grade-band stripe: grey, behind everything, ignores the pointer. The label sits at the top of the stripe.
+          selector: 'node[kind="band"]',
+          style: {
+            shape: 'rectangle', width: 'data(w)', height: 'data(h)', 'border-width': 0, 'background-color': '#808080', 'background-opacity': 'data(opacity)',
+            label: 'data(label)', 'text-halign': 'center', 'text-valign': 'top', 'text-margin-y': 12, 'font-size': 10, 'font-weight': 600,
+            color: cssVar('--text-muted', '#6b7280'), events: 'no', 'z-index-compare': 'manual', 'z-index': -10, 'text-opacity': 0.9,
+          } as any,
         },
         {
           selector: 'node.hover-label',
@@ -1151,7 +1126,7 @@ function NetzTab({
       }
       frontier = next
     }
-    cy.nodes().forEach((n) => { n.toggleClass('dimmed', !visited.has(n.id())) })
+    cy.nodes('[kind != "band"]').forEach((n) => { n.toggleClass('dimmed', !visited.has(n.id())) })
     cy.edges().forEach((e) => { e.toggleClass('dimmed', !(visited.has(e.source().id()) && visited.has(e.target().id()))) })
   }, [highlightId, gs.edges])
 
@@ -1163,26 +1138,29 @@ function NetzTab({
   }
   const fitView = () => cyRef.current?.fit(undefined, 30)
 
-  const growthWeeks = useMemo(() => {
-    if (!threads) return []
-    const byWeek = new Map<string, number>()
-    for (const t of threads) {
-      const d = new Date(t.created_at)
-      const monday = new Date(d)
-      monday.setDate(d.getDate() - ((d.getDay() + 6) % 7))
-      const key = monday.toISOString().slice(0, 10)
-      byWeek.set(key, (byWeek.get(key) ?? 0) + 1)
-    }
-    const weeks = Array.from(byWeek.keys()).sort()
-    let cumulative = 0
-    return weeks.map((w) => {
-      cumulative += byWeek.get(w)!
-      return { week: w, cumulative }
-    })
-  }, [threads])
+  const stripesShown = showLz && lzOrder === 'grade' && gs.layout !== 'physics'
 
   return (
     <div>
+      {/* Feedback 135a500e, 08967c79, fd20b1df (Susan, 2026-11-07): the explanation sits at the top as a "Beschreibung" box, so nobody misses it. */}
+      <details className="card netz-description" style={{ padding: '8px 14px', marginBottom: 10 }}>
+        <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Beschreibung</summary>
+        <p className="muted" style={{ fontSize: 12.5, marginTop: 8, marginBottom: 4 }}>
+          Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Kreise = ihre Unterkonzepte'}.
+          {sizeBy === 'count' ? ' Je mehr Lernziele zu einem Kreis gehören, desto größer ist er.' : ' Je höher die Relevanz-Summe der Lernziele eines Kreises, desto größer ist er.'}
+          {showLz && ' Kleine Rauten = einzelne Lernziele. Jedes Lernziel ist durch eine Linie mit dem '}
+          {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
+          {showLz && ' verbunden, zu dem es am stärksten passt (hohe Relevanz). Weitere Linien zu Konzepten mit mindestens mittlerer Bewertung erscheinen, wenn man auf das Lernziel zeigt oder „Alle“ wählt. Niedrig bewertete Verbindungen werden nicht dargestellt. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
+          {showLz && lzOrder === 'grade' && (stripesShown
+            ? ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet. Graue Streifen zeigen die Stufen: oben 5/6, darunter 7/8, 9 und 10.'
+            : ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet; bei bewegtem Layout ist diese Ordnung nicht sichtbar.')}
+          {showLz && lzOrder !== 'grade' && ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.'}
+          {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts. Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl).'}
+          {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
+          {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
+          {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen/-klicken eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal Antippen/-klicken hebt die Hervorhebung auf); Antippen/-klicken eines Lernziels öffnet es.
+        </p>
+      </details>
       <div className="netz-controls">
         <div className="netz-control-group">
           <button className={`chip-btn${showUk ? ' active' : ''}`} onClick={() => setShowUk((v) => !v)}>Unterkonzepte</button>
@@ -1216,20 +1194,6 @@ function NetzTab({
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div ref={containerRef} style={{ height: 480, minHeight: 480 }} />
       </div>
-      <p className="muted" style={{ fontSize: 12 }}>
-        Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Punkte = ihre Unterkonzepte'}.
-        {showLz && ' Kleine Punkte = einzelne Lernziele. Jedes Lernziel hängt mit einer Linie an dem '}
-        {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
-        {showLz && ', zu dem es am stärksten passt: Diese Hauptlinie zeigt die höchste Bewertung des Lernziels. '}
-        {showLz && 'Weitere Verbindungen zu Konzepten mit mindestens mittlerer Bewertung erscheinen beim Zeigen auf das Lernziel oder bei „Alle“. Niedrig bewertete Verbindungen werden nicht gezeichnet. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
-        {showLz && (lzOrder === 'grade' ? ' Unter jedem Konzept sind die Punkte nach Klassenstufe geordnet: oben 5/6, darunter 7/8, 9 und 10.' : ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.')}
-        {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts.'}
-        {showLz && gs.edges === 'bundled' && ' Viele Lernziele gehören zu mehreren Konzepten zugleich: Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl). Zeigt man auf ein Lernziel, erscheinen seine weiteren Verbindungen.'}
-        {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
-        {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
-        {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal antippen hebt die Hervorhebung auf); antippen eines Lernziels öffnet es.
-      </p>
-
       {showRelations && (
         <RelationPanel
           supabase={supabase}
@@ -1248,7 +1212,7 @@ function NetzTab({
             <div className="card">
               <h3>Am stärksten ausgearbeitete Unterkonzepte</h3>
               <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-                Die Unterkonzepte mit den meisten echten Lernzielen — guter Ausgangspunkt, um zu sehen, wo
+                Die Unterkonzepte mit den meisten Lernzielen — guter Ausgangspunkt, um zu sehen, wo
                 dieses Basiskonzept im Lehrplan am konkretesten wird.
               </p>
               {model.topUkByCount.map((u) => (
@@ -1264,16 +1228,16 @@ function NetzTab({
               {model.ukCoverage.total > 0 && (
                 <p className="muted" style={{ fontSize: 11, marginTop: 10 }}>
                   {model.ukCoverage.covered} von {model.ukCoverage.total} Unterkonzepten haben mindestens ein
-                  echtes Lernziel — der Rest ist im Lehrplan zwar definiert, aber noch keinem Lernziel zugeordnet.
+                  Lernziel — der Rest ist im Lehrplan zwar definiert, aber noch keinem Lernziel zugeordnet.
                 </p>
               )}
             </div>
           )}
           {model.mostCrossCutting.length > 0 && (
             <div className="card">
-              <h3>Fächerübergreifende Lernziele</h3>
+              <h3>Basiskonzept-verknüpfende Lernziele</h3>
               <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-                Lernziele, die mit hoher Relevanz zu mindestens 3 verschiedenen Basiskonzepten gleichzeitig
+                Lernziele, die mit mindestens mittlerer Relevanz zu mindestens 3 verschiedenen Basiskonzepten gleichzeitig
                 gehören — gut geeignet, um Schüler:innen Zusammenhänge zwischen Themen zu zeigen, statt
                 Konzepte isoliert zu behandeln.
               </p>
@@ -1288,46 +1252,56 @@ function NetzTab({
         </div>
       )}
 
-      {derivedRelations.length > 0 && (
+      {model && model.rootPairs.size > 0 && (
         <div className="card">
-          <h3>Verwandte Basiskonzepte</h3>
+          <h3>Gemeinsame Lernziele je zwei Basiskonzepte</h3>
           <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-            Wie oft echte, geprüfte Lehrplan-Verbindungen ein Lernziel aus dem einen Basiskonzept
-            mit einem Lernziel aus dem anderen verknüpfen.
+            Jede Zahl gibt an, wie viele Lernziele zu beiden Basiskonzepten mindestens mittel relevant sind. Es sind dieselben Zahlen wie bei den breiten Bögen im Netz (Ansicht „Gebündelt“).
           </p>
-          <div className="row" style={{ flexWrap: 'wrap', gap: 8 }}>
-            {derivedRelations.map((r) => (
-              <span key={`${r.aId}-${r.bId}`} className="chip" style={{ fontSize: 12.5 }}>
-                <span className={`bk-dot`} style={{ background: r.aColor }} />
-                {r.aLabel}
-                <span className="muted" style={{ margin: '0 4px' }}>↔</span>
-                <span className={`bk-dot`} style={{ background: r.bColor }} />
-                {r.bLabel}
-                <span className="muted" style={{ marginLeft: 6 }}>× {r.count}</span>
-              </span>
-            ))}
-          </div>
+          {(() => {
+            const pairKey = (x: string, y: string) => [x, y].sort().join('|')
+            const maxPair = Math.max(1, ...Array.from(model.rootPairs.values()))
+            return (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12.5 }}>
+                  <thead>
+                    <tr>
+                      <th />
+                      {rootConcepts.map((c, i) => (
+                        <th key={c.id} style={{ padding: '4px 6px', textAlign: 'center', fontWeight: 600, fontSize: 11.5, verticalAlign: 'bottom' }}>
+                          <span className={`bk-dot bk-dot-${i % 6}`} /> {c.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rootConcepts.map((r, i) => (
+                      <tr key={r.id} style={{ borderTop: '1px solid var(--border)' }}>
+                        <th scope="row" style={{ padding: '6px', textAlign: 'left', fontWeight: 600, fontSize: 12, whiteSpace: 'nowrap' }}>
+                          <span className={`bk-dot bk-dot-${i % 6}`} /> {r.label}
+                        </th>
+                        {rootConcepts.map((c) => {
+                          if (c.id === r.id) return <td key={c.id} className="muted" style={{ textAlign: 'center' }}>–</td>
+                          const n = model.rootPairs.get(pairKey(r.id, c.id)) ?? 0
+                          return (
+                            <td
+                              key={c.id}
+                              title={`${n} Lernziele verbinden „${r.label}“ und „${c.label}“`}
+                              style={{ textAlign: 'center', padding: '6px', fontWeight: n ? 600 : 400, background: n ? `color-mix(in srgb, var(--series-a, #006c66) ${Math.round(10 + (60 * n) / maxPair)}%, transparent)` : undefined }}
+                            >
+                              {n}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          })()}
         </div>
       )}
-
-      <div className="card">
-        <h3>Wachstum über die Zeit</h3>
-        <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>
-          Wie viele geprüfte Verbindungen zwischen Basiskonzepten und Lernzielen im Laufe des Semesters entstanden sind.
-        </p>
-        {growthWeeks.length === 0 ? (
-          <p className="muted">Noch keine geprüften Verbindungen — dieses Diagramm füllt sich, sobald welche angenommen werden.</p>
-        ) : (
-          <div className="row" style={{ alignItems: 'flex-end', gap: 4, height: 80 }}>
-            {growthWeeks.map((w) => {
-              const max = growthWeeks[growthWeeks.length - 1].cumulative
-              return (
-                <div key={w.week} className="tip" data-tip={`${w.week}: ${w.cumulative} gesamt`} style={{ flex: 1, background: 'var(--series-a)', height: `${Math.max(6, (w.cumulative / max) * 80)}px`, borderRadius: '3px 3px 0 0' }} />
-              )
-            })}
-          </div>
-        )}
-      </div>
     </div>
   )
 }

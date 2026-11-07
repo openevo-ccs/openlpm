@@ -45,8 +45,8 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
 // ready: set visible to true here once the page for it exists (route `path`
 // in App.tsx and in JENA_STUDENT_PATHS in project-layout.tsx).
 const SEMINAR_TASKS = [
-  { path: 'aufgabe-2', label: 'Aufgabe 2', visible: false },
-  { path: 'aufgabe-3', label: 'Aufgabe 3', visible: false },
+  { path: 'aufgabe2', label: 'Aufgabe 2', visible: false },
+  { path: 'aufgabe3', label: 'Aufgabe 3', visible: false },
 ]
 
 // Susan, 11/6 (feedback b4412950): the Wochenplan page is not shown in this view.
@@ -72,7 +72,7 @@ export function StudentNav({ slug, groupsEnabled, templateId }: { slug: string; 
       </NavLink>
       <div className="student-nav-section" data-tour="sidebar.meine-arbeit">
       <p className="muted student-nav-group">MEINE ARBEIT</p>
-      <NavLink to={`${base}/meine-arbeit`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
+      <NavLink to={`${base}/aufgabe1`} title="Aufgabe 1: Basiskonzepte" className={({ isActive }) => (isActive ? 'active' : '')}>
         <PenLine size={14} /><span className="nav-label">Aufgabe 1: Basiskonzepte</span>
       </NavLink>
       {SEMINAR_TASKS.filter((task) => task.visible).map((task) => (

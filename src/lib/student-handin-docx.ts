@@ -38,7 +38,7 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
   const children: (InstanceType<typeof Paragraph> | InstanceType<typeof Table>)[] = []
 
   children.push(new Paragraph({ text: 'Ergebnis zu Aufgabe 1: Basiskonzepte', heading: HeadingLevel.TITLE }))
-  if (h.tool.sandbox) children.push(p('SANDBOX-DATEI: erzeugt von einer synthetischen Testperson, keine echte Studierendenarbeit.', { bold: true }))
+  if (h.tool.sandbox) children.push(p('SANDBOX-DATEI: erzeugt von einer synthetischen Testperson, keine Arbeit von Studierenden.', { bold: true }))
   children.push(p(`${h.task.course}`))
   children.push(p(`Name: ${h.participant_name}`))
   const grp = groupNumberLine(h.groups)

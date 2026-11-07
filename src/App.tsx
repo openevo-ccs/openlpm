@@ -142,7 +142,9 @@ export default function App() {
             <Route path="basiskonzepte" element={<StudentBasiskonzeptePage />} />
             <Route path="basiskonzepte/:tab" element={<StudentBasiskonzeptePage />} />
             <Route path="planen" element={<StudentPromptPage />} />
-            <Route path="meine-arbeit" element={<StudentWorkPage />} />
+            {/* Feedback 1ff0cffa (Susan, 2026-11-07): the address names the task, so more tasks can be added next to it. The old address keeps working. */}
+            <Route path="aufgabe1" element={<StudentWorkPage />} />
+            <Route path="meine-arbeit" element={<Navigate to="../aufgabe1" replace />} />
             <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
             <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
             <Route path="timeline" element={<TimelineSwitch />} />

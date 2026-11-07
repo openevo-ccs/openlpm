@@ -53,7 +53,7 @@ export const TOUR_PAGES: TourPage[] = [
   { path: 'basiskonzepte/netz', label: 'Basiskonzepte (Netz tab)', templates: 'jena' },
   { path: 'basiskonzepte/detail', label: 'Basiskonzepte (Details zu den Basiskonzepten)', templates: 'jena' },
   { path: 'planen', label: 'KI-Prompt-Generator', templates: 'jena' },
-  { path: 'meine-arbeit', label: 'Meine Arbeit (Aufgabe 1)', templates: 'jena' },
+  { path: 'aufgabe1', label: 'Meine Arbeit (Aufgabe 1)', templates: 'jena' },
   { path: 'groups', label: 'Gruppen', templates: 'jena' },
 ]
 

@@ -26,7 +26,7 @@ export const WELCOME_CONFIGS: Record<string, WelcomeConfig> = {
     slug: 'evomentor-thuringia-sandbox',
     heading: 'EvoMentor Sandbox',
     intro:
-      'Testbereich für synthetische (KI-erzeugte) Studierende. Hier arbeiten keine echten Studierenden. Der Bereich ist ein Abbild des Seminarbereichs und dient dazu, Aufgaben, Oberfläche und Auswertung zu erproben, bevor echte Studierende sie nutzen.',
+      'Testbereich für synthetische (KI-erzeugte) Studierende. Hier arbeiten keine Studierenden. Der Bereich ist ein Abbild des Seminarbereichs und dient dazu, Aufgaben, Oberfläche und Auswertung zu erproben, bevor Studierende sie nutzen.',
     allowedDomain: 'globalesd.org',
     domainExample: 'name+test@globalesd.org',
     sandbox: true,
