@@ -275,7 +275,8 @@ function build(lang) {
 }
 
 function strandShort(doc, L) {
-  return doc.labels[L].replace(/^(The Story of|Die Geschichte (des|der))\s+/i, "").replace(/^\w/, (c) => c.toUpperCase());
+  const t = doc.labels[L].replace(/^(The Story of|Die Geschichte (des|der))\s+/i, "").replace(/^\w/, (c) => c.toUpperCase());
+  return L === "de" ? { Universums: "Universum", Lebens: "Leben", Menschen: "Mensch" }[t] || t : t;
 }
 
 const EN = build("en");
