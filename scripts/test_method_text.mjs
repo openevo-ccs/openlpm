@@ -63,6 +63,15 @@ test('a project works in its first working language, English when none is set', 
   assert.equal(M.projectUiLanguage(null), 'en')
 })
 
+test('German texts that Claude drafted are marked until an expert has read them', () => {
+  const draft = { textStatus: { de: { state: 'claude-draft-unreviewed', draftedOn: '2026-11-08' } } }
+  assert.equal(M.textState(draft, 'de'), 'claude-draft-unreviewed')
+  assert.equal(M.textState(draft, 'en'), 'original')
+  assert.equal(M.textState({ textStatus: { de: { state: 'reviewed' } } }, 'de'), 'reviewed')
+  assert.equal(M.textState({}, 'de'), 'original')
+  assert.equal(M.textState(null, 'de'), 'original')
+})
+
 // The app keeps its own copy of the English tag readings. When the MethodsBase checkout sits next to this repo, check that
 // the two agree, so a new tag cannot be added on one side only.
 const vocabPath = path.join(process.env.METHODSBASE_PATH ?? path.join(root, '..', 'methodsbase'), 'vocabularies', 'method-tags.yaml')

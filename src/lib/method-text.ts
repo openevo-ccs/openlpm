@@ -96,6 +96,15 @@ export function languagesOf(value: unknown): string[] {
   })
 }
 
+/**
+ * Whether the texts in a language were written by Claude and still wait for an expert. Reads the record's textStatus
+ * ({de: {state: 'claude-draft-unreviewed'}}). A language without an entry counts as original text.
+ */
+export function textState(data: Record<string, unknown> | null | undefined, lang: string): 'original' | 'claude-draft-unreviewed' | 'reviewed' {
+  const status = (data as any)?.textStatus?.[lang]?.state
+  return status === 'claude-draft-unreviewed' || status === 'reviewed' ? status : 'original'
+}
+
 export type TagField = 'lessonPhases' | 'learningApproaches'
 
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {

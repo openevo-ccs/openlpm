@@ -7,6 +7,7 @@ import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-
 import { listMethodsBaseByVocabulary, listMethodLernzielLinks, reviewMethodLernzielLink, type MethodsBaseRecord, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
 import { METHOD_ICON } from './student/student-lernziele-page'
 import { MethodDetailCard } from '@/components/method-detail-card'
+import { LanguageSwitch } from '@/components/language-switch'
 import { projectUiLanguage } from '@/lib/method-text'
 
 // Dustin's 2026-10-10 ask -- EvoMentor Thuringia's didactic methods weren't
@@ -75,6 +76,8 @@ export function MethodsWorkspace() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const uiLang = projectUiLanguage(project.working_languages)
   const t = strings(uiLang)
+  // The texts start in the project's language. The switch changes only the language of the method texts.
+  const [textLang, setTextLang] = useState(uiLang)
 
   const [methodOptions, setMethodOptions] = useState<string[]>([])
   const [methodsBaseByKey, setMethodsBaseByKey] = useState<Map<string, MethodsBaseRecord>>(new Map())
@@ -127,6 +130,7 @@ export function MethodsWorkspace() {
       ) : (
         <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
           <div style={{ minWidth: 240, flexShrink: 0 }}>
+            <div style={{ marginBottom: 10 }}><LanguageSwitch value={textLang} onChange={setTextLang} uiLang={uiLang} /></div>
             <p className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
               {t.count(methodOptions.length)}
             </p>
@@ -161,7 +165,7 @@ export function MethodsWorkspace() {
             return (
               <div style={{ flex: 1, minWidth: 0 }}>
                 {!methodsBase && selected && <div className="notice">{t.noRecord(selected)}</div>}
-                {methodsBase && <MethodDetailCard record={methodsBase} uiLang={uiLang} />}
+                {methodsBase && <MethodDetailCard record={methodsBase} uiLang={uiLang} textLang={textLang} />}
 
                 <h4>{t.goalsHeading(confirmedLinks.length)}</h4>
                 {confirmedLinks.length === 0 && <p className="muted">{t.noLinks}</p>}
