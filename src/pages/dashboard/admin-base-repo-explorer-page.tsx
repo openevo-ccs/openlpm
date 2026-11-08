@@ -4,7 +4,8 @@ import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, CheckCircle2, Clock, Filter, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Filter, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
+import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import {
@@ -266,9 +267,9 @@ export default function AdminBaseRepoExplorerPage() {
     <div>
       <h1 className="row"><BookOpen size={18} style={{ color: 'var(--text-muted)' }} />Base Repo Explorer</h1>
       <p className="muted" style={{ marginBottom: 16 }}>
-        Browse, review, and discuss real content from the OpenEvo CCS Foundational Repos, across every
-        project. Admin-only for now. The ConceptBase tab shows what each concept means; the dispute/graph
-        layer isn&apos;t covered here.
+        Browse, review, and discuss the content of the OpenEvo CCS Foundational Repos, across every
+        project. Admin-only for now. The ConceptBase tab shows what each concept means. The dispute and
+        graph layer is not covered here.
       </p>
 
       <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
@@ -349,7 +350,9 @@ export default function AdminBaseRepoExplorerPage() {
           ) : totalCount === 0 ? (
             <div className="card empty"><p>No records match.</p></div>
           ) : view === 'table' ? (
-            <TableView
+            // A table wider than its column scrolls sideways inside it. Without this wrapper the extra width ran
+            // underneath the record card on the right (feedback ca05a77a, Susan 2026-11-08).
+            <div style={{ overflowX: 'auto' }}><TableView
               rows={allRows}
               columns={columns}
               filterOptions={filterOptions}
@@ -358,7 +361,7 @@ export default function AdminBaseRepoExplorerPage() {
               onSort={setSort}
               onFilter={(id, value) => setColumnFilters((f) => ({ ...f, [id]: value }))}
               onSelect={setSelected}
-            />
+            /></div>
           ) : view === 'cards' ? (
             <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} />
           ) : (
@@ -827,6 +830,47 @@ function RecordDetails({
   )
 }
 
+// A link that opens in a new tab (feedback 6ad9269a, Susan 2026-11-08: "doi/url should be a hyperlink that opens in a new tab").
+function ExternalLink({ href, children }: { href: string | null; children: ReactNode }) {
+  if (!href || !/^https?:\/\//i.test(href)) return <span>{children}</span>
+  return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>
+}
+
+// The full APA reference with one click to copy it. The copy carries italics (journal and book titles) for a word processor and plain text
+// for everything else (feedback b8454f68, Susan 2026-11-08).
+function ApaCitation({ type, citation }: { type: string | undefined; citation: Record<string, unknown> }) {
+  const [copied, setCopied] = useState(false)
+  const parts = useMemo(() => formatApa(type, citation), [type, citation])
+  const copy = async () => {
+    const plain = apaToPlainText(parts)
+    try {
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        await navigator.clipboard.write([new ClipboardItem({
+          'text/plain': new Blob([plain], { type: 'text/plain' }),
+          'text/html': new Blob([apaToHtml(parts)], { type: 'text/html' }),
+        })])
+      } else {
+        await navigator.clipboard.writeText(plain)
+      }
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      try { await navigator.clipboard.writeText(plain); setCopied(true); window.setTimeout(() => setCopied(false), 1800) } catch { /* clipboard blocked */ }
+    }
+  }
+  return (
+    <div data-testid="apa-citation" style={{ margin: '4px 0 8px', padding: '8px 10px', background: 'var(--surface-2)', borderRadius: 'var(--radius)', fontSize: 12 }}>
+      <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 3 }}>Citation (APA 7)</div>
+      <div style={{ overflowWrap: 'anywhere' }}>
+        {parts.map((p, i) => (p.italic ? <i key={i}>{p.text}</i> : <span key={i}>{p.text}</span>))}
+      </div>
+      <button type="button" className="btn btn-mini" onClick={copy} style={{ marginTop: 6 }}>
+        {copied ? <Check size={12} /> : <Copy size={12} />}{copied ? 'Copied' : 'Copy citation'}
+      </button>
+    </div>
+  )
+}
+
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 10 }}>
@@ -852,7 +896,9 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
   if (citation.issue) pubParts.push(`no. ${citation.issue}`)
   if (citation.pages) pubParts.push(`pp. ${citation.pages}`)
   const publicationInfo = pubParts.join(', ')
-  const doiOrUrl = citation.doi ? `doi.org/${citation.doi}` : (citation.open_access_url as string | undefined) ?? (citation.isbn as string | undefined) ?? null
+  const doiLink = recordLink(citation)
+  const doiText = citation.doi ? `doi.org/${String(citation.doi).replace(/^https?:\/\/(dx\.)?doi\.org\//i, '')}` : (citation.open_access_url as string | undefined) ?? null
+  const isbn = (citation.isbn as string | undefined) ?? null
   const abstract = (data.plain_language_summary as Record<string, unknown> | undefined)?.text as string | undefined
   const keywords = Array.isArray(data.domains) ? (data.domains as unknown[]).map(String) : []
 
@@ -865,7 +911,8 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
       {authors.length > 0 && <DetailRow label="Authors">{authors.join(', ')}</DetailRow>}
       {!!citation.year && <DetailRow label="Year">{String(citation.year)}</DetailRow>}
       {!!publicationInfo && <DetailRow label="Publication">{publicationInfo}</DetailRow>}
-      {!!doiOrUrl && <DetailRow label="DOI / URL">{doiOrUrl}</DetailRow>}
+      {!!doiText && <DetailRow label="DOI / URL"><ExternalLink href={doiLink}>{doiText}</ExternalLink></DetailRow>}
+      {!doiText && !!isbn && <DetailRow label="ISBN">{isbn}</DetailRow>}
       {!!abstract && <DetailRow label="Abstract">{abstract}</DetailRow>}
       {keywords.length > 0 && <DetailRow label="Keywords">{keywords.join(', ')}</DetailRow>}
       <details style={{ marginTop: 8 }}>
@@ -935,6 +982,9 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
             {primarySources.map((s, i) => (
               <li key={i} style={{ marginBottom: 4 }}>
                 {s.citation ?? s.literatureRef ?? s.doi ?? s.url ?? '—'}
+                {(s.doi || s.url) && (
+                  <> <ExternalLink href={s.url ?? doiUrl(s.doi)}>{s.url ?? `doi.org/${s.doi}`}</ExternalLink></>
+                )}
               </li>
             ))}
           </ul>
@@ -1040,17 +1090,20 @@ function DetailPanel({
   }
 
   return (
-    <div className="card" style={{ width: 360, flexShrink: 0, position: 'sticky', top: 12 }}>
+    <div className="card" style={{ width: 360, flexShrink: 0, position: 'sticky', top: 12, maxHeight: 'calc(100vh - 24px)', overflowY: 'auto' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
         <button className="btn btn-mini" onClick={onClose}>×</button>
       </div>
+      {repoKey === 'literaturebase' && (
+        <ApaCitation type={row.data.type as string | undefined} citation={(row.data.citation as Record<string, unknown>) ?? {}} />
+      )}
       <p className="muted" style={{ fontSize: 12 }}>{repoKey} · {row.id}</p>
       {row.review_status && <p className="muted" style={{ fontSize: 12 }}>Review status (source repo): {row.review_status}</p>}
 
       <details style={{ marginTop: 8 }}>
         <summary style={{ cursor: 'pointer', fontSize: 12 }} className="muted">Full record</summary>
-        <div style={{ maxHeight: 320, overflow: 'auto', marginTop: 6 }}>
+        <div style={{ marginTop: 6 }}>
           {repoKey === 'literaturebase' ? (
             <LiteratureDetailSections data={row.data} />
           ) : repoKey === 'methodsbase' ? (
