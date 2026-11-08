@@ -1142,25 +1142,6 @@ function NetzTab({
 
   return (
     <div>
-      {/* Feedback 135a500e, 08967c79, fd20b1df (Susan, 2026-11-07): the explanation sits at the top as a "Beschreibung" box, so nobody misses it. */}
-      <details className="card netz-description" style={{ padding: '8px 14px', marginBottom: 10 }}>
-        <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Beschreibung</summary>
-        <p className="muted" style={{ fontSize: 12.5, marginTop: 8, marginBottom: 4 }}>
-          Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Kreise = ihre Unterkonzepte'}.
-          {sizeBy === 'count' ? ' Je mehr Lernziele zu einem Kreis gehören, desto größer ist er.' : ' Je höher die Relevanz-Summe der Lernziele eines Kreises, desto größer ist er.'}
-          {showLz && ' Kleine Rauten = einzelne Lernziele. Jedes Lernziel ist durch eine Linie mit dem '}
-          {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
-          {showLz && ' verbunden, zu dem es am stärksten passt (hohe Relevanz). Weitere Linien zu Konzepten mit mindestens mittlerer Bewertung erscheinen, wenn man auf das Lernziel zeigt oder „Alle“ wählt. Niedrig bewertete Verbindungen werden nicht dargestellt. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
-          {showLz && lzOrder === 'grade' && (stripesShown
-            ? ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet. Graue Streifen zeigen die Stufen: oben 5/6, darunter 7/8, 9 und 10.'
-            : ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet; bei bewegtem Layout ist diese Ordnung nicht sichtbar.')}
-          {showLz && lzOrder !== 'grade' && ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.'}
-          {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts. Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl).'}
-          {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
-          {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
-          {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen/-klicken eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal Antippen/-klicken hebt die Hervorhebung auf); Antippen/-klicken eines Lernziels öffnet es.
-        </p>
-      </details>
       <div className="netz-controls">
         <div className="netz-control-group">
           <button className={`chip-btn${showUk ? ' active' : ''}`} onClick={() => setShowUk((v) => !v)}>Unterkonzepte</button>
@@ -1190,6 +1171,27 @@ function NetzTab({
         onZoomOut={() => zoomBy(0.8)}
         onFit={fitView}
       />
+
+      {/* Feedback 135a500e, 08967c79, fd20b1df (Susan, 2026-11-07): the explanation is a "Beschreibung" box.
+          Feedback 9367533c (Dustin, 2026-11-07): it sits just above the network window, below the controls. */}
+      <details className="card netz-description" style={{ padding: '8px 14px', marginBottom: 10 }}>
+        <summary style={{ cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Beschreibung</summary>
+        <p className="muted" style={{ fontSize: 12.5, marginTop: 8, marginBottom: 4 }}>
+          Große Kreise (obere Reihe) = Basiskonzepte{showUk && ', mittlere Kreise = ihre Unterkonzepte'}.
+          {sizeBy === 'count' ? ' Je mehr Lernziele zu einem Kreis gehören, desto größer ist er.' : ' Je höher die Relevanz-Summe der Lernziele eines Kreises, desto größer ist er.'}
+          {showLz && ' Kleine Rauten = einzelne Lernziele. Jedes Lernziel ist durch eine Linie mit dem '}
+          {showLz && (showUk ? 'Unterkonzept (oder Basiskonzept, falls kein spezifisches Unterkonzept erfasst ist)' : 'Basiskonzept')}
+          {showLz && ' verbunden, zu dem es am stärksten passt (hohe Relevanz). Weitere Linien zu Konzepten mit mindestens mittlerer Bewertung erscheinen, wenn man auf das Lernziel zeigt oder „Alle“ wählt. Niedrig bewertete Verbindungen werden nicht dargestellt. Ein Lernziel kann mehrere hoch bewertete Konzepte haben; nur eines davon trägt die Hauptlinie.'}
+          {showLz && lzOrder === 'grade' && (stripesShown
+            ? ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet. Graue Streifen zeigen die Stufen: oben 5/6, darunter 7/8, 9 und 10.'
+            : ' Unter jedem Konzept sind die Lernziele nach Klassenstufe geordnet; bei bewegtem Layout ist diese Ordnung nicht sichtbar.')}
+          {showLz && lzOrder !== 'grade' && ' Unter jedem Konzept stehen oben die Lernziele mit der stärksten Verbindung.'}
+          {showLz && gs.edges === 'bundled' && ' Jeder Bogen läuft von der Farbe des einen zur Farbe des anderen Basiskonzepts. Die breiten Bögen über den Basiskonzepten zeigen, wie viele Lernziele je zwei Basiskonzepte verbinden (Zeiger darauf halten für die Zahl).'}
+          {showLz && gs.edges === 'tree' && ' Weitere Verbindungen eines Lernziels erscheinen, wenn man darauf zeigt.'}
+          {showLz && gs.edges === 'all' && ' Weil viele Lernziele zu mehreren Konzepten gehören, kreuzen sich viele Linien; „Gebündelt“ ist übersichtlicher.'}
+          {' '}Kräftigere Linien = höher bewertete Relevanz. Antippen/-klicken eines Basiskonzepts oder Unterkonzepts hebt nur seinen eigenen Bereich hervor (nochmal Antippen/-klicken hebt die Hervorhebung auf); Antippen/-klicken eines Lernziels öffnet es.
+        </p>
+      </details>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div ref={containerRef} style={{ height: 480, minHeight: 480 }} />
