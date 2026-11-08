@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { pickLocalized, tagLabel } from '@/lib/method-text'
 import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
@@ -143,15 +144,24 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     secondaryFilter: { dataKey: 'learningApproaches', label: 'Learning approach' },
     tableColumns: [
       { header: 'Label', get: (row) => row.label },
+      // The German name has its own column now that it no longer sits in brackets inside the English label.
+      {
+        header: 'German name',
+        get: (row) => {
+          const name = pickLocalized((row.data as any)?.label, 'de')
+          return name && name.lang === 'de' ? name.text : '—'
+        },
+      },
       {
         header: 'Method-class',
         get: (row) => row.secondary ?? '—',
         filterValues: (row) => (row.filterValue ? [row.filterValue] : []),
       },
+      // Tags are stored in German; the table shows the English reading with the German term in brackets.
       {
         header: 'Learning approaches',
-        get: (row) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.join(', ') : '—'),
-        filterValues: (row) => row.secondaryFilterValues,
+        get: (row) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.map((t) => tagLabel('learningApproaches', t, 'en')).join(', ') : '—'),
+        filterValues: (row) => row.secondaryFilterValues.map((t) => tagLabel('learningApproaches', t, 'en')),
       },
     ],
     relationFields: [
@@ -302,9 +312,9 @@ export function detectLanguages(data: Record<string, unknown>): string[] {
 /**
  * Turns a stored label into the plain words a person reads. MethodsBase
  * stores its label as a language-keyed object, and the snapshot table keeps
- * that as JSON text, e.g. {"en":"ABC Method (ABC-Methode)"}. This returns
- * just "ABC Method (ABC-Methode)": English first, then German, then whatever
- * language is there. A label that is already plain text comes back as is
+ * that as JSON text, e.g. {"en":"ABC Method","de":"ABC-Methode"}. This returns
+ * just "ABC Method": English first, then German, then whatever language is
+ * there. The German name has its own column in the MethodsBase table. A label that is already plain text comes back as is
  * (Susan Hanisch, 2026-10-30, feedback 6cffd929).
  */
 export function plainLabel(value: unknown): string {
