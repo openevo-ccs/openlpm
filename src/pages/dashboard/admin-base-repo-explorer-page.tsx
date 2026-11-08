@@ -4,10 +4,13 @@ import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Filter, LayoutGrid, MessageSquare, Network, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, Search, Table2, XCircle } from 'lucide-react'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
+import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
+import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
+import { applyEdits, historyFor, listEdits, markSentBack, pendingEdits, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
@@ -103,7 +106,7 @@ type SortState = { id: string; dir: 'asc' | 'desc' }
 const compareText = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
 
 export default function AdminBaseRepoExplorerPage() {
-  const { isAdmin } = useSession()
+  const { isAdmin, session } = useSession()
   const supabase = useMemo(() => createClient(), [])
 
   // The ConceptBase tab links back here with ?tab=<repo>, so the tab asked for is the one shown first.
@@ -122,6 +125,17 @@ export default function AdminBaseRepoExplorerPage() {
   const [selected, setSelected] = useState<NodeRef | null>(null)
   const [reviewQueue, setReviewQueue] = useState<GenericReviewItem[] | null>(null)
   const [showReviewQueue, setShowReviewQueue] = useState(false)
+  // In-app edits (feedback 0afc62a5): kept per base, laid over the repo copy below. `editsAvailable` is false until migration 237 is live.
+  const [editsByRepo, setEditsByRepo] = useState<Map<BaseRepoKey, BaseRepoEdit[]>>(new Map())
+  const [editsAvailable, setEditsAvailable] = useState(true)
+  const [onlyEdited, setOnlyEdited] = useState(false)
+  const [showEditsExport, setShowEditsExport] = useState(false)
+
+  const reloadEdits = async (repoKey: BaseRepoKey) => {
+    const { edits, available } = await listEdits(supabase, repoKey)
+    setEditsAvailable(available)
+    setEditsByRepo((prev) => new Map(prev).set(repoKey, edits))
+  }
 
   const reloadReviewQueue = () => listGlobalReviewQueue(supabase).then(setReviewQueue)
 
@@ -132,13 +146,19 @@ export default function AdminBaseRepoExplorerPage() {
     if (missing.length === 0) return
     let active = true
     setLoading(true)
-    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key)] as const)).then((pairs) => {
+    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key), await listEdits(supabase, key)] as const)).then((triples) => {
       if (!active) return
       setRowsByRepo((prev) => {
         const next = new Map(prev)
-        for (const [key, rows] of pairs) next.set(key, rows)
+        for (const [key, rows] of triples) next.set(key, rows)
         return next
       })
+      setEditsByRepo((prev) => {
+        const next = new Map(prev)
+        for (const [key, , result] of triples) next.set(key, result.edits)
+        return next
+      })
+      setEditsAvailable((was) => triples.every(([, , result]) => result.available) && was)
       setLoading(false)
     })
     return () => { active = false }
@@ -162,13 +182,41 @@ export default function AdminBaseRepoExplorerPage() {
   // A filter or sort set for one base's columns means nothing on another's.
   useEffect(() => { setColumnFilters({}); setSort(null) }, [tab])
 
+  // The repo copy with the in-app edits on top. Records without edits are the same objects as in rowsByRepo.
+  const effectiveRowsByRepo = useMemo(() => {
+    const out = new Map<BaseRepoKey, SnapshotRow[]>()
+    for (const [key, rows] of rowsByRepo) out.set(key, applyEdits(key, rows, editsByRepo.get(key) ?? []))
+    return out
+  }, [rowsByRepo, editsByRepo])
+
   // The rows for this tab, before any search or filter.
   const tabRows: NodeRef[] = useMemo(() => {
     const out: NodeRef[] = []
     const keys: BaseRepoKey[] = tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
-    for (const repoKey of keys) for (const row of rowsByRepo.get(repoKey) ?? []) out.push({ repoKey, row })
+    for (const repoKey of keys) for (const row of effectiveRowsByRepo.get(repoKey) ?? []) out.push({ repoKey, row })
     return out
-  }, [rowsByRepo, tab])
+  }, [effectiveRowsByRepo, tab])
+
+  // Words other records already use, offered as suggestions in the edit form.
+  const vocab: FieldVocabulary = useMemo(() => {
+    const methods = effectiveRowsByRepo.get('methodsbase') ?? []
+    const approaches = new Set<string>()
+    const classes = new Set<string>(['pedagogical-practice', 'research-method'])
+    for (const r of methods) {
+      for (const a of r.secondaryFilterValues) approaches.add(a)
+      if (r.filterValue) classes.add(r.filterValue)
+    }
+    return { learningApproaches: Array.from(approaches).sort(compareText), methodClasses: Array.from(classes).sort(compareText) }
+  }, [effectiveRowsByRepo])
+
+  const selectedLive: NodeRef | null = useMemo(() => {
+    if (!selected) return null
+    const fresh = (effectiveRowsByRepo.get(selected.repoKey) ?? []).find((r) => r.id === selected.row.id)
+    return { repoKey: selected.repoKey, row: fresh ?? selected.row }
+  }, [selected, effectiveRowsByRepo])
+
+  const allEdits = useMemo(() => Array.from(editsByRepo.values()).flat(), [editsByRepo])
+  const waitingEdits = useMemo(() => pendingEdits(allEdits), [allEdits])
 
   // Real feedback a3408216 (Susan, 2026-10-24): no way to tell, or filter,
   // which language a record's text is actually in -- MethodsBase content
@@ -233,7 +281,10 @@ export default function AdminBaseRepoExplorerPage() {
     return out
   }, [columns, tabRows])
 
-  const searched = useMemo(() => tabRows.filter((n) => rowMatchesSearch(n.row, search)), [tabRows, search])
+  const searched = useMemo(
+    () => tabRows.filter((n) => rowMatchesSearch(n.row, search) && (!onlyEdited || (n.row.editedPaths?.length ?? 0) > 0)),
+    [tabRows, search, onlyEdited]
+  )
 
   // Until someone clicks a heading, rows are in title order, as before.
   const defaultSortColumn = columns.find((c) => c.id === 'label' || c.header === 'Label' || c.header === 'Title') ?? columns.find((c) => c.id !== 'repo') ?? columns[0]
@@ -252,7 +303,7 @@ export default function AdminBaseRepoExplorerPage() {
 
   const totalCount = allRows.length
   // Tab counts cover every base already loaded, including tabs that aren't open, and follow the search box.
-  const searchedCountFor = (key: BaseRepoKey) => (rowsByRepo.get(key) ?? []).filter((r) => rowMatchesSearch(r, search)).length
+  const searchedCountFor = (key: BaseRepoKey) => (effectiveRowsByRepo.get(key) ?? []).filter((r) => rowMatchesSearch(r, search) && (!onlyEdited || (r.editedPaths?.length ?? 0) > 0)).length
 
   if (!isAdmin) {
     return (
@@ -333,11 +384,26 @@ export default function AdminBaseRepoExplorerPage() {
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
           <button className={`btn btn-mini${view === 'cards' ? ' btn-primary' : ''}`} onClick={() => setView('cards')}><LayoutGrid size={13} />Cards</button>
           <button className={`btn btn-mini${view === 'graph' ? ' btn-primary' : ''}`} onClick={() => setView('graph')}><Network size={13} />Graph</button>
+          <button className={`btn btn-mini${onlyEdited ? ' btn-primary' : ''}`} onClick={() => setOnlyEdited((v) => !v)} title="Show only the records that have been edited in OpenLPM">
+            <Pencil size={13} />Edited only
+          </button>
+          <button className="btn btn-mini" onClick={() => setShowEditsExport((v) => !v)} title="Edits made here that are not in the source repos yet">
+            <Download size={13} />Edits to send back ({waitingEdits.length})
+          </button>
           <button className="btn btn-mini" onClick={() => setShowReviewQueue((v) => !v)}>
             <Clock size={13} />Review queue {reviewQueue ? `(${reviewQueue.filter((i) => i.assignment.status === 'pending').length})` : ''}
           </button>
         </div>
       </div>
+
+      {showEditsExport && (
+        <EditsExportPanel
+          edits={waitingEdits}
+          labelFor={(repoKey, id) => (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id}
+          supabase={supabase}
+          onMarked={() => Promise.all(Array.from(editsByRepo.keys()).map(reloadEdits))}
+        />
+      )}
 
       {showReviewQueue && (
         <ReviewQueuePanel items={reviewQueue} supabase={supabase} onReviewed={reloadReviewQueue} />
@@ -369,10 +435,15 @@ export default function AdminBaseRepoExplorerPage() {
           )}
         </div>
 
-        {selected && (
+        {selectedLive && (
           <DetailPanel
-            nodeRef={selected}
+            nodeRef={selectedLive}
             supabase={supabase}
+            userId={session?.user.id ?? null}
+            vocab={vocab}
+            history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
+            editsAvailable={editsAvailable}
+            onEditsChanged={() => reloadEdits(selectedLive.repoKey)}
             onClose={() => setSelected(null)}
             onSubmittedForReview={reloadReviewQueue}
           />
@@ -546,6 +617,7 @@ function CardsView({
           <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
           {row.secondary && <p className="muted" style={{ fontSize: 12 }}>{row.secondary}</p>}
           {row.review_status && <p className="muted" style={{ fontSize: 11 }}>Review: {row.review_status}</p>}
+          {(row.editedPaths?.length ?? 0) > 0 && <p style={{ fontSize: 11, marginTop: 4 }}><span className="chip" title="Edited in OpenLPM on top of the repo copy">edited</span></p>}
         </div>
       ))}
     </div>
@@ -1003,15 +1075,27 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
 function DetailPanel({
   nodeRef,
   supabase,
+  userId,
+  vocab,
+  history,
+  editsAvailable,
+  onEditsChanged,
   onClose,
   onSubmittedForReview,
 }: {
   nodeRef: NodeRef
   supabase: ReturnType<typeof createClient>
+  userId: string | null
+  vocab: FieldVocabulary
+  history: BaseRepoEdit[]
+  editsAvailable: boolean
+  onEditsChanged: () => void
   onClose: () => void
   onSubmittedForReview: () => void
 }) {
   const { repoKey, row } = nodeRef
+  const [editing, setEditing] = useState(false)
+  useEffect(() => { setEditing(false) }, [repoKey, row.id])
   const [targetId, setTargetId] = useState<string | null>(null)
   const [topics, setTopics] = useState<Awaited<ReturnType<typeof listGlobalTopicsForTarget>> | null>(null)
   const [posts, setPosts] = useState<PostWithAuthor[]>([])
@@ -1099,8 +1183,27 @@ function DetailPanel({
         <ApaCitation type={row.data.type as string | undefined} citation={(row.data.citation as Record<string, unknown>) ?? {}} />
       )}
       <p className="muted" style={{ fontSize: 12 }}>{repoKey} · {row.id}</p>
+      {(row.editedPaths?.length ?? 0) > 0 && (
+        <p style={{ fontSize: 12 }}>
+          <span className="chip" title="Shown on top of the repo copy">edited in OpenLPM</span>{' '}
+          <span className="muted">{row.pendingEditCount ? `${row.pendingEditCount} waiting to be sent back to the repo` : 'all sent back to the repo'}</span>
+        </p>
+      )}
       {row.review_status && <p className="muted" style={{ fontSize: 12 }}>Review status (source repo): {row.review_status}</p>}
 
+      {editing && userId ? (
+        <div style={{ marginTop: 8 }}>
+          <RecordEditor
+            supabase={supabase}
+            userId={userId}
+            repoKey={repoKey}
+            row={row}
+            vocab={vocab}
+            onCancel={() => setEditing(false)}
+            onSaved={() => { setEditing(false); onEditsChanged() }}
+          />
+        </div>
+      ) : (
       <details style={{ marginTop: 8 }}>
         <summary style={{ cursor: 'pointer', fontSize: 12 }} className="muted">Full record</summary>
         <div style={{ marginTop: 6 }}>
@@ -1113,8 +1216,23 @@ function DetailPanel({
           )}
         </div>
       </details>
+      )}
+
+      {!editing && userId && (
+        <EditHistory supabase={supabase} userId={userId} repoKey={repoKey} row={row} history={history} onChanged={onEditsChanged} />
+      )}
 
       <div className="row" style={{ marginTop: 12, gap: 8 }}>
+        {!editing && (
+          <button
+            className="btn btn-mini"
+            disabled={!userId || !editsAvailable}
+            title={editsAvailable ? 'Edit this record here. The source repo is not changed until the edits are sent back.' : 'Editing starts once the database update for it is applied.'}
+            onClick={() => setEditing(true)}
+          >
+            <Pencil size={13} />Edit
+          </button>
+        )}
         <button className="btn btn-mini" disabled={busy} onClick={submitReview}><CheckCircle2 size={13} />Submit for review</button>
       </div>
       {notice && <p className="muted" style={{ fontSize: 12 }}>{notice}</p>}
@@ -1146,6 +1264,75 @@ function DetailPanel({
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+// The edits made here that the source repos do not have yet. An admin downloads them, a session applies them to the repos through a normal
+// pull request, and then marks them as sent back, which takes them off this list (feedback 0afc62a5).
+function EditsExportPanel({
+  edits,
+  labelFor,
+  supabase,
+  onMarked,
+}: {
+  edits: BaseRepoEdit[]
+  labelFor: (repoKey: BaseRepoKey, id: string) => string
+  supabase: ReturnType<typeof createClient>
+  onMarked: () => unknown
+}) {
+  const [batch, setBatch] = useState(() => `batch-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}`)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  const download = () => {
+    const payload = {
+      kind: 'openlpm-base-repo-edits',
+      created_at: new Date().toISOString(),
+      batch,
+      edits: edits.map((e) => ({
+        edit_id: e.id, base_repo: e.base_repo, record_id: e.record_id, record_label: labelFor(e.base_repo, e.record_id), field_path: e.field_path,
+        before: e.before_value, after: e.after_value, note: e.note, edited_by: e.editor_name ?? e.edited_by, edited_at: e.edited_at,
+      })),
+    }
+    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url; a.download = `openlpm-base-repo-edits-${batch}.json`; a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const markAll = async () => {
+    if (!window.confirm(`Mark these ${edits.length} edits as applied to the source repos? Do this only after the change has been made there.`)) return
+    setBusy(true); setMessage(null)
+    const error = await markSentBack(supabase, edits.map((e) => e.id), batch)
+    setBusy(false)
+    if (error) setMessage(error)
+    else { setMessage('Marked as sent back.'); await onMarked() }
+  }
+
+  return (
+    <div className="card" style={{ marginBottom: 16 }} data-testid="edits-export">
+      <h3 style={{ marginBottom: 8 }}>Edits to send back to the repos</h3>
+      {edits.length === 0 ? (
+        <p className="muted">Nothing is waiting. Every edit made here is already in the source repos.</p>
+      ) : (
+        <>
+          <p className="muted" style={{ fontSize: 12 }}>These changes are shown in this app but are not in the source repos yet. Download them, ask for them to be applied through a normal pull request, then mark them as sent back.</p>
+          <div style={{ maxHeight: 220, overflow: 'auto', marginBottom: 8 }}>
+            {edits.map((e) => (
+              <div key={e.id} style={{ fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
+                <strong>{labelFor(e.base_repo, e.record_id)}</strong> <span className="muted">· {e.base_repo} · {e.field_path} · {e.editor_name ?? 'Someone'} · {new Date(e.edited_at).toLocaleDateString()}</span>
+              </div>
+            ))}
+          </div>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+            <input value={batch} onChange={(ev) => setBatch(ev.target.value)} aria-label="Batch name" style={{ fontSize: 12, minWidth: 200 }} />
+            <button className="btn btn-mini" onClick={download}><Download size={13} />Download file</button>
+            <button className="btn btn-mini" disabled={busy} onClick={markAll}><Check size={13} />Mark as sent back</button>
+          </div>
+        </>
+      )}
+      {message && <p className="muted" style={{ fontSize: 12 }}>{message}</p>}
     </div>
   )
 }

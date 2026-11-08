@@ -271,6 +271,10 @@ export interface SnapshotRow {
   languages: string[]
   /** Values from this repo's secondaryFilter.dataKey, coerced to an array -- [] if the repo has no secondaryFilter or the record has no values. */
   secondaryFilterValues: string[]
+  /** Latest in-app edit of each field of this record that is on top of the repo copy (see base-repo-edits.ts). Absent when there are none. */
+  editedPaths?: string[]
+  /** How many of those edits have not been sent back to the source repo yet. */
+  pendingEditCount?: number
 }
 
 function toStringArray(value: unknown): string[] {
@@ -284,7 +288,7 @@ function toStringArray(value: unknown): string[] {
 // language-keyed objects contribute their keys.
 const LANGUAGE_CANDIDATE_FIELDS = ['label', 'description', 'whenToUse', 'protocolSteps', 'statement']
 
-function detectLanguages(data: Record<string, unknown>): string[] {
+export function detectLanguages(data: Record<string, unknown>): string[] {
   const found = new Set<string>()
   for (const field of LANGUAGE_CANDIDATE_FIELDS) {
     const value = (data as any)?.[field]
