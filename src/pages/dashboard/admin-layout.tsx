@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { ArrowLeft, BookOpen, FolderKanban, LogIn, MessageSquareText, Pencil, Users } from 'lucide-react'
+import { ArrowLeft, BookOpen, FolderKanban, LogIn, MessageSquareText, PanelLeftClose, PanelLeftOpen, Pencil, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
@@ -25,9 +26,30 @@ const TABS: AdminTab[] = [
   { to: 'content', label: 'Edit data', icon: Pencil },
 ]
 
+// Same switch and the same remembered setting as a project's sidebar (feedback cea80aaa, Dustin 2026-11-07), so folding the menu in one place
+// folds it in the other.
+const SIDEBAR_COLLAPSED_KEY = 'openlpm:sidebar_collapsed'
+
+function readStoredSidebarCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 export default function AdminLayout() {
   const { isAdmin } = useSession()
   const location = useLocation()
+  const [collapsed, setCollapsed] = useState(readStoredSidebarCollapsed)
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => {
+      const next = !prev
+      try { localStorage.setItem(SIDEBAR_COLLAPSED_KEY, next ? '1' : '0') } catch { /* private window */ }
+      return next
+    })
+  }
 
   if (!isAdmin) {
     return (
@@ -40,20 +62,23 @@ export default function AdminLayout() {
 
   return (
     <div className="project-shell">
-      <aside className="project-side" aria-label="Admin sections">
+      <aside className={`project-side${collapsed ? ' collapsed' : ''}`} aria-label="Admin sections">
         <div className="project-side-top">
           <Link to="/dashboard" className="row muted" title="All project spaces">
             <ArrowLeft size={14} />
             <span className="nav-label">All project spaces</span>
           </Link>
+          <button type="button" className="sidebar-toggle" onClick={toggleSidebar} title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
         </div>
-        <h2 style={{ marginTop: 10, marginBottom: 2 }}>Admin</h2>
+        <h2 className="project-side-title" style={{ marginTop: 10, marginBottom: 2 }}>Admin</h2>
         <nav>
           {TABS.map((tab) => {
             const Icon = tab.icon
             const extra = !!tab.alsoActiveFor && location.pathname.startsWith(tab.alsoActiveFor)
             return (
-              <NavLink key={tab.to} to={`/dashboard/admin/${tab.to}`} className={({ isActive }) => (isActive || extra ? 'active' : '')}>
+              <NavLink key={tab.to} to={`/dashboard/admin/${tab.to}`} title={tab.label} className={({ isActive }) => (isActive || extra ? 'active' : '')}>
                 <Icon size={14} />
                 <span className="nav-label">{tab.label}</span>
               </NavLink>
