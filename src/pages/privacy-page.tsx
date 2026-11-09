@@ -9,9 +9,8 @@ import { OpenLpmLogo } from '@/components/openlpm-logo'
 // noreply@openevo.net), the student-work tables (migration 192), feedback (migration 026),
 // the opt-out table (migration 238) and the project's data region (eu-central-1, Frankfurt).
 //
-// It is a draft until the Max Planck Society's data protection officer has read it. The notice
-// at the top says so in both languages. Keep both language versions in step: a change to one
-// is a change to the other.
+// Reviewed and approved by Dustin Eirdosh on 2026-11-09. Keep both language versions in step:
+// a change to one is a change to the other.
 //
 // The page opens in German for browsers set to German, in English otherwise. A link can force
 // one: /privacy?lang=de or /privacy?lang=en.
@@ -72,17 +71,14 @@ function PrivacyEn() {
       <h1>Privacy Policy</h1>
       <p className="muted">Last updated {LAST_UPDATED.en}. The German version is the one to read if the two ever seem to differ.</p>
 
-      <div className="notice notice-bad" style={{ alignItems: 'flex-start' }}>
-        <div>
-          <strong>Draft. The data protection officer has not reviewed it yet.</strong> This text describes how OpenLPM
-          is built and what it does with your data. Neither the data protection officer of the Max Planck Society nor
-          a lawyer has checked it. It replaces, for this service, the general{' '}
-          <a href="https://www.eva.mpg.de/privacy-policy/" target="_blank" rel="noreferrer">
-            eva.mpg.de privacy policy
-          </a>
-          , which covers the institute&apos;s own WordPress sites.
-        </div>
-      </div>
+      <p>
+        This text describes how OpenLPM is built and what it does with your data. It applies to OpenLPM. The institute&apos;s
+        own websites are covered by the{' '}
+        <a href="https://www.eva.mpg.de/privacy-policy/" target="_blank" rel="noreferrer">
+          eva.mpg.de privacy policy
+        </a>
+        .
+      </p>
 
       <h2>1. The short version</h2>
       <ul>
@@ -370,18 +366,14 @@ function PrivacyDe() {
       <h1>Datenschutzerklärung</h1>
       <p className="muted">Stand: {LAST_UPDATED.de}. Die englische Fassung steht unter „English“.</p>
 
-      <div className="notice notice-bad" style={{ alignItems: 'flex-start' }}>
-        <div>
-          <strong>Entwurf. Die Datenschutzbeauftragten haben den Text noch nicht geprüft.</strong>{' '}
-          Der Text beschreibt, wie OpenLPM aufgebaut ist und was damit mit deinen Daten geschieht. Weder die
-          Datenschutzbeauftragte der Max-Planck-Gesellschaft noch eine Juristin oder ein Jurist haben ihn gelesen. Für
-          diesen Dienst ersetzt er die allgemeine{' '}
-          <a href="https://www.eva.mpg.de/privacy-policy/" target="_blank" rel="noreferrer">
-            Datenschutzerklärung von eva.mpg.de
-          </a>
-          , die für die WordPress-Seiten des Instituts gilt.
-        </div>
-      </div>
+      <p>
+        Dieser Text beschreibt, wie OpenLPM aufgebaut ist und was damit mit deinen Daten geschieht. Er gilt für
+        OpenLPM. Für die übrigen Webseiten des Instituts gilt die{' '}
+        <a href="https://www.eva.mpg.de/privacy-policy/" target="_blank" rel="noreferrer">
+          Datenschutzerklärung von eva.mpg.de
+        </a>
+        .
+      </p>
 
       <h2>1. Das Wichtigste in Kürze</h2>
       <ul>
