@@ -6,6 +6,7 @@ import { useSession } from '@/state/session'
 import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
 import { deleteProject, updateProjectMetadata, type ProjectMetadataPatch } from '@/lib/supabase/projects'
 import { listFeedback, type FeedbackItem } from '@/lib/supabase/feedback'
+import { listAiOptOutUserIds, listOpenDeletionRequests, type AdminDeletionRequest } from '@/lib/supabase/privacy-settings'
 import { projectColorHexOrDefault, projectColorTint } from '@/lib/project-colors'
 import { CURATION, EPISTEMIC_STATUS_OPTIONS } from '@/components/epistemic-status-badge'
 import {
@@ -74,8 +75,12 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
   const [projects, setProjects] = useState<AdminProjectRow[] | null>(null)
   const [joinRules, setJoinRules] = useState<AdminJoinRule[] | null>(null)
   const [feedback, setFeedback] = useState<FeedbackItem[] | null>(null)
+  const [deletionRequests, setDeletionRequests] = useState<AdminDeletionRequest[] | null>(null)
+  const [aiOptOutIds, setAiOptOutIds] = useState<Set<string> | null>(null)
 
   const reload = () => {
+    listOpenDeletionRequests(supabase).then(setDeletionRequests)
+    listAiOptOutUserIds(supabase).then(setAiOptOutIds)
     listAllUsers(supabase).then(setUsers)
     listAllMemberships(supabase).then(setMemberships)
     listAllProjects(supabase).then(setProjects)
@@ -128,6 +133,8 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
         </>
       )}
 
+      {section === 'accounts' && <DeletionRequestsCard requests={deletionRequests} />}
+
       {section === 'accounts' && (
       <div className="card" style={{ marginBottom: 20 }}>
         <h3>Accounts</h3>
@@ -144,7 +151,19 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
               {users.filter((u) => u.blocked_at).length} blocked
               {' · '}
               {users.filter((u) => (membershipsByUser.get(u.id) ?? []).length === 0).length} not in any project
+              {aiOptOutIds && (
+                <>
+                  {' · '}
+                  {aiOptOutIds.size} opted out of AI processing
+                </>
+              )}
             </p>
+            {aiOptOutIds && aiOptOutIds.size > 0 && (
+              <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+                Opted out of AI processing (their text must not go to any AI assistant or outside model):{' '}
+                {users.filter((u) => aiOptOutIds.has(u.id)).map((u) => u.name || u.email).join(', ')}
+              </p>
+            )}
             {users.filter((u) => !looksLikeTestAccount(u.email)).map((u) => (
               <UserRow
                 key={u.id}
@@ -195,6 +214,41 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
 // users and test accounts." Collapsed by default -- these accounts exist
 // on purpose (the standing QA account, this skill's mint_qa_session.mjs
 // tooling) but shouldn't compete for attention with the real people above.
+// Requests to delete an account and its data (GDPR Art. 17). The law asks for an answer within
+// one month, so the due date is shown on every row and overdue ones turn red. Deleting is done
+// with `node scripts/execute_data_deletion.mjs --request <id>` (it needs the service key, which
+// the browser never has).
+function DeletionRequestsCard({ requests }: { requests: AdminDeletionRequest[] | null }) {
+  if (!requests || requests.length === 0) return null
+  const now = Date.now()
+  const fmt = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  return (
+    <div className="card" style={{ marginBottom: 20, borderColor: 'var(--warning-text)' }}>
+      <h3 className="row"><Trash2 size={16} />Deletion requests waiting ({requests.length})</h3>
+      <p className="muted" style={{ fontSize: 12.5 }}>
+        Each person is owed an answer within one month. Run <code>node scripts/execute_data_deletion.mjs --request &lt;id&gt;</code>{' '}
+        to delete the account and data. The script prints the email address first, so a confirmation can be sent.
+      </p>
+      {requests.map((r) => {
+        const overdue = new Date(r.due_at).getTime() < now
+        return (
+          <div key={r.id} className="row" style={{ justifyContent: 'space-between', padding: '6px 0', borderTop: '1px solid var(--border)' }}>
+            <span>
+              <strong>{r.user?.name || r.user?.email || 'Unknown'}</strong>
+              {r.user?.name && r.user?.email ? <span className="muted"> · {r.user.email}</span> : null}
+              {r.reason ? <span className="muted"> · “{r.reason}”</span> : null}
+            </span>
+            <span style={{ fontSize: 12.5, color: overdue ? 'var(--warning-text)' : undefined }}>
+              asked {fmt(r.requested_at)} · due {fmt(r.due_at)}{overdue ? ' (overdue)' : ''}
+              {' · '}<code style={{ fontSize: 11 }}>{r.id}</code>
+            </span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function TestAccountsSection({
   users,
   membershipsByUser,
