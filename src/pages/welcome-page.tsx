@@ -209,7 +209,9 @@ export default function WelcomePage() {
           <strong>Wer sieht was?</strong> Deine Dozentin und das OpenEvo-Team können deine Arbeit in diesem Bereich einsehen (gemerkte Lernziele,
           Beurteilungen, Gruppen). Andere Studierende sehen deinen Namen in der Gruppenliste und nur das aus deiner Arbeit, was du mit deiner Gruppe teilst.
           Deine E-Mail-Adresse sehen sie nicht.
-          Die Daten liegen auf einem Server in Frankfurt. Mehr steht in der <Link to="/privacy">Datenschutzerklärung</Link>.
+          Die Daten liegen auf einem Server in Frankfurt. Wenn du nicht möchtest, dass deine Daten von externen KI-Diensten
+          verarbeitet werden, kannst du das nach der Anmeldung im Profil einstellen. Dort kannst du auch beantragen, dass dein Konto
+          und deine Daten gelöscht werden. Mehr steht in der <Link to="/privacy?lang=de">Datenschutzerklärung</Link>.
         </div>
       </div>
       </main>
@@ -219,7 +221,7 @@ export default function WelcomePage() {
         <p>
           <Link to="/impressum">Impressum</Link>
           {' · '}
-          <Link to="/privacy">Datenschutzerklärung</Link>
+          <Link to="/privacy?lang=de">Datenschutzerklärung</Link>
         </p>
       </footer>
     </div>

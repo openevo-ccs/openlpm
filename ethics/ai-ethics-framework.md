@@ -230,6 +230,8 @@ Each OpenLPM-hosted project decides its own equivalent of an "AI ethics committe
 
 ### 6. Privacy & Data Protection
 - Student data never used for AI training
+- Anyone can opt out of having their data processed by outside AI services (Profile page). The opt-out covers personal data. Properly anonymized data, which nobody can trace back to a person, is not personal data and stays usable for the normal running and improvement of the app. Text with only the name removed does not count as anonymized.
+- Anyone can ask for their account and data to be deleted, and gets an answer within one month
 - Researcher data handled with appropriate consent
 - Compliance with GDPR and other applicable regulations
 

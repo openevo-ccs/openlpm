@@ -27,6 +27,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { loadOptedOutUserIds, storagePathIsOptedOut, WITHHELD } from './lib/ai-opt-out.mjs'
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const SECRET_PATH = path.join(ROOT, '.supabase-secrets', 'service-role-key.txt')
@@ -71,11 +72,18 @@ function parseArgs(argv) {
   return args
 }
 
-function fmt(entry) {
+function fmt(entry, optedOut) {
   const ctx = entry.context || {}
   const lines = []
   lines.push(`── ${entry.id} ${'─'.repeat(Math.max(0, 60 - entry.id.length))}`)
   lines.push(`${entry.created_at}  [${entry.tag}]  status=${entry.status}`)
+  // The author opted out of AI processing (migration 238): print nothing they wrote or that
+  // identifies them. A person reads the row in the admin Feedback page instead.
+  if (entry.user_id && optedOut.has(entry.user_id)) {
+    lines.push(entry.project ? `project: ${entry.project.name} (${entry.project.slug})` : 'project: (none)')
+    lines.push(WITHHELD)
+    return lines.join('\n')
+  }
   lines.push(`from: ${entry.submitter?.name ?? '?'} <${entry.submitter?.email ?? '?'}>` +
     (entry.project ? `  project: ${entry.project.name} (${entry.project.slug})` : '  project: (none)'))
   if (ctx.page_title || ctx.path) lines.push(`page: "${ctx.page_title ?? ''}" (${ctx.path ?? ''})`)
@@ -94,8 +102,14 @@ function fmt(entry) {
 async function main() {
   const args = parseArgs(process.argv.slice(2))
   const key = loadServiceRoleKey()
+  const optedOut = await loadOptedOutUserIds(SUPABASE_URL, key)
 
   if (args.screenshot) {
+    if (storagePathIsOptedOut(args.screenshot, optedOut)) {
+      console.error(WITHHELD)
+      process.exitCode = 1
+      return
+    }
     const res = await sb(`/storage/v1/object/feedback-screenshots/${args.screenshot}`, key)
     const buf = Buffer.from(await res.arrayBuffer())
     const safeName = args.screenshot.replace(/[\/\\]/g, '-')
@@ -118,7 +132,7 @@ async function main() {
     return
   }
   console.log(`${rows.length} entr${rows.length === 1 ? 'y' : 'ies'}${args.openOnly ? ' (open only)' : ''}:\n`)
-  for (const entry of rows) console.log(fmt(entry) + '\n')
+  for (const entry of rows) console.log(fmt(entry, optedOut) + '\n')
 }
 
 main().catch((e) => {

@@ -17,6 +17,7 @@
 // Usage: node scripts/read-feedback.mjs [--tag Problem|Request|Other] [--since 2026-09-01] [--limit 50]
 
 import { createClient } from '@supabase/supabase-js'
+import { loadOptedOutUserIds, WITHHELD } from './lib/ai-opt-out.mjs'
 
 const url = process.env.OPENLPM_URL
 const serviceRoleKey = process.env.OPENLPM_SERVICE_ROLE_KEY
@@ -44,13 +45,14 @@ const supabase = createClient(url, serviceRoleKey, { auth: { persistSession: fal
 
 let query = supabase
   .from('feedback')
-  .select('id, tag, comment, context, screenshot_path, project_id, created_at, users:user_id(name, email)')
+  .select('id, user_id, tag, comment, context, screenshot_path, project_id, created_at, users:user_id(name, email)')
   .order('created_at', { ascending: false })
   .limit(limit)
 
 if (tag) query = query.eq('tag', tag)
 if (since) query = query.gte('created_at', since)
 
+const optedOut = await loadOptedOutUserIds(url, serviceRoleKey)
 const { data, error } = await query
 
 // From here on, never call process.exit() directly. createClient() above
@@ -70,6 +72,11 @@ if (error) {
 } else {
   for (const row of data) {
     console.log(`\n[${row.created_at}] ${row.tag}${row.project_id ? ` (project ${row.project_id})` : ''}`)
+    if (row.user_id && optedOut.has(row.user_id)) {
+      // The author opted out of AI processing (migration 238). Print nothing they wrote.
+      console.log(`  ${WITHHELD}`)
+      continue
+    }
     console.log(`  from: ${row.users?.name ?? 'unknown'} <${row.users?.email ?? '?'}>`)
     console.log(`  page: ${row.context?.page ?? '?'} (${row.context?.path ?? '?'})`)
     if (row.comment) console.log(`  comment: ${row.comment}`)

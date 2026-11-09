@@ -17,6 +17,15 @@ Rules:
 - Update the note's tracker and the registry row in the same piece of work as the change.
 - A screen that needs something the kit cannot do gets the kit extended, so the next screen benefits too.
 
+## People who opted out of AI processing
+
+A person can opt out of having their data processed by outside AI services (Profile page, table `user_privacy_settings`, migration 238, privacy statement section 6). Anyone who reads people's own words from this database and shows them to an AI assistant, or sends them to any outside model, must leave out the opted-out people's text. That includes a Claude Code session.
+
+- Feedback readers (`scripts/pull_feedback.mjs`, `scripts/read-feedback.mjs`) already do this through `scripts/lib/ai-opt-out.mjs`. Use `loadOptedOutUserIds` in any new script or ad-hoc query that reads feedback, `student_work_entries`, `student_activity_events`, `prompt_experiments`, `portfolios`, `discussion_posts` or any other table with people's own text.
+- The service key sees every row, so nothing in the database stops a careless query. The rule is the protection. Check the opt-out list before printing text.
+- Counts, dates and averages that cannot be traced to a person are fine for opted-out people too. Text with the name removed is not anonymized if it can still be linked back to the person. The privacy statement says the same.
+- A request to delete an account is carried out with `node scripts/execute_data_deletion.mjs` (see the header of that file). The answer is due within one month.
+
 ## Before you open a pull request
 
 - Run `npm ci` first, then `npm run build`. A build in a worktree that shares an older `node_modules` fails on missing packages (`papaparse`, `exceljs`, `docx`) and looks like a broken build when it is a stale install.

@@ -5,6 +5,7 @@ import type { UserIdentity } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { REDIRECT_KEY } from '@/components/require-auth'
+import { PrivacyChoicesCard } from '@/components/privacy-choices-card'
 import { getUserProjects, type ProjectWithRole } from '@/lib/supabase/projects'
 import { listMyJoinableProjects, selfJoinProject, type JoinableProject } from '@/lib/supabase/join'
 
@@ -166,6 +167,8 @@ export default function ProfilePage() {
           </>
         )}
       </div>
+
+      <PrivacyChoicesCard />
 
       {repoTopLevel.length > 0 && (
         <div className="card">
