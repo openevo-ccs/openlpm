@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { SessionProvider, useSession } from '@/state/session'
+import { EmailLinkNotice } from '@/components/email-link-notice'
 import { RequireAuth, REDIRECT_KEY } from '@/components/require-auth'
 import HomePage from '@/pages/home-page'
 import LoginPage from '@/pages/login-page'
@@ -109,6 +110,7 @@ export default function App() {
   return (
     <SessionProvider>
       <RedirectAfterLogin />
+      <EmailLinkNotice />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth/login" element={<LoginPage />} />

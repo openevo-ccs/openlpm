@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { KeyRound, MailCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { REDIRECT_KEY } from '@/components/require-auth'
@@ -33,7 +33,10 @@ export default function WelcomePage() {
   const config = slug ? WELCOME_CONFIGS[slug] : undefined
   const navigate = useNavigate()
   const { session, loading } = useSession()
-  const [mode, setMode] = useState<Mode>('signup')
+  // ?mode=signin opens the sign-in form, for people who already have an account (the notice shown
+  // after an email link opened in another browser sends them here, see email-link-notice.tsx).
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState<Mode>(searchParams.get('mode') === 'signin' ? 'signin' : 'signup')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
