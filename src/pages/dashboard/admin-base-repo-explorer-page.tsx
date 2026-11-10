@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { LangChip } from '@/components/method-detail-card'
+import { DraftChip, LangChip } from '@/components/method-detail-card'
+import { LanguageSwitch } from '@/components/language-switch'
 import { otherLanguages, pickLocalized, pickLocalizedList, tagLabel } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
@@ -1013,14 +1014,15 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
   // The Explorer is an English-language screen. Every text shows the language it is written in, and a record that also has a
   // German name shows it on its own line.
   const uiLang = 'en'
-  const name = pickLocalized(data.label, uiLang)
+  const [textLang, setTextLang] = useState('en')
+  const name = pickLocalized(data.label, textLang)
   const otherNames = name ? otherLanguages(data.label, name.lang) : []
   const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
   const discipline = data.discipline as string | undefined
   const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
-  const whenToUse = pickLocalized(data.whenToUse, uiLang)
-  const description = pickLocalized(data.description, uiLang)
-  const protocolSteps = pickLocalizedList(data.protocolSteps, uiLang)
+  const whenToUse = pickLocalized(data.whenToUse, textLang)
+  const description = pickLocalized(data.description, textLang)
+  const protocolSteps = pickLocalizedList(data.protocolSteps, textLang)
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
 
@@ -1031,6 +1033,7 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
 
   return (
     <div style={{ fontSize: 12 }}>
+      <div style={{ marginBottom: 8 }}><LanguageSwitch value={textLang} onChange={setTextLang} uiLang={uiLang} /></div>
       {!!name && (
         <DetailRow label="Label">
           {name.text}<LangChip lang={name.lang} uiLang={uiLang} />
@@ -1043,7 +1046,7 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
       {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagLabel('lessonPhases', t, uiLang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{whenToUse.text}<LangChip lang={whenToUse.lang} uiLang={uiLang} /></DetailRow>}
-      {!!description && <DetailRow label="Description">{description.text}<LangChip lang={description.lang} uiLang={uiLang} /></DetailRow>}
+      {!!description && <DetailRow label="Description">{description.text}<LangChip lang={description.lang} uiLang={uiLang} /><DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
       {!!protocolSteps?.items.length && (
         <DetailRow label="Protocol steps">
           <LangChip lang={protocolSteps.lang} uiLang={uiLang} />
