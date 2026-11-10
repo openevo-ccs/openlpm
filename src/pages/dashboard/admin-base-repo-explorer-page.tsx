@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { LangChip } from '@/components/method-detail-card'
+import { otherLanguages, pickLocalized, pickLocalizedList, tagLabel } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
@@ -1008,13 +1010,17 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
 // method_class enum value too (e.g. "(pedagogical-practice)") produced a
 // confusing double-parenthetical rather than something more readable.
 function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknown>; idLabels: Map<string, ResolvedLabel> }) {
-  const label = pickLang(data.label) as string | undefined
+  // The Explorer is an English-language screen. Every text shows the language it is written in, and a record that also has a
+  // German name shows it on its own line.
+  const uiLang = 'en'
+  const name = pickLocalized(data.label, uiLang)
+  const otherNames = name ? otherLanguages(data.label, name.lang) : []
   const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
   const discipline = data.discipline as string | undefined
   const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
-  const whenToUse = pickLang(data.whenToUse) as string | undefined
-  const description = pickLang(data.description) as string | undefined
-  const protocolSteps = pickLang(data.protocolSteps) as string[] | undefined
+  const whenToUse = pickLocalized(data.whenToUse, uiLang)
+  const description = pickLocalized(data.description, uiLang)
+  const protocolSteps = pickLocalizedList(data.protocolSteps, uiLang)
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
 
@@ -1025,16 +1031,24 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
 
   return (
     <div style={{ fontSize: 12 }}>
-      {!!label && <DetailRow label="Label">{label}</DetailRow>}
-      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.join(', ')}</DetailRow>}
+      {!!name && (
+        <DetailRow label="Label">
+          {name.text}<LangChip lang={name.lang} uiLang={uiLang} />
+          {otherNames.map((o) => (
+            <div key={o.lang}>{o.text}<LangChip lang={o.lang} uiLang={uiLang} /></div>
+          ))}
+        </DetailRow>
+      )}
+      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.map((t) => tagLabel('learningApproaches', t, uiLang)).join(', ')}</DetailRow>}
       {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
-      {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.join(', ')}</DetailRow>}
-      {!!whenToUse && <DetailRow label="When to use">{whenToUse}</DetailRow>}
-      {!!description && <DetailRow label="Description">{description}</DetailRow>}
-      {!!protocolSteps?.length && (
+      {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagLabel('lessonPhases', t, uiLang)).join(', ')}</DetailRow>}
+      {!!whenToUse && <DetailRow label="When to use">{whenToUse.text}<LangChip lang={whenToUse.lang} uiLang={uiLang} /></DetailRow>}
+      {!!description && <DetailRow label="Description">{description.text}<LangChip lang={description.lang} uiLang={uiLang} /></DetailRow>}
+      {!!protocolSteps?.items.length && (
         <DetailRow label="Protocol steps">
+          <LangChip lang={protocolSteps.lang} uiLang={uiLang} />
           <ol style={{ margin: 0, paddingLeft: 18 }}>
-            {protocolSteps.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{s}</li>)}
+            {protocolSteps.items.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{s}</li>)}
           </ol>
         </DetailRow>
       )}

@@ -6,6 +6,8 @@ import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
 import { listMethodsBaseByVocabulary, listMethodLernzielLinks, reviewMethodLernzielLink, type MethodsBaseRecord, type MethodLernzielLink } from '@/lib/supabase/methodsbase'
 import { METHOD_ICON } from './student/student-lernziele-page'
+import { MethodDetailCard } from '@/components/method-detail-card'
+import { projectUiLanguage } from '@/lib/method-text'
 
 // Dustin's 2026-10-10 ask -- EvoMentor Thuringia's didactic methods weren't
 // "linked well to the Lernziele," so advance the whole chain from a real
@@ -24,8 +26,55 @@ import { METHOD_ICON } from './student/student-lernziele-page'
 // project member has actually reviewed here. Nothing here auto-promotes a
 // suggestion; that would repeat exactly the mistake migrations 078/079/089
 // deliberately avoided (guessing at Susan's own subject-matter judgment).
+function strings(uiLang: string) {
+  return uiLang === 'de'
+    ? {
+        title: 'Methoden',
+        intro: 'Didaktische Methoden aus dem Vokabular dieses Projekts, ihre Beschreibungen und die Lernziele, bei denen sie passen.',
+        noVocabulary: 'Für dieses Projekt ist noch kein Methodenvokabular hinterlegt. Deshalb gibt es hier noch nichts zu zeigen.',
+        count: (n: number) => `${n} didaktische Methoden im Vokabular dieses Projekts`,
+        newBadge: (n: number) => `${n} neu`,
+        noRecord: (m: string) => `Zu „${m}“ gibt es noch keine ausführliche Beschreibung.`,
+        goalsHeading: (n: number) => `Lernziele, bei denen diese Methode passt (${n})`,
+        noLinks: 'Noch keine bestätigten Zuordnungen.',
+        suggestedHeading: (n: number) => `KI-Vorschläge, noch ungeprüft (${n})`,
+        suggestedNote: 'Ein KI-Werkzeug hat diese Zuordnungen anhand der Methodenbeschreibung vorgeschlagen. Studierende sehen sie nicht. Erst wenn ein Projektmitglied sie hier bestätigt, gelten sie als Zuordnung.',
+        confirm: 'Zuordnung bestätigen',
+        reject: 'Zuordnung ablehnen',
+      }
+    : {
+        title: 'Methods',
+        intro: "Didactic methods in this project's vocabulary, their descriptions, and which learning goals each one applies to.",
+        noVocabulary: "This project's prompt library has no didactic-method vocabulary set, so there's nothing to show here yet.",
+        count: (n: number) => `${n} didactic methods in this project's vocabulary`,
+        newBadge: (n: number) => `${n} new`,
+        noRecord: (m: string) => `There is no detailed description for "${m}" yet.`,
+        goalsHeading: (n: number) => `Learning goals (Lernziele) this method applies to (${n})`,
+        noLinks: 'No confirmed links yet.',
+        suggestedHeading: (n: number) => `AI-suggested, awaiting review (${n})`,
+        suggestedNote: "An AI tool suggested these links from the method's description. Students do not see them. The rest of the app treats them as links only after a project member confirms them here.",
+        confirm: 'Confirm this link',
+        reject: 'Reject this link',
+      }
+}
+
 export default function MethodsPage() {
+  const { project } = useOutletContext<ProjectOutletContext>()
+  const t = strings(projectUiLanguage(project.working_languages))
+  return (
+    <div>
+      <h1>{t.title}</h1>
+      <p className="muted" style={{ marginBottom: 12 }}>{t.intro}</p>
+      <MethodsWorkspace />
+    </div>
+  )
+}
+
+/** The method list, the method card and the linked learning goals. Shared by the Methods page and the Learning Goals page. */
+export function MethodsWorkspace() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
+  const uiLang = projectUiLanguage(project.working_languages)
+  const t = strings(uiLang)
 
   const [methodOptions, setMethodOptions] = useState<string[]>([])
   const [methodsBaseByKey, setMethodsBaseByKey] = useState<Map<string, MethodsBaseRecord>>(new Map())
@@ -73,19 +122,13 @@ export default function MethodsPage() {
 
   return (
     <div>
-      <h1>Methods</h1>
-      <p className="muted" style={{ marginBottom: 12 }}>
-        Didactic methods in this project's vocabulary, their real descriptions, and which learning
-        goals each one applies to.
-      </p>
-
       {methodOptions.length === 0 ? (
-        <p className="muted">This project's prompt library has no didactic-method vocabulary set, so there's nothing to show here yet.</p>
+        <p className="muted">{t.noVocabulary}</p>
       ) : (
         <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
           <div style={{ minWidth: 240, flexShrink: 0 }}>
             <p className="muted" style={{ fontSize: 12, marginBottom: 8 }}>
-              {methodOptions.length} didactic methods in this project's vocabulary
+              {t.count(methodOptions.length)}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {methodOptions.map((m) => {
@@ -103,7 +146,7 @@ export default function MethodsPage() {
                     <span style={{ flex: 1 }}>{m}</span>
                     {!methodsBaseByKey.get(m) && <Info size={12} style={{ color: 'var(--text-muted)' }} />}
                     <span className="muted" style={{ fontSize: 11 }}>{confirmedCount}</span>
-                    {suggestedCount > 0 && <span className="badge" style={{ fontSize: 10 }}>{suggestedCount} new</span>}
+                    {suggestedCount > 0 && <span className="badge" style={{ fontSize: 10 }}>{t.newBadge(suggestedCount)}</span>}
                   </button>
                 )
               })}
@@ -117,31 +160,11 @@ export default function MethodsPage() {
             const methodsBase = selected ? methodsBaseByKey.get(selected) : undefined
             return (
               <div style={{ flex: 1, minWidth: 0 }}>
-                {!methodsBase && (
-                  <div className="notice">
-                    No MethodsBase record is mapped for "{selected}" yet -- nothing to show beyond the label itself.
-                  </div>
-                )}
-                {methodsBase && (
-                  <div className="card" style={{ marginBottom: 12 }}>
-                    <h3 style={{ marginTop: 0 }}>{methodsBase.label}</h3>
-                    {methodsBase.discipline && <p className="muted" style={{ fontSize: 12, marginTop: -6 }}>{methodsBase.discipline}</p>}
-                    <p>{methodsBase.description}</p>
-                    {methodsBase.when_to_use && (
-                      <>
-                        <p style={{ fontWeight: 600, marginBottom: 2 }}>When to use it</p>
-                        <p className="muted">{methodsBase.when_to_use}</p>
-                      </>
-                    )}
-                    <p className="muted" style={{ fontSize: 11 }}>
-                      Canonical description from MethodsBase ({methodsBase.id}), review status: {methodsBase.review_status ?? 'unknown'}.
-                      {methodsBase.review_status === 'author-draft' && ' Not yet reviewed by anyone with Biologiedidaktik expertise -- treat it as a draft, not an authority.'}
-                    </p>
-                  </div>
-                )}
+                {!methodsBase && selected && <div className="notice">{t.noRecord(selected)}</div>}
+                {methodsBase && <MethodDetailCard record={methodsBase} uiLang={uiLang} />}
 
-                <h4>Lernziele this method applies to ({confirmedLinks.length})</h4>
-                {confirmedLinks.length === 0 && <p className="muted">No confirmed links yet.</p>}
+                <h4>{t.goalsHeading(confirmedLinks.length)}</h4>
+                {confirmedLinks.length === 0 && <p className="muted">{t.noLinks}</p>}
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 16px 0' }}>
                   {confirmedLinks.map((l) => (
                     <li key={l.id} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
@@ -154,13 +177,9 @@ export default function MethodsPage() {
                 {suggestedLinks.length > 0 && (
                   <>
                     <h4 style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <Sparkle size={14} />AI-suggested, awaiting review ({suggestedLinks.length})
+                      <Sparkle size={14} />{t.suggestedHeading(suggestedLinks.length)}
                     </h4>
-                    <p className="muted" style={{ fontSize: 12 }}>
-                      Proposed by scripts/suggest_method_lernziel_links.mjs from this method's MethodsBase description.
-                      Not shown to students and not treated as a real link anywhere else in the app until a project member
-                      confirms it here.
-                    </p>
+                    <p className="muted" style={{ fontSize: 12 }}>{t.suggestedNote}</p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                       {suggestedLinks.map((l) => (
                         <li key={l.id} className="row" style={{ padding: '8px 0', borderBottom: '1px solid var(--border)', alignItems: 'flex-start', gap: 8 }}>
@@ -168,10 +187,10 @@ export default function MethodsPage() {
                             <Link to={`/dashboard/${project.slug}/learning-goals/${l.lernziel_id}`}>{topicById.get(l.lernziel_id)?.title ?? l.lernziel_id}</Link>
                             {l.rationale && <p className="muted" style={{ fontSize: 12, margin: '2px 0 0 0' }}>{l.rationale}</p>}
                           </div>
-                          <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'confirmed')} title="Confirm this link">
+                          <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'confirmed')} title={t.confirm}>
                             <Check size={12} />
                           </button>
-                          <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'rejected')} title="Reject this link">
+                          <button type="button" className="btn btn-mini" disabled={busyLinkId === l.id} onClick={() => decide(l.id, 'rejected')} title={t.reject}>
                             <X size={12} />
                           </button>
                         </li>
