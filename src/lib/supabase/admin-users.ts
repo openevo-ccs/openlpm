@@ -130,3 +130,83 @@ export async function setUserPlatformAdmin(supabase: Client, userId: string, adm
     .update({ role: admin ? 'admin' : 'contributor' })
     .eq('id', userId)
 }
+
+// ---------------------------------------------------------------------------
+// Bulk account tools (2026-11-10, migration 239). Confirmation state and last
+// sign-in live in Supabase's own auth tables, so they come through admin-only
+// database functions. Sending emails uses the ordinary sign-up and password-reset
+// calls, which work from the browser for any address.
+// ---------------------------------------------------------------------------
+
+export interface AdminAccountStatus {
+  account_id: string
+  email_confirmed_at: string | null
+  confirmation_sent_at: string | null
+  last_sign_in_at: string | null
+}
+
+/** Null when the database functions from migration 239 are not there yet. */
+export async function listAccountStatus(supabase: Client): Promise<Map<string, AdminAccountStatus> | null> {
+  const { data, error } = await (supabase as any).rpc('admin_account_status')
+  if (error || !data) return null
+  return new Map((data as AdminAccountStatus[]).map((r) => [r.account_id, r]))
+}
+
+/** Marks emails as confirmed by hand. Returns how many accounts changed. */
+export async function confirmEmailsByHand(supabase: Client, userIds: string[]): Promise<{ changed: number; error?: string }> {
+  const { data, error } = await (supabase as any).rpc('admin_confirm_emails', { account_ids: userIds })
+  if (error) return { changed: 0, error: error.message }
+  return { changed: Number(data ?? 0) }
+}
+
+export interface RemoveAccountResult {
+  account_id: string
+  outcome: 'removed' | 'skipped'
+  detail: string
+}
+
+/** Removes accounts for good. The database skips admins, your own account, open deletion requests and accounts with feedback screenshots, and says why. */
+export async function removeAccounts(supabase: Client, userIds: string[]): Promise<{ results: RemoveAccountResult[]; error?: string }> {
+  const { data, error } = await (supabase as any).rpc('admin_remove_accounts', { account_ids: userIds })
+  if (error) return { results: [], error: error.message }
+  return { results: (data ?? []) as RemoveAccountResult[] }
+}
+
+export interface EmailSendResult {
+  email: string
+  error?: string
+}
+
+async function sendEach(emails: string[], send: (email: string) => Promise<{ error: { message: string } | null }>): Promise<EmailSendResult[]> {
+  const out: EmailSendResult[] = []
+  for (const email of emails) {
+    const { error } = await send(email)
+    out.push({ email, error: error?.message })
+  }
+  return out
+}
+
+/** Sends the sign-up confirmation email again. Only works for accounts that are not confirmed yet. */
+export function resendConfirmationEmails(supabase: Client, emails: string[]) {
+  return sendEach(emails, (email) =>
+    supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+    })
+  )
+}
+
+/** Sends the "set a new password" email. Also the quickest way back in for someone who forgot the password they chose. */
+export function sendPasswordResetEmails(supabase: Client, emails: string[]) {
+  return sendEach(emails, (email) =>
+    supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + import.meta.env.BASE_URL })
+  )
+}
+
+export async function setUsersBlocked(supabase: Client, userIds: string[], blocked: boolean) {
+  return (supabase as any)
+    .from('users')
+    .update({ blocked_at: blocked ? new Date().toISOString() : null })
+    .in('id', userIds)
+}

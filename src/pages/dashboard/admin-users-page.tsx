@@ -14,15 +14,24 @@ import {
   listAllJoinRules,
   listAllMemberships,
   listAllProjects,
+  listAccountStatus,
   listAllUsers,
   removeAdminJoinRule,
   setUserBlocked,
   setUserPlatformAdmin,
   type AdminJoinRule,
   type AdminMembershipRow,
+  type AdminAccountStatus,
   type AdminProjectRow,
   type AdminUserRow,
 } from '@/lib/supabase/admin-users'
+import {
+  AccountSelectBox,
+  AccountStateChips,
+  AccountToolbar,
+  matchesAccountFilter,
+  type AccountFilter,
+} from './admin-accounts-bulk'
 
 // Scoped 2026-09-30 via the openlpm-design-session skill -- see
 // lab_manager/docs/design-notes/openlpm-system-wide-admin-page-scoping-2026-09-30.md
@@ -77,8 +86,15 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
   const [feedback, setFeedback] = useState<FeedbackItem[] | null>(null)
   const [deletionRequests, setDeletionRequests] = useState<AdminDeletionRequest[] | null>(null)
   const [aiOptOutIds, setAiOptOutIds] = useState<Set<string> | null>(null)
+  // undefined while loading, null when the database functions from migration 239 are not there yet.
+  const [accountStatus, setAccountStatus] = useState<Map<string, AdminAccountStatus> | null | undefined>(undefined)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [filter, setFilter] = useState<AccountFilter>('all')
+  const [search, setSearch] = useState('')
+  const [testOpen, setTestOpen] = useState(false)
 
   const reload = () => {
+    listAccountStatus(supabase).then(setAccountStatus)
     listOpenDeletionRequests(supabase).then(setDeletionRequests)
     listAiOptOutUserIds(supabase).then(setAiOptOutIds)
     listAllUsers(supabase).then(setUsers)
@@ -108,6 +124,23 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
     const list = membershipsByUser.get(m.user_id) ?? []
     list.push(m)
     membershipsByUser.set(m.user_id, list)
+  }
+
+  // Filter and search apply to both groups. What "select all" covers is whatever is listed right
+  // now: the people, plus the test accounts when that group is open.
+  const status = accountStatus ?? null
+  const needle = search.trim().toLowerCase()
+  const passes = (u: AdminUserRow) =>
+    matchesAccountFilter(filter, u, status, (membershipsByUser.get(u.id) ?? []).length) &&
+    (!needle || u.email.toLowerCase().includes(needle) || (u.name ?? '').toLowerCase().includes(needle))
+  const peopleListed = (users ?? []).filter((u) => !looksLikeTestAccount(u.email) && passes(u))
+  const testListed = (users ?? []).filter((u) => looksLikeTestAccount(u.email) && passes(u))
+  const listedForSelection = testOpen ? [...peopleListed, ...testListed] : peopleListed
+  const toggleSelected = (id: string) => {
+    const next = new Set(selected)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    setSelected(next)
   }
 
   return (
@@ -151,6 +184,14 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
               {users.filter((u) => u.blocked_at).length} blocked
               {' · '}
               {users.filter((u) => (membershipsByUser.get(u.id) ?? []).length === 0).length} not in any project
+              {status && (
+                <>
+                  {' · '}
+                  {users.filter((u) => !status.get(u.id)?.email_confirmed_at).length} email not confirmed
+                  {' · '}
+                  {users.filter((u) => status.get(u.id)?.email_confirmed_at && !status.get(u.id)?.last_sign_in_at).length} confirmed, never signed in
+                </>
+              )}
               {aiOptOutIds && (
                 <>
                   {' · '}
@@ -164,7 +205,25 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
                 {users.filter((u) => aiOptOutIds.has(u.id)).map((u) => u.name || u.email).join(', ')}
               </p>
             )}
-            {users.filter((u) => !looksLikeTestAccount(u.email)).map((u) => (
+            <AccountToolbar
+              visible={listedForSelection}
+              everyone={users}
+              selected={selected}
+              setSelected={setSelected}
+              filter={filter}
+              setFilter={setFilter}
+              search={search}
+              setSearch={setSearch}
+              status={status}
+              statusMissing={accountStatus === null}
+              selfId={users.find((u) => u.email === session?.user.email)?.id}
+              supabase={supabase}
+              onChanged={reload}
+            />
+            {peopleListed.length === 0 && testListed.length === 0 && (
+              <p className="muted" style={{ fontSize: 12.5 }}>No accounts match.</p>
+            )}
+            {peopleListed.map((u) => (
               <UserRow
                 key={u.id}
                 user={u}
@@ -173,14 +232,22 @@ export default function AdminUsersPage({ section }: { section: AdminSection }) {
                 supabase={supabase}
                 isSelf={u.email === session?.user.email}
                 onChanged={reload}
+                status={status}
+                selected={selected.has(u.id)}
+                onToggleSelected={() => toggleSelected(u.id)}
               />
             ))}
             <TestAccountsSection
-              users={users.filter((u) => looksLikeTestAccount(u.email))}
+              users={testListed}
               membershipsByUser={membershipsByUser}
               projects={projects ?? []}
               supabase={supabase}
               onChanged={reload}
+              open={testOpen}
+              onToggle={() => setTestOpen((v) => !v)}
+              status={status}
+              selected={selected}
+              onToggleSelected={toggleSelected}
             />
           </>
         )}
@@ -255,21 +322,30 @@ function TestAccountsSection({
   projects,
   supabase,
   onChanged,
+  open,
+  onToggle,
+  status,
+  selected,
+  onToggleSelected,
 }: {
   users: AdminUserRow[]
   membershipsByUser: Map<string, AdminMembershipRow[]>
   projects: AdminProjectRow[]
   supabase: ReturnType<typeof createClient>
   onChanged: () => void
+  open: boolean
+  onToggle: () => void
+  status: Map<string, AdminAccountStatus> | null
+  selected: Set<string>
+  onToggleSelected: (id: string) => void
 }) {
   const { session } = useSession()
-  const [open, setOpen] = useState(false)
   if (users.length === 0) return null
   return (
     <div style={{ marginTop: 8 }}>
       <button
         className="btn btn-mini"
-        onClick={() => setOpen((v) => !v)}
+        onClick={onToggle}
         style={{ color: 'var(--text-muted)' }}
       >
         {open ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
@@ -286,6 +362,9 @@ function TestAccountsSection({
               supabase={supabase}
               isSelf={u.email === session?.user.email}
               onChanged={onChanged}
+              status={status}
+              selected={selected.has(u.id)}
+              onToggleSelected={() => onToggleSelected(u.id)}
             />
           ))}
         </div>
@@ -361,6 +440,9 @@ function UserRow({
   supabase,
   isSelf,
   onChanged,
+  status,
+  selected,
+  onToggleSelected,
 }: {
   user: AdminUserRow
   memberships: AdminMembershipRow[]
@@ -368,6 +450,9 @@ function UserRow({
   supabase: ReturnType<typeof createClient>
   isSelf: boolean
   onChanged: () => void
+  status: Map<string, AdminAccountStatus> | null
+  selected: boolean
+  onToggleSelected: () => void
 }) {
   const [busy, setBusy] = useState(false)
   const [expanded, setExpanded] = useState(false)
@@ -394,10 +479,16 @@ function UserRow({
   return (
     <div style={{ padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <AccountSelectBox
+          checked={selected}
+          disabled={isSelf}
+          onChange={onToggleSelected}
+          label={`Select ${user.name || user.email}`}
+        />
         <button
           type="button"
           className="btn-linklike row"
-          style={{ gap: 6, textDecoration: 'none', color: 'inherit', flexWrap: 'wrap' }}
+          style={{ gap: 6, textDecoration: 'none', color: 'inherit', flexWrap: 'wrap', flex: 1, justifyContent: 'flex-start', textAlign: 'left' }}
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
         >
@@ -406,6 +497,7 @@ function UserRow({
           <span className="muted">{user.email}</span>
           {isAdmin && <span className="chip chip-progress">Admin</span>}
           {blocked && <span className="chip chip-critical">Blocked</span>}
+          <AccountStateChips status={status} userId={user.id} />
           {!expanded && (
             <span className="muted" style={{ fontSize: 12 }}>
               {memberships.length === 0 ? '· not in any project' : `· ${memberships.length} project${memberships.length === 1 ? '' : 's'}`}
