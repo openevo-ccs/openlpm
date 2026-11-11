@@ -40,6 +40,7 @@ import GroupsPage from '@/pages/dashboard/groups-page'
 import GroupDetailPage from '@/pages/dashboard/groups/group-detail-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
 import AdminBaseRepoExplorerPage from '@/pages/dashboard/admin-base-repo-explorer-page'
+import TeachingLessonsReviewPage from '@/pages/dashboard/teaching-lessons-review-page'
 import AdminLayout, { AdminFeedbackTab } from '@/pages/dashboard/admin-layout'
 import AdminContentEditorPage from '@/pages/dashboard/admin-content-editor-page'
 import JoinPage from '@/pages/join-page'
@@ -150,6 +151,7 @@ export default function App() {
             <Route path="explore" element={<AdminBaseRepoExplorerPage />} />
             <Route path="concept-meanings" element={<ConceptMeaningsPage />} />
             <Route path="concept-meanings/:conceptId" element={<ConceptMeaningsPage />} />
+            <Route path="teaching-lessons" element={<TeachingLessonsReviewPage />} />
             <Route path="content" element={<AdminContentEditorPage />} />
           </Route>
           <Route path=":project" element={<ProjectLayout />}>

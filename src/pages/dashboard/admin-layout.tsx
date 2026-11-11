@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { ArrowLeft, BookOpen, FolderKanban, LogIn, MessageSquareText, PanelLeftClose, PanelLeftOpen, Pencil, Users } from 'lucide-react'
+import { ArrowLeft, BookOpen, FolderKanban, GraduationCap, LogIn, MessageSquareText, PanelLeftClose, PanelLeftOpen, Pencil, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import AdminFeedbackPage from '@/pages/dashboard/admin-feedback-page'
 import AdminUsersPage from '@/pages/dashboard/admin-users-page'
@@ -23,6 +23,7 @@ const TABS: AdminTab[] = [
   { to: 'join-rules', label: 'Join rules', icon: LogIn },
   { to: 'feedback', label: 'Feedback', icon: MessageSquareText },
   { to: 'explore', label: 'Base repos', icon: BookOpen, alsoActiveFor: '/dashboard/admin/concept-meanings' },
+  { to: 'teaching-lessons', label: 'Teaching lessons', icon: GraduationCap },
   { to: 'content', label: 'Edit data', icon: Pencil },
 ]
 
