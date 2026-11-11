@@ -1,4 +1,4 @@
-// Pure functions for the Teaching lessons review: the stable key of a link or component, and the seeded "start here" sample.
+// Pure functions for the TeachingBase link checking: the stable key of a link or component, and the seeded "start here" sample.
 // Used by scripts/sync_teachingbase_snapshot.mjs and tested by scripts/test_teaching_lessons_review.mjs.
 import { createHash } from 'node:crypto'
 

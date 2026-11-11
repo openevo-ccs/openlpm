@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2, HelpCircle, XCircle } from 'lucide-react'
 import { VERDICTS, readableTarget, type ItemKind, type LessonComponent, type LessonLink, type Verdict, type VerdictRow } from '@/lib/supabase/teaching-lessons-review'
-import { T, type Lang } from '@/pages/dashboard/teaching-lessons-review-strings'
+import { T, type Lang } from '@/lib/teachingbase-review-strings'
 
 // One linked item (a suggested link or a part of a lesson) with its three verdict buttons. Once judged it shows who judged it and when;
 // "Change verdict" shows the buttons again, and saving adds a new row, so the earlier verdicts stay on record.

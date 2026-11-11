@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Tests for the Teaching lessons review rules: item keys and the "start here" sample (scripts/lib/teachingbase-review.mjs) and the
+// Tests for the TeachingBase link-checking rules: item keys and the "start here" sample (scripts/lib/teachingbase-review.mjs) and the
 // verdict rules (src/lib/supabase/teaching-lessons-review.ts). Bundles the TypeScript with esbuild, then runs node:test.
 //   node scripts/test_teaching_lessons_review.mjs
 import { build } from 'esbuild'
@@ -147,4 +147,53 @@ test('the download holds the latest verdict per item with reviewer and date', ()
   assert.deepEqual(Object.keys(rows[0]).sort(), ['date', 'item_key', 'item_kind', 'item_summary', 'lesson_id', 'note', 'reviewer', 'verdict'])
   assert.equal(rows[0].verdict, 'unsure')
   assert.equal(rows[0].reviewer, 'Ann')
+})
+
+// ---- named reviewers (migration 241) and the TeachingBase tab filters ----
+
+test('admins and named reviewers may use the page, nobody else', () => {
+  assert.equal(R.mayUseReviewPage(true, false), true)
+  assert.equal(R.mayUseReviewPage(false, true), true)
+  assert.equal(R.mayUseReviewPage(true, true), true)
+  assert.equal(R.mayUseReviewPage(false, false), false)
+})
+
+test('a search is cleaned so it cannot change the meaning of the filter', () => {
+  assert.equal(R.cleanSearch('  Ann,  name.eq.x) '), 'Ann name.eq.x')
+  assert.equal(R.cleanSearch('a%b_c*d"e'), 'a b c d e')
+  assert.equal(R.cleanSearch('(),'), '')
+})
+
+test('reviewers show newest first with name and email, and a missing person still shows', () => {
+  const rows = R.reviewerRows(
+    [{ user_id: 'u1', added_at: '2026-11-10T10:00:00Z' }, { user_id: 'u2', added_at: '2026-11-11T10:00:00Z' }, { user_id: 'u3', added_at: '2026-11-09T10:00:00Z' }],
+    [{ id: 'u1', name: 'Ann', email: 'ann@x.org' }, { id: 'u2', name: 'Bo', email: 'bo@x.org' }],
+  )
+  assert.deepEqual(rows.map((r) => r.user_id), ['u2', 'u1', 'u3'])
+  assert.equal(rows[0].email, 'bo@x.org')
+  assert.equal(rows[2].name, '')
+  assert.equal(rows[2].email, 'u3')
+})
+
+test('people already named as reviewers are left out of the search results', () => {
+  const hits = [{ id: 'a', name: 'A', email: 'a@x' }, { id: 'b', name: 'B', email: 'b@x' }]
+  assert.deepEqual(R.candidatesFor(hits, new Set(['a'])).map((h) => h.id), ['b'])
+  assert.equal(R.candidatesFor(hits, new Set()).length, 2)
+})
+
+test('start-here and still-to-check follow the links and the newest verdicts', () => {
+  const lesson = { id: 'L', data: { links: [{ item_key: 'a', sample: true }, { item_key: 'b' }], components: [] } }
+  const none = { id: 'M', data: { links: [], components: [] } }
+  assert.equal(R.hasStartHere(lesson), true)
+  assert.equal(R.hasStartHere(none), false)
+  const open = R.latestVerdicts([])
+  assert.equal(R.isStillOpen(lesson, open), true)
+  assert.equal(R.isStillOpen(none, open), false)
+  const half = R.latestVerdicts([{ lesson_id: 'L', item_kind: 'link', item_key: 'a', verdict: 'correct', reviewed_at: '2026-11-11T10:00:00Z' }])
+  assert.equal(R.isStillOpen(lesson, half), true)
+  const all = R.latestVerdicts([
+    { lesson_id: 'L', item_kind: 'link', item_key: 'a', verdict: 'correct', reviewed_at: '2026-11-11T10:00:00Z' },
+    { lesson_id: 'L', item_kind: 'link', item_key: 'b', verdict: 'wrong', reviewed_at: '2026-11-11T10:00:00Z' },
+  ])
+  assert.equal(R.isStillOpen(lesson, all), false)
 })

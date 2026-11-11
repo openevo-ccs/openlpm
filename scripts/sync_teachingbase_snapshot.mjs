@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Refreshes teachingbase_snapshot (migration 240) from a sibling checkout of the teachingbase repo: one row per lesson record in
 // records/*.yaml, merged with its drafted-links file graph/<slug>.yaml when there is one. Every link and component gets a stable
-// item_key, and about 150 links are flagged `sample: true` as the "start here" set for the Teaching lessons review page.
+// item_key, and about 150 links are flagged `sample: true` as the "start here" set for the TeachingBase tab of the Base Repo Explorer.
 // Same shape as scripts/sync_theorybase_snapshot.mjs: reads the local filesystem, writes with the service_role key.
 //
 // Dry run by default (prints counts, writes nothing). --yes upserts into teachingbase_snapshot.

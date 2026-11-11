@@ -25,6 +25,7 @@ const BASE_REPO_SNAPSHOT_TABLES: Record<string, { table: string; label: string }
   quotebase: { table: 'quotebase_snapshot', label: 'label' },
   competencybase: { table: 'competencybase_snapshot', label: 'label' },
   projectbase: { table: 'projectbase_snapshot', label: 'label' },
+  teachingbase: { table: 'teachingbase_snapshot', label: 'label' },
 }
 
 const RESOLVERS: Record<GenericReviewableType, (supabase: Client, ids: string[]) => Promise<Map<string, { label: string; detail: string | null }>>> = {

@@ -8,8 +8,8 @@ type Client = SupabaseClient<Database>
 // browse, review, and discuss real content from the OpenEvo CCS Foundational
 // Repos -- across every project, not any one project's own local copy.
 // Scope is Base Repos only (ConceptBase/TheoryBase/LiteratureBase/
-// QuestionBase/MethodsBase/CompetencyBase/QuoteBase/ProjectBase) --
-// SpeciesBase and TeachingBase have no snapshot pipeline yet, and the
+// QuestionBase/MethodsBase/CompetencyBase/QuoteBase/ProjectBase/TeachingBase) --
+// SpeciesBase has no snapshot pipeline yet (TeachingBase has one since migration 240, and its tab is where its drafted links are checked), and the
 // ccs-graph/openevo-graph/eva-graph dispute-and-relations layer is a
 // deliberately separate layer, out of scope here (Dustin, 2026-10-21).
 //
@@ -28,6 +28,7 @@ export type BaseRepoKey =
   | 'quotebase'
   | 'competencybase'
   | 'projectbase'
+  | 'teachingbase'
 
 /**
  * A repo's own column set for the single-repo table view (Susan Hanisch,
@@ -108,12 +109,16 @@ function formatAuthorsShort(authors: unknown): string {
  * `labelIsFallback` tells the screen so it can say so.
  */
 export function rowLabel(row: SnapshotRow, lang: string = 'en'): string {
-  const picked = pickLocalized((row.data as any)?.label, lang)
+  // Lessons (TeachingBase) keep their name under `title`, per language.
+  const title = (row.data as any)?.title
+  const named = (row.data as any)?.label ?? (title && typeof title === 'object' ? title : undefined)
+  const picked = pickLocalized(named, lang)
   return picked ? picked.text : row.label
 }
 
 export function labelIsFallback(row: SnapshotRow, lang: string = 'en'): boolean {
-  const picked = pickLocalized((row.data as any)?.label, lang)
+  const title = (row.data as any)?.title
+  const picked = pickLocalized((row.data as any)?.label ?? (title && typeof title === 'object' ? title : undefined), lang)
   return !!picked && picked.lang !== '' && picked.lang !== lang
 }
 
@@ -264,7 +269,40 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       { field: 'theoretical_framing', targetRepo: 'theorybase' },
     ],
   },
+  {
+    // TeachingBase (migration 240): the lessons, with the links a language model drafted from each lesson to the other bases. The
+    // links are checked inside the record card (Correct / Wrong / Unsure), so they are not listed as relation fields here.
+    key: 'teachingbase',
+    name: 'TeachingBase',
+    table: 'teachingbase_snapshot',
+    idColumn: 'id',
+    labelColumn: 'label',
+    tableColumns: [
+      { header: 'Label', get: (row, lang) => rowLabel(row, lang) },
+      {
+        header: 'Collection',
+        get: (row) => stringList((row.data as any)?.collections).map((c) => c.replace(/-/g, ' ')).join(', ') || '—',
+        filterValues: (row) => stringList((row.data as any)?.collections).map((c) => c.replace(/-/g, ' ')),
+      },
+      { header: 'Grades', get: (row) => stringList((row.data as any)?.grades).join(', ') || '—' },
+      {
+        header: 'Suggested links',
+        get: (row) => String(((row.data as any)?.links ?? []).length),
+        filterValues: (row) => [((row.data as any)?.links ?? []).length > 0 ? 'With suggested links' : 'No suggested links'],
+      },
+      {
+        header: 'Start here',
+        get: (row) => String(((row.data as any)?.links ?? []).filter((l: any) => l?.sample).length),
+        filterValues: (row) => (((row.data as any)?.links ?? []).some((l: any) => l?.sample) ? ['Has start-here links'] : []),
+      },
+    ],
+    relationFields: [],
+  },
 ]
+
+function stringList(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === 'string') : []
+}
 
 export interface SnapshotRow {
   id: string
