@@ -201,6 +201,7 @@ code {
 .project-side.collapsed .nav-label,
 .project-side.collapsed .student-nav-group { display: none; }
 .project-side.collapsed .project-side-top { justify-content: center; flex-direction: column; gap: 4px; }
+.project-side-top > .sidebar-toggle:first-child { margin-left: auto; }
 .project-side.collapsed nav a { justify-content: center; padding: 8px 0; }
 
 .sidebar-toggle {

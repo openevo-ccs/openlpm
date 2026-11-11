@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { pickLocalized, tagLabel } from '@/lib/method-text'
+import { pickLocalized, tagReading } from '@/lib/method-text'
 import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
@@ -39,14 +39,15 @@ export type BaseRepoKey =
  */
 export interface TableColumn {
   header: string
-  get: (row: SnapshotRow) => string
+  /** `lang` is the explorer's English/German view. Columns that show no language-keyed text ignore it. */
+  get: (row: SnapshotRow, lang?: string) => string
   /**
    * Values this column can be filtered by, for the filter control in its
    * heading (Susan Hanisch, 2026-10-25: "sorting and filtering options
    * directly in the column headers"). Leave unset for free-text columns
    * (a title, an author list) where a pick-list wouldn't make sense.
    */
-  filterValues?: (row: SnapshotRow) => string[]
+  filterValues?: (row: SnapshotRow, lang?: string) => string[]
 }
 
 /**
@@ -101,6 +102,21 @@ function formatAuthorsShort(authors: unknown): string {
   return `${names[0]}, ${names[1]}, et al.`
 }
 
+/**
+ * A record's title in the explorer's view language. Only records whose label is stored per language (MethodsBase)
+ * change with the view. A record without text in that language falls back to the English one, and
+ * `labelIsFallback` tells the screen so it can say so.
+ */
+export function rowLabel(row: SnapshotRow, lang: string = 'en'): string {
+  const picked = pickLocalized((row.data as any)?.label, lang)
+  return picked ? picked.text : row.label
+}
+
+export function labelIsFallback(row: SnapshotRow, lang: string = 'en'): boolean {
+  const picked = pickLocalized((row.data as any)?.label, lang)
+  return !!picked && picked.lang !== '' && picked.lang !== lang
+}
+
 export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
   {
     key: 'theorybase',
@@ -143,25 +159,17 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     // as its own filterable/sortable column.
     secondaryFilter: { dataKey: 'learningApproaches', label: 'Learning approach' },
     tableColumns: [
-      { header: 'Label', get: (row) => row.label },
-      // The German name has its own column now that it no longer sits in brackets inside the English label.
-      {
-        header: 'German name',
-        get: (row) => {
-          const name = pickLocalized((row.data as any)?.label, 'de')
-          return name && name.lang === 'de' ? name.text : '—'
-        },
-      },
+      { header: 'Label', get: (row, lang) => rowLabel(row, lang) },
       {
         header: 'Method-class',
         get: (row) => row.secondary ?? '—',
         filterValues: (row) => (row.filterValue ? [row.filterValue] : []),
       },
-      // Tags are stored in German; the table shows the English reading with the German term in brackets.
+      // Tags are stored in German; each view shows them in its own language only.
       {
         header: 'Learning approaches',
-        get: (row) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.map((t) => tagLabel('learningApproaches', t, 'en')).join(', ') : '—'),
-        filterValues: (row) => row.secondaryFilterValues.map((t) => tagLabel('learningApproaches', t, 'en')),
+        get: (row, lang) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.map((t) => tagReading('learningApproaches', t, lang ?? 'en')).join(', ') : '—'),
+        filterValues: (row, lang) => row.secondaryFilterValues.map((t) => tagReading('learningApproaches', t, lang ?? 'en')),
       },
     ],
     relationFields: [
@@ -314,7 +322,7 @@ export function detectLanguages(data: Record<string, unknown>): string[] {
  * stores its label as a language-keyed object, and the snapshot table keeps
  * that as JSON text, e.g. {"en":"ABC Method","de":"ABC-Methode"}. This returns
  * just "ABC Method": English first, then German, then whatever language is
- * there. The German name has its own column in the MethodsBase table. A label that is already plain text comes back as is
+ * there. The explorer's EN/DE switch picks the other language through rowLabel. A label that is already plain text comes back as is
  * (Susan Hanisch, 2026-10-30, feedback 6cffd929).
  */
 export function plainLabel(value: unknown): string {

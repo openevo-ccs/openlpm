@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { otherLanguages, pickLocalized, pickLocalizedList, tagLabel } from '@/lib/method-text'
+import { pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
@@ -17,6 +17,8 @@ import { applyEdits, historyFor, listEdits, markSentBack, pendingEdits, type Bas
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
+  labelIsFallback,
+  rowLabel,
   rowMatchesSearch,
   resolveCrossRepoLabels,
   type BaseRepoKey,
@@ -117,6 +119,14 @@ export default function AdminBaseRepoExplorerPage() {
   const askedTab = searchParams.get('tab')
   const [tab, setTab] = useState<TabKey>(BASE_REPO_CONFIGS.some((c) => c.key === askedTab) ? (askedTab as BaseRepoKey) : 'all')
   const [view, setView] = useState<ViewMode>('table')
+  // The page-wide English/German view. Names, descriptions and tags of records that have both show in this language.
+  const [viewLang, setViewLangState] = useState<string>(() => {
+    try { return localStorage.getItem('base-repo-explorer-language') === 'de' ? 'de' : 'en' } catch { return 'en' }
+  })
+  const setViewLang = (l: string) => {
+    setViewLangState(l)
+    try { localStorage.setItem('base-repo-explorer-language', l) } catch { /* the choice is just not remembered */ }
+  }
   const [search, setSearch] = useState('')
   const [columnFilters, setColumnFilters] = useState<Record<string, string>>({})
   const [sort, setSort] = useState<SortState | null>(null)
@@ -239,12 +249,13 @@ export default function AdminBaseRepoExplorerPage() {
     if (activeTableColumns) {
       for (const c of activeTableColumns) {
         cols.push({
-          id: `col:${c.header}`, header: c.header, get: (n) => c.get(n.row),
-          filterValues: c.filterValues ? (n) => c.filterValues!(n.row) : undefined,
+          id: `col:${c.header}`, header: c.header, get: (n) => c.get(n.row, viewLang),
+          filterValues: c.filterValues ? (n) => c.filterValues!(n.row, viewLang) : undefined,
+          render: c.header === 'Label' ? (n) => <LabelCell n={n} lang={viewLang} /> : undefined,
         })
       }
     } else {
-      cols.push({ id: 'label', header: 'Label', get: (n) => n.row.label })
+      cols.push({ id: 'label', header: 'Label', get: (n) => rowLabel(n.row, viewLang), render: (n) => <LabelCell n={n} lang={viewLang} /> })
     }
     if (anyLanguageTagged) {
       cols.push({
@@ -269,7 +280,7 @@ export default function AdminBaseRepoExplorerPage() {
       render: (n) => <span className="muted">{n.row.review_status ?? '—'}</span>,
     })
     return cols
-  }, [showRepoColumn, activeTableColumns, anyLanguageTagged, activeFilterColumn])
+  }, [showRepoColumn, activeTableColumns, anyLanguageTagged, activeFilterColumn, viewLang])
 
   // Each filterable column's choices come from every row loaded for the tab,
   // so picking one filter doesn't shrink the choices in another heading.
@@ -325,6 +336,15 @@ export default function AdminBaseRepoExplorerPage() {
         project. Admin-only for now. The ConceptBase tab shows what each concept means. The dispute and
         graph layer is not covered here.
       </p>
+
+      {anyLanguageTagged && (
+        <div className="row" style={{ gap: 10, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+          <LanguageSwitch value={viewLang} onChange={setViewLang} uiLang="en" languages={['en', 'de']} />
+          <span className="muted" style={{ fontSize: 12 }}>
+            Names, descriptions and tags show in this language where a record has them. Where it has no text in this language yet, the English text shows with an EN tag.
+          </span>
+        </div>
+      )}
 
       <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <button className={`btn btn-mini${tab === 'all' ? ' btn-primary' : ''}`} onClick={() => setTab('all')}>
@@ -432,9 +452,9 @@ export default function AdminBaseRepoExplorerPage() {
               onSelect={setSelected}
             /></div>
           ) : view === 'cards' ? (
-            <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} />
+            <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} lang={viewLang} />
           ) : (
-            <GraphView rows={allRows} onSelect={setSelected} />
+            <GraphView rows={allRows} onSelect={setSelected} lang={viewLang} />
           )}
         </div>
 
@@ -444,6 +464,7 @@ export default function AdminBaseRepoExplorerPage() {
             supabase={supabase}
             userId={session?.user.id ?? null}
             vocab={vocab}
+            lang={viewLang}
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
             editsAvailable={editsAvailable}
             onEditsChanged={() => reloadEdits(selectedLive.repoKey)}
@@ -460,6 +481,13 @@ export default function AdminBaseRepoExplorerPage() {
 // the dense table/card badge (EN/DE), same two-letter tags methodsbase's
 // own records now use as language keys.
 const LANGUAGE_NAMES: Partial<Record<string, string>> = { en: 'English', de: 'German' }
+
+function LabelCell({ n, lang }: { n: NodeRef; lang: string }) {
+  const text = rowLabel(n.row, lang)
+  if (!labelIsFallback(n.row, lang)) return <>{text}</>
+  const shown = pickLocalized((n.row.data as any)?.label, lang)?.lang ?? ''
+  return <>{text}<span className="chip muted" style={{ fontSize: 10, marginLeft: 6 }} title="No text in the chosen language yet, so this one shows">{shown.toUpperCase()}</span></>
+}
 
 function LanguageBadge({ languages }: { languages: string[] }) {
   if (languages.length === 0) {
@@ -603,11 +631,13 @@ function CardsView({
   onSelect,
   showLanguage,
   showRepoChip,
+  lang,
 }: {
   rows: NodeRef[]
   onSelect: (r: NodeRef) => void
   showLanguage: boolean
   showRepoChip: boolean
+  lang: string
 }) {
   return (
     <div className="grid grid-3">
@@ -617,7 +647,7 @@ function CardsView({
             {showRepoChip && <span className="chip" style={{ borderColor: REPO_COLOR[repoKey], color: REPO_COLOR[repoKey], marginBottom: 6 }}>{repoKey}</span>}
             {showLanguage && <LanguageBadge languages={row.languages} />}
           </div>
-          <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
+          <h3 style={{ marginBottom: 4 }}>{rowLabel(row, lang)}</h3>
           {row.secondary && <p className="muted" style={{ fontSize: 12 }}>{row.secondary}</p>}
           {row.review_status && <p className="muted" style={{ fontSize: 11 }}>Review: {row.review_status}</p>}
           {(row.editedPaths?.length ?? 0) > 0 && <p style={{ fontSize: 11, marginTop: 4 }}><span className="chip" title="Edited in OpenLPM on top of the repo copy">edited</span></p>}
@@ -633,7 +663,7 @@ function CardsView({
 // same as on every other graph. The seven repo colors stay outside the six
 // concept colors on purpose: each repo also has its own shape, so color is
 // never the only way to tell them apart.
-function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void }) {
+function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; lang: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
   const [gs, updateGs, resetGs] = useGraphSettings('base-repo-explorer')
@@ -645,7 +675,7 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
     // Records sit in a grid shaped like the canvas (about 2.2 wide to 1 high),
     // grouped by repo so each repo forms its own colored block. A fixed order
     // (repo, then name) keeps the picture the same every time.
-    const ordered = [...rows].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || a.row.label.localeCompare(b.row.label))
+    const ordered = [...rows].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || rowLabel(a.row, lang).localeCompare(rowLabel(b.row, lang)))
     const cols = Math.max(1, Math.ceil(Math.sqrt(ordered.length * 2.2)))
     const positions = new Map<string, { x: number; y: number }>()
     ordered.forEach((r, i) => positions.set(`${r.repoKey}:${r.row.id}`, { x: (i % cols) * 60, y: Math.floor(i / cols) * 60 }))
@@ -669,7 +699,7 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
       ...rows.map((r) => {
         const id = `${r.repoKey}:${r.row.id}`
         const pos = positions.get(id)
-        info.set(id, { full: r.row.label, priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
+        info.set(id, { full: rowLabel(r.row, lang), priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
         return { data: { id, repoKey: r.repoKey, size: 24 }, position: pos ? { x: pos.x, y: pos.y } : undefined }
       }),
       ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field } })),
@@ -724,7 +754,7 @@ function GraphView({ rows, onSelect }: { rows: NodeRef[]; onSelect: (r: NodeRef)
     return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null }
     // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, gs.layout, gs.labels, gs.spacing])
+  }, [rows, lang, gs.layout, gs.labels, gs.spacing])
 
   useEffect(() => {
     if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
@@ -1010,13 +1040,16 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
 // (e.g. "Cooperative Learning (Kooperative Lernformen)"), and appending the
 // method_class enum value too (e.g. "(pedagogical-practice)") produced a
 // confusing double-parenthetical rather than something more readable.
-function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknown>; idLabels: Map<string, ResolvedLabel> }) {
-  // The Explorer is an English-language screen. Every text shows the language it is written in, and a record that also has a
-  // German name shows it on its own line.
+function MethodsDetailSections({ data, idLabels, lang }: { data: Record<string, unknown>; idLabels: Map<string, ResolvedLabel>; lang: string }) {
+  // One language at a time, chosen with the switch at the top of the page. A text that only exists in the other language
+  // shows with a small language tag so nobody mistakes it for a translation.
   const uiLang = 'en'
-  const [textLang, setTextLang] = useState('en')
+  const textLang = lang
   const name = pickLocalized(data.label, textLang)
-  const otherNames = name ? otherLanguages(data.label, name.lang) : []
+  const germanName = pickLocalized(data.label, 'de')
+  const gloss = germanName && germanName.lang === 'de' ? germanName.text : undefined
+  const clean = (text: string, textIsLang: string) => (lang === 'en' && textIsLang === 'en' ? withoutGermanGloss(text, gloss) : text)
+  const tag = (l: string) => (l && l !== lang ? <LangChip lang={l} uiLang={uiLang} /> : null)
   const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
   const discipline = data.discipline as string | undefined
   const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
@@ -1033,25 +1066,17 @@ function MethodsDetailSections({ data, idLabels }: { data: Record<string, unknow
 
   return (
     <div style={{ fontSize: 12 }}>
-      <div style={{ marginBottom: 8 }}><LanguageSwitch value={textLang} onChange={setTextLang} uiLang={uiLang} /></div>
-      {!!name && (
-        <DetailRow label="Label">
-          {name.text}<LangChip lang={name.lang} uiLang={uiLang} />
-          {otherNames.map((o) => (
-            <div key={o.lang}>{o.text}<LangChip lang={o.lang} uiLang={uiLang} /></div>
-          ))}
-        </DetailRow>
-      )}
-      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.map((t) => tagLabel('learningApproaches', t, uiLang)).join(', ')}</DetailRow>}
+      {!!name && <DetailRow label="Label">{name.text}{tag(name.lang)}</DetailRow>}
+      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>}
       {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
-      {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagLabel('lessonPhases', t, uiLang)).join(', ')}</DetailRow>}
-      {!!whenToUse && <DetailRow label="When to use">{whenToUse.text}<LangChip lang={whenToUse.lang} uiLang={uiLang} /></DetailRow>}
-      {!!description && <DetailRow label="Description">{description.text}<LangChip lang={description.lang} uiLang={uiLang} /><DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
+      {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
+      {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
+      {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
       {!!protocolSteps?.items.length && (
         <DetailRow label="Protocol steps">
-          <LangChip lang={protocolSteps.lang} uiLang={uiLang} />
+          {tag(protocolSteps.lang)}
           <ol style={{ margin: 0, paddingLeft: 18 }}>
-            {protocolSteps.items.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{s}</li>)}
+            {protocolSteps.items.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{clean(s, protocolSteps.lang)}</li>)}
           </ol>
         </DetailRow>
       )}
@@ -1094,6 +1119,7 @@ function DetailPanel({
   supabase,
   userId,
   vocab,
+  lang,
   history,
   editsAvailable,
   onEditsChanged,
@@ -1104,6 +1130,7 @@ function DetailPanel({
   supabase: ReturnType<typeof createClient>
   userId: string | null
   vocab: FieldVocabulary
+  lang: string
   history: BaseRepoEdit[]
   editsAvailable: boolean
   onEditsChanged: () => void
@@ -1193,7 +1220,7 @@ function DetailPanel({
   return (
     <div className="card" style={{ width: 360, flexShrink: 0, position: 'sticky', top: 12, maxHeight: 'calc(100vh - 24px)', overflowY: 'auto' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <h3 style={{ marginBottom: 4 }}>{row.label}</h3>
+        <h3 style={{ marginBottom: 4 }}>{rowLabel(row, lang)}</h3>
         <button className="btn btn-mini" onClick={onClose}>×</button>
       </div>
       {repoKey === 'literaturebase' && (
@@ -1227,7 +1254,7 @@ function DetailPanel({
           {repoKey === 'literaturebase' ? (
             <LiteratureDetailSections data={row.data} />
           ) : repoKey === 'methodsbase' ? (
-            <MethodsDetailSections data={row.data} idLabels={idLabels} />
+            <MethodsDetailSections data={row.data} idLabels={idLabels} lang={lang} />
           ) : (
             <RecordDetails data={row.data} idLabels={idLabels} />
           )}
