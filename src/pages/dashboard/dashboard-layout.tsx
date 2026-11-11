@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
-import { LogOut, User, Users } from 'lucide-react'
+import { GraduationCap, LogOut, User, Users } from 'lucide-react'
 import { useSession } from '@/state/session'
 import { createClient } from '@/lib/supabase/client'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
@@ -7,6 +8,7 @@ import { OpenLpmLogo } from '@/components/openlpm-logo'
 import { FeedbackWidget } from '@/components/feedback-widget'
 import { HelpWidget } from '@/components/help-widget'
 import { TourProvider } from '@/state/tours'
+import { isNamedReviewer, REVIEWER_REVIEW_PATH } from '@/lib/supabase/teaching-lessons-review'
 
 // Outer top bar, shared by the project switcher (ProjectSwitcherPage) and
 // every project-scoped route (which nests its own sidebar nav in
@@ -15,6 +17,15 @@ import { TourProvider } from '@/state/tours'
 // one level up, in <RequireAuth> (App.tsx) -- RLS is the real boundary.
 export default function DashboardLayout() {
   const { session, isAdmin } = useSession()
+  const userId = session?.user.id ?? null
+  // A named reviewer who is not an admin gets a link to the TeachingBase tab (migration 241).
+  const [reviewer, setReviewer] = useState(false)
+  useEffect(() => {
+    if (isAdmin || !userId) { setReviewer(false); return }
+    let alive = true
+    isNamedReviewer(createClient(), userId).then((r) => { if (alive) setReviewer(r) })
+    return () => { alive = false }
+  }, [isAdmin, userId])
 
   const signOut = async () => {
     const supabase = createClient()
@@ -42,6 +53,12 @@ export default function DashboardLayout() {
             <Link to="/dashboard/admin" className="btn btn-mini">
               <Users size={12} />
               Admin
+            </Link>
+          )}
+          {reviewer && (
+            <Link to={REVIEWER_REVIEW_PATH} className="btn btn-mini" data-testid="reviewer-link">
+              <GraduationCap size={12} />
+              TeachingBase
             </Link>
           )}
           <HelpWidget />

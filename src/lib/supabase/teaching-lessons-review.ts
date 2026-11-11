@@ -1,6 +1,6 @@
 import type { createClient } from '@/lib/supabase/client'
 
-// Teaching lessons review (migration 240): experts check the links a machine drafted between TeachingBase lessons and the other base repos.
+// TeachingBase tab of the Base Repo Explorer (migrations 240 and 241): experts check the links a machine drafted between TeachingBase lessons and the other base repos.
 // The lessons come from teachingbase_snapshot (a copy, refreshed by scripts/sync_teachingbase_snapshot.mjs). Each judgement is a row in
 // teachingbase_link_verdicts; rows are never changed, and the newest row per item is the one that counts.
 // Design note: lab_manager/docs/design-notes/openlpm-teaching-lessons-review-2026-11-11.md
@@ -107,10 +107,13 @@ export function latestVerdicts(rows: VerdictRow[]): Map<string, VerdictRow> {
   return out
 }
 
+/** What the progress rules need from a lesson: its id and its data. A TeachingBase row in the Explorer has both. */
+export type LessonKey = Pick<LessonRow, 'id' | 'data'>
+
 export interface Progress { judged: number; total: number }
 
 /** Links judged out of links total, over the given lessons. With sampleOnly, only the "start here" links count. */
-export function linkProgress(lessons: LessonRow[], latest: Map<string, VerdictRow>, sampleOnly = false): Progress {
+export function linkProgress(lessons: LessonKey[], latest: Map<string, VerdictRow>, sampleOnly = false): Progress {
   let judged = 0
   let total = 0
   for (const l of lessons) {
@@ -124,7 +127,7 @@ export function linkProgress(lessons: LessonRow[], latest: Map<string, VerdictRo
 }
 
 /** Progress for one lesson, links and components together. */
-export function lessonProgress(lesson: LessonRow, latest: Map<string, VerdictRow>): Progress {
+export function lessonProgress(lesson: LessonKey, latest: Map<string, VerdictRow>): Progress {
   let judged = 0
   let total = 0
   for (const link of lesson.data.links ?? []) { total += 1; if (latest.has(verdictKey(lesson.id, 'link', link.item_key))) judged += 1 }
@@ -133,7 +136,7 @@ export function lessonProgress(lesson: LessonRow, latest: Map<string, VerdictRow
 }
 
 /** A lesson is reviewed when it has links and every link has a verdict. */
-export function isLessonReviewed(lesson: LessonRow, latest: Map<string, VerdictRow>): boolean {
+export function isLessonReviewed(lesson: LessonKey, latest: Map<string, VerdictRow>): boolean {
   const p = linkProgress([lesson], latest)
   return p.total > 0 && p.judged === p.total
 }
@@ -250,4 +253,82 @@ export async function addVerdict(
     .single()
   if (error) return { row: null, error: error.message }
   return { row: data as VerdictRow, error: null }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Named reviewers (migration 241): admins can name other people who may use this page and record verdicts.
+// ---------------------------------------------------------------------------------------------
+
+/** Where a named reviewer who is not an admin opens TeachingBase. It sits outside the Admin area and shows only that tab. */
+export const REVIEWER_REVIEW_PATH = '/dashboard/teaching-base'
+/** Where admins open it: the TeachingBase tab of the Base Repo Explorer. */
+export const ADMIN_TEACHINGBASE_PATH = '/dashboard/admin/explore?tab=teachingbase'
+
+export interface ReviewerRow { user_id: string; name: string; email: string; added_at: string }
+export interface PersonHit { id: string; name: string; email: string }
+
+/** Admins and named reviewers may use the page. */
+export function mayUseReviewPage(isAdmin: boolean, isNamedReviewer: boolean): boolean {
+  return isAdmin || isNamedReviewer
+}
+
+/** True when the lesson has at least one link in the "start here" sample. */
+export function hasStartHere(lesson: LessonKey): boolean {
+  return (lesson.data.links ?? []).some((l) => l.sample)
+}
+
+/** True when the lesson has links and some of them still have no verdict. */
+export function isStillOpen(lesson: LessonKey, latest: Map<string, VerdictRow>): boolean {
+  const p = linkProgress([lesson], latest)
+  return p.total > 0 && p.judged < p.total
+}
+
+/** Makes a typed search safe for a PostgREST or-filter (commas, parentheses, wildcards and quotes have their own meaning there). */
+export function cleanSearch(raw: string): string {
+  return raw.replace(/[,()%*_\\"']/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+/** Joins reviewer rows with the people's names. A person who cannot be found still shows, by id. Newest first. */
+export function reviewerRows(rows: { user_id: string; added_at: string }[], people: PersonHit[]): ReviewerRow[] {
+  const byId = new Map(people.map((p) => [p.id, p]))
+  return rows
+    .map((r) => ({ user_id: r.user_id, name: byId.get(r.user_id)?.name ?? '', email: byId.get(r.user_id)?.email ?? r.user_id, added_at: r.added_at }))
+    .sort((a, b) => b.added_at.localeCompare(a.added_at) || a.name.localeCompare(b.name))
+}
+
+/** People found by a search, without anyone who is already a reviewer. */
+export function candidatesFor(hits: PersonHit[], reviewerIds: Set<string>): PersonHit[] {
+  return hits.filter((h) => !reviewerIds.has(h.id))
+}
+
+/** Whether the signed-in person is a named reviewer. False when the table is not there yet. */
+export async function isNamedReviewer(supabase: Client, userId: string): Promise<boolean> {
+  const { data, error } = await (supabase as any).from('teachingbase_reviewers').select('user_id').eq('user_id', userId).maybeSingle()
+  return !error && !!data
+}
+
+export async function listReviewers(supabase: Client): Promise<ReviewerRow[]> {
+  const { data, error } = await (supabase as any).from('teachingbase_reviewers').select('user_id, added_at')
+  if (error || !data || data.length === 0) return []
+  const ids = (data as { user_id: string }[]).map((r) => r.user_id)
+  const { data: people } = await supabase.from('users').select('id, name, email').in('id', ids)
+  return reviewerRows(data as { user_id: string; added_at: string }[], (people ?? []) as PersonHit[])
+}
+
+/** Finds existing OpenLPM accounts by name or email. */
+export async function searchPeople(supabase: Client, query: string): Promise<PersonHit[]> {
+  const q = cleanSearch(query)
+  if (q.length < 2) return []
+  const { data } = await supabase.from('users').select('id, name, email').or(`name.ilike.%${q}%,email.ilike.%${q}%`).order('name', { ascending: true }).limit(10)
+  return (data ?? []) as PersonHit[]
+}
+
+export async function addReviewer(supabase: Client, userId: string, addedBy: string): Promise<string | null> {
+  const { error } = await (supabase as any).from('teachingbase_reviewers').insert({ user_id: userId, added_by: addedBy })
+  return error ? error.message : null
+}
+
+export async function removeReviewer(supabase: Client, userId: string): Promise<string | null> {
+  const { error } = await (supabase as any).from('teachingbase_reviewers').delete().eq('user_id', userId)
+  return error ? error.message : null
 }

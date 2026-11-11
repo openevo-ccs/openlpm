@@ -3,7 +3,7 @@ import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CONCEPTBASE_TAB_PATH, TEACHING_LESSONS_PATH } from '@/components/base-repo-tabs'
+import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
@@ -33,6 +33,13 @@ import {
   resolveBaseRepoReviewTarget,
   type GenericReviewItem,
 } from '@/lib/supabase/generic-review'
+import { TeachingBaseLessonBody } from '@/components/teachingbase-lesson-card'
+import { TeachingBaseToolbar } from '@/components/teachingbase-toolbar'
+import {
+  addVerdict, currentReviewer, hasStartHere, isNamedReviewer, isStillOpen, latestVerdicts, listVerdicts, summaryOf, verdictsExport,
+  type ItemKind, type LessonData, type LessonLink, type Verdict, type VerdictRow,
+} from '@/lib/supabase/teaching-lessons-review'
+import { T as TB_T, type Lang as TbLang } from '@/lib/teachingbase-review-strings'
 import { createGlobalTopic, createPost, listGlobalTopicsForTarget, listPosts, type PostWithAuthor } from '@/lib/supabase/discussions'
 
 // Base Repo Explorer (2026-10-21): a site-wide, admin-only area to browse,
@@ -68,6 +75,7 @@ const REPO_COLOR: Record<BaseRepoKey, string> = {
   quotebase: '#0d8f8f',
   competencybase: '#a3365b',
   projectbase: '#5a6b2e',
+  teachingbase: '#8a4b1f',
 }
 
 const REPO_SHAPE: Record<BaseRepoKey, string> = {
@@ -78,6 +86,7 @@ const REPO_SHAPE: Record<BaseRepoKey, string> = {
   quotebase: 'hexagon',
   competencybase: 'pentagon',
   projectbase: 'star',
+  teachingbase: 'octagon',
 }
 
 function token(name: string, fallback: string) {
@@ -110,14 +119,28 @@ type SortState = { id: string; dir: 'asc' | 'desc' }
 
 const compareText = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
 
-export default function AdminBaseRepoExplorerPage() {
-  const { isAdmin, session } = useSession()
+// `reviewerOnly` is the second way in (migration 241): a named reviewer who is not an admin opens /dashboard/teaching-base and gets this page
+// with only the TeachingBase tab. Everything else in the Explorer stays admin-only: the other tabs are not loaded, and the edit, discussion,
+// review-queue and Reviewers parts are not shown. The database rules are the boundary underneath.
+export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { reviewerOnly?: boolean }) {
+  const { isAdmin, session, loading: sessionLoading } = useSession()
   const supabase = useMemo(() => createClient(), [])
+  const userId = session?.user.id ?? null
+  const [named, setNamed] = useState<boolean | null>(null)
+  useEffect(() => {
+    if (!reviewerOnly || sessionLoading || isAdmin || !userId) return
+    let alive = true
+    isNamedReviewer(supabase, userId).then((r) => { if (alive) setNamed(r) })
+    return () => { alive = false }
+  }, [supabase, reviewerOnly, sessionLoading, isAdmin, userId])
+  const allowed = isAdmin || (reviewerOnly && named === true)
+  const restricted = reviewerOnly && !isAdmin
+  // The language of the TeachingBase checking wording follows the page-wide English/German switch.
 
   // The ConceptBase tab links back here with ?tab=<repo>, so the tab asked for is the one shown first.
   const [searchParams] = useSearchParams()
   const askedTab = searchParams.get('tab')
-  const [tab, setTab] = useState<TabKey>(BASE_REPO_CONFIGS.some((c) => c.key === askedTab) ? (askedTab as BaseRepoKey) : 'all')
+  const [tab, setTab] = useState<TabKey>(reviewerOnly ? 'teachingbase' : BASE_REPO_CONFIGS.some((c) => c.key === askedTab) ? (askedTab as BaseRepoKey) : 'all')
   const [view, setView] = useState<ViewMode>('table')
   // The page-wide English/German view. Names, descriptions and tags of records that have both show in this language.
   const [viewLang, setViewLangState] = useState<string>(() => {
@@ -143,6 +166,11 @@ export default function AdminBaseRepoExplorerPage() {
   const [editsAvailable, setEditsAvailable] = useState(true)
   const [onlyEdited, setOnlyEdited] = useState(false)
   const [showEditsExport, setShowEditsExport] = useState(false)
+  // TeachingBase link checking (migrations 240 and 241). Loaded when the TeachingBase tab is open.
+  const [verdicts, setVerdicts] = useState<VerdictRow[]>([])
+  const [reviewer, setReviewer] = useState<{ id: string; name: string } | null>(null)
+  const [onlyStartHere, setOnlyStartHere] = useState(false)
+  const [onlyOpen, setOnlyOpen] = useState(false)
 
   const reloadEdits = async (repoKey: BaseRepoKey) => {
     const { edits, available } = await listEdits(supabase, repoKey)
@@ -153,13 +181,13 @@ export default function AdminBaseRepoExplorerPage() {
   const reloadReviewQueue = () => listGlobalReviewQueue(supabase).then(setReviewQueue)
 
   useEffect(() => {
-    if (!isAdmin) return
-    const wanted: BaseRepoKey[] = tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
+    if (!allowed) return
+    const wanted: BaseRepoKey[] = restricted ? ['teachingbase'] : tab === 'all' ? BASE_REPO_CONFIGS.map((c) => c.key) : [tab]
     const missing = wanted.filter((key) => !rowsByRepo.has(key))
     if (missing.length === 0) return
     let active = true
     setLoading(true)
-    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key), await listEdits(supabase, key)] as const)).then((triples) => {
+    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key), restricted ? { edits: [] as BaseRepoEdit[], available: false } : await listEdits(supabase, key)] as const)).then((triples) => {
       if (!active) return
       setRowsByRepo((prev) => {
         const next = new Map(prev)
@@ -176,12 +204,45 @@ export default function AdminBaseRepoExplorerPage() {
     })
     return () => { active = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase, isAdmin, tab])
+  }, [supabase, allowed, restricted, tab])
 
   useEffect(() => {
-    if (isAdmin) reloadReviewQueue()
+    if (isAdmin && !restricted) reloadReviewQueue()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin])
+  }, [isAdmin, restricted])
+
+  const [verdictsLoaded, setVerdictsLoaded] = useState(false)
+  useEffect(() => {
+    if (!allowed || tab !== 'teachingbase' || verdictsLoaded) return
+    let alive = true
+    Promise.all([listVerdicts(supabase), currentReviewer(supabase)]).then(([v, r]) => {
+      if (!alive) return
+      setVerdicts(v.rows)
+      setReviewer(r)
+      setVerdictsLoaded(true)
+    })
+    return () => { alive = false }
+  }, [supabase, allowed, tab, verdictsLoaded])
+  const latest = useMemo(() => latestVerdicts(verdicts), [verdicts])
+  const tbLang: TbLang = viewLang === 'de' ? 'de' : 'en'
+
+  const judge = async (lessonId: string, kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null): Promise<string | null> => {
+    if (!reviewer) return 'not signed in'
+    const { row, error } = await addVerdict(supabase, reviewer, { lesson_id: lessonId, item_kind: kind, item_key: item.item_key, item_summary: summaryOf(item, kind), verdict, note })
+    if (error || !row) return error ?? 'unknown error'
+    setVerdicts((cur) => [...cur, row])
+    return null
+  }
+
+  const downloadVerdicts = () => {
+    const payload = { exported_at: new Date().toISOString(), source: 'teachingbase_link_verdicts', verdicts: verdictsExport(latest) }
+    const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }))
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `teachingbase-verdicts-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   const activeFilterCfg = tab !== 'all' ? BASE_REPO_CONFIGS.find((c) => c.key === tab) : undefined
   const activeFilterColumn = activeFilterCfg?.filterColumn
@@ -296,8 +357,9 @@ export default function AdminBaseRepoExplorerPage() {
   }, [columns, tabRows])
 
   const searched = useMemo(
-    () => tabRows.filter((n) => rowMatchesSearch(n.row, search) && (!onlyEdited || (n.row.editedPaths?.length ?? 0) > 0)),
-    [tabRows, search, onlyEdited]
+    () => tabRows.filter((n) => rowMatchesSearch(n.row, search) && (!onlyEdited || (n.row.editedPaths?.length ?? 0) > 0)
+      && (tab !== 'teachingbase' || ((!onlyStartHere || hasStartHere(n.row as any)) && (!onlyOpen || isStillOpen(n.row as any, latest))))),
+    [tabRows, search, onlyEdited, tab, onlyStartHere, onlyOpen, latest]
   )
 
   // Until someone clicks a heading, rows are in title order, as before.
@@ -319,26 +381,29 @@ export default function AdminBaseRepoExplorerPage() {
   // Tab counts cover every base already loaded, including tabs that aren't open, and follow the search box.
   const searchedCountFor = (key: BaseRepoKey) => (effectiveRowsByRepo.get(key) ?? []).filter((r) => rowMatchesSearch(r, search) && (!onlyEdited || (r.editedPaths?.length ?? 0) > 0)).length
 
-  if (!isAdmin) {
+  if (!allowed) {
+    const checking = sessionLoading || (reviewerOnly && !isAdmin && named === null && !!userId)
     return (
       <div>
-        <h1>Base Repo Explorer</h1>
-        <p className="muted">This page isn&apos;t available to your account.</p>
+        <h1>{reviewerOnly ? 'TeachingBase' : 'Base Repo Explorer'}</h1>
+        <p className="muted" data-testid="no-access">{checking ? 'Loading…' : "This page isn't available to your account."}</p>
       </div>
     )
   }
 
   return (
     <div>
-      <h1 className="row"><BookOpen size={18} style={{ color: 'var(--text-muted)' }} />Base Repo Explorer</h1>
-      <p className="muted" style={{ marginBottom: 16 }}>
-        Browse, review, and discuss the content of the OpenEvo CCS Foundational Repos, across every
-        project. Admin-only for now. The ConceptBase tab shows what each concept means. The dispute and
-        graph layer is not covered here.
-      </p>
+      <h1 className="row"><BookOpen size={18} style={{ color: 'var(--text-muted)' }} />{restricted ? 'TeachingBase' : 'Base Repo Explorer'}</h1>
+      {!restricted && (
+        <p className="muted" style={{ marginBottom: 16 }}>
+          Browse, review, and discuss the content of the OpenEvo CCS Foundational Repos, across every
+          project. Admin-only for now. The ConceptBase tab shows what each concept means. The dispute and
+          graph layer is not covered here.
+        </p>
+      )}
 
       {anyLanguageTagged && (
-        <div className="row" style={{ gap: 10, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <div className="row tlr-lang" style={{ gap: 10, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <LanguageSwitch value={viewLang} onChange={setViewLang} uiLang="en" languages={['en', 'de']} />
           <span className="muted" style={{ fontSize: 12 }}>
             Names, descriptions and tags show in this language where a record has them. Where it has no text in this language yet, the English text shows with an EN tag.
@@ -346,7 +411,7 @@ export default function AdminBaseRepoExplorerPage() {
         </div>
       )}
 
-      <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+      {!restricted && <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
         <button className={`btn btn-mini${tab === 'all' ? ' btn-primary' : ''}`} onClick={() => setTab('all')}>
           All{tab === 'all' && !loading ? ` (${totalCount})` : ''}
         </button>
@@ -360,8 +425,22 @@ export default function AdminBaseRepoExplorerPage() {
           </button>
         ))}
         <Link to={CONCEPTBASE_TAB_PATH} className="btn btn-mini" title="What ConceptBase says each concept means">ConceptBase</Link>
-        <Link to={TEACHING_LESSONS_PATH} className="btn btn-mini" title="Check the links drafted between teaching lessons and the other repos">Teaching lessons</Link>
-      </div>
+      </div>}
+
+      {tab === 'teachingbase' && (
+        <TeachingBaseToolbar
+          lessons={tabRows.map((n) => n.row as any)}
+          latest={latest}
+          lang={tbLang}
+          onlyStartHere={onlyStartHere}
+          onlyOpen={onlyOpen}
+          onToggleStartHere={() => setOnlyStartHere((v) => !v)}
+          onToggleOpen={() => setOnlyOpen((v) => !v)}
+          onDownload={downloadVerdicts}
+          supabase={supabase}
+          adminId={isAdmin ? userId : null}
+        />
+      )}
 
       <div className="row" style={{ gap: 8, marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -408,19 +487,19 @@ export default function AdminBaseRepoExplorerPage() {
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
           <button className={`btn btn-mini${view === 'cards' ? ' btn-primary' : ''}`} onClick={() => setView('cards')}><LayoutGrid size={13} />Cards</button>
           <button className={`btn btn-mini${view === 'graph' ? ' btn-primary' : ''}`} onClick={() => setView('graph')}><Network size={13} />Graph</button>
-          <button className={`btn btn-mini${onlyEdited ? ' btn-primary' : ''}`} onClick={() => setOnlyEdited((v) => !v)} title="Show only the records that have been edited in OpenLPM">
+          {!restricted && <button className={`btn btn-mini${onlyEdited ? ' btn-primary' : ''}`} onClick={() => setOnlyEdited((v) => !v)} title="Show only the records that have been edited in OpenLPM">
             <Pencil size={13} />Edited only
-          </button>
-          <button className="btn btn-mini" onClick={() => setShowEditsExport((v) => !v)} title="Edits made here that are not in the source repos yet">
+          </button>}
+          {!restricted && <button className="btn btn-mini" onClick={() => setShowEditsExport((v) => !v)} title="Edits made here that are not in the source repos yet">
             <Download size={13} />Edits to send back ({waitingEdits.length})
-          </button>
-          <button className="btn btn-mini" onClick={() => setShowReviewQueue((v) => !v)}>
+          </button>}
+          {!restricted && <button className="btn btn-mini" onClick={() => setShowReviewQueue((v) => !v)}>
             <Clock size={13} />Review queue {reviewQueue ? `(${reviewQueue.filter((i) => i.assignment.status === 'pending').length})` : ''}
-          </button>
+          </button>}
         </div>
       </div>
 
-      {showEditsExport && (
+      {!restricted && showEditsExport && (
         <EditsExportPanel
           edits={waitingEdits}
           labelFor={(repoKey, id) => (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id}
@@ -429,7 +508,7 @@ export default function AdminBaseRepoExplorerPage() {
         />
       )}
 
-      {showReviewQueue && (
+      {!restricted && showReviewQueue && (
         <ReviewQueuePanel items={reviewQueue} supabase={supabase} onReviewed={reloadReviewQueue} />
       )}
 
@@ -463,7 +542,11 @@ export default function AdminBaseRepoExplorerPage() {
           <DetailPanel
             nodeRef={selectedLive}
             supabase={supabase}
-            userId={session?.user.id ?? null}
+            userId={userId}
+            restricted={restricted}
+            tbLang={tbLang}
+            latest={latest}
+            onJudge={(kind, item, verdict, note) => judge(selectedLive.row.id, kind, item, verdict, note)}
             vocab={vocab}
             lang={viewLang}
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
@@ -1119,6 +1202,10 @@ function DetailPanel({
   nodeRef,
   supabase,
   userId,
+  restricted,
+  tbLang,
+  latest,
+  onJudge,
   vocab,
   lang,
   history,
@@ -1130,6 +1217,11 @@ function DetailPanel({
   nodeRef: NodeRef
   supabase: ReturnType<typeof createClient>
   userId: string | null
+  /** A named reviewer who is not an admin: no edit, discussion or review-queue parts. */
+  restricted: boolean
+  tbLang: TbLang
+  latest: Map<string, VerdictRow>
+  onJudge: (kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null) => Promise<string | null>
   vocab: FieldVocabulary
   lang: string
   history: BaseRepoEdit[]
@@ -1151,6 +1243,7 @@ function DetailPanel({
   const [idLabels, setIdLabels] = useState<Map<string, ResolvedLabel>>(new Map())
 
   useEffect(() => {
+    if (restricted) return
     let active = true
     setTargetId(null); setTopics(null); setPosts([]); setNotice(null)
     resolveBaseRepoReviewTarget(supabase, { baseRepo: repoKey, recordId: row.id }).then(async (id) => {
@@ -1162,7 +1255,7 @@ function DetailPanel({
       if (t.length > 0) setPosts(await listPosts(supabase, t[0].id))
     })
     return () => { active = false }
-  }, [repoKey, row.id, supabase])
+  }, [repoKey, row.id, supabase, restricted])
 
   // Real feedback aee0b27e (Susan, 2026-10-24): resolve this record's own
   // relation fields (e.g. a method's relatedApproaches/relatedQuestions)
@@ -1219,7 +1312,7 @@ function DetailPanel({
   }
 
   return (
-    <div className="card" style={{ width: 360, flexShrink: 0, position: 'sticky', top: 12, maxHeight: 'calc(100vh - 24px)', overflowY: 'auto' }}>
+    <div className="card" style={{ width: repoKey === 'teachingbase' ? 'min(100%, 520px)' : 360, flexShrink: repoKey === 'teachingbase' ? 1 : 0, position: 'sticky', top: 12, maxHeight: 'calc(100vh - 24px)', overflowY: 'auto' }}>
       <div className="row" style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <h3 style={{ marginBottom: 4 }}>{rowLabel(row, lang)}</h3>
         <button className="btn btn-mini" onClick={onClose}>×</button>
@@ -1236,7 +1329,11 @@ function DetailPanel({
       )}
       {row.review_status && <p className="muted" style={{ fontSize: 12 }}>Review status (source repo): {row.review_status}</p>}
 
-      {editing && userId ? (
+      {repoKey === 'teachingbase' ? (
+        <div style={{ marginTop: 8 }}>
+          <TeachingBaseLessonBody lessonId={row.id} data={row.data as unknown as LessonData} lang={tbLang} latest={latest} onJudge={onJudge} />
+        </div>
+      ) : editing && userId ? (
         <div style={{ marginTop: 8 }}>
           <RecordEditor
             supabase={supabase}
@@ -1263,12 +1360,12 @@ function DetailPanel({
       </details>
       )}
 
-      {!editing && userId && (
+      {!editing && userId && repoKey !== 'teachingbase' && (
         <EditHistory supabase={supabase} userId={userId} repoKey={repoKey} row={row} history={history} onChanged={onEditsChanged} />
       )}
 
-      <div className="row" style={{ marginTop: 12, gap: 8 }}>
-        {!editing && (
+      {!restricted && <div className="row" style={{ marginTop: 12, gap: 8 }}>
+        {!editing && repoKey !== 'teachingbase' && (
           <button
             className="btn btn-mini"
             disabled={!userId || !editsAvailable}
@@ -1279,11 +1376,11 @@ function DetailPanel({
           </button>
         )}
         <button className="btn btn-mini" disabled={busy} onClick={submitReview}><CheckCircle2 size={13} />Submit for review</button>
-      </div>
+      </div>}
       {notice && <p className="muted" style={{ fontSize: 12 }}>{notice}</p>}
 
-      <h4 className="row" style={{ marginTop: 16, fontSize: 13 }}><MessageSquare size={13} />Discuss</h4>
-      {!topics ? (
+      {!restricted && <h4 className="row" style={{ marginTop: 16, fontSize: 13 }}><MessageSquare size={13} />Discuss</h4>}
+      {restricted ? null : !topics ? (
         <p className="muted" style={{ fontSize: 12 }}>Loading…</p>
       ) : topics.length === 0 ? (
         <div className="row" style={{ gap: 6 }}>
