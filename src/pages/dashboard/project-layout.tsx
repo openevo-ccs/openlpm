@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BarChart3, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { getProjectBySlug, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
+import { getProjectBySlug, getUserProjects, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
+import { listMyPendingRequests } from '@/lib/supabase/members'
+import { useSession } from '@/state/session'
 import { hasRepositoryContent } from '@/lib/supabase/curriculum-repository'
 import { groupsSettings, listGroupsWithMyMembership } from '@/lib/supabase/groups'
 import {
@@ -144,6 +146,18 @@ export default function ProjectLayout() {
   const onDashboardHome = useLocation().pathname.replace(/\/+$/, '') === `/dashboard/${slug}`
   const [searchParams, setSearchParams] = useSearchParams()
   const supabase = useMemo(() => createClient(), [])
+  const { isAdmin } = useSession()
+  // Someone who belongs to exactly one space gets no "All spaces" link: it would only send them straight back here
+  // (the space list skips itself for them). Same rule the list page uses to skip itself (Susan, 2026-11-08, row 3a1ca563).
+  const [onlyOneSpace, setOnlyOneSpace] = useState(false)
+  useEffect(() => {
+    if (isAdmin) { setOnlyOneSpace(false); return }
+    let active = true
+    Promise.all([getUserProjects(supabase), listMyPendingRequests(supabase)])
+      .then(([mine, pending]) => { if (active) setOnlyOneSpace(mine.length === 1 && pending.length === 0) })
+      .catch(() => { if (active) setOnlyOneSpace(false) })
+    return () => { active = false }
+  }, [supabase, isAdmin])
   const [state, setState] = useState<{ project: ProjectRow | null; role: ProjectMemberRole | null; joinedVia: string | null } | null>(null)
   const [parent, setParent] = useState<{ slug: string; name: string } | null>(null)
   const [defaultBranchId, setDefaultBranchId] = useState<string | null>(null)
@@ -481,10 +495,12 @@ export default function ProjectLayout() {
         <TourSpacePublisher space={tourSpace} />
         <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`} data-tour="sidebar">
           <div className="project-side-top">
-            <Link to="/dashboard" className="row muted" title={templateLanguage === 'de' ? 'Alle Bereiche' : 'All project spaces'}>
-              <ArrowLeft size={14} />
-              <span className="nav-label">{templateLanguage === 'de' ? 'Alle Bereiche' : 'All spaces'}</span>
-            </Link>
+            {!onlyOneSpace && (
+              <Link to="/dashboard" className="row muted" title={templateLanguage === 'de' ? 'Alle Bereiche' : 'All project spaces'}>
+                <ArrowLeft size={14} />
+                <span className="nav-label">{templateLanguage === 'de' ? 'Alle Bereiche' : 'All spaces'}</span>
+              </Link>
+            )}
             <button
               type="button"
               className="sidebar-toggle"
@@ -547,10 +563,12 @@ export default function ProjectLayout() {
       <TourSpacePublisher space={tourSpace} />
       <aside className={`project-side${sidebarCollapsed ? ' collapsed' : ''}`} data-tour="sidebar">
         <div className="project-side-top">
-          <Link to="/dashboard" className="row muted" title="All project spaces">
-            <ArrowLeft size={14} />
-            <span className="nav-label">All project spaces</span>
-          </Link>
+          {!onlyOneSpace && (
+            <Link to="/dashboard" className="row muted" title="All project spaces">
+              <ArrowLeft size={14} />
+              <span className="nav-label">All project spaces</span>
+            </Link>
+          )}
           <button type="button" className="sidebar-toggle" data-tour="sidebar.toggle" onClick={toggleSidebar} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
             {sidebarCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>

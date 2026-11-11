@@ -141,3 +141,20 @@ export function tagLabel(field: TagField, term: string, uiLang: string): string 
   const reading = TAG_READINGS[field][term]
   return reading ? `${reading} (${term})` : term
 }
+
+/**
+ * A tag in one language only. English gives the English reading, German gives the stored German term. The Base Repo
+ * Explorer uses this so its English view shows no German words (Dustin, 2026-11-11). A tag without an English reading is
+ * shown as stored.
+ */
+export function tagReading(field: TagField, term: string, lang: string): string {
+  if (lang === 'de') return term
+  return TAG_READINGS[field][term] ?? term
+}
+
+/** Removes a "(German name)" gloss that an English text carries inside it, e.g. "The ABC Method (ABC-Methode) uses...". */
+export function withoutGermanGloss(text: string, germanName: string | undefined): string {
+  if (!germanName) return text
+  const escaped = germanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return text.replace(new RegExp(`\\s*\\(${escaped}\\)`, 'g'), '')
+}
