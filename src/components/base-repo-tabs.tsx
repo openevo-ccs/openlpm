@@ -5,6 +5,7 @@ import { BASE_REPO_CONFIGS } from '@/lib/supabase/base-repo-explorer'
 // Concept meanings view, which is its own page, so this row is shown on that page too, with ConceptBase marked, and the other tabs link back
 // into the Explorer (feedback cc19c44c, Dustin 2026-11-07).
 export const CONCEPTBASE_TAB_PATH = '/dashboard/admin/concept-meanings'
+export const TEACHING_LESSONS_PATH = '/dashboard/admin/teaching-lessons'
 
 export function BaseRepoTabBar() {
   return (
@@ -14,6 +15,7 @@ export function BaseRepoTabBar() {
         <Link key={cfg.key} to={`/dashboard/admin/explore?tab=${cfg.key}`} className="btn btn-mini">{cfg.name}</Link>
       ))}
       <span className="btn btn-mini btn-primary" aria-current="page">ConceptBase</span>
+      <Link to={TEACHING_LESSONS_PATH} className="btn btn-mini">Teaching lessons</Link>
     </div>
   )
 }

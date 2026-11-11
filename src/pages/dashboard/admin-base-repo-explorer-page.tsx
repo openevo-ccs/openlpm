@@ -3,7 +3,7 @@ import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
+import { CONCEPTBASE_TAB_PATH, TEACHING_LESSONS_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
@@ -360,6 +360,7 @@ export default function AdminBaseRepoExplorerPage() {
           </button>
         ))}
         <Link to={CONCEPTBASE_TAB_PATH} className="btn btn-mini" title="What ConceptBase says each concept means">ConceptBase</Link>
+        <Link to={TEACHING_LESSONS_PATH} className="btn btn-mini" title="Check the links drafted between teaching lessons and the other repos">Teaching lessons</Link>
       </div>
 
       <div className="row" style={{ gap: 8, marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
