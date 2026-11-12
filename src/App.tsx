@@ -28,6 +28,7 @@ import CurriculumRepositoryPage from '@/pages/dashboard/curriculum-repository-pa
 import CurriculumStructurePage from '@/pages/dashboard/curriculum-structure-page'
 import TimelineSwitch from '@/pages/dashboard/timeline-switch'
 import ContextItemsPage from '@/pages/dashboard/context-items-page'
+import RegionalAssetsPage from '@/pages/dashboard/regional-assets-page'
 import MapPage from '@/pages/dashboard/map-page'
 import LearningGoalsPage from '@/pages/dashboard/learning-goals-page'
 import AnalyticsPage from '@/pages/dashboard/analytics-page'
@@ -198,6 +199,7 @@ export default function App() {
             <Route path="curriculum-repository/:recordId" element={<CurriculumRepositoryPage />} />
             <Route path="curriculum-structure" element={<CurriculumStructurePage />} />
             <Route path="context" element={<ContextItemsPage />} />
+            <Route path="regional-assets" element={<RegionalAssetsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
             <Route path="review" element={<ReviewPage />} />
