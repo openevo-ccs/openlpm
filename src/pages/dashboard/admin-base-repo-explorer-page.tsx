@@ -35,6 +35,8 @@ import {
 } from '@/lib/supabase/generic-review'
 import { TeachingBaseLessonBody } from '@/components/teachingbase-lesson-card'
 import { TeachingBaseToolbar } from '@/components/teachingbase-toolbar'
+import { TeachingBaseReviewMode } from '@/components/teachingbase-review-mode'
+import { loadPointer, pointerIfValid, type Ref as ReviewRef } from '@/lib/teachingbase-review-mode'
 import {
   addVerdict, currentReviewer, hasStartHere, isNamedReviewer, isStillOpen, latestVerdicts, listVerdicts, ownJudgedKeys, summaryOf, verdictsExport,
   type ItemKind, type LessonData, type LessonLink, type Verdict, type VerdictRow,
@@ -172,6 +174,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   const [reviewer, setReviewer] = useState<{ id: string; name: string } | null>(null)
   const [onlyStartHere, setOnlyStartHere] = useState(false)
   const [onlyOpen, setOnlyOpen] = useState(false)
+  // Review mode (one decision at a time) is the front door of the TeachingBase tab; the table and cards stay as the overview.
+  const [review, setReview] = useState<{ initial: ReviewRef | null; view: 'decide' | 'map' } | null>(null)
 
   const reloadEdits = async (repoKey: BaseRepoKey) => {
     const { edits, available } = await listEdits(supabase, repoKey)
@@ -273,6 +277,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     return out
   }, [effectiveRowsByRepo, tab])
 
+  const reviewLessons = useMemo(() => (tab === 'teachingbase' ? tabRows.map((n) => ({ id: n.row.id, label: n.row.label, data: n.row.data as unknown as LessonData })) : []), [tab, tabRows])
+  const resumePointer = useMemo(() => (tab === 'teachingbase' ? pointerIfValid(reviewLessons, loadPointer(userId)) : null), [tab, reviewLessons, userId, review])
   // Words other records already use, offered as suggestions in the edit form.
   const vocab: FieldVocabulary = useMemo(() => {
     const methods = effectiveRowsByRepo.get('methodsbase') ?? []
@@ -407,6 +413,22 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
         </p>
       )}
 
+      {review && tab === 'teachingbase' && (
+        <TeachingBaseReviewMode
+          lessons={reviewLessons}
+          latest={latest}
+          ownJudged={ownJudged}
+          lang={tbLang}
+          onLang={(l) => setViewLang(l)}
+          reviewerId={reviewer?.id ?? userId}
+          supabase={supabase}
+          onJudge={(lessonId, link, verdict, note) => judge(lessonId, 'link', link, verdict, note)}
+          onClose={() => setReview(null)}
+          initial={review.initial}
+          initialView={review.view}
+        />
+      )}
+
       {anyLanguageTagged && (
         <div className="row tlr-lang" style={{ gap: 10, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <LanguageSwitch value={viewLang} onChange={setViewLang} uiLang="en" languages={['en', 'de']} />
@@ -442,6 +464,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           onToggleStartHere={() => setOnlyStartHere((v) => !v)}
           onToggleOpen={() => setOnlyOpen((v) => !v)}
           onDownload={downloadVerdicts}
+          onStartReview={() => setReview({ initial: null, view: 'decide' })}
+          onResumeReview={resumePointer ? () => setReview({ initial: resumePointer, view: 'decide' }) : null}
           supabase={supabase}
           adminId={isAdmin ? userId : null}
         />
