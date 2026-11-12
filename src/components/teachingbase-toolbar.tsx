@@ -1,15 +1,16 @@
-import { Download } from 'lucide-react'
+import { Download, PlayCircle } from 'lucide-react'
+import { InfoTip } from '@/components/info-tip'
 import { DRAFT_LABEL } from '@/lib/supabase/curriculum-repository'
 import { ReviewersPanel } from '@/components/teaching-reviewers-panel'
 import { linkProgress, type LessonKey, type VerdictRow } from '@/lib/supabase/teaching-lessons-review'
-import { T, type Lang } from '@/lib/teachingbase-review-strings'
+import { RM, T, type Lang } from '@/lib/teachingbase-review-strings'
 import type { createClient } from '@/lib/supabase/client'
 
 // What the TeachingBase tab shows above the lesson list: what the checking is, progress over every link, the "start here" and "still to
 // check" filters, Download verdicts, and (admins only) the Reviewers section.
 
 export function TeachingBaseToolbar({
-  lessons, latest, lang, onlyStartHere, onlyOpen, onToggleStartHere, onToggleOpen, onDownload, supabase, adminId,
+  lessons, latest, lang, onlyStartHere, onlyOpen, onToggleStartHere, onToggleOpen, onDownload, supabase, adminId, onStartReview, onResumeReview,
 }: {
   lessons: LessonKey[]
   latest: Map<string, VerdictRow>
@@ -19,6 +20,10 @@ export function TeachingBaseToolbar({
   onToggleStartHere: () => void
   onToggleOpen: () => void
   onDownload: () => void
+  /** Opens review mode at its first screen. */
+  onStartReview: () => void
+  /** Opens review mode where this person left off. Null when there is nothing to resume. */
+  onResumeReview: (() => void) | null
   supabase: ReturnType<typeof createClient>
   /** Set for admins; the Reviewers section shows only then. */
   adminId: string | null
@@ -26,9 +31,17 @@ export function TeachingBaseToolbar({
   const t = T[lang]
   const overall = linkProgress(lessons, latest)
   const start = linkProgress(lessons, latest, true)
+  const r = RM[lang]
   const pct = overall.total === 0 ? 0 : Math.round((overall.judged / overall.total) * 100)
   return (
     <div data-testid="teachingbase-toolbar">
+      <div className="card" style={{ marginBottom: 12, borderColor: 'var(--series-a)' }}>
+        <div className="row" style={{ gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button type="button" className="tb-btn primary" onClick={onStartReview} data-testid="start-review"><PlayCircle size={20} />{r.start}</button>
+          {onResumeReview && <button type="button" className="tb-btn" onClick={onResumeReview} data-testid="resume-review">{r.resume}</button>}
+          <span className="muted" style={{ fontSize: 14, flex: '1 1 240px' }}>{r.browseHint}</span>
+        </div>
+      </div>
       <p className="muted" style={{ marginBottom: 6 }}>{t.intro}</p>
       <p className="muted" style={{ marginTop: 0 }}><span className="chip chip-draft">{DRAFT_LABEL[lang]}</span> {t.draftHint}</p>
       <div className="card" style={{ marginBottom: 12 }}>
@@ -39,7 +52,7 @@ export function TeachingBaseToolbar({
               <div style={{ width: `${pct}%`, height: '100%', background: 'var(--series-a)' }} />
             </div>
           </div>
-          <div className="muted" style={{ fontSize: 12.5 }} data-testid="start-progress">{t.startHere}: {start.judged} {t.of} {start.total}</div>
+          <div className="muted" style={{ fontSize: 12.5 }} data-testid="start-progress">{t.startHere} <InfoTip term="startHere" lang={lang} />: {start.judged} {t.of} {start.total}</div>
           <button type="button" className={`btn tlr-tap${onlyStartHere ? ' btn-primary' : ''}`} aria-pressed={onlyStartHere} onClick={onToggleStartHere}>{t.onlyStartHere}</button>
           <button type="button" className={`btn tlr-tap${onlyOpen ? ' btn-primary' : ''}`} aria-pressed={onlyOpen} onClick={onToggleOpen}>{t.stillOpen}</button>
           <button type="button" className="btn tlr-tap" onClick={onDownload} title={t.downloadHint}><Download size={14} /> {t.download}</button>
