@@ -36,7 +36,7 @@ import {
 import { TeachingBaseLessonBody } from '@/components/teachingbase-lesson-card'
 import { TeachingBaseToolbar } from '@/components/teachingbase-toolbar'
 import {
-  addVerdict, currentReviewer, hasStartHere, isNamedReviewer, isStillOpen, latestVerdicts, listVerdicts, summaryOf, verdictsExport,
+  addVerdict, currentReviewer, hasStartHere, isNamedReviewer, isStillOpen, latestVerdicts, listVerdicts, ownJudgedKeys, summaryOf, verdictsExport,
   type ItemKind, type LessonData, type LessonLink, type Verdict, type VerdictRow,
 } from '@/lib/supabase/teaching-lessons-review'
 import { T as TB_T, type Lang as TbLang } from '@/lib/teachingbase-review-strings'
@@ -112,6 +112,7 @@ interface ColumnDef {
   /** Present = the heading gets a filter control with these values as its choices. */
   filterValues?: (n: NodeRef) => string[]
   filterLabel?: (value: string) => string
+  sortValue?: (n: NodeRef) => string
   render?: (n: NodeRef) => ReactNode
 }
 
@@ -224,6 +225,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     return () => { alive = false }
   }, [supabase, allowed, tab, verdictsLoaded])
   const latest = useMemo(() => latestVerdicts(verdicts), [verdicts])
+  const ownJudged = useMemo(() => ownJudgedKeys(verdicts, reviewer?.id ?? null), [verdicts, reviewer])
   const tbLang: TbLang = viewLang === 'de' ? 'de' : 'en'
 
   const judge = async (lessonId: string, kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null): Promise<string | null> => {
@@ -311,6 +313,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
       for (const c of activeTableColumns) {
         cols.push({
           id: `col:${c.header}`, header: c.header, get: (n) => c.get(n.row, viewLang),
+          sortValue: c.sortKey ? (n) => c.sortKey!(n.row) : undefined,
           filterValues: c.filterValues ? (n) => c.filterValues!(n.row, viewLang) : undefined,
           render: c.header === 'Label' ? (n) => <LabelCell n={n} lang={viewLang} /> : undefined,
         })
@@ -363,7 +366,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   )
 
   // Until someone clicks a heading, rows are in title order, as before.
-  const defaultSortColumn = columns.find((c) => c.id === 'label' || c.header === 'Label' || c.header === 'Title') ?? columns.find((c) => c.id !== 'repo') ?? columns[0]
+  // On the TeachingBase tab the lessons with the most doubtful links come first, until someone clicks a heading.
+  const defaultSortColumn = (tab === 'teachingbase' ? columns.find((c) => c.header === 'Check first') : undefined) ?? columns.find((c) => c.id === 'label' || c.header === 'Label' || c.header === 'Title') ?? columns.find((c) => c.id !== 'repo') ?? columns[0]
   const effectiveSort: SortState = sort ?? { id: defaultSortColumn.id, dir: 'asc' }
 
   const allRows: NodeRef[] = useMemo(() => {
@@ -371,7 +375,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     const filtered = searched.filter((n) => active.every((c) => c.filterValues!(n).includes(columnFilters[c.id])))
     const sortCol = columns.find((c) => c.id === effectiveSort.id) ?? columns[0]
     const dir = effectiveSort.dir === 'desc' ? -1 : 1
-    return [...filtered].sort((a, b) => dir * compareText(sortCol.get(a) ?? '', sortCol.get(b) ?? ''))
+    const key = (n: NodeRef) => (sortCol.sortValue ? sortCol.sortValue(n) : sortCol.get(n)) ?? ''
+    return [...filtered].sort((a, b) => dir * compareText(key(a), key(b)))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searched, columns, columnFilters, effectiveSort.id, effectiveSort.dir])
 
@@ -546,6 +551,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             restricted={restricted}
             tbLang={tbLang}
             latest={latest}
+            ownJudged={ownJudged}
             onJudge={(kind, item, verdict, note) => judge(selectedLive.row.id, kind, item, verdict, note)}
             vocab={vocab}
             lang={viewLang}
@@ -1205,6 +1211,7 @@ function DetailPanel({
   restricted,
   tbLang,
   latest,
+  ownJudged,
   onJudge,
   vocab,
   lang,
@@ -1221,6 +1228,7 @@ function DetailPanel({
   restricted: boolean
   tbLang: TbLang
   latest: Map<string, VerdictRow>
+  ownJudged: Set<string>
   onJudge: (kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null) => Promise<string | null>
   vocab: FieldVocabulary
   lang: string
@@ -1331,7 +1339,7 @@ function DetailPanel({
 
       {repoKey === 'teachingbase' ? (
         <div style={{ marginTop: 8 }}>
-          <TeachingBaseLessonBody lessonId={row.id} data={row.data as unknown as LessonData} lang={tbLang} latest={latest} onJudge={onJudge} />
+          <TeachingBaseLessonBody lessonId={row.id} data={row.data as unknown as LessonData} lang={tbLang} latest={latest} ownJudged={ownJudged} onJudge={onJudge} />
         </div>
       ) : editing && userId ? (
         <div style={{ marginTop: 8 }}>

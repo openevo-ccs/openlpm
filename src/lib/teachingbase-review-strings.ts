@@ -49,6 +49,10 @@ export const T = {
     quoteUnchecked: 'Stelle nicht geprüft',
     targetMissing: 'Ziel nicht gefunden',
     startHereTag: 'Einstieg',
+    checkFirst: 'Zuerst prüfen',
+    checkFirstGroup: 'Zuerst prüfen',
+    checkFirstHint: 'Hier ist die Wahrscheinlichkeit am größten, dass etwas nicht stimmt. Die wackligsten stehen oben.',
+    checkReasonLabel: 'Warum diese Verknüpfung markiert wurde',
     download: 'Urteile herunterladen',
     downloadHint: 'Eine Datei mit dem jeweils neuesten Urteil zu jeder Verknüpfung, damit Korrekturen ins Material übernommen werden können.',
     saveError: 'Das Urteil konnte nicht gespeichert werden',
@@ -118,6 +122,10 @@ export const T = {
     quoteUnchecked: 'Passage not checked',
     targetMissing: 'Target not found',
     startHereTag: 'Start here',
+    checkFirst: 'Check first',
+    checkFirstGroup: 'Check first',
+    checkFirstHint: 'These are the links most likely to be wrong. The shakiest ones are at the top.',
+    checkReasonLabel: 'Why this link was marked',
     download: 'Download verdicts',
     downloadHint: 'A file with the newest verdict for every item, so corrections can be carried back into the lessons.',
     saveError: 'The verdict could not be saved',
@@ -145,3 +153,26 @@ export const T = {
 } as const
 
 export const KIND_ORDER = ['concept', 'competency', 'theory', 'method', 'species', 'literature', 'question', 'quote', 'feature']
+
+// The one-line reasons arrive in English, built from these sentences. The German wording is a Claude draft and has not been read by a person
+// who speaks German natively. A sentence without an entry here shows in English.
+export const CHECK_REASONS_DE: Record<string, string> = {
+  'Three independent readers found this link again.': 'Drei unabhängige Leser haben diese Verknüpfung von sich aus wiedergefunden.',
+  'None of three independent readers found this link again.': 'Keiner von drei unabhängigen Lesern hat diese Verknüpfung wiedergefunden.',
+  'A reviewing reader argued that the passage is about something else.': 'Ein prüfender Leser meinte, die Stelle handle von etwas anderem.',
+  'The lesson only mentions this in passing.': 'Das Material erwähnt dies nur am Rande.',
+  'The readers were less sure about this link than about most others.': 'Die Leser waren sich bei dieser Verknüpfung unsicherer als bei den meisten anderen.',
+  'A reviewing reader found the link loose.': 'Ein prüfender Leser fand die Verknüpfung zu lose.',
+  'Most readers see no clear connection between the lesson passage and this record.': 'Die meisten Leser sehen keinen klaren Zusammenhang zwischen der Stelle im Material und diesem Eintrag.',
+  'The kind of link does not fit the kind of record.': 'Die Art der Verknüpfung passt nicht zur Art des Eintrags.',
+  'The quote cannot be found in the lesson text we have, so this link could not be checked against the lesson.': 'Das Zitat steht nicht im vorliegenden Text des Materials, deshalb ließ sich die Verknüpfung nicht daran prüfen.',
+  'The record is filed as a different kind of thing than the link says.': 'Der Eintrag ist als etwas anderes abgelegt, als die Verknüpfung angibt.',
+  'The quote only roughly matches the lesson text.': 'Das Zitat stimmt nur ungefähr mit dem Text des Materials überein.',
+  'The record this link points to is not on the main branch of its knowledge base.': 'Der Eintrag, auf den die Verknüpfung zeigt, ist noch nicht im Hauptbestand seiner Wissensbasis.',
+}
+
+/** The reason line in the reader's language. The English text is cut into sentences and each one is looked up. */
+export function reasonText(reason: string, lang: Lang): string {
+  if (lang !== 'de') return reason
+  return reason.split(/(?<=\.) /).map((s) => CHECK_REASONS_DE[s.trim()] ?? s).join(' ')
+}

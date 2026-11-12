@@ -7,13 +7,18 @@
 // Dry run by default (prints counts, writes nothing). --yes upserts into teachingbase_snapshot.
 //
 // Usage:
-//   node scripts/sync_teachingbase_snapshot.mjs [--repo ../teachingbase] [--sample 150] [--seed 20261111] [--out rows.json] [--yes]
+//   node scripts/sync_teachingbase_snapshot.mjs [--repo ../teachingbase] [--sample 150] [--seed 20261111] [--check-first-dir <folder>] [--out rows.json] [--yes]
+//
+// Check-first order: when the folder given by --check-first-dir (or env TEACHINGBASE_CHECK_FIRST_DIR; default D:\dev_local\openevo_he_mining\swarm_full)
+// holds review_tab_feed.json and ranked_links.json, the links get check_first, check_rank and check_reason fields (see applyCheckFirst). Without
+// those files the step is skipped and the rows come out as before. The fields sit in the snapshot data, so the interface hides the reason
+// until the reviewer has judged a link, and a person who reads the table directly can see it.
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import yaml from 'js-yaml'
-import { keysFor, pickSample } from './lib/teachingbase-review.mjs'
+import { applyCheckFirst, keysFor, pickSample } from './lib/teachingbase-review.mjs'
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const SUPABASE_URL = 'https://tfynvjjxyluzorigyfsp.supabase.co'
@@ -28,12 +33,13 @@ function loadServiceRoleKey() {
 }
 
 function parseArgs(argv) {
-  const out = { repo: path.join(ROOT, '..', 'teachingbase'), sample: 150, seed: 20261111, out: null, yes: false }
+  const out = { repo: path.join(ROOT, '..', 'teachingbase'), sample: 150, seed: 20261111, out: null, yes: false, checkFirstDir: process.env.TEACHINGBASE_CHECK_FIRST_DIR || 'D:/dev_local/openevo_he_mining/swarm_full' }
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--repo') out.repo = path.resolve(argv[++i])
     else if (argv[i] === '--sample') out.sample = Number(argv[++i])
     else if (argv[i] === '--seed') out.seed = Number(argv[++i])
     else if (argv[i] === '--out') out.out = path.resolve(argv[++i])
+    else if (argv[i] === '--check-first-dir') out.checkFirstDir = path.resolve(argv[++i])
     else if (argv[i] === '--yes') out.yes = true
   }
   return out
@@ -134,12 +140,20 @@ function show(title, rows, pick) {
 }
 
 async function main() {
-  const { repo, sample, seed, out, yes } = parseArgs(process.argv.slice(2))
+  const { repo, sample, seed, out, yes, checkFirstDir } = parseArgs(process.argv.slice(2))
   console.log(`${yes ? 'LIVE RUN' : 'DRY RUN'} -- reading ${repo}\n`)
   if (!existsSync(repo)) { console.error(`${repo} does not exist. Pass --repo if the teachingbase checkout lives somewhere else.`); process.exit(1) }
 
   const lessons = buildLessons(repo)
   markSample(lessons, sample, seed)
+  const feedFile = path.join(checkFirstDir, 'review_tab_feed.json')
+  const rankedFile = path.join(checkFirstDir, 'ranked_links.json')
+  if (existsSync(feedFile) && existsSync(rankedFile)) {
+    const c = applyCheckFirst(lessons, JSON.parse(readFileSync(feedFile, 'utf8')), JSON.parse(readFileSync(rankedFile, 'utf8')))
+    console.log(`Check-first order from ${checkFirstDir}: ${c.flagged} links flagged, ${c.reasons} with a reason, ${c.withheld} left out on purpose, ${c.unmatched} in the file but not in the lessons`)
+  } else {
+    console.log(`Check-first order: skipped (no review_tab_feed.json and ranked_links.json in ${checkFirstDir})`)
+  }
   const rows = lessons.map(toRow)
 
   const allLinks = rows.flatMap((r) => r.data.links)

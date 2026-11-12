@@ -23,6 +23,12 @@ export interface LessonLink {
   checks?: { id_exists?: boolean; quote_found?: boolean; was_candidate?: boolean } | null
   state?: string | null
   sample?: boolean
+  /** Set by the sync when the link is in the "check first" group. Never shown as a number. */
+  check_first?: boolean
+  /** Position among the flagged links, 1 = most doubtful. Only used for the order. */
+  check_rank?: number
+  /** One plain line on why the link was marked. Shown only after the reviewer has judged the link. */
+  check_reason?: string | null
 }
 
 export interface LessonComponent {
@@ -331,4 +337,39 @@ export async function addReviewer(supabase: Client, userId: string, addedBy: str
 export async function removeReviewer(supabase: Client, userId: string): Promise<string | null> {
   const { error } = await (supabase as any).from('teachingbase_reviewers').delete().eq('user_id', userId)
   return error ? error.message : null
+}
+
+// ---------------------------------------------------------------------------------------------
+// "Check first" order. The order and a small marker are visible from the start; the reason only after the reviewer's own verdict,
+// so it cannot steer the judgement. Links left out of the order on purpose carry none of these fields.
+// ---------------------------------------------------------------------------------------------
+
+/** Flagged links first, most doubtful first. The other links keep their order. */
+export function checkFirstLinks(links: LessonLink[]): { first: LessonLink[]; rest: LessonLink[] } {
+  const first = links.filter((l) => l.check_first).sort((a, b) => (a.check_rank ?? Infinity) - (b.check_rank ?? Infinity))
+  return { first, rest: links.filter((l) => !l.check_first) }
+}
+
+/** A lesson's place in the lesson list: the position of its most doubtful flagged link, or a large value when it has none. */
+export function lessonCheckSortKey(lesson: Pick<LessonRow, 'data'>): string {
+  const ranks = (lesson.data.links ?? []).filter((l) => l.check_first && Number.isFinite(l.check_rank)).map((l) => l.check_rank as number)
+  return String(ranks.length ? Math.min(...ranks) : 99999).padStart(5, '0')
+}
+
+/** How many links of the lesson are flagged. */
+export function flaggedCount(lesson: Pick<LessonRow, 'data'>): number {
+  return (lesson.data.links ?? []).filter((l) => l.check_first).length
+}
+
+/** The reason shows once the signed-in person has recorded their own verdict on the link. */
+export function showCheckReason(link: LessonLink, lessonId: string, ownJudged: Set<string>): boolean {
+  return !!link.check_reason && ownJudged.has(verdictKey(lessonId, 'link', link.item_key))
+}
+
+/** The keys of the items this person has judged themselves. */
+export function ownJudgedKeys(rows: VerdictRow[], reviewerId: string | null): Set<string> {
+  const out = new Set<string>()
+  if (!reviewerId) return out
+  for (const r of rows) if (r.reviewer_id === reviewerId) out.add(verdictKey(r.lesson_id, r.item_kind, r.item_key))
+  return out
 }

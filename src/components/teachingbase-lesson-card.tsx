@@ -1,6 +1,6 @@
 import { ExternalLink } from 'lucide-react'
 import { DRAFT_LABEL } from '@/lib/supabase/curriculum-repository'
-import { lessonProgress, verdictKey, type ItemKind, type LessonData, type LessonLink, type Verdict, type VerdictRow } from '@/lib/supabase/teaching-lessons-review'
+import { checkFirstLinks, lessonProgress, showCheckReason, verdictKey, type ItemKind, type LessonData, type LessonLink, type Verdict, type VerdictRow } from '@/lib/supabase/teaching-lessons-review'
 import { KIND_ORDER, T, type Lang } from '@/lib/teachingbase-review-strings'
 import { ReviewItem } from '@/components/teaching-review-item'
 
@@ -17,12 +17,14 @@ function ProgressBar({ judged, total }: { judged: number; total: number }) {
 }
 
 export function TeachingBaseLessonBody({
-  lessonId, data, lang, latest, onJudge,
+  lessonId, data, lang, latest, onJudge, ownJudged,
 }: {
   lessonId: string
   data: LessonData
   lang: Lang
   latest: Map<string, VerdictRow>
+  /** Keys of the items the signed-in person has judged themselves (the reasons show for these). */
+  ownJudged: Set<string>
   onJudge: (kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null) => Promise<string | null>
 }) {
   const t = T[lang]
@@ -34,9 +36,10 @@ export function TeachingBaseLessonBody({
   const components = data.components ?? []
   const assets = data.assets ?? []
   const rightsFlags = data.rights_flags ?? []
-  const byType = KIND_ORDER.map((k) => ({ kind: k, links: links.filter((l) => l.type === k) })).filter((g) => g.links.length > 0)
+  const { first, rest } = checkFirstLinks(links)
+  const byType = KIND_ORDER.map((k) => ({ kind: k, links: rest.filter((l) => l.type === k) })).filter((g) => g.links.length > 0)
   const known = new Set(KIND_ORDER)
-  const other = links.filter((l) => !known.has(l.type))
+  const other = rest.filter((l) => !known.has(l.type))
   if (other.length > 0) byType.push({ kind: 'other', links: other })
 
   return (
@@ -70,6 +73,19 @@ export function TeachingBaseLessonBody({
         </section>
       )}
 
+      {first.length > 0 && (
+        <section style={{ marginTop: 12 }} data-testid="check-first-group">
+          <h4 style={{ marginBottom: 2 }}>{t.checkFirstGroup} ({first.length})</h4>
+          <p className="muted" style={{ fontSize: 12.5, marginTop: 0 }}>{t.checkFirstHint}</p>
+          <ul className="tlr-list">
+            {first.map((l) => (
+              <ReviewItem key={l.item_key} kind="link" item={l} lang={lang} latest={latest.get(verdictKey(lessonId, 'link', l.item_key))}
+                showReason={showCheckReason(l, lessonId, ownJudged)} onJudge={(v, n) => onJudge('link', l, v, n)} />
+            ))}
+          </ul>
+        </section>
+      )}
+
       {byType.length > 0 && (
         <section style={{ marginTop: 12 }}>
           <h4 style={{ marginBottom: 2 }}>{t.links} ({links.length})</h4>
@@ -80,7 +96,7 @@ export function TeachingBaseLessonBody({
               <ul className="tlr-list">
                 {g.links.map((l) => (
                   <ReviewItem key={l.item_key} kind="link" item={l} lang={lang} latest={latest.get(verdictKey(lessonId, 'link', l.item_key))}
-                    onJudge={(v, n) => onJudge('link', l, v, n)} />
+                    showReason={showCheckReason(l, lessonId, ownJudged)} onJudge={(v, n) => onJudge('link', l, v, n)} />
                 ))}
               </ul>
             </div>
