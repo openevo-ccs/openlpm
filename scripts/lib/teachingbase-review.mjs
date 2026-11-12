@@ -78,3 +78,31 @@ export function pickSample(candidates, { target = 150, seed = 20261111, perLesso
   }
   return picked
 }
+
+/**
+ * Adds the "check first" order to the lessons' links (data only; the screen shows an order, a small marker and a one-line reason, never a number).
+ * `feed` is review_tab_feed.json ({ links: [{ link_id, check_first, reason, badge_withheld }] }) and `ranked` is ranked_links.json (a list with
+ * link_id and rank_most_doubtful_first). A link id is "<lesson slug>|<item key>". Links whose marker is withheld (the hold-out set) get no field at all,
+ * so they sit in their natural place and show nothing. Flagged links get check_first: true and check_rank (1 = most doubtful, counted among the
+ * flagged links). Any other link with a reason gets check_reason only. Returns counts.
+ */
+export function applyCheckFirst(lessons, feed, ranked) {
+  const rankOf = new Map((ranked ?? []).map((r) => [r.link_id, r.rank_most_doubtful_first]))
+  const byId = new Map((feed?.links ?? []).map((f) => [f.link_id, f]))
+  const flagged = (feed?.links ?? []).filter((f) => f.check_first && !f.badge_withheld && Number.isFinite(rankOf.get(f.link_id)))
+  flagged.sort((a, b) => rankOf.get(a.link_id) - rankOf.get(b.link_id) || a.link_id.localeCompare(b.link_id))
+  const position = new Map(flagged.map((f, i) => [f.link_id, i + 1]))
+  const counts = { matched: 0, flagged: 0, withheld: 0, reasons: 0, unmatched: 0 }
+  const seen = new Set()
+  for (const l of lessons) for (const link of l.links) {
+    const f = byId.get(`${l.slug}|${link.item_key}`)
+    if (!f) continue
+    seen.add(f.link_id)
+    counts.matched += 1
+    if (f.badge_withheld) { counts.withheld += 1; continue }
+    if (position.has(f.link_id)) { link.check_first = true; link.check_rank = position.get(f.link_id); counts.flagged += 1 }
+    if (f.reason) { link.check_reason = f.reason; counts.reasons += 1 }
+  }
+  counts.unmatched = (feed?.links ?? []).filter((f) => !seen.has(f.link_id)).length
+  return counts
+}

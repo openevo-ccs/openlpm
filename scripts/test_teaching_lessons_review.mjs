@@ -197,3 +197,61 @@ test('start-here and still-to-check follow the links and the newest verdicts', (
   ])
   assert.equal(R.isStillOpen(lesson, all), false)
 })
+
+// ---- "check first" order ----
+import { applyCheckFirst } from './lib/teachingbase-review.mjs'
+
+test('flagged links come first, most doubtful first, and the others keep their order', () => {
+  const links = [{ item_key: 'a' }, { item_key: 'b', check_first: true, check_rank: 5 }, { item_key: 'c' }, { item_key: 'd', check_first: true, check_rank: 2 }]
+  const { first, rest } = R.checkFirstLinks(links)
+  assert.deepEqual(first.map((l) => l.item_key), ['d', 'b'])
+  assert.deepEqual(rest.map((l) => l.item_key), ['a', 'c'])
+})
+
+test('a lesson sorts by its most doubtful flagged link; lessons without any go last', () => {
+  const les = (...ranks) => ({ data: { links: ranks.map((r) => (r ? { check_first: true, check_rank: r } : {})) } })
+  assert.equal(R.lessonCheckSortKey(les(7, 3)), '00003')
+  assert.equal(R.lessonCheckSortKey(les(null)), '99999')
+  assert.ok(R.lessonCheckSortKey(les(3)) < R.lessonCheckSortKey(les(null)))
+  assert.equal(R.flaggedCount(les(7, null, 3)), 2)
+})
+
+test('the reason shows only after the signed-in person has judged that link', () => {
+  const link = { item_key: 'k', check_reason: 'Because.' }
+  const mine = R.ownJudgedKeys([{ lesson_id: 'L', item_kind: 'link', item_key: 'k', reviewer_id: 'me' }, { lesson_id: 'L', item_kind: 'link', item_key: 'z', reviewer_id: 'other' }], 'me')
+  assert.equal(R.showCheckReason(link, 'L', mine), true)
+  assert.equal(R.showCheckReason({ item_key: 'z', check_reason: 'x' }, 'L', mine), false)
+  assert.equal(R.showCheckReason({ item_key: 'k' }, 'L', mine), false)
+  assert.equal(R.showCheckReason(link, 'L', R.ownJudgedKeys([], null)), false)
+})
+
+test('the sync step marks flagged links, leaves withheld ones bare, and orders by rank', () => {
+  const lessons = [{ slug: 'l1', links: [{ item_key: 'a' }, { item_key: 'b' }, { item_key: 'c' }, { item_key: 'd' }] }]
+  const feed = { links: [
+    { link_id: 'l1|a', check_first: true, reason: 'R1', badge_withheld: false },
+    { link_id: 'l1|b', check_first: true, reason: 'R2', badge_withheld: false },
+    { link_id: 'l1|c', check_first: false, reason: '', badge_withheld: true },
+    { link_id: 'l1|d', check_first: false, reason: 'R4', badge_withheld: false },
+    { link_id: 'l9|x', check_first: true, reason: 'gone', badge_withheld: false },
+  ] }
+  const ranked = [{ link_id: 'l1|a', rank_most_doubtful_first: 40 }, { link_id: 'l1|b', rank_most_doubtful_first: 12 }, { link_id: 'l1|c', rank_most_doubtful_first: 1 }, { link_id: 'l9|x', rank_most_doubtful_first: 3 }]
+  const c = applyCheckFirst(lessons, feed, ranked)
+  const [a, b, cc, d] = lessons[0].links
+  assert.equal(b.check_rank < a.check_rank, true)
+  assert.equal(a.check_first, true)
+  assert.deepEqual(Object.keys(cc), ['item_key'])
+  assert.equal(d.check_first, undefined)
+  assert.equal(d.check_reason, 'R4')
+  assert.deepEqual(c, { matched: 4, flagged: 2, withheld: 1, reasons: 3, unmatched: 1 })
+})
+
+test('German reasons are looked up sentence by sentence and fall back to English', async () => {
+  const { build } = await import('esbuild')
+  const f = path.join(dir, 'strings.mjs')
+  await build({ entryPoints: [path.join(root, 'src/lib/teachingbase-review-strings.ts')], bundle: true, format: 'esm', platform: 'node', outfile: f, logLevel: 'error' })
+  const S = await import(pathToFileURL(f).href)
+  assert.match(S.reasonText('The lesson only mentions this in passing. Something new.', 'de'), /Das Material erwähnt dies nur am Rande\. Something new\.$/)
+  assert.equal(S.reasonText('Something new.', 'en'), 'Something new.')
+  const visible = JSON.stringify([S.T.en, S.T.de, S.CHECK_REASONS_DE]).toLowerCase()
+  for (const word of ['swarm', 'triage', 'auc', 'hold-out', 'holdout', 'deepseek', 'qwen', 'gemma']) assert.equal(new RegExp(`\\b${word}\\b`).test(visible), false, word)
+})

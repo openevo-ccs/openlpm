@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CheckCircle2, HelpCircle, XCircle } from 'lucide-react'
 import { VERDICTS, readableTarget, type ItemKind, type LessonComponent, type LessonLink, type Verdict, type VerdictRow } from '@/lib/supabase/teaching-lessons-review'
-import { T, type Lang } from '@/lib/teachingbase-review-strings'
+import { T, reasonText, type Lang } from '@/lib/teachingbase-review-strings'
 
 // One linked item (a suggested link or a part of a lesson) with its three verdict buttons. Once judged it shows who judged it and when;
 // "Change verdict" shows the buttons again, and saving adds a new row, so the earlier verdicts stay on record.
@@ -26,13 +26,15 @@ function QuoteCheck({ found, t }: { found: boolean | undefined; t: Strings }) {
 }
 
 export function ReviewItem({
-  kind, item, lang, latest, onJudge,
+  kind, item, lang, latest, onJudge, showReason = false,
 }: {
   kind: ItemKind
   item: LessonLink | LessonComponent
   lang: Lang
   latest: VerdictRow | undefined
   onJudge: (verdict: Verdict, note: string | null) => Promise<string | null>
+  /** Show the one-line reason for the "check first" marker. True only once this reviewer has judged the link. */
+  showReason?: boolean
 }) {
   const t = T[lang]
   const [changing, setChanging] = useState(false)
@@ -61,6 +63,7 @@ export function ReviewItem({
       <div className="row" style={{ gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
         <strong style={{ overflowWrap: 'anywhere' }}>{title}</strong>
         {link?.sample && <span className="chip chip-progress">{t.startHereTag}</span>}
+        {link?.check_first && <span className="chip chip-draft" data-testid="check-first-badge">{t.checkFirst}</span>}
         {comp && <span className="chip chip-muted">{comp.type}</span>}
       </div>
       {link && (
@@ -82,6 +85,7 @@ export function ReviewItem({
         {link?.checks?.id_exists === false && <span className="chip chip-draft">{t.targetMissing}</span>}
       </div>
       {link?.why && <p className="tlr-line"><span className="muted">{t.why}: </span>{link.why}</p>}
+      {showReason && link?.check_reason && <p className="tlr-line" data-testid="check-reason"><span className="muted">{t.checkReasonLabel}: </span>{reasonText(link.check_reason, lang)}</p>}
 
       {latest && !changing && (
         <div className="row" style={{ gap: 8, alignItems: 'center', flexWrap: 'wrap', marginTop: 6 }} data-testid="verdict-line">

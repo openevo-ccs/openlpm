@@ -49,6 +49,8 @@ export interface TableColumn {
    * (a title, an author list) where a pick-list wouldn't make sense.
    */
   filterValues?: (row: SnapshotRow, lang?: string) => string[]
+  /** Value to sort by when it differs from what the cell shows. */
+  sortKey?: (row: SnapshotRow) => string
 }
 
 /**
@@ -285,6 +287,16 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
         filterValues: (row) => stringList((row.data as any)?.collections).map((c) => c.replace(/-/g, ' ')),
       },
       { header: 'Grades', get: (row) => stringList((row.data as any)?.grades).join(', ') || '—' },
+      {
+        // Lessons with the most doubtful links come first. The cell shows how many links of the lesson are marked, never a score.
+        header: 'Check first',
+        get: (row) => String(((row.data as any)?.links ?? []).filter((l: any) => l?.check_first).length || '—'),
+        sortKey: (row) => {
+          const ranks = ((row.data as any)?.links ?? []).filter((l: any) => l?.check_first && Number.isFinite(l?.check_rank)).map((l: any) => l.check_rank as number)
+          return String(ranks.length ? Math.min(...ranks) : 99999).padStart(5, '0')
+        },
+        filterValues: (row) => (((row.data as any)?.links ?? []).some((l: any) => l?.check_first) ? ['Has links to check first'] : []),
+      },
       {
         header: 'Suggested links',
         get: (row) => String(((row.data as any)?.links ?? []).length),
