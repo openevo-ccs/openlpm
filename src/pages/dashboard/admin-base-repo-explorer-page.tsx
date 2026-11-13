@@ -1,21 +1,22 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
+import { setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 import { blockLayoutPositions, hierarchyLayoutPositions } from '@/lib/graph-standards'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, Tags, XCircle } from 'lucide-react'
 import { ReviewSpace, type ReviewSectionInfo, type ReviewSectionKey } from '@/components/explorer-review-space'
+import { TagNamesPanel } from '@/components/explorer-tag-names'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
 import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
-import { applyEdits, historyFor, listEdits, markSentBack, pendingEdits, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
+import { applyEdits, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
@@ -171,6 +172,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   const [onlyEdited, setOnlyEdited] = useState(false)
   // Everything about reviewing sits behind one Review button and opens in its own space instead of above the table (Dustin, 2026-11-13).
   const [reviewSection, setReviewSection] = useState<ReviewSectionKey | null>(null)
+  const [showTagNames, setShowTagNames] = useState(false)
   // TeachingBase link checking (migrations 240 and 241). Loaded when the TeachingBase tab is open.
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([])
   const [reviewer, setReviewer] = useState<{ id: string; name: string } | null>(null)
@@ -273,6 +275,13 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     return out
   }, [rowsByRepo, editsByRepo])
 
+  // The names given to method tags in the app (in either language) are handed to the shared tag wording before anything is drawn.
+  // The number changes with them, so the columns that show tags are rebuilt.
+  const tagNamesRevision = useMemo(() => {
+    setTagNameOverlay(tagNamesFromEdits(editsByRepo.get('methodsbase') ?? []))
+    return tagNameVersion()
+  }, [editsByRepo])
+
   // The rows for this tab, before any search or filter.
   const tabRows: NodeRef[] = useMemo(() => {
     const out: NodeRef[] = []
@@ -355,7 +364,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
       render: (n) => <span className="muted">{n.row.review_status ?? '—'}</span>,
     })
     return cols
-  }, [showRepoColumn, activeTableColumns, anyLanguageTagged, activeFilterColumn, viewLang])
+  }, [showRepoColumn, activeTableColumns, anyLanguageTagged, activeFilterColumn, viewLang, tagNamesRevision])
 
   // Each filterable column's choices come from every row loaded for the tab,
   // so picking one filter doesn't shrink the choices in another heading.
@@ -505,7 +514,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
               </div>
               <EditsExportPanel
                 edits={waitingEdits}
-                labelFor={(repoKey, id) => (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id}
+                labelFor={(repoKey, id) => (isVocabRecord(id) ? vocabLabel(id) : (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id)}
                 supabase={supabase}
                 onMarked={() => Promise.all(Array.from(editsByRepo.keys()).map(reloadEdits))}
               />
@@ -590,6 +599,11 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
               <PlayCircle size={13} />Start reviewing
             </button>
           )}
+          {!restricted && tab === 'methodsbase' && (
+            <button className={`btn btn-mini${showTagNames ? ' btn-primary' : ''}`} data-testid="open-tag-names" onClick={() => setShowTagNames((v) => !v)} title="Name the learning approaches and lesson phases in English and German">
+              <Tags size={13} />Tag names
+            </button>
+          )}
           {!restricted && (
             <button
               className="btn btn-mini"
@@ -602,6 +616,10 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           )}
         </div>
       </div>
+
+      {!restricted && tab === 'methodsbase' && showTagNames && userId && (
+        <TagNamesPanel supabase={supabase} userId={userId} onClose={() => setShowTagNames(false)} onSaved={() => reloadEdits('methodsbase')} />
+      )}
 
       <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
         <div style={{ flex: 1, minWidth: 0 }}>

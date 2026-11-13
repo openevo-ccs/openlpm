@@ -6,7 +6,8 @@ import {
   currentValue, describePath, fieldsFor, hasLanguagePairs, LANGUAGE_NAMES, otherEditLang, parseInput, sameValue, sourceLine, splitChoices, toInput,
   type EditField, type EditLang, type EditValue, type FieldVocabulary, type SourceEntry,
 } from '@/lib/base-repo-edit-fields'
-import { resetEdit, saveEdits, type BaseRepoEdit, type FieldChange } from '@/lib/supabase/base-repo-edits'
+import { resetEdit, saveEdits, saveTagNames, type BaseRepoEdit, type FieldChange, type TagNameChange } from '@/lib/supabase/base-repo-edits'
+import { tagNameIn, tagReading, tagTerms, type TagField, type TagNames } from '@/lib/method-text'
 import { LanguageSwitch } from '@/components/language-switch'
 
 // Edit form for one Base Repo record, shown inside the Explorer card (feedback 0afc62a5, Susan Hanisch 2026-11-08).
@@ -43,6 +44,9 @@ export function RecordEditor({
     return init
   })
   const [note, setNote] = useState('')
+  // Tags added in this form, with the name typed in the language the form was showing. They are saved with the record.
+  const [newTags, setNewTags] = useState<Record<string, Record<string, TagNames>>>({})
+  const [newTagText, setNewTagText] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -57,8 +61,29 @@ export function RecordEditor({
     return out
   }, [fields, values, row.data])
 
+  // The names of the tags added here that are still picked.
+  const nameChanges: Record<string, TagNameChange[]> = useMemo(() => {
+    const out: Record<string, TagNameChange[]> = {}
+    for (const f of fields) {
+      if (!f.tagField) continue
+      const picked = new Set(splitChoices(values[f.path] ?? ''))
+      for (const [term, names] of Object.entries(newTags[f.tagField] ?? {})) {
+        if (!picked.has(term)) continue
+        for (const lang of ['en', 'de'] as const) if (names[lang]) (out[f.tagField] ??= []).push({ term, lang, before: null, after: names[lang]! })
+      }
+    }
+    return out
+  }, [fields, values, newTags])
+  const nameChangeCount = Object.values(nameChanges).reduce((n, l) => n + l.length, 0)
+  const totalChanges = changes.length + nameChangeCount
+
   const save = async () => {
     setBusy(true); setError(null)
+    // The names first, so a tag never exists in a record without a name.
+    for (const [field, list] of Object.entries(nameChanges)) {
+      const nameMessage = await saveTagNames(supabase, { field: field as TagField, userId, changes: list, note })
+      if (nameMessage) { setBusy(false); setError(nameMessage); return }
+    }
     const message = await saveEdits(supabase, { repoKey, recordId: row.id, userId, changes, note })
     setBusy(false)
     if (message) { setError(message); return }
@@ -103,9 +128,25 @@ export function RecordEditor({
         {f.kind === 'multi' && (() => {
           // Several choices: the picked ones as removable chips, the rest in a menu that adds one. The form keeps them as comma-separated text.
           const chosen = splitChoices(values[f.path] ?? '')
-          const labelOf = (v: string) => (f.reading ? f.reading(v, viewLang) : f.choices?.find((c) => c.value === v)?.label ?? v)
+          const pendingNames = f.tagField ? newTags[f.tagField] : undefined
+          // A tag with no name in this language yet shows the name it has, marked, so the gap is visible.
+          const missing = (v: string) => !!f.tagField && tagNameIn(f.tagField, v, viewLang, pendingNames) === null
+          const nameOf = (v: string) => (f.tagField ? tagNameIn(f.tagField, v, viewLang, pendingNames) ?? tagReading(f.tagField, v, viewLang) : f.reading ? f.reading(v, viewLang) : f.choices?.find((c) => c.value === v)?.label ?? v)
+          const labelOf = (v: string) => (missing(v) ? `${nameOf(v)} (needs a ${LANGUAGE_NAMES[viewLang]} name)` : nameOf(v))
           const setChosen = (list: string[]) => setValues((cur) => ({ ...cur, [f.path]: list.join(',') }))
-          const remaining = (f.choices ?? []).filter((c) => !chosen.includes(c.value))
+          const options = [...(f.choices ?? []), ...Object.keys(pendingNames ?? {}).filter((t) => !(f.choices ?? []).some((c) => c.value === t)).map((t) => ({ value: t, label: t }))]
+          const remaining = options.filter((c) => !chosen.includes(c.value))
+          const typed = newTagText[f.path] ?? ''
+          const addNew = () => {
+            const name = typed.trim()
+            if (!name || !f.tagField) return
+            // A name that is already a tag picks that tag. Any other name makes a new tag, named in this language.
+            const known = tagTerms(f.tagField).concat(options.map((o) => o.value)).find((t) => t === name || tagNameIn(f.tagField!, t, viewLang, pendingNames)?.toLowerCase() === name.toLowerCase())
+            const term = known ?? name
+            if (!known) setNewTags((cur) => ({ ...cur, [f.tagField!]: { ...cur[f.tagField!], [term]: { [viewLang]: name } } }))
+            if (!chosen.includes(term)) setChosen([...chosen, term])
+            setNewTagText((cur) => ({ ...cur, [f.path]: '' }))
+          }
           return (
             <div>
               <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
@@ -118,6 +159,17 @@ export function RecordEditor({
                 <option value="">Add…</option>
                 {remaining.map((c) => <option key={c.value} value={c.value}>{labelOf(c.value)}</option>)}
               </select>
+              {f.tagField && (
+                <div className="row" style={{ gap: 4, marginTop: 4, flexWrap: 'nowrap' }}>
+                  <input
+                    aria-label={`New tag name in ${LANGUAGE_NAMES[viewLang]}`} data-testid={`new-tag-${f.tagField}`}
+                    value={typed} placeholder={`New tag, named in ${LANGUAGE_NAMES[viewLang]}`} style={{ flex: 1, fontSize: 12 }}
+                    onChange={(e) => setNewTagText((cur) => ({ ...cur, [f.path]: e.target.value }))}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addNew() } }}
+                  />
+                  <button type="button" className="btn btn-mini" disabled={!typed.trim()} onClick={addNew}>Add tag</button>
+                </div>
+              )}
             </div>
           )
         })()}
@@ -174,14 +226,19 @@ export function RecordEditor({
         <input id="edit-note" value={note} onChange={(e) => setNote(e.target.value)} style={{ width: '100%', fontSize: 12 }} />
       </div>
       {error && <div className="notice" style={{ marginBottom: 8 }}>Not saved: {error}</div>}
+      {nameChangeCount > 0 && (
+        <div className="muted" data-testid="new-tag-note" style={{ fontSize: 11, marginBottom: 6 }}>
+          {nameChangeCount} tag name{nameChangeCount === 1 ? '' : 's'} will be saved with the record. The other language's name can be added later under "Tag names".
+        </div>
+      )}
       {pairs && hiddenChanges > 0 && (
         <div className="muted" data-testid="hidden-language-changes" style={{ fontSize: 11, marginBottom: 6 }}>
           {hiddenChanges} of the changes are in {LANGUAGE_NAMES[otherLang]}. They are saved with the rest.
         </div>
       )}
       <div className="row" style={{ gap: 8 }}>
-        <button className="btn btn-mini btn-primary" disabled={busy || changes.length === 0} onClick={save}>
-          <Check size={13} />{changes.length === 0 ? 'Save (no changes yet)' : `Save ${changes.length} change${changes.length === 1 ? '' : 's'}`}
+        <button className="btn btn-mini btn-primary" disabled={busy || totalChanges === 0} onClick={save}>
+          <Check size={13} />{totalChanges === 0 ? 'Save (no changes yet)' : `Save ${totalChanges} change${totalChanges === 1 ? '' : 's'}`}
         </button>
         <button className="btn btn-mini" disabled={busy} onClick={onCancel}>Cancel</button>
       </div>

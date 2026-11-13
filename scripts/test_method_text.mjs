@@ -91,3 +91,36 @@ test('the app copy of the tag readings matches methodsbase/vocabularies/method-t
     assert.deepEqual(Object.fromEntries(entries.map((e) => [e.term, e.en])), mine, field)
   }
 })
+
+// ---- tag names in both languages (Dustin, 2026-11-13) ----
+
+test('tags added in the app have the name they were typed with, and the other language shows that name until one is added', () => {
+  M.setTagNameOverlay({ lessonPhases: {}, learningApproaches: { 'Neuer Ansatz': { de: 'Neuer Ansatz' }, 'Open play': { en: 'Open play' } } })
+  assert.ok(M.tagTerms('learningApproaches').includes('Neuer Ansatz') && M.tagTerms('learningApproaches').includes('kooperativ'))
+  assert.equal(M.tagNameIn('learningApproaches', 'Neuer Ansatz', 'de'), 'Neuer Ansatz')
+  assert.equal(M.tagNameIn('learningApproaches', 'Neuer Ansatz', 'en'), null)
+  assert.equal(M.tagReading('learningApproaches', 'Neuer Ansatz', 'en'), 'Neuer Ansatz')
+  assert.equal(M.tagNameIn('learningApproaches', 'Open play', 'de'), null)
+  assert.equal(M.tagReading('learningApproaches', 'Open play', 'de'), 'Open play')
+  assert.equal(M.tagLabel('learningApproaches', 'Open play', 'en'), 'Open play')
+  // the taxonomy's own tags are unchanged
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'de'), 'kooperativ')
+  assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'en'), 'Introduction (Einstieg)')
+  assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'de'), 'Einstieg')
+})
+
+test('a name set in the app replaces the name of a taxonomy tag in that language only', () => {
+  const before = M.tagNameVersion()
+  M.setTagNameOverlay({ lessonPhases: { Einstieg: { en: 'Opening' } }, learningApproaches: { kooperativ: { de: 'kooperatives Lernen' } } })
+  assert.ok(M.tagNameVersion() > before, 'the version moves so screens rebuild')
+  assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'en'), 'Opening')
+  assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'de'), 'Einstieg')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'de'), 'kooperatives Lernen')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative')
+  assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'en'), 'Opening (Einstieg)')
+  // names typed for a tag that is still in a record under its old spelling
+  assert.equal(M.tagReading('learningApproaches', 'konzeptbasiert/vernetztend', 'en'), 'Conceptual/networked')
+  M.setTagNameOverlay(null)
+  assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'en'), 'Introduction')
+})
