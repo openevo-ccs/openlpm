@@ -3,7 +3,7 @@ import { Check, History, RotateCcw } from 'lucide-react'
 import type { createClient } from '@/lib/supabase/client'
 import type { BaseRepoKey, SnapshotRow } from '@/lib/supabase/base-repo-explorer'
 import {
-  currentValue, fieldsFor, parseInput, sameValue, sourceLine, toInput, type EditField, type EditValue, type FieldVocabulary, type SourceEntry,
+  currentValue, fieldsFor, parseInput, sameValue, sourceLine, splitChoices, toInput, type EditField, type EditValue, type FieldVocabulary, type SourceEntry,
 } from '@/lib/base-repo-edit-fields'
 import { resetEdit, saveEdits, type BaseRepoEdit, type FieldChange } from '@/lib/supabase/base-repo-edits'
 
@@ -78,6 +78,27 @@ export function RecordEditor({
             {f.kind === 'longtext' && <textarea {...common} rows={Math.min(10, Math.max(3, Math.ceil((values[f.path] ?? '').length / 45)))} />}
             {(f.kind === 'lines' || f.kind === 'sources') && <textarea {...common} rows={Math.min(10, Math.max(3, (values[f.path] ?? '').split('\n').length + 1))} />}
             {f.kind === 'tags' && <input {...common} placeholder="tag one, tag two" />}
+            {f.kind === 'multi' && (() => {
+              // Several choices: the picked ones as removable chips, the rest in a menu that adds one. The form keeps them as comma-separated text.
+              const chosen = splitChoices(values[f.path] ?? '')
+              const labelOf = (v: string) => f.choices?.find((c) => c.value === v)?.label ?? v
+              const setChosen = (list: string[]) => setValues((cur) => ({ ...cur, [f.path]: list.join(',') }))
+              const remaining = (f.choices ?? []).filter((c) => !chosen.includes(c.value))
+              return (
+                <div>
+                  <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
+                    {chosen.length === 0 && <span className="muted">None</span>}
+                    {chosen.map((v) => (
+                      <button key={v} type="button" className="btn btn-mini" title="Remove" onClick={() => setChosen(chosen.filter((x) => x !== v))}>{labelOf(v)} ×</button>
+                    ))}
+                  </div>
+                  <select id={id} value="" onChange={(e) => { if (e.target.value) setChosen([...chosen, e.target.value]) }} style={{ width: '100%', fontSize: 12 }}>
+                    <option value="">Add…</option>
+                    {remaining.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  </select>
+                </div>
+              )
+            })()}
             {f.kind === 'select' && (
               <select {...common}>
                 <option value="">(none)</option>

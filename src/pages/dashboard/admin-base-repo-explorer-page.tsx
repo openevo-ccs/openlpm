@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
+import { methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 import { blockLayoutPositions } from '@/lib/graph-standards'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, ListTree, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
 import { ReviewSpace, type ReviewSectionInfo, type ReviewSectionKey } from '@/components/explorer-review-space'
+import { MethodTreeView } from '@/components/method-tree-view'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -68,7 +69,7 @@ import { createGlobalTopic, createPost, listGlobalTopicsForTarget, listPosts, ty
 // category, no dense direct edges) because it reads as "random" even when
 // it technically isn't.
 
-type ViewMode = 'table' | 'cards' | 'graph'
+type ViewMode = 'table' | 'cards' | 'graph' | 'tree'
 type TabKey = 'all' | BaseRepoKey
 
 const REPO_COLOR: Record<BaseRepoKey, string> = {
@@ -290,9 +291,10 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     const classes = new Set<string>(['pedagogical-practice', 'research-method'])
     for (const r of methods) {
       for (const a of r.secondaryFilterValues) approaches.add(normalizeTag(a))
-      if (r.filterValue) classes.add(r.filterValue)
+      for (const c of methodClassesOf((r.data as any)?.methodClass)) classes.add(c)
     }
-    return { learningApproaches: Array.from(approaches).sort(compareText), methodClasses: Array.from(classes).sort(compareText) }
+    const methodList = methods.map((r) => ({ id: r.id, label: rowLabel(r, 'en') })).sort((a, b) => compareText(a.label, b.label))
+    return { learningApproaches: Array.from(approaches).sort(compareText), methodClasses: Array.from(classes).sort(compareText), methods: methodList }
   }, [effectiveRowsByRepo])
 
   const selectedLive: NodeRef | null = useMemo(() => {
@@ -578,6 +580,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
           <button className={`btn btn-mini${view === 'cards' ? ' btn-primary' : ''}`} onClick={() => setView('cards')}><LayoutGrid size={13} />Cards</button>
           <button className={`btn btn-mini${view === 'graph' ? ' btn-primary' : ''}`} onClick={() => setView('graph')}><Network size={13} />Graph</button>
+          {tab === 'methodsbase' && <button className={`btn btn-mini${view === 'tree' ? ' btn-primary' : ''}`} onClick={() => setView('tree')} title="The methods from general to specific"><ListTree size={13} />Hierarchy</button>}
           {!restricted && tab === 'teachingbase' && (
             <button className="btn btn-mini btn-primary" data-testid="start-review" onClick={() => setReview({ initial: null, view: 'decide' })} title="Go through the suggested lesson links one at a time">
               <PlayCircle size={13} />Start reviewing
@@ -617,6 +620,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             /></div>
           ) : view === 'cards' ? (
             <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} lang={viewLang} />
+          ) : view === 'tree' && tab === 'methodsbase' ? (
+            <MethodTreeView rows={allRows} onSelect={setSelected} lang={viewLang} />
           ) : (
             <GraphView rows={allRows} onSelect={setSelected} lang={viewLang} />
           )}
@@ -634,6 +639,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             onJudge={(kind, item, verdict, note) => judge(selectedLive.row.id, kind, item, verdict, note)}
             vocab={vocab}
             lang={viewLang}
+            methodRows={effectiveRowsByRepo.get('methodsbase') ?? []}
+            onOpenMethod={(id) => { const r = (effectiveRowsByRepo.get('methodsbase') ?? []).find((x) => x.id === id); if (r) setSelected({ repoKey: 'methodsbase', row: r }) }}
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
             editsAvailable={editsAvailable}
             onEditsChanged={() => reloadEdits(selectedLive.repoKey)}
@@ -1243,7 +1250,7 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
 // (e.g. "Cooperative Learning (Kooperative Lernformen)"), and appending the
 // method_class enum value too (e.g. "(pedagogical-practice)") produced a
 // confusing double-parenthetical rather than something more readable.
-function MethodsDetailSections({ data, idLabels, lang }: { data: Record<string, unknown>; idLabels: Map<string, ResolvedLabel>; lang: string }) {
+function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLabels, lang }: { data: Record<string, unknown>; recordId: string; methodRows: SnapshotRow[]; onOpenMethod: (id: string) => void; idLabels: Map<string, ResolvedLabel>; lang: string }) {
   // One language at a time, chosen with the switch at the top of the page. A text that only exists in the other language
   // shows with a small language tag so nobody mistakes it for a translation.
   const uiLang = 'en'
@@ -1261,20 +1268,32 @@ function MethodsDetailSections({ data, idLabels, lang }: { data: Record<string, 
   const protocolSteps = pickLocalizedList(data.protocolSteps, textLang)
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
+  // The ladder from general to specific methods (Dustin, 2026-11-13). Only the narrower method stores the link, so the more specific
+  // methods of this one are the records that name it.
+  const classes = methodClassesOf(data.methodClass)
+  const broaderIds = Array.isArray(data.broaderMethods) ? (data.broaderMethods as unknown[]).map(String) : []
+  const narrowerIds = methodRows.filter((r) => Array.isArray((r.data as any)?.broaderMethods) && ((r.data as any).broaderMethods as string[]).includes(recordId)).map((r) => r.id)
+  const methodLabel = (id: string) => { const r = methodRows.find((x) => x.id === id); return r ? rowLabel(r, lang) : id }
+  const methodLinks = (ids: string[]) => ids.map((id, i) => (
+    <span key={id}>{i > 0 ? ', ' : ''}<button type="button" className="btn-linklike" style={{ fontSize: 'inherit' }} onClick={() => onOpenMethod(id)}>{methodLabel(id)}</button></span>
+  ))
 
   const skip = new Set([
-    'label', 'learningApproaches', 'discipline', 'lessonPhases', 'whenToUse',
+    'label', 'methodClass', 'broaderMethods', 'learningApproaches', 'discipline', 'lessonPhases', 'whenToUse',
     'description', 'protocolSteps', 'relatedApproaches', 'primarySources',
   ])
 
   return (
     <div style={{ fontSize: 12 }}>
       {!!name && <DetailRow label="Label">{name.text}{tag(name.lang)}</DetailRow>}
+      {classes.length > 0 && <DetailRow label="Method class">{methodClassesReading(data.methodClass, lang)}</DetailRow>}
+      {broaderIds.length > 0 && <DetailRow label="More general method">{methodLinks(broaderIds)}</DetailRow>}
+      {narrowerIds.length > 0 && <DetailRow label="More specific methods">{methodLinks(narrowerIds)}</DetailRow>}
       {/* Susan Hanisch, 2026-11-12 (feedback cf57a372): a classroom method always shows this row, also when it is empty,
           so it is clear that something can be added. Research methods have no learning approach and show nothing. */}
       {learningApproaches.length > 0
         ? <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>
-        : data.methodClass === 'pedagogical-practice' && <DetailRow label="Learning approach"><span className="muted">Not set yet. Press Edit to add one.</span></DetailRow>}
+        : classes.includes('pedagogical-practice') && <DetailRow label="Learning approach"><span className="muted">Not set yet. Press Edit to add one.</span></DetailRow>}
       {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
@@ -1332,6 +1351,8 @@ function DetailPanel({
   onJudge,
   vocab,
   lang,
+  methodRows,
+  onOpenMethod,
   history,
   editsAvailable,
   onEditsChanged,
@@ -1349,6 +1370,9 @@ function DetailPanel({
   onJudge: (kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null) => Promise<string | null>
   vocab: FieldVocabulary
   lang: string
+  /** Every method record, so a method can show the methods above and below it in the hierarchy. */
+  methodRows: SnapshotRow[]
+  onOpenMethod: (id: string) => void
   history: BaseRepoEdit[]
   editsAvailable: boolean
   onEditsChanged: () => void
@@ -1477,7 +1501,7 @@ function DetailPanel({
           {repoKey === 'literaturebase' ? (
             <LiteratureDetailSections data={row.data} />
           ) : repoKey === 'methodsbase' ? (
-            <MethodsDetailSections data={row.data} idLabels={idLabels} lang={lang} />
+            <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} />
           ) : (
             <RecordDetails data={row.data} idLabels={idLabels} />
           )}

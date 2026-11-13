@@ -1,6 +1,7 @@
 import type { createClient } from '@/lib/supabase/client'
 import { BASE_REPO_CONFIGS, detectLanguages, plainLabel, type BaseRepoKey, type SnapshotRow } from '@/lib/supabase/base-repo-explorer'
 import { getPath, setPath, type EditValue } from '@/lib/base-repo-edit-fields'
+import { methodClassesOf } from '@/lib/method-text'
 
 // In-app edits to Base Repo records (feedback 0afc62a5, Susan Hanisch 2026-11-08; migration 237). The Explorer's records are a copy of the
 // source repos, refreshed by a script, so an edit is stored as its own row and shown on top of the copy. Rows are the change log as well:
@@ -77,8 +78,8 @@ function rederive(repoKey: BaseRepoKey, row: SnapshotRow): SnapshotRow {
     if (label) next.label = label
   }
   if (repoKey === 'methodsbase') {
-    const cls = (data as any).methodClass
-    next.secondary = typeof cls === 'string' && cls ? cls : null
+    const cls = methodClassesOf((data as any).methodClass).join(', ')
+    next.secondary = cls || null
     next.filterValue = next.secondary
   }
   if (cfg?.secondaryFilter) {
