@@ -36,25 +36,91 @@ function humanizeConceptId(id: string): string {
     .join(' ')
 }
 
+// A goal can also carry its own review tag, an evolution relevance level and links with a strength and a reason (EvoMentor US preview, migration
+// 243). Goals without these fields (every other space) show exactly what they showed before.
+interface EvolutionTag {
+  level: number
+  label: string
+  why: string | null
+  concepts: string[]
+}
+
+interface TopicLink {
+  name: string
+  strength: number
+  why: string | null
+  draftTag: string | null
+  concepts: string[]
+}
+
 interface TopicProvenance {
-  concepts: { id: string; emphasis: string | null }[]
+  concepts: { id: string; emphasis: string | null; label: string | null }[]
   sourceRepo: string | null
   sourcePath: string | null
   sourceId: string | null
+  draftTag: string | null
+  evolution: EvolutionTag | null
+  links: TopicLink[]
+  foundation: { label: string; values: string[] }[]
+  attribution: string | null
+  engineeringMarker: string | null
 }
+
+const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [])
 
 function readProvenance(content: unknown): TopicProvenance {
   const c = (content ?? {}) as Record<string, unknown>
   const concepts = Array.isArray(c.concepts)
-    ? (c.concepts as any[]).filter((x) => x?.id).map((x) => ({ id: String(x.id), emphasis: x.emphasis ? String(x.emphasis) : null }))
+    ? (c.concepts as any[])
+        .filter((x) => x?.id)
+        .map((x) => ({ id: String(x.id), emphasis: x.emphasis ? String(x.emphasis) : null, label: typeof x.label === 'string' ? x.label : null }))
     : []
   const source = (c._source ?? {}) as Record<string, unknown>
+  const evo = (c.evolutionRelevance ?? null) as Record<string, unknown> | null
+  const box = (c.foundationBox ?? null) as Record<string, unknown> | null
+  const links: TopicLink[] = Array.isArray(c.basiskonzeptbezug)
+    ? (c.basiskonzeptbezug as any[])
+        .filter((x) => typeof x?.conceptName === 'string')
+        .map((x) => ({
+          name: String(x.conceptName),
+          strength: Number(x.relevanz_beurteilung) || 0,
+          why: typeof x.begruendung === 'string' ? x.begruendung : null,
+          draftTag: typeof x.draftTag === 'string' ? x.draftTag : null,
+          concepts: strings(x.relevante_evolutionskonzepte),
+        }))
+    : []
+  const foundation = box
+    ? [
+        { label: 'Science practice', values: strings(box.practices) },
+        { label: 'Core idea', values: strings(box.coreIdeas) },
+        { label: 'Crosscutting concept', values: strings(box.crosscuttingConcepts) },
+      ].filter((r) => r.values.length > 0)
+    : []
   return {
     concepts,
     sourceRepo: typeof source.repo === 'string' ? source.repo : null,
     sourcePath: typeof source.path === 'string' ? source.path : null,
     sourceId: typeof c.source_id === 'string' ? c.source_id : null,
+    draftTag: typeof c.draftTag === 'string' ? c.draftTag : null,
+    evolution:
+      evo && typeof evo.level === 'number' && typeof evo.label === 'string'
+        ? { level: evo.level, label: evo.label, why: typeof evo.why === 'string' ? evo.why : null, concepts: strings(evo.concepts) }
+        : null,
+    links,
+    foundation,
+    attribution: typeof c.attribution === 'string' ? c.attribution : null,
+    engineeringMarker: typeof c.engineeringMarker === 'string' ? c.engineeringMarker : null,
   }
+}
+
+const EVOLUTION_CHIP: Record<number, string> = { 3: 'chip-good', 2: 'chip-progress', 1: 'chip-muted' }
+
+function EvolutionChip({ evolution }: { evolution: EvolutionTag }) {
+  return (
+    <span className={`chip ${EVOLUTION_CHIP[evolution.level] ?? 'chip-muted'}`} style={{ fontSize: 10 }} title={evolution.why ?? undefined}>
+      Evolution {evolution.level}/3: {evolution.label}
+    </span>
+  )
 }
 import { CaseImportPanel, DirectCaseImportPanel, FwuImportPanel, UploadImportPanel, ExportPanel } from './importers-panels'
 import { getLibraryForProject, resolveOptionLists } from '@/lib/supabase/prompt-libraries'
@@ -155,12 +221,15 @@ function BrowseTab() {
   const { project, defaultBranchId, supabase } = useOutletContext<ProjectOutletContext>()
   const { objectId } = useParams<{ objectId?: string }>()
   const navigate = useNavigate()
+  // The note below is about the Thuringia Gymnasium curriculum, so an English-only space (for example the US standards preview) does not show it.
+  const englishOnly = project.working_languages?.length === 1 && project.working_languages[0] === 'en'
 
   const [topics, setTopics] = useState<TopicListItem[] | null>(null)
   const [provenanceByTopic, setProvenanceByTopic] = useState<Map<string, TopicProvenance>>(new Map())
   const [query, setQuery] = useState('')
   const [gradeFilter, setGradeFilter] = useState<string>('all')
   const [conceptFilter, setConceptFilter] = useState<string>('all')
+  const [evolutionFilter, setEvolutionFilter] = useState<string>('all')
   const [groupBy, setGroupBy] = useState<GroupBy>('grade')
 
   useEffect(() => {
@@ -182,11 +251,23 @@ function BrowseTab() {
     return Array.from(set).sort((a, b) => leadingNumber(a) - leadingNumber(b))
   }, [topics])
 
+  // A concept may carry its own label (the NGSS crosscutting concepts do). Otherwise the label is made from the id as before.
+  const conceptLabels = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const p of provenanceByTopic.values()) for (const c of p.concepts) if (c.label && !m.has(c.id)) m.set(c.id, c.label)
+    return m
+  }, [provenanceByTopic])
+  const conceptName = (id: string) => conceptLabels.get(id) ?? humanizeConceptId(id)
+
   const concepts = useMemo(() => {
     const set = new Set<string>()
     for (const p of provenanceByTopic.values()) for (const c of p.concepts) set.add(c.id)
-    return Array.from(set).sort((a, b) => humanizeConceptId(a).localeCompare(humanizeConceptId(b)))
-  }, [provenanceByTopic])
+    return Array.from(set).sort((a, b) => conceptName(a).localeCompare(conceptName(b)))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [provenanceByTopic, conceptLabels])
+
+  // The evolution filter only appears in a space whose goals carry an evolution level.
+  const hasEvolution = useMemo(() => Array.from(provenanceByTopic.values()).some((p) => p.evolution), [provenanceByTopic])
 
   const filtered = useMemo(() => {
     if (!topics) return []
@@ -194,6 +275,7 @@ function BrowseTab() {
     return topics.filter((t) => {
       if (gradeFilter !== 'all' && !matchesGrade(t.grade_band, gradeFilter)) return false
       if (conceptFilter !== 'all' && !(provenanceByTopic.get(t.id)?.concepts ?? []).some((c) => c.id === conceptFilter)) return false
+      if (evolutionFilter !== 'all' && String(provenanceByTopic.get(t.id)?.evolution?.level ?? '') !== evolutionFilter) return false
       if (!q) return true
       return (
         t.title.toLowerCase().includes(q) ||
@@ -201,7 +283,7 @@ function BrowseTab() {
         (t.unterthema ?? '').toLowerCase().includes(q)
       )
     })
-  }, [topics, query, gradeFilter, conceptFilter, provenanceByTopic])
+  }, [topics, query, gradeFilter, conceptFilter, evolutionFilter, provenanceByTopic])
 
   // "just like most data spaces here" (b3d9116e) -- grouped sections instead
   // of one flat grid, the same structural idea as the Timeline's lanes or
@@ -239,17 +321,20 @@ function BrowseTab() {
       }
     }
     return Array.from(byConcept.entries())
-      .sort((a, b) => (a[0] === '__none' ? 1 : b[0] === '__none' ? -1 : humanizeConceptId(a[0]).localeCompare(humanizeConceptId(b[0]))))
-      .map(([key, items]) => ({ key, label: key === '__none' ? 'No concept tagged yet' : humanizeConceptId(key), items }))
-  }, [filtered, groupBy, provenanceByTopic])
+      .sort((a, b) => (a[0] === '__none' ? 1 : b[0] === '__none' ? -1 : conceptName(a[0]).localeCompare(conceptName(b[0]))))
+      .map(([key, items]) => ({ key, label: key === '__none' ? 'No concept tagged yet' : conceptName(key), items }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, groupBy, provenanceByTopic, conceptLabels])
 
   return (
     <div className="explorer">
-      <div className="notice">
-        Covers the Gymnasium (academic-track) curriculum only. Most Thuringia students attend a
-        different school type (Regelschule/Gemeinschaftsschule) — that curriculum isn&apos;t
-        represented here yet.
-      </div>
+      {!englishOnly && (
+        <div className="notice">
+          Covers the Gymnasium (academic-track) curriculum only. Most Thuringia students attend a
+          different school type (Regelschule/Gemeinschaftsschule) — that curriculum isn&apos;t
+          represented here yet.
+        </div>
+      )}
       <div className="toolbar">
         <div className="row" style={{ flex: 1 }}>
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
@@ -271,8 +356,16 @@ function BrowseTab() {
           <select value={conceptFilter} onChange={(e) => setConceptFilter(e.target.value)} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid var(--border)' }}>
             <option value="all">All concepts</option>
             {concepts.map((c) => (
-              <option key={c} value={c}>{humanizeConceptId(c)}</option>
+              <option key={c} value={c}>{conceptName(c)}</option>
             ))}
+          </select>
+        )}
+        {hasEvolution && (
+          <select value={evolutionFilter} onChange={(e) => setEvolutionFilter(e.target.value)} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid var(--border)' }}>
+            <option value="all">All evolution levels</option>
+            <option value="3">Names evolution explicitly</option>
+            <option value="2">Covers the idea without the word</option>
+            <option value="1">Background only</option>
           </select>
         )}
         <span className="muted">{topics === null ? 'Loading…' : `${filtered.length} of ${topics.length} learning goals`}</span>
@@ -330,8 +423,9 @@ function BrowseTab() {
                       >
                         <div className="row" style={{ gap: 4, flexWrap: 'wrap' }}>
                           <span className="chip">{gradeLabel(t.grade_band)}</span>
+                          {prov?.evolution && <EvolutionChip evolution={prov.evolution} />}
                           {prov?.concepts.map((c) => (
-                            <span key={c.id} className="chip" style={{ fontSize: 10 }}>{humanizeConceptId(c.id)}</span>
+                            <span key={c.id} className="chip" style={{ fontSize: 10 }}>{conceptName(c.id)}</span>
                           ))}
                         </div>
                         <strong style={{ display: 'block', marginTop: 6 }}>{t.title}</strong>
@@ -341,6 +435,7 @@ function BrowseTab() {
                           </span>
                         )}
                         {t.description && <p className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{t.description}</p>}
+                        {prov?.draftTag && <span className="chip chip-draft" style={{ fontSize: 10, marginTop: 6 }}>{prov.draftTag}</span>}
                       </div>
                     )
                   })}
@@ -405,10 +500,16 @@ function TopicDetail({
         <h2 style={{ marginBottom: 2 }}>{topic.title}</h2>
         <span className="chip">{gradeLabel(topic.grade_band)}</span>
       </div>
+      {(prov.evolution || prov.draftTag) && (
+        <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
+          {prov.evolution && <EvolutionChip evolution={prov.evolution} />}
+          {prov.draftTag && <span className="chip chip-draft" style={{ fontSize: 10 }}>{prov.draftTag}</span>}
+        </div>
+      )}
       {prov.concepts.length > 0 && (
         <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginBottom: 8 }}>
           {prov.concepts.map((c) => (
-            <span key={c.id} className="chip" style={{ fontSize: 10 }} title={c.emphasis ? `${c.emphasis} emphasis` : undefined}>{humanizeConceptId(c.id)}</span>
+            <span key={c.id} className="chip" style={{ fontSize: 10 }} title={c.emphasis ? `${c.emphasis} emphasis` : undefined}>{c.label ?? humanizeConceptId(c.id)}</span>
           ))}
         </div>
       )}
@@ -423,6 +524,37 @@ function TopicDetail({
           {prov.sourcePath && <> — <code>{prov.sourcePath}</code></>}
           {prov.sourceId && <> (<code>{prov.sourceId}</code>)</>}
         </p>
+      )}
+      {prov.attribution && <p className="muted" style={{ fontSize: 12, marginTop: -8, marginBottom: 12 }}>{prov.attribution}</p>}
+      {prov.engineeringMarker && <p className="muted" style={{ fontSize: 12, marginTop: -8, marginBottom: 12 }}>{prov.engineeringMarker}</p>}
+      {prov.foundation.length > 0 && (
+        <section style={{ marginBottom: 16 }}>
+          <h3>In the standard&apos;s foundation box</h3>
+          {prov.foundation.map((row) => (
+            <p key={row.label} style={{ margin: '2px 0', fontSize: 13 }}><strong>{row.label}:</strong> {row.values.join('; ')}</p>
+          ))}
+        </section>
+      )}
+      {prov.links.length > 0 && (
+        <section style={{ marginBottom: 16 }}>
+          <h3>Concept links</h3>
+          <p className="muted" style={{ marginTop: -4, fontSize: 12 }}>Strength says how closely the goal relates to the concept: 1 is low, 2 is medium, 3 is high.</p>
+          {prov.links.map((l) => (
+            <div key={l.name} style={{ padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+              <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+                <strong style={{ fontSize: 13 }}>{l.name}</strong>
+                <span className="chip" style={{ fontSize: 10 }}>Strength {l.strength} of 3</span>
+                {l.draftTag && <span className="chip chip-draft" style={{ fontSize: 10 }}>{l.draftTag}</span>}
+              </div>
+              {l.why && <p className="muted" style={{ fontSize: 12.5, margin: '4px 0 0' }}>{l.why}</p>}
+              {l.concepts.length > 0 && (
+                <div className="row" style={{ gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
+                  {l.concepts.map((c) => <span key={c} className="chip" style={{ fontSize: 10 }}>{c}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </section>
       )}
 
       {(requiredBefore.length > 0 || leadsTo.length > 0) && (
