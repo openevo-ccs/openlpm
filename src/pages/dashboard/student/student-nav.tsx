@@ -43,9 +43,11 @@ function CurriculumConnectionsNav({ slug, language }: { slug: string; language: 
 
 // The seminar's further tasks (Susan, 10/29). They stay hidden until the task is
 // ready: set visible to true here once the page for it exists (route `path`
-// in App.tsx and in JENA_STUDENT_PATHS in project-layout.tsx).
+// in App.tsx and in JENA_STUDENT_PATHS in project-layout.tsx). The page for
+// Aufgabe 2 exists since 2026-11-13 (feedback 1acd80a7); owners can open it by
+// address, students cannot until it is switched on in both places.
 const SEMINAR_TASKS = [
-  { path: 'aufgabe2', label: 'Aufgabe 2', visible: false },
+  { path: 'aufgabe2', label: 'Aufgabe 2: Didaktische Methoden', visible: false },
   { path: 'aufgabe3', label: 'Aufgabe 3', visible: false },
 ]
 

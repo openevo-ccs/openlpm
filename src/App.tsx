@@ -46,6 +46,7 @@ import AdminContentEditorPage from '@/pages/dashboard/admin-content-editor-page'
 import JoinPage from '@/pages/join-page'
 import WelcomePage from '@/pages/welcome-page'
 import StudentWorkPage from '@/pages/dashboard/student/student-work-page'
+import StudentMethodsTaskPage from '@/pages/dashboard/student/student-methods-task-page'
 import ProjectIndexRouter from '@/pages/dashboard/student/index-router'
 import StudentLernzielePage from '@/pages/dashboard/student/student-lernziele-page'
 import StudentBasiskonzeptePage from '@/pages/dashboard/student/student-basiskonzepte-page'
@@ -165,6 +166,8 @@ export default function App() {
             <Route path="planen" element={<StudentPromptPage />} />
             {/* Feedback 1ff0cffa (Susan, 2026-11-07): the address names the task, so more tasks can be added next to it. The old address keeps working. */}
             <Route path="aufgabe1" element={<StudentWorkPage />} />
+            {/* Feedback 1acd80a7 (Susan, 2026-11-12): Aufgabe 2 exists but stays hidden from students for now (see student-nav.tsx). */}
+            <Route path="aufgabe2" element={<StudentMethodsTaskPage />} />
             <Route path="meine-arbeit" element={<Navigate to="../aufgabe1" replace />} />
             <Route path="coverage" element={<ComparisonOnly><ComparisonCoveragePage /></ComparisonOnly>} />
             <Route path="network" element={<ComparisonOnly><ComparisonNetworkPage /></ComparisonOnly>} />
