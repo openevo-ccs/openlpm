@@ -791,7 +791,11 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
   const [physicsSkipped, setPhysicsSkipped] = useState(false)
   // Feedback 31cea347 (Dustin, 2026-11-13): with every repo loaded the graph was a grid of 3,509 records, three quarters of them
   // with no link to anything, and "Free spread" changed nothing. Records without a link are left out unless asked for.
-  const [linkedOnly, setLinkedOnly] = useState(true)
+  // Automatic until someone ticks or unticks the box: a view of more than 500 records starts with the linked ones only. A smaller view starts with
+  // every record, as before. Links are only counted between records of the same view, so a single repo whose links go to other repos has none
+  // (links to other repos are drawn on the All tab). A view with no links at all shows every record and says why, so the graph is never blank.
+  const [linkedChoice, setLinkedChoice] = useState<boolean | null>(null)
+  const wantLinkedOnly = linkedChoice ?? rows.length > 500
   const [counts, setCounts] = useState({ shown: 0, total: 0, linked: 0 })
   const [drawing, setDrawing] = useState(true)
 
@@ -821,7 +825,7 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
 
       const linkedIds = new Set<string>()
       for (const e of edges) { linkedIds.add(e.source); linkedIds.add(e.target) }
-      const shown = linkedOnly ? rows.filter((r) => linkedIds.has(keyOf(r))) : rows
+      const shown = wantLinkedOnly && linkedIds.size > 0 ? rows.filter((r) => linkedIds.has(keyOf(r))) : rows
       setCounts({ shown: shown.length, total: rows.length, linked: linkedIds.size })
 
       // Linked records form blocks, one block for each group that is linked together, biggest first, and the records without a
@@ -892,7 +896,7 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
     return () => { clearTimeout(timer); if (built) { built.destroy(); if (cyRef.current === built) cyRef.current = null } }
     // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, lang, linkedOnly, gs.layout, gs.labels, gs.spacing])
+  }, [rows, lang, wantLinkedOnly, gs.layout, gs.labels, gs.spacing])
 
   useEffect(() => {
     if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
@@ -906,14 +910,14 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
         wording={{ fixed: { label: 'Tiers', hint: 'Rows of records. Always the same.' } }}
         onZoomIn={() => zoomBy(1.25)} onZoomOut={() => zoomBy(0.8)} onFit={() => cyRef.current?.fit(undefined, 30)}
       />
-      <label className="row" style={{ gap: 6, fontSize: 12, margin: '0 0 6px' }}>
-        <input type="checkbox" checked={linkedOnly} onChange={(e) => setLinkedOnly(e.target.checked)} />
+      <label className="row" style={{ gap: 6, fontSize: 12, margin: '0 0 6px', opacity: counts.linked === 0 ? 0.6 : 1 }}>
+        <input type="checkbox" checked={wantLinkedOnly && counts.linked > 0} disabled={counts.linked === 0} onChange={(e) => setLinkedChoice(e.target.checked)} />
         Only records that have a link to another record
-        <span className="muted">({linkedOnly ? `${counts.shown} of ${counts.total} shown` : `all ${counts.total} shown, ${counts.total - counts.linked} without a link`})</span>
+        <span className="muted">({counts.linked === 0 ? 'none in this view' : wantLinkedOnly ? `${counts.shown} of ${counts.total} shown` : `all ${counts.total} shown, ${counts.total - counts.linked} without a link`})</span>
       </label>
       {drawing && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }} role="status">Drawing the graph…</p>}
-      {linkedOnly && counts.total > 0 && counts.shown === 0 && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>No record here links to another record, so there is nothing to draw. Untick the box above to see every record.</p>}
-      {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Free spread is off for more than {EXPLORER_PHYSICS_MAX} records, because it would freeze the page. {linkedOnly ? 'Pick one repo above to use it.' : 'Tick the box above to leave out the records without a link, or pick one repo.'}</p>}
+      {counts.total > 0 && counts.linked === 0 && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>No record in this view links to another record in this view, so every record is shown. Links to records of other repos are drawn on the All tab.</p>}
+      {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Free spread is off for more than {EXPLORER_PHYSICS_MAX} records, because it would freeze the page. {wantLinkedOnly && counts.linked > 0 ? 'Pick one repo above to use it.' : counts.linked > 0 ? 'Tick the box above to leave out the records without a link, or pick one repo.' : 'Pick a smaller repo above to use it.'}</p>}
       <div className="row" style={{ gap: 10, marginBottom: 8, flexWrap: 'wrap', fontSize: 12 }}>
         {(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => (
           <span key={key} className="row" style={{ gap: 4 }}>
