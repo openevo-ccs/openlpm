@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { methodClassReading, pickLocalized, tagReading } from '@/lib/method-text'
+import { methodClassReading, methodClassesOf, methodClassesReading, pickLocalized, tagReading } from '@/lib/method-text'
 import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
@@ -175,8 +175,9 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       { header: 'Label', get: (row, lang) => rowLabel(row, lang) },
       {
         header: 'Method-class',
-        get: (row, lang) => (row.secondary ? methodClassReading(row.secondary, lang ?? 'en') : '—'),
-        filterValues: (row, lang) => (row.filterValue ? [methodClassReading(row.filterValue, lang ?? 'en')] : []),
+        // A method can have two classes (Dustin, 2026-11-13). The record's own data is read first; the snapshot column holds them joined.
+        get: (row, lang) => methodClassesReading((row.data as any)?.methodClass ?? row.secondary, lang ?? 'en') || '—',
+        filterValues: (row, lang) => methodClassesOf((row.data as any)?.methodClass ?? row.secondary).map((c) => methodClassReading(c, lang ?? 'en')),
       },
       // Tags are stored in German; each view shows them in its own language only.
       {
@@ -199,6 +200,8 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       // shouldn't show raw "OE-METHOD-..." ids -- resolve to the real
       // method's own readable label instead.
       { field: 'relatedApproaches', targetRepo: 'methodsbase' },
+      // The ladder from general to specific methods (Dustin, 2026-11-13: the method space needs hierarchical modeling).
+      { field: 'broaderMethods', targetRepo: 'methodsbase' },
     ],
   },
   {

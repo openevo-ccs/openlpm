@@ -6,7 +6,7 @@
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
 import { normalizeTag } from '@/lib/method-text'
 
-export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources'
+export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources' | 'multi'
 
 /** One entry of a MethodsBase record's primarySources. Only `citation` is always there. */
 export interface SourceEntry {
@@ -24,6 +24,10 @@ export interface EditField {
   kind: EditKind
   /** Choices for a select, or suggestions for tags. */
   options?: string[]
+  /** Choices for a multi-select: the stored value and the words shown for it. */
+  choices?: { value: string; label: string }[]
+  /** For a multi-select: always store a list, also when one choice is picked. Without it one choice is stored as a plain string. */
+  asList?: boolean
   /** Short note under the field. */
   hint?: string
   /** For kind 'sources': the entries the record has now, so a line left alone keeps every key it had (for example a link to a LiteratureBase record). */
@@ -87,6 +91,8 @@ export interface FieldVocabulary {
   learningApproaches: string[]
   /** Method classes already used. */
   methodClasses: string[]
+  /** Every method record, for choosing the more general method of one. */
+  methods: { id: string; label: string }[]
 }
 
 export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, vocab: FieldVocabulary): EditField[] {
@@ -123,7 +129,13 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
   if (repoKey === 'methodsbase') {
     // The fields people review most, in the order the card shows them. The tag fields and the class are always offered.
     addLanguageFields('label', 'Label', 'text')
-    add({ path: 'methodClass', label: 'Method-class', kind: 'select', options: vocab.methodClasses })
+    // Dustin, 2026-11-13: the method class is multi-select (a computer simulation is a teaching method and a research method).
+    add({ path: 'methodClass', label: 'Method-class', kind: 'multi', choices: vocab.methodClasses.map((c) => ({ value: c, label: c })), hint: 'Pick both when the method is used both ways.' })
+    add({
+      path: 'broaderMethods', label: 'More general method', kind: 'multi', asList: true,
+      choices: vocab.methods.filter((m) => m.id !== String(data.id ?? '')).map((m) => ({ value: m.id, label: m.label })),
+      hint: 'The method this one is a special case of, for example agent-based modeling under computer simulation. Usually one.',
+    })
     add({ path: 'learningApproaches', label: 'Learning approaches', kind: 'tags', options: vocab.learningApproaches, hint: 'Separate with commas. Suggestions are the tags other methods already use.' })
     addValue('discipline', 'Discipline', data.discipline)
     addValue('lessonPhases', 'Lesson phases', data.lessonPhases)
@@ -160,6 +172,7 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
 /** The value a field currently shows in the form: text for the text kinds, a list for tags and lines. */
 export function currentValue(field: EditField, data: Record<string, unknown>): EditValue {
   const v = getPath(data, field.path)
+  if (field.kind === 'multi') return Array.isArray(v) ? v.map(String) : typeof v === 'string' && v ? [v] : []
   if (field.kind === 'sources') return Array.isArray(v) ? (v as SourceEntry[]) : []
   if (field.kind === 'tags' || field.kind === 'lines') {
     // The tag lists of a method show the corrected spelling of an old misspelled tag.
@@ -172,13 +185,23 @@ export function currentValue(field: EditField, data: Record<string, unknown>): E
 
 /** What the form's box holds, turned back into the stored value. Empty entries are dropped. */
 export function parseInput(field: EditField, raw: string): EditValue {
+  if (field.kind === 'multi') {
+    const list = splitChoices(raw)
+    return field.asList ? list : list.length <= 1 ? (list[0] ?? '') : list
+  }
   if (field.kind === 'sources') return parseSources(raw, field.original ?? [])
   if (field.kind === 'tags') return raw.split(',').map((s) => s.trim()).filter(Boolean)
   if (field.kind === 'lines') return raw.split('\n').map((s) => s.trim()).filter(Boolean)
   return raw.trim()
 }
 
+/** The ids or classes picked in a multi-select, from the comma-separated text the form keeps for it. */
+export function splitChoices(raw: string): string[] {
+  return raw.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
 export function toInput(field: EditField, value: EditValue): string {
+  if (field.kind === 'multi') return (Array.isArray(value) ? (value as unknown[]).map(String) : value ? [String(value)] : []).join(',')
   if (field.kind === 'sources') return (Array.isArray(value) ? (value as SourceEntry[]) : []).map(sourceLine).join(NEWLINE)
   if (Array.isArray(value)) return value.join(field.kind === 'tags' ? ', ' : '\n')
   return value

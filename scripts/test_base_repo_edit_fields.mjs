@@ -19,7 +19,7 @@ await build({ entryPoints: [path.join(root, 'src/lib/method-text.ts')], bundle: 
 const M = await import(pathToFileURL(outM).href)
 process.on('exit', () => rmSync(dir, { recursive: true, force: true }))
 
-const vocab = { learningApproaches: [], methodClasses: [] }
+const vocab = { learningApproaches: [], methodClasses: [], methods: [] }
 const paths = (data) => F.fieldsFor('methodsbase', data, vocab).map((f) => f.path)
 
 test('a method with only an English name still offers a German name box (feedback c950e8f8)', () => {
@@ -81,4 +81,42 @@ test('the German reader sees the method classes as Unterrichtsmethoden and Forsc
   assert.equal(M.methodClassReading('research-method', 'de'), 'Forschungsmethoden')
   assert.equal(M.methodClassReading('pedagogical-practice', 'en'), 'pedagogical-practice')
   assert.equal(M.methodClassReading('something-new', 'de'), 'something-new')
+})
+
+test('a method can have two classes: the class box is a multi-select (Dustin, 2026-11-13)', () => {
+  const classes = ['pedagogical-practice', 'research-method']
+  const vocab2 = { learningApproaches: [], methodClasses: classes, methods: [{ id: 'OE-METHOD-a', label: 'A' }, { id: 'OE-METHOD-b', label: 'B' }] }
+  const fields = F.fieldsFor('methodsbase', { id: 'OE-METHOD-a', methodClass: 'pedagogical-practice' }, vocab2)
+  const cls = fields.find((f) => f.path === 'methodClass')
+  assert.equal(cls.kind, 'multi')
+  assert.deepEqual(cls.choices.map((c) => c.value), classes)
+  // one choice stays a plain string, two become a list, none is empty
+  assert.equal(F.parseInput(cls, 'research-method'), 'research-method')
+  assert.deepEqual(F.parseInput(cls, 'pedagogical-practice,research-method'), ['pedagogical-practice', 'research-method'])
+  assert.equal(F.parseInput(cls, ''), '')
+  // a record left alone is not seen as changed, whether its class is a string or a list
+  for (const stored of ['pedagogical-practice', ['pedagogical-practice', 'research-method']]) {
+    const now = F.currentValue(cls, { methodClass: stored })
+    assert.equal(F.sameValue(F.parseInput(cls, F.toInput(cls, now)), F.parseInput(cls, F.toInput(cls, now))), true)
+    assert.deepEqual(F.parseInput(cls, F.toInput(cls, now)), stored)
+  }
+})
+
+test('the broader method of a method is chosen from the other methods and always stored as a list', () => {
+  const vocab2 = { learningApproaches: [], methodClasses: [], methods: [{ id: 'OE-METHOD-a', label: 'A' }, { id: 'OE-METHOD-b', label: 'B' }] }
+  const f = F.fieldsFor('methodsbase', { id: 'OE-METHOD-a' }, vocab2).find((x) => x.path === 'broaderMethods')
+  assert.equal(f.kind, 'multi')
+  assert.equal(f.asList, true)
+  assert.deepEqual(f.choices, [{ value: 'OE-METHOD-b', label: 'B' }], 'a method cannot be its own broader method')
+  assert.deepEqual(F.parseInput(f, 'OE-METHOD-b'), ['OE-METHOD-b'])
+  assert.deepEqual(F.parseInput(f, ''), [])
+  assert.deepEqual(F.currentValue(f, { broaderMethods: ['OE-METHOD-b'] }), ['OE-METHOD-b'])
+})
+
+test('method classes read the same for a string, a list and nothing', () => {
+  assert.deepEqual(M.methodClassesOf('research-method'), ['research-method'])
+  assert.deepEqual(M.methodClassesOf(['pedagogical-practice', 'research-method']), ['pedagogical-practice', 'research-method'])
+  assert.deepEqual(M.methodClassesOf(undefined), [])
+  assert.equal(M.methodClassesReading(['pedagogical-practice', 'research-method'], 'de'), 'Unterrichtsmethoden, Forschungsmethoden')
+  assert.equal(M.methodClassesReading('research-method', 'en'), 'research-method')
 })

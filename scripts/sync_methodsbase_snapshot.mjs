@@ -110,7 +110,8 @@ function loadSnapshotRows(methodsbasePath) {
       id: entry.id,
       slug: entry.slug ?? entry.id,
       label: pickDisplayText(entry.label, '(untitled)'),
-      method_class: entry.methodClass ?? null,
+      // A method used both ways has a list of classes; the column holds them joined (the record's own data keeps the list).
+      method_class: Array.isArray(entry.methodClass) ? entry.methodClass.join(', ') : entry.methodClass ?? null,
       description: pickDisplayText(entry.description, null),
       when_to_use: pickDisplayText(entry.whenToUse, null),
       discipline: entry.discipline ?? null,

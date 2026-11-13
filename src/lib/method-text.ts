@@ -129,6 +129,17 @@ export function methodClassReading(value: string, lang: string): string {
   return lang === 'de' ? METHOD_CLASS_DE[value] ?? value : value
 }
 
+/** The method classes of a record: a single string, a list of them (a method used both ways), or nothing. */
+export function methodClassesOf(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map(String).filter(Boolean)
+  return typeof value === 'string' && value ? [value] : []
+}
+
+/** All method classes of a record in one language, joined for a table cell. */
+export function methodClassesReading(value: unknown, lang: string): string {
+  return methodClassesOf(value).map((c) => methodClassReading(c, lang)).join(', ')
+}
+
 export type TagField = 'lessonPhases' | 'learningApproaches'
 
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {
