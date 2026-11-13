@@ -62,7 +62,7 @@ check('the table lists Computer simulation with both classes', /Computer simulat
 await page.locator('input[aria-label="Search all fields"]').fill('')
 await page.getByRole('button', { name: /^Filter Method-class/ }).click()
 const options = (await page.locator('.popover .menu button').allInnerTexts()).map((t) => t.trim())
-check('the class filter offers the two classes, not the pair as a third choice', options.join('|') === 'All|pedagogical-practice|research-method', options.join(' | '))
+check('the class filter offers the two classes and no extra choice for the pair', options.join('|') === 'All|pedagogical-practice|research-method', options.join(' | '))
 await page.locator('.popover .menu button', { hasText: /^research-method$/ }).click()
 await page.waitForTimeout(500)
 const researchRows = await page.locator(`tbody tr td:nth-child(${ci + 1})`).allInnerTexts()
