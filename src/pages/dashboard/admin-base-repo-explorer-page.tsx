@@ -7,6 +7,7 @@ import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
+import { blockLayoutPositions } from '@/lib/graph-standards'
 import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, Search, Table2, XCircle } from 'lucide-react'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
@@ -779,98 +780,119 @@ function CardsView({
 // same as on every other graph. The seven repo colors stay outside the six
 // concept colors on purpose: each repo also has its own shape, so color is
 // never the only way to tell them apart.
+// With the records without a link left out, the Explorer's graph holds about a thousand records, and the spreading layout runs in a few seconds
+// from the grouped starting picture. The kit's general limit (500) stays for every other graph.
+const EXPLORER_PHYSICS_MAX = 1200
+
 function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: NodeRef) => void; lang: string }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cyRef = useRef<Core | null>(null)
   const [gs, updateGs, resetGs] = useGraphSettings('base-repo-explorer')
   const [physicsSkipped, setPhysicsSkipped] = useState(false)
+  // Feedback 31cea347 (Dustin, 2026-11-13): with every repo loaded the graph was a grid of 3,509 records, three quarters of them
+  // with no link to anything, and "Free spread" changed nothing. Records without a link are left out unless asked for.
+  const [linkedOnly, setLinkedOnly] = useState(true)
+  const [counts, setCounts] = useState({ shown: 0, total: 0, linked: 0 })
+  const [drawing, setDrawing] = useState(true)
 
   useEffect(() => {
     if (!containerRef.current) return
-    const byId = new Map(rows.map((r) => [`${r.repoKey}:${r.row.id}`, r]))
-    // Records sit in a grid shaped like the canvas (about 2.2 wide to 1 high),
-    // grouped by repo so each repo forms its own colored block. A fixed order
-    // (repo, then name) keeps the picture the same every time.
-    const ordered = [...rows].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || rowLabel(a.row, lang).localeCompare(rowLabel(b.row, lang)))
-    const cols = Math.max(1, Math.ceil(Math.sqrt(ordered.length * 2.2)))
-    const positions = new Map<string, { x: number; y: number }>()
-    ordered.forEach((r, i) => positions.set(`${r.repoKey}:${r.row.id}`, { x: (i % cols) * 60, y: Math.floor(i / cols) * 60 }))
+    // The drawing of a big graph takes a few seconds and blocks the page, so the page first shows that it is working.
+    setDrawing(true)
+    let built: Core | null = null
+    const timer = setTimeout(() => {
+      if (!containerRef.current) return
+      const keyOf = (r: NodeRef) => `${r.repoKey}:${r.row.id}`
+      const byId = new Map(rows.map((r) => [keyOf(r), r]))
 
-    const edges: { source: string; target: string; field: string }[] = []
-    for (const r of rows) {
-      const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
-      if (!cfg) continue
-      for (const rel of cfg.relationFields) {
-        const raw = (r.row.data as any)?.[rel.field]
-        const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
-        for (const targetId of targetIds) {
-          const targetKey = `${rel.targetRepo}:${targetId}`
-          if (byId.has(targetKey)) edges.push({ source: `${r.repoKey}:${r.row.id}`, target: targetKey, field: rel.field })
+      const edges: { source: string; target: string; field: string }[] = []
+      for (const r of rows) {
+        const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
+        if (!cfg) continue
+        for (const rel of cfg.relationFields) {
+          const raw = (r.row.data as any)?.[rel.field]
+          const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
+          for (const targetId of targetIds) {
+            const targetKey = `${rel.targetRepo}:${targetId}`
+            if (byId.has(targetKey)) edges.push({ source: `${r.repoKey}:${r.row.id}`, target: targetKey, field: rel.field })
+          }
         }
       }
-    }
 
-    const info = new Map<string, NodeLabelInfo>()
-    const elements: ElementDefinition[] = [
-      ...rows.map((r) => {
-        const id = `${r.repoKey}:${r.row.id}`
-        const pos = positions.get(id)
-        info.set(id, { full: rowLabel(r.row, lang), priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
-        return { data: { id, repoKey: r.repoKey, size: 24 }, position: pos ? { x: pos.x, y: pos.y } : undefined }
-      }),
-      ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field } })),
-    ]
+      const linkedIds = new Set<string>()
+      for (const e of edges) { linkedIds.add(e.source); linkedIds.add(e.target) }
+      const shown = linkedOnly ? rows.filter((r) => linkedIds.has(keyOf(r))) : rows
+      setCounts({ shown: shown.length, total: rows.length, linked: linkedIds.size })
 
-    const cy = cytoscape({
-      container: containerRef.current,
-      elements,
-      boxSelectionEnabled: false,
-      layout: { name: 'preset' },
-      minZoom: 0.15,
-      maxZoom: 3,
-      style: [
-        {
-          selector: 'node',
-          style: {
-            width: 'data(size)', height: 'data(size)', label: 'data(label)', 'font-size': 10, 'font-weight': 600,
-            'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 5,
-            color: token('--text-primary', '#0b0b0b'), 'border-width': 2, 'border-color': token('--surface-0', '#fff'),
+      // Linked records form blocks, one block for each group that is linked together, biggest first, and the records without a
+      // link fill one block at the end. A fixed order (repo, then name) keeps the picture the same every time.
+      const ordered = [...shown].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || rowLabel(a.row, lang).localeCompare(rowLabel(b.row, lang)))
+      const positions = blockLayoutPositions(ordered.map(keyOf), edges.map((e) => [e.source, e.target] as [string, string]))
+
+      const info = new Map<string, NodeLabelInfo>()
+      const elements: ElementDefinition[] = [
+        ...shown.map((r) => {
+          const id = `${r.repoKey}:${r.row.id}`
+          const pos = positions.get(id)
+          info.set(id, { full: rowLabel(r.row, lang), priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
+          return { data: { id, repoKey: r.repoKey, size: 24 }, position: pos ? { x: pos.x, y: pos.y } : undefined }
+        }),
+        ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field } })),
+      ]
+
+      const cy = cytoscape({
+        container: containerRef.current,
+        elements,
+        boxSelectionEnabled: false,
+        layout: { name: 'preset' },
+        minZoom: 0.15,
+        maxZoom: 3,
+        style: [
+          {
+            selector: 'node',
+            style: {
+              width: 'data(size)', height: 'data(size)', label: 'data(label)', 'font-size': 10, 'font-weight': 600,
+              'text-wrap': 'wrap', 'text-max-width': '100px', 'text-valign': 'bottom', 'text-margin-y': 5,
+              color: token('--text-primary', '#0b0b0b'), 'border-width': 2, 'border-color': token('--surface-0', '#fff'),
+            },
           },
-        },
-        ...(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => ({
-          selector: `node[repoKey = "${key}"]`,
-          style: { 'background-color': REPO_COLOR[key], shape: REPO_SHAPE[key] as any },
-        })),
-        { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--text-primary', '#0b0b0b') } },
-        {
-          selector: 'edge',
-          style: {
-            width: 1.4, 'line-color': token('--place-other', '#6f7d8c'), 'target-arrow-color': token('--place-other', '#6f7d8c'),
-            'target-arrow-shape': 'triangle', 'arrow-scale': 0.8, 'curve-style': 'bezier', opacity: 'data(op)',
-            'font-size': 9, color: token('--text-primary', '#0b0b0b'),
+          ...(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => ({
+            selector: `node[repoKey = "${key}"]`,
+            style: { 'background-color': REPO_COLOR[key], shape: REPO_SHAPE[key] as any },
+          })),
+          { selector: 'node:selected', style: { 'border-width': 3, 'border-color': token('--text-primary', '#0b0b0b') } },
+          {
+            selector: 'edge',
+            style: {
+              width: 1.4, 'line-color': token('--place-other', '#6f7d8c'), 'target-arrow-color': token('--place-other', '#6f7d8c'),
+              'target-arrow-shape': 'triangle', 'arrow-scale': 0.8, 'curve-style': 'bezier', opacity: 'data(op)',
+              'font-size': 9, color: token('--text-primary', '#0b0b0b'),
+            },
           },
-        },
-        ...hoverStyles(),
-      ] as never,
-    })
+          ...hoverStyles(),
+        ] as never,
+      })
 
-    // Records with more links get a label first when space is short.
-    cy.nodes().forEach((n) => { const i = info.get(n.id()); if (i) i.priority += n.degree(false) * 10 })
-    setPhysicsSkipped(applyGraphSettings(cy, gs, { name: 'preset' }, info).physicsSkipped)
-    applyLineLooks(cy, gs.lineStrength, () => 2)
-    attachHover(cy)
+      // Records with more links get a label first when space is short.
+      cy.nodes().forEach((n) => { const i = info.get(n.id()); if (i) i.priority += n.degree(false) * 10 })
+      setPhysicsSkipped(applyGraphSettings(cy, gs, { name: 'preset' }, info, () => false, EXPLORER_PHYSICS_MAX).physicsSkipped)
+      applyLineLooks(cy, gs.lineStrength, () => 2)
+      attachHover(cy)
 
-    cy.on('tap', 'node', (evt) => {
-      const id = evt.target.id() as string
-      const found = byId.get(id)
-      if (found) onSelect(found)
-    })
+      cy.on('tap', 'node', (evt) => {
+        const id = evt.target.id() as string
+        const found = byId.get(id)
+        if (found) onSelect(found)
+      })
 
-    cyRef.current = cy
-    return () => { cy.destroy(); if (cyRef.current === cy) cyRef.current = null }
+      cyRef.current = cy
+      built = cy
+      setDrawing(false)
+    }, 40)
+    return () => { clearTimeout(timer); if (built) { built.destroy(); if (cyRef.current === built) cyRef.current = null } }
     // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, lang, gs.layout, gs.labels, gs.spacing])
+  }, [rows, lang, linkedOnly, gs.layout, gs.labels, gs.spacing])
 
   useEffect(() => {
     if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
@@ -884,7 +906,14 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
         wording={{ fixed: { label: 'Tiers', hint: 'Rows of records. Always the same.' } }}
         onZoomIn={() => zoomBy(1.25)} onZoomOut={() => zoomBy(0.8)} onFit={() => cyRef.current?.fit(undefined, 30)}
       />
-      {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Physics is off for more than 500 records, because it would freeze the page. Pick one repo above to use it.</p>}
+      <label className="row" style={{ gap: 6, fontSize: 12, margin: '0 0 6px' }}>
+        <input type="checkbox" checked={linkedOnly} onChange={(e) => setLinkedOnly(e.target.checked)} />
+        Only records that have a link to another record
+        <span className="muted">({linkedOnly ? `${counts.shown} of ${counts.total} shown` : `all ${counts.total} shown, ${counts.total - counts.linked} without a link`})</span>
+      </label>
+      {drawing && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }} role="status">Drawing the graph…</p>}
+      {linkedOnly && counts.total > 0 && counts.shown === 0 && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>No record here links to another record, so there is nothing to draw. Untick the box above to see every record.</p>}
+      {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Free spread is off for more than {EXPLORER_PHYSICS_MAX} records, because it would freeze the page. {linkedOnly ? 'Pick one repo above to use it.' : 'Tick the box above to leave out the records without a link, or pick one repo.'}</p>}
       <div className="row" style={{ gap: 10, marginBottom: 8, flexWrap: 'wrap', fontSize: 12 }}>
         {(Object.keys(REPO_COLOR) as BaseRepoKey[]).map((key) => (
           <span key={key} className="row" style={{ gap: 4 }}>
