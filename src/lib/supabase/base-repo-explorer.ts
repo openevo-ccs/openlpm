@@ -110,6 +110,12 @@ function formatAuthorsShort(authors: unknown): string {
  * change with the view. A record without text in that language falls back to the English one, and
  * `labelIsFallback` tells the screen so it can say so.
  */
+/** The lesson-phase tags of a MethodsBase record, as stored (German). Empty for a record with none. */
+function lessonPhaseTags(row: SnapshotRow): string[] {
+  const raw = (row.data as any)?.lessonPhases
+  return Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' && raw ? [raw] : []
+}
+
 export function rowLabel(row: SnapshotRow, lang: string = 'en'): string {
   // Lessons (TeachingBase) keep their name under `title`, per language.
   const title = (row.data as any)?.title
@@ -177,6 +183,14 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
         header: 'Learning approaches',
         get: (row, lang) => (row.secondaryFilterValues.length > 0 ? row.secondaryFilterValues.map((t) => tagReading('learningApproaches', t, lang ?? 'en')).join(', ') : '—'),
         filterValues: (row, lang) => row.secondaryFilterValues.map((t) => tagReading('learningApproaches', t, lang ?? 'en')),
+      },
+      // Susan Hanisch, 2026-11-12 (feedback 68661322): "add column Lesson Phases to the table with filter and sort
+      // option." Same build as the learning-approaches column above. Read from the record's data, which already
+      // carries any edit saved in the app.
+      {
+        header: 'Lesson phases',
+        get: (row, lang) => { const t = lessonPhaseTags(row); return t.length > 0 ? t.map((x) => tagReading('lessonPhases', x, lang ?? 'en')).join(', ') : '—' },
+        filterValues: (row, lang) => lessonPhaseTags(row).map((x) => tagReading('lessonPhases', x, lang ?? 'en')),
       },
     ],
     relationFields: [

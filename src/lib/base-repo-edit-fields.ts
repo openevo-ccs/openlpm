@@ -4,6 +4,7 @@
 // are always offered, even when this record has none yet (a method with no learning approach still needs the tag box).
 
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
+import { normalizeTag } from '@/lib/method-text'
 
 export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select'
 export type EditValue = string | string[]
@@ -127,8 +128,10 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
 export function currentValue(field: EditField, data: Record<string, unknown>): EditValue {
   const v = getPath(data, field.path)
   if (field.kind === 'tags' || field.kind === 'lines') {
-    if (Array.isArray(v)) return v.map(String)
-    return typeof v === 'string' && v ? [v] : []
+    // The tag lists of a method show the corrected spelling of an old misspelled tag.
+    const clean = field.path === 'learningApproaches' ? normalizeTag : (t: string) => t
+    if (Array.isArray(v)) return v.map(String).map(clean)
+    return typeof v === 'string' && v ? [clean(v)] : []
   }
   return v === undefined || v === null ? '' : String(v)
 }
