@@ -60,8 +60,8 @@ test('the old misspelling of a learning approach reads as the corrected one', ()
   assert.equal(M.normalizeTag('konzeptbasiert/vernetztend'), 'konzeptbasiert/vernetzend')
   assert.equal(M.normalizeTag('kooperativ'), 'kooperativ')
   assert.equal(M.tagReading('learningApproaches', 'konzeptbasiert/vernetztend', 'de'), 'konzeptbasiert/vernetzend')
-  assert.equal(M.tagReading('learningApproaches', 'konzeptbasiert/vernetztend', 'en'), 'Concept-based and connecting')
-  assert.equal(M.tagLabel('learningApproaches', 'konzeptbasiert/vernetzend', 'en'), 'Concept-based and connecting (konzeptbasiert/vernetzend)')
+  assert.equal(M.tagReading('learningApproaches', 'konzeptbasiert/vernetztend', 'en'), 'Conceptual/networked')
+  assert.equal(M.tagLabel('learningApproaches', 'konzeptbasiert/vernetzend', 'en'), 'Conceptual/networked (konzeptbasiert/vernetzend)')
 })
 
 test('a project works in its first working language, English when none is set', () => {

@@ -156,7 +156,7 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     problembasiert: 'Problem-based',
     projektbasiert: 'Project-based',
     forschend: 'Inquiry-based',
-    'konzeptbasiert/vernetzend': 'Concept-based and connecting',
+    'konzeptbasiert/vernetzend': 'Conceptual/networked',
     kooperativ: 'Cooperative',
     selbstreguliert: 'Self-regulated',
     kreativ: 'Creative',

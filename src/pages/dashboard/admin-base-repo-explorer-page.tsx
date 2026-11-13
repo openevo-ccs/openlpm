@@ -569,6 +569,12 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
               {c.header}: {(c.filterLabel ?? ((v: string) => v))(columnFilters[c.id])} ×
             </button>
           ))}
+          {/* Dustin, 2026-11-13 (feedback 452bcae4): how many records are among the filtered. */}
+          {!loading && (
+            <span className="muted" style={{ fontSize: 12 }} data-testid="result-count" aria-live="polite">
+              {allRows.length === tabRows.length ? `${tabRows.length.toLocaleString('en-US')} records` : `${allRows.length.toLocaleString('en-US')} of ${tabRows.length.toLocaleString('en-US')} records match`}
+            </span>
+          )}
           {!restricted && onlyEdited && <button className="btn btn-mini active" title="Show every record again" onClick={() => setOnlyEdited(false)}>Edited only ×</button>}
           {tab === 'teachingbase' && onlyStartHere && <button className="btn btn-mini active" title="Show every lesson again" onClick={() => setOnlyStartHere(false)}>Start-here selection only ×</button>}
           {tab === 'teachingbase' && onlyOpen && <button className="btn btn-mini active" title="Show every lesson again" onClick={() => setOnlyOpen(false)}>Still to check ×</button>}
