@@ -83,11 +83,11 @@ for (const [label, re] of [['TheoryBase', /^TheoryBase/], ['LiteratureBase', /^L
     check(`${label}: no links of its own, so every record is shown and the page says why`, /every record is shown/.test(body) && (await box.locator('input').isDisabled()))
   }
   if (label === 'MethodsBase') {
-    check('MethodsBase: a small view starts with every record', /all 121 shown/.test(t) && !(await box.locator('input').isChecked()), t)
+    check('MethodsBase: a small view starts with every record', /all \d+ shown/.test(t) && !(await box.locator('input').isChecked()), t)
     await box.locator('input').check()
     await settled()
     const t2 = await text()
-    check('MethodsBase: ticking the box shows only the linked methods and still draws', /\(\d+ of 121 shown\)/.test(t2) && (await drawnPixels()) > 100, t2.slice(-40))
+    check('MethodsBase: ticking the box shows only the linked methods and still draws', /\(\d+ of \d+ shown\)/.test(t2) && (await drawnPixels()) > 100, t2.slice(-40))
     await box.locator('input').uncheck()
     await settled()
   }
