@@ -16,14 +16,14 @@
 
 export type GraphEdgeMode = 'tree' | 'bundled' | 'all'
 export type GraphLabelMode = 'few' | 'all'
-export type GraphLayoutMode = 'fixed' | 'physics'
+export type GraphLayoutMode = 'fixed' | 'physics' | 'hierarchy'
 
 export interface GraphViewSettings {
   /** tree = each item's strongest link only; bundled = tree plus counted arcs between groups; all = every link. */
   edges: GraphEdgeMode
   /** few = labels that fit without overlap; all = every label. */
   labels: GraphLabelMode
-  /** fixed = the graph's own deterministic layout (default); physics = force simulation around pinned groups. */
+  /** fixed = the graph's own deterministic layout (default); physics = force simulation around pinned groups; hierarchy = general items at the top, specific ones below (only for a graph that has broader/narrower links). */
   layout: GraphLayoutMode
   /** 10 to 100. Scales how strong the thin relevance lines look. 50 is the standard look. */
   lineStrength: number
@@ -74,7 +74,7 @@ export function sanitizeGraphSettings(input: unknown, defaults: GraphViewSetting
   return {
     edges: o.edges === 'tree' || o.edges === 'bundled' || o.edges === 'all' ? o.edges : defaults.edges,
     labels: o.labels === 'few' || o.labels === 'all' ? o.labels : defaults.labels,
-    layout: o.layout === 'fixed' || o.layout === 'physics' ? o.layout : defaults.layout,
+    layout: o.layout === 'fixed' || o.layout === 'physics' || o.layout === 'hierarchy' ? o.layout : defaults.layout,
     lineStrength: num(o.lineStrength, 10, 100, defaults.lineStrength),
     spacing: num(o.spacing, 0, 100, defaults.spacing),
   }
@@ -261,4 +261,137 @@ export function blockLayoutPositions(ids: string[], links: [string, string][], g
     rowHeight = Math.max(rowHeight, b.h)
   }
   return out
+}
+
+/**
+ * Hierarchy layout (Dustin, 2026-11-13: "a hierarchy is a kind of graph, so within the graph view there should be a way to view hierarchical
+ * relationships"). `links` are [narrower, broader] pairs: the first item is a special case of the second. The most general items sit at the
+ * top of their tree and every item sits one tier below its deepest broader item, so a tier always reads as "more specific than the tier
+ * above". An item with two broader items sits under the deeper one and keeps the line to the other. Every parent is centred over its
+ * children. A parent with more than six children that have no children of their own (a list of competencies under one area, say) puts
+ * them in a compact grid under it. Each tree is its own block and the blocks are packed into rows about as wide as a screen, so a forest of
+ * many trees is not stretched into one long strip. Items that are in no link are placed in a grid under the trees. The same input always
+ * gives the same picture. `tiersOut`, when given, receives the tier of every item in a tree (0 = the most general).
+ */
+export function hierarchyLayoutPositions(
+  ids: string[],
+  links: [string, string][],
+  opts: { xGap?: number; yGap?: number; tiersOut?: Map<string, number> } = {},
+): Map<string, { x: number; y: number }> {
+  const xGap = opts.xGap ?? 130
+  const yGap = opts.yGap ?? 120
+  const order = new Map(ids.map((id, i) => [id, i]))
+  const byOrder = (a: string, b: string) => order.get(a)! - order.get(b)!
+  const parents = new Map<string, string[]>()
+  const inLink = new Set<string>()
+  for (const [child, parent] of links) {
+    if (child === parent || !order.has(child) || !order.has(parent)) continue
+    const list = parents.get(child) ?? []
+    if (!list.includes(parent)) list.push(parent)
+    parents.set(child, list)
+    inLink.add(child)
+    inLink.add(parent)
+  }
+  // Depth: one more than the deepest broader item. A cycle in the data is cut at the item that closes it.
+  const depth = new Map<string, number>()
+  const visiting = new Set<string>()
+  const depthOf = (id: string): number => {
+    const known = depth.get(id)
+    if (known !== undefined) return known
+    if (visiting.has(id)) return 0
+    visiting.add(id)
+    let d = 0
+    for (const p of parents.get(id) ?? []) d = Math.max(d, depthOf(p) + 1)
+    visiting.delete(id)
+    depth.set(id, d)
+    return d
+  }
+  for (const id of inLink) depthOf(id)
+  // The item sits under its deepest broader item (ties: the first in input order).
+  const primary = new Map<string, string>()
+  for (const id of inLink) {
+    const ps = [...(parents.get(id) ?? [])].sort(byOrder)
+    if (ps.length === 0) continue
+    primary.set(id, ps.reduce((best, p) => (depth.get(p)! > depth.get(best)! ? p : best), ps[0]))
+  }
+  const children = new Map<string, string[]>()
+  for (const [child, parent] of primary) children.set(parent, [...(children.get(parent) ?? []), child])
+  for (const list of children.values()) list.sort(byOrder)
+  const roots = [...inLink].filter((id) => !primary.has(id)).sort(byOrder)
+
+  // One tree at a time, in its own coordinates (the first leaf at x = 0, the root at y = 0).
+  type Placed = Map<string, { x: number; y: number }>
+  const placeTree = (root: string): Placed => {
+    const local: Placed = new Map()
+    const rootDepth = depth.get(root)!
+    let nextLeaf = 0
+    const place = (id: string, seen: Set<string>): number => {
+      seen.add(id)
+      const kids = (children.get(id) ?? []).filter((k) => !seen.has(k))
+      const tier = depth.get(id)! - rootDepth
+      let x: number
+      if (kids.length === 0) {
+        x = nextLeaf++ * xGap
+      } else if (kids.length > 6 && kids.every((k) => (children.get(k) ?? []).filter((g) => !seen.has(g) && g !== id).length === 0)) {
+        const cols = Math.ceil(Math.sqrt(kids.length * 1.6))
+        const startX = nextLeaf * xGap
+        kids.forEach((k, i) => {
+          seen.add(k)
+          local.set(k, { x: startX + (i % cols) * xGap, y: (tier + 1) * yGap + Math.floor(i / cols) * (yGap * 0.55) })
+          opts.tiersOut?.set(k, tier + 1)
+        })
+        nextLeaf += Math.min(cols, kids.length)
+        x = startX + ((Math.min(cols, kids.length) - 1) * xGap) / 2
+      } else {
+        const xs = kids.map((k) => place(k, seen))
+        x = (xs[0] + xs[xs.length - 1]) / 2
+      }
+      local.set(id, { x, y: tier * yGap })
+      opts.tiersOut?.set(id, tier)
+      return x
+    }
+    place(root, new Set<string>())
+    return local
+  }
+  const trees: { nodes: Placed; w: number; h: number }[] = []
+  for (const r of roots) trees.push(measure(placeTree(r)))
+  // A cycle has no root: the items on it that were not reached form a tree of their own, so nothing is left without a spot.
+  const reached = new Set<string>()
+  for (const t of trees) for (const id of t.nodes.keys()) reached.add(id)
+  for (const id of [...inLink].sort(byOrder)) {
+    if (reached.has(id)) continue
+    const t = measure(placeTree(id))
+    for (const k of t.nodes.keys()) reached.add(k)
+    trees.push(t)
+  }
+
+  // Pack the trees into rows about as wide as a screen.
+  const out = new Map<string, { x: number; y: number }>()
+  const area = trees.reduce((sum, t) => sum + (t.w + xGap) * (t.h + yGap), 0)
+  const rowWidth = Math.max(Math.sqrt(area * 2.2), ...trees.map((t) => t.w))
+  let x = 0, y = 0, rowHeight = 0
+  for (const t of trees) {
+    if (x > 0 && x + t.w > rowWidth) { x = 0; y += rowHeight + yGap; rowHeight = 0 }
+    for (const [id, p] of t.nodes) out.set(id, { x: x + p.x, y: y + p.y })
+    x += t.w + xGap
+    rowHeight = Math.max(rowHeight, t.h)
+  }
+  // Items that are in no link: a grid under the trees.
+  const alone = ids.filter((id) => !inLink.has(id))
+  if (alone.length > 0) {
+    const top = trees.length > 0 ? y + rowHeight + yGap : 0
+    const cols = Math.max(1, Math.ceil(Math.sqrt(alone.length * 2.2)))
+    alone.forEach((id, i) => out.set(id, { x: (i % cols) * xGap, y: top + Math.floor(i / cols) * (yGap * 0.6) }))
+  }
+  return out
+
+  // The tree's own box, with its left and top edge moved to 0.
+  function measure(nodes: Placed): { nodes: Placed; w: number; h: number } {
+    const xs = [...nodes.values()].map((p) => p.x)
+    const ys = [...nodes.values()].map((p) => p.y)
+    const minX = Math.min(...xs), minY = Math.min(...ys)
+    const moved: Placed = new Map()
+    for (const [id, p] of nodes) moved.set(id, { x: p.x - minX, y: p.y - minY })
+    return { nodes: moved, w: Math.max(...xs) - minX, h: Math.max(...ys) - minY }
+  }
 }

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Checks Dustin's 2026-11-13 requests for MethodsBase in the Base Repo Explorer:
 //   - the method class is multi-select (a method can be a teaching method and a research method)
-//   - the method space has a hierarchy: agent-based modeling is a kind of computer simulation, which is a kind of work with models
+//   - the method space has a hierarchy: agent-based modeling is a kind of computer simulation, which is a kind of work with models. It is a
+//     layout of the Graph view (a hierarchy is a kind of graph), not a view of its own.
 // The new methods are not in the live copy of MethodsBase until the methods repo change is merged and the copy refreshed, so the
 // snapshot answer is topped up in the browser with the records from a rows file (the methods repo's new and changed records as snapshot
 // rows). Nothing is written: the edit form is only opened and cancelled. The QA account is answered as admin for the one role request.
@@ -108,21 +109,55 @@ await page.screenshot({ path: path.join(outDir, '2-edit-form.png'), fullPage: tr
 await form.getByRole('button', { name: 'Cancel' }).click()
 check('nothing was written to the edits table', writes.length === 0, writes.join(' | '))
 
-// ---- the hierarchy view ----
+// ---- the hierarchy is a layout of the Graph view (Dustin, 2026-11-13: a hierarchy is a kind of graph) ----
 await page.locator('input[aria-label="Search all fields"]').fill('')
+check('there is no separate Hierarchy button in the toolbar', (await page.getByRole('button', { name: /^Hierarchy$/ }).count()) === 0)
+await page.getByRole('button', { name: /^Graph$/ }).click()
+await page.locator('label', { hasText: /Only records that have a link|Only records that are part of a hierarchy/ }).waitFor({ timeout: 30000 })
+const drawn = async () => { await page.waitForTimeout(150); await page.locator('[role=status]', { hasText: 'Drawing the graph' }).waitFor({ state: 'detached', timeout: 90000 }); await page.waitForTimeout(400) }
+const drawnPixels = async () => page.evaluate(() => {
+  let n = 0
+  for (const c of Array.from(document.querySelectorAll('div[style*="height: 560"] canvas'))) {
+    const ctx2 = c.getContext('2d'); if (!ctx2 || !c.width || !c.height) continue
+    const d = ctx2.getImageData(0, 0, c.width, c.height).data
+    for (let i = 3; i < d.length; i += 28) if (d[i] > 0) n++
+  }
+  return n
+})
+const tiers = async () => JSON.parse((await page.locator('div[style*="height: 560"]').first().getAttribute('data-hierarchy-tiers')) ?? '{}')
+await drawn()
+check('the graph controls offer a Hierarchy layout on the MethodsBase tab', (await page.getByRole('button', { name: /^Hierarchy$/ }).count()) === 1)
 await page.getByRole('button', { name: /^Hierarchy$/ }).click()
-await page.waitForTimeout(800)
-const tree = page.getByTestId('method-tree')
-const treeText = (await tree.innerText()).replace(/\s+/g, ' ')
-check('the hierarchy shows models, then computer simulation, then agent-based modeling', treeText.indexOf('Models as a teaching method') >= 0 && treeText.indexOf('Computer simulation') > treeText.indexOf('Models as a teaching method') && treeText.indexOf('Agent-Based Modeling') > treeText.indexOf('Computer simulation'), treeText.slice(0, 220))
-check('it says how many methods are placed so far', /3 of \d+ methods are placed in the hierarchy so far/.test(treeText), treeText.slice(0, 120))
-const indent = async (name) => tree.getByRole('button', { name }).first().evaluate((el) => el.getBoundingClientRect().left)
-const [l0, l1, l2] = [await indent('Models as a teaching method'), await indent('Computer simulation'), await indent('Agent-Based Modeling')]
-check('each step is indented under the one above', l1 > l0 && l2 > l1, `${Math.round(l0)} < ${Math.round(l1)} < ${Math.round(l2)}`)
-await page.screenshot({ path: path.join(outDir, '3-hierarchy.png') })
-await tree.getByRole('button', { name: 'Computer simulation' }).click()
-await page.waitForTimeout(500)
-check('a click in the tree opens the method card', /Computer simulation/.test(await page.locator('.card[style*="sticky"]').innerText()))
+await drawn()
+const note = (await page.getByTestId('hierarchy-note').innerText()).replace(/\s+/g, ' ')
+check('the page says how many records are part of a hierarchy so far', /^3 of 123 records are part of a hierarchy so far/.test(note), note.slice(0, 90))
+const t = await tiers()
+check('models are at the top, computer simulation one tier down and agent-based modeling below that', t['Models as a teaching method'] === 0 && t['Computer simulation'] === 1 && t['Agent-Based Modeling'] === 2, JSON.stringify(t))
+check('only the three records of the hierarchy are drawn', Object.keys(t).length === 3)
+check('the hierarchy is drawn, not blank', (await drawnPixels()) > 100, String(await drawnPixels()))
+await page.screenshot({ path: path.join(outDir, '3-hierarchy-layout.png') })
+const box = page.locator('label', { hasText: 'Only records that are part of a hierarchy' })
+await box.locator('input').uncheck()
+await drawn()
+const all = await tiers()
+check('unticking the box adds the other records, which sit outside the trees', Object.keys(all).length === 123 && all['Models as a teaching method'] === 0 && Object.entries(all).filter(([k]) => !['Models as a teaching method', 'Computer simulation', 'Agent-Based Modeling'].includes(k)).every(([, v]) => v === null), `${Object.keys(all).length} records`)
+await box.locator('input').check()
+await drawn()
+// a repo without broader/narrower links has no Hierarchy layout; one with a deep hierarchy has
+await page.getByRole('button', { name: /^TheoryBase/ }).click()
+await drawn()
+check('no Hierarchy layout on TheoryBase (it has no broader/narrower links)', (await page.getByRole('button', { name: /^Hierarchy$/ }).count()) === 0 && (await drawnPixels()) > 100)
+await page.getByRole('button', { name: /^CompetencyBase/ }).click()
+await drawn()
+check('CompetencyBase offers the Hierarchy layout too', (await page.getByRole('button', { name: /^Hierarchy$/ }).count()) === 1)
+await page.getByRole('button', { name: /^Hierarchy$/ }).click()
+await drawn()
+const ct = await tiers()
+check('CompetencyBase: the competency standards form several tiers', Math.max(...Object.values(ct).filter((v) => v !== null)) >= 2 && (await drawnPixels()) > 100, `${Object.keys(ct).length} records, deepest tier ${Math.max(...Object.values(ct).filter((v) => v !== null))}`)
+await page.screenshot({ path: path.join(outDir, '4-competency-hierarchy.png') })
+await page.getByRole('button', { name: /^MethodsBase/ }).click()
+await drawn()
+await page.getByRole('button', { name: /^Table$/ }).click()
 
 // ---- German ----
 await page.getByRole('group', { name: 'Language of the texts' }).getByRole('button', { name: 'German' }).click()
