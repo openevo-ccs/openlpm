@@ -70,7 +70,7 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
   const description = pickLocalized(data.description, lang)
   const whenToUse = pickLocalized(data.whenToUse, lang)
   const steps = pickLocalizedList(data.protocolSteps, lang)
-  const discipline = typeof data.discipline === 'string' && data.discipline ? data.discipline : null
+  const discipline = pickLocalized(data.discipline, lang)
   const missingIn = [description, whenToUse, steps].some((x) => x && x.lang && x.lang !== lang)
   const hasTags = (Array.isArray(data.lessonPhases) && data.lessonPhases.length > 0) || (Array.isArray(data.learningApproaches) && data.learningApproaches.length > 0)
   const textLanguages = Array.from(new Set([...languagesOf(data.description), ...languagesOf(data.whenToUse), ...languagesOf(data.protocolSteps)]))
@@ -87,7 +87,7 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
           <LangChip lang={o.lang} uiLang={uiLang} />
         </p>
       ))}
-      {discipline && <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>{discipline}<LangChip lang="en" uiLang={uiLang} /></p>}
+      {discipline && <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>{discipline.text}<LangChip lang={discipline.lang || 'en'} uiLang={uiLang} /></p>}
       {hasTags && (
         <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
           <TagChips field="lessonPhases" terms={data.lessonPhases} uiLang={uiLang} />

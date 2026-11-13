@@ -117,17 +117,22 @@ function lessonPhaseTags(row: SnapshotRow): string[] {
   return Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' && raw ? [raw] : []
 }
 
+/** The text that names a record when it is kept per language: a method's label, a lesson's title, a competency's statement. */
+function namingText(row: SnapshotRow): unknown {
+  const d = row.data as any
+  const title = d?.title
+  const statement = d?.statement
+  return d?.label ?? (title && typeof title === 'object' ? title : undefined) ?? (statement && typeof statement === 'object' ? statement : undefined)
+}
+
 export function rowLabel(row: SnapshotRow, lang: string = 'en'): string {
-  // Lessons (TeachingBase) keep their name under `title`, per language.
-  const title = (row.data as any)?.title
-  const named = (row.data as any)?.label ?? (title && typeof title === 'object' ? title : undefined)
-  const picked = pickLocalized(named, lang)
+  // Lessons (TeachingBase) keep their name under `title`, per language. A competency's name is its statement.
+  const picked = pickLocalized(namingText(row), lang)
   return picked ? picked.text : row.label
 }
 
 export function labelIsFallback(row: SnapshotRow, lang: string = 'en'): boolean {
-  const title = (row.data as any)?.title
-  const picked = pickLocalized((row.data as any)?.label ?? (title && typeof title === 'object' ? title : undefined), lang)
+  const picked = pickLocalized(namingText(row), lang)
   return !!picked && picked.lang !== '' && picked.lang !== lang
 }
 
@@ -252,7 +257,7 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     // tree maps cleanly onto "area" + "sub-area."
     tableColumns: [
       { header: 'ID', get: (row) => (row.data as any)?.humanCodingScheme ?? '—' },
-      { header: 'Label', get: (row) => row.label },
+      { header: 'Label', get: (row, lang) => rowLabel(row, lang) },
       {
         header: 'Competency area',
         get: (row) => (row.data as any)?.__competencyArea ?? '—',

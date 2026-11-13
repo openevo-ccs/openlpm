@@ -2,11 +2,22 @@
 // A field is a dotted path into the record's own data ("learningApproaches", "description.en", "citation.title").
 // The list is built from the record itself, so a new field in a repo shows up without new code. A few fields that matter
 // are always offered, even when this record has none yet (a method with no learning approach still needs the tag box).
+//
+// Texts that exist once per language (a method's name and description, a competency's statement, a lesson's title) come as a pair of
+// fields, one for English and one for German, whether the record has both yet or not (Dustin, 2026-11-13: "edit all of the metadata for
+// any given entry in either language"). The form shows the pair for the language the page is set to. A text that is stored as one plain
+// string or list so far counts as the English text, and the first German text turns it into a pair on save (see getPath and setPath).
 
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
-import { normalizeTag } from '@/lib/method-text'
+import { methodClassReading, normalizeTag, tagReading, TAG_READINGS } from '@/lib/method-text'
 
 export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources' | 'multi'
+
+/** The two languages a text can be written in. */
+export type EditLang = 'en' | 'de'
+export const EDIT_LANGS: EditLang[] = ['en', 'de']
+export const isEditLang = (s: string): s is EditLang => s === 'en' || s === 'de'
+export const otherEditLang = (l: EditLang): EditLang => (l === 'de' ? 'en' : 'de')
 
 /** One entry of a MethodsBase record's primarySources. Only `citation` is always there. */
 export interface SourceEntry {
@@ -30,38 +41,63 @@ export interface EditField {
   asList?: boolean
   /** Short note under the field. */
   hint?: string
-  /** For kind 'sources': the entries the record has now, so a line left alone keeps every key it had (for example a link to a LiteratureBase record). */
+  /** For kind 'sources': the entries the record has now, so a line left alone keeps every key (for example a link to a LiteratureBase record). */
   original?: SourceEntry[]
+  /** Set for a text kept once per language: the language of this box. The box for the other language has the same `pair`. */
+  lang?: EditLang
+  /** The path without its language, shared by the English and German box of one text. */
+  pair?: string
+  /** Where the form puts the field: 'text' (per language), 'tags' (a pick list whose words follow the language), 'shared' (the same in both languages, shown with the rest), or 'other' (the same in both languages, folded away). */
+  group?: 'text' | 'tags' | 'shared' | 'other'
+  /** For a pick list: the words shown for a stored value in a language. Without it the stored value is shown. */
+  reading?: (value: string, lang: EditLang) => string
 }
 
 // Never edited here: ids, structure that other records point at, links to other records, review and provenance data.
-const NEVER_EDIT = new Set(['id', 'slug', '$schema', 'provenance', 'review_status', 'review', 'schema_version', 'version'])
+const NEVER_EDIT = new Set(['id', 'slug', '$schema', 'provenance', 'review_status', 'review', 'schema_version', 'version', 'textStatus'])
 const LINK_FIELDS = /^(related|decomposes|partOf|cycles|broader|narrower|primarySources|motivatedBy|literature_used|theoretical_framing|pedagogicalApproaches)/
 const LANG_KEY = /^[a-z]{2}(-[A-Z]{2})?$/
 
-const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'German' }
+export const LANGUAGE_NAMES: Record<string, string> = { en: 'English', de: 'German' }
 
 export function humanize(key: string): string {
   return key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase())
 }
 
+/** A path as a person reads it, for the history of edits: "description.de" is "Description (German)". */
+export function describePath(path: string): string {
+  const parts = path.split('.')
+  const last = parts[parts.length - 1]
+  const words = (key: string) => { const h = humanize(key); return h.charAt(0) + h.slice(1).toLowerCase() }
+  if (parts.length > 1 && isEditLang(last)) return `${parts.slice(0, -1).map(words).join(' · ')} (${LANGUAGE_NAMES[last]})`
+  return parts.map(words).join(' · ')
+}
+
 export function getPath(data: unknown, path: string): unknown {
+  const parts = path.split('.')
   let cur: any = data
-  for (const part of path.split('.')) {
+  for (let i = 0; i < parts.length; i++) {
+    // A text that is not kept per language yet counts as the English text.
+    if (i === parts.length - 1 && i > 0 && isEditLang(parts[i]) && (typeof cur === 'string' || Array.isArray(cur))) return parts[i] === 'en' ? cur : undefined
     if (cur === null || cur === undefined || typeof cur !== 'object') return undefined
-    cur = cur[part]
+    cur = cur[parts[i]]
   }
   return cur
 }
 
-/** A copy of `data` with the value at `path` set, or removed when `value` is undefined. Nothing in `data` is changed. */
+/**
+ * A copy of `data` with the value at `path` set, or removed when `value` is undefined. Nothing in `data` is changed.
+ * Setting one language of a text that is still one plain string or list makes it a pair: the plain text becomes the English one.
+ */
 export function setPath<T extends Record<string, unknown>>(data: T, path: string, value: unknown): T {
   const parts = path.split('.')
   const root: any = { ...data }
   let cur = root
   for (let i = 0; i < parts.length - 1; i++) {
     const next = cur[parts[i]]
-    cur[parts[i]] = next && typeof next === 'object' && !Array.isArray(next) ? { ...next } : {}
+    const nextIsLanguage = i === parts.length - 2 && isEditLang(parts[parts.length - 1])
+    const plain = (typeof next === 'string' && next !== '') || (Array.isArray(next) && next.length > 0)
+    cur[parts[i]] = next && typeof next === 'object' && !Array.isArray(next) ? { ...next } : nextIsLanguage && plain ? { en: next } : {}
     cur = cur[parts[i]]
   }
   const last = parts[parts.length - 1]
@@ -95,59 +131,120 @@ export interface FieldVocabulary {
   methods: { id: string; label: string }[]
 }
 
+// The texts that exist once per language in each repo. The three repos that already hold German text come first (Dustin, 2026-11-13).
+// Order is the order of the form. A text that is not listed but is stored per language in a record is offered as a pair as well.
+interface TranslatableText { key: string; label: string; empty: EditKind }
+const TRANSLATABLE: Partial<Record<BaseRepoKey, TranslatableText[]>> = {
+  methodsbase: [
+    { key: 'label', label: 'Label', empty: 'text' },
+    { key: 'discipline', label: 'Discipline', empty: 'text' },
+    { key: 'whenToUse', label: 'When to use', empty: 'longtext' },
+    { key: 'description', label: 'Description', empty: 'longtext' },
+    { key: 'protocolSteps', label: 'Protocol steps', empty: 'lines' },
+  ],
+  competencybase: [
+    { key: 'statement', label: 'Statement', empty: 'longtext' },
+    { key: 'indicators', label: 'Indicators', empty: 'lines' },
+  ],
+  teachingbase: [
+    { key: 'title', label: 'Title', empty: 'text' },
+    { key: 'description', label: 'Description', empty: 'longtext' },
+  ],
+}
+const BAND_ORDER = ['K-2', '3-5', '6-8', '9-12', '13-16']
+
+/** Whether a repo's texts are kept per language, so its form has the English/German pairs. */
+export function hasLanguagePairs(repoKey: BaseRepoKey): boolean {
+  return TRANSLATABLE[repoKey] !== undefined
+}
+
 export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, vocab: FieldVocabulary): EditField[] {
   const out: EditField[] = []
   const seen = new Set<string>()
-  const add = (f: EditField) => { if (!seen.has(f.path)) { seen.add(f.path); out.push(f) } }
+  const claimed = new Set<string>()
+  const bilingual = hasLanguagePairs(repoKey)
+  const add = (f: EditField) => { if (!seen.has(f.path)) { seen.add(f.path); out.push(bilingual && !f.group && !f.lang ? { ...f, group: 'other' } : f) } }
 
   const addValue = (path: string, label: string, value: unknown) => {
     if (typeof value === 'string') add({ path, label, kind: textKind(value) })
     else if (isLangObject(value)) {
-      for (const lang of Object.keys(value)) addValue(`${path}.${lang}`, `${label} (${LANGUAGE_NAMES[lang] ?? lang.toUpperCase()})`, value[lang])
-    } else if (isStringList(value)) {
+      // Only a text or a list of texts per language gets a pair of boxes (the status of each language's text does not).
+      if (EDIT_LANGS.some((l) => typeof value[l] === 'string' || isStringList(value[l]))) addLanguageFields(path, label, kindOfPair(value, 'text'))
+    }
+    else if (isStringList(value)) {
       if (isShortStringList(value)) add({ path, label, kind: 'tags' })
       else add({ path, label, kind: 'lines', hint: 'One entry per line.' })
     }
   }
 
+  const kindOfPair = (value: Record<string, unknown>, fallback: EditKind): EditKind => {
+    for (const lang of EDIT_LANGS) {
+      const v = value[lang]
+      if (typeof v === 'string' && v) return textKind(v)
+      if (isStringList(v) && v.length > 0) return 'lines'
+    }
+    return fallback
+  }
+
   // A text kept in two languages always offers both boxes, also when one language has no text yet, so a German name or description can
-  // be added to a record that only has the English one (feedback c950e8f8, Susan Hanisch, 2026-11-13: "add the German label").
-  const addLanguageFields = (key: string, label: string, emptyKind: EditKind) => {
-    const value = data[key]
-    if (value !== undefined && value !== null && !isLangObject(value)) { addValue(key, label, value); return }
-    const texts = isLangObject(value) ? value : {}
-    for (const lang of Array.from(new Set(['en', 'de', ...Object.keys(texts)]))) {
-      const path = `${key}.${lang}`
-      const name = `${label} (${LANGUAGE_NAMES[lang] ?? lang.toUpperCase()})`
-      const v = texts[lang]
-      if (typeof v === 'string') add({ path, label: name, kind: textKind(v) })
-      else if (isStringList(v)) add(isShortStringList(v) ? { path, label: name, kind: 'tags' } : { path, label: name, kind: 'lines', hint: 'One entry per line.' })
-      else add({ path, label: name, kind: emptyKind, hint: emptyKind === 'lines' ? 'One entry per line.' : undefined })
+  // be added to a record that only has the English one (feedback c950e8f8, Susan Hanisch, 2026-11-13: "add the German label"). A text
+  // that is still one plain string or list is the English one. `path` may be dotted ("developmentalProgression.6-8").
+  const addLanguageFields = (path: string, label: string, emptyKind: EditKind) => {
+    const value = getPath(data, path)
+    const pair = isLangObject(value) ? (value as Record<string, unknown>) : {}
+    const kind = isLangObject(value) ? kindOfPair(pair, emptyKind) : typeof value === 'string' && value ? textKind(value) : isStringList(value) && value.length > 0 ? 'lines' : emptyKind
+    for (const lang of EDIT_LANGS) {
+      add({
+        path: `${path}.${lang}`, pair: path, lang, group: 'text', kind,
+        label: `${label} (${LANGUAGE_NAMES[lang]})`,
+        hint: kind === 'lines' ? 'One entry per line.' : undefined,
+      })
+    }
+  }
+
+  const addTexts = (list: TranslatableText[]) => {
+    for (const t of list) {
+      claimed.add(t.key)
+      addLanguageFields(t.key, t.label, t.empty)
+    }
+  }
+
+  // The words shown for a tag follow the language of the form. The tag itself is stored once.
+  const termsOf = (path: string, field: 'learningApproaches' | 'lessonPhases', suggestions: string[]): EditField => {
+    const stored = Array.isArray(getPath(data, path)) ? (getPath(data, path) as unknown[]).map(String).map(normalizeTag) : []
+    const values = Array.from(new Set([...Object.keys(TAG_READINGS[field]), ...suggestions.map(normalizeTag), ...stored]))
+    return {
+      path, label: field === 'learningApproaches' ? 'Learning approaches' : 'Lesson phases', kind: 'multi', asList: true, group: 'tags',
+      choices: values.map((v) => ({ value: v, label: tagReading(field, v, 'en') })),
+      reading: (v, lang) => tagReading(field, v, lang),
     }
   }
 
   if (repoKey === 'methodsbase') {
     // The fields people review most, in the order the card shows them. The tag fields and the class are always offered.
-    addLanguageFields('label', 'Label', 'text')
+    claimed.add('label'); addLanguageFields('label', 'Label', 'text')
     // Dustin, 2026-11-13: the method class is multi-select (a computer simulation is a teaching method and a research method).
-    add({ path: 'methodClass', label: 'Method-class', kind: 'multi', choices: vocab.methodClasses.map((c) => ({ value: c, label: c })), hint: 'Pick both when the method is used both ways.' })
     add({
-      path: 'broaderMethods', label: 'More general method', kind: 'multi', asList: true,
+      path: 'methodClass', label: 'Method-class', kind: 'multi', group: 'tags',
+      choices: vocab.methodClasses.map((c) => ({ value: c, label: c })),
+      reading: (v, lang) => methodClassReading(v, lang),
+      hint: 'Pick both when the method is used both ways.',
+    })
+    add({
+      path: 'broaderMethods', label: 'More general method', kind: 'multi', asList: true, group: 'tags',
       choices: vocab.methods.filter((m) => m.id !== String(data.id ?? '')).map((m) => ({ value: m.id, label: m.label })),
       hint: 'The method this one is a special case of, for example agent-based modeling under computer simulation. Usually one.',
     })
-    add({ path: 'learningApproaches', label: 'Learning approaches', kind: 'tags', options: vocab.learningApproaches, hint: 'Separate with commas. Suggestions are the tags other methods already use.' })
-    addValue('discipline', 'Discipline', data.discipline)
-    addValue('lessonPhases', 'Lesson phases', data.lessonPhases)
-    addLanguageFields('whenToUse', 'When to use', 'longtext')
-    addLanguageFields('description', 'Description', 'longtext')
-    addLanguageFields('protocolSteps', 'Protocol steps', 'lines')
+    add({ ...termsOf('learningApproaches', 'learningApproaches', vocab.learningApproaches), hint: 'The tag names follow the language of the form.' })
+    add(termsOf('lessonPhases', 'lessonPhases', []))
+    addTexts(TRANSLATABLE.methodsbase!.filter((t) => t.key !== 'label'))
     // Feedback 53ccb804 (Susan Hanisch, 2026-11-13): "need to be able to edit primary sources". One line per source.
     add({
-      path: 'primarySources', label: 'Primary sources', kind: 'sources',
+      path: 'primarySources', label: 'Primary sources', kind: 'sources', group: 'shared',
       hint: 'One source per line: the citation, then " | " and a DOI or web address if there is one. A source linked to a LiteratureBase record keeps that link when you change its text.',
       original: Array.isArray(data.primarySources) ? (data.primarySources as SourceEntry[]) : [],
     })
+    claimed.add('learningApproaches'); claimed.add('lessonPhases')
   } else if (repoKey === 'literaturebase') {
     add({ path: 'citation.title', label: 'Title', kind: 'text' })
     add({ path: 'citation.authors', label: 'Authors', kind: 'lines', hint: 'One author per line, as "Family, Given".' })
@@ -158,12 +255,23 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
     for (const [k, l] of citationFields) add({ path: `citation.${k}`, label: l, kind: 'text' })
     add({ path: 'domains', label: 'Keywords', kind: 'tags' })
     add({ path: 'plain_language_summary.text', label: 'Abstract', kind: 'longtext' })
+  } else if (repoKey === 'competencybase') {
+    addTexts(TRANSLATABLE.competencybase!.filter((t) => t.key === 'statement'))
+    const dp = (data as any).developmentalProgression
+    if (dp && typeof dp === 'object' && !Array.isArray(dp)) {
+      claimed.add('developmentalProgression')
+      const bands = Object.keys(dp).sort((a, b) => (BAND_ORDER.indexOf(a) + 1 || 99) - (BAND_ORDER.indexOf(b) + 1 || 99))
+      for (const band of bands) addLanguageFields(`developmentalProgression.${band}`, `Developmental progression, grades ${band}`, 'longtext')
+    }
+    addTexts(TRANSLATABLE.competencybase!.filter((t) => t.key !== 'statement'))
+  } else if (repoKey === 'teachingbase') {
+    addTexts(TRANSLATABLE.teachingbase!)
   }
 
   // Everything else the record carries as text, a language-keyed text or a list of strings. Links to other records and
   // anything nested deeper stay read-only here.
   for (const [key, value] of Object.entries(data)) {
-    if (NEVER_EDIT.has(key) || key.startsWith('__') || LINK_FIELDS.test(key)) continue
+    if (NEVER_EDIT.has(key) || key.startsWith('__') || LINK_FIELDS.test(key) || claimed.has(key)) continue
     addValue(key, humanize(key), value)
   }
   return out
@@ -172,13 +280,14 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
 /** The value a field currently shows in the form: text for the text kinds, a list for tags and lines. */
 export function currentValue(field: EditField, data: Record<string, unknown>): EditValue {
   const v = getPath(data, field.path)
-  if (field.kind === 'multi') return Array.isArray(v) ? v.map(String) : typeof v === 'string' && v ? [v] : []
+  if (field.kind === 'multi') {
+    const list = Array.isArray(v) ? v.map(String) : typeof v === 'string' && v ? [v] : []
+    return field.path === 'learningApproaches' ? list.map(normalizeTag) : list
+  }
   if (field.kind === 'sources') return Array.isArray(v) ? (v as SourceEntry[]) : []
   if (field.kind === 'tags' || field.kind === 'lines') {
-    // The tag lists of a method show the corrected spelling of an old misspelled tag.
-    const clean = field.path === 'learningApproaches' ? normalizeTag : (t: string) => t
-    if (Array.isArray(v)) return v.map(String).map(clean)
-    return typeof v === 'string' && v ? [clean(v)] : []
+    if (Array.isArray(v)) return v.map(String)
+    return typeof v === 'string' && v ? [v] : []
   }
   return v === undefined || v === null ? '' : String(v)
 }

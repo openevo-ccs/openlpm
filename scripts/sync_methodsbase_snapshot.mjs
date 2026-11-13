@@ -114,7 +114,8 @@ function loadSnapshotRows(methodsbasePath) {
       method_class: Array.isArray(entry.methodClass) ? entry.methodClass.join(', ') : entry.methodClass ?? null,
       description: pickDisplayText(entry.description, null),
       when_to_use: pickDisplayText(entry.whenToUse, null),
-      discipline: entry.discipline ?? null,
+      // The discipline may be one English line or a pair per language; the column holds the English line (the record's own data keeps both).
+      discipline: pickDisplayText(entry.discipline, null),
       status: entry.status ?? null,
       review_status: entry.provenance?.review_status ?? null,
       data: entry,

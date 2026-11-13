@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
+import { isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
@@ -641,6 +641,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             onJudge={(kind, item, verdict, note) => judge(selectedLive.row.id, kind, item, verdict, note)}
             vocab={vocab}
             lang={viewLang}
+            onLangChange={setViewLang}
             methodRows={effectiveRowsByRepo.get('methodsbase') ?? []}
             onOpenMethod={(id) => { const r = (effectiveRowsByRepo.get('methodsbase') ?? []).find((x) => x.id === id); if (r) setSelected({ repoKey: 'methodsbase', row: r }) }}
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
@@ -1091,8 +1092,19 @@ function pickLang(value: unknown): unknown {
 // instead of the raw id -- anywhere in the generic field dump, for any
 // repo, not just the one field Susan named, since it's the same
 // mechanism either way.
-function FieldValue({ value, idLabels }: { value: unknown; idLabels?: Map<string, ResolvedLabel> }) {
+function FieldValue({ value, idLabels, lang }: { value: unknown; idLabels?: Map<string, ResolvedLabel>; lang?: string }) {
   if (value === null || value === undefined || value === '') return <span className="muted">—</span>
+  // A text kept per language shows in the language of the page, with a small tag when only the other language has it.
+  if (lang && isLangText(value)) {
+    const text = pickLocalized(value, lang)
+    const list = text ? null : pickLocalizedList(value, lang)
+    if (!text && !list) return <span className="muted">—</span>
+    const found = text ? text.lang : list!.lang
+    const chip = found && found !== lang ? <LangChip lang={found} uiLang="en" /> : null
+    return text
+      ? <span style={{ whiteSpace: 'pre-wrap' }}>{text.text}{chip}</span>
+      : <>{chip}<ol style={{ margin: '2px 0', paddingLeft: 18 }}>{list!.items.map((v, i) => <li key={i} style={{ marginBottom: 4 }}>{v}</li>)}</ol></>
+  }
   if (typeof value === 'string') {
     const resolved = idLabels?.get(value)
     if (resolved) return <span>{resolved.label}</span>
@@ -1128,7 +1140,7 @@ function FieldValue({ value, idLabels }: { value: unknown; idLabels?: Map<string
       <ul style={{ margin: '2px 0', paddingLeft: 16 }}>
         {value.map((v, i) => (
           <li key={i} style={{ marginBottom: 4 }}>
-            <FieldValue value={v} idLabels={idLabels} />
+            <FieldValue value={v} idLabels={idLabels} lang={lang} />
           </li>
         ))}
       </ul>
@@ -1139,7 +1151,7 @@ function FieldValue({ value, idLabels }: { value: unknown; idLabels?: Map<string
       <div style={{ paddingLeft: 10, borderLeft: '2px solid var(--border)', marginTop: 2 }}>
         {Object.entries(value as Record<string, unknown>).map(([k, v]) => (
           <div key={k} style={{ marginBottom: 4 }}>
-            <strong style={{ fontSize: 11 }}>{humanizeFieldName(k)}:</strong> <FieldValue value={v} idLabels={idLabels} />
+            <strong style={{ fontSize: 11 }}>{humanizeFieldName(k)}:</strong> <FieldValue value={v} idLabels={idLabels} lang={lang} />
           </div>
         ))}
       </div>
@@ -1152,11 +1164,14 @@ function RecordDetails({
   data,
   skipKeys,
   idLabels,
+  lang,
 }: {
   data: Record<string, unknown>
   /** Field keys already shown in a repo-specific ordered section above this one -- left out here so "Other info" doesn't repeat them. */
   skipKeys?: Set<string>
   idLabels?: Map<string, ResolvedLabel>
+  /** The language of the page. A text kept per language shows in it. */
+  lang?: string
 }) {
   const [showRaw, setShowRaw] = useState(false)
   const entries = Object.entries(data).filter(
@@ -1172,7 +1187,7 @@ function RecordDetails({
           <div key={key} style={{ marginBottom: 10 }}>
             <div className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{filterColumnLabel(key)}</div>
             <div>
-              <FieldValue value={value} idLabels={idLabels} />
+              <FieldValue value={value} idLabels={idLabels} lang={lang} />
             </div>
           </div>
         ))
@@ -1303,7 +1318,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   const clean = (text: string, textIsLang: string) => (lang === 'en' && textIsLang === 'en' ? withoutGermanGloss(text, gloss) : text)
   const tag = (l: string) => (l && l !== lang ? <LangChip lang={l} uiLang={uiLang} /> : null)
   const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
-  const discipline = data.discipline as string | undefined
+  const discipline = pickLocalized(data.discipline, textLang)
   const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
   const whenToUse = pickLocalized(data.whenToUse, textLang)
   const description = pickLocalized(data.description, textLang)
@@ -1336,7 +1351,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
       {learningApproaches.length > 0
         ? <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>
         : classes.includes('pedagogical-practice') && <DetailRow label="Learning approach"><span className="muted">Not set yet. Press Edit to add one.</span></DetailRow>}
-      {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
+      {!!discipline && <DetailRow label="Discipline">{discipline.text}{tag(discipline.lang)}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
       {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
@@ -1375,7 +1390,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
       <details style={{ marginTop: 8 }}>
         <summary className="muted" style={{ cursor: 'pointer', fontSize: 12 }}>Other info</summary>
         <div style={{ marginTop: 6 }}>
-          <RecordDetails data={data} skipKeys={skip} idLabels={idLabels} />
+          <RecordDetails data={data} skipKeys={skip} idLabels={idLabels} lang={lang} />
         </div>
       </details>
     </div>
@@ -1393,6 +1408,7 @@ function DetailPanel({
   onJudge,
   vocab,
   lang,
+  onLangChange,
   methodRows,
   onOpenMethod,
   history,
@@ -1412,6 +1428,7 @@ function DetailPanel({
   onJudge: (kind: ItemKind, item: LessonLink | LessonData['components'][number], verdict: Verdict, note: string | null) => Promise<string | null>
   vocab: FieldVocabulary
   lang: string
+  onLangChange: (lang: string) => void
   /** Every method record, so a method can show the methods above and below it in the hierarchy. */
   methodRows: SnapshotRow[]
   onOpenMethod: (id: string) => void
@@ -1520,11 +1537,7 @@ function DetailPanel({
       )}
       {row.review_status && <p className="muted" style={{ fontSize: 12 }}>Review status (source repo): {row.review_status}</p>}
 
-      {repoKey === 'teachingbase' ? (
-        <div style={{ marginTop: 8 }}>
-          <TeachingBaseLessonBody lessonId={row.id} data={row.data as unknown as LessonData} lang={tbLang} latest={latest} ownJudged={ownJudged} onJudge={onJudge} />
-        </div>
-      ) : editing && userId ? (
+      {editing && userId ? (
         <div style={{ marginTop: 8 }}>
           <RecordEditor
             supabase={supabase}
@@ -1532,9 +1545,15 @@ function DetailPanel({
             repoKey={repoKey}
             row={row}
             vocab={vocab}
+            lang={lang}
+            onLangChange={onLangChange}
             onCancel={() => setEditing(false)}
             onSaved={() => { setEditing(false); onEditsChanged() }}
           />
+        </div>
+      ) : repoKey === 'teachingbase' ? (
+        <div style={{ marginTop: 8 }}>
+          <TeachingBaseLessonBody lessonId={row.id} data={row.data as unknown as LessonData} lang={tbLang} latest={latest} ownJudged={ownJudged} onJudge={onJudge} />
         </div>
       ) : (
       <details style={{ marginTop: 8 }}>
@@ -1545,18 +1564,18 @@ function DetailPanel({
           ) : repoKey === 'methodsbase' ? (
             <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} />
           ) : (
-            <RecordDetails data={row.data} idLabels={idLabels} />
+            <RecordDetails data={row.data} idLabels={idLabels} lang={lang} />
           )}
         </div>
       </details>
       )}
 
-      {!editing && userId && repoKey !== 'teachingbase' && (
+      {!editing && userId && !restricted && (
         <EditHistory supabase={supabase} userId={userId} repoKey={repoKey} row={row} history={history} onChanged={onEditsChanged} />
       )}
 
       {!restricted && <div className="row" style={{ marginTop: 12, gap: 8 }}>
-        {!editing && repoKey !== 'teachingbase' && (
+        {!editing && (
           <button
             className="btn btn-mini"
             disabled={!userId || !editsAvailable}
