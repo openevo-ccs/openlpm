@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import { pickLocalized, tagReading } from '@/lib/method-text'
+import { methodClassReading, pickLocalized, tagReading } from '@/lib/method-text'
 import type { Database } from './database.types'
 
 type Client = SupabaseClient<Database>
@@ -175,8 +175,8 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       { header: 'Label', get: (row, lang) => rowLabel(row, lang) },
       {
         header: 'Method-class',
-        get: (row) => row.secondary ?? '—',
-        filterValues: (row) => (row.filterValue ? [row.filterValue] : []),
+        get: (row, lang) => (row.secondary ? methodClassReading(row.secondary, lang ?? 'en') : '—'),
+        filterValues: (row, lang) => (row.filterValue ? [methodClassReading(row.filterValue, lang ?? 'en')] : []),
       },
       // Tags are stored in German; each view shows them in its own language only.
       {

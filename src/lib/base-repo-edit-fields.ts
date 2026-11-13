@@ -6,8 +6,17 @@
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
 import { normalizeTag } from '@/lib/method-text'
 
-export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select'
-export type EditValue = string | string[]
+export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources'
+
+/** One entry of a MethodsBase record's primarySources. Only `citation` is always there. */
+export interface SourceEntry {
+  citation?: string
+  doi?: string
+  url?: string
+  literatureRef?: string
+  [key: string]: unknown
+}
+export type EditValue = string | string[] | SourceEntry[]
 
 export interface EditField {
   path: string
@@ -17,6 +26,8 @@ export interface EditField {
   options?: string[]
   /** Short note under the field. */
   hint?: string
+  /** For kind 'sources': the entries the record has now, so a line left alone keeps every key it had (for example a link to a LiteratureBase record). */
+  original?: SourceEntry[]
 }
 
 // Never edited here: ids, structure that other records point at, links to other records, review and provenance data.
@@ -93,16 +104,38 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
     }
   }
 
+  // A text kept in two languages always offers both boxes, also when one language has no text yet, so a German name or description can
+  // be added to a record that only has the English one (feedback c950e8f8, Susan Hanisch, 2026-11-13: "add the German label").
+  const addLanguageFields = (key: string, label: string, emptyKind: EditKind) => {
+    const value = data[key]
+    if (value !== undefined && value !== null && !isLangObject(value)) { addValue(key, label, value); return }
+    const texts = isLangObject(value) ? value : {}
+    for (const lang of Array.from(new Set(['en', 'de', ...Object.keys(texts)]))) {
+      const path = `${key}.${lang}`
+      const name = `${label} (${LANGUAGE_NAMES[lang] ?? lang.toUpperCase()})`
+      const v = texts[lang]
+      if (typeof v === 'string') add({ path, label: name, kind: textKind(v) })
+      else if (isStringList(v)) add(isShortStringList(v) ? { path, label: name, kind: 'tags' } : { path, label: name, kind: 'lines', hint: 'One entry per line.' })
+      else add({ path, label: name, kind: emptyKind, hint: emptyKind === 'lines' ? 'One entry per line.' : undefined })
+    }
+  }
+
   if (repoKey === 'methodsbase') {
     // The fields people review most, in the order the card shows them. The tag fields and the class are always offered.
-    addValue('label', 'Label', data.label)
+    addLanguageFields('label', 'Label', 'text')
     add({ path: 'methodClass', label: 'Method-class', kind: 'select', options: vocab.methodClasses })
     add({ path: 'learningApproaches', label: 'Learning approaches', kind: 'tags', options: vocab.learningApproaches, hint: 'Separate with commas. Suggestions are the tags other methods already use.' })
     addValue('discipline', 'Discipline', data.discipline)
     addValue('lessonPhases', 'Lesson phases', data.lessonPhases)
-    addValue('whenToUse', 'When to use', data.whenToUse)
-    addValue('description', 'Description', data.description)
-    addValue('protocolSteps', 'Protocol steps', data.protocolSteps)
+    addLanguageFields('whenToUse', 'When to use', 'longtext')
+    addLanguageFields('description', 'Description', 'longtext')
+    addLanguageFields('protocolSteps', 'Protocol steps', 'lines')
+    // Feedback 53ccb804 (Susan Hanisch, 2026-11-13): "need to be able to edit primary sources". One line per source.
+    add({
+      path: 'primarySources', label: 'Primary sources', kind: 'sources',
+      hint: 'One source per line: the citation, then " | " and a DOI or web address if there is one. A source linked to a LiteratureBase record keeps that link when you change its text.',
+      original: Array.isArray(data.primarySources) ? (data.primarySources as SourceEntry[]) : [],
+    })
   } else if (repoKey === 'literaturebase') {
     add({ path: 'citation.title', label: 'Title', kind: 'text' })
     add({ path: 'citation.authors', label: 'Authors', kind: 'lines', hint: 'One author per line, as "Family, Given".' })
@@ -127,6 +160,7 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
 /** The value a field currently shows in the form: text for the text kinds, a list for tags and lines. */
 export function currentValue(field: EditField, data: Record<string, unknown>): EditValue {
   const v = getPath(data, field.path)
+  if (field.kind === 'sources') return Array.isArray(v) ? (v as SourceEntry[]) : []
   if (field.kind === 'tags' || field.kind === 'lines') {
     // The tag lists of a method show the corrected spelling of an old misspelled tag.
     const clean = field.path === 'learningApproaches' ? normalizeTag : (t: string) => t
@@ -138,12 +172,69 @@ export function currentValue(field: EditField, data: Record<string, unknown>): E
 
 /** What the form's box holds, turned back into the stored value. Empty entries are dropped. */
 export function parseInput(field: EditField, raw: string): EditValue {
+  if (field.kind === 'sources') return parseSources(raw, field.original ?? [])
   if (field.kind === 'tags') return raw.split(',').map((s) => s.trim()).filter(Boolean)
   if (field.kind === 'lines') return raw.split('\n').map((s) => s.trim()).filter(Boolean)
   return raw.trim()
 }
 
 export function toInput(field: EditField, value: EditValue): string {
+  if (field.kind === 'sources') return (Array.isArray(value) ? (value as SourceEntry[]) : []).map(sourceLine).join(NEWLINE)
   if (Array.isArray(value)) return value.join(field.kind === 'tags' ? ', ' : '\n')
   return value
+}
+
+// ---- Primary sources: one line per source, "citation | link" ----
+
+const NEWLINE = String.fromCharCode(10)
+
+const DOI_PATTERN = /^10\.\d{4,9}\//
+
+/** The line a source shows as in the form. A DOI is written as its web address. */
+export function sourceLine(s: SourceEntry): string {
+  const text = String(s.citation ?? s.literatureRef ?? '').replace(/\s+/g, ' ').trim()
+  const link = s.url ? String(s.url).trim() : s.doi ? `https://doi.org/${String(s.doi).trim()}` : ''
+  return link ? `${text} | ${link}` : text
+}
+
+function splitSourceLine(line: string): { citation: string; link: string } {
+  const at = line.lastIndexOf(' | ')
+  if (at >= 0) {
+    const link = line.slice(at + 3).trim()
+    if (/^https?:\/\//i.test(link) || DOI_PATTERN.test(link) || /^doi:/i.test(link)) return { citation: line.slice(0, at).trim(), link }
+  }
+  return { citation: line.trim(), link: '' }
+}
+
+function applyLink(entry: SourceEntry, link: string): SourceEntry {
+  const next: SourceEntry = { ...entry }
+  delete next.doi
+  delete next.url
+  const doi = /^https?:\/\/(dx\.)?doi\.org\//i.test(link) ? link.replace(/^https?:\/\/(dx\.)?doi\.org\//i, '') : /^doi:/i.test(link) ? link.replace(/^doi:\s*/i, '') : DOI_PATTERN.test(link) ? link : ''
+  if (doi) next.doi = doi
+  else if (link) next.url = link
+  return next
+}
+
+/**
+ * The form's lines turned back into sources. A line left alone returns the entry it came from, with every key. A line
+ * that was changed keeps its LiteratureBase link when the number of lines is the same and the entry at that place had one.
+ * A new line is a new entry.
+ */
+export function parseSources(raw: string, original: SourceEntry[]): SourceEntry[] {
+  const lines = raw.split(NEWLINE).map((l) => l.trim()).filter(Boolean)
+  const used = new Set<number>()
+  const matched: (SourceEntry | null)[] = lines.map((line) => {
+    const at = original.findIndex((o, i) => !used.has(i) && sourceLine(o) === line)
+    if (at < 0) return null
+    used.add(at)
+    return original[at]
+  })
+  return lines.map((line, i) => {
+    if (matched[i]) return matched[i] as SourceEntry
+    const { citation, link } = splitSourceLine(line)
+    const sameCount = lines.length === original.length
+    const base: SourceEntry = sameCount && !used.has(i) && original[i] ? { ...original[i] } : {}
+    return applyLink({ ...base, citation }, link)
+  })
 }

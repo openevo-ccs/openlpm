@@ -117,6 +117,18 @@ export function normalizeTag(term: string): string {
   return MISSPELLED_TAGS[term] ?? term
 }
 
+// The two method classes, read in German (Susan Hanisch, 2026-11-13, feedback b28a398a: "change the German version of the methods
+// classes to Unterrichtsmethoden and Forschungsmethoden"). The stored values stay English.
+const METHOD_CLASS_DE: Record<string, string> = {
+  'pedagogical-practice': 'Unterrichtsmethoden',
+  'research-method': 'Forschungsmethoden',
+}
+
+/** A method class as a reader of that language should see it. English readers get the stored value. */
+export function methodClassReading(value: string, lang: string): string {
+  return lang === 'de' ? METHOD_CLASS_DE[value] ?? value : value
+}
+
 export type TagField = 'lessonPhases' | 'learningApproaches'
 
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {

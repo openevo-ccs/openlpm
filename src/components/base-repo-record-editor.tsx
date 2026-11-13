@@ -3,7 +3,7 @@ import { Check, History, RotateCcw } from 'lucide-react'
 import type { createClient } from '@/lib/supabase/client'
 import type { BaseRepoKey, SnapshotRow } from '@/lib/supabase/base-repo-explorer'
 import {
-  currentValue, fieldsFor, parseInput, sameValue, toInput, type EditField, type EditValue, type FieldVocabulary,
+  currentValue, fieldsFor, parseInput, sameValue, sourceLine, toInput, type EditField, type EditValue, type FieldVocabulary, type SourceEntry,
 } from '@/lib/base-repo-edit-fields'
 import { resetEdit, saveEdits, type BaseRepoEdit, type FieldChange } from '@/lib/supabase/base-repo-edits'
 
@@ -76,7 +76,7 @@ export function RecordEditor({
             </label>
             {f.kind === 'text' && <input {...common} />}
             {f.kind === 'longtext' && <textarea {...common} rows={Math.min(10, Math.max(3, Math.ceil((values[f.path] ?? '').length / 45)))} />}
-            {f.kind === 'lines' && <textarea {...common} rows={Math.min(10, Math.max(3, (values[f.path] ?? '').split('\n').length + 1))} />}
+            {(f.kind === 'lines' || f.kind === 'sources') && <textarea {...common} rows={Math.min(10, Math.max(3, (values[f.path] ?? '').split('\n').length + 1))} />}
             {f.kind === 'tags' && <input {...common} placeholder="tag one, tag two" />}
             {f.kind === 'select' && (
               <select {...common}>
@@ -111,7 +111,7 @@ export function RecordEditor({
 }
 
 const preview = (v: unknown): string => {
-  const text = Array.isArray(v) ? v.join(' | ') : v === null || v === undefined || v === '' ? '(empty)' : String(v)
+  const text = Array.isArray(v) ? v.map((x) => (x && typeof x === 'object' ? sourceLine(x as SourceEntry) : String(x))).join(' | ') : v === null || v === undefined || v === '' ? '(empty)' : String(v)
   return text.length > 140 ? `${text.slice(0, 140)}…` : text
 }
 
