@@ -21,6 +21,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     layout: 'Anordnung',
     fixed: 'Spalten',
     physics: 'Frei verteilt',
+    hierarchy: 'Hierarchie',
     lines: 'Linien',
     spacing: 'Abstand (frei verteilt)',
     zoomOut: 'Verkleinern',
@@ -32,6 +33,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     allHint: 'Jede Verbindung wird gezeichnet. Das wird schnell unübersichtlich.',
     fixedHint: 'Feste, immer gleiche Anordnung.',
     physicsHint: 'Die Punkte ordnen sich selbst an, ähnlich wie Magnete, um die festen Basiskonzepte herum. Die feste Anordnung bleibt die Standardeinstellung.',
+    hierarchyHint: 'Allgemeines oben, Spezielleres darunter.',
   },
   en: {
     connections: 'Connections',
@@ -44,6 +46,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     layout: 'Layout',
     fixed: 'Fixed',
     physics: 'Free spread',
+    hierarchy: 'Hierarchy',
     lines: 'Lines',
     spacing: 'Spacing (free spread)',
     zoomOut: 'Zoom out',
@@ -55,6 +58,7 @@ const TEXT: Record<Lang, Record<string, string>> = {
     allHint: 'Every link is drawn. This gets crowded quickly.',
     fixedHint: 'A fixed layout that is always the same.',
     physicsHint: 'Nodes arrange themselves around the pinned groups.',
+    hierarchyHint: 'General items at the top, more specific ones below.',
   },
 }
 
@@ -92,12 +96,14 @@ export interface GraphControlsProps {
   /** Graph-specific wording for a connection mode or the fixed layout, when the standard wording does not fit. */
   wording?: Partial<Record<'tree' | 'bundled' | 'all' | 'fixed', { label: string; hint?: string }>>
   showLayout?: boolean
+  /** Offer the Hierarchy layout (general items at the top, specific ones below). Pass it only for a graph that has broader/narrower links. */
+  hierarchy?: { label?: string; hint?: string }
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFit?: () => void
 }
 
-export function GraphControls({ settings, onChange, onReset, lang = 'de', showConnections = true, edgeModes = ['tree', 'bundled', 'all'], wording = {}, showLayout = true, onZoomIn, onZoomOut, onFit }: GraphControlsProps) {
+export function GraphControls({ settings, onChange, onReset, lang = 'de', showConnections = true, edgeModes = ['tree', 'bundled', 'all'], wording = {}, showLayout = true, hierarchy, onZoomIn, onZoomOut, onFit }: GraphControlsProps) {
   const t = TEXT[lang]
   const word = (key: 'tree' | 'bundled' | 'all' | 'fixed', fallbackLabel: string, fallbackHint: string) => ({
     label: wording[key]?.label ?? fallbackLabel,
@@ -106,7 +112,9 @@ export function GraphControls({ settings, onChange, onReset, lang = 'de', showCo
   const modeText = { tree: word('tree', t.tree, t.treeHint), bundled: word('bundled', t.bundled, t.bundledHint), all: word('all', t.all, t.allHint) }
   const fixedText = word('fixed', t.fixed, t.fixedHint)
   const chip = (active: boolean) => `chip-btn${active ? ' active' : ''}`
-  const physics = settings.layout === 'physics'
+  // A saved Hierarchy choice reads as Fixed on a graph that has no hierarchy to show.
+  const layout = settings.layout === 'hierarchy' && !hierarchy ? 'fixed' : settings.layout
+  const physics = layout === 'physics'
   return (
     <div className="netz-controls" role="group" aria-label={lang === 'de' ? 'Darstellung des Netzes' : 'Graph display'}>
       {showConnections && (
@@ -125,8 +133,9 @@ export function GraphControls({ settings, onChange, onReset, lang = 'de', showCo
       {showLayout && (
         <div className="netz-control-group">
           <span className="muted" style={{ fontSize: 11 }}>{t.layout}:</span>
-          <button className={chip(!physics)} title={fixedText.hint} onClick={() => onChange({ layout: 'fixed' })}>{fixedText.label}</button>
+          <button className={chip(layout === 'fixed')} title={fixedText.hint} onClick={() => onChange({ layout: 'fixed' })}>{fixedText.label}</button>
           <button className={chip(physics)} title={t.physicsHint} onClick={() => onChange({ layout: 'physics' })}>{t.physics}</button>
+          {hierarchy && <button className={chip(layout === 'hierarchy')} title={hierarchy.hint ?? t.hierarchyHint} onClick={() => onChange({ layout: 'hierarchy' })}>{hierarchy.label ?? t.hierarchy}</button>}
         </div>
       )}
       <div className="netz-control-group">

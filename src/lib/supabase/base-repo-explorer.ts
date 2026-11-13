@@ -82,7 +82,8 @@ export interface BaseRepoConfig {
   /** A second, array-valued filter/sort field (see SecondaryFilter). */
   secondaryFilter?: SecondaryFilter
   /** JSONB field names inside `data` that point at other Base Repo records, for the graph view. Each is {targetRepo, field}. */
-  relationFields: { field: string; targetRepo: BaseRepoKey }[]
+  /** `hierarchy`: the target is the more general record (a broader/narrower link), drawn as a tier in the graph's Hierarchy layout. */
+  relationFields: { field: string; targetRepo: BaseRepoKey; hierarchy?: boolean }[]
 }
 
 // Susan Hanisch, 2026-10-24: "show only the first two authors, then 'et
@@ -201,7 +202,7 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       // method's own readable label instead.
       { field: 'relatedApproaches', targetRepo: 'methodsbase' },
       // The ladder from general to specific methods (Dustin, 2026-11-13: the method space needs hierarchical modeling).
-      { field: 'broaderMethods', targetRepo: 'methodsbase' },
+      { field: 'broaderMethods', targetRepo: 'methodsbase', hierarchy: true },
     ],
   },
   {
@@ -272,7 +273,7 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
     // detail panel's idLabels resolution, the Graph view's edges) picks
     // it up for free -- no new UI mechanism needed.
     relationFields: [
-      { field: 'broader', targetRepo: 'competencybase' },
+      { field: 'broader', targetRepo: 'competencybase', hierarchy: true },
       { field: 'pedagogicalApproaches', targetRepo: 'methodsbase' },
     ],
   },

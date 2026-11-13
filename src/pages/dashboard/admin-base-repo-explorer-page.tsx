@@ -7,10 +7,9 @@ import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
-import { blockLayoutPositions } from '@/lib/graph-standards'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, ListTree, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
+import { blockLayoutPositions, hierarchyLayoutPositions } from '@/lib/graph-standards'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
 import { ReviewSpace, type ReviewSectionInfo, type ReviewSectionKey } from '@/components/explorer-review-space'
-import { MethodTreeView } from '@/components/method-tree-view'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -69,7 +68,7 @@ import { createGlobalTopic, createPost, listGlobalTopicsForTarget, listPosts, ty
 // category, no dense direct edges) because it reads as "random" even when
 // it technically isn't.
 
-type ViewMode = 'table' | 'cards' | 'graph' | 'tree'
+type ViewMode = 'table' | 'cards' | 'graph'
 type TabKey = 'all' | BaseRepoKey
 
 const REPO_COLOR: Record<BaseRepoKey, string> = {
@@ -586,7 +585,6 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
           <button className={`btn btn-mini${view === 'cards' ? ' btn-primary' : ''}`} onClick={() => setView('cards')}><LayoutGrid size={13} />Cards</button>
           <button className={`btn btn-mini${view === 'graph' ? ' btn-primary' : ''}`} onClick={() => setView('graph')}><Network size={13} />Graph</button>
-          {tab === 'methodsbase' && <button className={`btn btn-mini${view === 'tree' ? ' btn-primary' : ''}`} onClick={() => setView('tree')} title="The methods from general to specific"><ListTree size={13} />Hierarchy</button>}
           {!restricted && tab === 'teachingbase' && (
             <button className="btn btn-mini btn-primary" data-testid="start-review" onClick={() => setReview({ initial: null, view: 'decide' })} title="Go through the suggested lesson links one at a time">
               <PlayCircle size={13} />Start reviewing
@@ -626,8 +624,6 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             /></div>
           ) : view === 'cards' ? (
             <CardsView rows={allRows} onSelect={setSelected} showLanguage={anyLanguageTagged} showRepoChip={showRepoColumn} lang={viewLang} />
-          ) : view === 'tree' && tab === 'methodsbase' ? (
-            <MethodTreeView rows={allRows} onSelect={setSelected} lang={viewLang} />
           ) : (
             <GraphView rows={allRows} onSelect={setSelected} lang={viewLang} />
           )}
@@ -866,6 +862,37 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
   const [counts, setCounts] = useState({ shown: 0, total: 0, linked: 0 })
   const [drawing, setDrawing] = useState(true)
 
+  // The links of this view, worked out once per set of records. Links are only counted between records of the same view.
+  const graphData = useMemo(() => {
+    const keyOf = (r: NodeRef) => `${r.repoKey}:${r.row.id}`
+    const byId = new Map(rows.map((r) => [keyOf(r), r]))
+    const edges: { source: string; target: string; field: string; hier: boolean }[] = []
+    for (const r of rows) {
+      const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
+      if (!cfg) continue
+      for (const rel of cfg.relationFields) {
+        const raw = (r.row.data as any)?.[rel.field]
+        const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
+        for (const targetId of targetIds) {
+          const targetKey = `${rel.targetRepo}:${targetId}`
+          if (byId.has(targetKey)) edges.push({ source: keyOf(r), target: targetKey, field: rel.field, hier: !!rel.hierarchy })
+        }
+      }
+    }
+    const linkedIds = new Set<string>()
+    for (const e of edges) { linkedIds.add(e.source); linkedIds.add(e.target) }
+    // Broader/narrower links: the source is the more specific record, the target the more general one.
+    const hierEdges = edges.filter((e) => e.hier)
+    const hierarchyIds = new Set<string>()
+    for (const e of hierEdges) { hierarchyIds.add(e.source); hierarchyIds.add(e.target) }
+    return { keyOf, byId, edges, linkedIds, hierEdges, hierarchyIds }
+  }, [rows])
+  // Dustin, 2026-11-13: a hierarchy is a kind of graph, so it is a layout of the graph view (not a separate view). The layout is offered when
+  // this view has broader/narrower links, and then shows only the records that are part of a hierarchy unless asked for the rest.
+  const canHierarchy = graphData.hierEdges.length > 0
+  const hierarchyMode = gs.layout === 'hierarchy' && canHierarchy
+  const [hierarchyAll, setHierarchyAll] = useState(false)
+
   useEffect(() => {
     if (!containerRef.current) return
     // The drawing of a big graph takes a few seconds and blocks the page, so the page first shows that it is working.
@@ -873,42 +900,38 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
     let built: Core | null = null
     const timer = setTimeout(() => {
       if (!containerRef.current) return
-      const keyOf = (r: NodeRef) => `${r.repoKey}:${r.row.id}`
-      const byId = new Map(rows.map((r) => [keyOf(r), r]))
+      const { keyOf, byId, edges, linkedIds, hierEdges, hierarchyIds } = graphData
+      // What counts as "linked" depends on the layout: in the Hierarchy layout it is the records that are part of a hierarchy.
+      const relevantIds = hierarchyMode ? hierarchyIds : linkedIds
+      const onlyRelevant = hierarchyMode ? !hierarchyAll : wantLinkedOnly
+      const shown = onlyRelevant && relevantIds.size > 0 ? rows.filter((r) => relevantIds.has(keyOf(r))) : rows
+      setCounts({ shown: shown.length, total: rows.length, linked: relevantIds.size })
 
-      const edges: { source: string; target: string; field: string }[] = []
-      for (const r of rows) {
-        const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
-        if (!cfg) continue
-        for (const rel of cfg.relationFields) {
-          const raw = (r.row.data as any)?.[rel.field]
-          const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
-          for (const targetId of targetIds) {
-            const targetKey = `${rel.targetRepo}:${targetId}`
-            if (byId.has(targetKey)) edges.push({ source: `${r.repoKey}:${r.row.id}`, target: targetKey, field: rel.field })
-          }
-        }
-      }
-
-      const linkedIds = new Set<string>()
-      for (const e of edges) { linkedIds.add(e.source); linkedIds.add(e.target) }
-      const shown = wantLinkedOnly && linkedIds.size > 0 ? rows.filter((r) => linkedIds.has(keyOf(r))) : rows
-      setCounts({ shown: shown.length, total: rows.length, linked: linkedIds.size })
-
-      // Linked records form blocks, one block for each group that is linked together, biggest first, and the records without a
-      // link fill one block at the end. A fixed order (repo, then name) keeps the picture the same every time.
+      // A fixed order (repo, then name) keeps the picture the same every time.
       const ordered = [...shown].sort((a, b) => a.repoKey.localeCompare(b.repoKey) || rowLabel(a.row, lang).localeCompare(rowLabel(b.row, lang)))
-      const positions = blockLayoutPositions(ordered.map(keyOf), edges.map((e) => [e.source, e.target] as [string, string]))
+      const orderedIds = ordered.map(keyOf)
+      const shownSet = new Set(orderedIds)
+      const drawnEdges = (hierarchyMode ? edges.filter((e) => e.hier) : edges).filter((e) => shownSet.has(e.source) && shownSet.has(e.target))
+      // Hierarchy: general records on top, each tier more specific than the one above. Otherwise linked records form blocks, one block for each
+      // group that is linked together, biggest first, and the records without a link fill one block at the end.
+      const tiers = new Map<string, number>()
+      const positions = hierarchyMode
+        ? hierarchyLayoutPositions(orderedIds, hierEdges.filter((e) => shownSet.has(e.source) && shownSet.has(e.target)).map((e) => [e.source, e.target] as [string, string]), { tiersOut: tiers })
+        : blockLayoutPositions(orderedIds, edges.map((e) => [e.source, e.target] as [string, string]))
+      // A small hook for the browser check: the tier of each record in the Hierarchy layout (records outside any tree have none).
+      if (hierarchyMode) {
+        containerRef.current.setAttribute('data-hierarchy-tiers', JSON.stringify(Object.fromEntries(ordered.map((r) => [rowLabel(r.row, lang), tiers.get(keyOf(r)) ?? null]))))
+      } else containerRef.current.removeAttribute('data-hierarchy-tiers')
 
       const info = new Map<string, NodeLabelInfo>()
       const elements: ElementDefinition[] = [
-        ...shown.map((r) => {
-          const id = `${r.repoKey}:${r.row.id}`
+        ...ordered.map((r) => {
+          const id = keyOf(r)
           const pos = positions.get(id)
           info.set(id, { full: rowLabel(r.row, lang), priority: 10, fontPx: 10, maxWidthPx: 100, maxChars: 28 })
           return { data: { id, repoKey: r.repoKey, size: 24 }, position: pos ? { x: pos.x, y: pos.y } : undefined }
         }),
-        ...edges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field } })),
+        ...drawnEdges.map((e, i) => ({ data: { id: `edge-${i}`, source: e.source, target: e.target, name: e.field, hier: hierarchyMode } })),
       ]
 
       const cy = cytoscape({
@@ -940,6 +963,8 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
               'font-size': 9, color: token('--text-primary', '#0b0b0b'),
             },
           },
+          // The Hierarchy layout: plain right-angled lines from a record up to the more general one, no arrowheads.
+          { selector: 'edge[?hier]', style: { 'curve-style': 'taxi', 'taxi-direction': 'vertical', 'taxi-turn': '50%', 'target-arrow-shape': 'none', width: 2 } },
           ...hoverStyles(),
         ] as never,
       })
@@ -952,7 +977,7 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
 
       cy.on('tap', 'node', (evt) => {
         const id = evt.target.id() as string
-        const found = byId.get(id)
+        const found = graphData.byId.get(id)
         if (found) onSelect(found)
       })
 
@@ -963,7 +988,7 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
     return () => { clearTimeout(timer); if (built) { built.destroy(); if (cyRef.current === built) cyRef.current = null } }
     // gs.lineStrength is applied by the effect below, so dragging the slider does not rebuild the graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rows, lang, wantLinkedOnly, gs.layout, gs.labels, gs.spacing])
+  }, [graphData, rows, lang, wantLinkedOnly, hierarchyMode, hierarchyAll, gs.layout, gs.labels, gs.spacing])
 
   useEffect(() => {
     if (cyRef.current) applyLineLooks(cyRef.current, gs.lineStrength, () => 2)
@@ -975,13 +1000,24 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
       <GraphControls
         settings={gs} onChange={updateGs} onReset={resetGs} lang="en" showConnections={false} showLayout
         wording={{ fixed: { label: 'Tiers', hint: 'Rows of records. Always the same.' } }}
+        hierarchy={canHierarchy ? { label: 'Hierarchy', hint: 'General records at the top, more specific ones below. A line joins each record to the more general one above it.' } : undefined}
         onZoomIn={() => zoomBy(1.25)} onZoomOut={() => zoomBy(0.8)} onFit={() => cyRef.current?.fit(undefined, 30)}
       />
       <label className="row" style={{ gap: 6, fontSize: 12, margin: '0 0 6px', opacity: counts.linked === 0 ? 0.6 : 1 }}>
-        <input type="checkbox" checked={wantLinkedOnly && counts.linked > 0} disabled={counts.linked === 0} onChange={(e) => setLinkedChoice(e.target.checked)} />
-        Only records that have a link to another record
-        <span className="muted">({counts.linked === 0 ? 'none in this view' : wantLinkedOnly ? `${counts.shown} of ${counts.total} shown` : `all ${counts.total} shown, ${counts.total - counts.linked} without a link`})</span>
+        <input
+          type="checkbox"
+          checked={(hierarchyMode ? !hierarchyAll : wantLinkedOnly) && counts.linked > 0}
+          disabled={counts.linked === 0}
+          onChange={(e) => (hierarchyMode ? setHierarchyAll(!e.target.checked) : setLinkedChoice(e.target.checked))}
+        />
+        {hierarchyMode ? 'Only records that are part of a hierarchy' : 'Only records that have a link to another record'}
+        <span className="muted">({counts.linked === 0 ? 'none in this view' : counts.shown < counts.total ? `${counts.shown} of ${counts.total} shown` : `all ${counts.total} shown, ${counts.total - counts.linked} ${hierarchyMode ? 'not in a hierarchy' : 'without a link'}`})</span>
       </label>
+      {hierarchyMode && (
+        <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }} data-testid="hierarchy-note">
+          {graphData.hierarchyIds.size} of {counts.total} records are part of a hierarchy so far. General records sit at the top, and a line joins each record to the more general one above it.
+        </p>
+      )}
       {drawing && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }} role="status">Drawing the graph…</p>}
       {counts.total > 0 && counts.linked === 0 && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>No record in this view links to another record in this view, so every record is shown. Links to records of other repos are drawn on the All tab.</p>}
       {physicsSkipped && <p className="muted" style={{ fontSize: 12, margin: '0 0 6px' }}>Free spread is off for more than {EXPLORER_PHYSICS_MAX} records, because it would freeze the page. {wantLinkedOnly && counts.linked > 0 ? 'Pick one repo above to use it.' : counts.linked > 0 ? 'Tick the box above to leave out the records without a link, or pick one repo.' : 'Pick a smaller repo above to use it.'}</p>}
