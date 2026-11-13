@@ -38,6 +38,9 @@ export const TOUR_ANCHORS: TourAnchor[] = [
   { key: 'basiskonzepte.dashboard', label: 'Dashboard with the relevance overview', group: 'Basiskonzepte page', page: 'basiskonzepte', templates: 'jena' },
 
   { key: 'gruppen.liste', label: 'The numbered groups with the join buttons', group: 'Gruppen page', page: 'groups', templates: 'jena' },
+
+  { key: 'strands.liste', label: 'List of strands', group: 'Strands page', page: 'strands' },
+  { key: 'strands.detail', label: 'The chosen strand with its stages by grade band', group: 'Strands page', page: 'strands' },
 ]
 
 export interface TourPage {
