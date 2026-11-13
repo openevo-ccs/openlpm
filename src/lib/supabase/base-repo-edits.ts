@@ -1,7 +1,7 @@
 import type { createClient } from '@/lib/supabase/client'
 import { BASE_REPO_CONFIGS, detectLanguages, plainLabel, type BaseRepoKey, type SnapshotRow } from '@/lib/supabase/base-repo-explorer'
 import { getPath, setPath, type EditValue } from '@/lib/base-repo-edit-fields'
-import { methodClassesOf } from '@/lib/method-text'
+import { methodClassesOf, type TagField, type TagNameOverlay } from '@/lib/method-text'
 
 // In-app edits to Base Repo records (feedback 0afc62a5, Susan Hanisch 2026-11-08; migration 237). The Explorer's records are a copy of the
 // source repos, refreshed by a script, so an edit is stored as its own row and shown on top of the copy. Rows are the change log as well:
@@ -50,6 +50,55 @@ export async function listEdits(supabase: Client, repoKey: BaseRepoKey): Promise
     if (!failed) return { edits: all, available: true }
   }
   return { edits: [], available: false }
+}
+
+// Names of tags are saved as edits too, so they have the same log, the same undo and the same way back to the repo. They belong to no
+// record. Their record id is "vocab:" and the field ("vocab:learningApproaches"), and each row's path is "<language>|<tag>", for
+// example "en|kooperativ" (Dustin, 2026-11-13: tags can be named in either language).
+export const VOCAB_PREFIX = 'vocab:'
+export const isVocabRecord = (recordId: string): boolean => recordId.startsWith(VOCAB_PREFIX)
+export const vocabRecordId = (field: TagField): string => `${VOCAB_PREFIX}${field}`
+
+/** What a row of the edit log is about, in words: the record's name, or "Tag names: learning approaches". */
+export function vocabLabel(recordId: string): string {
+  const field = recordId.slice(VOCAB_PREFIX.length)
+  return `Tag names: ${field === 'lessonPhases' ? 'lesson phases' : field === 'learningApproaches' ? 'learning approaches' : field}`
+}
+
+/** "en|kooperativ" is the English name of the tag kooperativ. */
+export function splitVocabPath(path: string): { lang: 'en' | 'de'; term: string } | null {
+  const bar = path.indexOf('|')
+  const lang = path.slice(0, bar)
+  return bar > 0 && (lang === 'en' || lang === 'de') ? { lang, term: path.slice(bar + 1) } : null
+}
+
+/** The tag names set in the app, from the log of edits of MethodsBase. */
+export function tagNamesFromEdits(edits: BaseRepoEdit[]): TagNameOverlay {
+  const out: TagNameOverlay = { lessonPhases: {}, learningApproaches: {} }
+  for (const [recordId, fields] of latestEditsByRecord(edits)) {
+    if (!isVocabRecord(recordId)) continue
+    const field = recordId.slice(VOCAB_PREFIX.length) as TagField
+    if (!out[field]) continue
+    for (const [path, edit] of fields) {
+      const p = splitVocabPath(path)
+      if (!p || typeof edit.after_value !== 'string' || !edit.after_value.trim()) continue
+      out[field][p.term] = { ...out[field][p.term], [p.lang]: edit.after_value.trim() }
+    }
+  }
+  return out
+}
+
+export interface TagNameChange { term: string; lang: 'en' | 'de'; before: string | null; after: string }
+
+/** Saves tag names, one row per name. Returns an error message, or null when everything was saved. */
+export async function saveTagNames(
+  supabase: Client,
+  args: { field: TagField; userId: string; changes: TagNameChange[]; note: string }
+): Promise<string | null> {
+  return saveEdits(supabase, {
+    repoKey: 'methodsbase', recordId: vocabRecordId(args.field), userId: args.userId, note: args.note,
+    changes: args.changes.map((c) => ({ path: `${c.lang}|${c.term}`, before: c.before, after: c.after })),
+  })
 }
 
 /** The latest edit of each field, per record. A reset row removes the field's edit. */

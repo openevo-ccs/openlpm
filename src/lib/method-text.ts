@@ -171,27 +171,62 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
   },
 }
 
-/**
- * A tag the way a reader should see it. A German reader gets the stored German term. An English reader gets the English
- * reading with the German term in brackets, for example "Introduction (Einstieg)". A tag without an English reading is
- * shown as stored.
- */
-export function tagLabel(field: TagField, term: string, uiLang: string): string {
+// Names given to tags inside OpenLPM (Dustin, 2026-11-13: tags can be named and edited in either language). A tag is stored once, under
+// its term. The terms of the source taxonomy are German and keep their German name and the English reading above. A tag added in the
+// app has the name it was typed with in one language, and the other name is missing until someone adds it. The overlay holds the
+// names set in the app, per field and term. The Explorer fills it from the saved edits (see base-repo-edits.ts).
+export type TagNames = { en?: string; de?: string }
+export type TagNameOverlay = Record<TagField, Record<string, TagNames>>
+const EMPTY_OVERLAY = (): TagNameOverlay => ({ lessonPhases: {}, learningApproaches: {} })
+let tagOverlay: TagNameOverlay = EMPTY_OVERLAY()
+let tagOverlayVersion = 0
+
+/** Sets the names given in the app. Anything that shows a tag afterwards uses them. */
+export function setTagNameOverlay(overlay: TagNameOverlay | null): void {
+  tagOverlay = overlay ?? EMPTY_OVERLAY()
+  tagOverlayVersion++
+}
+
+/** Changes whenever the names set in the app change, so a screen can rebuild what it worked out from them. */
+export function tagNameVersion(): number {
+  return tagOverlayVersion
+}
+
+/** Every tag of a field: the taxonomy's terms, then the ones added in the app. */
+export function tagTerms(field: TagField): string[] {
+  return Array.from(new Set([...Object.keys(TAG_READINGS[field]), ...Object.keys(tagOverlay[field])]))
+}
+
+/** The name of a tag in one language, or null when it has none in that language yet. */
+export function tagNameIn(field: TagField, term: string, lang: string, extra?: Record<string, TagNames>): string | null {
   term = normalizeTag(term)
-  if (uiLang === 'de') return term
-  const reading = TAG_READINGS[field][term]
-  return reading ? `${reading} (${term})` : term
+  const set = extra?.[term] ?? tagOverlay[field][term]
+  const given = lang === 'de' ? set?.de : set?.en
+  if (given) return given
+  if (lang === 'de') return term in TAG_READINGS[field] ? term : null
+  return TAG_READINGS[field][term] ?? null
 }
 
 /**
- * A tag in one language only. English gives the English reading, German gives the stored German term. The Base Repo
- * Explorer uses this so its English view shows no German words (Dustin, 2026-11-11). A tag without an English reading is
- * shown as stored.
+ * A tag the way a reader should see it. A German reader gets the German name. An English reader gets the English
+ * name with the German term in brackets, for example "Introduction (Einstieg)". A tag without a name in the reader's
+ * language is shown by the name it has.
+ */
+export function tagLabel(field: TagField, term: string, uiLang: string): string {
+  term = normalizeTag(term)
+  if (uiLang === 'de') return tagNameIn(field, term, 'de') ?? tagNameIn(field, term, 'en') ?? term
+  const reading = tagNameIn(field, term, 'en')
+  const german = tagNameIn(field, term, 'de')
+  return reading ? (german && german !== reading ? `${reading} (${german})` : reading) : german ?? term
+}
+
+/**
+ * A tag in one language only. The Base Repo Explorer uses this so its English view shows no German words (Dustin, 2026-11-11).
+ * A tag without a name in that language is shown by the name it has in the other.
  */
 export function tagReading(field: TagField, term: string, lang: string): string {
   term = normalizeTag(term)
-  if (lang === 'de') return term
-  return TAG_READINGS[field][term] ?? term
+  return tagNameIn(field, term, lang) ?? tagNameIn(field, term, lang === 'de' ? 'en' : 'de') ?? term
 }
 
 /** Removes a "(German name)" gloss that an English text carries inside it, e.g. "The ABC Method (ABC-Methode) uses...". */

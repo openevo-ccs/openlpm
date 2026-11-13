@@ -9,7 +9,7 @@
 // string or list so far counts as the English text, and the first German text turns it into a pair on save (see getPath and setPath).
 
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
-import { methodClassReading, normalizeTag, tagReading, TAG_READINGS } from '@/lib/method-text'
+import { methodClassReading, normalizeTag, tagReading, tagTerms, type TagField } from '@/lib/method-text'
 
 export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources' | 'multi'
 
@@ -51,6 +51,8 @@ export interface EditField {
   group?: 'text' | 'tags' | 'shared' | 'other'
   /** For a pick list: the words shown for a stored value in a language. Without it the stored value is shown. */
   reading?: (value: string, lang: EditLang) => string
+  /** For a pick list of tags whose names can be set in each language: which tag list it is. A new tag can be added to it. */
+  tagField?: TagField
 }
 
 // Never edited here: ids, structure that other records point at, links to other records, review and provenance data.
@@ -212,9 +214,9 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
   // The words shown for a tag follow the language of the form. The tag itself is stored once.
   const termsOf = (path: string, field: 'learningApproaches' | 'lessonPhases', suggestions: string[]): EditField => {
     const stored = Array.isArray(getPath(data, path)) ? (getPath(data, path) as unknown[]).map(String).map(normalizeTag) : []
-    const values = Array.from(new Set([...Object.keys(TAG_READINGS[field]), ...suggestions.map(normalizeTag), ...stored]))
+    const values = Array.from(new Set([...tagTerms(field), ...suggestions.map(normalizeTag), ...stored]))
     return {
-      path, label: field === 'learningApproaches' ? 'Learning approaches' : 'Lesson phases', kind: 'multi', asList: true, group: 'tags',
+      path, label: field === 'learningApproaches' ? 'Learning approaches' : 'Lesson phases', kind: 'multi', asList: true, group: 'tags', tagField: field,
       choices: values.map((v) => ({ value: v, label: tagReading(field, v, 'en') })),
       reading: (v, lang) => tagReading(field, v, lang),
     }
