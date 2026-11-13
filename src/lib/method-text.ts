@@ -105,6 +105,18 @@ export function textState(data: Record<string, unknown> | null | undefined, lang
   return status === 'claude-draft-unreviewed' || status === 'reviewed' ? status : 'original'
 }
 
+// Spellings that were stored by mistake and are corrected in MethodsBase. Records and saved edits made before the
+// correction reached the database still carry them, so a tag is read through this list first (feedback 5824a32e,
+// Susan Hanisch, 2026-11-12: "typo in the learning approach in the German version").
+const MISSPELLED_TAGS: Record<string, string> = {
+  'konzeptbasiert/vernetztend': 'konzeptbasiert/vernetzend',
+}
+
+/** The correct spelling of a stored tag. Any other tag comes back unchanged. */
+export function normalizeTag(term: string): string {
+  return MISSPELLED_TAGS[term] ?? term
+}
+
 export type TagField = 'lessonPhases' | 'learningApproaches'
 
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {
@@ -121,7 +133,7 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     problembasiert: 'Problem-based',
     projektbasiert: 'Project-based',
     forschend: 'Inquiry-based',
-    'konzeptbasiert/vernetztend': 'Concept-based and connecting',
+    'konzeptbasiert/vernetzend': 'Concept-based and connecting',
     kooperativ: 'Cooperative',
     selbstreguliert: 'Self-regulated',
     kreativ: 'Creative',
@@ -137,6 +149,7 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
  * shown as stored.
  */
 export function tagLabel(field: TagField, term: string, uiLang: string): string {
+  term = normalizeTag(term)
   if (uiLang === 'de') return term
   const reading = TAG_READINGS[field][term]
   return reading ? `${reading} (${term})` : term
@@ -148,6 +161,7 @@ export function tagLabel(field: TagField, term: string, uiLang: string): string 
  * shown as stored.
  */
 export function tagReading(field: TagField, term: string, lang: string): string {
+  term = normalizeTag(term)
   if (lang === 'de') return term
   return TAG_READINGS[field][term] ?? term
 }

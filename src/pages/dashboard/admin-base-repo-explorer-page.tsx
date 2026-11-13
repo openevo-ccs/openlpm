@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
+import { normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
@@ -285,7 +285,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     const approaches = new Set<string>()
     const classes = new Set<string>(['pedagogical-practice', 'research-method'])
     for (const r of methods) {
-      for (const a of r.secondaryFilterValues) approaches.add(a)
+      for (const a of r.secondaryFilterValues) approaches.add(normalizeTag(a))
       if (r.filterValue) classes.add(r.filterValue)
     }
     return { learningApproaches: Array.from(approaches).sort(compareText), methodClasses: Array.from(classes).sort(compareText) }
@@ -1181,7 +1181,11 @@ function MethodsDetailSections({ data, idLabels, lang }: { data: Record<string, 
   return (
     <div style={{ fontSize: 12 }}>
       {!!name && <DetailRow label="Label">{name.text}{tag(name.lang)}</DetailRow>}
-      {learningApproaches.length > 0 && <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>}
+      {/* Susan Hanisch, 2026-11-12 (feedback cf57a372): a classroom method always shows this row, also when it is empty,
+          so it is clear that something can be added. Research methods have no learning approach and show nothing. */}
+      {learningApproaches.length > 0
+        ? <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>
+        : data.methodClass === 'pedagogical-practice' && <DetailRow label="Learning approach"><span className="muted">Not set yet. Press Edit to add one.</span></DetailRow>}
       {!!discipline && <DetailRow label="Discipline">{discipline}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
