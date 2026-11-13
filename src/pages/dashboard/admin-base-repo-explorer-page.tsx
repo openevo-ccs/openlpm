@@ -261,6 +261,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   const activeTableColumns: TableColumn[] | undefined = activeFilterCfg?.tableColumns
   // A filter or sort set for one base's columns means nothing on another's.
   useEffect(() => { setColumnFilters({}); setSort(null) }, [tab])
+  // Filters on tags and method classes hold the text of the language they were picked in, so they are cleared when the language changes.
+  useEffect(() => { setColumnFilters({}) }, [viewLang])
 
   // The repo copy with the in-app edits on top. Records without edits are the same objects as in rowsByRepo.
   const effectiveRowsByRepo = useMemo(() => {
