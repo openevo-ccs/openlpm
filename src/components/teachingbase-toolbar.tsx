@@ -10,7 +10,7 @@ import type { createClient } from '@/lib/supabase/client'
 // check" filters, Download verdicts, and (admins only) the Reviewers section.
 
 export function TeachingBaseToolbar({
-  lessons, latest, lang, onlyStartHere, onlyOpen, onToggleStartHere, onToggleOpen, onDownload, supabase, adminId, onStartReview, onResumeReview,
+  lessons, latest, lang, onlyStartHere, onlyOpen, onToggleStartHere, onToggleOpen, onDownload, supabase, adminId, onStartReview, onResumeReview, inReviewSpace = false,
 }: {
   lessons: LessonKey[]
   latest: Map<string, VerdictRow>
@@ -27,6 +27,8 @@ export function TeachingBaseToolbar({
   supabase: ReturnType<typeof createClient>
   /** Set for admins; the Reviewers section shows only then. */
   adminId: string | null
+  /** True inside the Review space, where no table sits below, so the line about the table below is left out. */
+  inReviewSpace?: boolean
 }) {
   const t = T[lang]
   const overall = linkProgress(lessons, latest)
@@ -39,7 +41,7 @@ export function TeachingBaseToolbar({
         <div className="row" style={{ gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <button type="button" className="tb-btn primary" onClick={onStartReview} data-testid="start-review"><PlayCircle size={20} />{r.start}</button>
           {onResumeReview && <button type="button" className="tb-btn" onClick={onResumeReview} data-testid="resume-review">{r.resume}</button>}
-          <span className="muted" style={{ fontSize: 14, flex: '1 1 240px' }}>{r.browseHint}</span>
+          {!inReviewSpace && <span className="muted" style={{ fontSize: 14, flex: '1 1 240px' }}>{r.browseHint}</span>}
         </div>
       </div>
       <p className="muted" style={{ marginBottom: 6 }}>{t.intro}</p>

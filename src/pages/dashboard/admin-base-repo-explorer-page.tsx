@@ -8,7 +8,8 @@ import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 import { blockLayoutPositions } from '@/lib/graph-standards'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, Search, Table2, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, XCircle } from 'lucide-react'
+import { ReviewSpace, type ReviewSectionInfo, type ReviewSectionKey } from '@/components/explorer-review-space'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -164,12 +165,12 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   const [loading, setLoading] = useState(false)
   const [selected, setSelected] = useState<NodeRef | null>(null)
   const [reviewQueue, setReviewQueue] = useState<GenericReviewItem[] | null>(null)
-  const [showReviewQueue, setShowReviewQueue] = useState(false)
   // In-app edits (feedback 0afc62a5): kept per base, laid over the repo copy below. `editsAvailable` is false until migration 237 is live.
   const [editsByRepo, setEditsByRepo] = useState<Map<BaseRepoKey, BaseRepoEdit[]>>(new Map())
   const [editsAvailable, setEditsAvailable] = useState(true)
   const [onlyEdited, setOnlyEdited] = useState(false)
-  const [showEditsExport, setShowEditsExport] = useState(false)
+  // Everything about reviewing sits behind one Review button and opens in its own space instead of above the table (Dustin, 2026-11-13).
+  const [reviewSection, setReviewSection] = useState<ReviewSectionKey | null>(null)
   // TeachingBase link checking (migrations 240 and 241). Loaded when the TeachingBase tab is open.
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([])
   const [reviewer, setReviewer] = useState<{ id: string; name: string } | null>(null)
@@ -393,6 +394,15 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
 
   const totalCount = allRows.length
   // Tab counts cover every base already loaded, including tabs that aren't open, and follow the search box.
+  const pendingQueueCount = reviewQueue ? reviewQueue.filter((i) => i.assignment.status === 'pending').length : null
+  const waitingTotal = (pendingQueueCount ?? 0) + waitingEdits.length
+  const inReviewSpace = !restricted && reviewSection !== null
+  const reviewSections: ReviewSectionInfo[] = [
+    { key: 'queue', label: 'Waiting for review', count: pendingQueueCount },
+    { key: 'edits', label: 'Edits to send back', count: waitingEdits.length },
+    ...(tab === 'teachingbase' ? [{ key: 'lessons' as const, label: 'Lesson links' }] : []),
+  ]
+  const repoViewName = tab === 'all' ? 'all repos' : BASE_REPO_CONFIGS.find((c) => c.key === tab)?.name ?? 'the records'
   const searchedCountFor = (key: BaseRepoKey) => (effectiveRowsByRepo.get(key) ?? []).filter((r) => rowMatchesSearch(r, search) && (!onlyEdited || (r.editedPaths?.length ?? 0) > 0)).length
 
   if (!allowed) {
@@ -457,7 +467,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
         <Link to={CONCEPTBASE_TAB_PATH} className="btn btn-mini" title="What ConceptBase says each concept means">ConceptBase</Link>
       </div>}
 
-      {tab === 'teachingbase' && (
+      {restricted && tab === 'teachingbase' && (
         <TeachingBaseToolbar
           lessons={tabRows.map((n) => n.row as any)}
           latest={latest}
@@ -474,6 +484,52 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
         />
       )}
 
+      {inReviewSpace ? (
+        <ReviewSpace
+          repoName={repoViewName}
+          sections={reviewSections}
+          section={reviewSection === 'lessons' && tab !== 'teachingbase' ? 'queue' : reviewSection!}
+          onSection={setReviewSection}
+          onClose={() => setReviewSection(null)}
+        >
+          {(reviewSection === 'queue' || (reviewSection === 'lessons' && tab !== 'teachingbase')) && (
+            <ReviewQueuePanel items={reviewQueue} supabase={supabase} onReviewed={reloadReviewQueue} />
+          )}
+          {reviewSection === 'edits' && (
+            <>
+              <div className="row" style={{ gap: 8, marginBottom: 10 }}>
+                <button className="btn btn-mini" onClick={() => { setOnlyEdited(true); setReviewSection(null) }} title="Close this and show only the records that were edited in OpenLPM">
+                  <Pencil size={13} />Show the edited records in the table
+                </button>
+              </div>
+              <EditsExportPanel
+                edits={waitingEdits}
+                labelFor={(repoKey, id) => (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id}
+                supabase={supabase}
+                onMarked={() => Promise.all(Array.from(editsByRepo.keys()).map(reloadEdits))}
+              />
+            </>
+          )}
+          {reviewSection === 'lessons' && tab === 'teachingbase' && (
+            <TeachingBaseToolbar
+              lessons={tabRows.map((n) => n.row as any)}
+              latest={latest}
+              lang={tbLang}
+              onlyStartHere={onlyStartHere}
+              onlyOpen={onlyOpen}
+              onToggleStartHere={() => setOnlyStartHere((v) => !v)}
+              onToggleOpen={() => setOnlyOpen((v) => !v)}
+              onDownload={downloadVerdicts}
+              onStartReview={() => setReview({ initial: null, view: 'decide' })}
+              onResumeReview={resumePointer ? () => setReview({ initial: resumePointer, view: 'decide' }) : null}
+              supabase={supabase}
+              adminId={isAdmin ? userId : null}
+              inReviewSpace
+            />
+          )}
+        </ReviewSpace>
+      ) : (
+      <>
       <div className="row" style={{ gap: 8, marginBottom: 16, justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <div className="row" style={{ gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <div className="field" style={{ marginBottom: 0 }}>
@@ -511,6 +567,9 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
               {c.header}: {(c.filterLabel ?? ((v: string) => v))(columnFilters[c.id])} ×
             </button>
           ))}
+          {!restricted && onlyEdited && <button className="btn btn-mini active" title="Show every record again" onClick={() => setOnlyEdited(false)}>Edited only ×</button>}
+          {tab === 'teachingbase' && onlyStartHere && <button className="btn btn-mini active" title="Show every lesson again" onClick={() => setOnlyStartHere(false)}>Start-here selection only ×</button>}
+          {tab === 'teachingbase' && onlyOpen && <button className="btn btn-mini active" title="Show every lesson again" onClick={() => setOnlyOpen(false)}>Still to check ×</button>}
           {activeFilterChips.length > 1 && (
             <button className="btn-linklike" style={{ fontSize: 12 }} onClick={() => setColumnFilters({})}>Clear all</button>
           )}
@@ -519,30 +578,23 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           <button className={`btn btn-mini${view === 'table' ? ' btn-primary' : ''}`} onClick={() => setView('table')}><Table2 size={13} />Table</button>
           <button className={`btn btn-mini${view === 'cards' ? ' btn-primary' : ''}`} onClick={() => setView('cards')}><LayoutGrid size={13} />Cards</button>
           <button className={`btn btn-mini${view === 'graph' ? ' btn-primary' : ''}`} onClick={() => setView('graph')}><Network size={13} />Graph</button>
-          {!restricted && <button className={`btn btn-mini${onlyEdited ? ' btn-primary' : ''}`} onClick={() => setOnlyEdited((v) => !v)} title="Show only the records that have been edited in OpenLPM">
-            <Pencil size={13} />Edited only
-          </button>}
-          {!restricted && <button className="btn btn-mini" onClick={() => setShowEditsExport((v) => !v)} title="Edits made here that are not in the source repos yet">
-            <Download size={13} />Edits to send back ({waitingEdits.length})
-          </button>}
-          {!restricted && <button className="btn btn-mini" onClick={() => setShowReviewQueue((v) => !v)}>
-            <Clock size={13} />Review queue {reviewQueue ? `(${reviewQueue.filter((i) => i.assignment.status === 'pending').length})` : ''}
-          </button>}
+          {!restricted && tab === 'teachingbase' && (
+            <button className="btn btn-mini btn-primary" data-testid="start-review" onClick={() => setReview({ initial: null, view: 'decide' })} title="Go through the suggested lesson links one at a time">
+              <PlayCircle size={13} />Start reviewing
+            </button>
+          )}
+          {!restricted && (
+            <button
+              className="btn btn-mini"
+              data-testid="open-review-space"
+              onClick={() => setReviewSection(tab === 'teachingbase' ? 'lessons' : 'queue')}
+              title={`Review: ${pendingQueueCount ?? 0} waiting for review, ${waitingEdits.length} edits to send back${tab === 'teachingbase' ? ', lesson links and reviewers' : ''}`}
+            >
+              <Clock size={13} />Review{waitingTotal > 0 ? ` (${waitingTotal})` : ''}
+            </button>
+          )}
         </div>
       </div>
-
-      {!restricted && showEditsExport && (
-        <EditsExportPanel
-          edits={waitingEdits}
-          labelFor={(repoKey, id) => (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id}
-          supabase={supabase}
-          onMarked={() => Promise.all(Array.from(editsByRepo.keys()).map(reloadEdits))}
-        />
-      )}
-
-      {!restricted && showReviewQueue && (
-        <ReviewQueuePanel items={reviewQueue} supabase={supabase} onReviewed={reloadReviewQueue} />
-      )}
 
       <div className="row" style={{ gap: 16, alignItems: 'flex-start' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -590,6 +642,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           />
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }
