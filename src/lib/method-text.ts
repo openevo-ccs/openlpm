@@ -48,6 +48,11 @@ function order(obj: Record<string, unknown>, preferred: string): string[] {
   return [preferred, 'en', 'de', ...keys].filter((k, i, all) => k in obj && all.indexOf(k) === i)
 }
 
+/** Whether a value is a text kept per language, such as {"en": "...", "de": "..."}. */
+export function isLangText(value: unknown): boolean {
+  return value !== null && typeof value === 'object' && !Array.isArray(value) && asLangObject(value) !== null
+}
+
 /** The text in the preferred language, else English, else German, else whatever exists. */
 export function pickLocalized(value: unknown, preferred: string): LangText | null {
   const obj = asLangObject(value)

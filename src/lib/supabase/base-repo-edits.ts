@@ -74,7 +74,8 @@ function rederive(repoKey: BaseRepoKey, row: SnapshotRow): SnapshotRow {
     const year = getPath(data, 'citation.year')
     if (year !== undefined && year !== null && year !== '') next.secondary = String(year)
   } else {
-    const label = plainLabel((data as any).label)
+    const named = (data as any).label ?? (data as any).title ?? (data as any).statement
+    const label = plainLabel(named)
     if (label) next.label = label
   }
   if (repoKey === 'methodsbase') {

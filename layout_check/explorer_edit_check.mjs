@@ -82,7 +82,8 @@ check('Save is off until something changes', await page.getByRole('button', { na
 await page.screenshot({ path: path.join(outDir, 'editor-open.png') })
 
 const tags = editor.locator('#edit-learningApproaches')
-await tags.fill('selbstreguliert')
+// the tags are picked from a menu, named in the language of the form (English here), and stored once
+await tags.selectOption({ label: 'Creative' })
 const desc = editor.locator('#edit-description\\.en')
 const oldDesc = await desc.inputValue()
 await desc.fill(oldDesc + ' Students choose their own order.')
@@ -91,16 +92,16 @@ await page.getByRole('button', { name: /Save 2 changes/ }).click()
 await page.waitForTimeout(1000)
 check('two edits sent, one per changed field', posted.length === 2 && posted.map((r) => r.field_path).sort().join() === 'description.en,learningApproaches', posted.map((r) => r.field_path).join())
 const tagEdit = posted.find((r) => r.field_path === 'learningApproaches')
-check('tag edit stores before and after as lists', Array.isArray(tagEdit.before_value) && JSON.stringify(tagEdit.after_value) === '["selbstreguliert"]', JSON.stringify([tagEdit.before_value, tagEdit.after_value]))
+check('tag edit stores before and after as lists, with the tag as stored (German)', Array.isArray(tagEdit.before_value) && JSON.stringify(tagEdit.after_value) === JSON.stringify([...tagEdit.before_value, 'kreativ']), JSON.stringify([tagEdit.before_value, tagEdit.after_value]))
 check('note, record and repo are stored', tagEdit.note === 'Susan 8 Nov: more practical' && tagEdit.base_repo === 'methodsbase' && tagEdit.record_id === 'OE-METHOD-station-based-learning' && !!tagEdit.edited_by && tagEdit.is_reset === false, `${tagEdit.record_id} by ${tagEdit.edited_by}`)
 
-check('table shows the new tag right away', (await page.locator('tbody tr').first().innerText()).includes('Self-regulated'))
+check('table shows the new tag right away', (await page.locator('tbody tr').first().innerText()).includes('Creative'))
 const cardText = await page.locator('.card[style*="sticky"]').innerText()
 check('card says it was edited and is waiting to be sent back', cardText.includes('edited in OpenLPM') && cardText.includes('2 waiting to be sent back'))
 check('the Review button shows a count of what waits', /Review \(\d+\)/.test(await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).innerText()))
 await page.locator('[data-testid="edit-history"] summary').click()
 const hist = await page.locator('[data-testid="edit-history"]').innerText()
-check('history shows who, what, before and now', hist.includes('Test Admin') && hist.includes('learningApproaches') && hist.includes('Before:') && hist.includes('Now: selbstreguliert'))
+check('history shows who, what, before and now', hist.includes('Test Admin') && hist.includes('Learning approaches') && hist.includes('Before:') && hist.includes('kreativ'))
 await page.screenshot({ path: path.join(outDir, 'after-save.png') })
 
 // ---- only edited ----

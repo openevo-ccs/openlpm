@@ -29,9 +29,11 @@ test('a method with only an English name still offers a German name box (feedbac
   assert.ok(p.indexOf('label.en') < p.indexOf('label.de'))
 })
 
-test('a plain string label stays one box and a record with both languages keeps both', () => {
-  assert.deepEqual(paths({ label: 'ABC' }).filter((x) => x.startsWith('label')), ['label'])
+test('a plain string label counts as the English one and a record with both languages keeps both', () => {
+  assert.deepEqual(paths({ label: 'ABC' }).filter((x) => x.startsWith('label')), ['label.en', 'label.de'])
   assert.deepEqual(paths({ label: { en: 'a', de: 'b' } }).filter((x) => x.startsWith('label')), ['label.en', 'label.de'])
+  const f = F.fieldsFor('methodsbase', { label: 'ABC' }, vocab).find((x) => x.path === 'label.en')
+  assert.equal(F.currentValue(f, { label: 'ABC' }), 'ABC')
 })
 
 test('saving an empty German box changes nothing', () => {
@@ -119,4 +121,120 @@ test('method classes read the same for a string, a list and nothing', () => {
   assert.deepEqual(M.methodClassesOf(undefined), [])
   assert.equal(M.methodClassesReading(['pedagogical-practice', 'research-method'], 'de'), 'Unterrichtsmethoden, Forschungsmethoden')
   assert.equal(M.methodClassesReading('research-method', 'en'), 'research-method')
+})
+
+// ---- two languages for every text (Dustin, 2026-11-13) ----
+
+const fieldsOf = (repo, data) => F.fieldsFor(repo, data, vocab)
+const by = (fields, path) => fields.find((f) => f.path === path)
+
+test('a text that is one plain string or list counts as English, and the first German text makes it a pair', () => {
+  assert.equal(F.getPath({ discipline: 'Biology' }, 'discipline.en'), 'Biology')
+  assert.equal(F.getPath({ discipline: 'Biology' }, 'discipline.de'), undefined)
+  assert.deepEqual(F.getPath({ indicators: ['a', 'b'] }, 'indicators.en'), ['a', 'b'])
+  assert.deepEqual(F.setPath({ discipline: 'Biology' }, 'discipline.de', 'Biologie'), { discipline: { en: 'Biology', de: 'Biologie' } })
+  assert.deepEqual(F.setPath({ indicators: ['a'] }, 'indicators.de', ['x']), { indicators: { en: ['a'], de: ['x'] } })
+  assert.deepEqual(F.setPath({ discipline: 'Biology' }, 'discipline.en', 'Life science'), { discipline: { en: 'Life science' } })
+  assert.deepEqual(F.setPath({ developmentalProgression: { '6-8': 'text', 'K-2': 'other' } }, 'developmentalProgression.6-8.de', 'Text'), { developmentalProgression: { '6-8': { en: 'text', de: 'Text' }, 'K-2': 'other' } })
+  // nothing is changed in the original, and a pair stays a pair
+  const data = { label: { en: 'a' } }
+  F.setPath(data, 'label.de', 'b')
+  assert.deepEqual(data, { label: { en: 'a' } })
+  assert.deepEqual(F.setPath({ label: { en: 'a', de: 'b' } }, 'label.de', 'c'), { label: { en: 'a', de: 'c' } })
+  // other paths behave as before
+  assert.equal(F.getPath({ citation: { title: 'T' } }, 'citation.title'), 'T')
+  assert.deepEqual(F.setPath({ citation: { title: 'T' } }, 'citation.year', '2020'), { citation: { title: 'T', year: '2020' } })
+})
+
+test('discipline of a method is a pair of boxes even while it is one English line', () => {
+  const data = { label: { en: 'A' }, discipline: 'Biology; chemistry' }
+  const f = fieldsOf('methodsbase', data)
+  assert.equal(F.currentValue(by(f, 'discipline.en'), data), 'Biology; chemistry')
+  assert.equal(F.currentValue(by(f, 'discipline.de'), data), '')
+  assert.ok(!f.some((x) => x.path === 'discipline'), 'no second, plain box for the same text')
+  assert.equal(by(f, 'discipline.de').lang, 'de')
+  assert.equal(by(f, 'discipline.de').pair, 'discipline')
+})
+
+test('competencies: the statement, the indicators and every grade-band description come in both languages', () => {
+  const data = {
+    id: 'OE-COMPETENCY-x', statement: { en: 'Be critical' }, indicators: ['Names a system'],
+    developmentalProgression: { '6-8': 'Naming tools', 'K-2': 'Noticing', '9-12': 'Evaluating' }, domain: 'critical-pedagogy', humanCodingScheme: 'CAIL',
+  }
+  const f = fieldsOf('competencybase', data)
+  const paths2 = f.map((x) => x.path)
+  for (const p of ['statement.en', 'statement.de', 'indicators.en', 'indicators.de', 'developmentalProgression.K-2.en', 'developmentalProgression.K-2.de', 'developmentalProgression.9-12.de']) assert.ok(paths2.includes(p), p)
+  assert.ok(!paths2.includes('developmentalProgression'), 'the grade bands are not offered a second time as one box')
+  assert.ok(paths2.indexOf('developmentalProgression.K-2.en') < paths2.indexOf('developmentalProgression.6-8.en'), 'bands in grade order')
+  assert.equal(by(f, 'indicators.en').kind, 'lines')
+  assert.equal(F.currentValue(by(f, 'indicators.en'), data).join('|'), 'Names a system')
+  assert.equal(F.currentValue(by(f, 'developmentalProgression.6-8.en'), data), 'Naming tools')
+  // fields that do not depend on a language are folded away, the texts are not
+  assert.equal(by(f, 'domain').group, 'other')
+  assert.equal(by(f, 'statement.en').group, 'text')
+  // a competency with a German statement only: the English box is empty
+  const de = { statement: { de: 'Die Lernenden analysieren.' } }
+  assert.equal(F.currentValue(by(fieldsOf('competencybase', de), 'statement.en'), de), '')
+  assert.equal(F.currentValue(by(fieldsOf('competencybase', de), 'statement.de'), de), 'Die Lernenden analysieren.')
+})
+
+test('lessons: title and description in both languages, and the page address per language', () => {
+  const data = { slug: 'x', title: { de: 'Kumulative Kultur', en: 'Cumulative culture' }, description: { de: 'd', en: 'e' }, source_pages: { de: 'https://a/de', en: 'https://a/en' }, grades: ['6-8'], subjects: [] }
+  const f = fieldsOf('teachingbase', data)
+  const p = f.map((x) => x.path)
+  for (const x of ['title.en', 'title.de', 'description.en', 'description.de', 'source_pages.en', 'source_pages.de']) assert.ok(p.includes(x), x)
+  assert.equal(by(f, 'grades').group, 'other')
+  assert.ok(!p.includes('slug'))
+})
+
+test('a repo that holds English only has single boxes and nothing folded', () => {
+  assert.equal(F.hasLanguagePairs('literaturebase'), false)
+  assert.equal(F.hasLanguagePairs('methodsbase'), true)
+  const f = fieldsOf('literaturebase', { citation: { title: 'T', year: 2020 } })
+  assert.ok(f.every((x) => !x.lang && !x.group))
+  const q = fieldsOf('questionbase', { id: 'OE-Q', label: 'L', statement: 'S' })
+  assert.ok(q.every((x) => !x.lang && x.group !== 'other'))
+})
+
+test('tags show in the language of the form and are stored once', () => {
+  const data = { learningApproaches: ['kooperativ', 'ein-neuer-ansatz'], lessonPhases: ['Einstieg'], methodClass: 'pedagogical-practice' }
+  const f = fieldsOf('methodsbase', data)
+  const la = by(f, 'learningApproaches')
+  assert.equal(la.kind, 'multi')
+  assert.equal(la.asList, true)
+  assert.equal(la.reading('kooperativ', 'en'), 'Cooperative')
+  assert.equal(la.reading('kooperativ', 'de'), 'kooperativ')
+  assert.ok(la.choices.some((c) => c.value === 'ein-neuer-ansatz'), 'a tag the record has is always a choice')
+  assert.ok(la.choices.some((c) => c.value === 'selbstreguliert'), 'the other tags of the vocabulary are choices too')
+  const lp = by(f, 'lessonPhases')
+  assert.equal(lp.reading('Einstieg', 'en'), 'Introduction')
+  assert.deepEqual(F.parseInput(lp, 'Einstieg,Erarbeitung'), ['Einstieg', 'Erarbeitung'])
+  const mc = by(f, 'methodClass')
+  assert.equal(mc.reading('research-method', 'de'), 'Forschungsmethoden')
+  assert.equal(mc.reading('research-method', 'en'), 'research-method')
+  // an old misspelled tag reads as the corrected one
+  const old = { learningApproaches: ['konzeptbasiert/vernetztend'] }
+  assert.deepEqual(F.currentValue(by(fieldsOf('methodsbase', old), 'learningApproaches'), old), ['konzeptbasiert/vernetzend'])
+})
+
+test('edits in the history read as the field a person knows', () => {
+  assert.equal(F.describePath('description.de'), 'Description (German)')
+  assert.equal(F.describePath('developmentalProgression.6-8.en'), 'Developmental progression · 6-8 (English)')
+  assert.equal(F.describePath('learningApproaches'), 'Learning approaches')
+  assert.equal(F.describePath('citation.title'), 'Citation · Title')
+})
+
+test('saving a German text for a record that has none changes only that field', () => {
+  const data = { label: { en: 'Noticing Tool' }, description: { en: 'Text' } }
+  const f = fieldsOf('methodsbase', data)
+  const de = by(f, 'description.de')
+  const before = F.currentValue(de, data)
+  const after = F.parseInput(de, 'Deutscher Text')
+  assert.equal(F.sameValue(before, after), false)
+  const next = F.setPath(data, de.path, after)
+  assert.deepEqual(next.description, { en: 'Text', de: 'Deutscher Text' })
+  assert.deepEqual(next.label, { en: 'Noticing Tool' })
+  // the English box of the same record is unchanged
+  const en = by(f, 'description.en')
+  assert.equal(F.sameValue(F.parseInput(en, F.toInput(en, F.currentValue(en, data))), F.parseInput(en, F.toInput(en, F.currentValue(en, next)))), true)
 })
