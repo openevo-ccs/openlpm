@@ -71,7 +71,7 @@ export default function StrandsPage() {
         </div>
       ) : (
         <div className="grid grid-2" style={{ alignItems: 'flex-start' }}>
-          <div className="card">
+          <div className="card" data-tour="strands.liste">
             {strands.map((s) => (
               <button
                 key={s.id}
@@ -90,7 +90,7 @@ export default function StrandsPage() {
             ))}
           </div>
 
-          <div className="card" style={{ minHeight: 200 }}>
+          <div className="card" style={{ minHeight: 200 }} data-tour="strands.detail">
             {strandId ? (
               <StrandDetail strandId={strandId} strands={strands} canManage={canManage} supabase={supabase} projectId={project.id} />
             ) : (
