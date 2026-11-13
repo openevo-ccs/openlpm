@@ -81,11 +81,14 @@ async function open(viewport, mobile, { pointer, hash = '/dashboard/admin/explor
   await mintQaSession(page, base)
   await page.reload({ waitUntil: 'networkidle' })
   await page.goto(base + '#' + hash, { waitUntil: 'networkidle' })
+  // The lesson-link progress, "Start reviewing" and "Continue" live in the Review space (Dustin, 2026-11-13); an admin opens it with the Review button.
+  await page.getByTestId('open-review-space').click({ timeout: 30000 })
   await page.waitForSelector('[data-testid="teachingbase-toolbar"]', { timeout: 30000 })
   await page.waitForFunction((n) => document.querySelector('[data-testid="overall-progress"]')?.textContent?.includes(`of ${n} links`), lessons.reduce((n, l) => n + l.link_count, 0), { timeout: 20000 })
   if (pointer) {
     await page.evaluate(([id, p]) => { localStorage.setItem(`openlpm:teachingbase-review-pointer:${id}`, JSON.stringify(p)) }, [selfId, pointer])
     await page.reload({ waitUntil: 'networkidle' })
+    await page.getByTestId('open-review-space').click({ timeout: 30000 })
     await page.waitForSelector('[data-testid="resume-review"]', { timeout: 30000 })
   }
   return { ctx, page }
@@ -111,9 +114,11 @@ for (const vp of [{ w: 'desktop', width: 1400, height: 1000, mobile: false }, { 
   // ---- first screen, help ----
   {
     const { ctx, page } = await open(viewport, vp.mobile, { fresh: true })
-    check(`${vp.w}: "Start reviewing" button is at the top of the tab`, (await page.locator('[data-testid="start-review"]').count()) === 1)
+    check(`${vp.w}: "Start reviewing" is one click away in the Review space`, (await page.locator('[data-testid="start-review"]').count()) === 1)
     check(`${vp.w}: no "continue" button before anything is open`, (await page.locator('[data-testid="resume-review"]').count()) === 0)
-    check(`${vp.w}: the table is still there as the overview`, (await page.locator('tbody tr').count()) > 100)
+    await page.getByRole('button', { name: /^Back to/ }).click()
+    check(`${vp.w}: the table is still there as the overview once the Review space is closed`, (await page.locator('tbody tr').count()) > 100)
+    await page.getByTestId('open-review-space').click()
     await page.locator('[data-testid="start-review"]').click()
     await page.waitForSelector('[data-testid="decision"]')
     const text = await screenText(page)

@@ -91,13 +91,13 @@ await page.getByRole('button', { name: /Save 2 changes/ }).click()
 await page.waitForTimeout(1000)
 check('two edits sent, one per changed field', posted.length === 2 && posted.map((r) => r.field_path).sort().join() === 'description.en,learningApproaches', posted.map((r) => r.field_path).join())
 const tagEdit = posted.find((r) => r.field_path === 'learningApproaches')
-check('tag edit stores before and after as lists', JSON.stringify(tagEdit.before_value) === '[]' && JSON.stringify(tagEdit.after_value) === '["selbstreguliert"]', JSON.stringify([tagEdit.before_value, tagEdit.after_value]))
+check('tag edit stores before and after as lists', Array.isArray(tagEdit.before_value) && JSON.stringify(tagEdit.after_value) === '["selbstreguliert"]', JSON.stringify([tagEdit.before_value, tagEdit.after_value]))
 check('note, record and repo are stored', tagEdit.note === 'Susan 8 Nov: more practical' && tagEdit.base_repo === 'methodsbase' && tagEdit.record_id === 'OE-METHOD-station-based-learning' && !!tagEdit.edited_by && tagEdit.is_reset === false, `${tagEdit.record_id} by ${tagEdit.edited_by}`)
 
-check('table shows the new tag right away', (await page.locator('tbody tr').first().innerText()).includes('selbstreguliert'))
+check('table shows the new tag right away', (await page.locator('tbody tr').first().innerText()).includes('Self-regulated'))
 const cardText = await page.locator('.card[style*="sticky"]').innerText()
 check('card says it was edited and is waiting to be sent back', cardText.includes('edited in OpenLPM') && cardText.includes('2 waiting to be sent back'))
-check('toolbar counts 2 edits to send back', (await page.getByRole('button', { name: /Edits to send back \(2\)/ }).count()) === 1)
+check('the Review button shows a count of what waits', /Review \(\d+\)/.test(await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).innerText()))
 await page.locator('[data-testid="edit-history"] summary').click()
 const hist = await page.locator('[data-testid="edit-history"]').innerText()
 check('history shows who, what, before and now', hist.includes('Test Admin') && hist.includes('learningApproaches') && hist.includes('Before:') && hist.includes('Now: selbstreguliert'))
@@ -105,18 +105,24 @@ await page.screenshot({ path: path.join(outDir, 'after-save.png') })
 
 // ---- only edited ----
 await search.fill('')
-await page.getByRole('button', { name: 'Edited only' }).click()
+await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).click()
+await page.getByRole('tab', { name: /Edits to send back/ }).click()
+check('the Review space counts 2 edits to send back', (await page.getByRole('tab', { name: /Edits to send back \(2\)/ }).count()) === 1)
+await page.getByRole('button', { name: 'Show the edited records in the table' }).click()
 await page.waitForTimeout(400)
 check('"Edited only" lists just the edited record', (await page.locator('tbody tr').count()) === 1)
-await page.getByRole('button', { name: 'Edited only' }).click()
+await page.getByRole('button', { name: 'Edited only ×' }).click()
 
 // ---- put one field back ----
+await page.locator('[data-testid="edit-history"] summary').click()
 const undoButtons = page.getByRole('button', { name: /Put back to the repo copy/ })
 await undoButtons.first().click()
 await page.waitForTimeout(900)
 const reset = posted[posted.length - 1]
 check('undo adds a reset row, nothing is deleted', reset.is_reset === true && table.length === 3, `${table.length} rows, reset of ${reset.field_path}`)
-check('toolbar now counts 1 edit to send back', (await page.getByRole('button', { name: /Edits to send back \(1\)/ }).count()) === 1)
+await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).click()
+check('the Review space now counts 1 edit to send back', (await page.getByRole('tab', { name: /Edits to send back \(1\)/ }).count()) === 1)
+await page.getByRole('button', { name: /^Back to/ }).click()
 
 // ---- a literature record: title edit changes the table and the citation ----
 await page.getByRole('button', { name: /^LiteratureBase/ }).click()
@@ -134,7 +140,8 @@ check('citation box shows the edited year', (await page.locator('[data-testid="a
 check('table year column shows the edited year', (await page.locator('tbody tr').first().innerText()).includes('1984'))
 
 // ---- send back ----
-await page.getByRole('button', { name: /Edits to send back \(2\)/ }).click()
+await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).click()
+await page.getByRole('tab', { name: /Edits to send back \(2\)/ }).click()
 const panel = page.locator('[data-testid="edits-export"]')
 check('panel lists the two waiting edits (the undone description is not on it)', (await panel.innerText()).includes('learningApproaches') && !(await panel.innerText()).includes('description.en') && (await panel.innerText()).includes('citation.year'))
 const [download] = await Promise.all([page.waitForEvent('download'), panel.getByRole('button', { name: 'Download file' }).click()])
@@ -146,7 +153,10 @@ check('downloaded file has the batch, both edits and their labels', json.kind ==
 await panel.getByRole('button', { name: 'Mark as sent back' }).click()
 await page.waitForTimeout(900)
 check('marking sends the batch name and a time', table.filter((r) => r.exported_at).length >= 2 && table.some((r) => r.export_batch === json.batch))
-check('toolbar counts 0 afterwards and the edits stay visible', (await page.getByRole('button', { name: /Edits to send back \(0\)/ }).count()) === 1 && (await page.locator('tbody tr').first().innerText()).includes('1984'))
+check('the section counts 0 afterwards', (await page.getByRole('tab', { name: /Edits to send back \(0\)/ }).count()) === 1)
+await page.getByRole('button', { name: /^Back to/ }).click()
+await page.waitForTimeout(500)
+check('back in the repo view the edits stay visible', (await page.getByRole('button', { name: /^Review( \(\d+\))?$/ }).count()) === 1 && (await page.locator('tbody tr').first().innerText()).includes('1984'))
 await page.screenshot({ path: path.join(outDir, 'after-send-back.png') })
 
 check('no page errors', errors.length === 0, errors.join(' | ').slice(0, 300))

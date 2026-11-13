@@ -131,27 +131,37 @@ const openLesson = async (page) => {
   check('Explorer tab row lists TeachingBase next to the other bases', (await page.getByRole('button', { name: /^TeachingBase/ }).count()) === 1)
   check('no separate "Teaching lessons" tab or menu item', (await page.getByText('Teaching lessons', { exact: true }).count()) === 0)
   await page.getByRole('button', { name: /^TheoryBase/ }).click()
-  await page.waitForTimeout(1500)
+  await page.waitForSelector('tbody tr', { timeout: 20000 })
   const theoryRows = await page.locator('tbody tr').count()
   check('another tab (TheoryBase) still lists its records', theoryRows > 0, `${theoryRows} rows`)
   check('no TeachingBase toolbar on another tab', (await page.locator('[data-testid="teachingbase-toolbar"]').count()) === 0)
 
+  // Reviewing sits behind one Review button (Dustin, 2026-11-13). On the TeachingBase tab it opens on the lesson links.
+  const openSpace = async (pg) => { await pg.getByTestId('open-review-space').click(); await pg.waitForSelector('[data-testid="overall-progress"]', { timeout: 15000 }) }
+  const closeSpace = async (pg) => { await pg.getByRole('button', { name: /^Back to/ }).click(); await pg.waitForTimeout(300) }
+  const progressText = async (pg) => { await openSpace(pg); const t = await pg.locator('[data-testid="overall-progress"]').innerText(); await closeSpace(pg); return t }
   await page.getByRole('button', { name: /^TeachingBase/ }).click()
-  await page.waitForSelector('[data-testid="overall-progress"]', { timeout: 15000 })
+  await page.waitForSelector('tbody tr', { timeout: 15000 })
+  check('the TeachingBase tab no longer shows the review cards above the table', (await page.locator('[data-testid="teachingbase-toolbar"]').count()) === 0 && (await page.locator('[data-testid="start-review"]').count()) === 1)
+  const tabTop = await page.locator('tbody tr').first().evaluate((el) => el.getBoundingClientRect().top)
+  check('the first lesson sits near the top of the page', tabTop < 420, `${Math.round(tabTop)}px from the top`)
+  await openSpace(page)
   await page.waitForFunction((n) => document.querySelector('[data-testid="overall-progress"]')?.textContent?.includes(`of ${n} links`), totalLinks, { timeout: 15000 })
   const progress = await page.locator('[data-testid="overall-progress"]').innerText()
   check(`progress starts at 0 of ${totalLinks} links judged`, progress.startsWith(`0 of ${totalLinks} links judged`), progress)
   check('start-here progress counts the sample', (await page.locator('[data-testid="start-progress"]').innerText()).includes(`0 of ${sampleLinks}`))
-  check('table lists every lesson', (await page.locator('tbody tr').count()) === lessons.length, `${await page.locator('tbody tr').count()} of ${lessons.length}`)
-  check('draft tag in the toolbar says LLM synthesized draft', (await page.locator('[data-testid="teachingbase-toolbar"] .chip-draft').first().innerText()) === 'LLM synthesized draft, awaiting review')
+  check('draft tag in the Review space says LLM synthesized draft', (await page.locator('[data-testid="teachingbase-toolbar"] .chip-draft').first().innerText()) === 'LLM synthesized draft, awaiting review')
+  check('Reviewers section is in the Review space for admins', (await page.locator('[data-testid="reviewers-panel"]').count()) === 1)
+  await page.screenshot({ path: path.join(outDir, 'review-space-desktop.png'), fullPage: true })
   await page.getByRole('button', { name: 'Start-here selection only' }).click()
+  await closeSpace(page)
   const withSample = lessons.filter((l) => l.sample_count > 0).length
   check('start-here filter narrows to lessons with sampled links', (await page.locator('tbody tr').count()) === withSample, `${await page.locator('tbody tr').count()} vs ${withSample}`)
-  await page.getByRole('button', { name: 'Start-here selection only' }).click()
+  await page.getByRole('button', { name: 'Start-here selection only ×' }).click()
+  check('table lists every lesson', (await page.locator('tbody tr').count()) === lessons.length, `${await page.locator('tbody tr').count()} of ${lessons.length}`)
   await page.screenshot({ path: path.join(outDir, 'tab-desktop.png'), fullPage: true })
 
   await openLesson(page)
-  check('Reviewers section is in the TeachingBase tab for admins', (await page.locator('[data-testid="reviewers-panel"]').count()) === 1)
   check('card shows the draft tag', (await page.locator('[data-testid="teachingbase-card"] [data-testid="draft-tag"]').innerText()) === 'LLM synthesized draft, awaiting review')
   const total = target.link_count + target.data.components.length
   check('card progress counts links and parts', (await page.locator('[data-testid="lesson-progress"]').innerText()).startsWith(`0 of ${total}`))
@@ -163,24 +173,29 @@ const openLesson = async (page) => {
   const p0 = db.posted[0]
   check('a verdict row was sent with kind, key, summary, note and verdict', db.posted.length === 1 && p0.item_kind === 'link' && p0.item_key === target.data.links[0].item_key && p0.verdict === 'correct' && p0.note === 'looks right' && p0.lesson_id === target.id && !!p0.reviewer_id && !!p0.reviewer_name)
   check('judged item shows reviewer name and date', /Judged by .+ on \d/.test(await first.locator('[data-testid="verdict-line"]').innerText()))
-  check('overall progress is 1 of all links', (await page.locator('[data-testid="overall-progress"]').innerText()).startsWith(`1 of ${totalLinks} links judged`))
+  check('overall progress is 1 of all links', (await progressText(page)).startsWith(`1 of ${totalLinks} links judged`))
   await first.getByRole('button', { name: 'Change verdict' }).click()
   await first.locator('button[data-verdict="wrong"]').click()
   await page.waitForSelector(`[data-item-key="${target.data.links[0].item_key}"] [data-testid="verdict-line"]`)
-  check('changing adds a second row and the newest counts once', db.posted.length === 2 && (await page.locator('[data-testid="overall-progress"]').innerText()).startsWith(`1 of ${totalLinks} links judged`))
+  check('changing adds a second row and the newest counts once', db.posted.length === 2 && (await progressText(page)).startsWith(`1 of ${totalLinks} links judged`))
+  await openSpace(page)
   await page.getByRole('button', { name: 'Still to check' }).click()
+  await closeSpace(page)
   check('"Still to check" keeps a partly judged lesson', (await tbRow(page, target.label).count()) === 1)
-  await page.getByRole('button', { name: 'Still to check' }).click()
+  await page.getByRole('button', { name: 'Still to check ×' }).click()
 
+  await openSpace(page)
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Download verdicts' }).click()])
   const dlPath = path.join(outDir, 'verdicts.json')
   await download.saveAs(dlPath)
   const dl = JSON.parse(readFileSync(dlPath, 'utf8'))
   check('download holds the newest verdict per item', dl.verdicts.length === 1 && dl.verdicts[0].verdict === 'wrong' && !!dl.verdicts[0].reviewer && !!dl.verdicts[0].date)
+  await closeSpace(page)
 
   // German
   await page.getByRole('button', { name: 'German', exact: true }).click()
   check('draft tag in German', (await page.locator('[data-testid="teachingbase-card"] [data-testid="draft-tag"]').innerText()) === 'LLM-erzeugter Entwurf, Prüfung ausstehend')
+  await openSpace(page)
   check('German progress and reviewers wording', (await page.locator('[data-testid="overall-progress"]').innerText()).includes('Verknüpfungen geprüft') && (await page.locator('[data-testid="reviewers-panel"] h3').innerText()) === 'Prüfende')
   await page.screenshot({ path: path.join(outDir, 'card-desktop-de.png'), fullPage: true })
   await page.getByRole('button', { name: 'English', exact: true }).click()
@@ -220,7 +235,7 @@ const openLesson = async (page) => {
 {
   const { ctx, page } = await open('admin', false, { width: 1440, height: 1000 })
   await go(page, '/dashboard/admin/teaching-lessons')
-  await page.waitForSelector('[data-testid="overall-progress"]', { timeout: 15000 })
+  await page.waitForSelector('[data-testid="start-review"]', { timeout: 15000 })
   check('the first address (/dashboard/admin/teaching-lessons) redirects to the TeachingBase tab', page.url().includes('/dashboard/admin/explore?tab=teachingbase'), page.url())
   await ctx.close()
 }
@@ -279,6 +294,7 @@ for (const v of widths) {
   for (const who of ['admin', 'reviewer']) {
     const { ctx, page } = await open(who === 'admin' ? 'admin' : 'student', who === 'reviewer', { width: v.w, height: v.h }, { mobile: v.mobile })
     await go(page, who === 'admin' ? '/dashboard/admin/explore?tab=teachingbase' : '/dashboard/teaching-base')
+    if (who === 'admin') { await page.getByTestId('open-review-space').click() }
     await page.waitForSelector('[data-testid="overall-progress"]', { timeout: 15000 })
     const measure = () => page.evaluate(() => {
       const vis = (el) => { const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' }
@@ -288,7 +304,7 @@ for (const v of widths) {
       return { overflow: document.documentElement.scrollWidth - window.innerWidth, small }
     })
     for (const [label, open_] of [['list', false], ['card', true]]) {
-      if (open_) await openLesson(page)
+      if (open_) { if (who === 'admin') await page.getByRole('button', { name: /^Back to/ }).click(); await openLesson(page) }
       await page.waitForTimeout(400)
       const m = await measure()
       console.log(`${v.name} ${who} ${label}: sideways overflow ${m.overflow}px, TeachingBase controls under 44px: ${m.small.length}${m.small.length ? ' [' + m.small.slice(0, 6).join(', ') + ']' : ''}`)
