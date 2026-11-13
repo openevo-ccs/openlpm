@@ -46,13 +46,15 @@ export function applyGraphSettings(
   info: Map<string, NodeLabelInfo>,
   /** Nodes physics must not move (the groups), so the structure stays readable. */
   pinned: (nodeId: string) => boolean = () => false,
+  /** A graph whose fixed layout already groups the items can allow physics for more of them than the default. */
+  physicsMax: number = PHYSICS_MAX_NODES,
 ): { physicsSkipped: boolean } {
   cy.layout({ ...fixedLayout, animate: false } as LayoutOptions).run()
-  const physicsSkipped = settings.layout === 'physics' && cy.nodes().length > PHYSICS_MAX_NODES
+  const physicsSkipped = settings.layout === 'physics' && cy.nodes().length > physicsMax
   if (settings.layout === 'physics' && !physicsSkipped) {
     const locked = cy.nodes().filter((n) => pinned(n.id()))
     locked.lock()
-    cy.layout({ ...physicsLayoutOptions(settings.spacing), fit: false } as unknown as LayoutOptions).run()
+    cy.layout({ ...physicsLayoutOptions(settings.spacing, cy.nodes().length), fit: false } as unknown as LayoutOptions).run()
     locked.unlock()
   }
   const candidates: LabelCandidate[] = cy.nodes().map((n) => {

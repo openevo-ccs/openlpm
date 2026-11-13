@@ -196,7 +196,7 @@ export function pickVisibleLabels(items: LabelCandidate[]): Set<string> {
  * cross-links and the arcs out of the simulation, since they would pull every
  * group's nodes toward the middle.
  */
-export function physicsLayoutOptions(spacing: number): Record<string, unknown> {
+export function physicsLayoutOptions(spacing: number, nodeCount = 0): Record<string, unknown> {
   return {
     name: 'cose',
     animate: false,
@@ -209,6 +209,56 @@ export function physicsLayoutOptions(spacing: number): Record<string, unknown> {
     nodeOverlap: 12,
     gravity: 1.2,
     componentSpacing: 40,
-    numIter: 1000,
+    // A big graph starts from a grouped layout that is already close, so fewer rounds are enough and the page stays responsive.
+    numIter: nodeCount > 500 ? 350 : 1000,
   }
+}
+
+/**
+ * Fixed layout for many items of which only some are linked: every group of linked items becomes its own block, biggest first,
+ * and the blocks are packed into rows about as wide as a screen. Inside a block the items follow the links outward from the
+ * best-linked one, so neighbours sit next to each other. Items with no link at all fill one block at the end. The same input
+ * always gives the same picture.
+ */
+export function blockLayoutPositions(ids: string[], links: [string, string][], gap = 60): Map<string, { x: number; y: number }> {
+  const adj = new Map<string, string[]>()
+  for (const id of ids) adj.set(id, [])
+  for (const [a, b] of links) {
+    if (a === b || !adj.has(a) || !adj.has(b)) continue
+    adj.get(a)!.push(b)
+    adj.get(b)!.push(a)
+  }
+  const order = new Map(ids.map((id, i) => [id, i]))
+  const byOrder = (a: string, b: string) => order.get(a)! - order.get(b)!
+  const starts = [...ids].sort((a, b) => adj.get(b)!.length - adj.get(a)!.length || byOrder(a, b))
+  const seen = new Set<string>()
+  const groups: string[][] = []
+  for (const start of starts) {
+    if (seen.has(start)) continue
+    seen.add(start)
+    const group: string[] = []
+    for (let head = 0, queue = [start]; head < queue.length; head++) {
+      const id = queue[head]
+      group.push(id)
+      for (const next of [...adj.get(id)!].sort(byOrder)) if (!seen.has(next)) { seen.add(next); queue.push(next) }
+    }
+    groups.push(group)
+  }
+  const linked = groups.filter((g) => g.length > 1).sort((a, b) => b.length - a.length)
+  const alone = groups.filter((g) => g.length === 1).map((g) => g[0]).sort(byOrder)
+
+  const blocks = linked.map((ids2) => ({ ids: ids2, cols: Math.max(1, Math.ceil(Math.sqrt(ids2.length))) }))
+  if (alone.length > 0) blocks.push({ ids: alone, cols: Math.max(1, Math.ceil(Math.sqrt(alone.length * 2.2))) })
+  const sized = blocks.map((b) => ({ ...b, w: b.cols * gap, h: Math.ceil(b.ids.length / b.cols) * gap }))
+  const area = sized.reduce((sum, b) => sum + (b.w + gap) * (b.h + gap), 0)
+  const rowWidth = Math.max(Math.sqrt(area * 2.2), ...sized.map((b) => b.w))
+  const out = new Map<string, { x: number; y: number }>()
+  let x = 0, y = 0, rowHeight = 0
+  for (const b of sized) {
+    if (x > 0 && x + b.w > rowWidth) { x = 0; y += rowHeight + gap; rowHeight = 0 }
+    b.ids.forEach((id, i) => out.set(id, { x: x + (i % b.cols) * gap, y: y + Math.floor(i / b.cols) * gap }))
+    x += b.w + gap
+    rowHeight = Math.max(rowHeight, b.h)
+  }
+  return out
 }
