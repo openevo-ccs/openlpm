@@ -92,17 +92,22 @@ async function main() {
   }
 
   const serviceKey = loadServiceRoleKey()
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/literaturebase_snapshot`, {
-    method: 'POST',
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      'Content-Type': 'application/json',
-      Prefer: 'resolution=merge-duplicates,return=minimal',
-    },
-    body: JSON.stringify(rows),
-  })
-  if (!res.ok) throw new Error(`Upsert failed: ${res.status} ${await res.text()}`)
+  // One request for all rows timed out at about 6,600 records (2026-11-14), so the rows go in batches.
+  const BATCH = 200
+  for (let i = 0; i < rows.length; i += BATCH) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/literaturebase_snapshot`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates,return=minimal',
+      },
+      body: JSON.stringify(rows.slice(i, i + BATCH)),
+    })
+    if (!res.ok) throw new Error(`Upsert failed at row ${i}: ${res.status} ${await res.text()}`)
+    if ((i / BATCH) % 5 === 0) console.log(`  ${Math.min(i + BATCH, rows.length)} of ${rows.length}`)
+  }
   console.log(`\nUpserted ${rows.length} rows into literaturebase_snapshot.`)
 }
 
