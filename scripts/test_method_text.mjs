@@ -52,7 +52,7 @@ test('step lists are picked by language too', () => {
 test('a tag reads German for German readers and English with the German term for the rest', () => {
   assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'de'), 'Einstieg')
   assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'en'), 'Introduction (Einstieg)')
-  assert.equal(M.tagLabel('learningApproaches', 'kooperativ', 'en'), 'Cooperative (kooperativ)')
+  assert.equal(M.tagLabel('learningApproaches', 'kooperativ', 'en'), 'Cooperative/social (kooperativ/sozial)')
   assert.equal(M.tagLabel('learningApproaches', 'unbekannt', 'en'), 'unbekannt')
 })
 
@@ -89,6 +89,8 @@ test('the app copy of the tag readings matches methodsbase/vocabularies/method-t
     const mine = M.TAG_READINGS[field]
     assert.ok(mine, `no readings for ${field}`)
     assert.deepEqual(Object.fromEntries(entries.map((e) => [e.term, e.en])), mine, field)
+    // a German name that differs from the stored term must be in the app copy too
+    assert.deepEqual(Object.fromEntries(entries.filter((e) => e.de).map((e) => [e.term, e.de])), M.TAG_GERMAN_NAMES[field], `${field} German names`)
   }
 })
 
@@ -104,8 +106,8 @@ test('tags added in the app have the name they were typed with, and the other la
   assert.equal(M.tagReading('learningApproaches', 'Open play', 'de'), 'Open play')
   assert.equal(M.tagLabel('learningApproaches', 'Open play', 'en'), 'Open play')
   // the taxonomy's own tags are unchanged
-  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative')
-  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'de'), 'kooperativ')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative/social')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'de'), 'kooperativ/sozial')
   assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'en'), 'Introduction (Einstieg)')
   assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'de'), 'Einstieg')
 })
@@ -117,7 +119,7 @@ test('a name set in the app replaces the name of a taxonomy tag in that language
   assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'en'), 'Opening')
   assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'de'), 'Einstieg')
   assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'de'), 'kooperatives Lernen')
-  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative')
+  assert.equal(M.tagReading('learningApproaches', 'kooperativ', 'en'), 'Cooperative/social')
   assert.equal(M.tagLabel('lessonPhases', 'Einstieg', 'en'), 'Opening (Einstieg)')
   // names typed for a tag that is still in a record under its old spelling
   assert.equal(M.tagReading('learningApproaches', 'konzeptbasiert/vernetztend', 'en'), 'Conceptual/networked')

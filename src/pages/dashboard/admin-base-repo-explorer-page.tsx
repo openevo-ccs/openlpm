@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
@@ -784,14 +784,35 @@ function HeaderFilter({
   onChange: (value: string) => void
 }) {
   const [open, setOpen] = useState(false)
+  // The pick-list is placed against the window instead of the column, so the table's own scroll area cannot cut it off. A heading near
+  // the right edge (Review status, the last column) opens it to the left of the button. Feedback f8dcb3ec (Dustin, 2026-11-13).
+  const [place, setPlace] = useState<{ top: number; left?: number; right?: number; maxHeight: number } | null>(null)
   const ref = useRef<HTMLSpanElement>(null)
+  const toggle = (e: ReactMouseEvent<HTMLButtonElement>) => {
+    if (open) { setOpen(false); return }
+    const r = e.currentTarget.getBoundingClientRect()
+    const room = window.innerHeight - r.bottom - 14
+    const alignRight = r.left + 320 > window.innerWidth - 8
+    setPlace({
+      top: r.bottom + 6,
+      ...(alignRight ? { right: Math.max(8, window.innerWidth - r.right) } : { left: r.left }),
+      maxHeight: Math.max(140, Math.min(320, room)),
+    })
+    setOpen(true)
+  }
   useEffect(() => {
     if (!open) return
     const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    const close = () => setOpen(false)
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
-    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey) }
+    window.addEventListener('resize', close)
+    window.addEventListener('scroll', close, true)
+    return () => {
+      document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', close); window.removeEventListener('scroll', close, true)
+    }
   }, [open])
   const label = (v: string) => (labelFor ? labelFor(v) : v)
   return (
@@ -803,12 +824,12 @@ function HeaderFilter({
         aria-label={`Filter ${header}${value ? ` (currently ${label(value)})` : ''}`}
         aria-expanded={open}
         title={value ? `Filtered: ${label(value)}` : `Filter ${header.toLowerCase()}`}
-        onClick={() => setOpen((o) => !o)}
+        onClick={toggle}
       >
         <Filter size={11} />
       </button>
-      {open && (
-        <div className="popover" style={{ width: 'max-content', minWidth: 160, maxWidth: 320, maxHeight: 320, overflowY: 'auto', padding: 6, fontWeight: 400, fontSize: 13, color: 'var(--text-primary)' }}>
+      {open && place && (
+        <div className="popover" style={{ position: 'fixed', top: place.top, left: place.left ?? 'auto', right: place.right ?? 'auto', width: 'max-content', minWidth: 160, maxWidth: 320, maxHeight: place.maxHeight, overflowY: 'auto', padding: 6, fontWeight: 400, fontSize: 13, color: 'var(--text-primary)' }}>
           <div className="menu">
             <button type="button" onClick={() => { onChange(''); setOpen(false) }} style={{ fontWeight: value === '' ? 600 : 400 }}>
               All
