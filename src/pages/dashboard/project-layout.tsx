@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, Landmark, BookCheck, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
-import { WORKSHOP_TAG } from '@/lib/supabase/literature-workshop'
+import { ArrowLeft, BarChart3, Landmark, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, getUserProjects, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { listMyPendingRequests } from '@/lib/supabase/members'
@@ -433,7 +432,6 @@ export default function ProjectLayout() {
     { key: 'calendar', href: `/dashboard/${slug}/calendar`, icon: <CalendarRange size={14} />, label: isGermanOnly ? 'Wochenplan' : 'Calendar' },
     { key: 'time', href: `/dashboard/${slug}/time`, icon: <Hourglass size={14} />, label: 'Time' },
     { key: 'literature', href: `/dashboard/${slug}/literature`, icon: <BookOpen size={14} />, label: 'Literature' },
-    ...(project.theme_tags?.includes(WORKSHOP_TAG) ? [{ key: 'literature-review', href: `/dashboard/${slug}/literature-review`, icon: <BookCheck size={14} />, label: 'Literature Workshop' }] : []),
     { key: 'review', href: `/dashboard/${slug}/review`, icon: <Clock size={14} />, label: 'Review' },
     { key: 'discussions', href: `/dashboard/${slug}/discussions`, icon: <MessageSquare size={14} />, label: 'Discussions' },
     { key: 'notebooks', href: `/dashboard/${slug}/notebooks`, icon: <Network size={14} />, label: 'Notebooks', end: false },
