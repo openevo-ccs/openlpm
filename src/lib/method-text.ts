@@ -150,10 +150,10 @@ export type TagField = 'lessonPhases' | 'learningApproaches'
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {
   lessonPhases: {
     Einstieg: 'Introduction',
-    Erarbeitung: 'Working through new material',
+    Erarbeitung: 'Knowledge acquisition',
     'Festigung/Anwendung': 'Practice and application',
     'Reflexion/Feedback': 'Reflection and feedback',
-    'Ergebnisermittlung/Bewertung': 'Collecting and judging results',
+    'Ergebnisermittlung/Bewertung': 'Evaluation',
   },
   learningApproaches: {
     erfahrungsbasiert: 'Experience-based',
@@ -162,13 +162,21 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     projektbasiert: 'Project-based',
     forschend: 'Inquiry-based',
     'konzeptbasiert/vernetzend': 'Conceptual/networked',
-    kooperativ: 'Cooperative',
+    kooperativ: 'Cooperative/social',
     selbstreguliert: 'Self-regulated',
     kreativ: 'Creative',
     bewegt: 'Movement-based',
     digital: 'Digital',
     außerschulisch: 'Out-of-school',
+    'kritisch/reflexiv': 'Critical/reflective',
   },
+}
+
+// Tags whose German name differs from the stored term (the `de` key of an entry in methodsbase/vocabularies/method-tags.yaml).
+// The stored term stays as it is, so records, filters and links keep working.
+export const TAG_GERMAN_NAMES: Record<TagField, Record<string, string>> = {
+  lessonPhases: {},
+  learningApproaches: { kooperativ: 'kooperativ/sozial' },
 }
 
 // Names given to tags inside OpenLPM (Dustin, 2026-11-13: tags can be named and edited in either language). A tag is stored once, under
@@ -203,7 +211,7 @@ export function tagNameIn(field: TagField, term: string, lang: string, extra?: R
   const set = extra?.[term] ?? tagOverlay[field][term]
   const given = lang === 'de' ? set?.de : set?.en
   if (given) return given
-  if (lang === 'de') return term in TAG_READINGS[field] ? term : null
+  if (lang === 'de') return term in TAG_READINGS[field] ? TAG_GERMAN_NAMES[field][term] ?? term : null
   return TAG_READINGS[field][term] ?? null
 }
 

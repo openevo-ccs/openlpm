@@ -99,6 +99,13 @@ export function authorLastName(author: string): string {
   return comma > 0 ? name.slice(0, comma).trim() : name
 }
 
+/** A LiteratureBase record's type as a reader should see it: "journal-article" shows as "Journal article". No type shows as a dash. */
+export function literatureTypeName(type: unknown): string {
+  if (typeof type !== 'string' || !type) return '—'
+  const words = type.replace(/-/g, ' ')
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
 function formatAuthorsShort(authors: unknown): string {
   if (!Array.isArray(authors) || authors.length === 0) return '—'
   const names = authors.map((a) => authorLastName(String(a)))
@@ -163,6 +170,12 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
       { header: 'Authors', get: (row) => formatAuthorsShort((row.data as any)?.citation?.authors) },
       { header: 'Year', get: (row) => String((row.data as any)?.citation?.year ?? row.secondary ?? '—') },
       { header: 'Title', get: (row) => row.label },
+      // Dustin, 2026-11-13 (feedback 804d2f67): "a column for type (journal article etc.)". The stored value is the record's `type`.
+      {
+        header: 'Type',
+        get: (row) => literatureTypeName((row.data as any)?.type),
+        filterValues: (row) => [literatureTypeName((row.data as any)?.type)],
+      },
     ],
     relationFields: [],
   },
