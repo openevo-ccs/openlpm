@@ -21,6 +21,7 @@ import ConceptsPage from '@/pages/dashboard/concepts-page'
 import ConceptMeaningsPage from '@/pages/dashboard/concept-meanings-page'
 import TheoriesPage from '@/pages/dashboard/theories-page'
 import StrandsPage from '@/pages/dashboard/strands-page'
+import LiteratureReviewPage from '@/pages/dashboard/literature-review-page'
 import CalendarPage from '@/pages/dashboard/calendar-page'
 import TimePage from '@/pages/dashboard/time-page'
 import MethodsPage from '@/pages/dashboard/methods-page'
@@ -205,6 +206,7 @@ export default function App() {
             <Route path="regional-assets" element={<RegionalAssetsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="literature" element={<LiteraturePage />} />
+            <Route path="literature-review" element={<LiteratureReviewPage />} />
             <Route path="review" element={<ReviewPage />} />
             <Route path="discussions" element={<DiscussionsPage />} />
             <Route path="notebooks" element={<PortfoliosPage />} />
