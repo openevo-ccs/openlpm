@@ -1,6 +1,6 @@
 SET search_path = public, extensions;
 
--- EvoKE Literature Workshop (2026-11-14): a space where evolution education researchers check, tag and annotate the records of the
+-- Literature review space (2026-11-14): a space where evolution education researchers check, tag and annotate the records of the
 -- LiteratureBase, one record at a time, and propose missing papers by DOI. Built from existing parts: a normal project space (members,
 -- roles, invitations), the literaturebase_snapshot cache the Literature page already reads, and two small tables for what members add.
 --
@@ -11,7 +11,7 @@ SET search_path = public, extensions;
 --
 -- Who can do what: members of the space who are not viewers can add rows as themselves. Every member can read all rows of the space,
 -- so reviewers see each other's tags and notes.
--- Rollback: DROP TABLE literature_suggestions; DROP TABLE literature_reviews; DELETE FROM projects WHERE slug = 'evoke-literature-workshop';
+-- Rollback: DROP TABLE literature_suggestions; DROP TABLE literature_reviews; DELETE FROM projects WHERE slug = 'literature-review-space';
 
 CREATE TABLE IF NOT EXISTS literature_reviews (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -88,12 +88,12 @@ BEGIN
   SELECT id INTO v_user FROM users WHERE email = 'dustin.eirdosh@eva.mpg.de';
 
   INSERT INTO projects (slug, name, description, status, epistemic_status, epistemic_status_note, hosting_mode, is_private, maturity, parent_project_id, focus_type, region_tags, theme_tags, working_languages)
-  VALUES ('evoke-literature-workshop', $J$EvoKE Literature Workshop$J$,
+  VALUES ('literature-review-space', $J$Literature review space$J$,
     $J$A shared place where evolution education researchers check, tag and annotate the records of the LiteratureBase, one record at a time. Each review is saved under your name and goes back into the library in a weekly batch. You can also propose a missing paper by its DOI.$J$,
     'active', 'in-development', $J$A working space for checking and tagging literature records. Nothing in it is a finished result.$J$, 'hosted', TRUE, 'draft', NULL, 'thematic', ARRAY[]::TEXT[], ARRAY['literature-workshop','evolution-education']::TEXT[], ARRAY['en']::TEXT[])
   ON CONFLICT (slug) DO NOTHING;
-  SELECT id INTO v_project FROM projects WHERE slug = 'evoke-literature-workshop';
-  IF v_project IS NULL THEN RAISE EXCEPTION 'evoke-literature-workshop missing'; END IF;
+  SELECT id INTO v_project FROM projects WHERE slug = 'literature-review-space';
+  IF v_project IS NULL THEN RAISE EXCEPTION 'literature-review-space missing'; END IF;
   IF v_user IS NOT NULL THEN
     INSERT INTO project_members (project_id, user_id, role) VALUES (v_project, v_user, 'owner') ON CONFLICT (project_id, user_id) DO NOTHING;
     UPDATE projects SET created_by = v_user WHERE id = v_project AND created_by IS NULL;
