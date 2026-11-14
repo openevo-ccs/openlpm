@@ -90,7 +90,7 @@ BEGIN
   INSERT INTO projects (slug, name, description, status, epistemic_status, epistemic_status_note, hosting_mode, is_private, maturity, parent_project_id, focus_type, region_tags, theme_tags, working_languages)
   VALUES ('evoke-literature-workshop', $J$EvoKE Literature Workshop$J$,
     $J$A shared place where evolution education researchers check, tag and annotate the records of the LiteratureBase, one record at a time. Each review is saved under your name and goes back into the library in a weekly batch. You can also propose a missing paper by its DOI.$J$,
-    'active', NULL, NULL, 'hosted', TRUE, 'draft', NULL, 'thematic', ARRAY[]::TEXT[], ARRAY['literature-workshop','evolution-education']::TEXT[], ARRAY['en']::TEXT[])
+    'active', 'in-process', $J$A working space for checking and tagging literature records. Nothing in it is a finished result.$J$, 'hosted', TRUE, 'draft', NULL, 'thematic', ARRAY[]::TEXT[], ARRAY['literature-workshop','evolution-education']::TEXT[], ARRAY['en']::TEXT[])
   ON CONFLICT (slug) DO NOTHING;
   SELECT id INTO v_project FROM projects WHERE slug = 'evoke-literature-workshop';
   IF v_project IS NULL THEN RAISE EXCEPTION 'evoke-literature-workshop missing'; END IF;
