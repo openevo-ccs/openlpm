@@ -788,6 +788,7 @@ function HeaderFilter({
   // the right edge (Review status, the last column) opens it to the left of the button. Feedback f8dcb3ec (Dustin, 2026-11-13).
   const [place, setPlace] = useState<{ top: number; left?: number; right?: number; maxHeight: number } | null>(null)
   const ref = useRef<HTMLSpanElement>(null)
+  const popRef = useRef<HTMLDivElement>(null)
   const toggle = (e: ReactMouseEvent<HTMLButtonElement>) => {
     if (open) { setOpen(false); return }
     const r = e.currentTarget.getBoundingClientRect()
@@ -805,13 +806,16 @@ function HeaderFilter({
     const onDown = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     const close = () => setOpen(false)
+    // The page or the table scrolling moves the heading away from the pick-list, so the list closes. Scrolling the list itself must not
+    // close it (feedback 661e87ee, Susan, 2026-11-14: "one can't scroll down the list - the window disappears").
+    const onScroll = (e: Event) => { if (popRef.current && popRef.current.contains(e.target as Node)) return; setOpen(false) }
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
     window.addEventListener('resize', close)
-    window.addEventListener('scroll', close, true)
+    window.addEventListener('scroll', onScroll, true)
     return () => {
       document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey)
-      window.removeEventListener('resize', close); window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close); window.removeEventListener('scroll', onScroll, true)
     }
   }, [open])
   const label = (v: string) => (labelFor ? labelFor(v) : v)
@@ -829,7 +833,7 @@ function HeaderFilter({
         <Filter size={11} />
       </button>
       {open && place && (
-        <div className="popover" style={{ position: 'fixed', top: place.top, left: place.left ?? 'auto', right: place.right ?? 'auto', width: 'max-content', minWidth: 160, maxWidth: 320, maxHeight: place.maxHeight, overflowY: 'auto', padding: 6, fontWeight: 400, fontSize: 13, color: 'var(--text-primary)' }}>
+        <div ref={popRef} className="popover" style={{ position: 'fixed', top: place.top, left: place.left ?? 'auto', right: place.right ?? 'auto', width: 'max-content', minWidth: 160, maxWidth: 320, maxHeight: place.maxHeight, overflowY: 'auto', padding: 6, fontWeight: 400, fontSize: 13, color: 'var(--text-primary)' }}>
           <div className="menu">
             <button type="button" onClick={() => { onChange(''); setOpen(false) }} style={{ fontWeight: value === '' ? 600 : 400 }}>
               All
@@ -907,6 +911,10 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
     const keyOf = (r: NodeRef) => `${r.repoKey}:${r.row.id}`
     const byId = new Map(rows.map((r) => [keyOf(r), r]))
     const edges: { source: string; target: string; field: string; hier: boolean }[] = []
+    // Two records joined in more than one way (a method that is a related approach and also a more general method, or two methods that list
+    // each other) get one line, as the graph standard asks: the strongest link is drawn and the others are only named. A broader/narrower link
+    // wins and keeps its direction. Feedback 0279d2dc (Susan, 2026-11-15): "why are there two arrows/links here?"
+    const pairIndex = new Map<string, number>()
     for (const r of rows) {
       const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
       if (!cfg) continue
@@ -915,7 +923,18 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
         const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
         for (const targetId of targetIds) {
           const targetKey = `${rel.targetRepo}:${targetId}`
-          if (byId.has(targetKey)) edges.push({ source: keyOf(r), target: targetKey, field: rel.field, hier: !!rel.hierarchy })
+          if (!byId.has(targetKey)) continue
+          const source = keyOf(r)
+          const pair = source < targetKey ? `${source}|${targetKey}` : `${targetKey}|${source}`
+          const at = pairIndex.get(pair)
+          if (at === undefined) {
+            pairIndex.set(pair, edges.length)
+            edges.push({ source, target: targetKey, field: rel.field, hier: !!rel.hierarchy })
+          } else {
+            const kept = edges[at]
+            if (rel.hierarchy && !kept.hier) edges[at] = { source, target: targetKey, field: [rel.field, kept.field].join(', '), hier: true }
+            else if (!kept.field.split(', ').includes(rel.field)) kept.field = `${kept.field}, ${rel.field}`
+          }
         }
       }
     }
@@ -962,6 +981,11 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
       if (hierarchyMode) {
         containerRef.current.setAttribute('data-hierarchy-tiers', JSON.stringify(Object.fromEntries(ordered.map((r) => [rowLabel(r.row, lang), tiers.get(keyOf(r)) ?? null]))))
       } else containerRef.current.removeAttribute('data-hierarchy-tiers')
+      // A second hook for the browser check: how many lines are drawn, and how many pairs of records have more than one.
+      const pairCount = new Map<string, number>()
+      for (const e of drawnEdges) { const k = e.source < e.target ? `${e.source}|${e.target}` : `${e.target}|${e.source}`; pairCount.set(k, (pairCount.get(k) ?? 0) + 1) }
+      containerRef.current.setAttribute('data-edge-count', String(drawnEdges.length))
+      containerRef.current.setAttribute('data-edge-pairs-twice', String(Array.from(pairCount.values()).filter((n) => n > 1).length))
 
       const info = new Map<string, NodeLabelInfo>()
       const elements: ElementDefinition[] = [
