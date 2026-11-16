@@ -38,6 +38,8 @@
     "exceljs": "^4.4.0",
     "html2canvas-pro": "2.5.2",
     "js-yaml": "^4.1.0",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "lucide-react": "^0.303.0",
     "papaparse": "^5.7.0",
     "react": "^18.2.0",

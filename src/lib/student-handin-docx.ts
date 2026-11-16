@@ -131,7 +131,7 @@ export async function buildHandInDocx(h: HandIn): Promise<Blob> {
 
   children.push(
     p(
-      'Diese Datei enthält weder deinen Namen noch deine E-Mail-Adresse.',
+      'Diese Datei enthält deinen Namen und deine Arbeit, aber keine E-Mail-Adresse.',
       { italics: true, size: 16 }
     )
   )
