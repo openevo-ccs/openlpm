@@ -66,7 +66,9 @@ export function downloadBlob(blob: Blob, filename: string) {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  // Some phone browsers start the download after this function returns, so the
+  // link is released late. Releasing it at once can leave an empty or failed download.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
 }
 
 export async function parseJsonFile(file: File): Promise<Record<string, unknown>[]> {

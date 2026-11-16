@@ -123,7 +123,7 @@ export default function StudentWorkPage() {
           <h1 style={{ marginBottom: 4 }}>Aufgabe 1: Basiskonzepte</h1>
           <p className="muted" style={{ marginTop: 0, maxWidth: 680 }}>
             Hier hältst du fest, was du für die erste Aufgabe im Seminar erarbeitest. Alles wird beim Schreiben automatisch gespeichert.
-            Am Ende lädst du eine Word-Datei herunter und gibst sie in Moodle ab.
+            Am Ende lädst du eine Word- oder PDF-Datei herunter und gibst sie in Moodle ab.
           </p>
         </div>
         <span className="muted" style={{ fontSize: 12 }} aria-live="polite">
@@ -558,12 +558,18 @@ function AbgabeTab({
     if (n && n !== storedName) void save('meta', 'participant', { participant_name: n })
   }
 
-  const downloadWord = async () => {
+  const download = async (format: 'docx' | 'pdf') => {
     setBusy(true); setError(null)
+    const label = format === 'pdf' ? 'PDF-Datei' : 'Word-Datei'
     try {
-      const { buildHandInDocx } = await import('@/lib/student-handin-docx')
-      downloadBlob(await buildHandInDocx(handIn), `${base}.docx`)
-      void logStudentEvent(supabase, project.id, 'handin_downloaded', { format: 'docx' })
+      if (format === 'pdf') {
+        const { buildHandInPdf } = await import('@/lib/student-handin-pdf')
+        downloadBlob(await buildHandInPdf(handIn), `${base}.pdf`)
+      } else {
+        const { buildHandInDocx } = await import('@/lib/student-handin-docx')
+        downloadBlob(await buildHandInDocx(handIn), `${base}.docx`)
+      }
+      void logStudentEvent(supabase, project.id, 'handin_downloaded', { format })
     } catch (e) {
       const msg = (e as Error).message ?? ''
       // After an update, a page that was already open still points at program
@@ -571,7 +577,7 @@ function AbgabeTab({
       setError(
         /dynamically imported module|Importing a module script failed|error loading dynamically/i.test(msg)
           ? STALE_PAGE_MESSAGE
-          : `Die Word-Datei konnte nicht erstellt werden: ${msg}`
+          : `Die ${label} konnte nicht erstellt werden: ${msg}`
       )
     }
     setBusy(false)
@@ -581,7 +587,7 @@ function AbgabeTab({
     <div className="card">
       <h3>Abgabe</h3>
       <p className="muted" style={{ maxWidth: 720 }}>
-        Du lädst eine Word-Datei herunter und gibst sie in Moodle ab. Sie ist zum Lesen, für dich, die Gruppe und die Dozentin.
+        Du lädst eine Word- oder PDF-Datei herunter und gibst sie in Moodle ab. Lässt sich die Word-Datei auf deinem Gerät nicht richtig öffnen, nimm die PDF-Datei. Sie ist zum Lesen, für dich, die Gruppe und die Dozentin.
         Die Datei enthält deinen Namen und deine Arbeit, aber keine E-Mail-Adresse.
       </p>
       {handIn.tool.sandbox && <div className="notice notice-bad">Sandbox: Dies ist ein Testkonto mit synthetischen Daten.</div>}
@@ -630,8 +636,11 @@ function AbgabeTab({
         </div>
       )}
       <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
-        <button className="btn btn-primary" onClick={() => { saveName(); void downloadWord() }} disabled={busy || nameMissing}>
+        <button className="btn btn-primary" onClick={() => { saveName(); void download('docx') }} disabled={busy || nameMissing}>
           <FileText size={14} /> Word-Datei herunterladen
+        </button>
+        <button className="btn" onClick={() => { saveName(); void download('pdf') }} disabled={busy || nameMissing}>
+          <FileText size={14} /> PDF-Datei herunterladen
         </button>
       </div>
       {nameMissing && (
@@ -647,7 +656,7 @@ function AbgabeTab({
 }
 
 const STALE_PAGE_MESSAGE =
-  'EvoMentor wurde gerade aktualisiert, und diese Seite ist noch die alte Fassung. Deine Antworten sind gespeichert. Bitte lade die Seite neu und klicke dann noch einmal auf „Word-Datei herunterladen“.'
+  'EvoMentor wurde gerade aktualisiert, und diese Seite ist noch die alte Fassung. Deine Antworten sind gespeichert. Bitte lade die Seite neu und klicke dann noch einmal auf den Download-Knopf.'
 
 const EVENT_TEXT: Record<string, string> = {
   page_view: 'Seite geöffnet',
