@@ -94,6 +94,33 @@ test('the app copy of the tag readings matches methodsbase/vocabularies/method-t
   }
 })
 
+test('the app copy of the general method of each learning approach matches methodsbase/vocabularies/method-tags.yaml', { skip: !existsSync(vocabPath) }, () => {
+  const vocab = yaml.load(readFileSync(vocabPath, 'utf8'))
+  assert.deepEqual(Object.fromEntries(vocab.learningApproaches.filter((e) => e.method).map((e) => [e.term, e.method])), M.TAG_GENERAL_METHODS)
+})
+
+// ---- a method's more general methods through its tags (Dustin, 2026-11-17, feedback 5844bcd2) ----
+
+test('a method with the tag bewegt has Movement-Based Learning as a more general method, once, with the tag it comes from', () => {
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['bewegt', 'kooperativ'] }, 'OE-METHOD-gallery-walk'), [
+    { id: 'OE-METHOD-movement-based-learning', term: 'bewegt' },
+    { id: 'OE-METHOD-cooperative-learning', term: 'kooperativ' },
+  ])
+  // two tags that name the same general method give it once
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['erfahrungsbasiert', 'handlungsorientiert'] }, 'OE-METHOD-x').map((b) => b.id), ['OE-METHOD-experiential-action-oriented-learning'])
+})
+
+test('no more general method through a tag when it is the method itself, is already named by hand, or the tag names none', () => {
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['bewegt'] }, 'OE-METHOD-movement-based-learning'), [])
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['forschend'], broaderMethods: ['OE-METHOD-inquiry-based-learning'] }, 'OE-METHOD-x'), [])
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['kritisch/reflexiv', 'Neuer Ansatz'] }, 'OE-METHOD-x'), [])
+  assert.deepEqual(M.broaderMethodsFromTags({}, 'OE-METHOD-x'), [])
+})
+
+test('an old spelling of a tag still finds its general method', () => {
+  assert.deepEqual(M.broaderMethodsFromTags({ learningApproaches: ['konzeptbasiert/vernetztend'] }, 'OE-METHOD-x').map((b) => b.id), ['OE-METHOD-concept-based-teaching'])
+})
+
 // ---- tag names in both languages (Dustin, 2026-11-13) ----
 
 test('tags added in the app have the name they were typed with, and the other language shows that name until one is added', () => {
