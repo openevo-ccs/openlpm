@@ -32,6 +32,8 @@ export interface SectionLabels {
   tone_label: string
   length_label: string
   other_notes_label: string
+  // Optional: only a library that lists lesson phases needs it.
+  lesson_phases_section?: string
 }
 
 export interface PromptOptionLists {
@@ -40,6 +42,8 @@ export interface PromptOptionLists {
   assessment: string[]
   societal_context: string[]
   output_types: string[]
+  // Optional list of lesson phases (didactic functions) the AI should structure its plan by. Specific to the library's region.
+  lesson_phases?: string[]
   default_output_types: string[]
   default_assessment: string[]
   tones: [string, string][]

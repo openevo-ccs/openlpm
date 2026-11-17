@@ -142,6 +142,11 @@ export function buildPrompt(
   if (cfg.evalNotizen) lines.push(`${labels.eval_notes_label} ${cfg.evalNotizen}`)
   if (cfg.kontext.length) lines.push(`${labels.context_section} ${cfg.kontext.join(', ')}`)
   if (cfg.kontextNotizen) lines.push(`${labels.context_notes_label} ${cfg.kontextNotizen}`)
+  if (options.lesson_phases?.length) {
+    lines.push('')
+    lines.push(labels.lesson_phases_section ?? 'LESSON PHASES (didactic functions, not exhaustive):')
+    for (const phase of options.lesson_phases) lines.push(`- ${phase}`)
+  }
   lines.push('')
   lines.push(labels.output_section)
   lines.push(`- ${labels.tone_label} ${cfg.ton}, ${labels.length_label} ${cfg.laenge}`)
