@@ -147,6 +147,11 @@ export function buildPrompt(
     lines.push(labels.lesson_phases_section ?? 'LESSON PHASES (didactic functions; the list is open-ended):')
     for (const phase of options.lesson_phases) lines.push(`- ${phase}`)
   }
+  if (options.lesson_plan_template) {
+    lines.push('')
+    lines.push(labels.lesson_plan_template_section ?? 'LESSON PLAN FORMAT:')
+    lines.push(options.lesson_plan_template)
+  }
   lines.push('')
   lines.push(labels.output_section)
   lines.push(`- ${labels.tone_label} ${cfg.ton}, ${labels.length_label} ${cfg.laenge}`)
