@@ -179,6 +179,42 @@ export const TAG_GERMAN_NAMES: Record<TagField, Record<string, string>> = {
   learningApproaches: { kooperativ: 'kooperativ/sozial' },
 }
 
+// The general method a learning approach stands for (the `method` key of an entry in methodsbase/vocabularies/method-tags.yaml), for example the
+// tag "bewegt" and the method "Movement-Based Learning". Susan Hanisch, 2026-11-15 (feedback 5844bcd2): "Do entries that have the learning
+// approach tag 'bewegt' also need to be grouped under a higher-level method?" Dustin chose to work the link out from the tag, so it is entered once.
+export const TAG_GENERAL_METHODS: Record<string, string> = {
+  erfahrungsbasiert: 'OE-METHOD-experiential-action-oriented-learning',
+  handlungsorientiert: 'OE-METHOD-experiential-action-oriented-learning',
+  problembasiert: 'OE-METHOD-problem-based-learning',
+  projektbasiert: 'OE-METHOD-project-based-learning',
+  forschend: 'OE-METHOD-inquiry-based-learning',
+  'konzeptbasiert/vernetzend': 'OE-METHOD-concept-based-teaching',
+  kooperativ: 'OE-METHOD-cooperative-learning',
+  selbstreguliert: 'OE-METHOD-self-regulated-learning',
+  kreativ: 'OE-METHOD-creative-design-tasks',
+  bewegt: 'OE-METHOD-movement-based-learning',
+  digital: 'OE-METHOD-digital-media-integration',
+  außerschulisch: 'OE-METHOD-out-of-school-learning',
+}
+
+/**
+ * The more general methods a method has through its learning approach tags: one per tag that names a general method, left out when it is the
+ * method itself or is already named in the record's own broaderMethods. Each comes with the tag it comes from.
+ */
+export function broaderMethodsFromTags(data: Record<string, unknown> | null | undefined, ownId: string): { id: string; term: string }[] {
+  const tags = Array.isArray(data?.learningApproaches) ? (data!.learningApproaches as unknown[]).map((t) => normalizeTag(String(t))) : []
+  const explicit = new Set(Array.isArray(data?.broaderMethods) ? (data!.broaderMethods as unknown[]).map(String) : [])
+  const seen = new Set<string>()
+  const out: { id: string; term: string }[] = []
+  for (const term of tags) {
+    const id = TAG_GENERAL_METHODS[term]
+    if (!id || id === ownId || explicit.has(id) || seen.has(id)) continue
+    seen.add(id)
+    out.push({ id, term })
+  }
+  return out
+}
+
 // Names given to tags inside OpenLPM (Dustin, 2026-11-13: tags can be named and edited in either language). A tag is stored once, under
 // its term. The terms of the source taxonomy are German and keep their German name and the English reading above. A tag added in the
 // app has the name it was typed with in one language, and the other name is missing until someone adds it. The overlay holds the

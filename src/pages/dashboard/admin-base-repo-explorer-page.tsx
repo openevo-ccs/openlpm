@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
-import { setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
+import { broaderMethodsFromTags, setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CONCEPTBASE_TAB_PATH } from '@/components/base-repo-tabs'
 import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
@@ -915,6 +915,18 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
     // each other) get one line, as the graph standard asks: the strongest link is drawn and the others are only named. A broader/narrower link
     // wins and keeps its direction. Feedback 0279d2dc (Susan, 2026-11-15): "why are there two arrows/links here?"
     const pairIndex = new Map<string, number>()
+    const addEdge = (source: string, targetKey: string, field: string, hier: boolean) => {
+      const pair = source < targetKey ? `${source}|${targetKey}` : `${targetKey}|${source}`
+      const at = pairIndex.get(pair)
+      if (at === undefined) {
+        pairIndex.set(pair, edges.length)
+        edges.push({ source, target: targetKey, field, hier })
+      } else {
+        const kept = edges[at]
+        if (hier && !kept.hier) edges[at] = { source, target: targetKey, field: [field, kept.field].join(', '), hier: true }
+        else if (!kept.field.split(', ').includes(field)) kept.field = `${kept.field}, ${field}`
+      }
+    }
     for (const r of rows) {
       const cfg = BASE_REPO_CONFIGS.find((c) => c.key === r.repoKey)
       if (!cfg) continue
@@ -923,18 +935,14 @@ function GraphView({ rows, onSelect, lang }: { rows: NodeRef[]; onSelect: (r: No
         const targetIds: string[] = Array.isArray(raw) ? raw : raw ? [raw] : []
         for (const targetId of targetIds) {
           const targetKey = `${rel.targetRepo}:${targetId}`
-          if (!byId.has(targetKey)) continue
-          const source = keyOf(r)
-          const pair = source < targetKey ? `${source}|${targetKey}` : `${targetKey}|${source}`
-          const at = pairIndex.get(pair)
-          if (at === undefined) {
-            pairIndex.set(pair, edges.length)
-            edges.push({ source, target: targetKey, field: rel.field, hier: !!rel.hierarchy })
-          } else {
-            const kept = edges[at]
-            if (rel.hierarchy && !kept.hier) edges[at] = { source, target: targetKey, field: [rel.field, kept.field].join(', '), hier: true }
-            else if (!kept.field.split(', ').includes(rel.field)) kept.field = `${kept.field}, ${rel.field}`
-          }
+          if (byId.has(targetKey)) addEdge(keyOf(r), targetKey, rel.field, !!rel.hierarchy)
+        }
+      }
+      // A method's learning approach tags lead to the general methods they stand for, so the link is entered once (feedback 5844bcd2).
+      if (r.repoKey === 'methodsbase') {
+        for (const b of broaderMethodsFromTags(r.row.data as Record<string, unknown>, r.row.id)) {
+          const targetKey = `methodsbase:${b.id}`
+          if (byId.has(targetKey)) addEdge(keyOf(r), targetKey, 'learningApproaches', true)
         }
       }
     }
@@ -1392,7 +1400,13 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   // methods of this one are the records that name it.
   const classes = methodClassesOf(data.methodClass)
   const broaderIds = Array.isArray(data.broaderMethods) ? (data.broaderMethods as unknown[]).map(String) : []
-  const narrowerIds = methodRows.filter((r) => Array.isArray((r.data as any)?.broaderMethods) && ((r.data as any).broaderMethods as string[]).includes(recordId)).map((r) => r.id)
+  // Learning approach tags also lead to a more general method ("bewegt" to Movement-Based Learning). That link is worked out from the tag, so it is
+  // listed here without anyone entering it a second time. Feedback 5844bcd2 (Susan, 2026-11-15).
+  const broaderViaTags = broaderMethodsFromTags(data, recordId)
+  const narrowerIds = methodRows
+    .filter((r) => (Array.isArray((r.data as any)?.broaderMethods) && ((r.data as any).broaderMethods as string[]).includes(recordId))
+      || broaderMethodsFromTags(r.data as Record<string, unknown>, r.id).some((b) => b.id === recordId))
+    .map((r) => r.id)
   const methodLabel = (id: string) => { const r = methodRows.find((x) => x.id === id); return r ? rowLabel(r, lang) : id }
   const methodLinks = (ids: string[]) => ids.map((id, i) => (
     <span key={id}>{i > 0 ? ', ' : ''}<button type="button" className="btn-linklike" style={{ fontSize: 'inherit' }} onClick={() => onOpenMethod(id)}>{methodLabel(id)}</button></span>
@@ -1407,7 +1421,14 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
     <div style={{ fontSize: 12 }}>
       {!!name && <DetailRow label="Label">{name.text}{tag(name.lang)}</DetailRow>}
       {classes.length > 0 && <DetailRow label="Method class">{methodClassesReading(data.methodClass, lang)}</DetailRow>}
-      {broaderIds.length > 0 && <DetailRow label="More general method">{methodLinks(broaderIds)}</DetailRow>}
+      {(broaderIds.length > 0 || broaderViaTags.length > 0) && (
+        <DetailRow label="More general method">
+          {methodLinks(broaderIds)}
+          {broaderViaTags.map((b, i) => (
+            <span key={b.id}>{broaderIds.length > 0 || i > 0 ? ', ' : ''}{methodLinks([b.id])} <span className="muted">(through the tag {tagReading('learningApproaches', b.term, lang)})</span></span>
+          ))}
+        </DetailRow>
+      )}
       {narrowerIds.length > 0 && <DetailRow label="More specific methods">{methodLinks(narrowerIds)}</DetailRow>}
       {/* Susan Hanisch, 2026-11-12 (feedback cf57a372): a classroom method always shows this row, also when it is empty,
           so it is clear that something can be added. Research methods have no learning approach and show nothing. */}
