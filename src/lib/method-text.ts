@@ -154,6 +154,7 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     'Festigung/Anwendung': 'Practice and application',
     'Reflexion/Feedback': 'Reflection and feedback',
     'Ergebnisermittlung/Bewertung': 'Evaluation',
+    'Transfer/Vernetzung': 'Transfer, connecting knowledge',
   },
   learningApproaches: {
     erfahrungsbasiert: 'Experience-based',
