@@ -142,6 +142,16 @@ export function buildPrompt(
   if (cfg.evalNotizen) lines.push(`${labels.eval_notes_label} ${cfg.evalNotizen}`)
   if (cfg.kontext.length) lines.push(`${labels.context_section} ${cfg.kontext.join(', ')}`)
   if (cfg.kontextNotizen) lines.push(`${labels.context_notes_label} ${cfg.kontextNotizen}`)
+  if (options.lesson_phases?.length) {
+    lines.push('')
+    lines.push(labels.lesson_phases_section ?? 'LESSON PHASES (didactic functions; the list is open-ended):')
+    for (const phase of options.lesson_phases) lines.push(`- ${phase}`)
+  }
+  if (options.lesson_plan_template) {
+    lines.push('')
+    lines.push(labels.lesson_plan_template_section ?? 'LESSON PLAN FORMAT:')
+    lines.push(options.lesson_plan_template)
+  }
   lines.push('')
   lines.push(labels.output_section)
   lines.push(`- ${labels.tone_label} ${cfg.ton}, ${labels.length_label} ${cfg.laenge}`)
@@ -308,7 +318,7 @@ export function groupLinksByMethod(links: MethodConceptLink[]): Map<string, Map<
 // Evolutionsbezug choice is better as selectable tags than drop down."
 // Single-select, like the dropdown it replaces -- "tags" here means the
 // chip-button look already used elsewhere in this app (e.g. the BK focus
-// chips), not a multi-select.
+// chips). It is a single choice and has no multi-select.
 export function PercentChips({
   value,
   onChange,
