@@ -157,7 +157,7 @@ export function createdRecords(edits: BaseRepoEdit[]): Map<string, { data: Recor
 }
 
 /**
- * The rows with their in-app edits laid on top, plus the records created in the app that the copy does not have yet. A row without edits
+ * The rows with their waiting in-app edits laid on top, plus the records created in the app that the copy does not have yet. A row without edits
  * is returned as the same object, so nothing downstream (search text, memoized lists) is rebuilt for it.
  */
 export function applyEdits(repoKey: BaseRepoKey, rows: SnapshotRow[], edits: BaseRepoEdit[]): SnapshotRow[] {
@@ -174,8 +174,15 @@ export function applyEdits(repoKey: BaseRepoKey, rows: SnapshotRow[], edits: Bas
     if (!mine || mine.size === 0) return row
     const paths = Array.from(mine.keys()).filter((p) => p !== NEW_RECORD_PATH)
     if (paths.length === 0 && !row.createdInApp) return row
+    // Once an edit has been sent back, the repo copy has the value and is the one to show: a later change in the repo (made another way)
+    // must not be hidden under the old saved text. Only edits still waiting are laid on top. A record that exists only here has no repo copy
+    // yet, so all of its edits count.
     let data = row.data
-    for (const p of paths) data = setPath(data, p, mine.get(p)!.after_value as EditValue)
+    for (const p of paths) {
+      const edit = mine.get(p)!
+      if (edit.exported_at && !row.createdInApp) continue
+      data = setPath(data, p, edit.after_value as EditValue)
+    }
     const edited = rederive(repoKey, { ...row, data })
     edited.editedPaths = paths
     edited.pendingEditCount = Array.from(mine.values()).filter((e) => !e.exported_at).length

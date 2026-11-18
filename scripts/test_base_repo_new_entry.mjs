@@ -96,4 +96,32 @@ test('a created record counts among the edits waiting to be sent back', () => {
   assert.ok(pending.some((e) => e.field_path === '$new'))
 })
 
+test('an edit that was sent back no longer covers the field, so a later change in the repo shows (Flash Round, 2026-11-18)', () => {
+  const id = 'OE-METHOD-flash'
+  const repo = { ...repoRow(id, 'Flash'), data: { id, label: { en: 'Flash' }, description: { en: 'NEW repo text' }, methodClass: 'pedagogical-practice' } }
+  const sent = edit(id, 'description.en', 'OLD saved text', { exported_at: '2026-11-13T13:20:00Z', export_batch: 'b' })
+  const rows = E.applyEdits('methodsbase', [repo], [sent])
+  assert.equal(rows[0].data.description.en, 'NEW repo text')
+  assert.deepEqual(rows[0].editedPaths, ['description.en'])
+  assert.equal(rows[0].pendingEditCount, 0)
+})
+
+test('an edit that is still waiting covers the repo text, and a newer waiting edit wins over a sent one', () => {
+  const id = 'OE-METHOD-flash'
+  const repo = { ...repoRow(id, 'Flash'), data: { id, label: { en: 'Flash' }, description: { en: 'repo text' }, methodClass: 'pedagogical-practice' } }
+  const sent = edit(id, 'description.en', 'sent text', { exported_at: '2026-11-13T13:20:00Z', edited_at: '2026-11-13T13:14:00Z' })
+  const waiting = edit(id, 'description.en', 'waiting text', { edited_at: '2026-11-18T09:00:00Z' })
+  const rows = E.applyEdits('methodsbase', [repo], [sent, waiting])
+  assert.equal(rows[0].data.description.en, 'waiting text')
+  assert.equal(rows[0].pendingEditCount, 1)
+})
+
+test('a record that exists only in the app keeps showing its edits even after they were sent back, until the repo copy has it', () => {
+  const id = 'OE-METHOD-only-here'
+  const edits = [marker(id, 'only-here', { exported_at: 'x' }), edit(id, 'label.en', 'Only here', { exported_at: 'x' })]
+  const rows = E.applyEdits('methodsbase', [], edits)
+  assert.equal(rows.length, 1)
+  assert.equal(rows[0].data.label.en, 'Only here')
+})
+
 console.log('')
