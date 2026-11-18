@@ -58,7 +58,9 @@ test('the id changes of the unmerged branch pair each old id with the new one', 
 test('the snapshot: every id change is a registered concept, with the same definition', () => {
   const ids = new Set(snap.concepts.map((c) => c.id))
   const changes = M.idChanges(snap.pending)
-  assert.ok(changes.length >= 10)
+  // The Bio-Core list of the branch extend-bio-core-evolution-mechanisms was merged with slug ids on 2026-11-18, so nothing is pending now.
+  // The loop below still checks every id change a future pending list brings.
+  assert.equal(snap.pending.length, 0)
   for (const c of changes) {
     assert.ok(ids.has(c.oldId), c.oldId)
     assert.equal(c.sameDefinition, true, `${c.label} changed its definition`)
