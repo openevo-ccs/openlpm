@@ -391,6 +391,8 @@ export interface SnapshotRow {
   editedPaths?: string[]
   /** How many of those edits have not been sent back to the source repo yet. */
   pendingEditCount?: number
+  /** True for a record that was created in OpenLPM and is not in the Explorer's copy of the repo yet. */
+  createdInApp?: boolean
 }
 
 function toStringArray(value: unknown): string[] {
