@@ -124,6 +124,12 @@ function lessonPhaseTags(row: SnapshotRow): string[] {
   return Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' && raw ? [raw] : []
 }
 
+/** The discipline tags of a MethodsBase record. */
+function disciplineTagsOf(row: SnapshotRow): string[] {
+  const raw = (row.data as any)?.disciplineTags
+  return Array.isArray(raw) ? raw.map(String) : typeof raw === 'string' && raw ? [raw] : []
+}
+
 /** The text that names a record when it is kept per language: a method's label, a lesson's title, a competency's statement. */
 function namingText(row: SnapshotRow): unknown {
   const d = row.data as any
@@ -211,6 +217,12 @@ export const BASE_REPO_CONFIGS: BaseRepoConfig[] = [
         header: 'Lesson phases',
         get: (row, lang) => { const t = lessonPhaseTags(row); return t.length > 0 ? t.map((x) => tagReading('lessonPhases', x, lang ?? 'en')).join(', ') : '—' },
         filterValues: (row, lang) => lessonPhaseTags(row).map((x) => tagReading('lessonPhases', x, lang ?? 'en')),
+      },
+      // Feedback 3bef962e (Susan Hanisch): Discipline as tags, with the same column build.
+      {
+        header: 'Discipline',
+        get: (row, lang) => { const t = disciplineTagsOf(row); return t.length > 0 ? t.map((x) => tagReading('disciplineTags', x, lang ?? 'en')).join(', ') : '—' },
+        filterValues: (row, lang) => disciplineTagsOf(row).map((x) => tagReading('disciplineTags', x, lang ?? 'en')),
       },
     ],
     relationFields: [

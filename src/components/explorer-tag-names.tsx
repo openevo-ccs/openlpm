@@ -12,6 +12,7 @@ type Client = ReturnType<typeof createClient>
 const FIELDS: { field: TagField; title: string }[] = [
   { field: 'learningApproaches', title: 'Learning approaches' },
   { field: 'lessonPhases', title: 'Lesson phases' },
+  { field: 'disciplineTags', title: 'Disciplines' },
 ]
 const LANGS = [{ code: 'en' as const, name: 'English' }, { code: 'de' as const, name: 'German' }]
 

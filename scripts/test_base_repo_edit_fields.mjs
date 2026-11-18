@@ -196,6 +196,23 @@ test('a repo that holds English only has single boxes and nothing folded', () =>
   assert.ok(q.every((x) => !x.lang && x.group !== 'other'))
 })
 
+test('Discipline is a tag box with English and German names, and the free-text line is the note (feedback 3bef962e)', () => {
+  const data = { label: { en: 'A' }, discipline: 'cultural evolution; science (engineering)', disciplineTags: ['Behavioral economics', 'Ein neues Fach'] }
+  const f = fieldsOf('methodsbase', data)
+  const d = by(f, 'disciplineTags')
+  assert.equal(d.kind, 'multi')
+  assert.equal(d.asList, true)
+  assert.equal(d.label, 'Discipline')
+  assert.equal(d.tagField, 'disciplineTags')
+  assert.equal(d.reading('Behavioral economics', 'en'), 'Behavioral economics')
+  assert.equal(d.reading('Behavioral economics', 'de'), 'Verhaltensökonomik')
+  assert.ok(d.choices.some((c) => c.value === 'Biology education'), 'the other disciplines of the vocabulary are choices')
+  assert.ok(d.choices.some((c) => c.value === 'Ein neues Fach'), 'a tag the record has is always a choice')
+  assert.deepEqual(F.currentValue(d, data), ['Behavioral economics', 'Ein neues Fach'])
+  assert.equal(by(f, 'discipline.en').label, 'Discipline note (English)')
+  assert.equal(f.filter((x) => x.path === 'disciplineTags').length, 1, 'the tags are not offered a second time as a plain list')
+})
+
 test('tags show in the language of the form and are stored once', () => {
   const data = { learningApproaches: ['kooperativ', 'ein-neuer-ansatz'], lessonPhases: ['Einstieg'], methodClass: 'pedagogical-practice' }
   const f = fieldsOf('methodsbase', data)

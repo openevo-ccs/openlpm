@@ -1390,6 +1390,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   const tag = (l: string) => (l && l !== lang ? <LangChip lang={l} uiLang={uiLang} /> : null)
   const learningApproaches = Array.isArray(data.learningApproaches) ? (data.learningApproaches as unknown[]).map(String) : []
   const discipline = pickLocalized(data.discipline, textLang)
+  const disciplineTags = Array.isArray(data.disciplineTags) ? (data.disciplineTags as unknown[]).map(String) : []
   const lessonPhases = Array.isArray(data.lessonPhases) ? (data.lessonPhases as unknown[]).map(String) : []
   const whenToUse = pickLocalized(data.whenToUse, textLang)
   const description = pickLocalized(data.description, textLang)
@@ -1413,7 +1414,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   ))
 
   const skip = new Set([
-    'label', 'methodClass', 'broaderMethods', 'learningApproaches', 'discipline', 'lessonPhases', 'whenToUse',
+    'label', 'methodClass', 'broaderMethods', 'learningApproaches', 'discipline', 'disciplineTags', 'lessonPhases', 'whenToUse',
     'description', 'protocolSteps', 'relatedApproaches', 'primarySources',
   ])
 
@@ -1435,7 +1436,8 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
       {learningApproaches.length > 0
         ? <DetailRow label="Learning approach">{learningApproaches.map((t) => tagReading('learningApproaches', t, lang)).join(', ')}</DetailRow>
         : classes.includes('pedagogical-practice') && <DetailRow label="Learning approach"><span className="muted">Not set yet. Press Edit to add one.</span></DetailRow>}
-      {!!discipline && <DetailRow label="Discipline">{discipline.text}{tag(discipline.lang)}</DetailRow>}
+      {disciplineTags.length > 0 && <DetailRow label="Discipline">{disciplineTags.map((t) => tagReading('disciplineTags', t, lang)).join(', ')}</DetailRow>}
+      {!!discipline && <DetailRow label={disciplineTags.length > 0 ? 'Discipline note' : 'Discipline'}>{discipline.text}{tag(discipline.lang)}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
       {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
