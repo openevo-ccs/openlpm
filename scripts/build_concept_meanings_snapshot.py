@@ -26,7 +26,9 @@ try:
 except ImportError:  # the pending branch is optional
     yaml = None
 
-PENDING_BRANCH = "extend-bio-core-evolution-mechanisms"
+# The Bio-Core list of the branch extend-bio-core-evolution-mechanisms was merged with slug ids (conceptbase pull request 21, 2026-11-18),
+# so there is no pending branch to read any more. Set a branch name here to read a future one.
+PENDING_BRANCH = None
 PENDING_FILE = "vocabularies/BIO-CORE-v1.2.0.yaml"
 CITE = re.compile(r"OE-CONCEPT-[A-Za-z0-9][A-Za-z0-9._\-]*")
 
@@ -112,7 +114,7 @@ def main():
                                "assertedBy": r.get("assertedBy") or [], "date": r.get("date"), "rationale": clean(r.get("rationale"))})
 
     pending = []
-    text = show(root, "conceptbase", "origin/" + PENDING_BRANCH, PENDING_FILE) if yaml else None
+    text = show(root, "conceptbase", "origin/" + PENDING_BRANCH, PENDING_FILE) if (yaml and PENDING_BRANCH) else None
     if text:
         for raw in yaml.safe_load(text).get("concepts") or []:
             c = concept(raw, "pending")
@@ -134,6 +136,8 @@ def main():
     for t, slugs in sorted(tags.items(), key=lambda kv: kv[0].lower()):
         pile, cand = TAG_PILES.get(t.lower(), ("unsorted", None))
         same_word = by_label.get(t.lower(), []) + [p["id"] for p in pending if p["label"].lower() == t.lower()]
+        if pile == "pending":  # the tag was waiting for the merged Bio-Core list
+            pile = "in-conceptbase" if same_word else "no-entry"
         tag_rows.append({"tag": t, "models": [{"slug": s, "title": models.get(s, s)} for s in sorted(set(slugs))], "pile": pile, "candidate": cand, "sameWord": same_word})
 
     cites = {}

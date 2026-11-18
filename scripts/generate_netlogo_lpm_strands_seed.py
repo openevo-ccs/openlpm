@@ -213,7 +213,7 @@ MODELS = [
             "OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling, OE-INTERDISCIPLINARY-v1.0.0) -- all "
             "verified against the real ConceptBase registry, 2026-08-29. Gap: the pending, unmerged "
             "extend-bio-core-evolution-mechanisms branch (BIO-CORE-v1.2.0, 16 to 43 concepts) "
-            "proposes Trade-offs (OE-CONCEPT-000128), a direct match for this strand's "
+            "proposes Trade-offs (OE-CONCEPT-bio-core-trade-offs), a direct match for this strand's "
             "speed-vs-energy-cost activity, once/if it merges; Coevolution is absent from both main "
             "and that branch."
         ),
@@ -389,7 +389,7 @@ MODELS = [
             "mechanic); -7648-1/-2 (species/population concept). Gap flagged: Multilevel Selection "
             "and Founder Effect are both named explicitly in the model's own documentation but "
             "neither exists in ConceptBase main -- both exist as proposed, unmerged entries "
-            "(OE-CONCEPT-000125, OE-CONCEPT-000124, BIO-CORE-v1.2.0) in the pending "
+            "(OE-CONCEPT-bio-core-multilevel-selection, OE-CONCEPT-bio-core-founder-effect, BIO-CORE-v1.2.0) in the pending "
             "extend-bio-core-evolution-mechanisms branch; treat as pending, not citable."
         ),
         "competency_alignment": (
@@ -1045,7 +1045,7 @@ MODELS = [
             "this model's own documentation names kin selection, multi-level selection, and "
             "frequency-dependent selection as the mechanisms behind its outcomes, but none of the "
             "three exist as concepts in ConceptBase main -- all three exist as proposed, unmerged "
-            "entries (OE-CONCEPT-000126, OE-CONCEPT-000125, OE-CONCEPT-000121, all BIO-CORE-"
+            "entries (OE-CONCEPT-bio-core-kin-selection, OE-CONCEPT-bio-core-multilevel-selection, OE-CONCEPT-bio-core-frequency-dependent-selection, all BIO-CORE-"
             "v1.2.0) in the pending extend-bio-core-evolution-mechanisms branch. This is the "
             "strand in this set where that gap matters most, since the model literally cannot be "
             "fully competency-tagged against ConceptBase main without them."
@@ -1428,7 +1428,7 @@ MODELS = [
             "documentation names kin selection, multilevel selection, and frequency-dependent "
             "selection as the mechanisms behind its outcomes, and none of the three exist as "
             "concepts in ConceptBase main -- all three exist as proposed, unmerged entries "
-            "(OE-CONCEPT-000126, OE-CONCEPT-000125, OE-CONCEPT-000121, all BIO-CORE-v1.2.0) in the "
+            "(OE-CONCEPT-bio-core-kin-selection, OE-CONCEPT-bio-core-multilevel-selection, OE-CONCEPT-bio-core-frequency-dependent-selection, all BIO-CORE-v1.2.0) in the "
             "pending extend-bio-core-evolution-mechanisms branch. There is also no ConceptBase "
             "concept for \"ethnocentrism\" or \"in-group/out-group bias\" specifically, in either "
             "main or the pending branch."
