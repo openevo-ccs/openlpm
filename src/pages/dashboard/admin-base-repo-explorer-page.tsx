@@ -8,9 +8,10 @@ import cytoscape, { type Core, type ElementDefinition } from 'cytoscape'
 import { GraphControls, useGraphSettings } from '@/components/graph-controls'
 import { applyGraphSettings, applyLineLooks, attachHover, hoverStyles, type NodeLabelInfo } from '@/lib/graph-cytoscape'
 import { blockLayoutPositions, hierarchyLayoutPositions } from '@/lib/graph-standards'
-import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Search, Table2, Tags, XCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, BookOpen, Check, CheckCircle2, Clock, Copy, Download, Filter, LayoutGrid, MessageSquare, Network, Pencil, PlayCircle, Plus, Search, Table2, Tags, XCircle } from 'lucide-react'
 import { ReviewSpace, type ReviewSectionInfo, type ReviewSectionKey } from '@/components/explorer-review-space'
 import { TagNamesPanel } from '@/components/explorer-tag-names'
+import { NewEntryPanel } from '@/components/explorer-new-entry'
 import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/apa-citation'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
@@ -173,6 +174,10 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   // Everything about reviewing sits behind one Review button and opens in its own space instead of above the table (Dustin, 2026-11-13).
   const [reviewSection, setReviewSection] = useState<ReviewSectionKey | null>(null)
   const [showTagNames, setShowTagNames] = useState(false)
+  // Adding a method (feedback 5016dccd). `openInEditId` is the new entry that is waiting to be shown and opened in the edit form.
+  const [showNewEntry, setShowNewEntry] = useState(false)
+  const [openInEditId, setOpenInEditId] = useState<string | null>(null)
+  const [editOnOpenId, setEditOnOpenId] = useState<string | null>(null)
   // TeachingBase link checking (migrations 240 and 241). Loaded when the TeachingBase tab is open.
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([])
   const [reviewer, setReviewer] = useState<{ id: string; name: string } | null>(null)
@@ -310,6 +315,16 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     const fresh = (effectiveRowsByRepo.get(selected.repoKey) ?? []).find((r) => r.id === selected.row.id)
     return { repoKey: selected.repoKey, row: fresh ?? selected.row }
   }, [selected, effectiveRowsByRepo])
+
+  // A method that was just created shows in the card as soon as the edits are loaded again, and the edit form opens on it.
+  useEffect(() => {
+    if (!openInEditId) return
+    const row = (effectiveRowsByRepo.get('methodsbase') ?? []).find((r) => r.id === openInEditId)
+    if (!row) return
+    setSelected({ repoKey: 'methodsbase', row })
+    setEditOnOpenId(openInEditId)
+    setOpenInEditId(null)
+  }, [openInEditId, effectiveRowsByRepo])
 
   const allEdits = useMemo(() => Array.from(editsByRepo.values()).flat(), [editsByRepo])
   const waitingEdits = useMemo(() => pendingEdits(allEdits), [allEdits])
@@ -600,6 +615,11 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             </button>
           )}
           {!restricted && tab === 'methodsbase' && (
+            <button className={`btn btn-mini${showNewEntry ? ' btn-primary' : ''}`} data-testid="open-new-entry" disabled={!userId || !editsAvailable} onClick={() => setShowNewEntry((v) => !v)} title={editsAvailable ? 'Add a new method to MethodsBase' : 'Adding starts once the database update for edits is applied.'}>
+              <Plus size={13} />Add entry
+            </button>
+          )}
+          {!restricted && tab === 'methodsbase' && (
             <button className={`btn btn-mini${showTagNames ? ' btn-primary' : ''}`} data-testid="open-tag-names" onClick={() => setShowTagNames((v) => !v)} title="Name the learning approaches and lesson phases in English and German">
               <Tags size={13} />Tag names
             </button>
@@ -616,6 +636,20 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
           )}
         </div>
       </div>
+
+      {!restricted && tab === 'methodsbase' && showNewEntry && userId && (
+        <NewEntryPanel
+          supabase={supabase}
+          userId={userId}
+          existingIds={(effectiveRowsByRepo.get('methodsbase') ?? []).map((r) => r.id)}
+          onClose={() => setShowNewEntry(false)}
+          onCreated={async (id) => {
+            setShowNewEntry(false); setSearch(''); setColumnFilters({}); setOnlyEdited(false)
+            await reloadEdits('methodsbase')
+            setOpenInEditId(id)
+          }}
+        />
+      )}
 
       {!restricted && tab === 'methodsbase' && showTagNames && userId && (
         <TagNamesPanel supabase={supabase} userId={userId} onClose={() => setShowTagNames(false)} onSaved={() => reloadEdits('methodsbase')} />
@@ -665,6 +699,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
             editsAvailable={editsAvailable}
             onEditsChanged={() => reloadEdits(selectedLive.repoKey)}
+            editOnOpenId={editOnOpenId}
+            onEditOpened={() => setEditOnOpenId(null)}
             onClose={() => setSelected(null)}
             onSubmittedForReview={reloadReviewQueue}
           />
@@ -1459,8 +1495,9 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
             .join(', ')}
         </DetailRow>
       )}
-      {primarySources.length > 0 && (
-        <DetailRow label="Primary sources">
+      {/* Feedback 3db809fe (Susan, 2026-11-18: "why is there no field Sources here"): the row is always there, also when a method has none yet. */}
+      <DetailRow label="Sources">
+        {primarySources.length > 0 ? (
           <ul style={{ margin: 0, paddingLeft: 16 }}>
             {primarySources.map((s, i) => (
               <li key={i} style={{ marginBottom: 4 }}>
@@ -1471,8 +1508,10 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
               </li>
             ))}
           </ul>
-        </DetailRow>
-      )}
+        ) : (
+          <span className="muted" data-testid="no-sources">None yet. Press Edit to add one.</span>
+        )}
+      </DetailRow>
       <details style={{ marginTop: 8 }}>
         <summary className="muted" style={{ cursor: 'pointer', fontSize: 12 }}>Other info</summary>
         <div style={{ marginTop: 6 }}>
@@ -1500,6 +1539,8 @@ function DetailPanel({
   history,
   editsAvailable,
   onEditsChanged,
+  editOnOpenId,
+  onEditOpened,
   onClose,
   onSubmittedForReview,
 }: {
@@ -1521,12 +1562,16 @@ function DetailPanel({
   history: BaseRepoEdit[]
   editsAvailable: boolean
   onEditsChanged: () => void
+  /** The id of a record that was just created: its card opens in the edit form. */
+  editOnOpenId: string | null
+  onEditOpened: () => void
   onClose: () => void
   onSubmittedForReview: () => void
 }) {
   const { repoKey, row } = nodeRef
   const [editing, setEditing] = useState(false)
   useEffect(() => { setEditing(false) }, [repoKey, row.id])
+  useEffect(() => { if (editOnOpenId === row.id) { setEditing(true); onEditOpened() } }, [editOnOpenId, row.id])
   const [targetId, setTargetId] = useState<string | null>(null)
   const [topics, setTopics] = useState<Awaited<ReturnType<typeof listGlobalTopicsForTarget>> | null>(null)
   const [posts, setPosts] = useState<PostWithAuthor[]>([])
@@ -1615,7 +1660,13 @@ function DetailPanel({
         <ApaCitation type={row.data.type as string | undefined} citation={(row.data.citation as Record<string, unknown>) ?? {}} />
       )}
       <p className="muted" style={{ fontSize: 12 }}>{repoKey} · {row.id}</p>
-      {(row.editedPaths?.length ?? 0) > 0 && (
+      {row.createdInApp && (
+        <p style={{ fontSize: 12 }} data-testid="new-entry-chip">
+          <span className="chip" title="Created in OpenLPM. The MethodsBase repo does not have it yet.">new entry, only in OpenLPM</span>{' '}
+          <span className="muted">{row.pendingEditCount ? 'waiting to be added to the repo' : 'added to the repo, the copy here refreshes soon'}</span>
+        </p>
+      )}
+      {!row.createdInApp && (row.editedPaths?.length ?? 0) > 0 && (
         <p style={{ fontSize: 12 }}>
           <span className="chip" title="Shown on top of the repo copy">edited in OpenLPM</span>{' '}
           <span className="muted">{row.pendingEditCount ? `${row.pendingEditCount} waiting to be sent back to the repo` : 'all sent back to the repo'}</span>

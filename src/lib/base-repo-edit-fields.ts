@@ -11,6 +11,9 @@
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
 import { methodClassReading, normalizeTag, tagReading, tagTerms, type TagField } from '@/lib/method-text'
 
+/** The edit-log path that marks a record created in the app (see createdRecords in base-repo-edits.ts). It is no field of the record. */
+export const NEW_RECORD_PATH = '$new'
+
 export type EditKind = 'text' | 'longtext' | 'tags' | 'lines' | 'select' | 'sources' | 'multi'
 
 /** The two languages a text can be written in. */
@@ -68,6 +71,7 @@ export function humanize(key: string): string {
 
 /** A path as a person reads it, for the history of edits: "description.de" is "Description (German)". */
 export function describePath(path: string): string {
+  if (path === NEW_RECORD_PATH) return 'Created this entry'
   const parts = path.split('.')
   const last = parts[parts.length - 1]
   const words = (key: string) => { const h = humanize(key); return h.charAt(0) + h.slice(1).toLowerCase() }
@@ -245,7 +249,7 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
     addTexts(TRANSLATABLE.methodsbase!.filter((t) => t.key !== 'label'))
     // Feedback 53ccb804 (Susan Hanisch, 2026-11-13): "need to be able to edit primary sources". One line per source.
     add({
-      path: 'primarySources', label: 'Primary sources', kind: 'sources', group: 'shared',
+      path: 'primarySources', label: 'Sources', kind: 'sources', group: 'shared',
       hint: 'One source per line: the citation, then " | " and a DOI or web address if there is one. A source linked to a LiteratureBase record keeps that link when you change its text.',
       original: Array.isArray(data.primarySources) ? (data.primarySources as SourceEntry[]) : [],
     })

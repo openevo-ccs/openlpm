@@ -75,7 +75,7 @@ await form.getByRole('group', { name: /Language of the texts/ }).getByRole('butt
 await page.waitForTimeout(300)
 const labelsDe = (await form.locator('label').allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim().toUpperCase())
 check('after switching the form to German it has Label (German)', labelsDe.some((l) => l.startsWith('LABEL (GERMAN)')) && !labelsDe.some((l) => l.startsWith('LABEL (ENGLISH)')), labelsDe.slice(0, 6).join(' | '))
-check('edit form has a "Primary sources" box', labels.some((l) => l.startsWith('PRIMARY SOURCES')))
+check('edit form has a "Sources" box', labels.some((l) => l.startsWith('SOURCES')))
 const src = await form.locator('#edit-primarySources').inputValue()
 check('the primary sources box holds one line per source, with the link after a bar', src.split('\n').length >= 1 && src.length > 20, src.slice(0, 160).replace(/\n/g, ' // '))
 await page.screenshot({ path: path.join(outDir, '2-edit-form.png'), fullPage: true })

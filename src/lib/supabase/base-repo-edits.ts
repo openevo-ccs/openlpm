@@ -1,6 +1,6 @@
 import type { createClient } from '@/lib/supabase/client'
 import { BASE_REPO_CONFIGS, detectLanguages, plainLabel, type BaseRepoKey, type SnapshotRow } from '@/lib/supabase/base-repo-explorer'
-import { getPath, setPath, type EditValue } from '@/lib/base-repo-edit-fields'
+import { getPath, setPath, NEW_RECORD_PATH, type EditValue } from '@/lib/base-repo-edit-fields'
 import { methodClassesOf, type TagField, type TagNameOverlay } from '@/lib/method-text'
 
 // In-app edits to Base Repo records (feedback 0afc62a5, Susan Hanisch 2026-11-08; migration 237). The Explorer's records are a copy of the
@@ -141,19 +141,43 @@ function rederive(repoKey: BaseRepoKey, row: SnapshotRow): SnapshotRow {
 }
 
 /**
- * The rows with their in-app edits laid on top. A row without edits is returned as the same object, so nothing downstream
- * (search text, memoized lists) is rebuilt for it.
+ * The records people created in the app (feedback 5016dccd, Susan Hanisch 2026-11-18: "need an option to add a new entry into the base repo").
+ * A new record is stored as an edit row of its own, at the path NEW_RECORD_PATH, holding the few fields every record needs. The fields people
+ * fill in afterwards are ordinary edit rows. Once the record is in the repo and the Explorer's copy has been refreshed, the copy has a row
+ * with this id and the marker is ignored.
+ */
+export function createdRecords(edits: BaseRepoEdit[]): Map<string, { data: Record<string, unknown>; marker: BaseRepoEdit }> {
+  const out = new Map<string, { data: Record<string, unknown>; marker: BaseRepoEdit }>()
+  for (const [recordId, fields] of latestEditsByRecord(edits)) {
+    const marker = fields.get(NEW_RECORD_PATH)
+    if (!marker || !marker.after_value || typeof marker.after_value !== 'object' || Array.isArray(marker.after_value)) continue
+    out.set(recordId, { data: marker.after_value as Record<string, unknown>, marker })
+  }
+  return out
+}
+
+/**
+ * The rows with their in-app edits laid on top, plus the records created in the app that the copy does not have yet. A row without edits
+ * is returned as the same object, so nothing downstream (search text, memoized lists) is rebuilt for it.
  */
 export function applyEdits(repoKey: BaseRepoKey, rows: SnapshotRow[], edits: BaseRepoEdit[]): SnapshotRow[] {
   if (edits.length === 0) return rows
   const byRecord = latestEditsByRecord(edits)
-  return rows.map((row) => {
+  const have = new Set(rows.map((r) => r.id))
+  const made: SnapshotRow[] = []
+  for (const [id, { data }] of createdRecords(edits)) {
+    if (have.has(id)) continue
+    made.push(rederive(repoKey, { id, label: id, secondary: null, filterValue: null, review_status: null, data, languages: [], secondaryFilterValues: [], createdInApp: true }))
+  }
+  return [...rows, ...made].map((row) => {
     const mine = byRecord.get(row.id)
     if (!mine || mine.size === 0) return row
+    const paths = Array.from(mine.keys()).filter((p) => p !== NEW_RECORD_PATH)
+    if (paths.length === 0 && !row.createdInApp) return row
     let data = row.data
-    for (const [path, edit] of mine) data = setPath(data, path, edit.after_value as EditValue)
+    for (const p of paths) data = setPath(data, p, mine.get(p)!.after_value as EditValue)
     const edited = rederive(repoKey, { ...row, data })
-    edited.editedPaths = Array.from(mine.keys())
+    edited.editedPaths = paths
     edited.pendingEditCount = Array.from(mine.values()).filter((e) => !e.exported_at).length
     return edited
   })
@@ -205,6 +229,55 @@ export async function resetEdit(
     edited_by: args.userId,
   })
   return error ? error.message : null
+}
+
+
+// ---- Adding a record in the app ----
+
+/** The first part of every MethodsBase id. Ids are slugs, with no numbers (see the repo's GOVERNANCE.md). */
+const METHOD_ID_PREFIX = 'OE-METHOD-'
+
+/** Lowercase words joined by hyphens, from an English title: "Group and sort to approach systematics" becomes "group-and-sort-to-approach-systematics". */
+export function slugFromTitle(title: string): string {
+  const words = title
+    .normalize('NFKD').replace(/\p{M}/gu, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  if (words.length <= 80) return words
+  const cut = words.slice(0, 80)
+  return cut.slice(0, Math.max(cut.lastIndexOf('-'), 1)).replace(/-+$/g, '')
+}
+
+export type NewEntryCheck = { ok: true; id: string; slug: string } | { ok: false; problem: string }
+
+/** Whether a title can start a new method, and the id it would get. `existingIds` are the ids of every method already shown. */
+export function checkNewMethodTitle(title: string, existingIds: Iterable<string>): NewEntryCheck {
+  const slug = slugFromTitle(title)
+  if (!title.trim() || !slug) return { ok: false, problem: 'Type a title in English first.' }
+  const id = `${METHOD_ID_PREFIX}${slug}`
+  for (const x of existingIds) if (x === id) return { ok: false, problem: 'A method with this title already exists. Open it from the table, or make the new title more specific.' }
+  return { ok: true, id, slug }
+}
+
+/**
+ * Creates a new MethodsBase record: the marker row and the English title. The rest is filled in with the ordinary edit form. Returns an
+ * error message, or null when it was saved.
+ */
+export async function createMethodEntry(
+  supabase: Client,
+  args: { userId: string; title: string; existingIds: Iterable<string> }
+): Promise<{ error: string | null; id?: string }> {
+  const check = checkNewMethodTitle(args.title, args.existingIds)
+  if (!check.ok) return { error: check.problem }
+  const title = args.title.trim()
+  const rows = [
+    { path: NEW_RECORD_PATH, before: null, after: { id: check.id, slug: check.slug, methodClass: 'pedagogical-practice', status: 'active' } },
+    { path: 'label.en', before: null, after: title },
+  ].map((c) => ({
+    base_repo: 'methodsbase', record_id: check.id, field_path: c.path, before_value: c.before, after_value: c.after,
+    is_reset: false, note: 'New entry created in the Explorer', edited_by: args.userId,
+  }))
+  const { error } = await (supabase as any).from('base_repo_record_edits').insert(rows)
+  return error ? { error: error.message } : { error: null, id: check.id }
 }
 
 /** Edits whose latest state is still on top of the repo copy and not yet sent back. */

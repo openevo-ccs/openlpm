@@ -198,6 +198,8 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     'Health': 'Health',
     'Sports': 'Sports',
     'Social-emotional learning': 'Social-emotional learning',
+    'Biology': 'Biology',
+    'Evolution': 'Evolution',
   },
 }
 
@@ -232,6 +234,8 @@ export const TAG_GERMAN_NAMES: Record<TagField, Record<string, string>> = {
     'Health': 'Gesundheit',
     'Sports': 'Sport',
     'Social-emotional learning': 'Sozial-emotionales Lernen',
+    'Biology': 'Biologie',
+    'Evolution': 'Evolution',
   },
 }
 
