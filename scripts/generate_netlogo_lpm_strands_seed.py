@@ -208,9 +208,9 @@ MODELS = [
             "OE-CONCEPT-bio-core-natural-selection (Natural Selection, BIO-CORE-v1.0.0); "
             "OE-CONCEPT-bio-core-adaptation (Adaptation, BIO-CORE-v1.0.0); "
             "OE-CONCEPT-oe-interdisciplinary-agency (Agency, OE-INTERDISCIPLINARY-v1.0.0); "
-            "OE-SANDBOX-CONCEPT-000007 (Restructuration, OE-INTERDISCIPLINARY-v1.0.0); "
-            "OE-SANDBOX-CONCEPT-000008 (Decentralized Causal Reasoning, OE-INTERDISCIPLINARY-v1.0.0); "
-            "OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling, OE-INTERDISCIPLINARY-v1.0.0) -- all "
+            "OE-SANDBOX-CONCEPT-oe-interdisciplinary-restructuration (Restructuration, OE-INTERDISCIPLINARY-v1.0.0); "
+            "OE-SANDBOX-CONCEPT-oe-interdisciplinary-decentralized-causal-reasoning (Decentralized Causal Reasoning, OE-INTERDISCIPLINARY-v1.0.0); "
+            "OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling (Agent-Based Modeling, OE-INTERDISCIPLINARY-v1.0.0) -- all "
             "verified against the real ConceptBase registry, 2026-08-29. Gap: the pending, unmerged "
             "extend-bio-core-evolution-mechanisms branch (BIO-CORE-v1.2.0, 16 to 43 concepts) "
             "proposes Trade-offs (OE-CONCEPT-bio-core-trade-offs), a direct match for this strand's "
@@ -219,11 +219,11 @@ MODELS = [
         ),
         "competency_ids_cited": [
             "OE-CONCEPT-bio-core-natural-selection", "OE-CONCEPT-bio-core-adaptation",
-            "OE-CONCEPT-oe-interdisciplinary-agency", "OE-SANDBOX-CONCEPT-000007",
-            "OE-SANDBOX-CONCEPT-000008", "OE-SANDBOX-CONCEPT-000009",
+            "OE-CONCEPT-oe-interdisciplinary-agency", "OE-SANDBOX-CONCEPT-oe-interdisciplinary-restructuration",
+            "OE-SANDBOX-CONCEPT-oe-interdisciplinary-decentralized-causal-reasoning", "OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling",
         ],
         "assessment": (
-            "Existing item bank: assessments/bug-evolution.json, OE-ASSESS-BUGEVOLUTION-001 -- a "
+            "Existing item bank: assessments/bug-evolution.json, OE-ASSESS-bug-evolution -- a "
             "real, already-built 5-item integrated-causal-reasoning assessment, based on the "
             "EvoFlex assessment pattern (Hanisch, Eirdosh, Gonzalez Galli, Hartelt, Perez & Cupo, "
             "2026), diagnosing integrated vs. dichotomized reasoning about teleology, Lamarckism, "
@@ -263,7 +263,7 @@ MODELS = [
             "review_status: author-draft (unreviewed) as of the 2026-10-01 quality-review pass -- "
             "this strand's theoretical backbone rests on other unreviewed content, not an "
             "independently validated theory.",
-            "This strand's Competency Alignment cites OE-SANDBOX-CONCEPT-000007/8/9 (Restructuration, "
+            "This strand's Competency Alignment cites OE-SANDBOX-CONCEPT-oe-interdisciplinary-restructuration/8/9 (Restructuration, "
             "Decentralized Causal Reasoning, Agent-Based Modeling) without flagging in the strand "
             "text itself that these are provisional sandbox concepts with a 12-month TTL, expiring "
             "2027-08-06. Flagged explicitly here (2026-10-01 quality-review pass) since the source "
@@ -397,17 +397,17 @@ MODELS = [
             "sustainable agents); OE-CONCEPT-bio-core-population (the model's subgroup structure); "
             "OE-CONCEPT-bio-core-adaptation (sustainable harvesting as context-dependent "
             "adaptation); OE-CONCEPT-oe-interdisciplinary-selection (selection spanning biology "
-            "and culture); OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling) -- all BIO-CORE-"
+            "and culture); OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling (Agent-Based Modeling) -- all BIO-CORE-"
             "v1.0.0/OE-INTERDISCIPLINARY-v1.0.0, verified 2026-08-29. Not yet in ConceptBase: "
             "Multilevel Selection, Founder Effect, Isolation-as-evolutionary-factor."
         ),
         "competency_ids_cited": [
             "OE-CONCEPT-bio-core-natural-selection", "OE-CONCEPT-bio-core-population",
             "OE-CONCEPT-bio-core-adaptation", "OE-CONCEPT-oe-interdisciplinary-selection",
-            "OE-SANDBOX-CONCEPT-000009",
+            "OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling",
         ],
         "assessment": (
-            "Existing item bank: assessments/island-world.json, OE-ASSESS-ISLANDWORLD-001 -- a "
+            "Existing item bank: assessments/island-world.json, OE-ASSESS-island-world -- a "
             "real, already-built 5-item integrated-causal-reasoning assessment using an "
             "\"Archipelago\" vignette (island mammals, migration, founder effects), scored against "
             "verified real competencies. Noted gap, not fixed this pass: the vignette is a generic "
@@ -714,14 +714,14 @@ MODELS = [
         "competency_alignment": (
             "OE-CONCEPT-bio-core-natural-selection; OE-CONCEPT-bio-core-population (the "
             "oscillating resource/agent population as the direct object of study); "
-            "OE-CONCEPT-bio-core-fitness; OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling -- "
+            "OE-CONCEPT-bio-core-fitness; OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling (Agent-Based Modeling -- "
             "performance indicator: explain why changing Agents-Appearance doesn't change the "
             "underlying simulated mechanism) -- all verified 2026-08-29. Not yet in ConceptBase: "
             "predator-prey dynamics / population oscillation as a named concept."
         ),
         "competency_ids_cited": [
             "OE-CONCEPT-bio-core-natural-selection", "OE-CONCEPT-bio-core-population",
-            "OE-CONCEPT-bio-core-fitness", "OE-SANDBOX-CONCEPT-000009",
+            "OE-CONCEPT-bio-core-fitness", "OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling",
         ],
         "assessment": (
             "No assessment file exists yet -- needs building. Vignette sketch, grounded in the "
@@ -1453,7 +1453,7 @@ MODELS = [
         ],
         "assessment": (
             "Existing item bank: assessments/evolution-ethnocentrism.json, "
-            "OE-ASSESS-ETHNOCENTRISM-001 -- a real, already-built integrated-causal-reasoning "
+            "OE-ASSESS-ethnocentrism -- a real, already-built integrated-causal-reasoning "
             "assessment using a \"Two Communities of River Valley\" vignette (Red/Blue ethnic "
             "groups, differing cooperation traditions, a town-council policy change), scored "
             "against verified real competencies (re-verified above). Noted gap, not fixed this "
@@ -1562,7 +1562,7 @@ PROJECT_EPISTEMIC_NOTE = (
     "(proposition:restructuration-grounds-icr-transfer and two question: records) that are "
     "themselves tagged review_status: author-draft (unreviewed) -- its theoretical backbone rests "
     "on other unreviewed content, not an independently validated theory. (2) bug-evolution also "
-    "cites OE-SANDBOX-CONCEPT-000007/8/9 (Restructuration, Decentralized Causal Reasoning, "
+    "cites OE-SANDBOX-CONCEPT-oe-interdisciplinary-restructuration/8/9 (Restructuration, Decentralized Causal Reasoning, "
     "Agent-Based Modeling) without flagging in the strand's own text that these are provisional "
     "sandbox concepts with a 12-month TTL, expiring 2027-08-06 -- flagged here since the source "
     "text doesn't carry the caveat itself. Both caveats are also recorded directly on "
