@@ -4,6 +4,7 @@ import { Github, KeyRound } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { REDIRECT_KEY } from '@/components/require-auth'
 import { OpenLpmLogo } from '@/components/openlpm-logo'
+import { explainAuthError, SIGNUP_ALREADY_REGISTERED_TEXT, signUpHitExistingAccount, type AuthProblem } from '@/lib/auth-messages'
 
 type Mode = 'signin' | 'signup' | 'forgot'
 
@@ -28,6 +29,9 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [busy, setBusy] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [problem, setProblem] = useState<AuthProblem | null>(null)
+  const [resent, setResent] = useState(false)
   const [notice, setNotice] = useState<{ kind: 'ok' | 'bad'; text: string } | null>(null)
   const error = searchParams.get('error') || searchParams.get('error_description')
   const navigate = useNavigate()
@@ -50,19 +54,36 @@ export default function LoginPage() {
     e.preventDefault()
     setBusy(true)
     setNotice(null)
+    setProblem(null)
+    setResent(false)
     const supabase = createClient()
 
     if (mode === 'signup') {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
       })
-      setNotice(error ? { kind: 'bad', text: error.message } : { kind: 'ok', text: 'Check your inbox to confirm your email, then sign in.' })
+      if (error) {
+        const e = explainAuthError(error)
+        setProblem(e.problem)
+        setNotice({ kind: 'bad', text: e.text })
+      } else if (signUpHitExistingAccount(data.user)) {
+        // No email is sent in this case, so say so instead of showing "check your inbox".
+        setProblem('already_registered')
+        setNotice({ kind: 'bad', text: SIGNUP_ALREADY_REGISTERED_TEXT })
+      } else {
+        setNotice({
+          kind: 'ok',
+          text: 'Schau in dein Postfach (auch im Spam-Ordner) und bestätige deine E-Mail-Adresse. Danach kannst du dich anmelden.\n\nCheck your inbox (and spam) to confirm your email, then sign in.',
+        })
+      }
     } else if (mode === 'signin') {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       if (error) {
-        setNotice({ kind: 'bad', text: error.message })
+        const e = explainAuthError(error)
+        setProblem(e.problem)
+        setNotice({ kind: 'bad', text: e.text })
       } else {
         // <RedirectAfterLogin> (App.tsx) only acts at pathname === '/' --
         // built for the OAuth/password-reset round-trip that lands back at
@@ -77,17 +98,45 @@ export default function LoginPage() {
         navigate(stored || '/dashboard', { replace: true })
       }
     } else {
-      // Deliberately the plain site root, not a '#/auth/update-password'
-      // hash target -- Supabase appends '?code=...' after this URL, and
-      // under HashRouter anything after the '#' is fragment, not query
-      // string, so detectSessionInUrl (client.ts) would never see the code
+      // Deliberately the plain site root. A '#/auth/update-password' hash
+      // target would break the flow: Supabase appends '?code=...' after this
+      // URL, and under HashRouter anything after the '#' is fragment and never
+      // a query string, so detectSessionInUrl (client.ts) would never see the code
       // if it were appended after a hash path. Same fix already applied to
       // the GitHub OAuth redirect. App.tsx's PASSWORD_RECOVERY handling
       // sends the visitor on to the update-password page from there.
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: window.location.origin + import.meta.env.BASE_URL,
       })
-      setNotice(error ? { kind: 'bad', text: error.message } : { kind: 'ok', text: 'Check your inbox for a link to set a new password.' })
+      if (error) {
+        const e = explainAuthError(error)
+        setNotice({ kind: 'bad', text: e.text })
+      } else {
+        setNotice({
+          kind: 'ok',
+          text: 'Schau in dein Postfach (auch im Spam-Ordner): Dort ist ein Link, mit dem du ein neues Passwort setzt.\n\nCheck your inbox (and spam) for a link to set a new password.',
+        })
+      }
+    }
+    setBusy(false)
+  }
+
+  const resendConfirmation = async () => {
+    setBusy(true)
+    const { error } = await createClient().auth.resend({
+      type: 'signup',
+      email: email.trim(),
+      options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+    })
+    if (error) {
+      const e = explainAuthError(error)
+      setNotice({ kind: 'bad', text: e.text })
+    } else {
+      setResent(true)
+      setNotice({
+        kind: 'ok',
+        text: 'Die Bestätigungs-E-Mail ist unterwegs. Schau auch im Spam-Ordner nach.\n\nThe confirmation email is on its way. Check spam too.',
+      })
     }
     setBusy(false)
   }
@@ -137,14 +186,21 @@ export default function LoginPage() {
             <div className="field" style={{ marginBottom: 0 }}>
               <label>Password</label>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
               />
+              <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontWeight: 'normal', fontSize: 12.5, marginTop: 4 }}>
+                <input type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} />
+                Passwort anzeigen / Show password
+              </label>
             </div>
           )}
           <button className="btn" type="submit" disabled={busy}>
@@ -152,21 +208,32 @@ export default function LoginPage() {
             {busy ? 'Please wait…' : mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : 'Send reset link'}
           </button>
         </form>
-        {notice && <div className={`notice notice-${notice.kind}`}>{notice.text}</div>}
+        {notice && (
+          <div className={`notice notice-${notice.kind}`} style={{ whiteSpace: 'pre-line' }}>
+            {notice.text}
+            {problem === 'not_confirmed' && !resent && (
+              <div style={{ marginTop: 8 }}>
+                <button type="button" className="btn btn-mini" disabled={busy} onClick={() => void resendConfirmation()}>
+                  Bestätigungs-E-Mail erneut senden / Send confirmation again
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
         <p style={{ textAlign: 'center', fontSize: 12.5, marginTop: 4 }}>
           {mode === 'signin' && (
             <>
-              <button type="button" className="btn-linklike" onClick={() => { setMode('signup'); setNotice(null) }}>Need an account? Sign up</button>
+              <button type="button" className="btn-linklike" onClick={() => { setMode('signup'); setNotice(null); setProblem(null) }}>Need an account? Sign up</button>
               {' · '}
-              <button type="button" className="btn-linklike" onClick={() => { setMode('forgot'); setNotice(null) }}>Forgot password?</button>
+              <button type="button" className="btn-linklike" onClick={() => { setMode('forgot'); setNotice(null); setProblem(null) }}>Forgot password?</button>
             </>
           )}
           {mode === 'signup' && (
-            <button type="button" className="btn-linklike" onClick={() => { setMode('signin'); setNotice(null) }}>Already have an account? Sign in</button>
+            <button type="button" className="btn-linklike" onClick={() => { setMode('signin'); setNotice(null); setProblem(null) }}>Already have an account? Sign in</button>
           )}
           {mode === 'forgot' && (
-            <button type="button" className="btn-linklike" onClick={() => { setMode('signin'); setNotice(null) }}>Back to sign in</button>
+            <button type="button" className="btn-linklike" onClick={() => { setMode('signin'); setNotice(null); setProblem(null) }}>Back to sign in</button>
           )}
         </p>
 
@@ -178,7 +245,7 @@ export default function LoginPage() {
         {/* Real feedback 2a332362 (2026-10-01): OpenEvo/CCP/Bienenhaus/
             UniJena logo footer + legal links, matching openevo.net's own
             real footer -- scoped to this page only (Dustin's own call,
-            2026-10-01), not the whole signed-in app. */}
+            2026-10-01); the signed-in app does not get it. */}
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
           <div className="login-footer-logos">
             <img src={`${import.meta.env.BASE_URL}assets/logos/openevo-wordmark.png`} alt="OpenEvo" />
