@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generates a new OpenLPM migration seeding 4 orphaned sandbox-tier LPM capstones
-(OE-SANDBOX-LPM-000001..000004) as nested draft Projects under the two existing
+(OE-SANDBOX-LPM-bio-core-k12-human-evolution-capstone..000004) as nested draft Projects under the two existing
 synthetic Project Spaces (bio-core-lpm-synth / interdisciplinary-lpm-synth).
 
 Source: the now-GitHub-deleted bio-core-k12 and oe-interdisciplinary-k12 repos'
@@ -52,7 +52,7 @@ def emit(s):
 
 emit("SET search_path = public, extensions;")
 emit("")
-emit("-- Seeds 4 orphaned sandbox-tier LPM capstones (OE-SANDBOX-LPM-000001..000004) as")
+emit("-- Seeds 4 orphaned sandbox-tier LPM capstones (OE-SANDBOX-LPM-bio-core-k12-human-evolution-capstone..000004) as")
 emit("-- nested draft Projects under bio-core-lpm-synth / interdisciplinary-lpm-synth.")
 emit("-- These never merged into bio-core-k12/oe-interdisciplinary-k12's own main branch")
 emit("-- and never made it into 092/139's content seed; both source repos were retired")
@@ -109,7 +109,7 @@ rows = [
         "bio-core-human-lineage-capstone",
         "Human Lineage: Genetics and Paleoanthropology Capstone",
         (
-            "9-12 capstone (OE-SANDBOX-STRAND-000001/RFC-0010) treating human evolutionary "
+            "9-12 capstone (OE-SANDBOX-STRAND-bio-core-k12-human-evolution-capstone/RFC-0010) treating human evolutionary "
             "history with exactly the same evidentiary/causal toolkit as the parent Space's "
             "Speciation and Diversity of Life strand -- phylogeny, population genetics, "
             "ancient DNA -- applied specifically to the hominin lineage, with no agency, "
@@ -131,7 +131,7 @@ rows = [
         "bio-core-human-lineage-k12",
         "Human Lineage: Genetics and Paleoanthropology (K-12)",
         (
-            "Full K-2 -> 9-12 strand (OE-SANDBOX-STRAND-000004/RFC-0010) on human "
+            "Full K-2 -> 9-12 strand (OE-SANDBOX-STRAND-bio-core-k12-human-evolution-k12-strand/RFC-0010) on human "
             "evolutionary genetics and paleoanthropology, strictly non-agentic throughout, "
             "mirroring the parent Space's Speciation and Diversity of Life strand's "
             "four-substrand shape and spreading the hominin lineage as the worked example "
@@ -154,7 +154,7 @@ rows = [
         "interdisciplinary-evo-anthro-capstone",
         "Evo-Anthro Capstone",
         (
-            "9-12 capstone (OE-SANDBOX-STRAND-000010/RFC-0010) organized around seven "
+            "9-12 capstone (OE-SANDBOX-STRAND-interdisciplinary-k12-eva-capstone/RFC-0010) organized around seven "
             "fields of evolutionary anthropology (archaeogenetics, comparative cultural "
             "psychology, evolutionary genetics, human behavioral ecology, human origins/"
             "paleoanthropology, linguistic and cultural evolution, and primate behavior and "
@@ -185,7 +185,7 @@ rows = [
         "interdisciplinary-machine-culture-coevolution",
         "Machine Culture and Human-AI Coevolution Capstone",
         (
-            "9-12 capstone (OE-SANDBOX-STRAND-000013/RFC-0010) treating AI systems as "
+            "9-12 capstone (OE-SANDBOX-STRAND-interdisciplinary-k12-machine-culture-coevolution/RFC-0010) treating AI systems as "
             "potential participants in cultural evolution's variation/transmission/"
             "selection dynamics (Brinkmann et al. 2023, 'Machine culture,' Nature Human "
             "Behaviour), not merely as tools culture passes through -- grounded in a real, "
@@ -261,41 +261,41 @@ emit("")
 # ---------------------------------------------------------------------------
 NEW_CONCEPTS = {
     "Hominin": (
-        "OE-SANDBOX-CONCEPT-000001", "BIO-CORE-v1.0.0",
+        "OE-SANDBOX-CONCEPT-bio-core-hominin", "BIO-CORE-v1.0.0",
         "A member of the taxonomic group (tribe Hominini) comprising modern humans, "
         "extinct human species, and their immediate fossil ancestors since the "
         "divergence from the lineage leading to chimpanzees -- a strictly taxonomic/"
         "phylogenetic category, not an agency- or intentionality-bearing one.",
     ),
     "Ancient DNA": (
-        "OE-SANDBOX-CONCEPT-000002", "BIO-CORE-v1.0.0",
+        "OE-SANDBOX-CONCEPT-bio-core-ancient-dna", "BIO-CORE-v1.0.0",
         "Genetic material recovered and sequenced from historical or fossil remains, "
         "enabling direct observation of genetic variation and population history at "
         "past points in time rather than inferring it solely from present-day "
         "populations.",
     ),
     "Language Evolution": (
-        "OE-SANDBOX-CONCEPT-000003", "OE-INTERDISCIPLINARY-v1.0.0",
+        "OE-SANDBOX-CONCEPT-oe-interdisciplinary-language-evolution", "OE-INTERDISCIPLINARY-v1.0.0",
         "The process by which languages change, diversify, and descend from common "
         "ancestral languages over time, through the same general transmission-with-"
         "variation dynamics that shape other cultural traits.",
     ),
     "Comparative Cognition": (
-        "OE-SANDBOX-CONCEPT-000004", "OE-INTERDISCIPLINARY-v1.0.0",
+        "OE-SANDBOX-CONCEPT-oe-interdisciplinary-comparative-cognition", "OE-INTERDISCIPLINARY-v1.0.0",
         "The study of cognitive capacities (perception, memory, problem-solving, "
         "social learning) across species, used to identify which capacities are "
         "shared through common ancestry, which evolved independently, and which are "
         "distinctively elaborated in a given lineage.",
     ),
     "Machine Culture": (
-        "OE-SANDBOX-CONCEPT-000005", "OE-INTERDISCIPLINARY-v1.0.0",
+        "OE-SANDBOX-CONCEPT-oe-interdisciplinary-machine-culture", "OE-INTERDISCIPLINARY-v1.0.0",
         "Culture that is mediated or generated by machines -- cases where AI systems "
         "shape, participate in, or themselves undergo the variation, transmission, "
         "and selection dynamics that define cultural evolution, rather than machines "
         "being only passive tools culture is transmitted through.",
     ),
     "Hybrid Social Learning": (
-        "OE-SANDBOX-CONCEPT-000006", "OE-INTERDISCIPLINARY-v1.0.0",
+        "OE-SANDBOX-CONCEPT-oe-interdisciplinary-hybrid-social-learning", "OE-INTERDISCIPLINARY-v1.0.0",
         "Social learning processes that span human and artificial agents jointly -- "
         "humans learning from AI-generated content or behavior, AI systems trained "
         "on human-generated content or behavior, and the resulting feedback loop "

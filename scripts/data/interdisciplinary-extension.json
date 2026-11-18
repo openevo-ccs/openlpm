@@ -262,7 +262,7 @@
     "doi:10.1086/231294 (Emirbayer & Mische 1998; Crossref-checked)",
     "ISBN 9780134610993 (Russell & Norvig 2020, Artificial Intelligence: A Modern Approach; Open Library-checked)",
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-agency",
-    "ConceptBase AI4K12 OE-COMPETENCY-000263 (an intelligent agent)",
+    "ConceptBase AI4K12 OE-COMPETENCY-ai4k12-1-c-i-k-2-lo (an intelligent agent)",
     "DOI 10.1080/00219266.2025.2486963 (Hanisch, Eirdosh & González Galli 2025, Crossref checked; LiteratureBase OE-LITERATURE-hanisch-2025)",
     "DOI 10.1002/bies.202100185 (Sultan, Moczek & Walsh 2021, Crossref checked; LiteratureBase OE-LITERATURE-sultan-2022)",
     "LiteratureBase OE-LITERATURE-ariew-panchanathan-2023 and OE-LITERATURE-moore-et-al-2002 (agency ascribed to evolution as a learning problem)",
@@ -603,7 +603,7 @@
    "grounding": [
     "OE-CONCEPT-bio-core-common-ancestor",
     "OE-CONCEPT-bio-core-phylogeny",
-    "OE-SANDBOX-CONCEPT-000003",
+    "OE-SANDBOX-CONCEPT-oe-interdisciplinary-language-evolution",
     "doi:10.1038/29667 (Barbrook et al. 1998, The phylogeny of The Canterbury Tales; Crossref-checked)",
     "doi:10.1038/nature02029 (Gray & Atkinson 2003; Crossref-checked)",
     "doi:10.1080/10635150590950317 (Atkinson & Gray 2005; Crossref-checked)",
@@ -698,7 +698,7 @@
    "curriculumUse": "Grade 10 Biologie Stammesgeschichte des Menschen (Hominidenstammbaum) and Zwischenformen.",
    "grounding": [
     "OE-CONCEPT-bio-core-common-ancestor",
-    "OE-SANDBOX-CONCEPT-000003",
+    "OE-SANDBOX-CONCEPT-oe-interdisciplinary-language-evolution",
     "doi:10.1038/nature02029 (Gray & Atkinson 2003; Crossref-checked)",
     "doi:10.1038/29667 (Barbrook et al. 1998, The phylogeny of The Canterbury Tales; Crossref-checked)",
     "Sachsen Lehrplan topic lehrplan-522-1/lernbereich-7602-1 (Biologie grade 10, Stammesgeschichte des Menschen; read in the topic cache)"
@@ -947,8 +947,8 @@
    "curriculumUse": "Describes ecological Konkurrenz (Klasse 9), territory and aggression in mammals (Klasse 5), and war and resistance topics (Klassen 8 to 10). The excludes line guards the persecution and bullying cases (Ethik Klasse 6) against a two-sided reading.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-conflict",
-    "ConceptBase NGSS competencies OE-COMPETENCY-000110 (MS-LS2-1) and OE-COMPETENCY-000148 (HS-LS4-2, competition for limited resources)",
-    "ConceptBase OE-SANDBOX-CONCEPT-000016 (Social Dilemma: distinguishes aligned, mixed and fully opposed interests)",
+    "ConceptBase NGSS competencies OE-COMPETENCY-ngss-life-science-ms-ls2-1 (MS-LS2-1) and OE-COMPETENCY-ngss-life-science-hs-ls4-2 (HS-LS4-2, competition for limited resources)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-social-dilemma (Social Dilemma: distinguishes aligned, mixed and fully opposed interests)",
     "LiteratureBase OE-LITERATURE-jessup-ode-balgopal-2016 (competition for limiting resources)",
     "LiteratureBase OE-LITERATURE-schluter-2010 (resource competition in sticklebacks)",
     "unverified: the computing facet rests on standard AI textbook material on zero-sum game search and on resource contention; no citation checked"
@@ -977,7 +977,7 @@
    "curriculumUse": "Describes kulturelle Leistungen (China, Klasse 8) and citizenship education across eras (Klasse 6). Also gives a bounded way to place animal traditions as a contrast case to human culture.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-culture",
-    "ConceptBase OE-SANDBOX-CONCEPT-000019 (Cumulative Culture) and OE-SANDBOX-CONCEPT-000005 (Machine Culture)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-cumulative-culture (Cumulative Culture) and OE-SANDBOX-CONCEPT-oe-interdisciplinary-machine-culture (Machine Culture)",
     "DOI 10.1038/21415 (Whiten, Goodall, McGrew et al. 1999, Crossref checked)",
     "DOI 10.1098/rstb.2006.1998 (Whiten & van Schaik 2007, Crossref checked)",
     "DOI 10.1017/ehs.2019.1 (Schuppli & van Schaik 2019, Crossref checked)",
@@ -1055,7 +1055,7 @@
    "curriculumUse": "Describes Netiquette and Umgangsformen, class and community rules, group pressure, and ethical demands of religions (Klassen 5 to 9). Separates these from descriptive versus normative statements in Biologie (Klassen 7 to 10).",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-norms",
-    "ConceptBase AI4K12 OE-COMPETENCY-000528 (AI systems and the norms of the groups they serve)",
+    "ConceptBase AI4K12 OE-COMPETENCY-ai4k12-5-a-iii-6-8-eu (AI systems and the norms of the groups they serve)",
     "DOI 10.1017/CBO9780511616037 (Bicchieri 2005, Crossref checked)",
     "DOI 10.1037/0022-3514.58.6.1015 (Cialdini, Reno & Kallgren 1990, Crossref checked)",
     "DOI 10.1006/jtbi.2003.3104 (Gintis 2003, internalisation of norms, Crossref checked)",
@@ -1087,7 +1087,7 @@
    "curriculumUse": "Describes colony-level problem solving and Arbeitsteilung in bees (Klasse 6), peer-to-peer and collaboration services in networks (Klassen 8 and 9), and team projects in Informatik (Klasse 10).",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-collective-intelligence",
-    "ConceptBase OE-SANDBOX-CONCEPT-000008 (Decentralized Causal Reasoning)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-decentralized-causal-reasoning (Decentralized Causal Reasoning)",
     "LiteratureBase OE-LITERATURE-anwarzai-2026, OE-LITERATURE-falandays-2023, OE-LITERATURE-muthukrishna-2016",
     "DOI 10.1126/science.1193147 (Woolley et al. 2010, Crossref checked)",
     "DOI 10.1126/science.1210361 (Seeley et al. 2012, honeybee swarms, Crossref checked)",
@@ -1167,8 +1167,8 @@
     "DOI 10.1038/nature08366 (Clutton-Brock 2009, Crossref checked)",
     "DOI 10.1002/ejsp.2420010202 (Tajfel et al. 1971, social categorization, Crossref checked)",
     "DOI 10.1126/science.1210361 (Seeley et al. 2012, colony decisions without a ruler, Crossref checked)",
-    "ConceptBase OE-COMPETENCY-000141 (NGSS HS-LS2-8, group behavior)",
-    "ConceptBase OE-SANDBOX-CONCEPT-000021 (Ultrasociality)",
+    "ConceptBase OE-COMPETENCY-ngss-life-science-hs-ls2-8 (NGSS HS-LS2-8, group behavior)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-ultrasociality (Ultrasociality)",
     "TheoryBase OE-THEORY-symbolic-group-marking (author-draft status)"
    ],
    "reason": "Social-Core has Group and the Interdisciplinary space has none. Animal social groups (sozialer Verband) are well documented, so the concept travels to biology. Computing offers only clusters and sets, so no facet is given there.",
@@ -1236,8 +1236,8 @@
    ],
    "curriculumUse": "Describes market coordination through prices, supply and demand (Gemeinschaftskunde Klassen 8 and 10), reward-based learning in AI units, and foraging choices in animal behaviour.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000023 (Homo Economicus: material incentives can backfire)",
-    "ConceptBase AI4K12 OE-COMPETENCY-000399 (reinforcement learning) and OE-COMPETENCY-000341 (maximizing reward)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-homo-economicus (Homo Economicus: material incentives can backfire)",
+    "ConceptBase AI4K12 OE-COMPETENCY-ai4k12-3-a-vi-6-8-eu (reinforcement learning) and OE-COMPETENCY-ai4k12-2-c-i-6-8-eu (maximizing reward)",
     "DOI 10.1086/468061 (Gneezy & Rustichini 2000, A fine is a price, Crossref checked)",
     "DOI 10.1037/0033-2909.125.6.627 (Deci, Koestner & Ryan 1999, Crossref checked)",
     "DOI 10.1111/1467-6419.00150 (Frey & Jegen 2001, Crossref checked)",
@@ -1272,7 +1272,7 @@
     "DOI 10.1139/z99-099 (Mech 1999, alpha status in wolf packs, Crossref checked)",
     "DOI 10.1016/S1090-5138(00)00071-4 (Henrich & Gil-White 2001, prestige, Crossref checked)",
     "DOI 10.1037/0033-295X.110.2.265 (Keltner, Gruenfeld & Anderson 2003, Crossref checked)",
-    "ConceptBase OE-SANDBOX-CONCEPT-000022 (Egalitarianism: leveling mechanisms against dominance)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-egalitarianism (Egalitarianism: leveling mechanisms against dominance)",
     "LiteratureBase OE-LITERATURE-turchin-gavrilets-2009"
    ],
    "reason": "Power has a thin but documented animal reading in dominance and rank order, which Klasse 5 teaches. Authority, legitimacy and control of beliefs stay human, so the general sentence is relational and excludes names what does not transfer.",
@@ -1351,7 +1351,7 @@
    "curriculumUse": "Describes knowledge in history source work (limits of interpreting sources), curriculum goals about what students should know, and school topics on memory. Gives knowledge-base topics in informatics a flagged technical reading.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-knowledge",
-    "ConceptBase AI4K12 OE-COMPETENCY-000263 (what an agent must know)",
+    "ConceptBase AI4K12 OE-COMPETENCY-ai4k12-1-c-i-k-2-lo (what an agent must know)",
     "DOI 10.1207/s15430421tip4104_2 (Krathwohl 2002, knowledge dimension, Crossref checked)",
     "DOI 10.1145/3447772 (Hogan et al. 2021, Knowledge Graphs, Crossref checked)",
     "DOI 10.1098/rstb.2015.0192 (Muthukrishna & Henrich 2016, Crossref checked)",
@@ -1380,7 +1380,7 @@
    ],
    "curriculumUse": "Describes shared-resource problems such as commons and public goods in Gemeinschaftskunde and Ethik, and partnerships such as cleaner fish where cheating is possible, with one problem statement across domains.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000016 (Social Dilemma) and OE-SANDBOX-CONCEPT-000017 (Tragedy of the Commons)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-social-dilemma (Social Dilemma) and OE-SANDBOX-CONCEPT-oe-interdisciplinary-tragedy-of-the-commons (Tragedy of the Commons)",
     "TheoryBase OE-PROPOSITION-commons-dilemma-misaligned-interests (author-draft status)",
     "DOI 10.1126/science.162.3859.1243 (Hardin 1968; LiteratureBase OE-LITERATURE-hardin-1968)",
     "DOI 10.1017/cbo9780511807763 (Ostrom 1990; LiteratureBase OE-LITERATURE-ostrom-1990)",
@@ -1429,7 +1429,7 @@
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-information",
     "TheoryBase OE-CROSSDOMAINCONSTRUCT-information-processing-domain-general",
     "TheoryBase OE-CURRICULUMDECISION-bio-core-strand-101-no-information-concept",
-    "ConceptBase OE-COMPETENCY-000108 (NGSS MS-LS1-8, sensory receptors and memory)",
+    "ConceptBase OE-COMPETENCY-ngss-life-science-ms-ls1-8 (NGSS MS-LS1-8, sensory receptors and memory)",
     "DOI 10.1002/j.1538-7305.1948.tb01338.x (Shannon 1948, Crossref verified)",
     "DOI 10.1086/392768 (Maynard Smith 2000, Crossref verified)",
     "DOI 10.1086/392760 (Godfrey-Smith 2000, Crossref verified)",
@@ -1471,7 +1471,7 @@
    "curriculumUse": "Describes map work in geography and Sachunterricht (the map as a generalized picture), number systems, markup languages and binary coding in informatics, and mental images or concepts in cognition topics.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-representation",
-    "ConceptBase OE-COMPETENCY-000283 (AI4K12: the map is not the territory)",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-a-i-k-2-eu (AI4K12: the map is not the territory)",
     "TheoryBase OE-THEORY-restructuration-theory",
     "LiteratureBase OE-LITERATURE-wilensky-papert-2010",
     "DOI 10.1007/s10539-006-9046-6 (Shea 2007, Crossref verified; representation in inheritance systems, background only)"
@@ -1526,9 +1526,9 @@
    "curriculumUse": "Describes learning in Sachunterricht (learning from mistakes, learning together), human and animal learned behavior in biology, and machine learning in informatics grade 9 under a flagged technical reading.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-learning",
-    "ConceptBase OE-COMPETENCY-000358 (AI4K12 3-5: people and computers both learn from patterns, people are flexible)",
-    "ConceptBase OE-COMPETENCY-000360 (AI4K12 6-8: human learning versus machine learning)",
-    "ConceptBase OE-COMPETENCY-000394 (AI4K12 9-12: algorithms adjust internal representations)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-i-3-5-eu (AI4K12 3-5: people and computers both learn from patterns, people are flexible)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-i-6-8-eu (AI4K12 6-8: human learning versus machine learning)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-v-9-12-eu (AI4K12 9-12: algorithms adjust internal representations)",
     "TheoryBase OE-THEORY-sociocultural-progression-as-community-practice",
     "DOI 10.1147/rd.33.0210 (Samuel 1959, Crossref verified)",
     "TheoryBase OE-CROSSDOMAINCONSTRUCT-selection-as-hierarchical-bayesian-updating (theory bridge: the record treats learning and evolution as one kind of updating at different grains and does not claim they are identical)"
@@ -1555,8 +1555,8 @@
    "curriculumUse": "Covers the informatics grade 9 topic on artificial intelligence (supervised, unsupervised and reinforcement learning, data basis, model) and the grade 10 AI web application project. Both fit the narrow sense.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-learning",
-    "ConceptBase OE-COMPETENCY-000362 (AI4K12 9-12: supervised, unsupervised and reinforcement learning)",
-    "ConceptBase OE-COMPETENCY-000394 (AI4K12 9-12: algorithms adjust internal representations)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-i-9-12-eu (AI4K12 9-12: supervised, unsupervised and reinforcement learning)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-v-9-12-eu (AI4K12 9-12: algorithms adjust internal representations)",
     "DOI 10.1147/rd.33.0210 (Samuel 1959, Crossref verified)"
    ],
    "reason": "Machine Learning shares the word with Learning and differs in what changes. It fits better as one flagged technical facet of Learning than as a second general concept.",
@@ -1615,7 +1615,7 @@
    "coreCounterparts": [],
    "curriculumUse": "No digest case tags it. Typical use is school goals about reviewing one's own work and strategies, and the OpenEvo content anchor Our Mind.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000011 (sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-metacognition (sandbox tier)",
     "ConceptBase OE-CONCEPT-openevo-design-concept-our-mind",
     "DOI 10.1037/0003-066X.34.10.906 (Flavell 1979, Crossref verified)",
     "DOI 10.1017/S0140525X03000086 (Smith, Shields and Washburn 2003, Crossref verified)"
@@ -1637,7 +1637,7 @@
    "coreCounterparts": [],
    "curriculumUse": "No digest case tags it. Typical use is child development, comparing animal and human social thinking, and perspective-taking topics such as understanding others in Ethik grade 6.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000010 (sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-theory-of-mind (sandbox tier)",
     "DOI 10.1017/S0140525X00076512 (Premack and Woodruff 1978, Crossref verified)",
     "DOI 10.1111/1467-8624.00304 (Wellman, Cross and Watson 2001, Crossref verified)",
     "DOI 10.1016/j.tics.2008.02.010 (Call and Tomasello 2008, Crossref verified)",
@@ -1663,7 +1663,7 @@
    "coreCounterparts": [],
    "curriculumUse": "No digest case tags it. Typical use is teaching that starts from student preconceptions, such as purpose-based explanations of traits in evolution lessons.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000012 (sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-intuitive-theories (sandbox tier)",
     "TheoryBase OE-MISCONCEPTION-need-based-teleology",
     "TheoryBase OE-PROPOSITION-agential-biases-as-barriers",
     "DOI 10.1037/a0028044 (Gopnik and Wellman 2012, Crossref verified)",
@@ -1690,7 +1690,7 @@
    "coreCounterparts": [],
    "curriculumUse": "Describes analogy-based teaching, such as breeders' selection as a way into natural selection. No Sachsen digest case tags it directly.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000013 (sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-analogical-reasoning (sandbox tier)",
     "DOI 10.1207/s15516709cog0702_3 (Gentner 1983, Crossref verified)",
     "DOI 10.1016/0004-3702(89)90077-5 (Falkenhainer, Forbus and Gentner 1989, Crossref verified)",
     "DOI 10.1016/j.tics.2021.03.002 (Brand, Mesoudi and Smaldino 2021, Crossref verified)",
@@ -1760,7 +1760,7 @@
    "curriculumUse": "Describes Technik und Computer grades 5 and 6 (designing, making and evaluating objects, work plans), tool use in human origins (biology grade 10) and industrialisation (history grade 8).",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-technology",
-    "ConceptBase OE-SANDBOX-CONCEPT-000005 (Machine Culture, sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-machine-culture (Machine Culture, sandbox tier)",
     "DOI 10.1098/rspb.2002.2302 (Hunt and Gray 2003, Crossref verified)",
     "DOI 10.1038/s41562-023-01742-2 (Brinkmann et al. 2023, Crossref verified)"
    ],
@@ -1793,9 +1793,9 @@
    ],
    "curriculumUse": "Describes the geography topic on the map as a generalized picture of reality (grade 5), simplified models in several subjects, and layers and interfaces in informatics. All four digest cases fit the narrow sense.",
    "grounding": [
-    "ConceptBase OE-COMPETENCY-000281 (AI4K12: Representation (Abstraction))",
-    "ConceptBase OE-COMPETENCY-000284 (AI4K12 3-5: different maps capture different aspects)",
-    "ConceptBase OE-COMPETENCY-000286 (AI4K12 6-8: a game board described in plain language)",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-a-i (AI4K12: Representation (Abstraction))",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-a-i-3-5-lo (AI4K12 3-5: different maps capture different aspects)",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-a-i-6-8-lo (AI4K12 6-8: a game board described in plain language)",
     "DOI 10.1145/1118178.1118215 (Wing 2006, Crossref verified)",
     "DOI 10.1098/rsta.2008.0118 (Wing 2008, Crossref verified)",
     "DOI 10.1207/s15516709cog0702_3 (Gentner 1983, Crossref verified)"
@@ -1829,7 +1829,7 @@
    ],
    "curriculumUse": "Describes informatics grade 7 and 8 algorithm topics including transfer to everyday cases, dichotomous keys in biology grades 6 and 9, and the work plan in Technik und Computer grades 5 and 6.",
    "grounding": [
-    "ConceptBase OE-COMPETENCY-000321 (AI4K12 3-5: an algorithm chooses the next move)",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-b-i-3-5-eu (AI4K12 3-5: an algorithm chooses the next move)",
     "DOI 10.1038/msb.2011.78 (Navlakha and Bar-Joseph 2011, Crossref verified)",
     "DOI 10.1145/1118178.1118215 (Wing 2006, Crossref verified)"
    ],
@@ -1873,8 +1873,8 @@
    ],
    "curriculumUse": "Describes the biological control loop for blood sugar (biology grade 8) and feedback to learners as used in lessons. The blood sugar case tags as narrower under Comp-Core.",
    "grounding": [
-    "ConceptBase OE-COMPETENCY-000128 (NGSS HS-LS1-3: feedback mechanisms maintain homeostasis)",
-    "ConceptBase OE-COMPETENCY-000397 (AI4K12 3-5: a reinforcement signal lets a computer learn from experience)",
+    "ConceptBase OE-COMPETENCY-ngss-life-science-hs-ls1-3 (NGSS HS-LS1-3: feedback mechanisms maintain homeostasis)",
+    "ConceptBase OE-COMPETENCY-ai4k12-3-a-vi-3-5-eu (AI4K12 3-5: a reinforcement signal lets a computer learn from experience)",
     "DOI 10.1086/286788 (Rosenblueth, Wiener and Bigelow 1943, Crossref verified)",
     "DOI 10.3102/003465430298487 (Hattie and Timperley 2007, Crossref verified)"
    ],
@@ -1905,7 +1905,7 @@
    "curriculumUse": "Covers the hominid family tree, sector and city-region models, conscience models, the input-process-output model and scale models. Worldview 'models' in the Ethik grade 10 topic count only if testable; an expert should judge.",
    "grounding": [
     "ConceptBase OE-CONCEPT-openevo-design-concept-computer-models",
-    "ConceptBase OE-COMPETENCY-000102 (NGSS MS-LS1-2: develop and use a model)",
+    "ConceptBase OE-COMPETENCY-ngss-life-science-ms-ls1-2 (NGSS MS-LS1-2: develop and use a model)",
     "TheoryBase OE-THEORY-computational-models-as-theory-mediators",
     "DOI 10.1002/tea.3660280907 (Grosslight et al. 1991, Crossref verified)",
     "DOI 10.1080/095006900416884 (Harrison and Treagust 2000, Crossref verified)",
@@ -1935,7 +1935,7 @@
    ],
    "curriculumUse": "No Sachsen digest case tags Simulation. Typical use is classroom agent-based models and software that lets students vary settings and watch results.",
    "grounding": [
-    "ConceptBase OE-SANDBOX-CONCEPT-000009 (Agent-Based Modeling, sandbox tier)",
+    "ConceptBase OE-SANDBOX-CONCEPT-oe-interdisciplinary-agent-based-modeling (Agent-Based Modeling, sandbox tier)",
     "ConceptBase OE-CONCEPT-openevo-design-concept-computer-models"
    ],
    "reason": "A simulation is a model being run, so it shares the structure of Model. No Sachsen case in the digest separates the two. A facet of Model covers it.",
@@ -1983,7 +1983,7 @@
    "curriculumUse": "Describes the informatics grade 8 topic on search strategies and ranking of results, search strategies in Sachunterricht and Technik und Computer, and animal foraging. Leaves out 'Sinnsuche' in Ethik grade 8.",
    "grounding": [
     "ConceptBase OE-CONCEPT-oe-interdisciplinary-selection (its AI sense is close to Search)",
-    "ConceptBase OE-COMPETENCY-000325 (AI4K12 9-12: problems as search from a start state to a goal state)",
+    "ConceptBase OE-COMPETENCY-ai4k12-2-b-i-9-12-eu (AI4K12 9-12: problems as search from a start state to a goal state)",
     "DOI 10.1145/360018.360022 (Newell and Simon 1976, Crossref verified)",
     "DOI 10.1111/tops.12703 (Bramley et al. 2023, Crossref verified)",
     "DOI 10.1086/409852 (Pyke, Pulliam and Charnov 1977, Crossref verified)"
