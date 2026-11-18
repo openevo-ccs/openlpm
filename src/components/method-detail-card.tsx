@@ -72,7 +72,7 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
   const steps = pickLocalizedList(data.protocolSteps, lang)
   const discipline = pickLocalized(data.discipline, lang)
   const missingIn = [description, whenToUse, steps].some((x) => x && x.lang && x.lang !== lang)
-  const hasTags = (Array.isArray(data.lessonPhases) && data.lessonPhases.length > 0) || (Array.isArray(data.learningApproaches) && data.learningApproaches.length > 0)
+  const hasTags = (Array.isArray(data.disciplineTags) && data.disciplineTags.length > 0) || (Array.isArray(data.lessonPhases) && data.lessonPhases.length > 0) || (Array.isArray(data.learningApproaches) && data.learningApproaches.length > 0)
   const textLanguages = Array.from(new Set([...languagesOf(data.description), ...languagesOf(data.whenToUse), ...languagesOf(data.protocolSteps)]))
 
   return (
@@ -90,6 +90,7 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
       {discipline && <p className="muted" style={{ fontSize: 12, marginTop: 0 }}>{discipline.text}<LangChip lang={discipline.lang || 'en'} uiLang={uiLang} /></p>}
       {hasTags && (
         <div className="row" style={{ gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+          <TagChips field="disciplineTags" terms={data.disciplineTags} uiLang={uiLang} />
           <TagChips field="lessonPhases" terms={data.lessonPhases} uiLang={uiLang} />
           <TagChips field="learningApproaches" terms={data.learningApproaches} uiLang={uiLang} />
         </div>

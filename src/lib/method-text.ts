@@ -145,7 +145,7 @@ export function methodClassesReading(value: unknown, lang: string): string {
   return methodClassesOf(value).map((c) => methodClassReading(c, lang)).join(', ')
 }
 
-export type TagField = 'lessonPhases' | 'learningApproaches'
+export type TagField = 'lessonPhases' | 'learningApproaches' | 'disciplineTags'
 
 export const TAG_READINGS: Record<TagField, Record<string, string>> = {
   lessonPhases: {
@@ -171,6 +171,34 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     außerschulisch: 'Out-of-school',
     'kritisch/reflexiv': 'Critical/reflective',
   },
+  // Disciplines (Susan Hanisch, feedback 3bef962e, 2026-11-18). Unlike the two lists above the stored term is the English name.
+  disciplineTags: {
+    'Educational research': 'Educational research',
+    'Curriculum studies': 'Curriculum studies',
+    'Science education': 'Science education',
+    'Biology education': 'Biology education',
+    'Evolutionary biology': 'Evolutionary biology',
+    'Cultural evolution': 'Cultural evolution',
+    'Behavioral economics': 'Behavioral economics',
+    'Cognitive science and psychology': 'Cognitive science and psychology',
+    'Systems science and modeling': 'Systems science and modeling',
+    'Computational text analysis': 'Computational text analysis',
+    'Linguistics': 'Linguistics',
+    'Information science': 'Information science',
+    'Science and technology studies': 'Science and technology studies',
+    'Science': 'Science',
+    'Mathematics': 'Mathematics',
+    'Engineering': 'Engineering',
+    'Art': 'Art',
+    'Language': 'Language',
+    'History': 'History',
+    'Geography': 'Geography',
+    'Social studies': 'Social studies',
+    'Ethics': 'Ethics',
+    'Health': 'Health',
+    'Sports': 'Sports',
+    'Social-emotional learning': 'Social-emotional learning',
+  },
 }
 
 // Tags whose German name differs from the stored term (the `de` key of an entry in methodsbase/vocabularies/method-tags.yaml).
@@ -178,6 +206,33 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
 export const TAG_GERMAN_NAMES: Record<TagField, Record<string, string>> = {
   lessonPhases: {},
   learningApproaches: { kooperativ: 'kooperativ/sozial' },
+  disciplineTags: {
+    'Educational research': 'Bildungsforschung',
+    'Curriculum studies': 'Curriculumforschung',
+    'Science education': 'Naturwissenschaftsdidaktik',
+    'Biology education': 'Biologiedidaktik',
+    'Evolutionary biology': 'Evolutionsbiologie',
+    'Cultural evolution': 'Kulturelle Evolution',
+    'Behavioral economics': 'Verhaltensökonomik',
+    'Cognitive science and psychology': 'Kognitionswissenschaft und Psychologie',
+    'Systems science and modeling': 'Systemwissenschaft und Modellierung',
+    'Computational text analysis': 'Computergestützte Textanalyse',
+    'Linguistics': 'Sprachwissenschaft',
+    'Information science': 'Informationswissenschaft',
+    'Science and technology studies': 'Wissenschafts- und Technikforschung',
+    'Science': 'Naturwissenschaften',
+    'Mathematics': 'Mathematik',
+    'Engineering': 'Technik',
+    'Art': 'Kunst',
+    'Language': 'Sprache',
+    'History': 'Geschichte',
+    'Geography': 'Geografie',
+    'Social studies': 'Gesellschaftslehre',
+    'Ethics': 'Ethik',
+    'Health': 'Gesundheit',
+    'Sports': 'Sport',
+    'Social-emotional learning': 'Sozial-emotionales Lernen',
+  },
 }
 
 // The general method a learning approach stands for (the `method` key of an entry in methodsbase/vocabularies/method-tags.yaml), for example the
@@ -222,7 +277,7 @@ export function broaderMethodsFromTags(data: Record<string, unknown> | null | un
 // names set in the app, per field and term. The Explorer fills it from the saved edits (see base-repo-edits.ts).
 export type TagNames = { en?: string; de?: string }
 export type TagNameOverlay = Record<TagField, Record<string, TagNames>>
-const EMPTY_OVERLAY = (): TagNameOverlay => ({ lessonPhases: {}, learningApproaches: {} })
+const EMPTY_OVERLAY = (): TagNameOverlay => ({ lessonPhases: {}, learningApproaches: {}, disciplineTags: {} })
 let tagOverlay: TagNameOverlay = EMPTY_OVERLAY()
 let tagOverlayVersion = 0
 

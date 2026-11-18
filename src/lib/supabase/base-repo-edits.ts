@@ -62,7 +62,7 @@ export const vocabRecordId = (field: TagField): string => `${VOCAB_PREFIX}${fiel
 /** What a row of the edit log is about, in words: the record's name, or "Tag names: learning approaches". */
 export function vocabLabel(recordId: string): string {
   const field = recordId.slice(VOCAB_PREFIX.length)
-  return `Tag names: ${field === 'lessonPhases' ? 'lesson phases' : field === 'learningApproaches' ? 'learning approaches' : field}`
+  return `Tag names: ${field === 'lessonPhases' ? 'lesson phases' : field === 'learningApproaches' ? 'learning approaches' : field === 'disciplineTags' ? 'disciplines' : field}`
 }
 
 /** "en|kooperativ" is the English name of the tag kooperativ. */
@@ -74,7 +74,7 @@ export function splitVocabPath(path: string): { lang: 'en' | 'de'; term: string 
 
 /** The tag names set in the app, from the log of edits of MethodsBase. */
 export function tagNamesFromEdits(edits: BaseRepoEdit[]): TagNameOverlay {
-  const out: TagNameOverlay = { lessonPhases: {}, learningApproaches: {} }
+  const out: TagNameOverlay = { lessonPhases: {}, learningApproaches: {}, disciplineTags: {} }
   for (const [recordId, fields] of latestEditsByRecord(edits)) {
     if (!isVocabRecord(recordId)) continue
     const field = recordId.slice(VOCAB_PREFIX.length) as TagField

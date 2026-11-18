@@ -139,7 +139,7 @@ interface TranslatableText { key: string; label: string; empty: EditKind }
 const TRANSLATABLE: Partial<Record<BaseRepoKey, TranslatableText[]>> = {
   methodsbase: [
     { key: 'label', label: 'Label', empty: 'text' },
-    { key: 'discipline', label: 'Discipline', empty: 'text' },
+    { key: 'discipline', label: 'Discipline note', empty: 'text' },
     { key: 'whenToUse', label: 'When to use', empty: 'longtext' },
     { key: 'description', label: 'Description', empty: 'longtext' },
     { key: 'protocolSteps', label: 'Protocol steps', empty: 'lines' },
@@ -212,11 +212,12 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
   }
 
   // The words shown for a tag follow the language of the form. The tag itself is stored once.
-  const termsOf = (path: string, field: 'learningApproaches' | 'lessonPhases', suggestions: string[]): EditField => {
+  const TAG_FIELD_LABELS: Record<TagField, string> = { learningApproaches: 'Learning approaches', lessonPhases: 'Lesson phases', disciplineTags: 'Discipline' }
+  const termsOf = (path: string, field: TagField, suggestions: string[]): EditField => {
     const stored = Array.isArray(getPath(data, path)) ? (getPath(data, path) as unknown[]).map(String).map(normalizeTag) : []
     const values = Array.from(new Set([...tagTerms(field), ...suggestions.map(normalizeTag), ...stored]))
     return {
-      path, label: field === 'learningApproaches' ? 'Learning approaches' : 'Lesson phases', kind: 'multi', asList: true, group: 'tags', tagField: field,
+      path, label: TAG_FIELD_LABELS[field], kind: 'multi', asList: true, group: 'tags', tagField: field,
       choices: values.map((v) => ({ value: v, label: tagReading(field, v, 'en') })),
       reading: (v, lang) => tagReading(field, v, lang),
     }
@@ -239,6 +240,8 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
     })
     add({ ...termsOf('learningApproaches', 'learningApproaches', vocab.learningApproaches), hint: 'The tag names follow the language of the form.' })
     add(termsOf('lessonPhases', 'lessonPhases', []))
+    // Feedback 3bef962e (Susan Hanisch, 2026-11-15): Discipline as tags with English and German names. The free-text line stays as a note.
+    add({ ...termsOf('disciplineTags', 'disciplineTags', []), hint: 'The subject or research field. The tag names follow the language of the form.' })
     addTexts(TRANSLATABLE.methodsbase!.filter((t) => t.key !== 'label'))
     // Feedback 53ccb804 (Susan Hanisch, 2026-11-13): "need to be able to edit primary sources". One line per source.
     add({
@@ -246,7 +249,7 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
       hint: 'One source per line: the citation, then " | " and a DOI or web address if there is one. A source linked to a LiteratureBase record keeps that link when you change its text.',
       original: Array.isArray(data.primarySources) ? (data.primarySources as SourceEntry[]) : [],
     })
-    claimed.add('learningApproaches'); claimed.add('lessonPhases')
+    claimed.add('learningApproaches'); claimed.add('lessonPhases'); claimed.add('disciplineTags')
   } else if (repoKey === 'literaturebase') {
     add({ path: 'citation.title', label: 'Title', kind: 'text' })
     add({ path: 'citation.authors', label: 'Authors', kind: 'lines', hint: 'One author per line, as "Family, Given".' })
