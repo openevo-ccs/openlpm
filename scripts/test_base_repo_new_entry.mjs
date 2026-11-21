@@ -125,3 +125,48 @@ test('a record that exists only in the app keeps showing its edits even after th
 })
 
 console.log('')
+
+test('every base can start an entry, each with its own id rule', () => {
+  const id = (repo, name, taken = []) => { const r = E.checkNewEntryName(repo, name, taken); return r.ok ? r.id : r.problem }
+  assert.equal(id('theorybase', 'Niche construction theory'), 'OE-THEORY-niche-construction-theory')
+  assert.equal(id('literaturebase', 'The extended evolutionary synthesis'), 'OE-LITERATURE-the-extended-evolutionary-synthesis')
+  assert.equal(id('questionbase', 'How do students use agency language?'), 'OE-QUESTION-how-do-students-use-agency-language')
+  assert.equal(id('projectbase', 'eMu 2'), 'project:emu-2')
+  assert.equal(id('teachingbase', 'Agency in evolution education'), 'agency-in-evolution-education')
+})
+
+test('a quote or competency makes its id from the first eight words only', () => {
+  assert.equal(E.checkNewEntryName('quotebase', 'We think apes are especially good at cognizing things about the physical world and more', []).id, 'OE-QUOTE-we-think-apes-are-especially-good-at-cognizing')
+  assert.equal(E.checkNewEntryName('competencybase', 'Students can explain how traits change across generations in a population', []).id, 'OE-COMPETENCY-students-can-explain-how-traits-change-across-generations')
+})
+
+test('a taken name is refused in every base, and an empty one too', () => {
+  assert.equal(E.checkNewEntryName('theorybase', 'Commons dilemma', ['OE-THEORY-commons-dilemma']).ok, false)
+  assert.equal(E.checkNewEntryName('projectbase', 'eMu', ['project:emu']).ok, false)
+  assert.equal(E.checkNewEntryName('questionbase', '   ', []).ok, false)
+})
+
+test('the entry saves a marker row with the starter fields and the name at the path of that base', async () => {
+  const saved = []
+  const supabase = { from: () => ({ insert: async (rows) => { saved.push(...rows); return { error: null } } }) }
+  const a = await E.createEntry(supabase, 'competencybase', { userId: 'u1', title: 'Students can explain adaptation', existingIds: [] })
+  assert.equal(a.id, 'OE-COMPETENCY-students-can-explain-adaptation')
+  assert.deepEqual(saved.map((r) => r.field_path), ['$new', 'statement.en'])
+  assert.equal(saved[0].base_repo, 'competencybase')
+  assert.equal(saved[0].after_value.type, 'oe:Competency')
+  assert.equal(saved[1].after_value, 'Students can explain adaptation')
+  saved.length = 0
+  await E.createEntry(supabase, 'literaturebase', { userId: 'u1', title: 'A new book', existingIds: [] })
+  assert.deepEqual(saved.map((r) => r.field_path), ['$new', 'citation.title'])
+})
+
+test('a new quote shows its text as the label in the table', () => {
+  const edits = [
+    { id: 'a', base_repo: 'quotebase', record_id: 'OE-QUOTE-x', field_path: '$new', before_value: null, after_value: { id: 'OE-QUOTE-x', slug: 'x', status: 'proposed' }, is_reset: false, note: null, edited_by: 'u1', edited_at: '2026-11-21T10:00:00Z', exported_at: null, export_batch: null },
+    { id: 'b', base_repo: 'quotebase', record_id: 'OE-QUOTE-x', field_path: 'text', before_value: null, after_value: 'Culture is not a thing.', is_reset: false, note: null, edited_by: 'u1', edited_at: '2026-11-21T10:00:01Z', exported_at: null, export_batch: null },
+  ]
+  const rows = E.applyEdits('quotebase', [], edits)
+  assert.equal(rows.length, 1)
+  assert.equal(rows[0].label, 'Culture is not a thing.')
+  assert.equal(rows[0].createdInApp, true)
+})
