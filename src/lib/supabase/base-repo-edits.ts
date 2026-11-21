@@ -123,7 +123,7 @@ function rederive(repoKey: BaseRepoKey, row: SnapshotRow): SnapshotRow {
     const year = getPath(data, 'citation.year')
     if (year !== undefined && year !== null && year !== '') next.secondary = String(year)
   } else {
-    const named = (data as any).label ?? (data as any).title ?? (data as any).statement
+    const named = (data as any).label ?? (data as any).title ?? (data as any).statement ?? (row.createdInApp ? (data as any).text : undefined)
     const label = plainLabel(named)
     if (label) next.label = label
   }
@@ -241,9 +241,6 @@ export async function resetEdit(
 
 // ---- Adding a record in the app ----
 
-/** The first part of every MethodsBase id. Ids are slugs, with no numbers (see the repo's GOVERNANCE.md). */
-const METHOD_ID_PREFIX = 'OE-METHOD-'
-
 /** Lowercase words joined by hyphens, from an English title: "Group and sort to approach systematics" becomes "group-and-sort-to-approach-systematics". */
 export function slugFromTitle(title: string): string {
   const words = title
@@ -254,38 +251,81 @@ export function slugFromTitle(title: string): string {
   return cut.slice(0, Math.max(cut.lastIndexOf('-'), 1)).replace(/-+$/g, '')
 }
 
+/**
+ * What a new entry needs in each base (feedback 5016dccd, Susan Hanisch 2026-11-21: "each base could have that option, with the only restriction
+ * regarding fields maybe being the name/label"). The person types the name, and everything else is filled in with the ordinary edit form. The id
+ * follows each repo's own rule (its GOVERNANCE.md, Identifier Scheme). It is proposed here, and whoever copies the entry into the repo may
+ * finish it (for example LiteratureBase ids carry the authors and the year, which are only known after the form is filled in).
+ */
+export interface NewEntrySpec {
+  /** "method", "theory", ... used in the button and the panel. */
+  noun: string
+  /** The first part of the id. */
+  idPrefix: string
+  /** The label of the one required field. */
+  nameLabel: string
+  /** Where the name is stored in the record. */
+  namePath: string
+  placeholder: string
+  /** For a long name such as a quote: how many words make the id. Default: the whole name, cut at 80 characters. */
+  idWords?: number
+  /** The few fields every record of this base carries, besides id and slug. */
+  starter: Record<string, unknown>
+}
+
+export const NEW_ENTRY_SPECS: Partial<Record<BaseRepoKey, NewEntrySpec>> = {
+  methodsbase: { noun: 'method', idPrefix: 'OE-METHOD-', nameLabel: 'Title (English)', namePath: 'label.en', placeholder: 'For example: Model evolutionary trees with different materials', starter: { methodClass: 'pedagogical-practice', status: 'active' } },
+  theorybase: { noun: 'theory', idPrefix: 'OE-THEORY-', nameLabel: 'Name of the theory', namePath: 'label', placeholder: 'For example: Niche construction theory', starter: { status: 'proposed' } },
+  literaturebase: { noun: 'reference', idPrefix: 'OE-LITERATURE-', nameLabel: 'Title of the work', namePath: 'citation.title', placeholder: 'For example: The extended evolutionary synthesis', starter: { status: 'proposed' } },
+  questionbase: { noun: 'question', idPrefix: 'OE-QUESTION-', nameLabel: 'Short name of the question', namePath: 'label', placeholder: 'For example: How do students use agency language about evolution?', starter: { status: 'open' } },
+  quotebase: { noun: 'quote', idPrefix: 'OE-QUOTE-', nameLabel: 'The quote', namePath: 'text', placeholder: 'The words as written in the source', idWords: 8, starter: { status: 'proposed' } },
+  competencybase: { noun: 'competency', idPrefix: 'OE-COMPETENCY-', nameLabel: 'Competency statement (English)', namePath: 'statement.en', placeholder: 'For example: Students can explain how traits change across generations', idWords: 8, starter: { type: 'oe:Competency', status: 'proposed' } },
+  projectbase: { noun: 'project', idPrefix: 'project:', nameLabel: 'Name of the project', namePath: 'label', placeholder: 'For example: eMu', starter: { status: 'active' } },
+  teachingbase: { noun: 'lesson page', idPrefix: '', nameLabel: 'Title (English)', namePath: 'title.en', placeholder: 'For example: Agency in evolution education', starter: {} },
+}
+
 export type NewEntryCheck = { ok: true; id: string; slug: string } | { ok: false; problem: string }
 
-/** Whether a title can start a new method, and the id it would get. `existingIds` are the ids of every method already shown. */
-export function checkNewMethodTitle(title: string, existingIds: Iterable<string>): NewEntryCheck {
-  const slug = slugFromTitle(title)
-  if (!title.trim() || !slug) return { ok: false, problem: 'Type a title in English first.' }
-  const id = `${METHOD_ID_PREFIX}${slug}`
-  for (const x of existingIds) if (x === id) return { ok: false, problem: 'A method with this title already exists. Open it from the table, or make the new title more specific.' }
+/** Whether a name can start a new entry in this base, and the id it would get. `existingIds` are the ids of every record of the base already shown. */
+export function checkNewEntryName(repoKey: BaseRepoKey, title: string, existingIds: Iterable<string>): NewEntryCheck {
+  const spec = NEW_ENTRY_SPECS[repoKey]
+  if (!spec) return { ok: false, problem: 'Adding is not available for this repo.' }
+  const source = spec.idWords ? title.trim().split(/\s+/).slice(0, spec.idWords).join(' ') : title
+  const slug = slugFromTitle(source)
+  if (!title.trim() || !slug) return { ok: false, problem: 'Type the name first.' }
+  const id = `${spec.idPrefix}${slug}`
+  for (const x of existingIds) if (x === id) return { ok: false, problem: `A ${spec.noun} with this name already exists. Open it from the table, or make the new name more specific.` }
   return { ok: true, id, slug }
 }
 
 /**
- * Creates a new MethodsBase record: the marker row and the English title. The rest is filled in with the ordinary edit form. Returns an
- * error message, or null when it was saved.
+ * Creates a new record: the marker row and the name. The rest is filled in with the ordinary edit form. Returns an error message, or null
+ * when it was saved.
  */
-export async function createMethodEntry(
+export async function createEntry(
   supabase: Client,
+  repoKey: BaseRepoKey,
   args: { userId: string; title: string; existingIds: Iterable<string> }
 ): Promise<{ error: string | null; id?: string }> {
-  const check = checkNewMethodTitle(args.title, args.existingIds)
+  const spec = NEW_ENTRY_SPECS[repoKey]
+  if (!spec) return { error: 'Adding is not available for this repo.' }
+  const check = checkNewEntryName(repoKey, args.title, args.existingIds)
   if (!check.ok) return { error: check.problem }
   const title = args.title.trim()
   const rows = [
-    { path: NEW_RECORD_PATH, before: null, after: { id: check.id, slug: check.slug, methodClass: 'pedagogical-practice', status: 'active' } },
-    { path: 'label.en', before: null, after: title },
+    { path: NEW_RECORD_PATH, before: null, after: { id: check.id, slug: check.slug, ...spec.starter } },
+    { path: spec.namePath, before: null, after: title },
   ].map((c) => ({
-    base_repo: 'methodsbase', record_id: check.id, field_path: c.path, before_value: c.before, after_value: c.after,
+    base_repo: repoKey, record_id: check.id, field_path: c.path, before_value: c.before, after_value: c.after,
     is_reset: false, note: 'New entry created in the Explorer', edited_by: args.userId,
   }))
   const { error } = await (supabase as any).from('base_repo_record_edits').insert(rows)
   return error ? { error: error.message } : { error: null, id: check.id }
 }
+
+/** The methods version of the two functions above, kept under its first names. */
+export const checkNewMethodTitle = (title: string, existingIds: Iterable<string>): NewEntryCheck => checkNewEntryName('methodsbase', title, existingIds)
+export const createMethodEntry = (supabase: Client, args: { userId: string; title: string; existingIds: Iterable<string> }) => createEntry(supabase, 'methodsbase', args)
 
 /** Edits whose latest state is still on top of the repo copy and not yet sent back. */
 export function pendingEdits(edits: BaseRepoEdit[]): BaseRepoEdit[] {

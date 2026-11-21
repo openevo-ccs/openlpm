@@ -17,7 +17,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
 import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
-import { applyEdits, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
+import { NEW_ENTRY_SPECS, applyEdits, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
@@ -176,7 +176,7 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
   const [showTagNames, setShowTagNames] = useState(false)
   // Adding a method (feedback 5016dccd). `openInEditId` is the new entry that is waiting to be shown and opened in the edit form.
   const [showNewEntry, setShowNewEntry] = useState(false)
-  const [openInEditId, setOpenInEditId] = useState<string | null>(null)
+  const [openInEditId, setOpenInEditId] = useState<{ repoKey: BaseRepoKey; id: string } | null>(null)
   const [editOnOpenId, setEditOnOpenId] = useState<string | null>(null)
   // TeachingBase link checking (migrations 240 and 241). Loaded when the TeachingBase tab is open.
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([])
@@ -316,13 +316,13 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
     return { repoKey: selected.repoKey, row: fresh ?? selected.row }
   }, [selected, effectiveRowsByRepo])
 
-  // A method that was just created shows in the card as soon as the edits are loaded again, and the edit form opens on it.
+  // An entry that was just created (in any base) shows in the card as soon as the edits are loaded again, and the edit form opens on it.
   useEffect(() => {
     if (!openInEditId) return
-    const row = (effectiveRowsByRepo.get('methodsbase') ?? []).find((r) => r.id === openInEditId)
+    const row = (effectiveRowsByRepo.get(openInEditId.repoKey) ?? []).find((r) => r.id === openInEditId.id)
     if (!row) return
-    setSelected({ repoKey: 'methodsbase', row })
-    setEditOnOpenId(openInEditId)
+    setSelected({ repoKey: openInEditId.repoKey, row })
+    setEditOnOpenId(openInEditId.id)
     setOpenInEditId(null)
   }, [openInEditId, effectiveRowsByRepo])
 
@@ -477,14 +477,14 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
       )}
 
       {!restricted && <div className="row" style={{ gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
-        <button className={`btn btn-mini${tab === 'all' ? ' btn-primary' : ''}`} onClick={() => setTab('all')}>
+        <button className={`btn btn-mini${tab === 'all' ? ' btn-primary' : ''}`} onClick={() => { setTab('all'); setShowNewEntry(false) }}>
           All{tab === 'all' && !loading ? ` (${totalCount})` : ''}
         </button>
         {BASE_REPO_CONFIGS.map((cfg) => (
           <button
             key={cfg.key}
             className={`btn btn-mini${tab === cfg.key ? ' btn-primary' : ''}`}
-            onClick={() => setTab(cfg.key)}
+            onClick={() => { setTab(cfg.key); setShowNewEntry(false) }}
           >
             {cfg.name}{rowsByRepo.has(cfg.key) ? ` (${searchedCountFor(cfg.key)})` : ''}
           </button>
@@ -614,8 +614,8 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
               <PlayCircle size={13} />Start reviewing
             </button>
           )}
-          {!restricted && tab === 'methodsbase' && (
-            <button className={`btn btn-mini${showNewEntry ? ' btn-primary' : ''}`} data-testid="open-new-entry" disabled={!userId || !editsAvailable} onClick={() => setShowNewEntry((v) => !v)} title={editsAvailable ? 'Add a new method to MethodsBase' : 'Adding starts once the database update for edits is applied.'}>
+          {!restricted && tab !== 'all' && NEW_ENTRY_SPECS[tab] && (
+            <button className={`btn btn-mini${showNewEntry ? ' btn-primary' : ''}`} data-testid="open-new-entry" disabled={!userId || !editsAvailable || loading} onClick={() => setShowNewEntry((v) => !v)} title={!editsAvailable ? 'Adding starts once the database update for edits is applied.' : loading ? 'Adding starts once the list has loaded, so a name that is taken is noticed.' : `Add a new ${NEW_ENTRY_SPECS[tab]!.noun}`}>
               <Plus size={13} />Add entry
             </button>
           )}
@@ -637,16 +637,18 @@ export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { re
         </div>
       </div>
 
-      {!restricted && tab === 'methodsbase' && showNewEntry && userId && (
+      {!restricted && tab !== 'all' && NEW_ENTRY_SPECS[tab] && showNewEntry && userId && (
         <NewEntryPanel
+          key={tab}
+          repoKey={tab}
           supabase={supabase}
           userId={userId}
-          existingIds={(effectiveRowsByRepo.get('methodsbase') ?? []).map((r) => r.id)}
+          existingIds={(effectiveRowsByRepo.get(tab) ?? []).map((r) => r.id)}
           onClose={() => setShowNewEntry(false)}
           onCreated={async (id) => {
             setShowNewEntry(false); setSearch(''); setColumnFilters({}); setOnlyEdited(false)
-            await reloadEdits('methodsbase')
-            setOpenInEditId(id)
+            await reloadEdits(tab)
+            setOpenInEditId({ repoKey: tab, id })
           }}
         />
       )}
@@ -1662,7 +1664,7 @@ function DetailPanel({
       <p className="muted" style={{ fontSize: 12 }}>{repoKey} · {row.id}</p>
       {row.createdInApp && (
         <p style={{ fontSize: 12 }} data-testid="new-entry-chip">
-          <span className="chip" title="Created in OpenLPM. The MethodsBase repo does not have it yet.">new entry, only in OpenLPM</span>{' '}
+          <span className="chip" title="Created in OpenLPM. The repo does not have it yet.">new entry, only in OpenLPM</span>{' '}
           <span className="muted">{row.pendingEditCount ? 'waiting to be added to the repo' : 'added to the repo, the copy here refreshes soon'}</span>
         </p>
       )}
