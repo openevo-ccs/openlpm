@@ -25,9 +25,9 @@ let failed = 0
 const check = (name, ok, detail = '') => { if (!ok) failed++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  -- ' + detail : ''}`) }
 
 const AFTER_MIGRATION = {
-  lengths: [['kurz', 'Kurz (etwa eine Seite)'], ['mittel', 'Mittel (zwei bis drei Seiten)'], ['ausführlich', 'Ausführlich']],
-  detail_levels: [['knapp', 'Knapp: Stichpunkte mit den wichtigsten Punkten'], ['ausgewogen', 'Ausgewogen: kurze Erklärungen mit Beispielen'], ['sehr-detailliert', 'Sehr detailliert: ausformuliert, mit Zeitangaben, Material und Impulsfragen']],
-  default_detail: 'ausgewogen',
+  lengths: [['kurz', 'Kurz (1 bis 2 Seiten pro Unterrichtsstunde)'], ['mittel', 'Mittel (3 bis 4 Seiten pro Unterrichtsstunde)'], ['ausführlich', 'Ausführlich (ohne Seitenbegrenzung)']],
+  detail_levels: [['knapp', 'Kurz und knapp: nur die wichtigsten Angaben, Verlaufsordnungen in Stichpunkten'], ['ausfuehrlicher', 'Ausführlicher: zusätzlich kurze Erklärungen und Beispiele für Methoden und Arbeitsmaterial'], ['sehr-detailliert', 'Sehr detailliert: ausformuliert, mit didaktischen Begründungen, Vorschlägen für Variationen und Arbeitsmaterial für alle Phasen']],
+  default_detail: 'ausfuehrlicher',
 }
 let simulate = false
 
@@ -86,7 +86,7 @@ check('after the migration a Detailgrad control appears', labels2.includes('Deta
 const lengthOptions = await card8b.locator('select').nth(1).locator('option').allInnerTexts()
 check('Länge now has three choices', lengthOptions.length === 3, lengthOptions.join(' | '))
 const first = await preview()
-check('the prompt starts with the default detail line', /- Detailgrad: Ausgewogen: kurze Erklärungen mit Beispielen/.test(first))
+check('the prompt starts with the default detail line (Ausführlicher)', /- Detailgrad: Ausführlicher: zusätzlich kurze Erklärungen und Beispiele für Methoden und Arbeitsmaterial/.test(first))
 await card8b.locator('select').nth(1).selectOption('kurz')
 await card8b.locator('select').nth(2).selectOption('sehr-detailliert')
 await card8b.locator('textarea').fill('Bitte ohne Tabellen.')
@@ -96,7 +96,7 @@ const changed = await preview()
 const tail = changed.slice(changed.indexOf('GEWÜNSCHTE AUSGABE:'))
 console.log('\n--- end of the prompt ---\n' + tail + '\n--- end ---\n')
 check('the prompt carries the chosen length', /Länge: kurz/.test(tail))
-check('the prompt carries the chosen detail level in plain words', /- Detailgrad: Sehr detailliert: ausformuliert, mit Zeitangaben, Material und Impulsfragen/.test(tail))
+check('the prompt carries the chosen detail level in plain words', /- Detailgrad: Sehr detailliert: ausformuliert, mit didaktischen Begründungen, Vorschlägen für Variationen und Arbeitsmaterial für alle Phasen/.test(tail))
 check('the prompt carries the note', /Bitte ohne Tabellen\./.test(tail))
 check('the extra output type is in the prompt', /Hinweise auf Materialien \/ Medien/.test(tail))
 await card8b.scrollIntoViewIfNeeded()
