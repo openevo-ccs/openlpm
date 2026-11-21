@@ -45,3 +45,4 @@ layout_check/out/
 
 # Jena semester synthetic cohort: generated working files
 scripts/jena_semester/cache/
+src/lib/schema-studio/dev-snapshot.json
