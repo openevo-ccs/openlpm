@@ -1,4 +1,4 @@
--- 253: The KI-Prompt-Generator of the German library gets a fourth prior-knowledge level, "Nicht bekannt", and a meaning for every level.
+-- 255: The KI-Prompt-Generator of the German library gets a fourth prior-knowledge level, "Nicht bekannt", and a meaning for every level.
 --
 -- Feedback 1fab704b (Dustin Eirdosh, 2026-11-13): "we may need four levels regarding prior knowledge of basiskonzepte". Susan Hanisch could not
 -- name a meaningful fourth level herself and asked for suggestions (2026-11-21); Dustin chose "Nicht bekannt" (the teacher does not know what the
