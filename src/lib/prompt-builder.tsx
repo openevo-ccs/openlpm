@@ -1,4 +1,4 @@
-import { Anchor, Star } from 'lucide-react'
+import { Anchor, Info, Star } from 'lucide-react'
 import type { Database } from './supabase/database.types'
 import type { PromptOptionLists, PromptTemplateLibraryRow, SectionLabels } from './supabase/prompt-libraries'
 import { bkAbbreviation, bkEntries, type BkGroup } from './supabase/basiskonzepte'
@@ -112,7 +112,7 @@ export function buildPrompt(
   lines.push(labels.concepts_section)
   for (const g of bkGroups) {
     const vw = options.prior_knowledge_levels.find((v) => v[0] === (cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]))
-    lines.push(`- ${g.label}: ${vw ? vw[1] : '—'}`)
+    lines.push(`- ${g.label}: ${vw ? vw[1] + (vw[3] ? ` (${vw[3]})` : '') : '—'}`)
   }
   if (cfg.fachNotizen) lines.push(`${labels.extra_focus_label} ${cfg.fachNotizen}`)
   lines.push('')
@@ -348,5 +348,28 @@ export function PercentChips({
         </button>
       ))}
     </div>
+  )
+}
+
+
+/**
+ * The prior-knowledge choice for one Basiskonzept (feedback 1fab704b, Dustin and Susan, 2026-11-21): a fourth level "Nicht bekannt", and what each
+ * level means shows on hover. The select shows the meaning of the chosen level, each entry carries its own text, and the small icon next to the
+ * select lists all levels at once. Levels without a meaning text (a library that has none) show a plain select.
+ */
+export function PriorKnowledgeSelect({ levels, value, onChange }: { levels: PromptOptionLists['prior_knowledge_levels']; value: string | undefined; onChange: (v: string) => void }) {
+  const current = levels.find((l) => l[0] === value)
+  const all = levels.filter((l) => l[2]).map((l) => `${l[1]}: ${l[2]}`).join('\n\n')
+  return (
+    <span className="row" style={{ gap: 6, alignItems: 'center' }}>
+      <select style={{ flex: 1, minWidth: 0 }} value={value} onChange={(e) => onChange(e.target.value)} title={current?.[2] ?? undefined}>
+        {levels.map(([v, l, tip]) => <option key={v} value={v} title={tip ?? undefined}>{l}</option>)}
+      </select>
+      {all && (
+        <span title={all} aria-label={all} tabIndex={0} style={{ display: 'inline-flex', color: 'var(--muted, #667)', cursor: 'help', flexShrink: 0 }}>
+          <Info size={16} />
+        </span>
+      )}
+    </span>
   )
 }

@@ -20,7 +20,7 @@ import {
 import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, PriorKnowledgeSelect, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { listMethodConceptLinks, setMethodConceptKonzeptanker, setMethodConceptLink, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
 
@@ -248,14 +248,11 @@ export default function PromptGeneratorPage() {
             {focusedBkGroups.map((g) => (
               <div key={g.rootId} className="field">
                 <label>{g.label}</label>
-                <select
+                <PriorKnowledgeSelect
+                  levels={options.prior_knowledge_levels}
                   value={cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]}
-                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: e.target.value } })}
-                >
-                  {options.prior_knowledge_levels.map(([v, l]) => (
-                    <option key={v} value={v}>{l}</option>
-                  ))}
-                </select>
+                  onChange={(v) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: v } })}
+                />
               </div>
             ))}
             <div className="field">
