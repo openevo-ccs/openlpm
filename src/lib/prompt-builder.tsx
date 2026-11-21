@@ -37,6 +37,8 @@ export interface Config {
   ausgabeTyp: string[]
   ton: string
   laenge: string
+  // How detailed the answer should be ('' when the library offers no detail levels).
+  detailgrad: string
   sonstigeNotizen: string
 }
 
@@ -48,7 +50,9 @@ export function defaultConfig(options: PromptOptionLists): Config {
     bewertung: [...options.default_assessment], evalNotizen: '',
     kontext: [], kontextNotizen: '',
     ausgabeTyp: [...options.default_output_types],
-    ton: options.default_tone, laenge: options.default_length, sonstigeNotizen: '',
+    ton: options.default_tone, laenge: options.default_length,
+    detailgrad: options.detail_levels?.length ? (options.default_detail ?? options.detail_levels[0][0]) : '',
+    sonstigeNotizen: '',
   }
 }
 
@@ -155,6 +159,9 @@ export function buildPrompt(
   lines.push('')
   lines.push(labels.output_section)
   lines.push(`- ${labels.tone_label} ${cfg.ton}, ${labels.length_label} ${cfg.laenge}`)
+  // The detail line prints the option's plain description, so the AI is told what "detailed" means and not only a one-word key.
+  const detail = options.detail_levels?.find((d) => d[0] === cfg.detailgrad)
+  if (detail) lines.push(`- ${labels.detail_label ?? 'Detail level:'} ${detail[1]}`)
   for (const t of cfg.ausgabeTyp) lines.push(`- ${t}`)
   if (cfg.sonstigeNotizen) lines.push(`- ${labels.other_notes_label} ${cfg.sonstigeNotizen}`)
   return lines.join('\n')

@@ -35,6 +35,8 @@ export interface SectionLabels {
   // Optional: only a library that lists lesson phases needs it.
   lesson_phases_section?: string
   lesson_plan_template_section?: string
+  // Optional: the line that says how detailed the answer should be. Only a library with detail_levels needs it.
+  detail_label?: string
 }
 
 export interface PromptOptionLists {
@@ -51,6 +53,10 @@ export interface PromptOptionLists {
   default_assessment: string[]
   tones: [string, string][]
   lengths: [string, string][]
+  // Optional: how detailed the answer should be (key, plain label that also goes into the prompt). A library without it shows no
+  // detail control and the prompt has no detail line, exactly as before.
+  detail_levels?: [string, string][]
+  default_detail?: string
   prior_knowledge_levels: [string, string][]
   // Stored explicitly. Taking "whichever option happens to be listed first"
   // was a real bug caught in review: the seeded German library lists
