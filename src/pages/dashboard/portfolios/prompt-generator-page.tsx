@@ -325,6 +325,16 @@ export default function PromptGeneratorPage() {
                   ))}
                 </select>
               </div>
+              {!!options.detail_levels?.length && (
+                <div className="field" style={{ flex: 2 }}>
+                  <label>Detail level</label>
+                  <select value={cfg.detailgrad} onChange={(e) => setCfg({ ...cfg, detailgrad: e.target.value })}>
+                    {options.detail_levels.map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             <CheckGroup options={options.output_types} selected={cfg.ausgabeTyp} onToggle={(v) => setCfg({ ...cfg, ausgabeTyp: toggleInList(cfg.ausgabeTyp, v) })} />
             <div className="field" style={{ marginTop: 8 }}>

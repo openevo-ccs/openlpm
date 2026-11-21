@@ -601,6 +601,43 @@ export default function StudentPromptPage() {
             <textarea value={cfg.kontextNotizen} onChange={(e) => setCfg({ ...cfg, kontextNotizen: e.target.value })} />
           </div>
         </div>
+
+        {/* Real feedback e3c38ffb (Dustin, 2026-11-13): the prompt ended with "Gewünschte Ausgabe" (tone, length, output types) but this page
+            had no controls for any of it, so a student could not change what the prompt asked for. The researcher page has had this section
+            from the start; this is the same section in German, plus a detail level (how much the answer spells out). */}
+        <div className="card student-prompt-card">
+          <h3><span className="num">8</span>Gewünschte Ausgabe</h3>
+          <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+            <div className="field" style={{ flex: 1, minWidth: 160 }}>
+              <label>Ton</label>
+              <select value={cfg.ton} onChange={(e) => setCfg({ ...cfg, ton: e.target.value })}>
+                {options.tones.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
+            <div className="field" style={{ flex: 1, minWidth: 160 }}>
+              <label>Länge</label>
+              <select value={cfg.laenge} onChange={(e) => setCfg({ ...cfg, laenge: e.target.value })}>
+                {options.lengths.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </div>
+            {!!options.detail_levels?.length && (
+              <div className="field" style={{ flex: 2, minWidth: 220 }}>
+                <label>Detailgrad</label>
+                <select value={cfg.detailgrad} onChange={(e) => setCfg({ ...cfg, detailgrad: e.target.value })}>
+                  {options.detail_levels.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+              </div>
+            )}
+          </div>
+          <div className="field" style={{ marginTop: 8 }}>
+            <label>Was soll die Antwort enthalten?</label>
+            <CheckGroup options={options.output_types} selected={cfg.ausgabeTyp} onToggle={(v) => setCfg({ ...cfg, ausgabeTyp: toggleInList(cfg.ausgabeTyp, v) })} />
+          </div>
+          <div className="field" style={{ marginTop: 8 }}>
+            <label>Weitere Hinweise zur Ausgabe</label>
+            <textarea value={cfg.sonstigeNotizen} onChange={(e) => setCfg({ ...cfg, sonstigeNotizen: e.target.value })} />
+          </div>
+        </div>
       </div>
 
       <div className="card" style={{ marginTop: 16, position: 'sticky', top: 12 }}>
