@@ -1,0 +1,31 @@
+# Copy this file into a base repository as .github/workflows/notify-openlpm-schema.yml.
+# When a schema, ontology or vocabulary file changes on main, it tells OpenLPM's "Schema Studio sync" workflow to refresh the map
+# straight away. Without it the map still refreshes every hour.
+#
+# Needs one secret in the base repository: OPENLPM_DISPATCH_TOKEN, a fine-grained personal access token that may "Run workflows"
+# (Actions: read and write) on openevo-ccs/openlpm.
+
+name: Notify OpenLPM of schema changes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'schema/**'
+      - 'schemas/**'
+      - 'ontologies/**'
+      - 'vocabularies/**'
+      - 'GOVERNANCE.md'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/openevo-ccs/openlpm/dispatches \
+            -d "{\"event_type\":\"schema-updated\",\"client_payload\":{\"repo\":\"${GITHUB_REPOSITORY}\",\"sha\":\"${GITHUB_SHA}\"}}"
+        env:
+          TOKEN: ${{ secrets.OPENLPM_DISPATCH_TOKEN }}

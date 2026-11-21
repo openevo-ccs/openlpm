@@ -1,0 +1,60 @@
+name: Schema Studio sync
+
+# Keeps the Schema Studio (Admin > Base repos > Schema Studio) in step with the base repositories. It reads the schema files of
+# every base repository and writes a new snapshot row only when something changed, so running it often costs almost nothing.
+#
+# It runs
+#   - every hour (so a schema change shows up within the hour even if nobody tells this workflow),
+#   - straight away when a base repository sends a "schema-updated" event (see docs/schema-studio/notify-openlpm-workflow.yml,
+#     which each base repository can carry),
+#   - by hand from the Actions tab.
+#
+# One-time set-up (a person with admin rights does this once):
+#   1. Repository secret SUPABASE_SERVICE_ROLE_KEY: the project's service role key.
+#   2. Repository secret BASE_REPOS_READ_TOKEN: a fine-grained personal access token with read-only "Contents" access to the base
+#      repositories listed below (most of them are private).
+#   3. Migration 252 applied (Actions > Apply Supabase migrations).
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  repository_dispatch:
+    types: [schema-updated]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schema-studio-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      LAB_ROOT: ${{ github.workspace }}/_bases
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Check out the base repositories (schema and record folders only)
+        run: |
+          mkdir -p "$LAB_ROOT"
+          for repo in conceptbase competencybase teachingbase projectbase theorybase questionbase methodsbase literaturebase quotebase speciesbase ccs-graph deutsche_lp openevo-core; do
+            echo "::group::$repo"
+            git clone --depth 50 --filter=blob:none --no-checkout "https://x-access-token:${TOKEN}@github.com/openevo-ccs/${repo}.git" "$LAB_ROOT/$repo" || { echo "::warning::could not clone $repo"; echo "::endgroup::"; continue; }
+            git -C "$LAB_ROOT/$repo" sparse-checkout init --no-cone
+            git -C "$LAB_ROOT/$repo" sparse-checkout set '/schema/' '/schemas/' '/ontologies/' '/vocabularies/' '/records/' '/registry/' '/taxa/' '/features/' '/explanations/' '/languages/' '/cultural-categories/' '/contexts/' '/data/' '/nodes/' '/alignments/' '/README.md' '/GOVERNANCE.md' '/CONTRIBUTING.md'
+            git -C "$LAB_ROOT/$repo" checkout
+            echo "::endgroup::"
+          done
+        env:
+          TOKEN: ${{ secrets.BASE_REPOS_READ_TOKEN }}
+      - run: node scripts/sync_schema_studio_snapshot.mjs --yes
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_URL: https://tfynvjjxyluzorigyfsp.supabase.co

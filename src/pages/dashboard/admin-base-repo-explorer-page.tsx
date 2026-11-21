@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
 import { DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { broaderMethodsFromTags, setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
@@ -129,7 +129,7 @@ const compareText = (a: string, b: string) => a.localeCompare(b, undefined, { nu
 // `reviewerOnly` is the second way in (migration 241): a named reviewer who is not an admin opens /dashboard/teaching-base and gets this page
 // with only the TeachingBase tab. Everything else in the Explorer stays admin-only: the other tabs are not loaded, and the edit, discussion,
 // review-queue and Reviewers parts are not shown. The database rules are the boundary underneath.
-export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { reviewerOnly?: boolean }) {
+function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: boolean }) {
   const { isAdmin, session, loading: sessionLoading } = useSession()
   const supabase = useMemo(() => createClient(), [])
   const userId = session?.user.id ?? null
@@ -1889,6 +1889,37 @@ function ReviewQueuePanel({
           )
         })
       )}
+    </div>
+  )
+}
+
+// The Base repos tab has two modes. "Records" is the Explorer above: the content of the repositories. "Schema Studio" is the map of their
+// structure (what kinds of records exist, which fields they have, how the repositories point at each other), with a place for suggestions.
+// The mode is kept in the address (?mode=schema) so a link opens the right one. Added 2026-11-21.
+const SchemaStudio = lazy(() => import('./schema-studio/studio'))
+
+export default function AdminBaseRepoExplorerPage({ reviewerOnly = false }: { reviewerOnly?: boolean }) {
+  const { isAdmin, session } = useSession()
+  const supabase = useMemo(() => createClient(), [])
+  const [params, setParams] = useSearchParams()
+  const mode = !reviewerOnly && params.get('mode') === 'schema' ? 'schema' : 'records'
+  const setMode = (m: 'records' | 'schema') => setParams(() => {
+    const n = new URLSearchParams()
+    if (m === 'schema') n.set('mode', 'schema')
+    return n
+  })
+  if (reviewerOnly) return <BaseRepoRecordsExplorer reviewerOnly />
+  return (
+    <div>
+      <div className="ss-modeswitch" role="tablist" aria-label="Base repos">
+        <button role="tab" aria-selected={mode === 'records'} className={mode === 'records' ? 'on' : ''} onClick={() => setMode('records')}>Records</button>
+        <button role="tab" aria-selected={mode === 'schema'} className={mode === 'schema' ? 'on' : ''} onClick={() => setMode('schema')}>Schema Studio</button>
+      </div>
+      {mode === 'records' ? <BaseRepoRecordsExplorer /> : isAdmin ? (
+        <Suspense fallback={<p className="muted">Loading the Schema Studio...</p>}>
+          <SchemaStudio supabase={supabase} userId={session?.user.id ?? null} userEmail={session?.user.email ?? null} />
+        </Suspense>
+      ) : <p className="muted">The Schema Studio is available to admins.</p>}
     </div>
   )
 }

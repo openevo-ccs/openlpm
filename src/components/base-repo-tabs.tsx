@@ -14,6 +14,7 @@ export function BaseRepoTabBar() {
         <Link key={cfg.key} to={`/dashboard/admin/explore?tab=${cfg.key}`} className="btn btn-mini">{cfg.name}</Link>
       ))}
       <span className="btn btn-mini btn-primary" aria-current="page">ConceptBase</span>
+      <Link to="/dashboard/admin/explore?mode=schema" className="btn btn-mini">Schema Studio</Link>
     </div>
   )
 }
