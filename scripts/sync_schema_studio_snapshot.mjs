@@ -54,17 +54,22 @@ function readKey() {
 }
 const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://tfynvjjxyluzorigyfsp.supabase.co'
 
-if (!flag('--yes')) { console.log('Dry run: nothing written. Add --yes to write.'); process.exit(0) }
-const key = readKey()
-if (!key) { console.error('No service role key found.'); process.exit(1) }
-const sb = createClient(url, key, { auth: { persistSession: false } })
+// No process.exit() calls: on Windows, Node 24 can abort with a libuv assertion when exiting while the HTTP client is still closing.
+async function main() {
+  if (!flag('--yes')) { console.log('Dry run: nothing written. Add --yes to write.'); return 0 }
+  const key = readKey()
+  if (!key) { console.error('No service role key found.'); return 1 }
+  const sb = createClient(url, key, { auth: { persistSession: false } })
 
-const { data: latest, error: e1 } = await sb.from('schema_studio_snapshot').select('id, content_hash').order('id', { ascending: false }).limit(1)
-if (e1) { console.error('Could not read schema_studio_snapshot (is migration 253 applied?):', e1.message); process.exit(1) }
-if (latest?.[0]?.content_hash === snap.contentHash) { console.log('Already up to date: the structure has not changed since the latest row.'); process.exit(0) }
-const { error: e2 } = await sb.from('schema_studio_snapshot').insert({ content_hash: snap.contentHash, generated_at: snap.generatedAt, summary, data: snap })
-if (e2) { console.error('Insert failed:', e2.message); process.exit(1) }
-console.log('Wrote a new snapshot row.')
-const keep = Number(opt('--keep', 60))
-const { data: old } = await sb.from('schema_studio_snapshot').select('id').order('id', { ascending: false }).range(keep, keep + 500)
-if (old?.length) { await sb.from('schema_studio_snapshot').delete().in('id', old.map((r) => r.id)); console.log(`Pruned ${old.length} old rows.`) }
+  const { data: latest, error: e1 } = await sb.from('schema_studio_snapshot').select('id, content_hash').order('id', { ascending: false }).limit(1)
+  if (e1) { console.error('Could not read schema_studio_snapshot (is migration 253 applied?):', e1.message); return 1 }
+  if (latest?.[0]?.content_hash === snap.contentHash) { console.log('Already up to date: the structure has not changed since the latest row.'); return 0 }
+  const { error: e2 } = await sb.from('schema_studio_snapshot').insert({ content_hash: snap.contentHash, generated_at: snap.generatedAt, summary, data: snap })
+  if (e2) { console.error('Insert failed:', e2.message); return 1 }
+  console.log('Wrote a new snapshot row.')
+  const keep = Number(opt('--keep', 60))
+  const { data: old } = await sb.from('schema_studio_snapshot').select('id').order('id', { ascending: false }).range(keep, keep + 500)
+  if (old?.length) { await sb.from('schema_studio_snapshot').delete().in('id', old.map((r) => r.id)); console.log(`Pruned ${old.length} old rows.`) }
+  return 0
+}
+process.exitCode = await main()
