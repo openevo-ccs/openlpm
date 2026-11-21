@@ -16,8 +16,10 @@ import path from 'node:path'
 import { mintQaSession } from '../scripts/mint_qa_session.mjs'
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
-const base = process.argv[2] || 'http://localhost:5271/'
-const outDir = process.argv[3] || path.join(ROOT, 'layout_check', 'out', 'prompt-output-options')
+const migrated = process.argv.includes('--migrated') // migration 251 is live: part 1 already sees the detail control, nothing is simulated
+const args = process.argv.slice(2).filter((a) => !a.startsWith('--'))
+const base = args[0] || 'http://localhost:5271/'
+const outDir = args[1] || path.join(ROOT, 'layout_check', 'out', 'prompt-output-options')
 mkdirSync(outDir, { recursive: true })
 let failed = 0
 const check = (name, ok, detail = '') => { if (!ok) failed++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? '  -- ' + detail : ''}`) }
@@ -67,7 +69,7 @@ const card8 = page.locator('.student-prompt-card', { has: page.getByRole('headin
 check('section 8 "Gewünschte Ausgabe" is on the page', (await card8.count()) === 1)
 const labels1 = (await card8.locator('label').allInnerTexts()).map((t) => t.trim())
 check('it offers Ton, Länge, the output types and a notes box', ['Ton', 'Länge', 'Was soll die Antwort enthalten?', 'Weitere Hinweise zur Ausgabe'].every((l) => labels1.includes(l)), labels1.slice(0, 5).join(' | '))
-check('before migration 251 there is no Detailgrad control', !labels1.includes('Detailgrad'))
+check(migrated ? 'with migration 251 live the Detailgrad control is there' : 'before migration 251 there is no Detailgrad control', labels1.includes('Detailgrad') === migrated)
 const typeBoxes = await card8.locator('input[type="checkbox"]').count()
 check('the output types are checkboxes (8 in the German library)', typeBoxes === 8, `${typeBoxes} boxes`)
 check('the prompt shows the output block as before', /GEWÜNSCHTE AUSGABE:/.test(await preview()))
