@@ -4,7 +4,7 @@
 // content has changed since the latest row. Safe to run as often as you like: an unchanged structure writes nothing.
 //
 // It runs in three places:
-//   - the scheduled GitHub Action .github/workflows/schema-studio-sync.yml (every hour, and when a base repository reports a change),
+//   - the scheduled GitHub Action .github/workflows/schema-studio-sync.yml (every day, and when a base repository reports a change),
 //   - by hand: node scripts/sync_schema_studio_snapshot.mjs --yes
 //   - as a dry run (the default): prints what it found and what it would write.
 //

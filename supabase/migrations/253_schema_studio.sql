@@ -6,7 +6,7 @@ SET search_path = public, extensions;
 -- 1. schema_studio_snapshot: the map itself. The schemas live in the base repositories, most of them private, so the map cannot be
 --    a public file on the app's own web address. It is kept here instead, readable by admins only, and rewritten by
 --    scripts/sync_schema_studio_snapshot.mjs whenever a schema changes (the scheduled GitHub Action
---    .github/workflows/schema-studio-sync.yml runs it every hour and on request from a base repository). A new row is added only
+--    .github/workflows/schema-studio-sync.yml runs it every day and on request from a base repository). A new row is added only
 --    when the content hash differs from the latest row, so the table doubles as a short history of the structure.
 -- 2. schema_suggestions: a suggested change to a repository, a record type or a single field. Like base_repo_record_edits (237),
 --    suggestions are collected in the app and sent back to the repositories in batches through a normal pull request.

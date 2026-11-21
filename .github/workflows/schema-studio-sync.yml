@@ -13,7 +13,7 @@ name: Schema Studio sync
 #   1. Repository secret SUPABASE_SERVICE_ROLE_KEY: the project's service role key.
 #   2. Repository secret BASE_REPOS_READ_TOKEN: a fine-grained personal access token with read-only "Contents" access to the base
 #      repositories listed below (most of them are private).
-#   3. Migration 252 applied (Actions > Apply Supabase migrations).
+#   3. Migration 253 applied (Actions > Apply Supabase migrations).
 
 on:
   schedule:
