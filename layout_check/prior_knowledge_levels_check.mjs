@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Checks the fourth prior-knowledge level "Nicht bekannt" and the hover texts (feedback 1fab704b, Dustin Eirdosh 2026-11-13, chosen 2026-11-21) on
-// the Jena Planen page. Without --migrated the one library request is answered with the library plus what migration 253 adds (read-only, nothing is
+// the Jena Planen page. Without --migrated the one library request is answered with the library plus what migration 255 adds (read-only, nothing is
 // written). With --migrated nothing is simulated, so it reads what the database holds.
 //
 // Usage: node layout_check/prior_knowledge_levels_check.mjs [base] [--migrated]
