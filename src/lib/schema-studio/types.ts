@@ -1,4 +1,4 @@
-// Shapes of the Schema Studio snapshot (built by scripts/lib/schema-studio-build.mjs, stored in schema_studio_snapshot, migration 252).
+// Shapes of the Schema Studio snapshot (built by scripts/lib/schema-studio-build.mjs, stored in schema_studio_snapshot, migration 253).
 
 export interface LinkEvidence { token: string; evidence: string; legacy: boolean }
 

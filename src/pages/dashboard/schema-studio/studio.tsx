@@ -157,7 +157,7 @@ export default function SchemaStudio({ supabase, userId, userEmail, standalone }
       <div className="ss-studio"><div className="ss-empty-state">
         <h3>No snapshot of the structure yet</h3>
         <p>The Schema Studio reads a snapshot of every base repository's schema files from the database. {'error' in loaded ? `(${loaded.error})` : ''}</p>
-        <p>An administrator creates the first one with <code>node scripts/sync_schema_studio_snapshot.mjs --yes</code> after migration 252 is applied. After that the scheduled sync keeps it current.</p>
+        <p>An administrator creates the first one with <code>node scripts/sync_schema_studio_snapshot.mjs --yes</code> after migration 253 is applied. After that the scheduled sync keeps it current.</p>
       </div></div>
     )
   }
@@ -175,7 +175,7 @@ export default function SchemaStudio({ supabase, userId, userEmail, standalone }
             <h2><Sparkles size={17} /> Base Repo Schema Studio</h2>
             <p>The structure of every base repository and how the pieces connect. Pick anything to see what it means in plain words, and suggest improvements.</p>
           </div>
-          <div className="ss-fresh" title={`Content hash ${info.contentHash.slice(0, 12)}. ${sourceNote}. The structure refreshes about once an hour and straight away when a repository reports a schema change.`}>
+          <div className="ss-fresh" title={`Content hash ${info.contentHash.slice(0, 12)}. ${sourceNote}. The structure refreshes about once a day and straight away when a repository reports a schema change.`}>
             <span className={`ss-dot ${loaded.source === 'live' ? 'live' : 'local'}`} />Structure as of <b>{agoText(info.generatedAt, now)}</b>
             <span className="ss-dim"> · {model.stats.repos} repositories · {model.stats.types} record types · {model.stats.fields} fields · {model.stats.crossLinks} links between repositories</span>
           </div>
@@ -185,7 +185,7 @@ export default function SchemaStudio({ supabase, userId, userEmail, standalone }
           <div className="ss-banner" role="status"><RefreshCw size={14} /> The structure has changed since you opened this page.
             <button type="button" className="btn btn-mini btn-primary" onClick={reload}>Update the view</button></div>
         )}
-        {loaded.source === 'local-file' && !standalone && <div className="ss-banner warn" role="status">Showing a local development snapshot. In production the snapshot comes from the database (migration 252 and the sync script).</div>}
+        {loaded.source === 'local-file' && !standalone && <div className="ss-banner warn" role="status">Showing a local development snapshot. In production the snapshot comes from the database (migration 253 and the sync script).</div>}
 
         <div className="ss-bar">
           <div className="ss-tabs" role="tablist" aria-label="Views">

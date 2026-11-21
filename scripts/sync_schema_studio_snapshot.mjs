@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Refreshes schema_studio_snapshot (migration 252): the map the Schema Studio (Admin > Base repos > Schema Studio) shows.
+// Refreshes schema_studio_snapshot (migration 253): the map the Schema Studio (Admin > Base repos > Schema Studio) shows.
 // Reads the schema files of every base repository from local checkouts, builds one JSON document, and adds a row only when the
 // content has changed since the latest row. Safe to run as often as you like: an unchanged structure writes nothing.
 //
@@ -60,7 +60,7 @@ if (!key) { console.error('No service role key found.'); process.exit(1) }
 const sb = createClient(url, key, { auth: { persistSession: false } })
 
 const { data: latest, error: e1 } = await sb.from('schema_studio_snapshot').select('id, content_hash').order('id', { ascending: false }).limit(1)
-if (e1) { console.error('Could not read schema_studio_snapshot (is migration 252 applied?):', e1.message); process.exit(1) }
+if (e1) { console.error('Could not read schema_studio_snapshot (is migration 253 applied?):', e1.message); process.exit(1) }
 if (latest?.[0]?.content_hash === snap.contentHash) { console.log('Already up to date: the structure has not changed since the latest row.'); process.exit(0) }
 const { error: e2 } = await sb.from('schema_studio_snapshot').insert({ content_hash: snap.contentHash, generated_at: snap.generatedAt, summary, data: snap })
 if (e2) { console.error('Insert failed:', e2.message); process.exit(1) }

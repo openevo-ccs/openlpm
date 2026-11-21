@@ -4,7 +4,7 @@ name: Schema Studio sync
 # every base repository and writes a new snapshot row only when something changed, so running it often costs almost nothing.
 #
 # It runs
-#   - every hour (so a schema change shows up within the hour even if nobody tells this workflow),
+#   - every day (so a schema change shows up within a day even if nobody tells this workflow),
 #   - straight away when a base repository sends a "schema-updated" event (see docs/schema-studio/notify-openlpm-workflow.yml,
 #     which each base repository can carry),
 #   - by hand from the Actions tab.
@@ -17,7 +17,7 @@ name: Schema Studio sync
 
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '17 5 * * *'
   repository_dispatch:
     types: [schema-updated]
   workflow_dispatch:

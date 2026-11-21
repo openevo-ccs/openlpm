@@ -1,5 +1,5 @@
 // Loading the snapshot and the suggestions board for the Schema Studio.
-// Both live in tables from migration 252. Until that migration is applied the Studio still opens: in development it falls back to
+// Both live in tables from migration 253. Until that migration is applied the Studio still opens: in development it falls back to
 // a local snapshot file (src/lib/schema-studio/dev-snapshot.json, never committed), and suggestions are kept in the browser basket.
 
 import type { SupabaseClient } from '@supabase/supabase-js'

@@ -64,7 +64,7 @@ export default function SuggestDialog({ req, model, canSend, onClose, onBasket, 
           <button type="button" className="btn" disabled={!valid || busy} onClick={() => { onBasket(draft()); onClose() }} title="Keep it in your basket in this browser and send several together later">Add to my basket</button>
           {canSend
             ? <button type="button" className="btn btn-primary" disabled={!valid || busy} onClick={async () => { setBusy(true); const e = await onSend(draft()); setBusy(false); if (e) setErr(e); else onClose() }}>{busy ? 'Sending...' : 'Send to the board'}</button>
-            : <span className="ss-hint">The shared board opens once migration 252 is applied. Until then suggestions stay in your basket and can be exported.</span>}
+            : <span className="ss-hint">The shared board opens once migration 253 is applied. Until then suggestions stay in your basket and can be exported.</span>}
         </footer>
       </div>
     </div>

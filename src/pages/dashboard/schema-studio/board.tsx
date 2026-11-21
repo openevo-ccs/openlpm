@@ -69,7 +69,7 @@ export default function BoardView({ actions }: { actions: Actions }) {
       <Section title={`Shared board (${suggestions.length})`} aside={<span className="ss-actions">
         {picked.size > 0 && <><button type="button" className="btn btn-mini" onClick={() => { navigator.clipboard?.writeText(suggestionMarkdown(exportable, nameOf, snapDate)); flash('Copied as Markdown.') }}><ClipboardCopy size={13} /> Copy {picked.size} as Markdown</button>
           <button type="button" className="btn btn-mini" onClick={async () => { const batch = window.prompt('Name this batch (for example the pull request number):', `batch-${new Date().toISOString().slice(0, 10)}`); if (!batch) return; const e = await actions.markExported([...picked], batch); if (e) flash(e); else { setPicked(new Set()); actions.reload(); flash('Marked as sent back.') } }}><Check size={13} /> Mark as sent to a repository</button></>}</span>}>
-        {!actions.available ? <p className="ss-empty">The shared board is not switched on yet (migration 252 has not been applied). Suggestions can be collected in the basket and exported in the meantime.</p> : (
+        {!actions.available ? <p className="ss-empty">The shared board is not switched on yet (migration 253 has not been applied). Suggestions can be collected in the basket and exported in the meantime.</p> : (
           <>
             <div className="ss-filters">
               <select value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status"><option value="active">Open, discussing, accepted</option><option value="all">Every status</option>{STATUSES.map((s) => <option key={s.key} value={s.key}>{s.label}</option>)}</select>
