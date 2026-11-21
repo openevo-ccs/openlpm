@@ -57,7 +57,8 @@ export interface PromptOptionLists {
   // detail control and the prompt has no detail line, exactly as before.
   detail_levels?: [string, string][]
   default_detail?: string
-  prior_knowledge_levels: [string, string][]
+  // key, label, then two optional texts: what the level means (shown on hover) and a note that goes into the prompt after the label.
+  prior_knowledge_levels: [string, string, string?, string?][]
   // Stored explicitly. Taking "whichever option happens to be listed first"
   // was a real bug caught in review: the seeded German library lists
   // 'kurz' (short) before 'ausführlich' (detailed) in `lengths` for

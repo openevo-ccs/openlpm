@@ -5,7 +5,7 @@ import type { ProjectOutletContext } from '../project-layout'
 import type { Database } from '@/lib/supabase/database.types'
 import { getLibraryForProject, resolveOptionLists, resolveSectionLabels, type PromptTemplateLibraryRow } from '@/lib/supabase/prompt-libraries'
 import { bkAbbreviation, bkEntries, buildBkLabelMap, getRootConcepts, groupBkIdsByRoot } from '@/lib/supabase/basiskonzepte'
-import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, toggleInList, type Config } from '@/lib/prompt-builder'
+import { buildPrompt, defaultConfig, deriveKlassenstufe, groupLinksByMethod, isBkFocused, toggleBkFocus, CheckGroup, MethodConceptChips, PercentChips, PriorKnowledgeSelect, toggleInList, type Config } from '@/lib/prompt-builder'
 import { listTopics, type TopicListItem } from '@/lib/supabase/curriculum'
 import { listFavoriteGoalMethodsFor, listFavoriteIds, listFavoriteMethodKeys, toggleFavoriteMethod } from '@/lib/supabase/favorites'
 import { listMethodConceptLinks, type MethodConceptLink } from '@/lib/supabase/method-concept-links'
@@ -529,12 +529,11 @@ export default function StudentPromptPage() {
             focusedBkGroups.map((g) => (
               <div key={g.rootId} className="field">
                 <label>{g.label} — Vorwissen</label>
-                <select
+                <PriorKnowledgeSelect
+                  levels={options.prior_knowledge_levels}
                   value={cfg.vorwissenByBk[g.rootId] ?? options.prior_knowledge_levels[1]?.[0]}
-                  onChange={(e) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: e.target.value } })}
-                >
-                  {options.prior_knowledge_levels.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                </select>
+                  onChange={(v) => setCfg({ ...cfg, vorwissenByBk: { ...cfg.vorwissenByBk, [g.rootId]: v } })}
+                />
               </div>
             ))
           )}
