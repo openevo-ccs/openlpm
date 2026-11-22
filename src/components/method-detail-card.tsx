@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { MethodsBaseRecord } from '@/lib/supabase/methodsbase'
 import { languageName, languagesOf, otherLanguages, pickLocalized, pickLocalizedList, tagLabel, textState, type TagField } from '@/lib/method-text'
 
@@ -16,6 +17,12 @@ function strings(uiLang: string) {
     ? {
         whenToUse: 'Wann einsetzen',
         steps: 'Ablauf',
+        materials: 'Material',
+        tips: 'Hinweise',
+        example: 'Beispiel',
+        aiPrompt: 'KI-Prompt (Vorlage)',
+        copy: 'Kopieren',
+        copied: 'Kopiert',
         draft: 'Entwurf von Claude, noch nicht fachlich geprüft',
         draftTitle: 'Dieser Text wurde von Claude entworfen. Noch hat ihn niemand mit biologiedidaktischer Fachkenntnis gelesen.',
         missing: (name: string) => `Diese Angabe gibt es bisher nur auf ${name}.`,
@@ -26,6 +33,12 @@ function strings(uiLang: string) {
     : {
         whenToUse: 'When to use it',
         steps: 'Steps',
+        materials: 'Materials',
+        tips: 'Tips',
+        example: 'Example',
+        aiPrompt: 'AI prompt (template)',
+        copy: 'Copy',
+        copied: 'Copied',
         draft: 'Claude draft, not yet reviewed by an expert',
         draftTitle: 'Claude drafted this text. No one with Biologiedidaktik expertise has read it yet.',
         missing: (name: string) => `This text exists only in ${name} so far.`,
@@ -42,6 +55,29 @@ export function DraftChip({ data, lang, label, title }: { data: Record<string, u
     <span className="chip" style={{ fontSize: 10, marginLeft: 6, verticalAlign: 'middle', borderColor: 'var(--warning)', color: 'var(--warning-text)' }} title={title}>
       {label}
     </span>
+  )
+}
+
+function CopyButton({ text, label, doneLabel }: { text: string; label: string; doneLabel: string }) {
+  const [done, setDone] = useState(false)
+  return (
+    <button
+      type="button"
+      className="btn btn-mini"
+      style={{ fontSize: 12, marginLeft: 8 }}
+      onClick={() => {
+        try {
+          void navigator.clipboard.writeText(text).then(() => {
+            setDone(true)
+            setTimeout(() => setDone(false), 2000)
+          })
+        } catch {
+          // Clipboard not available: the text stays selectable on screen.
+        }
+      }}
+    >
+      {done ? doneLabel : label}
+    </button>
   )
 }
 
@@ -70,10 +106,14 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
   const description = pickLocalized(data.description, lang)
   const whenToUse = pickLocalized(data.whenToUse, lang)
   const steps = pickLocalizedList(data.protocolSteps, lang)
+  const materials = pickLocalized(data.materials, lang)
+  const tips = pickLocalizedList(data.teacherTips, lang)
+  const example = pickLocalized(data.workedExample, lang)
+  const aiPrompt = pickLocalized(data.aiPromptTemplate, lang)
   const discipline = pickLocalized(data.discipline, lang)
-  const missingIn = [description, whenToUse, steps].some((x) => x && x.lang && x.lang !== lang)
+  const missingIn = [description, whenToUse, steps, materials, tips, example, aiPrompt].some((x) => x && x.lang && x.lang !== lang)
   const hasTags = (Array.isArray(data.disciplineTags) && data.disciplineTags.length > 0) || (Array.isArray(data.lessonPhases) && data.lessonPhases.length > 0) || (Array.isArray(data.learningApproaches) && data.learningApproaches.length > 0)
-  const textLanguages = Array.from(new Set([...languagesOf(data.description), ...languagesOf(data.whenToUse), ...languagesOf(data.protocolSteps)]))
+  const textLanguages = Array.from(new Set([...languagesOf(data.description), ...languagesOf(data.whenToUse), ...languagesOf(data.protocolSteps), ...languagesOf(data.materials), ...languagesOf(data.teacherTips), ...languagesOf(data.workedExample), ...languagesOf(data.aiPromptTemplate)]))
 
   return (
     <div className="card" style={{ marginBottom: 12 }}>
@@ -120,6 +160,45 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
           <ol className="muted" style={{ marginTop: 0, paddingLeft: 20 }}>
             {steps.items.map((s, i) => <li key={i} style={{ marginBottom: 3 }}>{s}</li>)}
           </ol>
+        </>
+      )}
+      {materials && (
+        <>
+          <p style={{ fontWeight: 600, marginBottom: 2 }}>
+            {t.materials}
+            <LangChip lang={materials.lang} uiLang={uiLang} />
+          </p>
+          <p className="muted" style={{ marginTop: 0 }}>{materials.text}</p>
+        </>
+      )}
+      {tips && (
+        <>
+          <p style={{ fontWeight: 600, marginBottom: 2 }}>
+            {t.tips}
+            <LangChip lang={tips.lang} uiLang={uiLang} />
+          </p>
+          <ul className="muted" style={{ marginTop: 0, paddingLeft: 20 }}>
+            {tips.items.map((s, i) => <li key={i} style={{ marginBottom: 3 }}>{s}</li>)}
+          </ul>
+        </>
+      )}
+      {example && (
+        <>
+          <p style={{ fontWeight: 600, marginBottom: 2 }}>
+            {t.example}
+            <LangChip lang={example.lang} uiLang={uiLang} />
+          </p>
+          <p className="muted" style={{ marginTop: 0, whiteSpace: 'pre-line' }}>{example.text}</p>
+        </>
+      )}
+      {aiPrompt && (
+        <>
+          <p style={{ fontWeight: 600, marginBottom: 2 }}>
+            {t.aiPrompt}
+            <LangChip lang={aiPrompt.lang} uiLang={uiLang} />
+            <CopyButton text={aiPrompt.text} label={t.copy} doneLabel={t.copied} />
+          </p>
+          <p className="muted" style={{ marginTop: 0 }}>{aiPrompt.text}</p>
         </>
       )}
       {missingIn && textLanguages.length > 0 && (
