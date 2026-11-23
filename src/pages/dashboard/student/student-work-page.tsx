@@ -507,6 +507,11 @@ function AbgabeTab({
   const [name, setName] = useState(storedName)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // The finished file stays on the page as a plain link. Some phones and in-app browsers
+  // ignore the automatic download, and a link the student taps works there.
+  const [fallback, setFallback] = useState<{ url: string; name: string; label: string } | null>(null)
+  const fallbackUrl = useRef<string | null>(null)
+  useEffect(() => () => { if (fallbackUrl.current) URL.revokeObjectURL(fallbackUrl.current) }, [])
   const template = (project as any).student_view_template as string | undefined
 
   useEffect(() => {
@@ -561,17 +566,28 @@ function AbgabeTab({
   const download = async (format: 'docx' | 'pdf') => {
     setBusy(true); setError(null)
     const label = format === 'pdf' ? 'PDF-Datei' : 'Word-Datei'
+    const fileName = `${base}.${format}`
     try {
+      let blob: Blob
       if (format === 'pdf') {
         const { buildHandInPdf } = await import('@/lib/student-handin-pdf')
-        downloadBlob(await buildHandInPdf(handIn), `${base}.pdf`)
+        blob = await buildHandInPdf(handIn)
       } else {
         const { buildHandInDocx } = await import('@/lib/student-handin-docx')
-        downloadBlob(await buildHandInDocx(handIn), `${base}.docx`)
+        blob = await buildHandInDocx(handIn)
       }
+      if (fallbackUrl.current) URL.revokeObjectURL(fallbackUrl.current)
+      fallbackUrl.current = URL.createObjectURL(blob)
+      setFallback({ url: fallbackUrl.current, name: fileName, label })
+      downloadBlob(blob, fileName)
       void logStudentEvent(supabase, project.id, 'handin_downloaded', { format })
     } catch (e) {
       const msg = (e as Error).message ?? ''
+      void logStudentEvent(supabase, project.id, 'handin_download_failed', {
+        format,
+        message: msg.slice(0, 200),
+        device: (navigator.userAgent ?? '').slice(0, 200),
+      })
       // After an update, a page that was already open still points at program
       // files that no longer exist. Reloading fetches the new ones.
       setError(
@@ -643,6 +659,17 @@ function AbgabeTab({
           <FileText size={14} /> PDF-Datei herunterladen
         </button>
       </div>
+      {fallback && (
+        <div className="notice" style={{ marginTop: 12, maxWidth: 720 }}>
+          <strong>Hat sich nichts heruntergeladen?</strong>{' '}
+          <a href={fallback.url} download={fallback.name} target="_blank" rel="noopener">{fallback.label} hier antippen</a>.
+          Auf dem Handy öffnet sich die Datei dann in einem neuen Tab, von dort kannst du sie speichern oder teilen.
+          Klappt es weiterhin nicht, versuche die andere Dateiart oder einen anderen Browser (zum Beispiel Safari oder Chrome statt der Moodle-App).
+          <button className="btn btn-mini" style={{ marginLeft: 8 }} onClick={() => void logStudentEvent(supabase, project.id, 'handin_fallback_needed', { format: fallback.name.split('.').pop(), device: (navigator.userAgent ?? '').slice(0, 200) })}>
+            Es hat nicht geklappt
+          </button>
+        </div>
+      )}
       {nameMissing && (
         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Trage oben deinen Namen ein, dann kannst du die Datei herunterladen.</p>
       )}
@@ -665,6 +692,8 @@ const EVENT_TEXT: Record<string, string> = {
   work_tab: 'Bereich in „Meine Arbeit“ gewechselt',
   favorite_toggled: 'Lernziel gemerkt oder Merkung entfernt',
   handin_downloaded: 'Abgabedatei heruntergeladen',
+  handin_download_failed: 'Abgabedatei konnte nicht erstellt werden',
+  handin_fallback_needed: 'Download hat nicht geklappt (Schaltfläche angeklickt)',
 }
 
 function describeEvent(ev: ActivityEvent): string {
