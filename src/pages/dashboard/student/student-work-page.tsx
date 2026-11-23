@@ -20,7 +20,7 @@ import {
   type WorkEntry,
   type WorkKind,
 } from '@/lib/supabase/student-work'
-import { buildHandIn, describeHandIn, handInFileBase, loadFavoriteTimes, loadProfileName, type HandIn } from '@/lib/student-handin'
+import { buildHandIn, describeHandIn, handInFileBase, handInToText, loadFavoriteTimes, loadProfileName, type HandIn } from '@/lib/student-handin'
 import { downloadBlob } from '@/lib/export-import'
 
 // "Meine Arbeit": where a student keeps the answers to the seminar 2 task
@@ -510,6 +510,8 @@ function AbgabeTab({
   // The finished file stays on the page as a plain link. Some phones and in-app browsers
   // ignore the automatic download, and a link the student taps works there.
   const [fallback, setFallback] = useState<{ url: string; name: string; label: string } | null>(null)
+  const [copied, setCopied] = useState<'ok' | 'manual' | null>(null)
+  const [shownText, setShownText] = useState<string | null>(null)
   const fallbackUrl = useRef<string | null>(null)
   useEffect(() => () => { if (fallbackUrl.current) URL.revokeObjectURL(fallbackUrl.current) }, [])
   const template = (project as any).student_view_template as string | undefined
@@ -670,6 +672,33 @@ function AbgabeTab({
           </button>
         </div>
       )}
+      <div className="notice" style={{ marginTop: 12, maxWidth: 720 }}>
+        <strong>Die Datei lässt sich nicht speichern?</strong>{' '}
+        Am Handy öffnet sich die Datei manchmal nur zur Ansicht. Tippe dann auf das Teilen-Symbol (Quadrat mit Pfeil) und wähle „In Dateien sichern“ (iPhone) oder „Herunterladen“ (Android). Am Laptop hilft ein Rechtsklick auf den Link oben und „Link speichern unter“.
+        Geht auch das nicht: Kopiere deine Arbeit als Text, füge sie in ein Word-Dokument oder direkt in Moodle ein.
+        <div style={{ marginTop: 8 }}>
+          <button
+            className="btn btn-mini"
+            disabled={nameMissing}
+            onClick={async () => {
+              const text = handInToText(handIn)
+              try {
+                await navigator.clipboard.writeText(text)
+                setCopied('ok')
+              } catch {
+                setCopied('manual')
+              }
+              setShownText(text)
+              void logStudentEvent(supabase, project.id, 'handin_text_copied', {})
+            }}
+          >
+            Meine Arbeit als Text kopieren
+          </button>
+          {copied === 'ok' && <span className="muted" style={{ marginLeft: 8 }}>Kopiert. Jetzt in Word oder Moodle einfügen.</span>}
+          {copied === 'manual' && <span className="muted" style={{ marginLeft: 8 }}>Automatisches Kopieren geht hier nicht. Markiere den Text unten und kopiere ihn von Hand.</span>}
+        </div>
+        {shownText && <textarea readOnly rows={8} style={{ width: '100%', marginTop: 8 }} value={shownText} onFocus={(e) => e.currentTarget.select()} />}
+      </div>
       {nameMissing && (
         <p className="muted" style={{ fontSize: 12, marginTop: 10 }}>Trage oben deinen Namen ein, dann kannst du die Datei herunterladen.</p>
       )}
@@ -694,6 +723,7 @@ const EVENT_TEXT: Record<string, string> = {
   handin_downloaded: 'Abgabedatei heruntergeladen',
   handin_download_failed: 'Abgabedatei konnte nicht erstellt werden',
   handin_fallback_needed: 'Download hat nicht geklappt (Schaltfläche angeklickt)',
+  handin_text_copied: 'Abgabe als Text kopiert',
 }
 
 function describeEvent(ev: ActivityEvent): string {

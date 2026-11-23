@@ -250,6 +250,33 @@ export async function loadProfileName(supabase: Client): Promise<string> {
   return name.includes('@') ? '' : name
 }
 
+/** The whole hand-in as plain text, for pasting into a Word or Moodle text box when a file cannot be saved. */
+export function handInToText(h: HandIn): string {
+  const scale = ['', 'trifft nicht zu', 'trifft eher nicht zu', 'trifft eher zu', 'trifft voll zu']
+  const L: string[] = ['Ergebnis zu Aufgabe 1: Basiskonzepte', '']
+  for (const r of describeHandIn(h)) L.push(`${r.label}: ${r.value}`)
+  L.push('', 'Beurteilte Verknüpfungen', '')
+  for (const j of h.link_judgments) {
+    L.push(`${j.lernziel_title} (Kl. ${j.grade_band ?? '?'}) – ${j.basiskonzept}`)
+    for (const c of JUDGMENT_CRITERIA) {
+      const v = j.ratings[c.key as keyof typeof j.ratings]
+      L.push(`  ${c.label}: ${v ? `${v} ${scale[v] ?? ''}` : 'nicht beurteilt'}`)
+    }
+    if (j.note) L.push(`  Anmerkung: ${j.note}`)
+    L.push('')
+  }
+  if (h.link_proposals.length) {
+    L.push('Ergänzte Verknüpfungen', '')
+    for (const p of h.link_proposals) L.push(`${p.lernziel_title ?? ''} – ${p.basiskonzept}: ${p.description}`, '')
+  }
+  const refl = h.reflections.filter((r) => r.text)
+  if (refl.length) {
+    L.push('Reflexion', '')
+    for (const r of refl) L.push(r.prompt, r.text, '')
+  }
+  return L.join('\n')
+}
+
 export function handInJsonBlob(h: HandIn): Blob {
   return new Blob([JSON.stringify(h, null, 2)], { type: 'application/json;charset=utf-8' })
 }
