@@ -9,7 +9,7 @@
 // string or list so far counts as the English text, and the first German text turns it into a pair on save (see getPath and setPath).
 
 import type { BaseRepoKey } from '@/lib/supabase/base-repo-explorer'
-import { methodClassReading, normalizeTag, tagReading, tagTerms, type TagField } from '@/lib/method-text'
+import { methodClassesOf, methodClassReading, normalizeTag, tagReading, tagTerms, type TagField } from '@/lib/method-text'
 
 /** The edit-log path that marks a record created in the app (see createdRecords in base-repo-edits.ts). It is no field of the record. */
 export const NEW_RECORD_PATH = '$new'
@@ -146,6 +146,7 @@ const TRANSLATABLE: Partial<Record<BaseRepoKey, TranslatableText[]>> = {
     { key: 'discipline', label: 'Discipline note', empty: 'text' },
     { key: 'whenToUse', label: 'When to use', empty: 'longtext' },
     { key: 'description', label: 'Description', empty: 'longtext' },
+    { key: 'materials', label: 'Materials', empty: 'longtext' },
     { key: 'protocolSteps', label: 'Protocol steps', empty: 'lines' },
   ],
   competencybase: [
@@ -246,7 +247,11 @@ export function fieldsFor(repoKey: BaseRepoKey, data: Record<string, unknown>, v
     add(termsOf('lessonPhases', 'lessonPhases', []))
     // Feedback 3bef962e (Susan Hanisch, 2026-11-15): Discipline as tags with English and German names. The free-text line stays as a note.
     add({ ...termsOf('disciplineTags', 'disciplineTags', []), hint: 'The subject or research field. The tag names follow the language of the form.' })
-    addTexts(TRANSLATABLE.methodsbase!.filter((t) => t.key !== 'label'))
+    // Feedback 2f29c925 (Susan Hanisch, 2026-11-24): every classroom method offers a Materials text, also while it is empty.
+    // A research method offers it only when it already has one.
+    const classroom = methodClassesOf(data.methodClass).includes('pedagogical-practice')
+    const hasMaterials = getPath(data, 'materials.en') !== undefined || getPath(data, 'materials.de') !== undefined
+    addTexts(TRANSLATABLE.methodsbase!.filter((t) => t.key !== 'label' && (t.key !== 'materials' || classroom || hasMaterials)))
     // Feedback 53ccb804 (Susan Hanisch, 2026-11-13): "need to be able to edit primary sources". One line per source.
     add({
       path: 'primarySources', label: 'Sources', kind: 'sources', group: 'shared',

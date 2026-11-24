@@ -113,6 +113,21 @@ export function latestEditsByRecord(edits: BaseRepoEdit[]): Map<string, Map<stri
   return out
 }
 
+/**
+ * The fields of one record that a person has saved, as paths such as "description.de". Rows already sent back to the repo count too,
+ * because the log keeps them. An edit that was reset does not count. The rows can come in any order.
+ * Feedback cc545181 (Susan Hanisch, 2026-11-24): the draft tag goes away on every text she has edited.
+ */
+export function editedFieldPaths(history: BaseRepoEdit[]): Set<string> {
+  const out = new Set<string>()
+  const sorted = [...history].sort((a, b) => a.edited_at.localeCompare(b.edited_at) || a.id.localeCompare(b.id))
+  for (const e of sorted) {
+    if (e.is_reset) out.delete(e.field_path)
+    else out.add(e.field_path)
+  }
+  return out
+}
+
 function rederive(repoKey: BaseRepoKey, row: SnapshotRow): SnapshotRow {
   const cfg = BASE_REPO_CONFIGS.find((c) => c.key === repoKey)
   const data = row.data

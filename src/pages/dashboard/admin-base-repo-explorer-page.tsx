@@ -1,5 +1,5 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent, type ReactNode } from 'react'
-import { DraftChip, LangChip } from '@/components/method-detail-card'
+import { CopyButton, DraftChip, LangChip } from '@/components/method-detail-card'
 import { LanguageSwitch } from '@/components/language-switch'
 import { broaderMethodsFromTags, setTagNameOverlay, tagNameVersion, isLangText, methodClassReading, methodClassesOf, methodClassesReading, normalizeTag, pickLocalized, pickLocalizedList, tagReading, withoutGermanGloss } from '@/lib/method-text'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -17,7 +17,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
 import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
-import { NEW_ENTRY_SPECS, applyEdits, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
+import { NEW_ENTRY_SPECS, applyEdits, editedFieldPaths, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
@@ -1416,7 +1416,7 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
 // (e.g. "Cooperative Learning (Kooperative Lernformen)"), and appending the
 // method_class enum value too (e.g. "(pedagogical-practice)") produced a
 // confusing double-parenthetical rather than something more readable.
-function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLabels, lang }: { data: Record<string, unknown>; recordId: string; methodRows: SnapshotRow[]; onOpenMethod: (id: string) => void; idLabels: Map<string, ResolvedLabel>; lang: string }) {
+function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLabels, lang, history }: { data: Record<string, unknown>; recordId: string; methodRows: SnapshotRow[]; onOpenMethod: (id: string) => void; idLabels: Map<string, ResolvedLabel>; lang: string; history: BaseRepoEdit[] }) {
   // One language at a time, chosen with the switch at the top of the page. A text that only exists in the other language
   // shows with a small language tag so nobody mistakes it for a translation.
   const uiLang = 'en'
@@ -1433,6 +1433,14 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   const whenToUse = pickLocalized(data.whenToUse, textLang)
   const description = pickLocalized(data.description, textLang)
   const protocolSteps = pickLocalizedList(data.protocolSteps, textLang)
+  // Feedback 2f29c925 and 02a5a3fc (Susan Hanisch, 2026-11-24): Materials sits above the protocol steps, and the teacher tips, worked example and
+  // AI prompt template are part of the card (with a Copy button on the prompt), no longer folded into "Other info".
+  const materials = pickLocalized(data.materials, textLang)
+  const teacherTips = pickLocalizedList(data.teacherTips, textLang)
+  const workedExample = pickLocalized(data.workedExample, textLang)
+  const aiPrompt = pickLocalized(data.aiPromptTemplate, textLang)
+  // The texts a person has saved a change to. The draft tag goes away on those (feedback cc545181, Susan Hanisch, 2026-11-24).
+  const editedPaths = useMemo(() => editedFieldPaths(history), [history])
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
   // The ladder from general to specific methods (Dustin, 2026-11-13). Only the narrower method stores the link, so the more specific
@@ -1453,7 +1461,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
 
   const skip = new Set([
     'label', 'methodClass', 'broaderMethods', 'learningApproaches', 'discipline', 'disciplineTags', 'lessonPhases', 'whenToUse',
-    'description', 'protocolSteps', 'relatedApproaches', 'primarySources',
+    'description', 'protocolSteps', 'relatedApproaches', 'primarySources', 'materials', 'teacherTips', 'workedExample', 'aiPromptTemplate',
   ])
 
   return (
@@ -1478,13 +1486,31 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
       {!!discipline && <DetailRow label={disciplineTags.length > 0 ? 'Discipline note' : 'Discipline'}>{discipline.text}{tag(discipline.lang)}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
-      {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
+      {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} field="description" editedPaths={editedPaths} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
+      {materials
+        ? <DetailRow label="Materials"><span data-testid="materials-row">{materials.text}</span>{tag(materials.lang)}</DetailRow>
+        : classes.includes('pedagogical-practice') && <DetailRow label="Materials"><span className="muted" data-testid="no-materials">Not set yet. Press Edit to add one.</span></DetailRow>}
       {!!protocolSteps?.items.length && (
         <DetailRow label="Protocol steps">
           {tag(protocolSteps.lang)}
           <ol style={{ margin: 0, paddingLeft: 18 }}>
             {protocolSteps.items.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{clean(s, protocolSteps.lang)}</li>)}
           </ol>
+        </DetailRow>
+      )}
+      {!!teacherTips?.items.length && (
+        <DetailRow label="Teacher tips">
+          {tag(teacherTips.lang)}
+          <ul style={{ margin: 0, paddingLeft: 18 }}>
+            {teacherTips.items.map((s, i) => <li key={i} style={{ marginBottom: 4 }}>{s}</li>)}
+          </ul>
+        </DetailRow>
+      )}
+      {!!workedExample && <DetailRow label="Worked example">{workedExample.text}{tag(workedExample.lang)}</DetailRow>}
+      {!!aiPrompt && (
+        <DetailRow label="AI prompt template">
+          <span data-testid="ai-prompt-text">{aiPrompt.text}</span>{tag(aiPrompt.lang)}
+          <div><CopyButton text={aiPrompt.text} label="Copy prompt" doneLabel="Copied" style={{ marginLeft: 0, marginTop: 6 }} /></div>
         </DetailRow>
       )}
       {relatedApproaches.length > 0 && (
@@ -1701,7 +1727,7 @@ function DetailPanel({
           {repoKey === 'literaturebase' ? (
             <LiteratureDetailSections data={row.data} />
           ) : repoKey === 'methodsbase' ? (
-            <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} />
+            <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} history={history} />
           ) : (
             <RecordDetails data={row.data} idLabels={idLabels} lang={lang} />
           )}

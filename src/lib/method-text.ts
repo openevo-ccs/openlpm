@@ -110,6 +110,20 @@ export function textState(data: Record<string, unknown> | null | undefined, lang
   return status === 'claude-draft-unreviewed' || status === 'reviewed' ? status : 'original'
 }
 
+/** The text fields of a method that carry the draft state. */
+export type DraftField = 'label' | 'description' | 'whenToUse' | 'protocolSteps' | 'materials' | 'teacherTips' | 'workedExample' | 'aiPromptTemplate'
+
+/**
+ * Whether a person has read one text of a method in one language. The record names the field in textStatus.<lang>.reviewedFields
+ * (set when a person's edit is written back to the repo), or the whole language is marked reviewed.
+ * Feedback cc545181 (Susan Hanisch, 2026-11-24): the draft tag goes away on every text she has edited.
+ */
+export function fieldReviewed(data: Record<string, unknown> | null | undefined, lang: string, field: DraftField): boolean {
+  if (textState(data, lang) === 'reviewed') return true
+  const list = (data as any)?.textStatus?.[lang]?.reviewedFields
+  return Array.isArray(list) && list.includes(field)
+}
+
 // Spellings that were stored by mistake and are corrected in MethodsBase. Records and saved edits made before the
 // correction reached the database still carry them, so a tag is read through this list first (feedback 5824a32e,
 // Susan Hanisch, 2026-11-12: "typo in the learning approach in the German version").
