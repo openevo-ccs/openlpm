@@ -255,3 +255,26 @@ test('saving a German text for a record that has none changes only that field', 
   const en = by(f, 'description.en')
   assert.equal(F.sameValue(F.parseInput(en, F.toInput(en, F.currentValue(en, data))), F.parseInput(en, F.toInput(en, F.currentValue(en, next)))), true)
 })
+
+test('every classroom method offers a Materials box before the protocol steps, also while empty (feedback 2f29c925)', () => {
+  const classroom = { label: { en: 'Placemat' }, methodClass: 'pedagogical-practice', description: { en: 'Text' } }
+  const p = paths(classroom)
+  assert.ok(p.includes('materials.en') && p.includes('materials.de'))
+  assert.ok(p.indexOf('description.de') < p.indexOf('materials.en'))
+  assert.ok(p.indexOf('materials.de') < p.indexOf('protocolSteps.en'))
+  // a record that is both a classroom and a research method counts as a classroom method
+  assert.ok(paths({ label: { en: 'Simulation' }, methodClass: ['research-method', 'pedagogical-practice'] }).includes('materials.en'))
+  // saving the first Materials text changes only that field and makes the pair
+  const en = by(F.fieldsFor('methodsbase', classroom, vocab), 'materials.en')
+  const next = F.setPath(classroom, en.path, F.parseInput(en, 'Worksheet'))
+  assert.deepEqual(next.materials, { en: 'Worksheet' })
+  assert.deepEqual(next.description, { en: 'Text' })
+})
+
+test('a research method offers Materials only when it already has a text there', () => {
+  const research = { label: { en: 'Topic model' }, methodClass: 'research-method', description: { en: 'Text' } }
+  assert.equal(paths(research).some((x) => x.startsWith('materials')), false)
+  const withMaterials = { ...research, materials: { en: 'A corpus' } }
+  assert.ok(paths(withMaterials).includes('materials.en') && paths(withMaterials).includes('materials.de'))
+  assert.equal(paths(withMaterials).filter((x) => x === 'materials.en').length, 1, 'the box is offered once, and the catch-all does not offer it a second time')
+})

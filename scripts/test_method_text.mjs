@@ -153,3 +153,23 @@ test('a name set in the app replaces the name of a taxonomy tag in that language
   M.setTagNameOverlay(null)
   assert.equal(M.tagReading('lessonPhases', 'Einstieg', 'en'), 'Introduction')
 })
+
+test('a text a person has read no longer counts as a draft (feedback cc545181)', () => {
+  const draft = { textStatus: { de: { state: 'claude-draft-unreviewed' }, en: { state: 'claude-draft-unreviewed', reviewedFields: ['description'] } } }
+  assert.equal(M.fieldReviewed(draft, 'de', 'description'), false)
+  assert.equal(M.fieldReviewed(draft, 'en', 'description'), true)
+  assert.equal(M.fieldReviewed(draft, 'en', 'protocolSteps'), false, 'the other texts of the record stay drafts')
+  assert.equal(M.fieldReviewed({ textStatus: { de: { state: 'reviewed' } } }, 'de', 'whenToUse'), true, 'a language marked reviewed covers every field')
+  assert.equal(M.fieldReviewed({}, 'de', 'description'), false)
+  assert.equal(M.fieldReviewed(null, 'de', 'description'), false)
+})
+
+test('a record shows a text a person saved when the words are the same, spacing ignored', () => {
+  const data = { description: { de: 'Ein  Text\nmit Umbruch', en: 'Plain' }, protocolSteps: { de: ['Eins', 'Zwei'] }, label: 'Only English' }
+  assert.equal(M.matchesSavedText(data, 'description', 'de', 'Ein Text mit Umbruch'), true)
+  assert.equal(M.matchesSavedText(data, 'description', 'de', 'Ein anderer Text'), false, 'a text that changed since it was saved does not match')
+  assert.equal(M.matchesSavedText(data, 'protocolSteps', 'de', ['Eins', 'Zwei']), true)
+  assert.equal(M.matchesSavedText(data, 'label', 'en', 'Only English'), true, 'a plain string counts as the English text')
+  assert.equal(M.matchesSavedText(data, 'label', 'de', 'Only English'), false)
+  assert.equal(M.matchesSavedText(data, 'description', 'de', ''), false)
+})

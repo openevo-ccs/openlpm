@@ -170,3 +170,16 @@ test('a new quote shows its text as the label in the table', () => {
   assert.equal(rows[0].label, 'Culture is not a thing.')
   assert.equal(rows[0].createdInApp, true)
 })
+
+test('what a person saved is found from the log, sent-back rows included, resets removed (feedback cc545181)', () => {
+  const rows = [
+    edit('OE-METHOD-a', 'description.de', 'x', { edited_at: '2026-11-20T10:00:00Z', exported_at: '2026-11-21T10:00:00Z' }),
+    edit('OE-METHOD-a', 'protocolSteps.de', ['x'], { edited_at: '2026-11-20T10:01:00Z' }),
+    edit('OE-METHOD-a', 'protocolSteps.de', null, { edited_at: '2026-11-20T10:05:00Z', is_reset: true }),
+    edit('OE-METHOD-a', 'whenToUse.en', 'y', { edited_at: '2026-11-22T10:00:00Z' }),
+  ]
+  const found = E.savedTextsFromLog([...rows].reverse())
+  assert.deepEqual([...found.keys()].sort(), ['description.de', 'whenToUse.en'])
+  assert.equal(found.get('whenToUse.en'), 'y')
+  assert.equal(E.savedTextsFromLog([]).size, 0)
+})

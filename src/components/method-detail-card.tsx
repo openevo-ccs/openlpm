@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import type { MethodsBaseRecord } from '@/lib/supabase/methodsbase'
-import { languageName, languagesOf, otherLanguages, pickLocalized, pickLocalizedList, tagLabel, textState, type TagField } from '@/lib/method-text'
+import { fieldReviewed, matchesSavedText, languageName, languagesOf, otherLanguages, pickLocalized, pickLocalizedList, tagLabel, textState, type DraftField, type TagField } from '@/lib/method-text'
 
 // Small two-letter language tag shown next to a piece of text, so a reader can tell which language that text is in.
 export function LangChip({ lang, uiLang }: { lang: string; uiLang: string }) {
@@ -48,9 +48,16 @@ function strings(uiLang: string) {
       }
 }
 
-// Shown next to a German text that Claude drafted and no expert has read yet.
-export function DraftChip({ data, lang, label, title }: { data: Record<string, unknown>; lang: string; label: string; title: string }) {
+// Shown next to a text that Claude drafted and no expert has read yet. With `field` the tag goes away once a person has read that text:
+// the record names the field as reviewed, or (in the Base Repo Explorer) the log of edits holds what a person saved in that field and the
+// record shows exactly that text (`savedTexts`). A text that has changed since the person saved it keeps its tag.
+export function DraftChip({ data, lang, field, savedTexts, label, title }: { data: Record<string, unknown>; lang: string; field?: DraftField; savedTexts?: Map<string, unknown>; label: string; title: string }) {
   if (!lang || textState(data, lang) !== 'claude-draft-unreviewed') return null
+  if (field) {
+    if (fieldReviewed(data, lang, field)) return null
+    const path = `${field}.${lang}`
+    if (savedTexts?.has(path) && matchesSavedText(data, field, lang, savedTexts.get(path))) return null
+  }
   return (
     <span className="chip" style={{ fontSize: 10, marginLeft: 6, verticalAlign: 'middle', borderColor: 'var(--warning)', color: 'var(--warning-text)' }} title={title}>
       {label}
@@ -58,13 +65,14 @@ export function DraftChip({ data, lang, label, title }: { data: Record<string, u
   )
 }
 
-function CopyButton({ text, label, doneLabel }: { text: string; label: string; doneLabel: string }) {
+export function CopyButton({ text, label, doneLabel, style }: { text: string; label: string; doneLabel: string; style?: CSSProperties }) {
   const [done, setDone] = useState(false)
   return (
     <button
       type="button"
       className="btn btn-mini"
-      style={{ fontSize: 12, marginLeft: 8 }}
+      data-testid="copy-prompt"
+      style={{ fontSize: 12, marginLeft: 8, ...style }}
       onClick={() => {
         try {
           void navigator.clipboard.writeText(text).then(() => {
@@ -139,7 +147,7 @@ export function MethodDetailCard({ record, uiLang, textLang }: { record: Methods
         <p>
           {description.text}
           <LangChip lang={description.lang} uiLang={uiLang} />
-          <DraftChip data={data} lang={description.lang} label={t.draft} title={t.draftTitle} />
+          <DraftChip data={data} lang={description.lang} field="description" label={t.draft} title={t.draftTitle} />
         </p>
       )}
       {whenToUse && (
