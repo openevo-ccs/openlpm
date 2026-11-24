@@ -51,7 +51,9 @@ const germanDraft = (r) => r.data.textStatus?.de?.state === 'claude-draft-unrevi
 const withDe = (r) => typeof r.data.label?.de === 'string'
 const savedDe = (r) => edited.get(r.id)?.get('description.de')
 // The text on screen is the text she saved, or it has changed since.
-const draftEdited = snapshot.find((r) => withDe(r) && germanDraft(r) && savedDe(r) !== undefined && (waiting.has(r.id + '|description.de') || flat(savedDe(r)) === flat(r.data.description.de)))
+// A text a person read: marked in the repo (reviewedFields, written back), or saved in the Explorer and shown as saved.
+const marked = (r) => (r.data.textStatus?.de?.reviewedFields ?? []).includes('description')
+const draftEdited = snapshot.find((r) => withDe(r) && r.data.textStatus?.de?.state === 'claude-draft-unreviewed' && r.data.description?.de && (marked(r) || (savedDe(r) !== undefined && (waiting.has(r.id + '|description.de') || flat(savedDe(r)) === flat(r.data.description.de)))))
 const draftChanged = snapshot.find((r) => withDe(r) && germanDraft(r) && savedDe(r) !== undefined && !waiting.has(r.id + '|description.de') && flat(savedDe(r)) !== flat(r.data.description.de))
 const draftPlain = snapshot.find((r) => withDe(r) && germanDraft(r) && classes(r.data).includes('pedagogical-practice') && !r.data.materials && r.data.protocolSteps?.de && ![...(edited.get(r.id)?.keys() ?? [])].some((p) => p.startsWith('description')))
 const withPrompt = snapshot.find((r) => withDe(r) && r.data.aiPromptTemplate?.de && r.data.materials?.de)
@@ -99,7 +101,7 @@ await openMethods('de')
 
 // 1. draft tag, per text a person has edited
 let r = await openCard(draftEdited.data.label.de)
-check(`no draft tag on the German description of "${draftEdited.data.label.de}", a text a person has edited`, !r.text.includes(chip), r.text.slice(0, 160))
+check(`no draft tag on the German description of "${draftEdited.data.label.de}", a text a person has read`, !r.text.includes(chip), r.text.slice(0, 160))
 await page.screenshot({ path: path.join(outDir, '1-edited-description-no-tag.png') })
 if (draftChanged) {
   r = await openCard(draftChanged.data.label.de)
