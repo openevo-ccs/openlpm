@@ -280,6 +280,34 @@
             "type": "string",
             "maxLength": 400,
             "description": "A note from the review of this statement's placement, in plain words."
+          },
+          "review": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "The mark a person left on the statement's placement: checked (it is placed right), unsure (ask someone), or excluded (not about schooling, left out of the views).",
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "checked",
+                  "unsure",
+                  "excluded"
+                ]
+              },
+              "by": {
+                "type": "string",
+                "maxLength": 120
+              },
+              "at": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 400
+              }
+            }
           }
         }
       }

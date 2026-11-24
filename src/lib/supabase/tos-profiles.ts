@@ -94,7 +94,8 @@ export async function saveTosProfile(
     if (error || !data) return { id: null, replaced, error: 'The profile could not be saved. You may need the editor role in this space.' }
     rowId = data.id as string
   }
-  const rows = flattenProfile(profile).map((r) => ({ ...r, project_id: projectId, profile_row_id: rowId }))
+  // review_status is a column of migration 257. A row that has none is written without it, so saving also works before that migration is applied.
+  const rows = flattenProfile(profile).map(({ review_status, ...r }) => ({ ...r, ...(review_status ? { review_status } : {}), project_id: projectId, profile_row_id: rowId }))
   const cleared = await db(supabase).from('tos_elements').delete().eq('profile_row_id', rowId)
   if (cleared.error) return { id: rowId, replaced, error: 'The profile is saved, but its statement list could not be refreshed. Save it again.' }
   // Statements go in chunks so one request never gets very large.
@@ -102,6 +103,10 @@ export async function saveTosProfile(
     const { error } = await db(supabase).from('tos_elements').insert(rows.slice(i, i + 500))
     if (error) return { id: rowId, replaced, error: 'The profile is saved, but its statement list is incomplete. Save it again.' }
   }
+  // People's decisions about placements and marks (migration 257) are kept in a log of their own. Put the latest of each back on top of the saved profile.
+  // Quiet when migration 257 is not applied yet.
+  const back = await db(supabase).rpc('tos_reapply_edits', { p_project_id: projectId, p_profile_code: profile.id })
+  if (back.error && !isMissingTableError(back.error)) return { id: rowId, replaced, error: 'The profile is saved, but the earlier checks could not be put back on it. Save it again.' }
   return { id: rowId, replaced, error: null }
 }
 

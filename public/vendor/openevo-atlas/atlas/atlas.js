@@ -14,7 +14,7 @@
   var INK = '#2c3140', MUTED = '#566070';
   var GROUPS = [['concepts', 'Key ideas', 'ConceptBase'], ['theory', 'Theory behind it', 'TheoryBase'], ['literature', 'Further reading', 'LiteratureBase'], ['lessons', 'Lessons and materials', 'TeachingBase']];
   var STATUS = { 'ai-draft': 'Draft written with AI help and not yet checked by an expert', 'illustrative-example': 'Invented example', 'expert-reviewed': 'Checked by an expert', 'author-reviewed': 'Checked by the author' };
-  var VIEWS = [['flow', 'Flow'], ['stories', 'Domain stories'], ['links', 'Links between domains'], ['reasons', 'Reasons'], ['table', 'Table']];
+  var VIEWS = [['flow', 'Flow'], ['stories', 'Domain stories'], ['links', 'Links between domains'], ['reasons', 'Reasons'], ['table', 'Table'], ['review', 'Review']];
   var ctx = document.createElement('canvas').getContext('2d');
 
   function getJSON(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); }); }
@@ -42,6 +42,10 @@
   }
 
   /* ---------- reading a theory file ---------- */
+  var REVIEW = ['checked', 'unsure', 'excluded'];
+  /* the mark a person left on a statement: checked (the placement is right), unsure (ask someone) or excluded (not about schooling) */
+  function normReview(r) { if (!r || typeof r !== 'object' || REVIEW.indexOf(r.status) < 0) return null; return { status: r.status, by: r.by ? String(r.by) : '', at: r.at ? String(r.at) : '', note: r.note ? String(r.note) : '' }; }
+  function copyPlaced(l) { return (l || []).map(function (p) { return { id: p.id, strength: p.strength === 'single' ? 'single' : 'firm' }; }); }
   /* the written story of each domain: a headline, a few paragraphs, the statements that carry it, what is missing and what to ask next */
   function readNarr(d, t, sup, sub) {
     var out = { overview: null, byId: {} };
@@ -60,12 +64,12 @@
     if (!d || typeof d !== 'object' || String(d.schema || '').indexOf('openevo-schooling-theory-profile') !== 0 || !Array.isArray(d.elements)) return { error: 'This file is not a theory of schooling in the expected format.' };
     var sup = {}, sub = {}, warnings = [];
     model.supers.forEach(function (x) { sup[x.id] = 1; }); model.subs.forEach(function (x) { sub[x.id] = 1; });
-    var t = { id: String(d.id || 'theory-' + Math.random().toString(36).slice(2, 8)), title: String(d.title || 'Untitled theory'), summary: String(d.summary || ''), holder: d.holder || {}, visibility: d.visibility || 'public', license: d.license || '', version: d.version || '', date: d.date || '', theoryRef: d.theoryRef || '', characterizationStatus: d.characterizationStatus || '', provenance: d.provenance || {}, raw: d, elements: [], warrants: [], byId: {}, domainLinks: [] };
+    var t = { id: String(d.id || 'theory-' + Math.random().toString(36).slice(2, 8)), title: String(d.title || 'Untitled theory'), summary: String(d.summary || ''), holder: d.holder || {}, visibility: d.visibility || 'public', license: d.license || '', version: d.version || '', date: d.date || '', theoryRef: d.theoryRef || '', characterizationStatus: d.characterizationStatus || '', provenance: d.provenance || {}, raw: d, elements: [], warrants: [], byId: {}, domainLinks: [], hosted: false, history: [] };
     d.elements.forEach(function (e) {
       if (!e || !e.id || !e.statement) return;
       var pl = e.placement || {};
       function clean(list, ok) { return (list || []).map(function (p) { return typeof p === 'string' ? { id: p, strength: 'firm' } : p; }).filter(function (p) { if (p && ok[p.id]) return true; if (p) warnings.push(p.id); return false; }).map(function (p) { return { id: p.id, strength: p.strength === 'single' ? 'single' : 'firm' }; }); }
-      var x = { id: String(e.id), key: t.id + '#' + e.id, theory: t, type: e.type || 'proposition', statement: String(e.statement), stance: e.stance || 'own', sup: clean(pl.super, sup), sub: clean(pl.sub, sub), links: e.links || [], source: e.source || '', label: e.label || '', ref: e.ref || '', visibility: e.visibility || d.visibility || 'public', url: e.url || '', reasons: [], reasonFor: [], reviewNote: e.reviewNote ? String(e.reviewNote) : '' };
+      var x = { id: String(e.id), key: t.id + '#' + e.id, theory: t, type: e.type || 'proposition', statement: String(e.statement), stance: e.stance || 'own', sup: clean(pl.super, sup), sub: clean(pl.sub, sub), links: e.links || [], source: e.source || '', label: e.label || '', ref: e.ref || '', visibility: e.visibility || d.visibility || 'public', url: e.url || '', reasons: [], reasonFor: [], reviewNote: e.reviewNote ? String(e.reviewNote) : '', review: normReview(e.review), rawEl: e };
       t.elements.push(x); t.byId[x.id] = x;
     });
     (d.warrants || []).forEach(function (w) {
@@ -93,7 +97,7 @@
     });
     var panel = shell.panel;
     var view0 = opts.view === 'grid' || opts.view === 'web' ? 'flow' : opts.view;
-    var S = { units: 'statements', story: null, model: null, links: {}, theories: [], view: VIEWS.some(function (v) { return v[0] === view0; }) ? view0 : 'flow', sel: null, query: '', type: '', rows: 150, cards: 30, colorBy: 'domain', show: { shared: true, model: true, theory: true } };
+    var S = { review: '', qMode: 'todo', qScope: '', qKind: '', qi: 0, units: 'statements', story: null, model: null, links: {}, theories: [], view: VIEWS.some(function (v) { return v[0] === view0; }) ? view0 : 'flow', sel: null, query: '', type: '', rows: 150, cards: 30, colorBy: 'domain', show: { shared: true, model: true, theory: true } };
     var root = h('div', { class: 'at-stage' }, [h('p', { class: 'oew-note', text: 'Loading…' })]);
     shell.stage(root);
     var own = null, els = {}, redraw = null;
@@ -111,8 +115,13 @@
       var n = normalize(detail, S.model);
       if (n.error) { say(n.error); return; }
       var old = S.theories.filter(function (t) { return t.id === n.theory.id; })[0];
-      if (old) S.theories.splice(S.theories.indexOf(old), 1);
-      addTheory(n.theory); S.theories.forEach(function (t, i) { t.idx = i; t.color = COLORS[i % COLORS.length]; t.shape = SHAPES[i % SHAPES.length]; }); drawAll();
+      n.theory.hosted = true;
+      if (old) {
+        var at = S.theories.indexOf(old); n.theory.on = old.on; n.theory.history = old.history;
+        S.theories.splice(at, 1, n.theory);
+        if (S.sel && S.sel.type === 'element' && S.sel.e.theory === old) { var again = n.theory.byId[S.sel.e.id]; S.sel = again ? { type: 'element', e: again } : null; }
+      } else addTheory(n.theory);
+      S.theories.forEach(function (t, i) { t.idx = i; t.color = COLORS[i % COLORS.length]; t.shape = SHAPES[i % SHAPES.length]; }); drawAll();
     }
     host.addEventListener('atlas:add-theory', function (ev) { if (!S.model) pending.push(ev.detail); else feed(ev.detail); });
     Promise.all([getJSON(modelUrl), getJSON(new URL('base-links.json', BASE).href).catch(function () { return { domains: {} }; })]).then(function (r) {
@@ -133,15 +142,28 @@
     function kindOf(id) { return S.model.elementTypes.filter(function (x) { return x.id === id; })[0] || { id: id, name: id, short: id, color: '#566573', means: '' }; }
     function typeName(id) { return kindOf(id).name; }
     function vis() { return S.theories.filter(function (t) { return t.on; }); }
+    /* ---------- editing: who may, what a mark says ---------- */
+    function editorName() { return host.getAttribute('data-editor-name') || ''; }
+    function canEdit(t) { return host.hasAttribute('data-editable') && !!t && t.hosted; }
+    function editableNow() { return host.hasAttribute('data-editable') && S.theories.some(function (t) { return t.hosted; }); }
+    function isOut(e) { return !!e.review && e.review.status === 'excluded'; }
+    function isChecked(e) { return !!e.review && e.review.status === 'checked'; }
+    function isUnsure(e) { return !!e.review && e.review.status === 'unsure'; }
+    function reviewText(e) {
+      var r = e.review; if (!r) return '';
+      var who = r.by ? ' by ' + r.by : '', when = r.at ? ', ' + r.at.slice(0, 10) : '';
+      return (r.status === 'checked' ? 'Checked' : r.status === 'unsure' ? 'Marked unsure' : 'Left out') + who + when + (r.note ? '. “' + r.note + '”' : '');
+    }
     function elements() {
       if (S.units === 'reasons' && S.view === 'flow') return reasonUnits();
-      var out = []; vis().forEach(function (t) { out = out.concat(t.elements); }); return out;
+      var out = []; vis().forEach(function (t) { out = out.concat(t.elements.filter(function (e) { return !isOut(e); })); }); return out;
     }
+    function allElements() { var out = []; vis().forEach(function (t) { out = out.concat(t.elements); }); return out; }
     /* the flow can count reasons instead of statements: one unit per reason a proposal rests on. The unit reads as the proposal, with the broad idea
        of the reason on its left, so the flow shows which broad ideas the reasons come from and which aspects of schooling the proposals are about. */
     function reasonUnits() {
       var out = [];
-      vis().forEach(function (t) { t.warrants.forEach(function (w) { w.basis.forEach(function (b) { var u = Object.create(w.design); u.sup = b.sup; u.reasonBasis = b; out.push(u); }); }); });
+      vis().forEach(function (t) { t.warrants.forEach(function (w) { if (isOut(w.design)) return; w.basis.forEach(function (b) { if (isOut(b)) return; var u = Object.create(w.design); u.sup = b.sup; u.reasonBasis = b; out.push(u); }); }); });
       return out;
     }
     function hasReasons() { return vis().some(function (t) { return t.warrants.length > 0; }); }
@@ -174,7 +196,7 @@
         var b = h('button', { type: 'button', role: 'tab', id: shell.uid + '-tab-' + t[0], 'aria-selected': String(t[0] === S.view), text: t[1] });
         b.addEventListener('click', function () { S.view = t[0]; drawAll(); });
         b.addEventListener('keydown', function (ev) {
-          var order = VIEWS.map(function (v) { return v[0]; }), i = order.indexOf(S.view);
+          var order = VIEWS.filter(function (v) { return !els.tabs[v[0]].hidden; }).map(function (v) { return v[0]; }), i = order.indexOf(S.view);
           if (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft') { ev.preventDefault(); S.view = order[(i + (ev.key === 'ArrowRight' ? 1 : order.length - 1)) % order.length]; drawAll(); els.tabs[S.view].focus(); }
         });
         els.tabs[t[0]] = b; tabs.appendChild(b);
@@ -434,6 +456,135 @@
       redraw = draw; draw();
     }
 
+    /* ---------- editing ---------- */
+    function snapshot(e) { return { placement: { super: copyPlaced(e.sup), sub: copyPlaced(e.sub) }, review: e.review ? Object.assign({}, e.review) : null }; }
+    function applyLocal(e, ch) {
+      if (ch.placement) { e.sup = copyPlaced(ch.placement.super); e.sub = copyPlaced(ch.placement.sub); if (e.rawEl) e.rawEl.placement = { super: copyPlaced(ch.placement.super), sub: copyPlaced(ch.placement.sub) }; }
+      if ('review' in ch) { e.review = ch.review ? normReview(ch.review) : null; if (e.rawEl) { if (e.review) e.rawEl.review = Object.assign({}, e.review); else delete e.rawEl.review; } }
+    }
+    function sameList(a, b) { return a.length === b.length && a.every(function (p, i) { return p.id === b[i].id && p.strength === b[i].strength; }); }
+    /* one change: applied here at once, remembered for Undo, announced to the host page, which saves it */
+    function commitEdit(e, ch, note, isUndo) {
+      var before = snapshot(e), edits = [];
+      if (ch.placement && !(sameList(before.placement.super, ch.placement.super) && sameList(before.placement.sub, ch.placement.sub))) edits.push({ field: 'placement', before: before.placement, after: ch.placement });
+      if ('review' in ch) edits.push({ field: 'review', before: before.review, after: ch.review });
+      if (!edits.length) return;
+      applyLocal(e, ch);
+      if (!isUndo) e.theory.history.push({ e: e, before: before });
+      host.dispatchEvent(new CustomEvent('atlas:edit', { bubbles: true, detail: { theory: e.theory.id, element: e.id, edits: edits, note: note || '' } }));
+      say(isUndo ? 'Undone.' : 'Saved. ' + (e.review ? reviewText(e) + '.' : ''));
+      drawAll();
+    }
+    function undoLast(t) { var h = t.history.pop(); if (!h) return; commitEdit(h.e, { placement: h.before.placement, review: h.before.review }, 'Undo', true); }
+    function mark(status, note) { return { status: status, by: editorName(), at: new Date().toISOString(), note: note || '' }; }
+
+    /* the box that lets a person say whether a statement is placed right: toggle the domains, then confirm, save a change, mark unsure or leave it out */
+    function editorBox(e, onAction) {
+      var t = e.theory, m = S.model, box = h('section', { class: 'at-edit', 'aria-label': 'Check this placement' });
+      var pend = { sup: e.sup.map(function (p) { return p.id; }), sub: e.sub.map(function (p) { return p.id; }) }, noteIn;
+      function strengthOf(list, id) { var f = list.filter(function (p) { return p.id === id; })[0]; return f ? f.strength : 'firm'; }
+      function wanted() { return { super: pend.sup.map(function (id) { return { id: id, strength: strengthOf(e.sup, id) }; }), sub: pend.sub.map(function (id) { return { id: id, strength: strengthOf(e.sub, id) }; }) }; }
+      function changed() { var w = wanted(); return !(sameList(w.super, e.sup) && sameList(w.sub, e.sub)); }
+      var state = h('p', { class: 'at-edit-state', text: e.review ? reviewText(e) : 'Not checked yet. A language model sorted this statement.' });
+      box.appendChild(h('h4', { text: 'Is it placed right?' })); box.appendChild(state);
+      var go = h('button', { type: 'button', class: 'oew-step', text: 'Looks right' });
+      function group(label, list, key) {
+        var fs = h('fieldset', { class: 'at-fs' }, [h('legend', { text: label })]);
+        list.forEach(function (d) {
+          var on = pend[key].indexOf(d.id) >= 0, b = h('button', { type: 'button', class: 'oew-chip at-dchip', 'aria-pressed': String(on), style: '--c:' + d.color, text: d.short + (on && strengthOf(key === 'sup' ? e.sup : e.sub, d.id) === 'single' ? ' (weaker)' : '') });
+          b.addEventListener('click', function () {
+            var i = pend[key].indexOf(d.id); if (i >= 0) pend[key].splice(i, 1); else pend[key].push(d.id);
+            var now = pend[key].indexOf(d.id) >= 0; b.setAttribute('aria-pressed', String(now)); b.textContent = d.short; go.textContent = changed() ? 'Save my change' : 'Looks right';
+          });
+          fs.appendChild(b);
+        });
+        return fs;
+      }
+      box.appendChild(group('Broad ideas about people', m.supers, 'sup')); box.appendChild(group('Aspects of schooling', m.subs, 'sub'));
+      noteIn = h('input', { type: 'text', class: 'at-q at-edit-note', maxlength: 200, placeholder: 'Why? (optional)', 'aria-label': 'Why? (optional)' });
+      box.appendChild(noteIn);
+      function act(kind, ch) { if (onAction) onAction(kind); commitEdit(e, ch, noteIn.value.trim()); }
+      go.addEventListener('click', function () {
+        var w = wanted(); w.super = w.super.map(function (p) { return { id: p.id, strength: 'firm' }; }); w.sub = w.sub.map(function (p) { return { id: p.id, strength: 'firm' }; });
+        act('checked', { placement: w, review: mark('checked', noteIn.value.trim()) });
+      });
+      var unsure = h('button', { type: 'button', class: 'oew-step ghost', text: isUnsure(e) ? 'Still unsure' : 'Unsure, ask someone' });
+      unsure.addEventListener('click', function () { act('unsure', { review: mark('unsure', noteIn.value.trim()) }); });
+      var out = h('button', { type: 'button', class: 'oew-step ghost', text: 'Not about schooling' });
+      out.addEventListener('click', function () { act('excluded', { review: mark('excluded', noteIn.value.trim()) }); });
+      var row = [go, unsure, out];
+      if (t.history.length) { var un = h('button', { type: 'button', class: 'oew-step ghost', text: 'Undo my last change' }); un.addEventListener('click', function () { undoLast(t); }); row.push(un); }
+      box.appendChild(h('div', { class: 'oew-row' }, row));
+      return box;
+    }
+
+    /* ---------- the review queue: one statement at a time, the least certain first ---------- */
+    function uncertainty(e) {
+      var weak = e.sup.concat(e.sub).some(function (p) { return p.strength === 'single'; });
+      return (e.sup.length ? 0 : 3) + (e.sub.length ? 0 : 3) + (weak ? 2 : 0) + (e.sup.length > 1 ? 1 : 0) + (e.sub.length > 1 ? 1 : 0);
+    }
+    function queueItems() {
+      var out = [];
+      vis().forEach(function (t) {
+        if (!canEdit(t)) return;
+        t.elements.forEach(function (e) {
+          if (isOut(e) || isChecked(e)) return;
+          if (S.qMode === 'unsure' ? !isUnsure(e) : isUnsure(e)) return;
+          if (S.qScope && !(has(e.sup, S.qScope) || has(e.sub, S.qScope))) return;
+          if (S.qKind && e.type !== S.qKind) return;
+          out.push(e);
+        });
+      });
+      var rank = out.map(function (e, i) { return { e: e, i: i, u: uncertainty(e) }; });
+      rank.sort(function (a, b) { return b.u - a.u || a.i - b.i; });
+      return rank.map(function (r) { return r.e; });
+    }
+    function progress() {
+      var total = 0, done = 0, unsure = 0, left = 0;
+      vis().forEach(function (t) { if (!canEdit(t)) return; t.elements.forEach(function (e) { if (isOut(e)) { left++; return; } total++; if (isChecked(e)) done++; else if (isUnsure(e)) unsure++; }); });
+      return { total: total, done: done, unsure: unsure, left: left };
+    }
+    function progressBar(p) {
+      var pc = p.total ? Math.round(100 * p.done / p.total) : 0;
+      return h('div', { class: 'at-prog' }, [h('p', { class: 'at-prog-t', text: p.done + ' of ' + p.total + ' statements checked (' + pc + '%)' + (p.unsure ? ', ' + p.unsure + ' marked unsure' : '') + (p.left ? ', ' + p.left + ' left out' : '') + '.' }),
+        h('div', { class: 'at-prog-bar', role: 'img', 'aria-label': pc + ' percent checked' }, [h('i', { style: 'width:' + pc + '%' })])]);
+    }
+    function viewReview() {
+      var p = progress(), items = queueItems();
+      els.view.appendChild(progressBar(p));
+      var ctl = h('div', { class: 'at-ctl', role: 'group', 'aria-label': 'Which statements to review' }, [h('span', { class: 'at-ctl-l', text: 'Show' })]);
+      [['todo', 'Not checked yet'], ['unsure', 'Marked unsure']].forEach(function (c) { var b = h('button', { type: 'button', class: 'oew-chip', 'aria-pressed': String(S.qMode === c[0]), text: c[1] }); b.addEventListener('click', function () { S.qMode = c[0]; S.qi = 0; drawAll(); }); ctl.appendChild(b); });
+      var sc = h('select', { class: 'at-type', 'aria-label': 'Domain' }, [h('option', { value: '', text: 'In any domain' })].concat(S.model.supers.concat(S.model.subs).map(function (d) { return h('option', { value: d.id, text: d.short, selected: S.qScope === d.id ? true : null }); })));
+      sc.addEventListener('change', function () { S.qScope = sc.value; S.qi = 0; drawAll(); });
+      var kd = h('select', { class: 'at-type', 'aria-label': 'Kind of statement' }, [h('option', { value: '', text: 'All kinds' })].concat(S.model.elementTypes.map(function (k) { return h('option', { value: k.id, text: k.name, selected: S.qKind === k.id ? true : null }); })));
+      kd.addEventListener('change', function () { S.qKind = kd.value; S.qi = 0; drawAll(); });
+      ctl.appendChild(sc); ctl.appendChild(kd); els.view.appendChild(ctl);
+      if (!items.length) { els.view.appendChild(h('p', { class: 'oew-note', text: S.qMode === 'unsure' ? 'No statement is marked unsure here.' : 'Nothing is left to check with these choices. Change the domain or the kind above, or look at the statements marked unsure.' })); return; }
+      S.qi = clamp(0, S.qi, items.length - 1);
+      var e = items[S.qi], card = h('article', { class: 'at-card', tabindex: '0', 'aria-label': 'Statement to check' });
+      card.appendChild(h('p', { class: 'oew-kicker', text: 'Statement ' + (S.qi + 1) + ' of ' + items.length + (S.qMode === 'unsure' ? ' marked unsure' : ' not checked yet') }));
+      card.appendChild(h('p', { class: 'at-card-text', text: e.statement }));
+      var tags = h('p', { class: 'at-tline' }, [h('span', { class: 'oew-tag', text: typeName(e.type) })]);
+      if (e.source) tags.appendChild(h('span', { class: 'oew-tag', text: e.source })); if (e.visibility === 'lab-only') tags.appendChild(h('span', { class: 'oew-tag lab', text: 'lab only' }));
+      card.appendChild(tags);
+      if (e.label && e.label !== e.statement) card.appendChild(h('p', { class: 'oew-note', text: 'Title: ' + e.label }));
+      if (e.reviewNote) card.appendChild(h('p', { class: 'oew-note', text: e.reviewNote }));
+      if (isUnsure(e)) card.appendChild(h('p', { class: 'oew-note', text: reviewText(e) }));
+      card.appendChild(editorBox(e, function (kind) { if (kind === 'unsure' && S.qMode === 'unsure') S.qi++; }));
+      var nav = h('div', { class: 'oew-row' }, []);
+      var back = h('button', { type: 'button', class: 'oew-step ghost', text: 'Back', disabled: S.qi === 0 ? true : null }); back.addEventListener('click', function () { S.qi = Math.max(0, S.qi - 1); drawAll(); });
+      var skip = h('button', { type: 'button', class: 'oew-step ghost', text: 'Skip' }); skip.addEventListener('click', function () { S.qi = (S.qi + 1) % items.length; drawAll(); });
+      var look = h('button', { type: 'button', class: 'oew-step ghost', text: 'Open in the panel' }); look.addEventListener('click', function () { choose({ type: 'element', e: e }); });
+      nav.appendChild(back); nav.appendChild(skip); nav.appendChild(look); card.appendChild(nav);
+      card.appendChild(h('p', { class: 'oew-note', text: 'Keys while this card is selected: y looks right, s skip, u unsure, x not about schooling.' }));
+      card.addEventListener('keydown', function (ev) {
+        if (ev.target && /^(INPUT|TEXTAREA|SELECT)$/.test(ev.target.tagName)) return;
+        var k = ev.key.toLowerCase(), btn = k === 'y' ? card.querySelector('.at-edit .oew-step:not(.ghost)') : k === 'u' ? card.querySelectorAll('.at-edit .oew-step.ghost')[0] : k === 'x' ? card.querySelectorAll('.at-edit .oew-step.ghost')[1] : k === 's' ? skip : null;
+        if (btn) { ev.preventDefault(); btn.click(); }
+      });
+      els.view.appendChild(card);
+    }
+
     /* ---------- domain stories ---------- */
     function storyTheories() { return vis().filter(function (t) { return t.narr && (t.narr.overview || Object.keys(t.narr.byId).length); }); }
     function storyOf(t, id) { return id === '_overview' ? t.narr.overview : t.narr.byId[id]; }
@@ -446,7 +597,7 @@
       S.model.subs.forEach(function (x) { rows.push({ kind: 'sub', d: x }); });
       rows.forEach(function (r) {
         var l = ev.filter(function (e) { return inDom(e, r.kind, r.d.id); });
-        r.n = l.length; r.firm = l.filter(function (e) { return (r.kind === 'super' ? e.sup : e.sub).some(function (p) { return p.id === r.d.id && p.strength === 'firm'; }); }).length;
+        r.checked = l.filter(function (e) { return isChecked(e); }).length; r.n = l.length; r.firm = l.filter(function (e) { return (r.kind === 'super' ? e.sup : e.sub).some(function (p) { return p.id === r.d.id && p.strength === 'firm'; }); }).length;
       });
       return rows;
     }
@@ -454,6 +605,7 @@
       var m = S.model, ths = storyTheories();
       if (!ths.length) { els.view.appendChild(h('p', { class: 'oew-note', text: 'None of the theories shown has written domain stories yet. Turn on a theory that has them, or use the other views.' })); return; }
       var ids = storyIds(); if (!S.story || ids.indexOf(S.story) < 0) S.story = '_overview';
+      var showChecked = editableNow() || allElements().some(function (e) { return e.review; });
       var nav = h('nav', { class: 'at-story-nav', 'aria-label': 'Choose a domain story' }), cov = coverage(), covBy = {}; cov.forEach(function (r) { covBy[r.d.id] = r; });
       function group(label, list) {
         nav.appendChild(h('p', { class: 'at-story-grp', text: label }));
@@ -484,13 +636,14 @@
           sec.appendChild(h('h4', { text: 'How much each domain holds' }));
           var top = Math.max.apply(null, [1].concat(cov.map(function (r) { return r.n; }))), tb = h('ul', { class: 'at-cov' });
           cov.forEach(function (r) {
-            var b = h('button', { type: 'button', class: 'at-cov-row', style: '--c:' + r.d.color }, [h('span', { class: 'at-cov-name', text: r.d.short }), h('span', { class: 'at-cov-bar', 'aria-hidden': 'true' }, [h('i', { style: 'width:' + Math.max(r.n ? 2 : 0, Math.round(100 * r.n / top)) + '%' })]), h('span', { class: 'at-cov-n', text: r.n + (r.n ? ' (' + r.firm + ' firm)' : ' none') })]);
+            var b = h('button', { type: 'button', class: 'at-cov-row', style: '--c:' + r.d.color }, [h('span', { class: 'at-cov-name', text: r.d.short }), h('span', { class: 'at-cov-bar', 'aria-hidden': 'true' }, [h('i', { style: 'width:' + Math.max(r.n ? 2 : 0, Math.round(100 * r.n / top)) + '%' })]), h('span', { class: 'at-cov-n', text: r.n + (r.n ? ' (' + r.firm + ' firm' + (showChecked ? ', ' + r.checked + ' checked' : '') + ')' : ' none') })]);
             b.addEventListener('click', function () { S.story = r.d.id; drawAll(); }); tb.appendChild(h('li', {}, [b]));
           });
           sec.appendChild(tb);
           sec.appendChild(h('p', { class: 'oew-note', text: 'Firm means the placement is clear. A statement in two domains counts in both.' }));
+          if (showChecked) { var pg_ = { total: 0, done: 0, unsure: 0, left: 0 }; elements().forEach(function (e) { pg_.total++; if (isChecked(e)) pg_.done++; else if (isUnsure(e)) pg_.unsure++; }); pg_.left = allElements().filter(isOut).length; sec.appendChild(progressBar(pg_)); }
         } else {
-          var r = covBy[id]; sec.appendChild(h('p', { class: 'oew-note', text: r.n ? plural(r.n, 'statement') + ' sit here in the theories shown, ' + r.firm + ' of them firmly.' : 'No statement sits here yet.' }));
+          var r = covBy[id]; sec.appendChild(h('p', { class: 'oew-note', text: r.n ? plural(r.n, 'statement') + ' sit here in the theories shown, ' + r.firm + ' of them firmly' + (showChecked ? ', and a person has checked ' + r.checked + ' of them' : '') + '.' : 'No statement sits here yet.' }));
         }
         if (n.keyStatements.length) { sec.appendChild(h('h4', { text: 'Statements that carry this story' })); sec.appendChild(stmtList(n.keyStatements)); }
         if (n.gaps.length) { sec.appendChild(h('h4', { text: 'What the OpenEvo bases do not say yet' })); var gl = h('ul', { class: 'at-gaps' }); n.gaps.forEach(function (g) { gl.appendChild(h('li', { text: g })); }); sec.appendChild(gl); }
@@ -535,32 +688,36 @@
     /* ---------- table ---------- */
     function viewTable() {
       var q = h('input', { type: 'search', class: 'at-q', value: S.query, 'aria-label': 'Filter statements', placeholder: 'Filter by words' });
+      var showRev = editableNow() || allElements().some(function (e) { return e.review; });
       var ty = h('select', { class: 'at-type', 'aria-label': 'Kind of statement' }, [h('option', { value: '', text: 'All kinds' })].concat(S.model.elementTypes.map(function (t) { return h('option', { value: t.id, text: t.name, selected: S.type === t.id ? true : null }); })));
       var tbody = h('tbody'), status = h('p', { class: 'oew-note', role: 'status' }), more = h('button', { type: 'button', class: 'oew-step ghost', text: 'Show 150 more', hidden: true });
       more.addEventListener('click', function () { S.rows += 150; fill(); });
       function fill() {
         tbody.textContent = '';
-        var rows = elements().filter(function (e) { return matches(e, listSel(S.sel) ? S.sel : null) && (!S.query || e.statement.toLowerCase().indexOf(S.query.toLowerCase()) >= 0) && (!S.type || e.type === S.type); });
+        var rows = (S.review === 'excluded' ? allElements().filter(isOut) : elements()).filter(function (e) { return (S.review === 'excluded' || matches(e, listSel(S.sel) ? S.sel : null)) && (!S.query || e.statement.toLowerCase().indexOf(S.query.toLowerCase()) >= 0) && (!S.type || e.type === S.type) && (!S.review || (S.review === 'unchecked' ? !e.review : S.review === 'excluded' ? isOut(e) : e.review && e.review.status === S.review)); });
         rows.slice(0, S.rows).forEach(function (e) {
           var b = h('button', { type: 'button', class: 'at-link', text: e.statement }); b.addEventListener('click', function () { choose({ type: 'element', e: e }); });
           var nm = function (l, kind) { return l.length ? l.map(function (p) { return dom(kind, p.id).short + (p.strength === 'single' ? ' (weaker)' : ''); }).join(', ') : 'Not placed yet'; };
-          tbody.appendChild(h('tr', {}, [h('td', { 'data-label': 'Statement' }, [b]), h('td', { 'data-label': 'Kind', text: typeName(e.type) }), h('td', { 'data-label': 'Super-domains', text: nm(e.sup, 'super') }), h('td', { 'data-label': 'Sub-domains', text: nm(e.sub, 'sub') }), h('td', { 'data-label': 'Theory', text: e.theory.title })]));
+          tbody.appendChild(h('tr', {}, [h('td', { 'data-label': 'Statement' }, [b]), h('td', { 'data-label': 'Kind', text: typeName(e.type) }), h('td', { 'data-label': 'Super-domains', text: nm(e.sup, 'super') }), h('td', { 'data-label': 'Sub-domains', text: nm(e.sub, 'sub') }), h('td', { 'data-label': 'Theory', text: e.theory.title })].concat(showRev ? [h('td', { 'data-label': 'Review', text: e.review ? reviewText(e) : 'Not checked yet' })] : [])));
         });
         status.textContent = plural(rows.length, 'statement') + ' match' + (rows.length > S.rows ? '. The first ' + S.rows + ' are listed.' : '.');
         more.hidden = rows.length <= S.rows;
       }
       q.addEventListener('input', function () { S.query = q.value; S.rows = 150; fill(); }); ty.addEventListener('change', function () { S.type = ty.value; S.rows = 150; fill(); });
-      var tb = h('table', { class: 'at-table' }, [h('caption', { class: 'at-cap', text: 'All statements in the theories shown' }), h('thead', {}, [h('tr', {}, ['Statement', 'Kind', 'Super-domains', 'Sub-domains', 'Theory'].map(function (t) { return h('th', { scope: 'col', text: t }); }))]), tbody]);
-      els.view.appendChild(h('div', { class: 'oew-row' }, [q, ty])); els.view.appendChild(status); els.view.appendChild(h('div', { class: 'at-tablewrap' }, [tb])); els.view.appendChild(more); fill();
+      var tb = h('table', { class: 'at-table' }, [h('caption', { class: 'at-cap', text: 'All statements in the theories shown' }), h('thead', {}, [h('tr', {}, ['Statement', 'Kind', 'Super-domains', 'Sub-domains', 'Theory'].concat(showRev ? ['Review'] : []).map(function (t) { return h('th', { scope: 'col', text: t }); }))]), tbody]);
+      var rv = h('select', { class: 'at-type', 'aria-label': 'Review state' }, [['', 'Any review state'], ['unchecked', 'Not checked yet'], ['checked', 'Checked'], ['unsure', 'Marked unsure'], ['excluded', 'Left out']].map(function (o) { return h('option', { value: o[0], text: o[1], selected: S.review === o[0] ? true : null }); }));
+      rv.addEventListener('change', function () { S.review = rv.value; S.rows = 150; fill(); });
+      els.view.appendChild(h('div', { class: 'oew-row' }, showRev ? [q, ty, rv] : [q, ty])); els.view.appendChild(status); els.view.appendChild(h('div', { class: 'at-tablewrap' }, [tb])); els.view.appendChild(more); fill();
     }
 
     /* ---------- selection and the panel ---------- */
     function choose(sel) { S.sel = sel; drawAll(); shell.reveal(); }
     function drawAll() {
+      els.tabs.review.hidden = !editableNow(); if (S.view === 'review' && !editableNow()) S.view = 'flow';
       Object.keys(els.tabs).forEach(function (k) { els.tabs[k].setAttribute('aria-selected', String(k === S.view)); els.tabs[k].tabIndex = k === S.view ? 0 : -1; });
       els.view.setAttribute('aria-labelledby', shell.uid + '-tab-' + S.view);
       drawBar(); els.view.textContent = ''; redraw = null;
-      ({ flow: viewFlow, stories: viewStories, links: viewLinks, reasons: viewReasons, table: viewTable })[S.view]();
+      ({ flow: viewFlow, stories: viewStories, links: viewLinks, reasons: viewReasons, table: viewTable, review: viewReview })[S.view]();
       shell.setGroup(S.sel ? 'sel' : 'overview');
       drawPanel();
     }
@@ -674,6 +831,7 @@
       if (t.visibility !== 'public') panel.note(t.visibility === 'lab-only' ? 'Private to the lab.' : 'Only in your browser.');
       if (e.ref) { var ru = e.url || (isPrivate(e.ref) ? null : resolve(e.ref)); panel.add(h('p', { class: 'at-tline' }, ['Base record: ', ru ? OEW.linkEl({ label: e.ref, href: ru }) : h('span', { text: e.ref }), e.visibility === 'lab-only' ? h('span', { class: 'oew-tag lab', text: 'lab only' }) : null])); }
       if (e.reviewNote) panel.note(e.reviewNote);
+      if (canEdit(t)) panel.add(editorBox(e)); else if (e.review) panel.note(reviewText(e) + '.');
       panel.heading('Super-domains'); if (e.sup.length) panel.chips(chipsFor(e.sup, 'super')); else panel.note('Not placed yet.');
       panel.heading('Sub-domains'); if (e.sub.length) panel.chips(chipsFor(e.sub, 'sub')); else panel.note('Not placed yet.');
       if (e.reasons.length) {

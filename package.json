@@ -25,6 +25,7 @@
     "test:node-links": "node scripts/test_node_links.mjs && python scripts/test_generate_node_links_migration.py",
     "test:tos-profile": "node scripts/test_tos_profile.mjs",
     "test:tos-prompt": "node scripts/test_tos_prompt_builder.mjs",
+    "test:tos-edits": "node scripts/test_tos_edits.mjs",
     "read-feedback": "node scripts/read-feedback.mjs",
     "docs:check": "node scripts/check_docs_freshness.mjs",
     "self-model:check": "python ../lab_manager/scripts/self_model_check.py self-model/manifest.json --root . --render docs/architecture/self-model.generated.md"

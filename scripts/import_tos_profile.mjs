@@ -112,12 +112,19 @@ async function main() {
   }
   const { error: e4 } = await sb.from('tos_elements').delete().eq('profile_row_id', rowId)
   if (e4) { console.error('Could not clear the old statements:', e4.message); return 1 }
-  const out = rows.map((r) => ({ ...r, project_id: project.id, profile_row_id: rowId }))
+  // review_status is a column of migration 257. A row that has none is written without it, so the script also works before that migration is applied.
+  const out = rows.map(({ review_status, ...r }) => ({ ...r, ...(review_status ? { review_status } : {}), project_id: project.id, profile_row_id: rowId }))
   for (let i = 0; i < out.length; i += 500) {
     const { error } = await sb.from('tos_elements').insert(out.slice(i, i + 500))
     if (error) { console.error('Statement insert failed:', error.message); return 1 }
   }
   console.log(`Wrote ${out.length} statements.`)
+  // People's decisions about placements and marks (migration 257) live in a log of their own. Put the latest of each back on top of this profile.
+  const back = await sb.rpc('tos_reapply_edits', { p_project_id: project.id, p_profile_code: profile.id })
+  if (back.error) {
+    if (/does not exist|schema cache|42883|PGRST202/i.test(`${back.error.code} ${back.error.message}`)) console.log('Migration 257 is not applied yet, so no earlier checks to put back.')
+    else { console.error('The earlier checks could not be put back:', back.error.message); return 1 }
+  } else console.log(`Put the earlier checks back on ${back.data} statement${back.data === 1 ? '' : 's'}.`)
   return 0
 }
 process.exitCode = await main()

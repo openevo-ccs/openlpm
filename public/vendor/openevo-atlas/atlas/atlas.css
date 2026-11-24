@@ -87,6 +87,22 @@
 .at-cov-bar i { display: block; height: 100%; background: var(--c); border-radius: 999px; }
 .at-cov-n { color: var(--muted); font-size: .9em; white-space: nowrap; }
 
+/* editing: the check box, the review queue and the progress bar */
+.at-edit { background: #f4faf9; border: 1.5px solid var(--line); border-radius: 12px; padding: .5em .8em .7em; margin: .6em 0; }
+.at-edit h4 { margin: 0 0 .2em; }
+.at-edit-state { margin: 0 0 .4em; font-size: .88em; color: var(--muted); overflow-wrap: anywhere; }
+.at-edit .at-fs { margin: .3em 0; }
+.at-dchip { border-color: var(--c); }
+.at-dchip[aria-pressed="true"] { background: var(--c); color: #fff; }
+.at-edit-note { width: 100%; margin: .3em 0 .2em; }
+.at-prog { margin: 0 0 .6em; }
+.at-prog-t { margin: 0 0 .25em; font-size: .9em; font-weight: 600; color: var(--navy); overflow-wrap: anywhere; }
+.at-prog-bar { height: .7em; background: var(--tint); border-radius: 999px; overflow: hidden; }
+.at-prog-bar i { display: block; height: 100%; background: #0b8f80; border-radius: 999px; }
+.at-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: .8em 1em 1em; min-width: 0; }
+.at-card:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+.at-card-text { font-size: 1.05em; line-height: 1.5; margin: .2em 0 .5em; overflow-wrap: anywhere; }
+
 /* reasons */
 .at-reasons { list-style: none; margin: .5em 0 0; padding: 0; display: grid; gap: .8em; }
 .at-warrant { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: .8em 1em; min-width: 0; }
