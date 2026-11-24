@@ -8,6 +8,10 @@ name: Apply Supabase migrations
 # directly; a GitHub Actions run is a different, un-blocked actor). Safe to
 # re-run -- `supabase db push` only applies migrations not already recorded
 # as applied.
+# 2026-11-24: the CLI is pinned to 2.116.0. Version 3 of `supabase db push` targets a
+# local stack unless told `--remote`, so an unpinned install failed with "connection
+# refused 127.0.0.1:54322" and applied nothing. Version 2 targets the linked project,
+# which is what this workflow was written for.
 # 2026-10-10: added an optional `repair_reverted_version` input. A duplicate
 # migration filename (two files both claiming the same version number, same
 # root cause the box above already describes) can leave the live database's
@@ -37,7 +41,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g supabase
+      - run: npm install -g supabase@2.116.0
       - name: Link project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
         env:
