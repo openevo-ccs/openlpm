@@ -180,10 +180,10 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
   lessonPhases: {
     Einstieg: 'Introduction',
     Erarbeitung: 'Knowledge acquisition',
-    'Festigung/Anwendung': 'Practice and application',
-    'Reflexion/Feedback': 'Reflection and feedback',
+    'Festigung/Anwendung': 'Practice/application',
+    'Reflexion/Feedback': 'Reflection/feedback',
     'Ergebnisermittlung/Bewertung': 'Evaluation',
-    'Transfer/Vernetzung': 'Transfer, connecting knowledge',
+    'Transfer/Vernetzung': 'Transfer/connecting knowledge',
   },
   learningApproaches: {
     erfahrungsbasiert: 'Experience-based',
@@ -229,6 +229,9 @@ export const TAG_READINGS: Record<TagField, Record<string, string>> = {
     'Social-emotional learning': 'Social-emotional learning',
     'Biology': 'Biology',
     'Evolution': 'Evolution',
+    'Game theory': 'Game theory',
+    'Behavioral science': 'Behavioral science',
+    'Computer science': 'Computer science',
   },
 }
 
@@ -265,6 +268,9 @@ export const TAG_GERMAN_NAMES: Record<TagField, Record<string, string>> = {
     'Social-emotional learning': 'Sozial-emotionales Lernen',
     'Biology': 'Biologie',
     'Evolution': 'Evolution',
+    'Game theory': 'Spieltheorie',
+    'Behavioral science': 'Verhaltensforschung',
+    'Computer science': 'Informatik',
   },
 }
 
