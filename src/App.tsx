@@ -63,6 +63,9 @@ import ComparisonCuratePage from '@/pages/dashboard/comparison/curate-page'
 import ComparisonDraftLinksPage from '@/pages/dashboard/comparison/draft-links-page'
 import ComparisonReportPage from '@/pages/dashboard/comparison/report-page'
 import ComparisonSpacesPage from '@/pages/dashboard/comparison/spaces-page'
+import TosAtlasPage from '@/pages/dashboard/tos-atlas-page'
+import TosProfilesPage from '@/pages/dashboard/tos-profiles-page'
+import TosPromptContextPage from '@/pages/dashboard/tos-prompt-context-page'
 
 // After an OAuth round-trip, the provider always drops the visitor back at
 // the site root (see login-page.tsx's redirectTo) -- this sends them on to
@@ -214,6 +217,10 @@ export default function App() {
             <Route path="groups/:groupId" element={<GroupDetailPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            {/* Theories of Schooling spaces (migration 256). */}
+            <Route path="atlas" element={<TosAtlasPage />} />
+            <Route path="profiles" element={<TosProfilesPage />} />
+            <Route path="prompt-context" element={<TosPromptContextPage />} />
             <Route path="tours" element={<TourEditorPage />} />
           </Route>
         </Route>

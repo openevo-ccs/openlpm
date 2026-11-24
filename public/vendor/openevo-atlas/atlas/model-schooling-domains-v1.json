@@ -1,0 +1,325 @@
+{
+  "schema": "openevo-schooling-domain-model/1",
+  "id": "OE-SCHOOLINGMODEL-schooling-domains-v1",
+  "title": "Theories of schooling: super-domains and sub-domains",
+  "version": "1.0.0",
+  "date": "2026-11-24",
+  "license": "CC-BY-4.0",
+  "source": {
+    "label": "Eirdosh & Hanisch (2023), a community science model for interdisciplinary evolution education and school improvement",
+    "literatureRef": "OE-LITERATURE-eirdosh-hanisch-2023-community-science-model",
+    "href": "https://doi.org/10.1007/978-3-031-33358-3_7"
+  },
+  "note": "The domain names and one-line meanings follow the Theories of Schooling widget (widgets/schooling/schooling.js). Other models can use the same file shape, so the atlas can show a different set of domains.",
+  "superLabel": "Super-domains",
+  "superHint": "Broad ideas about people and societies that inform how people think about schooling",
+  "subLabel": "Sub-domains",
+  "subHint": "The aspects of schooling people reason about",
+  "supers": [
+    {
+      "id": "origins",
+      "name": "Human origins, diversity and flexibility",
+      "short": "Origins",
+      "umbrella": true,
+      "means": "Broad claims about the human condition across time and place: where humans come from, how much people differ, and how flexible human nature is. The umbrella the other four sit under.",
+      "ask": "Which beliefs about human nature sit behind the way our school is run?",
+      "color": "#6f7c8c"
+    },
+    {
+      "id": "development",
+      "name": "Human development",
+      "short": "Development",
+      "means": "How people grow, learn and change over a lifetime.",
+      "ask": "What do the adults and students here believe about how young people learn best?",
+      "color": "#1f9d7a"
+    },
+    {
+      "id": "cultural-evolution",
+      "name": "Cultural evolution",
+      "short": "Cultural evolution",
+      "means": "How cultures and institutions change, and why some practices spread and others fade.",
+      "ask": "Which school traditions have lasted, and who benefits from them?",
+      "color": "#c99a2e"
+    },
+    {
+      "id": "self",
+      "name": "Self",
+      "short": "Self",
+      "means": "What a person is, what makes someone capable, and how identity forms.",
+      "ask": "What does it mean to be a good student here, and who decided that?",
+      "color": "#c0589b"
+    },
+    {
+      "id": "society",
+      "name": "Society",
+      "short": "Society",
+      "means": "How societies work, what people owe each other and what schools are for.",
+      "ask": "What do people in our community expect school to do for society?",
+      "color": "#5b6dc8"
+    }
+  ],
+  "subs": [
+    {
+      "id": "school-origins",
+      "name": "Theories of school origins",
+      "short": "School origins",
+      "means": "Ideas about where schools came from and why they exist.",
+      "ask": "Why was our school founded, and who is it meant to serve?",
+      "color": "#a38b6b"
+    },
+    {
+      "id": "futures",
+      "name": "Theories of school futures",
+      "short": "School futures",
+      "means": "Ideas about how schooling could or should change.",
+      "ask": "What would our school look like if students designed it?",
+      "color": "#2e86c1"
+    },
+    {
+      "id": "adaptive-fit",
+      "name": "Theories of adaptive fit",
+      "short": "Adaptive fit",
+      "means": "Ideas about how well schools fit the lives, places and needs of the people they serve.",
+      "ask": "Where does school fit our lives well, and where does it clash with them?",
+      "color": "#d9564a"
+    },
+    {
+      "id": "optimal",
+      "name": "Theories of optimal schooling",
+      "short": "Optimal schooling",
+      "means": "Ideas about what the best possible schooling would be like.",
+      "ask": "What would the best school day look like, and for whom?",
+      "color": "#8a63c9"
+    },
+    {
+      "id": "improvement",
+      "name": "Theories of school improvement",
+      "short": "School improvement",
+      "means": "Ideas about how to make schools better. The OpenEvo theory of school improvement belongs to this sub-domain.",
+      "ask": "How do people here think change happens, and who gets to start it?",
+      "color": "#0b8f80"
+    }
+  ],
+  "elementTypes": [
+    {
+      "id": "proposition",
+      "name": "Statement about how things are",
+      "means": "A claim, finding or theory about people, learning, culture or schooling.",
+      "short": "Claims",
+      "color": "#34457a"
+    },
+    {
+      "id": "observation",
+      "name": "Observation about schools or curricula",
+      "means": "What a school, curriculum or textbook contains or does today.",
+      "short": "Observations",
+      "color": "#566573"
+    },
+    {
+      "id": "design",
+      "name": "Proposal for teaching or schooling",
+      "means": "A proposal for how to teach, what to teach or how to organise schooling.",
+      "short": "Proposals",
+      "color": "#9a5b00"
+    },
+    {
+      "id": "aim",
+      "name": "Aim",
+      "means": "A goal that schooling or teaching should serve.",
+      "short": "Aims",
+      "color": "#1b6b64"
+    },
+    {
+      "id": "practice",
+      "name": "Teaching practice",
+      "means": "A way of teaching or a teaching material: a method, a lesson or a resource used in classrooms.",
+      "short": "Practices",
+      "color": "#5a3d91"
+    },
+    {
+      "id": "question",
+      "name": "Open question",
+      "means": "A question that research or design work still has to answer.",
+      "short": "Open questions",
+      "color": "#8a2d4a"
+    },
+    {
+      "id": "concept",
+      "name": "Key idea",
+      "means": "A concept that the theory uses and defines.",
+      "short": "Key ideas",
+      "color": "#3b6b2f"
+    }
+  ],
+  "holderKinds": [
+    {
+      "id": "individual",
+      "name": "One person's theory"
+    },
+    {
+      "id": "community",
+      "name": "A community's theory"
+    },
+    {
+      "id": "group",
+      "name": "A group's or project's theory"
+    },
+    {
+      "id": "author",
+      "name": "A book or paper's theory"
+    },
+    {
+      "id": "scientific",
+      "name": "A research tradition's theory"
+    }
+  ],
+  "resolvers": {
+    "OE-CONCEPT-": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/{id}.json",
+    "OE-SANDBOX-CONCEPT-": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/{id}.json",
+    "OE-LITERATURE-": "https://github.com/openevo-ccs/literaturebase/blob/main/records/{slug}.yaml"
+  },
+  "privateBases": [
+    "OE-COMPETENCY-",
+    "OE-DESIGNPRINCIPLE-",
+    "OE-METHOD-",
+    "OE-PROPOSITION-",
+    "OE-QUESTION-",
+    "OE-THEORY-",
+    "claim:"
+  ],
+  "flow": {
+    "superHead": "Super-domains",
+    "superSub": "broad ideas about people and societies",
+    "kindHead": "Kind of statement",
+    "kindSub": "what the statement does",
+    "subHead": "Sub-domains",
+    "subSub": "aspects of schooling"
+  },
+  "links": {
+    "note": "First draft of how the domains relate. These are proposals for the authors to confirm, change or remove. A theory file can add its own links.",
+    "super": [
+      {
+        "from": "origins",
+        "to": "development",
+        "relation": "sits under",
+        "directed": true,
+        "means": "What is true of human nature in general both limits and enables how people develop."
+      },
+      {
+        "from": "origins",
+        "to": "cultural-evolution",
+        "relation": "sits under",
+        "directed": true,
+        "means": "What is true of human nature in general shapes how cultures can change."
+      },
+      {
+        "from": "origins",
+        "to": "self",
+        "relation": "sits under",
+        "directed": true,
+        "means": "What is true of human nature in general shapes what a person is and can become."
+      },
+      {
+        "from": "origins",
+        "to": "society",
+        "relation": "sits under",
+        "directed": true,
+        "means": "What is true of human nature in general shapes how societies can work."
+      },
+      {
+        "from": "development",
+        "to": "self",
+        "relation": "shape each other",
+        "directed": false,
+        "means": "People form a sense of self as they grow, and that sense of self guides how they go on to learn."
+      },
+      {
+        "from": "development",
+        "to": "cultural-evolution",
+        "relation": "carry each other",
+        "directed": false,
+        "means": "Learning passes culture on to each new generation, and culture shapes what children learn."
+      },
+      {
+        "from": "cultural-evolution",
+        "to": "society",
+        "relation": "builds",
+        "directed": true,
+        "means": "Changing practices and institutions are what societies are made of."
+      },
+      {
+        "from": "society",
+        "to": "development",
+        "relation": "frames",
+        "directed": true,
+        "means": "What a society expects of children and schools frames how young people are raised."
+      },
+      {
+        "from": "self",
+        "to": "society",
+        "relation": "differ together",
+        "directed": false,
+        "means": "Ideas of the self differ between societies, and a society depends on what its members expect of themselves and each other."
+      }
+    ],
+    "sub": [
+      {
+        "from": "school-origins",
+        "to": "adaptive-fit",
+        "relation": "shapes",
+        "directed": true,
+        "means": "How schools came to be explains much of how well they fit people’s lives today."
+      },
+      {
+        "from": "adaptive-fit",
+        "to": "optimal",
+        "relation": "informs",
+        "directed": true,
+        "means": "Seeing where schooling fits poorly shows what better schooling would have to do."
+      },
+      {
+        "from": "optimal",
+        "to": "improvement",
+        "relation": "guides",
+        "directed": true,
+        "means": "Ideas of the best possible schooling set the direction for improvement work."
+      },
+      {
+        "from": "improvement",
+        "to": "futures",
+        "relation": "opens up",
+        "directed": true,
+        "means": "Improvement work changes schools, and so changes which futures can happen."
+      },
+      {
+        "from": "futures",
+        "to": "optimal",
+        "relation": "revises",
+        "directed": true,
+        "means": "Pictures of possible futures change what people think the best schooling would be."
+      },
+      {
+        "from": "improvement",
+        "to": "adaptive-fit",
+        "relation": "changes",
+        "directed": true,
+        "means": "Improvements change how well schools fit the people they serve."
+      }
+    ],
+    "layout": {
+      "super": [
+        "development",
+        "cultural-evolution",
+        "self",
+        "society"
+      ],
+      "sub": [
+        "school-origins",
+        "adaptive-fit",
+        "optimal",
+        "improvement",
+        "futures"
+      ]
+    }
+  }
+}

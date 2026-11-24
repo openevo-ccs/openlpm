@@ -1,0 +1,405 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openevo.net/widgets/atlas/schooling-theory-profile-v1.schema.json",
+  "title": "Theory of schooling profile, version 1",
+  "description": "One theory of schooling held by a person, a community, a group, a book or a research tradition, sorted into the domains of a schooling-domain model, with the reasons given for each proposal. A profile is a view layer. When a TheoryBase record for the same theory exists, theoryRef names it, and each element says which kind of TheoryBase record it would become.",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "holder",
+    "model",
+    "visibility",
+    "license",
+    "version",
+    "provenance",
+    "elements"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "@context": {
+      "type": [
+        "string",
+        "object",
+        "array"
+      ]
+    },
+    "schema": {
+      "const": "openevo-schooling-theory-profile/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^OE-SCHOOLINGPROFILE-[a-z0-9-]+$",
+      "description": "Persistent identifier. An element is cited as this id, a hash sign and the element id."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "summary": {
+      "type": "string"
+    },
+    "theoryRef": {
+      "type": "string",
+      "pattern": "^OE-THEORY-[a-z0-9-]+$",
+      "description": "The TheoryBase theory record this profile describes, when one exists."
+    },
+    "holder": {
+      "type": "object",
+      "required": [
+        "kind",
+        "label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "individual",
+            "community",
+            "group",
+            "author",
+            "scientific"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string",
+          "description": "A HumanBase person or group id, when one exists (for example group:openevo-research-group)."
+        }
+      }
+    },
+    "model": {
+      "type": "string",
+      "pattern": "^OE-SCHOOLINGMODEL-[a-z0-9-]+$",
+      "description": "The domain model the placements refer to."
+    },
+    "visibility": {
+      "enum": [
+        "public",
+        "lab-only",
+        "local"
+      ],
+      "description": "public may be published. lab-only stays inside the lab, for example while a book is embargoed. local exists only in one browser."
+    },
+    "license": {
+      "type": "string",
+      "description": "An SPDX-style licence identifier, or private."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "date": {
+      "type": "string"
+    },
+    "characterizationStatus": {
+      "enum": [
+        "author_stated",
+        "openevo_reconstruction_unreviewed",
+        "openevo_reconstruction_reviewed"
+      ],
+      "description": "Same values as TheoryBase theory records."
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "extractedBy",
+        "reviewStatus"
+      ],
+      "properties": {
+        "extractedBy": {
+          "enum": [
+            "human",
+            "llm",
+            "human-and-llm"
+          ]
+        },
+        "addedBy": {
+          "type": "string"
+        },
+        "reviewStatus": {
+          "enum": [
+            "ai-draft",
+            "author-reviewed",
+            "expert-reviewed",
+            "illustrative-example"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "label"
+            ],
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "literatureRef": {
+                "type": "string",
+                "pattern": "^OE-LITERATURE-[a-z0-9-]+$"
+              }
+            }
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "statement",
+          "placement"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "type": {
+            "enum": [
+              "proposition",
+              "observation",
+              "design",
+              "aim",
+              "practice",
+              "question",
+              "concept"
+            ],
+            "description": "design = a proposal for teaching or schooling. proposition = a claim about how things are. observation = what a school, curriculum or learner does. aim = a goal. practice = a way of teaching or a teaching material. question = an open question. concept = a key idea the theory uses."
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 600
+          },
+          "stance": {
+            "enum": [
+              "own",
+              "attributed"
+            ],
+            "description": "attributed = the source reports another person's claim."
+          },
+          "placement": {
+            "type": "object",
+            "required": [
+              "super",
+              "sub"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "super": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/placed"
+                }
+              },
+              "sub": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/placed"
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "ref"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "ref": {
+                  "type": "string",
+                  "pattern": "^(OE-[A-Z]+(-[A-Z]+)?-[A-Za-z0-9._-]+|claim:[A-Za-z0-9._-]+)$"
+                },
+                "relation": {
+                  "type": "string",
+                  "maxLength": 40,
+                  "description": "A short phrase: uses, source, supports, contests, example, part of, raises, builds, motivated by, derived from, justified by, grounded in, relates, broader, addresses, teaches via, uses method, measured by, depends on, involves, similar claim."
+                },
+                "score": {
+                  "type": "number",
+                  "description": "For a similar-claim link: closeness of meaning from 0 to 1. A suggestion for a person to check."
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "source": {
+            "type": "string"
+          },
+          "becomes": {
+            "enum": [
+              "proposition",
+              "design-principle",
+              "hypothesis",
+              "assumption"
+            ],
+            "description": "The TheoryBase record type this element would become if promoted."
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "A short name for the statement. A public profile may show only this for a statement that comes from a private base."
+          },
+          "ref": {
+            "type": "string",
+            "description": "The base record this statement is, for example OE-DESIGNPRINCIPLE-... The record is the authority and the statement summarises it."
+          },
+          "visibility": {
+            "enum": [
+              "public",
+              "lab-only"
+            ],
+            "description": "Whether the source record may be shown in full to people outside the lab."
+          },
+          "url": {
+            "type": "string",
+            "description": "An address for the record when it has one."
+          }
+        }
+      }
+    },
+    "domainLinks": {
+      "type": "array",
+      "description": "Links between domains of the same kind (super with super, sub with sub) that this theory states itself.",
+      "items": {
+        "type": "object",
+        "required": [
+          "scope",
+          "from",
+          "to"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "enum": [
+              "super",
+              "sub"
+            ]
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string",
+            "description": "A short plain phrase, for example shapes, informs, sits under."
+          },
+          "directed": {
+            "type": "boolean"
+          },
+          "means": {
+            "type": "string",
+            "description": "One or two plain sentences saying what the link means in this theory."
+          }
+        }
+      }
+    },
+    "warrants": {
+      "type": "array",
+      "description": "Each warrant pairs one proposal (design) with the statements (basis) that make it sensible.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "design",
+          "basis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "design": {
+            "type": "string",
+            "description": "Id of an element of type design or aim."
+          },
+          "basis": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "basisKind": {
+            "type": "string",
+            "description": "What the reasons mostly rest on: finding, theory, hypothesis, observation, cited_author, book_reasoning, design."
+          },
+          "link": {
+            "enum": [
+              "explicit",
+              "implied"
+            ],
+            "description": "explicit = the source states the link. implied = the link is a reading of the source."
+          },
+          "note": {
+            "type": "string"
+          },
+          "review": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": [
+                  "ai-draft",
+                  "author-reviewed",
+                  "expert-reviewed",
+                  "illustrative-example"
+                ]
+              },
+              "verdict": {
+                "enum": [
+                  "good",
+                  "partial",
+                  "weak"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "placed": {
+      "type": "object",
+      "required": [
+        "id"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "strength": {
+          "enum": [
+            "firm",
+            "single"
+          ],
+          "description": "firm = the placement is clear. single = a weaker fit."
+        }
+      }
+    }
+  }
+}

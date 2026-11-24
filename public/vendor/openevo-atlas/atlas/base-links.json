@@ -1,0 +1,527 @@
+{
+ "asOf": "origin/main of each base repository",
+ "domains": {
+  "origins": {
+   "concepts": [
+    {
+     "label": "Evolutionary Mismatch",
+     "blurb": "A condition in which a trait that was adaptive in the environment it evolved in becomes neutral, or actively reduces fitness",
+     "ref": "OE-CONCEPT-bio-core-evolutionary-mismatch",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-bio-core-evolutionary-mismatch.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Life History Theory",
+     "blurb": "The study of how natural selection shapes the timing and allocation of an organism's key life events — age at maturity, reproductive investment",
+     "ref": "OE-CONCEPT-bio-core-life-history-theory",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-bio-core-life-history-theory.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": []
+  },
+  "development": {
+   "lessons": [
+    {
+     "label": "Cumulative culture",
+     "blurb": "Teaching resources and information about the evolution of cumulative culture",
+     "href": "https://openevo.eva.mpg.de/teachingbase/cumulative-culture/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Development",
+     "blurb": "The process by which an organism grows and matures from an initial state toward greater complexity or capability",
+     "ref": "OE-CONCEPT-oe-interdisciplinary-development",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-development.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Learning",
+     "blurb": "A relatively durable change in knowledge, behavior, or capability resulting from experience, instruction, or practice",
+     "ref": "OE-CONCEPT-oe-interdisciplinary-learning",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-learning.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Teaching",
+     "blurb": "Intentional action by one individual or system to facilitate another's learning or transmission of a skill, practice, or piece of knowledge",
+     "ref": "OE-CONCEPT-oe-interdisciplinary-teaching",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-teaching.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": []
+  },
+  "cultural-evolution": {
+   "lessons": [
+    {
+     "label": "Connecting the past, present, and future – Education",
+     "blurb": "Information about the history of education",
+     "href": "https://openevo.eva.mpg.de/teachingbase/education/",
+     "lab_only": false
+    },
+    {
+     "label": "Cultural evolution (lesson plan)",
+     "blurb": "Students explore the concept of cultural evolution by comparing it to genetic evolution based on a number of concepts",
+     "href": "https://openevo.eva.mpg.de/teachingbase/cultural-evolution-vs-gene-focused-evolution/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Culture",
+     "blurb": "Socially transmitted knowledge, beliefs, practices, and artifacts shared within a group, persisting beyond any single individual",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-culture.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Transmission",
+     "blurb": "The process by which information, traits, or practices move from one holder (organism, person, group, or system) to another",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-transmission.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Variation",
+     "blurb": "The existence of differences among individuals, variants, or instances within a population or system, providing the raw material on which selection can act",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-variation.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Selection",
+     "blurb": "A search or optimization process that favors candidates scoring higher against an objective function",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-selection.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": []
+  },
+  "self": {
+   "lessons": [
+    {
+     "label": "Exploring values",
+     "blurb": "This lesson is about exploring the concept of values with students and having them identify and reflect on what they personally value, or what makes their life meaningful",
+     "href": "https://openevo.eva.mpg.de/teachingbase/exploring-values/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Agency",
+     "blurb": "The capacity of an individual or system to act intentionally and make choices that influence outcomes, rather than responding passively to external forces",
+     "ref": "OE-CONCEPT-oe-interdisciplinary-agency",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-agency.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Metacognition",
+     "blurb": "The capacity to monitor, evaluate, and regulate one's own cognitive processes — knowing what one knows, tracking how one is thinking, and adjusting strategies accordingly",
+     "ref": "OE-SANDBOX-CONCEPT-oe-interdisciplinary-metacognition",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-SANDBOX-CONCEPT-oe-interdisciplinary-metacognition.json",
+     "lab_only": false,
+     "note": "draft concept"
+    },
+    {
+     "label": "Well-being",
+     "blurb": "The state of an organism's needs and values being adequately met",
+     "ref": "OE-SANDBOX-CONCEPT-oe-interdisciplinary-well-being",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-SANDBOX-CONCEPT-oe-interdisciplinary-well-being.json",
+     "lab_only": false,
+     "note": "draft concept"
+    }
+   ],
+   "theory": []
+  },
+  "society": {
+   "lessons": [
+    {
+     "label": "Connecting the past, present, and future – Social networking",
+     "blurb": "Information about the history and importance of social networking in our species",
+     "href": "https://openevo.eva.mpg.de/teachingbase/social-networking/",
+     "lab_only": false
+    },
+    {
+     "label": "Connecting the past, present, and future – Spread of innovations",
+     "blurb": "Information about the evolution and spread of innovations",
+     "href": "https://openevo.eva.mpg.de/teachingbase/spread-of-innovations/",
+     "lab_only": false
+    },
+    {
+     "label": "Human evolution – Life with other groups",
+     "blurb": "Teaching resources and information about the impact of intergroup cooperation and competition in human evolution",
+     "href": "https://openevo.eva.mpg.de/teachingbase/life-with-other-groups/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Institutions",
+     "blurb": "Stable, socially recognized structures or rules that organize and constrain collective behavior over time",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-institutions.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Communication",
+     "blurb": "The exchange of information between agents via signals, language, or other shared codes",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-communication.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Culture",
+     "blurb": "Socially transmitted knowledge, beliefs, practices, and artifacts shared within a group, persisting beyond any single individual",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-culture.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "A Community Science Model for Inter-disciplinary Evolution Education and School Improvement",
+     "blurb": "Eirdosh & Hanisch (2023)",
+     "href": "https://doi.org/10.1007/978-3-031-33358-3_7",
+     "lab_only": false
+    },
+    {
+     "label": "Community science and expanded school mental health: Bridging the research-to-practice gap to promote child well-being and academic success",
+     "blurb": "Flaspohler et al. (2006)",
+     "href": "https://doi.org/10.53841/bpsecp.2006.23.1.27",
+     "lab_only": false
+    },
+    {
+     "label": "Community science: A typology and its implications for governance of social-ecological systems",
+     "blurb": "Charles et al. (2020)",
+     "href": "https://doi.org/10.1016/j.envsci.2020.01.019",
+     "lab_only": false
+    }
+   ]
+  },
+  "school-origins": {
+   "lessons": [
+    {
+     "label": "Connecting the past, present, and future – Education",
+     "blurb": "Information about the history of education",
+     "href": "https://openevo.eva.mpg.de/teachingbase/education/",
+     "lab_only": false
+    },
+    {
+     "label": "Cultural evolution (lesson plan)",
+     "blurb": "Students explore the concept of cultural evolution by comparing it to genetic evolution based on a number of concepts",
+     "href": "https://openevo.eva.mpg.de/teachingbase/cultural-evolution-vs-gene-focused-evolution/",
+     "lab_only": false
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "The “Grammar” of Schooling: Why Has it Been so Hard to Change?",
+     "blurb": "Tyack & Tobin (1994)",
+     "href": "https://doi.org/10.3102/00028312031003453",
+     "lab_only": false
+    },
+    {
+     "label": "Evolving Schools in a Post-pandemic Context",
+     "blurb": "Eirdosh & Hanisch (2021)",
+     "href": "https://doi.org/10.1007/978-3-030-69284-1_24",
+     "lab_only": false
+    },
+    {
+     "label": "The Lecture Machine: A Cultural Evolutionary Model of Pedagogy in Higher Education",
+     "blurb": "Grunspan et al. (2018)",
+     "href": "https://doi.org/10.1187/cbe.17-12-0287",
+     "lab_only": false
+    }
+   ]
+  },
+  "futures": {
+   "lessons": [
+    {
+     "label": "Connecting Past, Present, and Future",
+     "blurb": "A collection of materials for connecting past human evolution to the present and the future",
+     "href": "https://openevo.eva.mpg.de/teachingbase/connecting-past-present-and-future/",
+     "lab_only": false
+    },
+    {
+     "label": "Mental Time Travel",
+     "blurb": "Teaching resources and information about the evolution of our capacity for mental time travel",
+     "href": "https://openevo.eva.mpg.de/teachingbase/mental-time-travel/",
+     "lab_only": false
+    },
+    {
+     "label": "Causal mapping pieces for causal relationships in the present and future",
+     "blurb": "Materials for creating a causal map on the relationships between human behaviors, technologies, institutions, social and natural environments",
+     "href": "https://openevo.eva.mpg.de/teachingbase/causal-mapping-pieces-for-causal-relationships-in-the-present-and-future/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Innovation",
+     "blurb": "The generation of a novel variant — an idea, practice, technology, or trait — that did not previously exist within a system",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-innovation.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Technology",
+     "blurb": "Tools, techniques, or systems created to extend or augment biological or cognitive capability",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-technology.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Mental Time Travel",
+     "blurb": "The capacity to mentally project oneself backward to re-experience a past event, or forward to pre-experience a possible future event",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-SANDBOX-CONCEPT-oe-interdisciplinary-mental-time-travel.json",
+     "lab_only": false,
+     "note": "draft concept"
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "Developing Students’ Futures Thinking in Science Education",
+     "blurb": "Jones et al. (2011)",
+     "href": "https://doi.org/10.1007/s11165-011-9214-9",
+     "lab_only": false
+    },
+    {
+     "label": "Plausible and desirable futures in the Anthropocene: A new research agenda",
+     "blurb": "Bai et al. (2016)",
+     "href": "https://doi.org/10.1016/j.gloenvcha.2015.09.017",
+     "lab_only": false
+    },
+    {
+     "label": "Participatory scenario planning: A social learning approach to build systems thinking and trust for sustainable environmental governance",
+     "blurb": "Galang et al. (2025)",
+     "href": "https://doi.org/10.1016/j.envsci.2025.103997",
+     "lab_only": false
+    }
+   ]
+  },
+  "adaptive-fit": {
+   "lessons": [
+    {
+     "label": "Human evolution – Human needs, values, and wellbeing",
+     "blurb": "Classroom resources for exploring (the evolution of) human needs, values, and well-being",
+     "href": "https://openevo.eva.mpg.de/teachingbase/human-needs-values-and-wellbeing/",
+     "lab_only": false
+    },
+    {
+     "label": "Exploring values",
+     "blurb": "This lesson is about exploring the concept of values with students and having them identify and reflect on what they personally value, or what makes their life meaningful",
+     "href": "https://openevo.eva.mpg.de/teachingbase/exploring-values/",
+     "lab_only": false
+    },
+    {
+     "label": "Life in groups and conflict resolution",
+     "blurb": "A reading text about the challenges of life in groups and how groups across biology have found ways to solve these challenges",
+     "href": "https://openevo.eva.mpg.de/teachingbase/life-in-groups-and-conflict-resolution/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Well-being",
+     "blurb": "The state of an organism's needs and values being adequately met",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-SANDBOX-CONCEPT-oe-interdisciplinary-well-being.json",
+     "lab_only": false,
+     "note": "draft concept"
+    },
+    {
+     "label": "Prosociality",
+     "blurb": "The ability and motivation to be friendly, tolerate others' presence, or share things and information with others without threat or rational calculation",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-SANDBOX-CONCEPT-oe-interdisciplinary-prosociality.json",
+     "lab_only": false,
+     "note": "draft concept"
+    },
+    {
+     "label": "Norms",
+     "blurb": "Shared expectations or rules of behavior within a group, enforced through social sanction rather than formal law",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-norms.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "Belongingness and the modern schoolchild: on loneliness, socioemotional health, self-esteem, evolutionary mismatch, online sociality, and the numbness of rejection",
+     "blurb": "Baumeister & Robson (2021)",
+     "href": "https://doi.org/10.1080/00049530.2021.1877573",
+     "lab_only": false
+    },
+    {
+     "label": "The Meaningful Roles Intervention: An Evolutionary Approach to Reducing Bullying and Increasing Prosocial Behavior",
+     "blurb": "Ellis et al. (2015)",
+     "href": "https://doi.org/10.1111/jora.12243",
+     "lab_only": false
+    },
+    {
+     "label": "What Schools Need to Know About Fostering School Belonging: a Meta-analysis",
+     "blurb": "Allen et al. (2016)",
+     "href": "https://doi.org/10.1007/s10648-016-9389-8",
+     "lab_only": false
+    }
+   ]
+  },
+  "optimal": {
+   "lessons": [
+    {
+     "label": "Content Anchors",
+     "blurb": "Content anchors reflect the concepts, methods, and perspectives of evolutionary anthropology, behavioral, and sustainability sciences",
+     "href": "https://openevo.eva.mpg.de/teachingbase/content-anchors/",
+     "lab_only": false
+    },
+    {
+     "label": "Thinking Tools",
+     "blurb": "Thinking tools are used across diverse lessons to develop the skills of evolutionary anthropologists, behavioral scientists, and sustainability scientists",
+     "href": "https://openevo.eva.mpg.de/teachingbase/thinking-tools/",
+     "lab_only": false
+    },
+    {
+     "label": "A Teacher's Guide to Evolution, Behavior, and Sustainability Science (living edition)",
+     "blurb": "An interactive, ecosystem-linked e-book edition of the Teacher's Guide, hosted at github.com/openevo-ccs/teachers-guide",
+     "href": "https://openevo.eva.mpg.de/teachingbase/teachers-guide/",
+     "lab_only": false
+    },
+    {
+     "label": "Goals, Behaviors, and Outcomes",
+     "blurb": "How can we understand the causal relationships between goals, behaviors, and outcomes?",
+     "href": "https://openevo.eva.mpg.de/teachingbase/goals-behaviors-and-outcomes/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Knowledge",
+     "blurb": "Justified, retained information that an individual, group, or system can draw upon to act or reason",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-knowledge.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Learning",
+     "blurb": "A relatively durable change in knowledge, behavior, or capability resulting from experience, instruction, or practice",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-learning.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Teaching",
+     "blurb": "Intentional action by one individual or system to facilitate another's learning or transmission of a skill, practice, or piece of knowledge",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-teaching.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "The Shifting Boundaries of School Subjects in Contemporary Curriculum Reforms",
+     "blurb": "Dussel (2020)",
+     "href": "https://doi.org/10.3262/zp2005666",
+     "lab_only": false
+    },
+    {
+     "label": "The curriculum prerequisite network: Modeling the curriculum as a complex system",
+     "blurb": "Aldrich (2015)",
+     "href": "https://doi.org/10.1002/bmb.20861",
+     "lab_only": false
+    }
+   ]
+  },
+  "improvement": {
+   "lessons": [
+    {
+     "label": "Exploring the Design Principles for Cooperation",
+     "blurb": "Students explore the principles that allow groups to work together and achieve common goals, applying them to the groups that they are a part of or care about",
+     "href": "https://openevo.eva.mpg.de/teachingbase/exploring-the-design-principles-for-cooperation/",
+     "lab_only": false
+    },
+    {
+     "label": "Collective Action Puzzle Game",
+     "blurb": "A group game that lets students experience the dilemma between self-interest and collective interest when groups have to work together to achieve shared goals",
+     "href": "https://openevo.eva.mpg.de/teachingbase/collective-action-puzzle-game/",
+     "lab_only": false
+    },
+    {
+     "label": "Three Mexican fisheries",
+     "blurb": "Students compare the stories of three Mexican fishing villages to understand the factors that enabled some villages to sustainably manage their fishing resources",
+     "href": "https://openevo.eva.mpg.de/teachingbase/three-mexican-fisheries/",
+     "lab_only": false
+    }
+   ],
+   "concepts": [
+    {
+     "label": "Institutions",
+     "blurb": "Stable, socially recognized structures or rules that organize and constrain collective behavior over time",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-institutions.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Norms",
+     "blurb": "Shared expectations or rules of behavior within a group, enforced through social sanction rather than formal law",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-norms.json",
+     "lab_only": false,
+     "note": ""
+    },
+    {
+     "label": "Collective Intelligence",
+     "blurb": "Problem-solving or knowledge-generating capability that emerges from the coordinated activity of many individuals or agents, exceeding what any one could achieve alone",
+     "href": "https://github.com/openevo-ccs/conceptbase/blob/main/registry/concept/OE-CONCEPT-oe-interdisciplinary-collective-intelligence.json",
+     "lab_only": false,
+     "note": ""
+    }
+   ],
+   "theory": [],
+   "literature": [
+    {
+     "label": "Governing the Commons",
+     "blurb": "Ostrom (1990)",
+     "href": "https://doi.org/10.1017/cbo9780511807763",
+     "lab_only": false
+    },
+    {
+     "label": "The Significance of Students: Can Increasing “Student Voice” in Schools Lead to Gains in Youth Development?",
+     "blurb": "Mitra (2004)",
+     "href": "https://doi.org/10.1111/j.1467-9620.2004.00354.x",
+     "lab_only": false
+    },
+    {
+     "label": "Students as researchers for promoting school improvement and inclusion: a review of studies",
+     "blurb": "Sandoval & Messiou (2020)",
+     "href": "https://doi.org/10.1080/13603116.2020.1730456",
+     "lab_only": false
+    },
+    {
+     "label": "“Not Only Adults Can Make Good Decisions, We as Children Can Do That as Well” Evaluating the Process of the Youth-Led Participatory Action Research ‘Kids in Action’",
+     "blurb": "Anselma et al. (2020)",
+     "href": "https://doi.org/10.3390/ijerph17020625",
+     "lab_only": false
+    },
+    {
+     "label": "A Community Science Model for Inter-disciplinary Evolution Education and School Improvement",
+     "blurb": "Eirdosh & Hanisch (2023)",
+     "ref": "OE-LITERATURE-eirdosh-hanisch-2023-community-science-model",
+     "href": "https://doi.org/10.1007/978-3-031-33358-3_7",
+     "lab_only": false
+    }
+   ]
+  }
+ }
+}

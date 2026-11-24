@@ -1,4 +1,4 @@
-import { useOutletContext } from 'react-router-dom'
+import { Navigate, useOutletContext } from 'react-router-dom'
 import type { ProjectOutletContext } from '../project-layout'
 import DashboardPage from '../dashboard-page'
 import StudentLernzielePage from './student-lernziele-page'
@@ -12,6 +12,8 @@ import { getCurriculumConnectionsViewConfig } from '@/lib/student-view-templates
 // see pages/dashboard/comparison).
 export default function ProjectIndexRouter() {
   const context = useOutletContext<ProjectOutletContext>()
+  // A Theories of Schooling space (migration 256) opens on its Atlas.
+  if ((context.project as any).project_kind === 'theory-of-schooling') return <Navigate to={`/dashboard/${context.slug}/atlas`} replace />
   if (!context.isStudentView) return <DashboardPage />
   if (getCurriculumConnectionsViewConfig(context.templateId)) return <ComparisonOverviewPage />
   return <StudentLernzielePage />
