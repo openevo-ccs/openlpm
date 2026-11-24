@@ -4,6 +4,8 @@ import type { Database } from '@/lib/supabase/database.types'
 import { cn } from '@/lib/utils'
 import { reviewStatusPlain, type TosModel } from '@/lib/tos-profile'
 import { listTosProfiles, loadTosModel, type TosProfileRow } from '@/lib/supabase/tos-profiles'
+import { loadReviewProgress } from '@/lib/supabase/tos-edits'
+import { progressBadge, type ReviewProgress } from '@/lib/tos-edits'
 
 // Small pieces shared by the three pages of a Theories of Schooling space (migration 256).
 
@@ -60,3 +62,28 @@ export function useTosModel() {
   }, [])
   return { model, failed }
 }
+
+/** The event the Atlas page sends after a change was saved, so the badge in the space header counts again. */
+export const TOS_PROGRESS_EVENT = 'tos:progress'
+
+/**
+ * The badge in the header of a Theories of Schooling space. It replaces the general "Human-Curated" badge, which says the content was made by teachers
+ * and researchers. What these spaces hold was sorted by language models, so the badge says how far people have checked it.
+ */
+export function TosProgressBadge({ supabase, projectId }: { supabase: SupabaseClient<Database>; projectId: string }) {
+  const [progress, setProgress] = useState<ReviewProgress | null>(null)
+  const load = useCallback(async () => setProgress(await loadReviewProgress(supabase, projectId)), [supabase, projectId])
+  useEffect(() => {
+    load()
+    window.addEventListener(TOS_PROGRESS_EVENT, load)
+    return () => window.removeEventListener(TOS_PROGRESS_EVENT, load)
+  }, [load])
+  const b = progressBadge(progress)
+  return (
+    <span className={cn('chip', `chip-${b.bucket}`)} title={b.title}>
+      <span className="dot" />
+      {b.text}
+    </span>
+  )
+}
+

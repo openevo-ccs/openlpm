@@ -52,6 +52,8 @@ export interface TosElement {
   ref?: string
   visibility?: 'public' | 'lab-only'
   url?: string
+  /** The mark a person left on the placement (migration 257). */
+  review?: { status: string; by?: string; at?: string; note?: string }
 }
 
 export interface TosWarrant {
@@ -302,6 +304,8 @@ export interface TosElementRow {
   subs: string[]
   ref: string | null
   visibility: 'public' | 'lab-only'
+  /** checked, unsure or excluded when a person looked at it (migration 257). Null = not checked yet. */
+  review_status: 'checked' | 'unsure' | 'excluded' | null
 }
 
 /** One row per statement, for the table tos_elements. */
@@ -315,6 +319,7 @@ export function flattenProfile(profile: TosProfile): TosElementRow[] {
     subs: placedIds(e.placement?.sub),
     ref: e.ref ? e.ref : null,
     visibility: elementVisibility(profile, e),
+    review_status: e.review && ['checked', 'unsure', 'excluded'].includes(e.review.status) ? (e.review.status as 'checked' | 'unsure' | 'excluded') : null,
   }))
 }
 

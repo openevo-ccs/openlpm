@@ -46,7 +46,7 @@ export function statementCode(profile: Pick<TosProfile, 'id'>, element: Pick<Tos
 /** Every statement of the given profiles, with its citation code. */
 export function listStatements(profiles: TosProfile[]): StatementRef[] {
   const out: StatementRef[] = []
-  for (const profile of profiles) for (const element of profile.elements) out.push({ profile, element, code: statementCode(profile, element) })
+  for (const profile of profiles) for (const element of profile.elements) if (element.review?.status !== 'excluded') out.push({ profile, element, code: statementCode(profile, element) })
   return out
 }
 

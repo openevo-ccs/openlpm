@@ -15,6 +15,7 @@ import {
   type DashboardViewAssignment,
 } from '@/lib/supabase/dashboard-views'
 import { EpistemicStatusBadge } from '@/components/epistemic-status-badge'
+import { TosProgressBadge } from '@/components/tos-shared'
 import { MaturityBadge } from '@/components/maturity-badge'
 import { WorkingLanguagesTag } from '@/components/working-languages-tag'
 import { ProjectNav, type ProjectNavItem } from '@/components/project-nav'
@@ -598,7 +599,7 @@ export default function ProjectLayout() {
             </p>
           )}
           <div className="row" style={{ flexWrap: 'wrap', marginTop: 4 }}>
-            <EpistemicStatusBadge status={project.epistemic_status} />
+            {isTheories ? <TosProgressBadge supabase={supabase} projectId={project.id} /> : <EpistemicStatusBadge status={project.epistemic_status} />}
             <MaturityBadge status={project.maturity} />
             <WorkingLanguagesTag languages={project.working_languages} />
           </div>

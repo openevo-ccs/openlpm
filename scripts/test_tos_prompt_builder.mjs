@@ -46,11 +46,13 @@ test('record codes and schema words appear only where they should', () => {
 
 test('domains are named in everyday words with their one-line meaning', () => {
   const r = B.buildTosContext([example()], model, all)
-  assert.match(r.text, /Human development\. How people grow, learn and change over a lifetime\./)
+  // The one-line meanings come from the model file, which was reworded on 2026-11-24, so the test reads them from there.
+  const means = (id) => [...model.supers, ...model.subs].find((d) => d.id === id).means
+  assert.ok(r.text.includes('Human development. ' + means('development')))
   assert.match(r.text, /\(sits under: Development, Optimal schooling\)/)
   // an aspect of schooling gets its own heading when it is chosen
   const optimal = B.buildTosContext([example()], model, { ...all, domainIds: ['optimal'] })
-  assert.match(optimal.text, /Theories of optimal schooling\. Ideas about what the best possible schooling would be like\. 2 statements listed here\./)
+  assert.ok(optimal.text.includes('Theories of optimal schooling. ' + means('optimal') + ' 2 statements listed here.'))
 })
 
 test('a statement that belongs to two domains is written once', () => {
