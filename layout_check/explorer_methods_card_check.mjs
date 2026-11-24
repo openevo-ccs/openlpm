@@ -36,21 +36,27 @@ const getAll = async (table, select, extra = '') => {
   return rows
 }
 const snapshot = await getAll('methodsbase_snapshot', 'id,data')
-const log = await getAll('base_repo_record_edits', 'record_id,field_path,is_reset,edited_at', '&base_repo=eq.methodsbase&order=edited_at.asc')
-const edited = new Map() // record id -> Set of paths whose latest row is not a reset
+const log = await getAll('base_repo_record_edits', 'record_id,field_path,is_reset,edited_at,after_value,exported_at', '&base_repo=eq.methodsbase&order=edited_at.asc')
+const waiting = new Set() // record|path whose latest saved text is not in the repo yet (the card shows it on top of the repo copy)
+const edited = new Map() // record id -> Map of path -> what was last saved (a reset removes it)
 for (const e of log) {
-  const s = edited.get(e.record_id) ?? new Set()
-  if (e.is_reset) s.delete(e.field_path); else s.add(e.field_path)
-  edited.set(e.record_id, s)
+  const m = edited.get(e.record_id) ?? new Map()
+  if (e.is_reset) m.delete(e.field_path); else m.set(e.field_path, e.after_value)
+  edited.set(e.record_id, m)
+  if (!e.is_reset) { if (e.exported_at) waiting.delete(e.record_id + '|' + e.field_path); else waiting.add(e.record_id + '|' + e.field_path) }
 }
+const flat = (v) => (Array.isArray(v) ? v.join(' ') : v ?? '').toString().replace(/\s+/g, ' ').trim()
 const classes = (d) => (Array.isArray(d.methodClass) ? d.methodClass : [d.methodClass])
 const germanDraft = (r) => r.data.textStatus?.de?.state === 'claude-draft-unreviewed' && !(r.data.textStatus?.de?.reviewedFields ?? []).includes('description') && r.data.description?.de
 const withDe = (r) => typeof r.data.label?.de === 'string'
-const draftEdited = snapshot.find((r) => withDe(r) && germanDraft(r) && edited.get(r.id)?.has('description.de'))
-const draftPlain = snapshot.find((r) => withDe(r) && germanDraft(r) && classes(r.data).includes('pedagogical-practice') && !r.data.materials && r.data.protocolSteps?.de && ![...(edited.get(r.id) ?? [])].some((p) => p.startsWith('description')))
+const savedDe = (r) => edited.get(r.id)?.get('description.de')
+// The text on screen is the text she saved, or it has changed since.
+const draftEdited = snapshot.find((r) => withDe(r) && germanDraft(r) && savedDe(r) !== undefined && (waiting.has(r.id + '|description.de') || flat(savedDe(r)) === flat(r.data.description.de)))
+const draftChanged = snapshot.find((r) => withDe(r) && germanDraft(r) && savedDe(r) !== undefined && !waiting.has(r.id + '|description.de') && flat(savedDe(r)) !== flat(r.data.description.de))
+const draftPlain = snapshot.find((r) => withDe(r) && germanDraft(r) && classes(r.data).includes('pedagogical-practice') && !r.data.materials && r.data.protocolSteps?.de && ![...(edited.get(r.id)?.keys() ?? [])].some((p) => p.startsWith('description')))
 const withPrompt = snapshot.find((r) => withDe(r) && r.data.aiPromptTemplate?.de && r.data.materials?.de)
 const research = snapshot.find((r) => withDe(r) && classes(r.data).length === 1 && classes(r.data)[0] === 'research-method' && !r.data.materials)
-check('the live data has the four kinds of example this check needs', !!(draftEdited && draftPlain && withPrompt && research), [draftEdited?.id, draftPlain?.id, withPrompt?.id, research?.id].join(' | '))
+check('the live data has the kinds of example this check needs', !!(draftEdited && draftPlain && withPrompt && research), [draftEdited?.id, draftChanged?.id ?? '(none: no saved text has changed since)', draftPlain?.id, withPrompt?.id, research?.id].join(' | '))
 if (!(draftEdited && draftPlain && withPrompt && research)) process.exit(1)
 
 const browser = await chromium.launch()
@@ -95,6 +101,10 @@ await openMethods('de')
 let r = await openCard(draftEdited.data.label.de)
 check(`no draft tag on the German description of "${draftEdited.data.label.de}", a text a person has edited`, !r.text.includes(chip), r.text.slice(0, 160))
 await page.screenshot({ path: path.join(outDir, '1-edited-description-no-tag.png') })
+if (draftChanged) {
+  r = await openCard(draftChanged.data.label.de)
+  check(`the draft tag stays on "${draftChanged.data.label.de}", whose description has changed since a person saved it`, r.text.includes(chip))
+}
 r = await openCard(draftPlain.data.label.de)
 check(`the draft tag stays on "${draftPlain.data.label.de}", whose description nobody has edited`, r.text.includes(chip))
 

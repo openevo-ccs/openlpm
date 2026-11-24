@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react'
 import type { MethodsBaseRecord } from '@/lib/supabase/methodsbase'
-import { fieldReviewed, languageName, languagesOf, otherLanguages, pickLocalized, pickLocalizedList, tagLabel, textState, type DraftField, type TagField } from '@/lib/method-text'
+import { fieldReviewed, matchesSavedText, languageName, languagesOf, otherLanguages, pickLocalized, pickLocalizedList, tagLabel, textState, type DraftField, type TagField } from '@/lib/method-text'
 
 // Small two-letter language tag shown next to a piece of text, so a reader can tell which language that text is in.
 export function LangChip({ lang, uiLang }: { lang: string; uiLang: string }) {
@@ -49,10 +49,15 @@ function strings(uiLang: string) {
 }
 
 // Shown next to a text that Claude drafted and no expert has read yet. With `field` the tag goes away once a person has read that text:
-// the record names the field as reviewed, or (in the Base Repo Explorer) the log of edits holds a saved change to it (`editedPaths`).
-export function DraftChip({ data, lang, field, editedPaths, label, title }: { data: Record<string, unknown>; lang: string; field?: DraftField; editedPaths?: Set<string>; label: string; title: string }) {
+// the record names the field as reviewed, or (in the Base Repo Explorer) the log of edits holds what a person saved in that field and the
+// record shows exactly that text (`savedTexts`). A text that has changed since the person saved it keeps its tag.
+export function DraftChip({ data, lang, field, savedTexts, label, title }: { data: Record<string, unknown>; lang: string; field?: DraftField; savedTexts?: Map<string, unknown>; label: string; title: string }) {
   if (!lang || textState(data, lang) !== 'claude-draft-unreviewed') return null
-  if (field && (fieldReviewed(data, lang, field) || editedPaths?.has(`${field}.${lang}`))) return null
+  if (field) {
+    if (fieldReviewed(data, lang, field)) return null
+    const path = `${field}.${lang}`
+    if (savedTexts?.has(path) && matchesSavedText(data, field, lang, savedTexts.get(path))) return null
+  }
   return (
     <span className="chip" style={{ fontSize: 10, marginLeft: 6, verticalAlign: 'middle', borderColor: 'var(--warning)', color: 'var(--warning-text)' }} title={title}>
       {label}

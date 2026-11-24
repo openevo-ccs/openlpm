@@ -17,7 +17,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
 import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
-import { NEW_ENTRY_SPECS, applyEdits, editedFieldPaths, historyFor, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
+import { NEW_ENTRY_SPECS, applyEdits, historyFor, savedTextsFromLog, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
   BASE_REPO_CONFIGS,
   listSnapshotRows,
@@ -1439,8 +1439,8 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   const teacherTips = pickLocalizedList(data.teacherTips, textLang)
   const workedExample = pickLocalized(data.workedExample, textLang)
   const aiPrompt = pickLocalized(data.aiPromptTemplate, textLang)
-  // The texts a person has saved a change to. The draft tag goes away on those (feedback cc545181, Susan Hanisch, 2026-11-24).
-  const editedPaths = useMemo(() => editedFieldPaths(history), [history])
+  // What a person last saved in each field. The draft tag goes away on a text that is exactly that (feedback cc545181, Susan Hanisch, 2026-11-24).
+  const savedTexts = useMemo(() => savedTextsFromLog(history), [history])
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
   // The ladder from general to specific methods (Dustin, 2026-11-13). Only the narrower method stores the link, so the more specific
@@ -1486,7 +1486,7 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
       {!!discipline && <DetailRow label={disciplineTags.length > 0 ? 'Discipline note' : 'Discipline'}>{discipline.text}{tag(discipline.lang)}</DetailRow>}
       {lessonPhases.length > 0 && <DetailRow label="Lesson phases">{lessonPhases.map((t) => tagReading('lessonPhases', t, lang)).join(', ')}</DetailRow>}
       {!!whenToUse && <DetailRow label="When to use">{clean(whenToUse.text, whenToUse.lang)}{tag(whenToUse.lang)}</DetailRow>}
-      {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} field="description" editedPaths={editedPaths} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
+      {!!description && <DetailRow label="Description">{clean(description.text, description.lang)}{tag(description.lang)}<DraftChip data={data} lang={description.lang} field="description" savedTexts={savedTexts} label="Claude draft, not yet reviewed by an expert" title="Claude drafted this text. No one with Biologiedidaktik expertise has read it yet." /></DetailRow>}
       {materials
         ? <DetailRow label="Materials"><span data-testid="materials-row">{materials.text}</span>{tag(materials.lang)}</DetailRow>
         : classes.includes('pedagogical-practice') && <DetailRow label="Materials"><span className="muted" data-testid="no-materials">Not set yet. Press Edit to add one.</span></DetailRow>}

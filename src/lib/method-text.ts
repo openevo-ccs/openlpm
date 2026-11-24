@@ -110,6 +110,21 @@ export function textState(data: Record<string, unknown> | null | undefined, lang
   return status === 'claude-draft-unreviewed' || status === 'reviewed' ? status : 'original'
 }
 
+/** The text of one language from a language-keyed field. A field that is still one plain string or list counts as the English text. */
+export function textInLanguage(value: unknown, lang: string): unknown {
+  const obj = asLangObject(value)
+  if (obj) return obj[lang]
+  return lang === 'en' ? value : undefined
+}
+
+const flatText = (v: unknown): string => (Array.isArray(v) ? v.join(' ') : v === null || v === undefined ? '' : String(v)).replace(/\s+/g, ' ').trim()
+
+/** Whether the text a record shows for one field and language is the text a person saved (same words, spacing ignored). */
+export function matchesSavedText(data: Record<string, unknown> | null | undefined, field: string, lang: string, saved: unknown): boolean {
+  const s = flatText(saved)
+  return s !== '' && flatText(textInLanguage((data as any)?.[field], lang)) === s
+}
+
 /** The text fields of a method that carry the draft state. */
 export type DraftField = 'label' | 'description' | 'whenToUse' | 'protocolSteps' | 'materials' | 'teacherTips' | 'workedExample' | 'aiPromptTemplate'
 
