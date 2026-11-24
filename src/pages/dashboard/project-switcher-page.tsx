@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FolderKanban, Library, Plus, ShieldCheck } from 'lucide-react'
+import { Compass, FolderKanban, Library, Plus, ShieldCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { getUserProjects, type ProjectRow, type ProjectMemberRole, type ProjectWithRole } from '@/lib/supabase/projects'
@@ -62,6 +62,8 @@ export default function ProjectSwitcherPage() {
   // no toggle of its own at all. On by default, same convention as the two
   // curation checkboxes.
   const [showRepos, setShowRepos] = useState(true)
+  // Theories of Schooling spaces (migration 256) have their own frame and their own checkbox, on by default like the others.
+  const [showTheories, setShowTheories] = useState(true)
   // null = not loaded yet, distinct from "loaded, zero pending" -- the
   // single-membership auto-redirect below has to wait for a real answer
   // here before it decides whether to fire, or an account with exactly one
@@ -154,7 +156,11 @@ export default function ProjectSwitcherPage() {
   // filter is about how a research project's content was made, which
   // doesn't apply to a curated source archive the same way).
   const repoTopLevel = topLevel.filter((m) => isRepository(m.project))
-  const standardTopLevel = topLevel.filter((m) => !isRepository(m.project))
+  // A Theories of Schooling space (migration 256) is its own part of the ontology as well. It never lands in the human-curated or
+  // synthetic-theoretical frames, because those say how a research project's content was made.
+  const isTheories = (p: ProjectRow) => (p as any).project_kind === 'theory-of-schooling'
+  const theoriesTopLevel = topLevel.filter((m) => isTheories(m.project))
+  const standardTopLevel = topLevel.filter((m) => !isRepository(m.project) && !isTheories(m.project))
   // Real feedback a4be05a6 (2026-10-01): differentiate human-curated from
   // synthetic-theoretical project spaces at the frame level, same split as
   // the Admin page's own Projects card now uses.
@@ -225,6 +231,13 @@ export default function ProjectSwitcherPage() {
             {CURATION_LABEL[c]}
           </label>
         ))}
+        {/* Shown only when there is such a space, so the page stays exactly as it was for everyone else. */}
+        {theoriesTopLevel.length > 0 && (
+          <label className="row" style={{ gap: 6, fontSize: 13, cursor: 'pointer' }} title="Places where a person, a community or a group keeps their own theory of schooling and compares it with others.">
+            <input type="checkbox" checked={showTheories} onChange={() => setShowTheories((v) => !v)} />
+            Theories of Schooling
+          </label>
+        )}
       </div>
 
       {entries.length === 0 ? (
@@ -250,7 +263,7 @@ export default function ProjectSwitcherPage() {
             </div>
           )}
 
-          {curatedTopLevel.length === 0 && syntheticTopLevel.length === 0 ? (
+          {curatedTopLevel.length === 0 && syntheticTopLevel.length === 0 && !(showTheories && theoriesTopLevel.length > 0) ? (
             <div className="card empty">
               <p className="muted">No project spaces match the selected filter.</p>
             </div>
@@ -286,6 +299,20 @@ export default function ProjectSwitcherPage() {
                 </div>
               )}
             </>
+          )}
+
+          {showTheories && theoriesTopLevel.length > 0 && (
+            <div className="frame frame-theories">
+              <h2 className="row" style={{ fontSize: 16, gap: 6 }}><Compass size={16} style={{ color: 'var(--text-muted)' }} />Theories of Schooling</h2>
+              <p className="muted" style={{ marginBottom: 12, fontSize: 13 }}>
+                Places where a person, a community or a group keeps their own theory of schooling and compares it with others.
+              </p>
+              <div className="grid grid-3">
+                {theoriesTopLevel.map(({ project, role }) => (
+                  <ProjectCard key={project.id} project={project} role={role} childrenOf={childrenOf} />
+                ))}
+              </div>
+            </div>
           )}
         </>
       )}

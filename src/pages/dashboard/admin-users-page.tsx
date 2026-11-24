@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, ChevronDown, ChevronRight, FolderTree, Globe, Library, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, ShieldCheck, Trash2, UserCheck, Users, UserX } from 'lucide-react'
+import { AlertTriangle, ChevronDown, ChevronRight, Compass, FolderTree, Globe, Library, Lock, Mail, MessageSquareText, Pencil, ShieldAlert, ShieldCheck, Trash2, UserCheck, Users, UserX } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { inviteMembers, removeMember, updateMemberRole, type ProjectMemberRole } from '@/lib/supabase/members'
@@ -642,7 +642,10 @@ function ProjectsAdminSection({
   // project spaces (project_kind, migration 072).
   const isRepository = (p: AdminProjectRow) => (p as any).project_kind === 'curriculum-repository'
   const repoTopLevel = topLevel.filter(isRepository)
-  const standardTopLevel = topLevel.filter((p) => !isRepository(p))
+  // Theories of Schooling spaces (migration 256) get a card of their own, the same way the project switcher gives them a frame.
+  const isTheories = (p: AdminProjectRow) => (p as any).project_kind === 'theory-of-schooling'
+  const theoriesTopLevel = topLevel.filter(isTheories)
+  const standardTopLevel = topLevel.filter((p) => !isRepository(p) && !isTheories(p))
 
   // Real feedback a4be05a6 (2026-10-01): differentiate human-curated from
   // synthetic-theoretical project spaces at the frame level, not just the
@@ -665,7 +668,8 @@ function ProjectsAdminSection({
   const clearSelection = () => { setSelectedIds(new Set()); setBulkEditing(false) }
   const selectedProjects = (projects ?? []).filter((p) => selectedIds.has(p.id))
   const repoProjects = (projects ?? []).filter(isRepository)
-  const standardProjects = (projects ?? []).filter((p) => !isRepository(p))
+  const theoriesProjects = (projects ?? []).filter(isTheories)
+  const standardProjects = (projects ?? []).filter((p) => !isRepository(p) && !isTheories(p))
 
   // Real feedback 74e440a3 (2026-10-01): "Curriculum repositories are
   // different than projects even if they share underlying infrastructure --
@@ -690,6 +694,33 @@ function ProjectsAdminSection({
             {repoProjects.length - repoTopLevel.length} nested
           </p>
           {repoTopLevel.map((p) => (
+            <ProjectTreeRow
+              key={p.id}
+              project={p}
+              parentName={null}
+              childrenByParent={childrenByParent}
+              memberCountByProject={memberCountByProject}
+              childCountByParent={childCountByParent}
+              supabase={supabase}
+              onChanged={onChanged}
+              selectedIds={selectedIds}
+              onToggleSelect={toggleSelect}
+              selectable={false}
+            />
+          ))}
+        </div>
+      )}
+
+      {theoriesTopLevel.length > 0 && (
+        <div className="card" style={{ marginBottom: 20 }}>
+          <h3 className="row"><Compass size={16} />Theories of Schooling</h3>
+          <p className="muted" style={{ marginBottom: 12 }}>
+            Places where a person, a community or a group keeps their own theory of schooling. Kept apart from the research project spaces below.
+          </p>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+            {theoriesProjects.length} space{theoriesProjects.length === 1 ? '' : 's'}
+          </p>
+          {theoriesTopLevel.map((p) => (
             <ProjectTreeRow
               key={p.id}
               project={p}

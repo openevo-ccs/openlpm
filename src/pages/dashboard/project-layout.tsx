@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, Outlet, useLocation, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, BarChart3, Landmark, BookOpen, CalendarRange, Clock, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
+import { ArrowLeft, BarChart3, Landmark, BookOpen, CalendarRange, Clock, Compass, FileJson, FileText, GitBranch, GraduationCap, Layers, Library, Lightbulb, ListTree, Map as MapIcon, MessageSquare, MessageSquareText, Network, Newspaper, PanelLeftClose, PanelLeftOpen, Settings, ShieldAlert, Sparkles, Users, Hourglass } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { getProjectBySlug, getUserProjects, type ProjectMemberRole, type ProjectRow } from '@/lib/supabase/projects'
 import { listMyPendingRequests } from '@/lib/supabase/members'
@@ -339,6 +339,8 @@ export default function ProjectLayout() {
   // project_kind (migration 072/094) isn't in the generated types yet.
   const isRepository = (project as any).project_kind === 'curriculum-repository'
   const isCustomView = (project as any).project_kind === 'curriculum-repository-custom-view'
+  // A Theories of Schooling space (migration 256) keeps theory profiles rather than learning goals, so it gets its own short nav.
+  const isTheories = (project as any).project_kind === 'theory-of-schooling'
 
   const canManage = role === 'owner' || role === 'maintainer'
 
@@ -459,7 +461,16 @@ export default function ProjectLayout() {
   // non-owners/maintainers -- same as today's Members list, the page itself
   // still gates each editable section (color, invites, self-join, student
   // view, danger zone) to canManage/owner exactly as before.
-  const nav = isRepository || isCustomView
+  // A Theories of Schooling space (migration 256) shows the Atlas, its Profiles, the Prompt context page and Settings (which holds the
+  // members). Dashboard Custom Views never apply to it, for the same reason as above.
+  const nav = isTheories
+    ? [
+        { href: `/dashboard/${slug}/atlas`, icon: <Compass size={14} />, label: 'Atlas', end: false },
+        { href: `/dashboard/${slug}/profiles`, icon: <FileJson size={14} />, label: 'Profiles', end: false },
+        { href: `/dashboard/${slug}/prompt-context`, icon: <MessageSquareText size={14} />, label: 'Prompt context', end: false },
+        { href: `/dashboard/${slug}/settings`, icon: <Settings size={14} />, label: 'Settings', end: false },
+      ]
+    : isRepository || isCustomView
     ? [
         { href: `/dashboard/${slug}`, icon: <FileText size={14} />, label: 'Dashboard' },
         ...(hasRepo ? [{ href: `/dashboard/${slug}/curriculum-repository`, icon: <Library size={14} />, label: 'Curriculum Repository', end: false }] : []),
@@ -576,7 +587,7 @@ export default function ProjectLayout() {
         </div>
         <div className="project-side-info">
           <p className="muted" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: 10, marginBottom: 0 }}>
-            {isCustomView ? 'Custom View' : isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
+            {isCustomView ? 'Custom View' : isTheories ? 'Theories of Schooling Space' : isRepository ? (isSpace ? 'Curriculum Repository Space' : 'Curriculum Repository') : (isSpace ? 'Project Space' : 'Project')}
           </p>
           <h2 style={{ marginTop: 2, marginBottom: 2 }}>{project.name}</h2>
           {parent && (
@@ -606,9 +617,11 @@ export default function ProjectLayout() {
             </button>
           </div>
         )}
-        <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
-          <LpmSearchBar project={project} slug={slug} supabase={supabase} />
-        </div>
+        {!isTheories && (
+          <div className="row" style={{ justifyContent: 'flex-end', marginBottom: 12 }}>
+            <LpmSearchBar project={project} slug={slug} supabase={supabase} />
+          </div>
+        )}
         <ProjectIntroBanner project={project} supabase={supabase} showDescription={!onDashboardHome} />
         <Outlet context={context} />
       </div>

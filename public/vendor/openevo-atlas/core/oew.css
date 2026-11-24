@@ -1,0 +1,84 @@
+/* OpenEvo widget kit: look and feel shared by the embeddable models. Self-contained. */
+.oew {
+  --navy: #242b6e; --teal: #006c66; --teal2: #0b8f80; --tint: #eef6f5; --line: #d6e2e1; --gold: #e8a21a;
+  --ink: #2c3140; --muted: #566070; --link: #0170b9;
+  container-type: inline-size; container-name: oew;
+  display: block; position: relative; box-sizing: border-box;
+  height: var(--oew-h, auto); background: #fff; color: var(--ink);
+  border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+  font-family: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif; line-height: 1.45;
+}
+.oew *, .oew *::before, .oew *::after { box-sizing: border-box; }
+.oew.oew-page { border: 0; border-radius: 0; }
+.oew:fullscreen, .oew.is-expanded { height: 100vh; width: 100vw; border-radius: 0; border: 0; background: #fff; }
+.oew.is-expanded { position: fixed; inset: 0; z-index: 2147483000; }
+.oew button { font-family: inherit; }
+.oew button:focus-visible, .oew a:focus-visible, .oew [role="button"]:focus-visible, .oew [role="tab"]:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+
+.oew-in { height: 100%; display: flex; flex-direction: column; font-size: clamp(13px, 7px + .75cqw, 18px); }
+
+/* title bar */
+.oew-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5em 1em; padding: .7em 1em; color: #fff; background: linear-gradient(100deg, var(--navy) 0%, #14578a 60%, var(--teal) 100%); }
+.oew-title strong { display: block; font-family: 'Nunito', system-ui, sans-serif; font-weight: 800; font-size: 1.15em; letter-spacing: .01em; }
+.oew-title span { font-size: .82em; opacity: .85; }
+.oew-actions { display: flex; flex-wrap: wrap; gap: .4em; }
+.oew-btn { display: inline-flex; align-items: center; gap: .4em; cursor: pointer; font-size: .85em; font-weight: 600; color: #fff; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.55); border-radius: 999px; padding: .3em .9em; }
+.oew-btn:hover { background: rgba(255,255,255,.26); }
+.oew-btn[aria-pressed="true"] { background: #fff; color: var(--navy); }
+.oew-btn svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* body: the diagram and the detail panel (each widget places them) */
+.oew-body { flex: 1; min-height: 0; display: grid; gap: 1.1em; padding: 1em; background: linear-gradient(180deg, #fff 0%, #f4f9f8 100%); grid-template-columns: minmax(0, 1fr); }
+.oew-foot { margin: 0; padding: .45em 1em; font-size: .72em; color: var(--muted); border-top: 1px solid var(--line); background: #fff; }
+
+/* detail panel */
+.oew-panel { min-height: 0; overflow: auto; background: #fff; border: 1px solid var(--line); border-left: .35em solid var(--teal); border-radius: 14px; padding: 1em 1.2em 1.1em; outline: none; }
+.oew-panel > :first-child { margin-top: 0; }
+.oew-kicker { margin: 0 0 .1em; text-transform: uppercase; letter-spacing: .07em; font-size: .72em; font-weight: 700; color: var(--teal); }
+.oew-panel h3 { margin: .1em 0 .5em; font-family: 'Nunito', system-ui, sans-serif; font-size: 1.3em; line-height: 1.2; color: var(--navy); }
+.oew-panel h4 { margin: 1em 0 .4em; font-family: 'Nunito', system-ui, sans-serif; font-size: .95em; color: var(--navy); }
+.oew-panel p { margin: 0 0 .65em; }
+.oew-note { font-size: .8em; color: var(--muted); }
+.oew-ask { background: var(--tint); border-radius: 10px; padding: .55em .8em; font-size: .92em; }
+.oew-links, .oew-chips, .oew-row { display: flex; flex-wrap: wrap; gap: .4em; margin: .8em 0 0; padding: 0; list-style: none; align-items: center; }
+.oew-link { display: inline-block; font-size: .85em; text-decoration: none; color: var(--teal); border: 1.5px solid var(--teal); border-radius: 999px; padding: .2em .8em; background: #fff; }
+.oew-link:hover { background: var(--teal); color: #fff; }
+.oew-chip { font-size: .8em; cursor: pointer; color: var(--navy); background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: .2em .7em; }
+.oew-chip:hover { border-color: var(--teal); }
+.oew-chip[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.oew-step { font-size: .85em; font-weight: 600; cursor: pointer; color: #fff; background: var(--teal); border: 1.5px solid var(--teal); border-radius: 999px; padding: .3em 1em; }
+.oew-step:hover { background: #0a5853; }
+.oew-step.ghost { color: var(--teal); background: #fff; }
+.oew-step.ghost:hover { background: var(--tint); }
+.oew-step:disabled { opacity: .4; cursor: default; }
+.oew-items { list-style: none; margin: .4em 0 0; padding: 0; display: grid; gap: .55em; }
+.oew-items li { font-size: .92em; }
+.oew-item-link, .oew-item-name { font-weight: 600; }
+.oew-item-link { color: var(--teal); }
+.oew-blurb { display: block; font-size: .86em; color: var(--muted); margin-top: .1em; }
+.oew-tag { display: inline-block; font-size: .68em; font-weight: 700; border-radius: 999px; padding: .02em .5em; margin-left: .4em; background: #e8eeee; color: #445; vertical-align: middle; }
+.oew-tag.lab { background: #fdf0d5; color: #7a5a00; }
+.oew-start { display: grid; gap: .4em; margin: .8em 0 0; padding: 0; list-style: none; }
+.oew-start button { width: 100%; text-align: left; cursor: pointer; font-size: .9em; color: var(--navy); background: var(--tint); border: 1.5px solid var(--line); border-radius: 10px; padding: .45em .8em; }
+.oew-start button:hover { border-color: var(--teal); background: #fff; }
+.oew-start b { display: block; }
+.oew-start span { color: var(--muted); font-size: .85em; }
+
+/* tab strip inside a widget */
+.oew-tabs { display: flex; flex-wrap: wrap; gap: .35em; margin: 0 0 .7em; }
+.oew-tabs button { font: inherit; font-family: 'Nunito', system-ui, sans-serif; font-weight: 700; font-size: .9em; cursor: pointer; color: var(--navy); background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: .3em 1em; }
+.oew-tabs button[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* embed dialog */
+.oew-embed { position: absolute; z-index: 5; inset: 0; display: grid; place-items: center; padding: 1em; background: rgba(20,24,60,.55); }
+.oew-embed[hidden] { display: none; }
+.oew-embed-card { width: min(40em, 100%); max-height: 100%; overflow: auto; background: #fff; border-radius: 14px; padding: 1.1em 1.3em; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+.oew-embed-card h3 { margin: 0 0 .4em; font-family: 'Nunito', system-ui, sans-serif; color: var(--navy); }
+.oew-embed-card h4 { margin: .8em 0 .2em; font-family: 'Nunito', system-ui, sans-serif; color: var(--navy); }
+.oew-embed-card textarea { width: 100%; min-height: 5.2em; font: .85em ui-monospace, Consolas, monospace; padding: .5em; border: 1px solid #c9c9c9; border-radius: 8px; resize: vertical; }
+
+@container oew (max-width: 420px) {
+  .oew-bar { padding: .55em .7em; }
+  .oew-btn span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .oew *, .oew *::before, .oew *::after { transition: none !important; } }

@@ -234,6 +234,10 @@ code {
    everywhere else in this app. */
 .frame-curated { border-color: var(--good); }
 .frame-synthetic { border-style: dashed; border-color: var(--warning); }
+/* Theories of Schooling spaces (migration 256) get their own frame in the project switcher, drawn in the main blue of the app. */
+.frame-theories { border-color: var(--series-a); }
+/* The Atlas widget's Embed button gives addresses on the widget's own site. They do not apply to the copy inside OpenLPM, so the button is hidden. */
+.tos-atlas-host .oew-actions .oew-btn:nth-last-child(2) { display: none; }
 .card h2, .card h3 { margin-top: 0; }
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
