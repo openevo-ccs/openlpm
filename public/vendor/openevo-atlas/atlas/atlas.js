@@ -1,7 +1,7 @@
 /* Theory of Schooling Atlas: shows one or several theories of schooling as a flow from super-domains, through the kind of statement,
    to sub-domains, with the links between domains, the reasons given for each proposal and links to entries in the OpenEvo bases.
    <div data-openevo-atlas data-height="760px"></div> plus widgets/core/oew.js and this script, or widgets/theory-of-schooling-atlas.html in a frame.
-   Options: data-height, data-narrow-auto, data-theories="name1,name2" (files in atlas/theories/, or full addresses), data-view="flow|links|reasons|table",
+   Options: data-height, data-narrow-auto, data-theories="name1,name2" (files in atlas/theories/, or full addresses), data-view="flow|stories|links|reasons|table",
    data-select="improvement", data-private-links="hide". A theory is one JSON file in the format described in docs/schooling-atlas-data-format.md. */
 (function () {
   'use strict';
@@ -14,7 +14,7 @@
   var INK = '#2c3140', MUTED = '#566070';
   var GROUPS = [['concepts', 'Key ideas', 'ConceptBase'], ['theory', 'Theory behind it', 'TheoryBase'], ['literature', 'Further reading', 'LiteratureBase'], ['lessons', 'Lessons and materials', 'TeachingBase']];
   var STATUS = { 'ai-draft': 'Draft written with AI help and not yet checked by an expert', 'illustrative-example': 'Invented example', 'expert-reviewed': 'Checked by an expert', 'author-reviewed': 'Checked by the author' };
-  var VIEWS = [['flow', 'Flow'], ['links', 'Links between domains'], ['reasons', 'Reasons'], ['table', 'Table']];
+  var VIEWS = [['flow', 'Flow'], ['stories', 'Domain stories'], ['links', 'Links between domains'], ['reasons', 'Reasons'], ['table', 'Table']];
   var ctx = document.createElement('canvas').getContext('2d');
 
   function getJSON(url) { return fetch(url).then(function (r) { if (!r.ok) throw new Error(url + ' ' + r.status); return r.json(); }); }
@@ -42,6 +42,20 @@
   }
 
   /* ---------- reading a theory file ---------- */
+  /* the written story of each domain: a headline, a few paragraphs, the statements that carry it, what is missing and what to ask next */
+  function readNarr(d, t, sup, sub) {
+    var out = { overview: null, byId: {} };
+    function one(n, dom) {
+      if (!n || typeof n !== 'object') return null;
+      var story = Array.isArray(n.story) ? n.story : (n.story ? [n.story] : []);
+      var x = { domain: dom, headline: String(n.headline || ''), story: story.map(String).filter(Boolean), keyStatements: (n.keyStatements || []).map(function (id) { return t.byId[id]; }).filter(Boolean), gaps: (n.gaps || []).map(String).filter(Boolean), askNext: (n.askNext || []).map(String).filter(Boolean), review: n.review || {}, theory: t };
+      return x.headline || x.story.length ? x : null;
+    }
+    out.overview = one(d.overview, '_overview');
+    (d.domainNarratives || []).forEach(function (n) { if (n && (sup[n.domain] || sub[n.domain])) { var x = one(n, n.domain); if (x) out.byId[n.domain] = x; } });
+    return out;
+  }
+
   function normalize(d, model) {
     if (!d || typeof d !== 'object' || String(d.schema || '').indexOf('openevo-schooling-theory-profile') !== 0 || !Array.isArray(d.elements)) return { error: 'This file is not a theory of schooling in the expected format.' };
     var sup = {}, sub = {}, warnings = [];
@@ -51,7 +65,7 @@
       if (!e || !e.id || !e.statement) return;
       var pl = e.placement || {};
       function clean(list, ok) { return (list || []).map(function (p) { return typeof p === 'string' ? { id: p, strength: 'firm' } : p; }).filter(function (p) { if (p && ok[p.id]) return true; if (p) warnings.push(p.id); return false; }).map(function (p) { return { id: p.id, strength: p.strength === 'single' ? 'single' : 'firm' }; }); }
-      var x = { id: String(e.id), key: t.id + '#' + e.id, theory: t, type: e.type || 'proposition', statement: String(e.statement), stance: e.stance || 'own', sup: clean(pl.super, sup), sub: clean(pl.sub, sub), links: e.links || [], source: e.source || '', label: e.label || '', ref: e.ref || '', visibility: e.visibility || d.visibility || 'public', url: e.url || '', reasons: [], reasonFor: [] };
+      var x = { id: String(e.id), key: t.id + '#' + e.id, theory: t, type: e.type || 'proposition', statement: String(e.statement), stance: e.stance || 'own', sup: clean(pl.super, sup), sub: clean(pl.sub, sub), links: e.links || [], source: e.source || '', label: e.label || '', ref: e.ref || '', visibility: e.visibility || d.visibility || 'public', url: e.url || '', reasons: [], reasonFor: [], reviewNote: e.reviewNote ? String(e.reviewNote) : '' };
       t.elements.push(x); t.byId[x.id] = x;
     });
     (d.warrants || []).forEach(function (w) {
@@ -60,6 +74,8 @@
       var x = { id: String(w.id || 'w' + t.warrants.length), design: des, basis: basis, link: w.link || 'implied', basisKind: w.basisKind || '', note: String(w.note || ''), review: w.review || {}, theory: t };
       t.warrants.push(x); des.reasons.push(x); basis.forEach(function (b) { b.reasonFor.push(x); });
     });
+    t.byRef = {}; t.elements.forEach(function (x) { if (x.ref) t.byRef[x.ref] = x; });
+    t.narr = readNarr(d, t, sup, sub);
     (d.domainLinks || []).forEach(function (l) {
       var ok = l && (l.scope === 'super' ? sup : l.scope === 'sub' ? sub : null);
       if (ok && ok[l.from] && ok[l.to] && l.from !== l.to) t.domainLinks.push({ scope: l.scope, from: l.from, to: l.to, relation: String(l.relation || ''), directed: !!l.directed, means: String(l.means || ''), theory: t });
@@ -77,7 +93,7 @@
     });
     var panel = shell.panel;
     var view0 = opts.view === 'grid' || opts.view === 'web' ? 'flow' : opts.view;
-    var S = { model: null, links: {}, theories: [], view: VIEWS.some(function (v) { return v[0] === view0; }) ? view0 : 'flow', sel: null, query: '', type: '', rows: 150, cards: 30, colorBy: 'domain', show: { shared: true, model: true, theory: true } };
+    var S = { units: 'statements', story: null, model: null, links: {}, theories: [], view: VIEWS.some(function (v) { return v[0] === view0; }) ? view0 : 'flow', sel: null, query: '', type: '', rows: 150, cards: 30, colorBy: 'domain', show: { shared: true, model: true, theory: true } };
     var root = h('div', { class: 'at-stage' }, [h('p', { class: 'oew-note', text: 'Loading…' })]);
     shell.stage(root);
     var own = null, els = {}, redraw = null;
@@ -117,7 +133,19 @@
     function kindOf(id) { return S.model.elementTypes.filter(function (x) { return x.id === id; })[0] || { id: id, name: id, short: id, color: '#566573', means: '' }; }
     function typeName(id) { return kindOf(id).name; }
     function vis() { return S.theories.filter(function (t) { return t.on; }); }
-    function elements() { var out = []; vis().forEach(function (t) { out = out.concat(t.elements); }); return out; }
+    function elements() {
+      if (S.units === 'reasons' && S.view === 'flow') return reasonUnits();
+      var out = []; vis().forEach(function (t) { out = out.concat(t.elements); }); return out;
+    }
+    /* the flow can count reasons instead of statements: one unit per reason a proposal rests on. The unit reads as the proposal, with the broad idea
+       of the reason on its left, so the flow shows which broad ideas the reasons come from and which aspects of schooling the proposals are about. */
+    function reasonUnits() {
+      var out = [];
+      vis().forEach(function (t) { t.warrants.forEach(function (w) { w.basis.forEach(function (b) { var u = Object.create(w.design); u.sup = b.sup; u.reasonBasis = b; out.push(u); }); }); });
+      return out;
+    }
+    function hasReasons() { return vis().some(function (t) { return t.warrants.length > 0; }); }
+    function unitWord() { return S.units === 'reasons' && S.view === 'flow' ? 'reason' : 'statement'; }
     function has(list, id) { return list.some(function (p) { return p.id === id; }); }
     function inDom(e, kind, id) { var l = kind === 'super' ? e.sup : e.sub; return id === NONE ? l.length === 0 : has(l, id); }
     function inCell(e, sup, sub) { return has(e.sup, sup) && has(e.sub, sub); }
@@ -211,17 +239,22 @@
 
     function viewFlow() {
       var F = flowModel(), host_ = h('div', { class: 'at-flow' }), svg = null, nodeEls = [], linkEls = [];
+      if (hasReasons()) {
+        var urow = h('div', { class: 'at-ctl', role: 'group', 'aria-label': 'What the ribbons count' }, [h('span', { class: 'at-ctl-l', text: 'Count' })]);
+        [['statements', 'Statements'], ['reasons', 'Reasons given for proposals']].forEach(function (c) { var b = h('button', { type: 'button', class: 'oew-chip', 'aria-pressed': String(S.units === c[0]), text: c[1] }); b.addEventListener('click', function () { S.units = c[0]; S.sel = null; drawAll(); }); urow.appendChild(b); });
+        els.view.appendChild(urow);
+      } else S.units = 'statements';
       if (vis().length > 1) {
         var row = h('div', { class: 'at-ctl', role: 'group', 'aria-label': 'Colour of the ribbons' }, [h('span', { class: 'at-ctl-l', text: 'Colour the ribbons by' })]);
         [['domain', 'Domain'], ['theory', 'Theory']].forEach(function (c) { var b = h('button', { type: 'button', class: 'oew-chip', 'aria-pressed': String(S.colorBy === c[0]), text: c[1] }); b.addEventListener('click', function () { S.colorBy = c[0]; drawAll(); }); row.appendChild(b); });
         els.view.appendChild(row);
       }
       els.view.appendChild(host_);
-      els.view.appendChild(h('p', { class: 'at-legend' }, [h('span', { text: 'Ribbon width shows how many statements. A statement placed in several domains is shared out between them. Select a box or a ribbon to see its statements.' })]));
+      els.view.appendChild(h('p', { class: 'at-legend' }, [h('span', { text: S.units === 'reasons' ? 'Ribbon width counts reasons. A proposal with two reasons counts twice. On the left is the broad idea a reason draws on, on the right the aspect of schooling the proposal is about. Select a box or a ribbon to see the proposals.' : 'Ribbon width shows how many statements. A statement placed in several domains is shared out between them. Select a box or a ribbon to see its statements.' })]));
       if (S.theories.length > 1) { var lg = h('p', { class: 'at-legend' }); S.theories.forEach(function (t) { lg.appendChild(h('span', { class: 'at-key' + (t.on ? '' : ' is-off'), style: '--c:' + t.color }, [h('i', { 'aria-hidden': 'true', text: t.shape }), ' ' + t.title + (t.on ? '' : ' (hidden)')])); }); els.view.appendChild(lg); }
       var partial = elements().filter(function (e) { return !(e.sup.length && e.sub.length); }).length;
-      if (partial) els.view.appendChild(h('p', { class: 'oew-note', text: partial + ' of the ' + F.total + ' statements are not yet placed on one or both sides. They flow to the grey “Not placed yet” boxes.' }));
-      if (!F.total) { host_.appendChild(h('p', { class: 'oew-note', text: 'No statements to show. Turn on a theory above or add your own statements.' })); return; }
+      if (partial) els.view.appendChild(h('p', { class: 'oew-note', text: partial + ' of the ' + F.total + ' ' + unitWord() + 's are not yet placed on one or both sides. They flow to the grey “Not placed yet” boxes.' }));
+      if (!F.total) { host_.appendChild(h('p', { class: 'oew-note', text: S.units === 'reasons' ? 'No reasons to show in the theories turned on.' : 'No statements to show. Turn on a theory above or add your own statements.' })); return; }
 
       function draw() {
         var W = Math.max(280, Math.floor(host_.clientWidth || els.view.clientWidth || 600)), m = S.model, narrow = W < 520;
@@ -230,10 +263,11 @@
         if (W - Lw - Rw - Mw - 2 * bw < 96) { Lw = Rw = Math.max(70, (W - Mw - 2 * bw - 96) / 2); }
         var gap = Math.max(20, (W - Lw - Rw - Mw - 2 * bw) / 2), xL = Lw, xML = xL + bw + gap, xMR = xML + Mw, xR = W - Rw - bw;
         var hw = Math.min(Lw + bw + gap * .45, W * .34), mw = Math.min(Mw + gap * .9, W * .34);
+        var rs = S.units === 'reasons', fl = m.flow;
         var heads = [
-          { t: m.flow.superHead, s: m.flow.superSub, x: 6, w: hw - 6, a: 'start' },
-          { t: m.flow.kindHead, s: m.flow.kindSub, x: xML + Mw / 2, w: Math.max(Mw, mw), a: 'middle' },
-          { t: m.flow.subHead, s: m.flow.subSub, x: W - 6, w: hw - 6, a: 'end' }
+          { t: rs ? 'What the reasons rest on' : fl.superHead, s: rs ? 'the broad idea a reason draws on' : fl.superSub, x: 6, w: hw - 6, a: 'start' },
+          { t: rs ? 'Kind of proposal' : fl.kindHead, s: rs ? 'what is proposed' : fl.kindSub, x: xML + Mw / 2, w: Math.max(Mw, mw), a: 'middle' },
+          { t: rs ? 'What the proposals are about' : fl.subHead, s: rs ? 'aspects of schooling' : fl.subSub, x: W - 6, w: hw - 6, a: 'end' }
         ];
         var hfont = '700 ' + (fs + 1) + 'px Nunito, Roboto, system-ui, sans-serif', hl = 0;
         heads.forEach(function (hd) { hd.tl = wrapLines(hd.t, hd.w - 4, hfont); hd.sl = narrow ? [] : wrapLines(hd.s, hd.w - 4, subfont); hl = Math.max(hl, hd.tl.length * (lh + 1) + hd.sl.length * (lh - 1)); });
@@ -262,7 +296,7 @@
           var gid = shell.uid + '-g' + i;
           defs.appendChild(sv('linearGradient', { id: gid, gradientUnits: 'userSpaceOnUse', x1: xs, x2: xt, y1: 0, y2: 0 }, [sv('stop', { offset: 0, 'stop-color': c1 }), sv('stop', { offset: 1, 'stop-color': c2 })]));
           var p = sv('path', { class: 'at-rib', d: 'M' + xs + ',' + l.y0 + ' C' + xm + ',' + l.y0 + ' ' + xm + ',' + l.y1 + ' ' + xt + ',' + l.y1, fill: 'none', stroke: 'url(#' + gid + ')', 'stroke-width': Math.max(1.5, l.t) });
-          var tt = sv('title'); tt.textContent = labelOf(l.a) + ' to ' + labelOf(l.b) + ': ' + plural(l.els.length, 'statement') + (S.colorBy === 'theory' ? ' (' + S.theories[l.g].title + ')' : ''); p.appendChild(tt);
+          var tt = sv('title'); tt.textContent = labelOf(l.a) + ' to ' + labelOf(l.b) + ': ' + plural(l.els.length, unitWord()) + (S.colorBy === 'theory' ? ' (' + S.theories[l.g].title + ')' : ''); p.appendChild(tt);
           var spec = { type: 'flow', parts: [{ col: l.a.col, id: l.a.id }, { col: l.b.col, id: l.b.id }] };
           p.addEventListener('mouseenter', function () { paint(spec); }); p.addEventListener('mouseleave', function () { paint(null); });
           p.addEventListener('click', function () { choose(spec); });
@@ -271,8 +305,8 @@
         cols.forEach(function (c, ci) { c.forEach(function (n) {
           var color = colorOf(n), count = n.els.length, ghost = count === 0, sel = S.sel && ((S.sel.type === 'domain' && n.col === S.sel.kind && n.id === S.sel.id) || (S.sel.type === 'kind' && n.col === 'kind' && n.id === S.sel.id));
           var nm = n.col === 'kind' ? kindOf(n.id).name : dom(n.col, n.id).name;
-          var g = sv('g', { class: 'at-nd ' + n.col + (ghost ? ' is-ghost' : '') + (sel ? ' is-sel' : ''), role: 'button', tabindex: '0', 'aria-label': nm + ', ' + plural(count, 'statement'), 'aria-pressed': String(!!sel) });
-          var tt = sv('title'); tt.textContent = nm + ': ' + plural(count, 'statement'); g.appendChild(tt);
+          var g = sv('g', { class: 'at-nd ' + n.col + (ghost ? ' is-ghost' : '') + (sel ? ' is-sel' : ''), role: 'button', tabindex: '0', 'aria-label': nm + ', ' + plural(count, unitWord()), 'aria-pressed': String(!!sel) });
+          var tt = sv('title'); tt.textContent = nm + ': ' + plural(count, unitWord()); g.appendChild(tt);
           if (ci === 1) {
             g.appendChild(sv('rect', { x: xML, y: n.y, width: Mw, height: n.h, rx: 8, fill: ghost ? '#fff' : color, stroke: color, 'stroke-width': ghost ? 1.5 : 0, 'stroke-dasharray': ghost ? '4 3' : null }));
             var ly = n.y + n.h / 2 - ((n.lines.length - 1) * lh) / 2 - (count ? lh * .55 : 0) + fs * .35;
@@ -283,7 +317,7 @@
             g.appendChild(sv('rect', { x: bx, y: n.y, width: bw, height: n.h, rx: 3, fill: ghost ? '#fff' : color, stroke: color, 'stroke-width': ghost ? 1.5 : 0, 'stroke-dasharray': ghost ? '3 2' : null }));
             var ty = n.y + n.h / 2 - ((n.lines.length) * lh) / 2 + fs * .95, tx = ci === 0 ? xL - 7 : xR + bw + 7, an = ci === 0 ? 'end' : 'start';
             g.appendChild(textBlock(n.lines, tx, ty, an, 'at-nt', fs, lh, ghost ? MUTED : INK));
-            g.appendChild(textBlock([ghost ? 'none yet' : plural(count, 'statement')], tx, ty + n.lines.length * lh - 1, an, 'at-nc', fs - 1.5, lh, MUTED));
+            g.appendChild(textBlock([ghost ? 'none yet' : plural(count, unitWord())], tx, ty + n.lines.length * lh - 1, an, 'at-nc', fs - 1.5, lh, MUTED));
           }
           OEW.press(g, function () { choose(nodeSel(n)); });
           g.addEventListener('mouseenter', function () { paint(nodeSel(n)); }); g.addEventListener('mouseleave', function () { paint(null); });
@@ -400,6 +434,80 @@
       redraw = draw; draw();
     }
 
+    /* ---------- domain stories ---------- */
+    function storyTheories() { return vis().filter(function (t) { return t.narr && (t.narr.overview || Object.keys(t.narr.byId).length); }); }
+    function storyOf(t, id) { return id === '_overview' ? t.narr.overview : t.narr.byId[id]; }
+    function storyIds() { return ['_overview'].concat(S.model.supers.map(function (x) { return x.id; })).concat(S.model.subs.map(function (x) { return x.id; })); }
+    function domKind(id) { return S.model.supers.some(function (x) { return x.id === id; }) ? 'super' : 'sub'; }
+    function openStory(id) { S.story = id; S.sel = null; S.view = 'stories'; drawAll(); }
+    function coverage() {
+      var ev = elements(), rows = [];
+      S.model.supers.forEach(function (x) { rows.push({ kind: 'super', d: x }); });
+      S.model.subs.forEach(function (x) { rows.push({ kind: 'sub', d: x }); });
+      rows.forEach(function (r) {
+        var l = ev.filter(function (e) { return inDom(e, r.kind, r.d.id); });
+        r.n = l.length; r.firm = l.filter(function (e) { return (r.kind === 'super' ? e.sup : e.sub).some(function (p) { return p.id === r.d.id && p.strength === 'firm'; }); }).length;
+      });
+      return rows;
+    }
+    function viewStories() {
+      var m = S.model, ths = storyTheories();
+      if (!ths.length) { els.view.appendChild(h('p', { class: 'oew-note', text: 'None of the theories shown has written domain stories yet. Turn on a theory that has them, or use the other views.' })); return; }
+      var ids = storyIds(); if (!S.story || ids.indexOf(S.story) < 0) S.story = '_overview';
+      var nav = h('nav', { class: 'at-story-nav', 'aria-label': 'Choose a domain story' }), cov = coverage(), covBy = {}; cov.forEach(function (r) { covBy[r.d.id] = r; });
+      function group(label, list) {
+        nav.appendChild(h('p', { class: 'at-story-grp', text: label }));
+        var ul = h('ul', { class: 'at-story-list' });
+        list.forEach(function (x) {
+          var id = x.id, c = id === '_overview' ? null : covBy[id], on = S.story === id;
+          var b = h('button', { type: 'button', class: 'at-story-btn' + (on ? ' is-on' : ''), style: '--c:' + (x.color || '#34457a'), 'aria-current': on ? 'true' : null }, [h('i', { class: 'at-dot', 'aria-hidden': 'true' }), h('span', { class: 'at-story-name', text: x.short || x.name }), c ? h('span', { class: 'at-story-n', text: String(c.n) }) : null]);
+          b.addEventListener('click', function () { S.story = id; drawAll(); });
+          ul.appendChild(h('li', {}, [b]));
+        });
+        nav.appendChild(ul);
+      }
+      group('Start here', [{ id: '_overview', name: 'The whole theory', short: 'The whole theory', color: '#34457a' }]);
+      group(m.superLabel || 'Broad ideas about people', m.supers);
+      group(m.subLabel || 'Aspects of schooling', m.subs);
+      var main = h('article', { class: 'at-story', 'aria-live': 'polite' });
+      var id = S.story, isOv = id === '_overview', d = isOv ? null : dom(domKind(id), id);
+      main.appendChild(h('p', { class: 'oew-kicker', text: isOv ? 'The whole theory' : (domKind(id) === 'super' ? 'Broad idea about people' : 'Aspect of schooling') }));
+      main.appendChild(h('h3', { class: 'at-story-title', text: isOv ? 'How the pieces fit together' : d.name }));
+      if (!isOv) main.appendChild(h('p', { class: 'oew-note', text: 'In the atlas, this domain means: ' + d.means }));
+      ths.forEach(function (t) {
+        var n = storyOf(t, id), sec = h('section', { class: 'at-story-sec', style: '--c:' + t.color });
+        if (ths.length > 1) sec.appendChild(h('h4', { class: 'at-story-th' }, [h('span', { 'aria-hidden': 'true', text: t.shape + ' ' }), t.title]));
+        if (!n) { sec.appendChild(h('p', { class: 'oew-note', text: 'This theory has no story for this domain yet.' })); main.appendChild(sec); return; }
+        if (n.headline) sec.appendChild(h('p', { class: 'at-lede', text: n.headline }));
+        n.story.forEach(function (p) { sec.appendChild(h('p', { class: 'at-prose', text: p })); });
+        if (isOv) {
+          sec.appendChild(h('h4', { text: 'How much each domain holds' }));
+          var top = Math.max.apply(null, [1].concat(cov.map(function (r) { return r.n; }))), tb = h('ul', { class: 'at-cov' });
+          cov.forEach(function (r) {
+            var b = h('button', { type: 'button', class: 'at-cov-row', style: '--c:' + r.d.color }, [h('span', { class: 'at-cov-name', text: r.d.short }), h('span', { class: 'at-cov-bar', 'aria-hidden': 'true' }, [h('i', { style: 'width:' + Math.max(r.n ? 2 : 0, Math.round(100 * r.n / top)) + '%' })]), h('span', { class: 'at-cov-n', text: r.n + (r.n ? ' (' + r.firm + ' firm)' : ' none') })]);
+            b.addEventListener('click', function () { S.story = r.d.id; drawAll(); }); tb.appendChild(h('li', {}, [b]));
+          });
+          sec.appendChild(tb);
+          sec.appendChild(h('p', { class: 'oew-note', text: 'Firm means the placement is clear. A statement in two domains counts in both.' }));
+        } else {
+          var r = covBy[id]; sec.appendChild(h('p', { class: 'oew-note', text: r.n ? plural(r.n, 'statement') + ' sit here in the theories shown, ' + r.firm + ' of them firmly.' : 'No statement sits here yet.' }));
+        }
+        if (n.keyStatements.length) { sec.appendChild(h('h4', { text: 'Statements that carry this story' })); sec.appendChild(stmtList(n.keyStatements)); }
+        if (n.gaps.length) { sec.appendChild(h('h4', { text: 'What the OpenEvo bases do not say yet' })); var gl = h('ul', { class: 'at-gaps' }); n.gaps.forEach(function (g) { gl.appendChild(h('li', { text: g })); }); sec.appendChild(gl); }
+        if (n.askNext.length) { sec.appendChild(h('h4', { text: 'Questions to take further' })); var ql = h('ul', { class: 'at-gaps' }); n.askNext.forEach(function (g) { ql.appendChild(h('li', { text: g })); }); sec.appendChild(ql); }
+        sec.appendChild(h('p', { class: 'oew-note', text: (STATUS[(n.review || {}).status] || STATUS['ai-draft']) + '.' }));
+        main.appendChild(sec);
+      });
+      var i = ids.indexOf(id), prev = ids[(i + ids.length - 1) % ids.length], next = ids[(i + 1) % ids.length];
+      function nm(x) { return x === '_overview' ? 'The whole theory' : dom(domKind(x), x).short; }
+      var acts = [];
+      if (!isOv) acts.push(panel.step('Show this domain in the flow', function () { S.view = 'flow'; choose({ type: 'domain', kind: domKind(id), id: id }); }));
+      acts.push(panel.step('Previous: ' + nm(prev), function () { S.story = prev; drawAll(); }, true));
+      acts.push(panel.step('Next: ' + nm(next), function () { S.story = next; drawAll(); }, true));
+      main.appendChild(h('div', { class: 'oew-row at-story-acts' }, acts));
+      els.view.appendChild(h('div', { class: 'at-story-wrap' }, [nav, main]));
+    }
+
     /* ---------- reasons ---------- */
     function viewReasons() {
       var list = h('ol', { class: 'at-reasons' }), n = 0, cards = [];
@@ -412,7 +520,9 @@
           d.addEventListener('click', function () { choose({ type: 'element', e: w.design }); });
           var bl = h('ul', { class: 'at-basis' });
           w.basis.forEach(function (b) { var bb = h('button', { type: 'button', class: 'at-stmt', style: '--c:' + t.color }, [h('span', { class: 'at-kind', text: typeName(b.type) + (b.stance === 'attributed' ? ', reported from another author' : '') }), h('span', { text: b.statement })]); bb.addEventListener('click', function () { choose({ type: 'element', e: b }); }); bl.appendChild(h('li', {}, [bb])); });
-          cards.push(h('li', { class: 'at-warrant' }, [d, h('p', { class: 'at-because', text: 'The reasons given' + (vis().length > 1 ? ' (' + t.title + ')' : '') + ':' }), bl, w.note ? h('p', { class: 'oew-note', text: w.note }) : null, h('p', { class: 'oew-note', text: (w.link === 'explicit' ? 'The text states this link.' : 'The link is a reading of the text.') + ' ' + (STATUS[(w.review || {}).status] || '') })]));
+          var goals = servesOf(w.design), gl = null;
+          if (goals.length) { gl = h('ul', { class: 'at-basis at-serves' }); goals.forEach(function (g) { var gb = h('button', { type: 'button', class: 'at-stmt', style: '--c:' + t.color }, [h('span', { class: 'at-kind', text: typeName(g.type) }), h('span', { text: g.statement })]); gb.addEventListener('click', function () { choose({ type: 'element', e: g }); }); gl.appendChild(h('li', {}, [gb])); }); }
+          cards.push(h('li', { class: 'at-warrant' }, [d, h('p', { class: 'at-because', text: 'The reasons given' + (vis().length > 1 ? ' (' + t.title + ')' : '') + ':' }), bl, goals.length ? h('p', { class: 'at-because', text: 'It serves these goals:' }) : null, gl, w.note ? h('p', { class: 'oew-note', text: w.note }) : null, h('p', { class: 'oew-note', text: (w.link === 'explicit' ? 'The text states this link.' : 'The link is a reading of the text.') + ' ' + (STATUS[(w.review || {}).status] || '') })]));
         });
       });
       cards.slice(0, S.cards).forEach(function (c) { list.appendChild(c); });
@@ -450,7 +560,7 @@
       Object.keys(els.tabs).forEach(function (k) { els.tabs[k].setAttribute('aria-selected', String(k === S.view)); els.tabs[k].tabIndex = k === S.view ? 0 : -1; });
       els.view.setAttribute('aria-labelledby', shell.uid + '-tab-' + S.view);
       drawBar(); els.view.textContent = ''; redraw = null;
-      ({ flow: viewFlow, links: viewLinks, reasons: viewReasons, table: viewTable })[S.view]();
+      ({ flow: viewFlow, stories: viewStories, links: viewLinks, reasons: viewReasons, table: viewTable })[S.view]();
       shell.setGroup(S.sel ? 'sel' : 'overview');
       drawPanel();
     }
@@ -498,7 +608,11 @@
       if (s.type === 'domain') {
         var d = dom(s.kind, s.id), ev = elements().filter(function (e) { return matches(e, s); });
         panel.kicker(s.id === NONE ? 'Not yet placed' : (s.kind === 'super' ? 'Super-domain' : 'Sub-domain')).title(d.name).paras(d.means); if (d.ask) panel.ask('A question for your school:', d.ask);
-        panel.heading(plural(ev.length, 'statement') + ' in the theories shown').add(ev.length ? stmtList(ev, 12) : null);
+        if (s.id !== NONE) {
+          var tell = storyTheories().map(function (t) { return storyOf(t, s.id); }).filter(Boolean);
+          if (tell.length) { panel.heading('The story of this domain'); tell.slice(0, 2).forEach(function (n) { panel.paras(n.headline || OEW.sentence(n.story[0], 200)); }); panel.row([panel.step('Read the story', function () { openStory(s.id); })]); }
+        }
+        panel.heading(plural(ev.length, unitWord()) + ' in the theories shown').add(ev.length ? stmtList(ev, 12) : null);
         if (s.id !== NONE) {
           var rel = relatedDomains(s.kind, s.id);
           if (rel.length) { panel.heading('Linked domains'); panel.chips(rel.map(function (o) { return panel.chip(dom(s.kind, o).short, function () { choose({ type: 'dlink', scope: s.kind, a: s.id, b: o }); }); })); }
@@ -507,12 +621,12 @@
         panel.row([panel.step('Clear selection', function () { S.sel = null; drawAll(); }, true)]);
       } else if (s.type === 'kind') {
         var k = kindOf(s.id), ev0 = elements().filter(function (e) { return matches(e, s); });
-        panel.kicker('Kind of statement').title(k.name).paras(k.means); panel.heading(plural(ev0.length, 'statement')).add(ev0.length ? stmtList(ev0, 12) : null);
+        panel.kicker('Kind of statement').title(k.name).paras(k.means); panel.heading(plural(ev0.length, unitWord())).add(ev0.length ? stmtList(ev0, 12) : null);
         panel.row([panel.step('Clear selection', function () { S.sel = null; drawAll(); }, true)]);
       } else if (s.type === 'flow') {
         var names = s.parts.map(function (p) { return p.col === 'kind' ? kindOf(p.id).short : dom(p.col, p.id).short; }), ev1 = elements().filter(function (e) { return matches(e, s); });
         panel.kicker('A flow').title(names[0] + ' to ' + names[1]).paras('Statements that sit in both “' + names[0] + '” and “' + names[1] + '”.');
-        panel.heading(plural(ev1.length, 'statement')).add(ev1.length ? stmtList(ev1, 12) : null);
+        panel.heading(plural(ev1.length, unitWord())).add(ev1.length ? stmtList(ev1, 12) : null);
         panel.row(s.parts.map(function (p) { return panel.chip(p.col === 'kind' ? kindOf(p.id).short : dom(p.col, p.id).short, function () { choose(p.col === 'kind' ? { type: 'kind', id: p.id } : { type: 'domain', kind: p.col, id: p.id }); }); }));
       } else if (s.type === 'dlink') { dlinkPanel(s); }
       else if (s.type === 'element') { elementPanel(s.e); }
@@ -530,10 +644,11 @@
     }
     function intro() {
       panel.kicker('How to read this atlas').title('A theory of schooling, sorted and linked');
-      if (S.view === 'links') panel.paras(['This view shows how the domains relate to each other. A teal line means statements sit in both domains. A dashed line is a relation proposed in the model, a first draft for the authors to confirm. A coloured line is a link a theory states itself. Select a box or a line to read about it.']);
+      if (S.view === 'stories') panel.paras(['Each domain has a short account of what this theory says there, written from the OpenEvo bases, the Teacher’s Guide and the published papers. Choose a domain on the left. The accounts are drafts written with AI help and not yet checked by the authors or an expert.']);
+      else if (S.view === 'links') panel.paras(['This view shows how the domains relate to each other. A teal line means statements sit in both domains. A dashed line is a relation proposed in the model, a first draft for the authors to confirm. A coloured line is a link a theory states itself. Select a box or a line to read about it.']);
       else panel.paras(['A theory of schooling is a set of statements about what schools are for, how they work and how they could be better. Each statement flows from the broad ideas about people and societies behind it (left), through what the statement does (middle), to the aspect of schooling it is about (right).', 'Where a statement offers a reason for a teaching or schooling proposal, the reason is kept with it. Each domain connects to entries in the OpenEvo bases.']);
       var ul = h('ul', { class: 'oew-start' });
-      [['The flow', 'Select a box or a ribbon', function () { S.view = 'flow'; drawAll(); }], ['Links between domains', 'How the broad ideas and the aspects of schooling relate', function () { S.view = 'links'; drawAll(); }], ['Reasons behind proposals', 'Proposals paired with the statements that support them', function () { S.view = 'reasons'; drawAll(); }], ['Add your own theory', 'Write statements, place them, and download the file', function () { choose({ type: 'add' }); }]].forEach(function (s) { var b = h('button', { type: 'button' }, [h('b', { text: s[0] }), h('span', { text: s[1] })]); b.addEventListener('click', s[2]); ul.appendChild(h('li', {}, [b])); });
+      [['The flow', 'Select a box or a ribbon', function () { S.view = 'flow'; drawAll(); }], ['Domain stories', 'What the theory says in each domain, in plain words', function () { S.view = 'stories'; drawAll(); }], ['Links between domains', 'How the broad ideas and the aspects of schooling relate', function () { S.view = 'links'; drawAll(); }], ['Reasons behind proposals', 'Proposals paired with the statements that support them', function () { S.view = 'reasons'; drawAll(); }], ['Add your own theory', 'Write statements, place them, and download the file', function () { choose({ type: 'add' }); }]].forEach(function (s) { var b = h('button', { type: 'button' }, [h('b', { text: s[0] }), h('span', { text: s[1] })]); b.addEventListener('click', s[2]); ul.appendChild(h('li', {}, [b])); });
       panel.add(ul);
       panel.heading('Theories shown');
       S.theories.forEach(function (t) { panel.add(h('p', { class: 'at-tline' }, [h('span', { style: 'color:' + t.color, 'aria-hidden': 'true', text: t.shape + ' ' }), h('strong', { text: t.title }), ' ' + (t.holder.label ? '(' + t.holder.label + ')' : '')])); });
@@ -550,18 +665,23 @@
       if (t.warnings.length) panel.note('Some domain names in the file were not recognised and were left out: ' + t.warnings.join(', ') + '.');
       panel.row([copyBtn(t.id, 'Copy identifier'), panel.step('Download as JSON', function () { download(t); }, true), panel.step(t.on ? 'Hide in views' : 'Show in views', function () { t.on = !t.on; drawAll(); }, true)]);
     }
+    function servesOf(e) { return (e.links || []).filter(function (l) { return l && l.relation === 'serves'; }).map(function (l) { return e.theory.byRef[l.ref]; }).filter(Boolean); }
+    function servedBy(e) { return e.ref ? e.theory.elements.filter(function (x) { return (x.links || []).some(function (l) { return l && l.relation === 'serves' && l.ref === e.ref; }); }) : []; }
     function elementPanel(e) {
       var t = e.theory;
       panel.kicker(typeName(e.type) + (e.stance === 'attributed' ? ', reported from another author' : '')).title(e.statement);
       panel.add(h('p', { class: 'at-tline' }, [h('span', { style: 'color:' + t.color, 'aria-hidden': 'true', text: t.shape + ' ' }), 'From ', h('strong', { text: t.title })]));
       if (t.visibility !== 'public') panel.note(t.visibility === 'lab-only' ? 'Private to the lab.' : 'Only in your browser.');
       if (e.ref) { var ru = e.url || (isPrivate(e.ref) ? null : resolve(e.ref)); panel.add(h('p', { class: 'at-tline' }, ['Base record: ', ru ? OEW.linkEl({ label: e.ref, href: ru }) : h('span', { text: e.ref }), e.visibility === 'lab-only' ? h('span', { class: 'oew-tag lab', text: 'lab only' }) : null])); }
+      if (e.reviewNote) panel.note(e.reviewNote);
       panel.heading('Super-domains'); if (e.sup.length) panel.chips(chipsFor(e.sup, 'super')); else panel.note('Not placed yet.');
       panel.heading('Sub-domains'); if (e.sub.length) panel.chips(chipsFor(e.sub, 'sub')); else panel.note('Not placed yet.');
       if (e.reasons.length) {
         panel.heading('Reasons given for this proposal');
         e.reasons.forEach(function (w) { panel.add(stmtList(w.basis)); if (w.note) panel.note(w.note); panel.note((w.link === 'explicit' ? 'The text states this link. ' : 'The link is a reading of the text. ') + (STATUS[(w.review || {}).status] || '')); });
       }
+      var sv_ = servesOf(e); if (sv_.length) { panel.heading('Goals this proposal serves'); panel.add(stmtList(sv_)); }
+      var by_ = servedBy(e); if (by_.length) { panel.heading('Proposals that serve this goal'); panel.add(stmtList(by_)); }
       if (e.reasonFor.length) { panel.heading('Used as a reason for'); panel.add(stmtList(e.reasonFor.map(function (w) { return w.design; }))); }
       var links = (e.links || []).filter(function (l) { return l && l.ref && (opts.privateLinks || !isPrivate(l.ref)); });
       if (links.length) {

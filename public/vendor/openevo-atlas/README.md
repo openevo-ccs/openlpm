@@ -6,8 +6,8 @@ Do not edit the files here. Change the widget in its own repository and copy it 
 
 ## Where it comes from
 
-- Repository: `openevo-ccs/openevo.net`, branch `schooling-model-viz-2026-11-24` (pull request 15)
-- Commit: `7a74bd322a2721171cdb205e1d4caf3a916204ae` (24 November 2026, "Atlas: three new kinds of statement, base-record refs, typed links, host feed")
+- Repository: `openevo-ccs/openevo.net`, branch `tos-stories-2026-11-24` (the Domain stories pull request; the first version was pull request 15)
+- Commit: `6a3819e` (24 November 2026, "Atlas: flow can count reasons instead of statements"). The earlier copy was commit `7a74bd322a2721171cdb205e1d4caf3a916204ae`.
 - Data format note in that repository: `docs/schooling-atlas-data-format.md`
 
 ## What was copied

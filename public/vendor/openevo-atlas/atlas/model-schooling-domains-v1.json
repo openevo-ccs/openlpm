@@ -21,7 +21,7 @@
       "name": "Human origins, diversity and flexibility",
       "short": "Origins",
       "umbrella": true,
-      "means": "Broad claims about the human condition across time and place: where humans come from, how much people differ, and how flexible human nature is. The umbrella the other four sit under.",
+      "means": "Broad claims about where human behaviour and thinking come from, how much people differ, and how flexible human nature is. In the Guide this is the evolutionary background: Tinbergen's four questions and comparisons with other species and with our ancestors. The umbrella the other four sit under.",
       "ask": "Which beliefs about human nature sit behind the way our school is run?",
       "color": "#6f7c8c"
     },
@@ -29,7 +29,7 @@
       "id": "development",
       "name": "Human development",
       "short": "Development",
-      "means": "How people grow, learn and change over a lifetime.",
+      "means": "How people grow, learn and change over a lifetime: how children's understanding builds up and changes, how thinking about thinking develops, and how competence is built.",
       "ask": "What do the adults and students here believe about how young people learn best?",
       "color": "#1f9d7a"
     },
@@ -37,7 +37,7 @@
       "id": "cultural-evolution",
       "name": "Cultural evolution",
       "short": "Cultural evolution",
-      "means": "How cultures and institutions change, and why some practices spread and others fade.",
+      "means": "How cultures, institutions and practices change, spread and persist: social learning, cumulative culture, norms and innovation. For schools this includes the account of curriculum change as an evolutionary process.",
       "ask": "Which school traditions have lasted, and who benefits from them?",
       "color": "#c99a2e"
     },
@@ -45,7 +45,7 @@
       "id": "self",
       "name": "Self",
       "short": "Self",
-      "means": "What a person is, what makes someone capable, and how identity forms.",
+      "means": "What a person is and can become: agency, identity, motivation, emotion, beliefs about oneself and the ability to watch one's own thinking.",
       "ask": "What does it mean to be a good student here, and who decided that?",
       "color": "#c0589b"
     },
@@ -53,7 +53,7 @@
       "id": "society",
       "name": "Society",
       "short": "Society",
-      "means": "How societies work, what people owe each other and what schools are for.",
+      "means": "How groups and societies work and what people owe each other: cooperation, conflict, fairness, shared resources, institutions and sustainability.",
       "ask": "What do people in our community expect school to do for society?",
       "color": "#5b6dc8"
     }
@@ -63,7 +63,7 @@
       "id": "school-origins",
       "name": "Theories of school origins",
       "short": "School origins",
-      "means": "Ideas about where schools came from and why they exist.",
+      "means": "Where schools, schooling and curricula came from and why they exist, including how teaching and social learning arose before schools.",
       "ask": "Why was our school founded, and who is it meant to serve?",
       "color": "#a38b6b"
     },
@@ -71,7 +71,7 @@
       "id": "futures",
       "name": "Theories of school futures",
       "short": "School futures",
-      "means": "Ideas about how schooling could or should change.",
+      "means": "How schooling could or should change: trends such as artificial intelligence and climate change, futures thinking taught in school, and the idea that education is studied as it could be.",
       "ask": "What would our school look like if students designed it?",
       "color": "#2e86c1"
     },
@@ -79,7 +79,7 @@
       "id": "adaptive-fit",
       "name": "Theories of adaptive fit",
       "short": "Adaptive fit",
-      "means": "Ideas about how well schools fit the lives, places and needs of the people they serve.",
+      "means": "How well schools, curricula and teaching fit the people, places and needs they serve, including the mismatches: overload, separated subjects, well-being, culture and surroundings.",
       "ask": "Where does school fit our lives well, and where does it clash with them?",
       "color": "#d9564a"
     },
@@ -87,7 +87,7 @@
       "id": "optimal",
       "name": "Theories of optimal schooling",
       "short": "Optimal schooling",
-      "means": "Ideas about what the best possible schooling would be like.",
+      "means": "What good teaching, learning and curriculum look like: aims and competencies, what to teach, how to teach it, how learning progresses and how to assess it.",
       "ask": "What would the best school day look like, and for whom?",
       "color": "#8a63c9"
     },
@@ -95,7 +95,7 @@
       "id": "improvement",
       "name": "Theories of school improvement",
       "short": "School improvement",
-      "means": "Ideas about how to make schools better. The OpenEvo theory of school improvement belongs to this sub-domain.",
+      "means": "How schools and school systems get better and who does it: design labs and community science labs, teacher development, the part students and teachers play, and curriculum modelling.",
       "ask": "How do people here think change happens, and who gets to start it?",
       "color": "#0b8f80"
     }

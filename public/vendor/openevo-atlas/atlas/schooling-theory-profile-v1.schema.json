@@ -232,7 +232,7 @@
                 "relation": {
                   "type": "string",
                   "maxLength": 40,
-                  "description": "A short phrase: uses, source, supports, contests, example, part of, raises, builds, motivated by, derived from, justified by, grounded in, relates, broader, addresses, teaches via, uses method, measured by, depends on, involves, similar claim."
+                  "description": "A short phrase: uses, source, supports, contests, example, part of, raises, builds, motivated by, derived from, justified by, grounded in, relates, broader, addresses, teaches via, uses method, measured by, depends on, involves, similar claim, serves."
                 },
                 "score": {
                   "type": "number",
@@ -275,6 +275,11 @@
           "url": {
             "type": "string",
             "description": "An address for the record when it has one."
+          },
+          "reviewNote": {
+            "type": "string",
+            "maxLength": 400,
+            "description": "A note from the review of this statement's placement, in plain words."
           }
         }
       }
@@ -379,6 +384,18 @@
           }
         }
       }
+    },
+    "overview": {
+      "$ref": "#/$defs/narrative"
+    },
+    "domainNarratives": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/narrative",
+        "required": [
+          "domain"
+        ]
+      }
     }
   },
   "$defs": {
@@ -398,6 +415,82 @@
             "single"
           ],
           "description": "firm = the placement is clear. single = a weaker fit."
+        }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The written story of one domain, or of the whole theory (overview). Plain language, written for a teacher or a student.",
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "The id of the super-domain or sub-domain this story is about. Left out in the overview."
+        },
+        "headline": {
+          "type": "string",
+          "maxLength": 320,
+          "description": "One sentence: what this theory says in this domain."
+        },
+        "story": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 1600
+          },
+          "maxItems": 8,
+          "description": "A few short paragraphs."
+        },
+        "keyStatements": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]+$"
+          },
+          "maxItems": 12,
+          "description": "Ids of the elements that carry the story."
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 400
+          },
+          "maxItems": 8,
+          "description": "What the theory does not say yet in this domain."
+        },
+        "askNext": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "maxItems": 8,
+          "description": "Questions to take further."
+        },
+        "labNotes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 600
+          },
+          "description": "Notes for the lab only. Public files leave this out."
+        },
+        "review": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "ai-draft",
+                "author-reviewed",
+                "expert-reviewed",
+                "illustrative-example"
+              ]
+            },
+            "note": {
+              "type": "string"
+            }
+          }
         }
       }
     }
