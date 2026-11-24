@@ -1,0 +1,209 @@
+{
+  "schema": "openevo-schooling-theory-profile/1",
+  "id": "OE-SCHOOLINGPROFILE-example-community",
+  "title": "Made-up example: one school community's everyday theory",
+  "summary": "An invented example that shows how a community's own ideas about schooling can be sorted into the same domains. It describes no actual school.",
+  "holder": {
+    "kind": "community",
+    "label": "An imaginary village school community"
+  },
+  "model": "OE-SCHOOLINGMODEL-schooling-domains-v1",
+  "visibility": "public",
+  "license": "CC0-1.0",
+  "version": "0.1.0",
+  "date": "2026-11-24",
+  "characterizationStatus": "author_stated",
+  "provenance": {
+    "extractedBy": "human",
+    "addedBy": "dustin-eirdosh",
+    "reviewStatus": "illustrative-example",
+    "sources": [],
+    "note": "Invented for this page. Delete it or replace it with your own theory."
+  },
+  "elements": [
+    {
+      "id": "e1",
+      "type": "proposition",
+      "statement": "The school was built so that village children would not have to travel to town every day.",
+      "placement": {
+        "super": [
+          {
+            "id": "society",
+            "strength": "firm"
+          }
+        ],
+        "sub": [
+          {
+            "id": "school-origins",
+            "strength": "firm"
+          }
+        ]
+      },
+      "links": []
+    },
+    {
+      "id": "e2",
+      "type": "proposition",
+      "statement": "Children learn best when they do things with their hands and see the result.",
+      "placement": {
+        "super": [
+          {
+            "id": "development",
+            "strength": "firm"
+          }
+        ],
+        "sub": [
+          {
+            "id": "optimal",
+            "strength": "firm"
+          }
+        ]
+      },
+      "links": [
+        {
+          "ref": "OE-CONCEPT-oe-interdisciplinary-learning",
+          "relation": "uses"
+        }
+      ]
+    },
+    {
+      "id": "e3",
+      "type": "design",
+      "statement": "Older students should help plan and run the school garden and the school kitchen.",
+      "placement": {
+        "super": [
+          {
+            "id": "development",
+            "strength": "firm"
+          },
+          {
+            "id": "self",
+            "strength": "single"
+          }
+        ],
+        "sub": [
+          {
+            "id": "optimal",
+            "strength": "firm"
+          },
+          {
+            "id": "improvement",
+            "strength": "single"
+          }
+        ]
+      },
+      "links": []
+    },
+    {
+      "id": "e4",
+      "type": "observation",
+      "statement": "Exams matter because employers in town look at them, even though they cover little of what the village needs.",
+      "placement": {
+        "super": [
+          {
+            "id": "society",
+            "strength": "firm"
+          }
+        ],
+        "sub": [
+          {
+            "id": "adaptive-fit",
+            "strength": "firm"
+          }
+        ]
+      },
+      "links": []
+    },
+    {
+      "id": "e5",
+      "type": "design",
+      "statement": "Part of the timetable should go to local farming and crafts, taught by people from the village.",
+      "placement": {
+        "super": [
+          {
+            "id": "cultural-evolution",
+            "strength": "firm"
+          },
+          {
+            "id": "society",
+            "strength": "single"
+          }
+        ],
+        "sub": [
+          {
+            "id": "adaptive-fit",
+            "strength": "firm"
+          },
+          {
+            "id": "futures",
+            "strength": "single"
+          }
+        ]
+      },
+      "links": [
+        {
+          "ref": "OE-CONCEPT-oe-interdisciplinary-transmission",
+          "relation": "uses"
+        }
+      ]
+    },
+    {
+      "id": "e6",
+      "type": "proposition",
+      "statement": "In ten years more lessons will happen online, and the school building will matter less.",
+      "placement": {
+        "super": [
+          {
+            "id": "cultural-evolution",
+            "strength": "single"
+          }
+        ],
+        "sub": [
+          {
+            "id": "futures",
+            "strength": "firm"
+          }
+        ]
+      },
+      "links": []
+    }
+  ],
+  "warrants": [
+    {
+      "id": "w1",
+      "design": "e3",
+      "basis": [
+        "e2"
+      ],
+      "link": "explicit",
+      "basisKind": "theory",
+      "note": "Running a garden and a kitchen is learning by doing something with a visible result.",
+      "review": {
+        "status": "illustrative-example"
+      }
+    },
+    {
+      "id": "w2",
+      "design": "e5",
+      "basis": [
+        "e4"
+      ],
+      "link": "implied",
+      "basisKind": "observation",
+      "note": "Exams reward town skills, so the village adds local skills to the timetable.",
+      "review": {
+        "status": "illustrative-example"
+      }
+    }
+  ],
+  "domainLinks": [
+    {
+      "scope": "sub",
+      "from": "adaptive-fit",
+      "to": "futures",
+      "relation": "leads to",
+      "directed": true,
+      "means": "Because exams cover little of what the village needs, the community expects schooling to change."
+    }
+  ]
+}
