@@ -28,8 +28,15 @@ await db.exec(`
   CREATE FUNCTION is_project_editor(p uuid) RETURNS boolean AS $$ SELECT coalesce(current_setting('test.editor', true), 'on') = 'on' $$ LANGUAGE sql;
 `)
 // the real migrations
-for (const f of ['256_theories_of_schooling_space.sql', '257_theories_of_schooling_edits.sql']) {
+for (const f of ['256_theories_of_schooling_space.sql', '257_theories_of_schooling_edits.sql', '258_theories_of_schooling_edits_reapply_fix.sql']) {
   try { await db.exec(fs.readFileSync(MIG + f, 'utf8')); check('migration ' + f + ' runs', true) } catch (e) { check('migration ' + f + ' runs', false, String(e.message).slice(0, 400)); console.log(e); process.exit(1) }
+}
+// Supabase refuses an UPDATE or DELETE without a WHERE clause (pg_safeupdate). This in-memory database does not, so the migration is read for it. Migration 257 has one
+// such DELETE (found by the first live test and applied that way, so it cannot be edited); migration 258 replaces that function. New migrations are read from 258 on.
+for (const f of ['258_theories_of_schooling_edits_reapply_fix.sql']) {
+  const text = fs.readFileSync(MIG + f, 'utf8').replace(/--[^\n]*/g, '')
+  const bare = text.split(';').filter((st) => /(^|\n)\s*(UPDATE\s+\w+(\s+\w+)?\s+SET|DELETE\s+FROM)/i.test(st) && !/\bWHERE\b/i.test(st))
+  check(f + ': every UPDATE and DELETE has a WHERE clause', bare.length === 0, bare.map((b) => b.trim().slice(0, 60)).join(' | '))
 }
 // running 257 twice must be harmless
 try { await db.exec(fs.readFileSync(MIG + '257_theories_of_schooling_edits.sql', 'utf8')); check('migration 257 can run twice', true) } catch (e) { check('migration 257 can run twice', false, String(e.message).slice(0, 300)) }
