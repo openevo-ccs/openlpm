@@ -16,6 +16,8 @@ import { apaToHtml, apaToPlainText, doiUrl, formatApa, recordLink } from '@/lib/
 import { createClient } from '@/lib/supabase/client'
 import { useSession } from '@/state/session'
 import { RecordEditor, EditHistory } from '@/components/base-repo-record-editor'
+import { approvedTexts, flaggedPaths, latestReviewsForRecord, listFieldReviews, markApprovalsSentBack, pendingApprovals, type FieldReview } from '@/lib/supabase/base-repo-field-reviews'
+import { describePath } from '@/lib/base-repo-edit-fields'
 import type { FieldVocabulary } from '@/lib/base-repo-edit-fields'
 import { NEW_ENTRY_SPECS, applyEdits, historyFor, savedTextsFromLog, isVocabRecord, listEdits, markSentBack, pendingEdits, tagNamesFromEdits, vocabLabel, type BaseRepoEdit } from '@/lib/supabase/base-repo-edits'
 import {
@@ -170,6 +172,9 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
   // In-app edits (feedback 0afc62a5): kept per base, laid over the repo copy below. `editsAvailable` is false until migration 237 is live.
   const [editsByRepo, setEditsByRepo] = useState<Map<BaseRepoKey, BaseRepoEdit[]>>(new Map())
   const [editsAvailable, setEditsAvailable] = useState(true)
+  // Thumbs-up and flag on single fields (feedback 1551a6e1, migration 259). `reviewsAvailable` is false until that migration is live.
+  const [reviewsByRepo, setReviewsByRepo] = useState<Map<BaseRepoKey, FieldReview[]>>(new Map())
+  const [reviewsAvailable, setReviewsAvailable] = useState(true)
   const [onlyEdited, setOnlyEdited] = useState(false)
   // Everything about reviewing sits behind one Review button and opens in its own space instead of above the table (Dustin, 2026-11-13).
   const [reviewSection, setReviewSection] = useState<ReviewSectionKey | null>(null)
@@ -192,6 +197,12 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
     setEditsByRepo((prev) => new Map(prev).set(repoKey, edits))
   }
 
+  const reloadReviews = async (repoKey: BaseRepoKey) => {
+    const { reviews, available } = await listFieldReviews(supabase, repoKey)
+    setReviewsAvailable(available)
+    setReviewsByRepo((prev) => new Map(prev).set(repoKey, reviews))
+  }
+
   const reloadReviewQueue = () => listGlobalReviewQueue(supabase).then(setReviewQueue)
 
   useEffect(() => {
@@ -201,7 +212,7 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
     if (missing.length === 0) return
     let active = true
     setLoading(true)
-    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key), restricted ? { edits: [] as BaseRepoEdit[], available: false } : await listEdits(supabase, key)] as const)).then((triples) => {
+    Promise.all(missing.map(async (key) => [key, await listSnapshotRows(supabase, key), restricted ? { edits: [] as BaseRepoEdit[], available: false } : await listEdits(supabase, key), restricted ? { reviews: [] as FieldReview[], available: false } : await listFieldReviews(supabase, key)] as const)).then((triples) => {
       if (!active) return
       setRowsByRepo((prev) => {
         const next = new Map(prev)
@@ -214,6 +225,12 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
         return next
       })
       setEditsAvailable((was) => triples.every(([, , result]) => result.available) && was)
+      setReviewsByRepo((prev) => {
+        const next = new Map(prev)
+        for (const [key, , , result] of triples) next.set(key, result.reviews)
+        return next
+      })
+      setReviewsAvailable((was) => triples.every(([, , , result]) => result.available) && was)
       setLoading(false)
     })
     return () => { active = false }
@@ -328,6 +345,8 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
 
   const allEdits = useMemo(() => Array.from(editsByRepo.values()).flat(), [editsByRepo])
   const waitingEdits = useMemo(() => pendingEdits(allEdits), [allEdits])
+  const allFieldReviews = useMemo(() => Array.from(reviewsByRepo.values()).flat(), [reviewsByRepo])
+  const waitingApprovals = useMemo(() => pendingApprovals(allFieldReviews), [allFieldReviews])
 
   // Real feedback a3408216 (Susan, 2026-10-24): no way to tell, or filter,
   // which language a record's text is actually in -- MethodsBase content
@@ -420,11 +439,11 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
   const totalCount = allRows.length
   // Tab counts cover every base already loaded, including tabs that aren't open, and follow the search box.
   const pendingQueueCount = reviewQueue ? reviewQueue.filter((i) => i.assignment.status === 'pending').length : null
-  const waitingTotal = (pendingQueueCount ?? 0) + waitingEdits.length
+  const waitingTotal = (pendingQueueCount ?? 0) + waitingEdits.length + waitingApprovals.length
   const inReviewSpace = !restricted && reviewSection !== null
   const reviewSections: ReviewSectionInfo[] = [
     { key: 'queue', label: 'Waiting for review', count: pendingQueueCount },
-    { key: 'edits', label: 'Edits to send back', count: waitingEdits.length },
+    { key: 'edits', label: 'Edits to send back', count: waitingEdits.length + waitingApprovals.length },
     ...(tab === 'teachingbase' ? [{ key: 'lessons' as const, label: 'Lesson links' }] : []),
   ]
   const repoViewName = tab === 'all' ? 'all repos' : BASE_REPO_CONFIGS.find((c) => c.key === tab)?.name ?? 'the records'
@@ -529,9 +548,10 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
               </div>
               <EditsExportPanel
                 edits={waitingEdits}
+                approvals={waitingApprovals}
                 labelFor={(repoKey, id) => (isVocabRecord(id) ? vocabLabel(id) : (effectiveRowsByRepo.get(repoKey) ?? []).find((r) => r.id === id)?.label ?? id)}
                 supabase={supabase}
-                onMarked={() => Promise.all(Array.from(editsByRepo.keys()).map(reloadEdits))}
+                onMarked={() => Promise.all([...Array.from(editsByRepo.keys()).map(reloadEdits), ...Array.from(reviewsByRepo.keys()).map(reloadReviews)])}
               />
             </>
           )}
@@ -629,7 +649,7 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
               className="btn btn-mini"
               data-testid="open-review-space"
               onClick={() => setReviewSection(tab === 'teachingbase' ? 'lessons' : 'queue')}
-              title={`Review: ${pendingQueueCount ?? 0} waiting for review, ${waitingEdits.length} edits to send back${tab === 'teachingbase' ? ', lesson links and reviewers' : ''}`}
+              title={`Review: ${pendingQueueCount ?? 0} waiting for review, ${waitingEdits.length + waitingApprovals.length} edits and approvals to send back${tab === 'teachingbase' ? ', lesson links and reviewers' : ''}`}
             >
               <Clock size={13} />Review{waitingTotal > 0 ? ` (${waitingTotal})` : ''}
             </button>
@@ -701,6 +721,9 @@ function BaseRepoRecordsExplorer({ reviewerOnly = false }: { reviewerOnly?: bool
             history={historyFor(editsByRepo.get(selectedLive.repoKey) ?? [], selectedLive.row.id)}
             editsAvailable={editsAvailable}
             onEditsChanged={() => reloadEdits(selectedLive.repoKey)}
+            fieldReviews={reviewsByRepo.get(selectedLive.repoKey) ?? []}
+            reviewsAvailable={reviewsAvailable}
+            onReviewsChanged={() => reloadReviews(selectedLive.repoKey)}
             editOnOpenId={editOnOpenId}
             onEditOpened={() => setEditOnOpenId(null)}
             onClose={() => setSelected(null)}
@@ -1416,7 +1439,7 @@ function LiteratureDetailSections({ data }: { data: Record<string, unknown> }) {
 // (e.g. "Cooperative Learning (Kooperative Lernformen)"), and appending the
 // method_class enum value too (e.g. "(pedagogical-practice)") produced a
 // confusing double-parenthetical rather than something more readable.
-function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLabels, lang, history }: { data: Record<string, unknown>; recordId: string; methodRows: SnapshotRow[]; onOpenMethod: (id: string) => void; idLabels: Map<string, ResolvedLabel>; lang: string; history: BaseRepoEdit[] }) {
+function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLabels, lang, history, fieldReviews }: { data: Record<string, unknown>; recordId: string; methodRows: SnapshotRow[]; onOpenMethod: (id: string) => void; idLabels: Map<string, ResolvedLabel>; lang: string; history: BaseRepoEdit[]; fieldReviews: FieldReview[] }) {
   // One language at a time, chosen with the switch at the top of the page. A text that only exists in the other language
   // shows with a small language tag so nobody mistakes it for a translation.
   const uiLang = 'en'
@@ -1440,7 +1463,12 @@ function MethodsDetailSections({ data, recordId, methodRows, onOpenMethod, idLab
   const workedExample = pickLocalized(data.workedExample, textLang)
   const aiPrompt = pickLocalized(data.aiPromptTemplate, textLang)
   // What a person last saved in each field. The draft tag goes away on a text that is exactly that (feedback cc545181, Susan Hanisch, 2026-11-24).
-  const savedTexts = useMemo(() => savedTextsFromLog(history), [history])
+  // A text a person approved with the thumbs-up counts the same way, for as long as the field still says what was approved (feedback 1551a6e1).
+  const savedTexts = useMemo(() => {
+    const texts = savedTextsFromLog(history)
+    for (const [path, value] of approvedTexts(fieldReviews, recordId)) texts.set(path, value)
+    return texts
+  }, [history, fieldReviews, recordId])
   const relatedApproaches = Array.isArray(data.relatedApproaches) ? (data.relatedApproaches as unknown[]).map(String) : []
   const primarySources = Array.isArray(data.primarySources) ? (data.primarySources as Record<string, string>[]) : []
   // The ladder from general to specific methods (Dustin, 2026-11-13). Only the narrower method stores the link, so the more specific
@@ -1567,6 +1595,9 @@ function DetailPanel({
   history,
   editsAvailable,
   onEditsChanged,
+  fieldReviews,
+  reviewsAvailable,
+  onReviewsChanged,
   editOnOpenId,
   onEditOpened,
   onClose,
@@ -1590,6 +1621,10 @@ function DetailPanel({
   history: BaseRepoEdit[]
   editsAvailable: boolean
   onEditsChanged: () => void
+  /** Every thumbs-up and flag of this base (feedback 1551a6e1). */
+  fieldReviews: FieldReview[]
+  reviewsAvailable: boolean
+  onReviewsChanged: () => void
   /** The id of a record that was just created: its card opens in the edit form. */
   editOnOpenId: string | null
   onEditOpened: () => void
@@ -1701,6 +1736,12 @@ function DetailPanel({
         </p>
       )}
       {row.review_status && <p className="muted" style={{ fontSize: 12 }}>Review status (source repo): {row.review_status}</p>}
+      {!restricted && flaggedPaths(fieldReviews, row.id).length > 0 && (
+        <p style={{ fontSize: 12 }} data-testid="flagged-fields">
+          <span className="chip" style={{ borderColor: 'var(--warning)', color: 'var(--warning-text)' }}>{flaggedPaths(fieldReviews, row.id).length === 1 ? '1 field flagged' : `${flaggedPaths(fieldReviews, row.id).length} fields flagged`}</span>{' '}
+          <span className="muted">{flaggedPaths(fieldReviews, row.id).map((p) => describePath(p)).join(', ')}. Press Edit to see the notes.</span>
+        </p>
+      )}
 
       {editing && userId ? (
         <div style={{ marginTop: 8 }}>
@@ -1710,6 +1751,8 @@ function DetailPanel({
             repoKey={repoKey}
             row={row}
             vocab={vocab}
+            reviews={reviewsAvailable ? latestReviewsForRecord(fieldReviews, row.id) : null}
+            onReviewed={onReviewsChanged}
             lang={lang}
             onLangChange={onLangChange}
             onCancel={() => setEditing(false)}
@@ -1727,7 +1770,7 @@ function DetailPanel({
           {repoKey === 'literaturebase' ? (
             <LiteratureDetailSections data={row.data} />
           ) : repoKey === 'methodsbase' ? (
-            <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} history={history} />
+            <MethodsDetailSections data={row.data} recordId={row.id} methodRows={methodRows} onOpenMethod={onOpenMethod} idLabels={idLabels} lang={lang} history={history} fieldReviews={fieldReviews} />
           ) : (
             <RecordDetails data={row.data} idLabels={idLabels} lang={lang} />
           )}
@@ -1789,11 +1832,14 @@ function DetailPanel({
 // pull request, and then marks them as sent back, which takes them off this list (feedback 0afc62a5).
 function EditsExportPanel({
   edits,
+  approvals,
   labelFor,
   supabase,
   onMarked,
 }: {
   edits: BaseRepoEdit[]
+  /** Thumbs-ups that the source repos do not have yet (feedback 1551a6e1). They go into the same file and are marked together. */
+  approvals: FieldReview[]
   labelFor: (repoKey: BaseRepoKey, id: string) => string
   supabase: ReturnType<typeof createClient>
   onMarked: () => unknown
@@ -1811,6 +1857,11 @@ function EditsExportPanel({
         edit_id: e.id, base_repo: e.base_repo, record_id: e.record_id, record_label: labelFor(e.base_repo, e.record_id), field_path: e.field_path,
         before: e.before_value, after: e.after_value, note: e.note, edited_by: e.editor_name ?? e.edited_by, edited_at: e.edited_at,
       })),
+      // A thumbs-up means a person read this text as it stands. In the repo it becomes an entry in the record's reviewed-fields list.
+      approvals: approvals.map((r) => ({
+        review_id: r.id, base_repo: r.base_repo, record_id: r.record_id, record_label: labelFor(r.base_repo, r.record_id), field_path: r.field_path,
+        approved_text: r.value_seen, note: r.note, approved_by: r.reviewer_name ?? r.reviewed_by, approved_at: r.reviewed_at,
+      })),
     }
     const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }))
     const a = document.createElement('a')
@@ -1819,9 +1870,9 @@ function EditsExportPanel({
   }
 
   const markAll = async () => {
-    if (!window.confirm(`Mark these ${edits.length} edits as applied to the source repos? Do this only after the change has been made there.`)) return
+    if (!window.confirm(`Mark these ${edits.length} edits and ${approvals.length} approvals as applied to the source repos? Do this only after the change has been made there.`)) return
     setBusy(true); setMessage(null)
-    const error = await markSentBack(supabase, edits.map((e) => e.id), batch)
+    const error = (await markSentBack(supabase, edits.map((e) => e.id), batch)) ?? (await markApprovalsSentBack(supabase, approvals.map((r) => r.id), batch))
     setBusy(false)
     if (error) setMessage(error)
     else { setMessage('Marked as sent back.'); await onMarked() }
@@ -1830,7 +1881,7 @@ function EditsExportPanel({
   return (
     <div className="card" style={{ marginBottom: 16 }} data-testid="edits-export">
       <h3 style={{ marginBottom: 8 }}>Edits to send back to the repos</h3>
-      {edits.length === 0 ? (
+      {edits.length === 0 && approvals.length === 0 ? (
         <p className="muted">Nothing is waiting. Every edit made here is already in the source repos.</p>
       ) : (
         <>
@@ -1839,6 +1890,11 @@ function EditsExportPanel({
             {edits.map((e) => (
               <div key={e.id} style={{ fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
                 <strong>{labelFor(e.base_repo, e.record_id)}</strong> <span className="muted">· {e.base_repo} · {e.field_path} · {e.editor_name ?? 'Someone'} · {new Date(e.edited_at).toLocaleDateString()}</span>
+              </div>
+            ))}
+            {approvals.map((r) => (
+              <div key={r.id} style={{ fontSize: 12, padding: '4px 0', borderBottom: '1px solid var(--border)' }}>
+                <strong>{labelFor(r.base_repo, r.record_id)}</strong> <span className="muted">· approved · {r.field_path} · {r.reviewer_name ?? 'Someone'} · {new Date(r.reviewed_at).toLocaleDateString()}</span>
               </div>
             ))}
           </div>

@@ -9,6 +9,8 @@ import {
 import { resetEdit, saveEdits, saveTagNames, type BaseRepoEdit, type FieldChange, type TagNameChange } from '@/lib/supabase/base-repo-edits'
 import { tagNameIn, tagReading, tagTerms, type TagField, type TagNames } from '@/lib/method-text'
 import { LanguageSwitch } from '@/components/language-switch'
+import { FieldReviewControls } from '@/components/field-review-controls'
+import { fieldReviewState, saveFieldReview, type FieldReview, type FieldVerdict } from '@/lib/supabase/base-repo-field-reviews'
 
 // Edit form for one Base Repo record, shown inside the Explorer card (feedback 0afc62a5, Susan Hanisch 2026-11-08).
 // Every changed field is saved as its own edit with what it said before, who changed it and an optional note.
@@ -22,12 +24,16 @@ type Client = ReturnType<typeof createClient>
 const OTHER_SHOWN_CHARS = 260
 
 export function RecordEditor({
-  supabase, userId, repoKey, row, vocab, lang, onLangChange, onSaved, onCancel,
+  supabase, userId, repoKey, row, vocab, lang, onLangChange, onSaved, onCancel, reviews, onReviewed,
 }: {
   supabase: Client
   userId: string
   repoKey: BaseRepoKey
   row: SnapshotRow
+  /** The latest thumbs-up or flag of each field of this record, by field path. Null while migration 259 is not live: no controls are shown. */
+  reviews: Map<string, FieldReview> | null
+  /** Called after a thumbs-up or flag was saved or taken away, so the page reloads them. */
+  onReviewed: () => void
   vocab: FieldVocabulary
   /** The language of the page, 'en' or 'de'. */
   lang: string
@@ -49,6 +55,16 @@ export function RecordEditor({
   const [newTagText, setNewTagText] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reviewBusy, setReviewBusy] = useState<string | null>(null)
+
+  // A thumbs-up or flag saves at once and covers the text as the card shows it now (the saved text, not what is half typed in the box).
+  const decide = async (f: EditField, verdict: FieldVerdict, noteText?: string) => {
+    setReviewBusy(f.path); setError(null)
+    const message = await saveFieldReview(supabase, { repoKey, recordId: row.id, userId, path: f.path, verdict, valueSeen: verdict === 'cleared' ? null : currentValue(f, row.data), note: noteText })
+    setReviewBusy(null)
+    if (message) setError(`Not saved: ${message}`)
+    else onReviewed()
+  }
 
   const changes: FieldChange[] = useMemo(() => {
     const out: FieldChange[] = []
@@ -116,11 +132,26 @@ export function RecordEditor({
     const otherRaw = sibling ? (values[sibling.path] ?? '').trim() : ''
     const otherShown = otherRaw.replace(/\n+/g, ' | ')
     const emptyHere = f.lang && !(values[f.path] ?? '').trim()
+    // Thumbs-up and flag for this field. They cover the saved text, so they wait while the box holds an unsaved change or has nothing in it.
+    const saved = currentValue(f, row.data)
+    const savedEmpty = Array.isArray(saved) ? saved.length === 0 : !String(saved ?? '').trim()
+    const dirty = changes.some((c) => c.path === f.path)
+    const reviewHint = dirty ? 'Save your change to this field first, then approve or flag it' : savedEmpty ? 'There is nothing here to approve yet' : null
     return (
       <div key={f.path} style={{ marginBottom: 10 }}>
-        <label htmlFor={id} className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', display: 'block' }}>
-          {f.label}{edited ? ' · edited in OpenLPM' : ''}
-        </label>
+        {(() => {
+          const labelEl = (
+            <label htmlFor={id} className="muted" style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.02em', display: 'block', paddingTop: 4 }}>
+              {f.label}{edited ? ' · edited in OpenLPM' : ''}
+            </label>
+          )
+          return reviews ? (
+            <FieldReviewControls
+              label={labelEl} fieldLabel={f.label} state={fieldReviewState(reviews.get(f.path), saved)} unavailableReason={reviewHint} busy={reviewBusy === f.path}
+              onApprove={() => decide(f, 'approved')} onFlag={(n) => decide(f, 'flagged', n)} onClear={() => decide(f, 'cleared')}
+            />
+          ) : labelEl
+        })()}
         {f.kind === 'text' && <input {...common} placeholder={emptyHere ? `Not written in ${LANGUAGE_NAMES[viewLang]} yet` : undefined} />}
         {f.kind === 'longtext' && <textarea {...common} placeholder={emptyHere ? `Not written in ${LANGUAGE_NAMES[viewLang]} yet` : undefined} rows={Math.min(10, Math.max(3, Math.ceil((values[f.path] ?? '').length / 45)))} />}
         {(f.kind === 'lines' || f.kind === 'sources') && <textarea {...common} placeholder={emptyHere ? `Not written in ${LANGUAGE_NAMES[viewLang]} yet` : undefined} rows={Math.min(10, Math.max(3, (values[f.path] ?? '').split('\n').length + 1))} />}
