@@ -22,6 +22,7 @@
     "test:dashboard-views": "node scripts/test_dashboard_views.mjs",
     "test:start-here": "node scripts/test_start_here.mjs",
     "test:method-text": "node scripts/test_method_text.mjs",
+    "test:field-reviews": "node scripts/test_base_repo_field_reviews.mjs",
     "test:node-links": "node scripts/test_node_links.mjs && python scripts/test_generate_node_links_migration.py",
     "test:tos-profile": "node scripts/test_tos_profile.mjs",
     "test:tos-prompt": "node scripts/test_tos_prompt_builder.mjs",
